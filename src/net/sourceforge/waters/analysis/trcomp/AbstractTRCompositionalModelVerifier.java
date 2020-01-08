@@ -39,7 +39,7 @@ import java.util.ListIterator;
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -137,7 +137,7 @@ public abstract class AbstractTRCompositionalModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.prepend(options, TRCompositionalModelAnalyzerFactory.

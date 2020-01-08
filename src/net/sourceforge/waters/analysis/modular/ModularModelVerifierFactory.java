@@ -35,7 +35,7 @@ package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -115,7 +115,7 @@ public class ModularModelVerifierFactory
 
 
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
     db.add(new EnumOption<ModularHeuristicFactory.Method>

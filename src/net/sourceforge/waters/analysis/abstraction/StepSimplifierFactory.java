@@ -35,7 +35,7 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -68,7 +68,7 @@ public class StepSimplifierFactory extends TRSimplifierFactory
   //#########################################################################
   //# Options
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
   }

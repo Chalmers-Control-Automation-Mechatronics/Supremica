@@ -37,8 +37,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -155,12 +156,11 @@ public abstract class WatersVerificationAction
   {
     final ModelAnalyzerFactoryLoader loader;
     if (Config.INCLUDE_WATERS_ANALYZER.isTrue() && mOperation != null) {
-      final String optionMapName =
-        mOperation.getOptionMapPrefix();
-      loader = (ModelAnalyzerFactoryLoader) OptionMap
-        .getOptionMap(optionMapName)
-        .getTopOptionSubset()
-        .getSelected();
+      final String optionPagePrefix =
+        mOperation.getOptionPagePrefix();
+      loader = (ModelAnalyzerFactoryLoader)
+        ((AnalysisOptionPage) OptionPage.getOptionPage(optionPagePrefix))
+        .getTopSelectorOption().getValue();
     } else {
       loader = Config.GUI_ANALYZER_USED_FACTORY.get();
     }
@@ -211,8 +211,8 @@ public abstract class WatersVerificationAction
   {
     final ModelVerifier verifier = (ModelVerifier)
       mOperation.createModelAnalyzer(factory, desFactory);
-    final String prefix = mOperation.getOptionMapName().replace('/', '.');
-    final OptionMap map = OptionMap.getOptionMap(prefix);
+    final String prefix = mOperation.getOptionPagePrefix();
+    final OptionPage map = OptionPage.getOptionPage(prefix);
     if (map != null && verifier != null) {
       for (final Option<?> option : verifier.getOptions(map)) {
         if (option.isPersistent()) verifier.setOption(option);

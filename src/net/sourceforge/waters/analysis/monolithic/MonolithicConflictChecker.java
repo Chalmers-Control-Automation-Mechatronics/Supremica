@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -160,7 +160,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, AbstractModelAnalyzerFactory.OPTION_ModelAnalyzer_FinalStateLimit);

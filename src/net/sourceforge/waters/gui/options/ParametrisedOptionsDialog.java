@@ -49,7 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -88,10 +88,10 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mTopTabbedPane = new OptionTabbedPane();
-    for (final OptionMap map : OptionMap.values()) {
-      mTopTabbedPane.populateOptions(mContext, map, map.getIdentifier());
-    }
+    mTopTabbedPane = (OptionTabbedPane) OptionPage.TOP_LEVEL_AGGREGATOR.createEditor(mContext);
+//    for (final AggregatorOptionPage page : OptionPage.TOP_LEVEL_AGGREGATORS) {
+//      mTopTabbedPane.populateOptions(mContext, page);
+//    }
     add(mTopTabbedPane, constraints);
 
     // Error label

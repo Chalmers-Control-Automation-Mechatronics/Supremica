@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
@@ -134,7 +134,7 @@ public class BDDModelVerifierFactory
 
 
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
     db.add(new EnumOption<BDDPackage>

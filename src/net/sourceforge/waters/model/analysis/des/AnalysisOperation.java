@@ -43,25 +43,20 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 public abstract class AnalysisOperation
 {
 
-  private AnalysisOperation(final String optionMapName,
+  private AnalysisOperation(final String optionPagePrefix,
                             final String analysisName,
                             final String failureDescription,
                             final String successDescription)
   {
-    mOptionMapName = optionMapName;
+    mOptionPagePrefix = optionPagePrefix;
     mAnalysisName = analysisName;
     mFailureDescription = failureDescription;
     mSuccessDescription = successDescription;
   }
 
-  public String getOptionMapName()
+  public String getOptionPagePrefix()
   {
-    return mOptionMapName;
-  }
-
-  public String getOptionMapPrefix()
-  {
-    return mOptionMapName.replace('/', '.');
+    return mOptionPagePrefix;
   }
 
   public String getAnalysisName()
@@ -83,13 +78,13 @@ public abstract class AnalysisOperation
     (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
       throws AnalysisConfigurationException;
 
-  private final String mOptionMapName;
+  private final String mOptionPagePrefix;
   private final String mAnalysisName;
   private final String mFailureDescription;
   private final String mSuccessDescription;
 
   public static final AnalysisOperation CONFLICT_CHECK =
-    new AnalysisOperation("waters.analysis/conflict", "Conflict",
+    new AnalysisOperation("waters.analysis.conflict", "Conflict",
                           "is nonblocking", "is blocking")
   {
     @Override
@@ -102,7 +97,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation CONTROLLABILITY_CHECK =
-    new AnalysisOperation("waters.analysis/controllability", "Controllability",
+    new AnalysisOperation("waters.analysis.controllability", "Controllability",
                           "is not controllable", "is controllable")
   {
     @Override
@@ -115,7 +110,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation CONTROL_LOOP_CHECK =
-    new AnalysisOperation("waters.analysis/loop", "Control Loop",
+    new AnalysisOperation("waters.analysis.loop", "Control Loop",
                           "has a control loop", "is control-loop free")
   {
     @Override
@@ -128,7 +123,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation DEADLOCK_CHECK =
-    new AnalysisOperation("waters.analysis/deadlock", "Deadlock Check",
+    new AnalysisOperation("waters.analysis.deadlock", "Deadlock Check",
                           "has a deadlock loop", "is deadlock-loop free")
   {
     @Override
@@ -141,7 +136,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation LANGUAGE_INCLUSION_CHECK =
-    new AnalysisOperation("waters.analysis/languageinclusion", "Language Inclusion",
+    new AnalysisOperation("waters.analysis.languageinclusion", "Language Inclusion",
                           "does not satisfy Language Inclusion",
                           "satisfies Language Inclusion")
   {
@@ -155,7 +150,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation STATE_COUNTER =
-    new AnalysisOperation("waters.analysis/statecount", "State Counter",
+    new AnalysisOperation("waters.analysis.statecount", "State Counter",
                           null, null)
   {
     @Override
@@ -168,7 +163,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation SYNCHRONOUS_PRODUCT =
-    new AnalysisOperation("waters.analysis/syncprod", "Synchronize",
+    new AnalysisOperation("waters.analysis.syncprod", "Synchronize",
                           null, null)
   {
     @Override
@@ -181,7 +176,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation SUPERVISOR_SYNTHESIZER =
-    new AnalysisOperation("waters.analysis/synthesis", "Synthesize",
+    new AnalysisOperation("waters.analysis.synthesis", "Synthesize",
                           null, null)
   {
     @Override

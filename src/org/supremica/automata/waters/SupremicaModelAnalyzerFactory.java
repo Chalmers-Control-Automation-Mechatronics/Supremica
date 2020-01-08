@@ -51,7 +51,7 @@
 package org.supremica.automata.waters;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -127,7 +127,7 @@ public class SupremicaModelAnalyzerFactory
 
 
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
 

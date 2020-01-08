@@ -54,7 +54,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -111,7 +111,7 @@ public class SupremicaMonolithicControllabilityChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, SupremicaModelAnalyzerFactory.

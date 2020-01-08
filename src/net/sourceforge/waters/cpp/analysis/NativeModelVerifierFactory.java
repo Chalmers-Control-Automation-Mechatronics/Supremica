@@ -35,7 +35,7 @@ package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -132,7 +132,7 @@ public class NativeModelVerifierFactory
 
 
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
     db.add(new BooleanOption

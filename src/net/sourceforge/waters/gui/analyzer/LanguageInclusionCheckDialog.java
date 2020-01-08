@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -86,9 +86,9 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected OptionMap getOptionMap()
+  protected OptionPage getOptionMap()
   {
-    return OptionMap.LanguageInclusion;
+    return OptionPage.LanguageInclusion;
   }
 
 

@@ -48,34 +48,35 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.analysis.options.OptionMap.OptionSubset;
+import net.sourceforge.waters.analysis.options.OptionPageEditor;
+import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 
 /**
  *
  * @author Benjamin Wheeler
  */
-public class OptionListPanel extends JScrollPane implements OptionContainer {
+public class OptionListPanel extends JScrollPane implements OptionPageEditor<SimpleLeafOptionPage> {
 
   public OptionListPanel(final GUIOptionContext context,
-                    final OptionMap map,
+                         final SimpleLeafOptionPage page) {
+    this(context, page, null, page.getOptions());
+  }
+
+  public OptionListPanel(final GUIOptionContext context,
+                    final LeafOptionPage map,
                     final Map<String, OptionPanel<?>> optionPanels,
-                    final OptionSubset subset) {
-    super();
+                    final List<Option<?>> options) {
     mSharedOptionPanels = optionPanels != null ? optionPanels
       : new HashMap<>();
     mOptionPanels = new LinkedList<>();
-    populateOptions(context, map, subset);
-  }
-
-  public OptionListPanel(final GUIOptionContext context, final OptionMap map) {
-    this(context, map, null, map.getTopOptionSubset());
+    populateOptions(context, map, options);
   }
 
   public void populateOptions(final GUIOptionContext context,
-                              final OptionMap map,
-                              final OptionSubset subset)
+                              final LeafOptionPage map,
+                              final List<Option<?>> options)
   {
     final JPanel internalPane = new JPanel();
     setViewportView(internalPane);
@@ -90,8 +91,7 @@ public class OptionListPanel extends JScrollPane implements OptionContainer {
 
     mOptionPanels.clear();
     final boolean persistentOnly = context.getWatersAnalyzerPanel() == null;
-    for (final String name : subset.getOptionNames()) {
-      final Option<?> option = map.get(name);
+    for (final Option<?> option : options) {
       if (!persistentOnly || option.isPersistent()) {
         OptionPanel<?> panel = mSharedOptionPanels.get(option.getID());
         if (panel == null) {

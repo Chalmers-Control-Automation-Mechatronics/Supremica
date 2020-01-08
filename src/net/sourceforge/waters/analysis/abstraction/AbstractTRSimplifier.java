@@ -37,7 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -328,7 +328,7 @@ public abstract class AbstractTRSimplifier
    *         reasonable presentation to the user.
    */
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = new LinkedList<Option<?>>();
     db.append(options, StepSimplifierFactory.
@@ -344,7 +344,7 @@ public abstract class AbstractTRSimplifier
    * the configurable.
    * @param  option  The option to be used, which should be an element
    *                 of the list returned by a previous call to
-   *                 {@link #getOptions(OptionMap) getOptions()}.
+   *                 {@link #getOptions(OptionPage) getOptions()}.
    */
   @Override
   public void setOption(final Option<?> option)

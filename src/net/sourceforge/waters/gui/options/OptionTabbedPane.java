@@ -34,27 +34,31 @@
 package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JTabbedPane;
 
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.OptionPageEditor;
 
 /**
  *
  * @author Benjamin Wheeler
  */
-public class OptionTabbedPane extends JTabbedPane implements OptionContainer
+public class OptionTabbedPane extends JTabbedPane implements OptionPageEditor<AggregatorOptionPage>
 {
 
-  public OptionTabbedPane()
+  public OptionTabbedPane(final GUIOptionContext context, final AggregatorOptionPage page)
   {
     super();
-    mTabbedPanes = new HashMap<>();
     optionChildren = new LinkedList<>();
+    for (final OptionPage tab : page.getPages()) {
+      final OptionPageEditor<? extends OptionPage> editor = tab.createEditor(context);
+      addTab(tab.getTitle(), (Component) editor);
+      optionChildren.add(editor);
+    }
   }
 
   @Override
@@ -62,34 +66,6 @@ public class OptionTabbedPane extends JTabbedPane implements OptionContainer
   {
     for (final OptionContainer c : optionChildren) {
       c.commitOptions();
-    }
-  }
-
-  public void populateOptions(final GUIOptionContext context,
-                              final OptionMap map,
-                              final String identifier)
-  {
-    final int catIndex = identifier.indexOf('/');
-    if (catIndex != -1) {
-      final String title = identifier.substring(0, catIndex);
-      OptionTabbedPane pane = mTabbedPanes.get(title);
-      if (pane == null) {
-        pane = new OptionTabbedPane();
-        addTab(title, pane);
-        mTabbedPanes.put(title, pane);
-        optionChildren.add(pane);
-      }
-      pane.populateOptions(context, map, identifier.substring(catIndex + 1));
-    } else {
-      if (!map.hasSubsets()) {
-        final OptionListPanel pane = new OptionListPanel(context, map);
-        addTab(identifier, pane);
-        optionChildren.add(pane);
-      } else {
-        final OptionGroupPanel pane = new OptionGroupPanel(context, map);
-        addTab(identifier, pane);
-        optionChildren.add(pane);
-      }
     }
   }
 
@@ -120,7 +96,6 @@ public class OptionTabbedPane extends JTabbedPane implements OptionContainer
     return false;
   }
 
-  private final Map<String, OptionTabbedPane> mTabbedPanes;
   private final List<OptionContainer> optionChildren;
 
   private static final long serialVersionUID = 5842441972089354096L;

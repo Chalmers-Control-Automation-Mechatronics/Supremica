@@ -54,7 +54,7 @@ import javax.swing.JScrollPane;
 
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -246,7 +246,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     return mContext.getProductDESProxyFactory();
   }
 
-  protected abstract OptionMap getOptionMap();
+  protected abstract OptionPage getOptionMap();
 
 
   //#########################################################################
@@ -291,7 +291,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
   private final GUIOptionContext mContext;
   private final JComboBox<ModelAnalyzerFactoryLoader> mAnalyzerComboBox;
   private final JPanel mParameterListPanel;
-  private final OptionMap mOptionDB;
+  private final OptionPage mOptionDB;
 
   private ModelAnalyzer mCurrentAnalyzer;
   private final List<OptionPanel<?>> mCurrentParameterPanels;

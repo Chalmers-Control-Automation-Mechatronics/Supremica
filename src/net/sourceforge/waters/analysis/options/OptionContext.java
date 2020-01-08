@@ -116,4 +116,22 @@ public interface OptionContext
   public OptionEditor<String>
   createStringEditor(StringOption option);
 
+  /**
+   * Creates an option editor for a simple leaf option page.
+   */
+  public OptionPageEditor<SimpleLeafOptionPage>
+  createSimpleLeafOptionPageEditor(SimpleLeafOptionPage page);
+
+  /**
+   * Creates an option editor for a selector leaf option page.
+   */
+  public OptionPageEditor<SelectorLeafOptionPage>
+  createSelectorLeafOptionPageEditor(SelectorLeafOptionPage page);
+
+  /**
+   * Creates an option editor for a string aggregator option page.
+   */
+  public OptionPageEditor<AggregatorOptionPage>
+  createAggregatorOptionPageEditor(AggregatorOptionPage page);
+
 }

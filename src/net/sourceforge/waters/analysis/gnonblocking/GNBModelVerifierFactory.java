@@ -34,7 +34,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -114,7 +114,7 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
 
 
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
     db.add(new EnumOption<PreselectingHeuristicFactory>

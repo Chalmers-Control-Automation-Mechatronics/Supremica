@@ -36,7 +36,7 @@ package net.sourceforge.waters.gui.analyzer;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -95,9 +95,9 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected OptionMap getOptionMap()
+  protected OptionPage getOptionMap()
   {
-    return OptionMap.SynchronousProduct;
+    return OptionPage.SynchronousProduct;
   }
 
   //#########################################################################

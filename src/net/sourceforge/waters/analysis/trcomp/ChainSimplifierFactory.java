@@ -43,7 +43,7 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -81,7 +81,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   //#########################################################################
   //# Options
   @Override
-  public void registerOptions(final OptionMap db)
+  public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
     db.add(new BooleanOption
@@ -263,7 +263,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
     }
 
     @Override
-    public List<Option<?>> getOptions(final OptionMap db)
+    public List<Option<?>> getOptions(final OptionPage db)
     {
       final List<Option<?>> options = super.getOptions(db);
       db.append(options, OPTION_ChainSimplifierFactory_WeakObservationEquivalence);
@@ -311,7 +311,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
     }
 
     @Override
-    public List<Option<?>> getOptions(final OptionMap db)
+    public List<Option<?>> getOptions(final OptionPage db)
     {
       final List<Option<?>> options = super.getOptions(db);
       db.append(options, OPTION_ChainSimplifierFactory_LimitedCertainConflicts);

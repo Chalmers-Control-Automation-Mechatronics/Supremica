@@ -38,7 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -100,7 +100,7 @@ public abstract class AbstractModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     return new LinkedList<>();
   }

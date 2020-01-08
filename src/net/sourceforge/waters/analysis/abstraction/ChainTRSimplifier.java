@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -113,7 +113,7 @@ public class ChainTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     for (final TransitionRelationSimplifier step : mSteps) {

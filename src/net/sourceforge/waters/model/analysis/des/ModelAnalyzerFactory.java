@@ -35,7 +35,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -119,7 +119,7 @@ public interface ModelAnalyzerFactory
 
   //#########################################################################
   //# Options
-  public void registerOptions(OptionMap db);
+  public void registerOptions(OptionPage db);
 
 
   //#########################################################################

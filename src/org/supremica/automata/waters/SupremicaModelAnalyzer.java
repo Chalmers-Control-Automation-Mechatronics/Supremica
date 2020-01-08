@@ -55,7 +55,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
@@ -180,7 +180,7 @@ public abstract class SupremicaModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, SupremicaModelAnalyzerFactory.

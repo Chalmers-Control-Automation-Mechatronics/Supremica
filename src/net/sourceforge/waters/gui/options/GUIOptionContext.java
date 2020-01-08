@@ -41,6 +41,7 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
+import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
@@ -49,8 +50,11 @@ import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.OptionContext;
 import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.analysis.options.OptionPageEditor;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
+import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -201,6 +205,27 @@ public class GUIOptionContext implements OptionContext
   createStringEditor(final StringOption option)
   {
     return new StringOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionPageEditor<SimpleLeafOptionPage>
+  createSimpleLeafOptionPageEditor(final SimpleLeafOptionPage page)
+  {
+    return new OptionListPanel(this, page);
+  }
+
+  @Override
+  public OptionPageEditor<SelectorLeafOptionPage>
+  createSelectorLeafOptionPageEditor(final SelectorLeafOptionPage page)
+  {
+    return new OptionGroupPanel(this, page);
+  }
+
+  @Override
+  public OptionTabbedPane
+  createAggregatorOptionPageEditor(final AggregatorOptionPage page)
+  {
+    return new OptionTabbedPane(this, page);
   }
 
 

@@ -38,7 +38,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -77,7 +77,7 @@ public abstract class AutomatonSimplifierCreator implements Configurable
    *         reasonable presentation to the user.
    */
   @Override
-  public List<Option<?>> getOptions(final OptionMap db)
+  public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = new LinkedList<Option<?>>();
     return options;
@@ -89,7 +89,7 @@ public abstract class AutomatonSimplifierCreator implements Configurable
    * the configurable.
    * @param  option  The option to be used, which should be an element
    *                 of the list returned by a previous call to
-   *                 {@link #getOptions(OptionMap) getOptions()}.
+   *                 {@link #getOptions(OptionPage) getOptions()}.
    */
   @Override
   public void setOption(final Option<?> option)

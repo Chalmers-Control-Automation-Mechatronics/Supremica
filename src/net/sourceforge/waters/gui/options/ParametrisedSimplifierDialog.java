@@ -63,7 +63,7 @@ import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
@@ -102,7 +102,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
 
-    mOptionDB = OptionMap.Simplifier;
+    mOptionDB = OptionPage.Simplifier;
     mCurrentParameterPanels = new LinkedList<>();
 
     final GridBagLayout layout = new GridBagLayout();
@@ -445,7 +445,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
   private final JComboBox<AutomatonSimplifierCreator> mAnalyzerComboBox;
   private final JTextPane mDescriptionTextPane;
   private final JPanel mParameterListPanel;
-  private final OptionMap mOptionDB;
+  private final OptionPage mOptionDB;
 
   private BooleanOption mKeepOriginalOption;
 
