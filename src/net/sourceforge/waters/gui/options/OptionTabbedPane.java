@@ -41,13 +41,13 @@ import javax.swing.JTabbedPane;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.OptionPageEditor;
 
 /**
  *
  * @author Benjamin Wheeler
  */
-public class OptionTabbedPane extends JTabbedPane implements OptionPageEditor<AggregatorOptionPage>
+public class OptionTabbedPane extends JTabbedPane
+  implements OptionContainer<AggregatorOptionPage>
 {
 
   public OptionTabbedPane(final GUIOptionContext context, final AggregatorOptionPage page)
@@ -55,7 +55,8 @@ public class OptionTabbedPane extends JTabbedPane implements OptionPageEditor<Ag
     super();
     optionChildren = new LinkedList<>();
     for (final OptionPage tab : page.getPages()) {
-      final OptionPageEditor<? extends OptionPage> editor = tab.createEditor(context);
+      final OptionContainer<? extends OptionPage> editor =
+        (OptionContainer<? extends OptionPage>) tab.createEditor(context);
       addTab(tab.getTitle(), (Component) editor);
       optionChildren.add(editor);
     }
@@ -64,7 +65,7 @@ public class OptionTabbedPane extends JTabbedPane implements OptionPageEditor<Ag
   @Override
   public void commitOptions()
   {
-    for (final OptionContainer c : optionChildren) {
+    for (final OptionContainer<?> c : optionChildren) {
       c.commitOptions();
     }
   }
@@ -72,9 +73,9 @@ public class OptionTabbedPane extends JTabbedPane implements OptionPageEditor<Ag
   @Override
   public void search(final SearchQuery query)
   {
-    final OptionContainer selected = (OptionContainer) getSelectedComponent();
+    final OptionContainer<?> selected = (OptionContainer<?>) getSelectedComponent();
     if (selected != null) selected.search(query);
-    for (final OptionContainer c : optionChildren) {
+    for (final OptionContainer<?> c : optionChildren) {
       c.search(query);
     }
   }
@@ -85,18 +86,18 @@ public class OptionTabbedPane extends JTabbedPane implements OptionPageEditor<Ag
     for (int t=0; t<getTabCount(); t++) {
       final Component c = getComponentAt(t);
       if (c instanceof OptionContainer
-        && ((OptionContainer)c).selectOption(panel)) {
+        && ((OptionContainer<?>)c).selectOption(panel)) {
         setSelectedComponent(c);
         return true;
       }
     }
-    for (final OptionContainer c : optionChildren) {
+    for (final OptionContainer<?> c : optionChildren) {
       if (c.selectOption(panel)) return true;
     }
     return false;
   }
 
-  private final List<OptionContainer> optionChildren;
+  private final List<OptionContainer<?>> optionChildren;
 
   private static final long serialVersionUID = 5842441972089354096L;
 

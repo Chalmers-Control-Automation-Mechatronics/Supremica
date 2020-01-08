@@ -56,7 +56,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPageEditor;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.analysis.options.SelectorOption;
 
@@ -65,7 +64,7 @@ import net.sourceforge.waters.analysis.options.SelectorOption;
  * @author Benjamin Wheeler
  */
 public class OptionGroupPanel extends JPanel
-  implements OptionPageEditor<SelectorLeafOptionPage>
+  implements OptionContainer<SelectorLeafOptionPage>
 {
 
   public OptionGroupPanel(final GUIOptionContext context,

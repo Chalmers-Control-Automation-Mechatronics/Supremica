@@ -33,11 +33,10 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import net.sourceforge.waters.gui.options.OptionContainer;
-
 /**
  *
  * @author Benjamin Wheeler
  */
-public interface OptionPageEditor<T extends OptionPage>
-  extends OptionContainer {}
+public interface OptionPageEditor<T extends OptionPage> {
+
+}

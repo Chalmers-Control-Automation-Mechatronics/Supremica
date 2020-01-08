@@ -33,11 +33,16 @@
 
 package net.sourceforge.waters.gui.options;
 
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.OptionPageEditor;
+
 /**
  *
  * @author Benjamin Wheeler
  */
-public interface OptionContainer {
+public interface OptionContainer<T extends OptionPage>
+  extends OptionPageEditor<T>
+{
   public void commitOptions();
   public void search(SearchQuery query);
   public boolean selectOption(OptionPanel<?> panel);

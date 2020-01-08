@@ -50,14 +50,13 @@ import javax.swing.JScrollPane;
 
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPageEditor;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 
 /**
  *
  * @author Benjamin Wheeler
  */
-public class OptionListPanel extends JScrollPane implements OptionPageEditor<SimpleLeafOptionPage> {
+public class OptionListPanel extends JScrollPane implements OptionContainer<SimpleLeafOptionPage> {
 
   public OptionListPanel(final GUIOptionContext context,
                          final SimpleLeafOptionPage page) {
