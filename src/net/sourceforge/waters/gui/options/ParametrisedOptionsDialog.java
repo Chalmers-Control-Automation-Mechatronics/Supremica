@@ -89,9 +89,6 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     constraints.weighty = 1.0;
 
     mTopTabbedPane = (OptionTabbedPane) OptionPage.TOP_LEVEL_AGGREGATOR.createEditor(mContext);
-//    for (final AggregatorOptionPage page : OptionPage.TOP_LEVEL_AGGREGATORS) {
-//      mTopTabbedPane.populateOptions(mContext, page);
-//    }
     add(mTopTabbedPane, constraints);
 
     // Error label

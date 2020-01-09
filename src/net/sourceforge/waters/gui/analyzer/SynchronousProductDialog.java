@@ -95,7 +95,7 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected OptionPage getOptionMap()
+  protected OptionPage getOptionPage()
   {
     return OptionPage.SynchronousProduct;
   }

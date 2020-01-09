@@ -51,7 +51,6 @@ public abstract class SelectorOption<E> extends EnumOption<E>
      final List<E> creators,
      final E defaultKey) {
     super(id, name, null, null, createFactory(creators, defaultKey));
-    System.out.println(id);
   }
 
   public String getDescription(final Object selectedItem) {

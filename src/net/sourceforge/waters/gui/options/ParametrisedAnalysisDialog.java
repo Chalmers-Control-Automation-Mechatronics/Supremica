@@ -33,27 +33,18 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
@@ -90,64 +81,25 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
 
-    mOptionDB = getOptionMap();
-    mCurrentParameterPanels = new LinkedList<>();
-
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.fill = GridBagConstraints.BOTH;
     constraints.anchor = GridBagConstraints.CENTER;
     constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
-
-    // Algorithm selector combo box
-    final JPanel algorithmPanel = new RaisedDialogPanel();
-    algorithmPanel.setLayout(new FlowLayout());
-    final JLabel algorithmComboboxLabel = new JLabel("Algorithm");
-    mAnalyzerComboBox = new JComboBox<>();
-    for (final ModelAnalyzerFactoryLoader loader :
-         ModelAnalyzerFactoryLoader.values()) {
-      try {
-        final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-        final ModelAnalyzer analyzer = createAnalyzer(factory);
-        if (analyzer != null) {
-//          factory.registerOptions(optionMap);
-          mAnalyzerComboBox.addItem(loader);
-        }
-      } catch (NoClassDefFoundError |
-               ClassNotFoundException |
-               UnsatisfiedLinkError |
-               AnalysisConfigurationException exception) {
-        // skip this factory
-      }
-    }
-//    mOptionDB = OptionRegistry.getOptionMap(getOptionPrefix(), optionMap);
-    final ActionListener algorithmChanged = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        showAlgorithmParameters();
-        pack();
-      }
-    };
-    mAnalyzerComboBox.addActionListener(algorithmChanged);
-    algorithmPanel.add(algorithmComboboxLabel);
-    algorithmPanel.add(mAnalyzerComboBox);
-    add(algorithmPanel, constraints);
-
-    // Parameter list
-    mParameterListPanel = new JPanel();
-    mParameterListPanel.setLayout(new GridBagLayout());
-    final JScrollPane scroll = new JScrollPane(mParameterListPanel);
-    final JPanel scrollPanel = new RaisedDialogPanel(0);
-    scrollPanel.setLayout(new GridBagLayout());
-    constraints.fill = GridBagConstraints.BOTH;
     constraints.weighty = 1.0;
-    scrollPanel.add(scroll, constraints);
-    add(scrollPanel, constraints);
-    showAlgorithmParameters();
+
+    mGroupPanel = (OptionGroupPanel) getOptionPage().createEditor(mContext);
+    add(mGroupPanel, constraints);
+    mGroupPanel.setSelectionChangedListener
+      (new OptionGroupPanel.SelectionChangedListener() {
+      @Override
+      public void selectionChanged()
+      {
+        updateModelAnalyzer();
+      }
+    });
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -186,50 +138,6 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
 
 
   //#########################################################################
-  //# Updating Algorithm
-  private void showAlgorithmParameters()
-  {
-    try {
-      final int index = mAnalyzerComboBox.getSelectedIndex();
-      final ModelAnalyzerFactoryLoader loader = mAnalyzerComboBox.getItemAt(index);
-      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-      mCurrentAnalyzer = createAnalyzer(factory);
-      final List<Option<?>> params = mCurrentAnalyzer.getOptions(mOptionDB);
-      updateParameterList(params);
-    } catch (NoClassDefFoundError |
-             ClassNotFoundException |
-             UnsatisfiedLinkError |
-             AnalysisConfigurationException exception) {
-      throw new WatersRuntimeException(exception);
-    }
-  }
-
-  private void updateParameterList(final List<Option<?>> params)
-  {
-    mParameterListPanel.removeAll();
-    mCurrentParameterPanels.clear();
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridy = 0;
-    constraints.anchor = GridBagConstraints.WEST;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    constraints.insets = new Insets(0, 2, 0, 2);
-    constraints.weightx = constraints.weighty = 1.0;
-    for (final Option<?> param : params) {
-      final OptionEditor<?> editor = param.createEditor(mContext);
-      final OptionPanel<?> panel = (OptionPanel<?>) editor;
-      mCurrentParameterPanels.add(panel);
-      final JLabel label = panel.getLabel();
-      constraints.gridx = 0;
-      mParameterListPanel.add(label, constraints);
-      final Component entry = panel.getEntryComponent();
-      constraints.gridx = 1;
-      mParameterListPanel.add(entry, constraints);
-      constraints.gridy++;
-    }
-  }
-
-
-  //#########################################################################
   //# Simple Access
   public GUIOptionContext getContext()
   {
@@ -238,7 +146,8 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
 
   protected ModelAnalyzer getAnalyzer()
   {
-    return mCurrentAnalyzer;
+
+    return mCurrentModelAnalyzer;
   }
 
   protected ProductDESProxyFactory getProductDESProxyFactory()
@@ -246,7 +155,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     return mContext.getProductDESProxyFactory();
   }
 
-  protected abstract OptionPage getOptionMap();
+  protected abstract OptionPage getOptionPage();
 
 
   //#########################################################################
@@ -271,10 +180,9 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     final IDE ide = mContext.getIDE();
     final FocusTracker tracker = ide.getFocusTracker();
     if (tracker.shouldYieldFocus(this)) {
-      for (final OptionPanel<?> panel : mCurrentParameterPanels) {
-        panel.commitValue();
-        final Option<?> option = panel.getOption();
-        mCurrentAnalyzer.setOption(option);
+      mGroupPanel.commitOptions();
+      for (final Option<?> option : mGroupPanel.getSelectedOptions()) {
+        mCurrentModelAnalyzer.setOption(option);
       }
       final ProductDESProxy des = mContext.getProductDES();
       final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
@@ -285,16 +193,25 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     }
   }
 
+  private void updateModelAnalyzer() {
+    pack();
+    try {
+      final ModelAnalyzerFactoryLoader loader =
+        (ModelAnalyzerFactoryLoader) mGroupPanel.getSelectedValue();
+      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+      mCurrentModelAnalyzer = createAnalyzer(factory);
+    } catch (ClassNotFoundException
+      | AnalysisConfigurationException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final JComboBox<ModelAnalyzerFactoryLoader> mAnalyzerComboBox;
-  private final JPanel mParameterListPanel;
-  private final OptionPage mOptionDB;
-
-  private ModelAnalyzer mCurrentAnalyzer;
-  private final List<OptionPanel<?>> mCurrentParameterPanels;
+  private final OptionGroupPanel mGroupPanel;
+  private ModelAnalyzer mCurrentModelAnalyzer;
 
 
   //#########################################################################

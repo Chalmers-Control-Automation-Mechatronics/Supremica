@@ -134,6 +134,8 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
   {
     final List<Option<?>> options = new LinkedList<>();
     addOptions(options, (AutomatonSimplifierCreator) key);
+    options.add(get(AutomatonSimplifierFactory.
+                    OPTION_AutomatonSimplifierFactory_KeepOriginal));
     return options;
   }
 

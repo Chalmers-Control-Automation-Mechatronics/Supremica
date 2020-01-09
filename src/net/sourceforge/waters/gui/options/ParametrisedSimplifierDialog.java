@@ -33,38 +33,25 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
-import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
+import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -80,7 +67,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.supremica.automata.waters.SupremicaSimplifierFactory;
 import org.supremica.gui.ide.IDE;
 
 
@@ -101,122 +87,27 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     super(panel.getModuleContainer().getIDE());
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
-
-    mOptionDB = OptionPage.Simplifier;
-    mCurrentParameterPanels = new LinkedList<>();
+    mPage = OptionPage.Simplifier;
 
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.fill = GridBagConstraints.BOTH;
     constraints.anchor = GridBagConstraints.CENTER;
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    //Family selector combo box
-    final JLabel familyComboboxLabel = new JLabel("Family");
-    mFamilyComboBox = new JComboBox<>();
-
-    mFamilyComboBox.addItem(ChainSimplifierFactory.getInstance());
-    mFamilyComboBox.addItem(StepSimplifierFactory.getInstance());
-    mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
-
-    final ActionListener familyChanged = new ActionListener() {
+    mGroupPanel = (OptionGroupPanel) OptionPage.Simplifier.createEditor(mContext);
+    add(mGroupPanel, constraints);
+    mGroupPanel.setSelectionChangedListener
+      (new OptionGroupPanel.SelectionChangedListener() {
       @Override
-      public void actionPerformed(final ActionEvent event)
+      public void selectionChanged()
       {
-        updateSimplifierList();
         pack();
       }
-    };
-
-    mFamilyComboBox.addActionListener(familyChanged);
-
-    // Algorithm selector combo box
-    final JLabel algorithmComboboxLabel = new JLabel("Simplifier");
-    mAnalyzerComboBox = new JComboBox<>();
-
-    final ActionListener algorithmChanged = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        showAlgorithmParameters();
-        pack();
-      }
-    };
-    mAnalyzerComboBox.addActionListener(algorithmChanged);
-    mAnalyzerComboBox.setRenderer(new ComboboxToolTipRenderer(300));
-
-    //Description
-    mDescriptionTextPane = new JTextPane();
-    mDescriptionTextPane.setContentType("text/html");
-    mDescriptionTextPane.setBackground(getBackground());
-    //Prevent selection
-    for (final MouseListener l : mDescriptionTextPane
-      .getListeners(MouseListener.class)) {
-      mDescriptionTextPane.removeMouseListener(l);
-    }
-
-    //Selection panel
-    final JPanel selectionPanel = new RaisedDialogPanel();
-    selectionPanel.setLayout(new GridBagLayout());
-    constraints.weighty = 1.0f;
-    constraints.fill = GridBagConstraints.BOTH;
-    add(selectionPanel, constraints);
-    final GridBagConstraints c = new GridBagConstraints();
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 0;
-    c.gridy = 0;
-    c.insets.right = 10;
-    c.weightx = 0.0f;
-    c.weightx = 0;
-    selectionPanel.add(familyComboboxLabel, c);
-    c.gridx++;
-    c.insets.right = 0;
-    c.weightx = 1.0f;
-    selectionPanel.add(mFamilyComboBox, c);
-    c.gridx = 0;
-    c.gridy++;
-    c.insets.right = 10;
-    c.weightx = 0.0f;
-    selectionPanel.add(algorithmComboboxLabel, c);
-    c.gridx++;
-    c.insets.right = 0;
-    c.weightx = 1.0f;
-    selectionPanel.add(mAnalyzerComboBox, c);
-    c.gridx = 0;
-    c.gridy++;
-    c.gridwidth = 2;
-    c.insets.top = 5;
-    c.weightx = 1.0f;
-    c.weighty = 1.0f;
-    c.fill = GridBagConstraints.BOTH;
-    final JScrollPane scrollDescription = new JScrollPane(mDescriptionTextPane) {
-      @Override
-      public Dimension getPreferredSize()
-      {
-        final Dimension d = super.getPreferredSize();
-        d.width = 0;
-        return d;
-      }
-      private static final long serialVersionUID = -7065386236668370127L;
-    };
-    selectionPanel.add(scrollDescription, c);
-
-
-    // Parameter list
-    mParameterListPanel = new JPanel();
-    mParameterListPanel.setLayout(new GridBagLayout());
-    final JScrollPane scroll = new JScrollPane(mParameterListPanel);
-    final JPanel scrollPanel = new RaisedDialogPanel(0);
-    scrollPanel.setLayout(new GridBagLayout());
-    constraints.fill = GridBagConstraints.BOTH;
-    constraints.weighty = 4.0;
-    scrollPanel.add(scroll, constraints);
-    add(scrollPanel, constraints);
-
-    updateSimplifierList();
+    });
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -264,78 +155,12 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     }
   }
 
-
-  //#########################################################################
-  //# Updating Algorithm
-  private void showAlgorithmParameters()
-  {
-    final int index = mAnalyzerComboBox.getSelectedIndex();
-    if (index == -1) return;
-    final AutomatonSimplifierCreator creator = mAnalyzerComboBox.getItemAt(index);
-    mCurrentAnalyzer = creator.createBuilder(mContext.getProductDESProxyFactory());
-    final List<Option<?>> params = mCurrentAnalyzer.getOptions(mOptionDB);
-    params.addAll(creator.getOptions(mOptionDB));
-    mKeepOriginalOption = new BooleanOption
-      (AutomatonSimplifierFactory.OPTION_AutomatonSimplifierFactory_KeepOriginal,
-       "Keep Original",
-       "Do not remove the input automaton from the analyzer " +
-       "after this operation.",
-       "-keep",
-       true);
-    params.add(mKeepOriginalOption);
-
-    final String text = "<body style='text-align:justify'>"
-      + creator.getDescription() + "</body>";
-    mDescriptionTextPane.setText(text);
-    mDescriptionTextPane.setCaretPosition(0);
-
-    updateParameterList(params);
-  }
-
-  private void updateParameterList(final List<Option<?>> params)
-  {
-    mParameterListPanel.removeAll();
-    mCurrentParameterPanels.clear();
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridy = 0;
-    constraints.anchor = GridBagConstraints.WEST;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    constraints.insets = new Insets(0, 2, 0, 2);
-    constraints.weightx = constraints.weighty = 1.0;
-    for (final Option<?> param : params) {
-      final OptionEditor<?> editor = param.createEditor(mContext);
-      final OptionPanel<?> panel = (OptionPanel<?>) editor;
-      mCurrentParameterPanels.add(panel);
-      final JLabel label = panel.getLabel();
-      constraints.gridx = 0;
-      mParameterListPanel.add(label, constraints);
-      final Component entry = panel.getEntryComponent();
-      constraints.gridx = 1;
-      mParameterListPanel.add(entry, constraints);
-      constraints.gridy++;
-    }
-  }
-
-  private void updateSimplifierList() {
-    mAnalyzerComboBox.removeAllItems();
-    final AutomatonSimplifierFactory factory =
-      (AutomatonSimplifierFactory) mFamilyComboBox.getSelectedItem();
-    for (final AutomatonSimplifierCreator creator :
-         factory.getSimplifierCreators()) {
-      mAnalyzerComboBox.addItem(creator);
-    }
-    showAlgorithmParameters();
-  }
-
   //#########################################################################
   //# Simple Access
   public GUIOptionContext getContext()
   {
     return mContext;
   }
-
-  //#########################################################################
-  //# Hooks
 
   //#########################################################################
   //# Auxiliary Methods
@@ -354,31 +179,29 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
     try {
 
-      final ProductDESProxyFactory factory = mContext.getProductDESProxyFactory();
+      final ProductDESProxyFactory factory =
+        mContext.getProductDESProxyFactory();
       final AutomatonSimplifierCreator creator =
-        (AutomatonSimplifierCreator) mAnalyzerComboBox.getSelectedItem();
+        (AutomatonSimplifierCreator) mGroupPanel.getSelectedValue();
 
       final FocusTracker tracker = ide.getFocusTracker();
       if (tracker.shouldYieldFocus(this)) {
-        for (final OptionPanel<?> optionPanel : mCurrentParameterPanels) {
-          optionPanel.commitValue();
-          final Option<?> option = optionPanel.getOption();
-          creator.setOption(option);
-        }
+        mGroupPanel.commitOptions();
 
         final AutomatonBuilder builder = creator.createBuilder(factory);
         builder.setModel(aut);
 
-        final boolean keepOriginal = mKeepOriginalOption.getBooleanValue();
+        final BooleanOption keepOriginalOption = (BooleanOption) mPage.get
+          (AutomatonSimplifierFactory.
+           OPTION_AutomatonSimplifierFactory_KeepOriginal);
+        final boolean keepOriginal = keepOriginalOption.getBooleanValue();
         if (keepOriginal) {
           final String newName = model.getUnusedName(aut.getName());
           builder.setOutputName(newName);
         }
         else builder.setOutputName(aut.getName());
 
-        for (final OptionPanel<?> optionPanel : mCurrentParameterPanels) {
-          optionPanel.commitValue();
-          final Option<?> option = optionPanel.getOption();
+        for (final Option<?> option : mGroupPanel.getSelectedOptions()) {
           builder.setOption(option);
         }
         builder.run();
@@ -403,54 +226,12 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
   }
 
-  public class ComboboxToolTipRenderer extends DefaultListCellRenderer {
-
-    public ComboboxToolTipRenderer(final int toolTipWidth)
-    {
-      super();
-      mToolTipWidth = toolTipWidth;
-    }
-
-    @Override
-    public Component getListCellRendererComponent(final JList<?> list,
-                                                  final Object value,
-                                                  final int index,
-                                                  final boolean isSelected,
-                                                  final boolean cellHasFocus) {
-      if (value != null) {
-        final AutomatonSimplifierCreator creator = (AutomatonSimplifierCreator) value;
-        final String text = creator.getDescription();
-
-        if (text.length() != 0) {
-          final String htmlText = "<html><p width=" + mToolTipWidth + ">"
-            + text + "</p></html>";
-
-          list.setToolTipText(htmlText);
-        }
-        else list.setToolTipText(null);
-      }
-      return super.getListCellRendererComponent(list, value, index,
-                                                isSelected, cellHasFocus);
-    }
-
-    private final int mToolTipWidth;
-
-    private static final long serialVersionUID = -3041815919444247332L;
-  }
 
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final JComboBox<AutomatonSimplifierFactory> mFamilyComboBox;
-  private final JComboBox<AutomatonSimplifierCreator> mAnalyzerComboBox;
-  private final JTextPane mDescriptionTextPane;
-  private final JPanel mParameterListPanel;
-  private final OptionPage mOptionDB;
-
-  private BooleanOption mKeepOriginalOption;
-
-  private AutomatonBuilder mCurrentAnalyzer;
-  private final List<OptionPanel<?>> mCurrentParameterPanels;
+  private final OptionGroupPanel mGroupPanel;
+  private final SelectorLeafOptionPage mPage;
 
 
   //#########################################################################

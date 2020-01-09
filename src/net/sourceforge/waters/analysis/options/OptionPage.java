@@ -117,24 +117,24 @@ public abstract class OptionPage
   //# Class Constants
   public static final List<LeafOptionPage> OPTION_PAGES = new LinkedList<>();
 
-  public static final LeafOptionPage ConflictCheck =
+  public static final SelectorLeafOptionPage ConflictCheck =
     new AnalysisOptionPage(AnalysisOperation.CONFLICT_CHECK);
-  public static final LeafOptionPage ControllabilityCheck =
+  public static final SelectorLeafOptionPage ControllabilityCheck =
     new AnalysisOptionPage(AnalysisOperation.CONTROLLABILITY_CHECK);
-  public static final LeafOptionPage ControlLoop =
+  public static final SelectorLeafOptionPage ControlLoop =
     new AnalysisOptionPage(AnalysisOperation.CONTROL_LOOP_CHECK);
-  public static final LeafOptionPage DeadlockCheck =
+  public static final SelectorLeafOptionPage DeadlockCheck =
     new AnalysisOptionPage(AnalysisOperation.DEADLOCK_CHECK);
-  public static final LeafOptionPage LanguageInclusion =
+  public static final SelectorLeafOptionPage LanguageInclusion =
     new AnalysisOptionPage(AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
-  public static final LeafOptionPage StateCounter =
+  public static final SelectorLeafOptionPage StateCounter =
     new AnalysisOptionPage(AnalysisOperation.STATE_COUNTER);
-  public static final LeafOptionPage SynchronousProduct =
+  public static final SelectorLeafOptionPage SynchronousProduct =
     new AnalysisOptionPage(AnalysisOperation.SYNCHRONOUS_PRODUCT);
-  public static final LeafOptionPage Synthesis =
+  public static final SelectorLeafOptionPage Synthesis =
     new AnalysisOptionPage(AnalysisOperation.SUPERVISOR_SYNTHESIZER);
 
-  public static final LeafOptionPage Simplifier = new SimplifierOptionPage
+  public static final SelectorLeafOptionPage Simplifier = new SimplifierOptionPage
     ("waters.analysis.simplification",
      "Simplifiers",
      StepSimplifierFactory.class.getName(),

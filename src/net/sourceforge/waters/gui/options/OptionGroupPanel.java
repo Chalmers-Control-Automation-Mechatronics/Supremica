@@ -211,6 +211,9 @@ public class OptionGroupPanel extends JPanel
     }
 
     revalidate();
+    if (mSelectionChangedListener != null) {
+      mSelectionChangedListener.selectionChanged();
+    }
 
   }
 
@@ -300,7 +303,6 @@ public class OptionGroupPanel extends JPanel
   {
     final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
     final Object selectedKey = comboBox.getSelectedItem();
-//    final List<SelectorOption<?>> subSelectors = mPage.getSubSelectors(selectorOption);
     if (hasSubselectors(selectorOption)) {
       search(query, mPage.getSubSelector(selectorOption, selectedKey));
       for (final Object key : selectorOption.getEnumConstants()) {
@@ -328,7 +330,6 @@ public class OptionGroupPanel extends JPanel
   {
     final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
     final Object selectedKey = comboBox.getSelectedItem();
-//    final List<SelectorOption<?>> subSelectors = mPage.getSubSelectors(selectorOption);
     if (hasSubselectors(selectorOption)) {
       if (selectOption(panel, mPage.getSubSelector(selectorOption, selectedKey))) {
         comboBox.setSelectedItem(selectedKey);
@@ -358,12 +359,40 @@ public class OptionGroupPanel extends JPanel
     return false;
   }
 
+  public Object getSelectedValue() {
+    SelectorOption<?> selectorOption = mPage.getTopSelectorOption();
+    while (true) {
+      final JComboBox<?> comboBox = mComboBoxes.get(selectorOption);
+      final Object key = comboBox.getSelectedItem();
+      selectorOption = mPage.getSubSelector(selectorOption, key);
+      if (selectorOption == null) return key;
+    }
+  }
+
+  public List<Option<?>> getSelectedOptions() {
+    SelectorOption<?> selectorOption = mPage.getTopSelectorOption();
+    while (true) {
+      final JComboBox<?> comboBox = mComboBoxes.get(selectorOption);
+      final Object key = comboBox.getSelectedItem();
+      final SelectorOption<?> subSelectorOption =
+        mPage.getSubSelector(selectorOption, key);
+      if (subSelectorOption == null) {
+        return mPage.getOptionsForSelector(selectorOption, key);
+      }
+      else selectorOption = mPage.getSubSelector(selectorOption, key);
+    }
+  }
+
   @Override
   public void revalidate()
   {
     super.revalidate();
     final Component parent = getParent();
     if (parent != null) parent.revalidate();
+  }
+
+  public void setSelectionChangedListener(final SelectionChangedListener listener) {
+    mSelectionChangedListener = listener;
   }
 
 
@@ -406,9 +435,15 @@ public class OptionGroupPanel extends JPanel
     private static final long serialVersionUID = -3041815919444247332L;
   }
 
+  public interface SelectionChangedListener
+  {
+    public void selectionChanged();
+  }
+
   private final SelectorLeafOptionPage mPage;
   private final Map<SelectorOption<?>, Map<Object, OptionListPanel>> mOptionPanes;
   private final Map<SelectorOption<?>, JComboBox<Object>> mComboBoxes;
+  private SelectionChangedListener mSelectionChangedListener;
 
   private static final long serialVersionUID = -6276738004584574667L;
 
