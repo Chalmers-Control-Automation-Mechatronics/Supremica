@@ -763,12 +763,8 @@ public class IDEMenuBar
     final Actions actions = getActions();
     final JMenu menu = new JMenu("Configure");
     menu.setMnemonic(KeyEvent.VK_G);
-    menu.add(actions.analyzerOptionsAction.getMenuItem());
-    addProperty(Config.INCLUDE_WATERS_ANALYZER);
-    if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
-      final Action options = actions.getAction(OptionsAction.class);
-      menu.add(options);
-    }
+    final Action options = actions.getAction(OptionsAction.class);
+    menu.add(options);
     add(menu);
   }
 

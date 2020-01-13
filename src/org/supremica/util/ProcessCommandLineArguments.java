@@ -53,7 +53,6 @@ import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.properties.WatersProperties;
 
 import org.xml.sax.SAXException;
 
@@ -97,8 +96,7 @@ public class ProcessCommandLineArguments
               propFile.createNewFile();
             }
 
-            //SupremicaProperties.loadProperties(propFile);
-            WatersProperties.loadProperties(propFile);
+            SupremicaProperties.loadProperties(propFile);
           } catch (final Exception e) {
             System.err.println("Error reading properties file: "
                                + propFile.getAbsolutePath());

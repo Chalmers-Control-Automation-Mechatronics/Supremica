@@ -37,8 +37,11 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
+
 import net.sourceforge.waters.gui.analyzer.OptionsDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -53,8 +56,9 @@ public class OptionsAction
   protected OptionsAction(final IDE ide)
   {
     super(ide);
-    putValue(NAME, "Waters Options...");
-    putValue(SHORT_DESCRIPTION, "Edit Waters options");
+    putValue(NAME, "Options...");
+    putValue(SHORT_DESCRIPTION, "Edit options");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPTIONS);
     setEnabled(true);
   }
 

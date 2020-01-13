@@ -155,43 +155,47 @@ public class SupremicaOptionPage extends SimpleLeafOptionPage
   public static final SimpleLeafOptionPage General =
     new SupremicaOptionPage(PropertyType.GENERAL, "General");
   public static final SimpleLeafOptionPage GeneralLog =
-    new SupremicaOptionPage(PropertyType.GENERAL_LOG, "General Log");
+    new SupremicaOptionPage(PropertyType.GENERAL_LOG, "Log");
   public static final SimpleLeafOptionPage GeneralFile =
-    new SupremicaOptionPage(PropertyType.GENERAL_FILE, "General File");
+    new SupremicaOptionPage(PropertyType.GENERAL_FILE, "File");
   public static final SimpleLeafOptionPage Gui =
-    new SupremicaOptionPage(PropertyType.GUI, "GUI");
+    new SupremicaOptionPage(PropertyType.GUI, "Compiler");
   public static final SimpleLeafOptionPage GuiEditor =
-    new SupremicaOptionPage(PropertyType.GUI_EDITOR, "GUI Editor");
+    new SupremicaOptionPage(PropertyType.GUI_EDITOR, "Editor");
   public static final SimpleLeafOptionPage GuiAnalyzer =
-    new SupremicaOptionPage(PropertyType.GUI_ANALYZER, "GUI Analyzer");
+    new SupremicaOptionPage(PropertyType.GUI_ANALYZER, "Analyzer");
   public static final SimpleLeafOptionPage GuiSimulator =
-    new SupremicaOptionPage(PropertyType.GUI_SIMULATOR, "GUI Simulator");
+    new SupremicaOptionPage(PropertyType.GUI_SIMULATOR, "Simulator");
   public static final SimpleLeafOptionPage GuiDot =
-    new SupremicaOptionPage(PropertyType.GUI_DOT, "GUI Dot");
+    new SupremicaOptionPage(PropertyType.GUI_DOT, "Dot");
 //  public static final SimpleLeafOptionPage Algorithms =
 //    new SupremicaOptionPage(PropertyType.ALGORITHMS, "Algorithms");
   public static final SimpleLeafOptionPage AlgorithmsSynchronization =
-    new SupremicaOptionPage(PropertyType.ALGORITHMS_SYNCHRONIZATION, "Algorithms Synchronization");
+    new SupremicaOptionPage(PropertyType.ALGORITHMS_SYNCHRONIZATION, "Synchronization");
   public static final SimpleLeafOptionPage AlgorithmsVerification =
-    new SupremicaOptionPage(PropertyType.ALGORITHMS_VERIFICATION, "Algorithms Verification");
+    new SupremicaOptionPage(PropertyType.ALGORITHMS_VERIFICATION, "Verification");
   public static final SimpleLeafOptionPage AlgorithmsSynthesis =
-    new SupremicaOptionPage(PropertyType.ALGORITHMS_SYNTHESIS, "Algorithms Synthesis");
+    new SupremicaOptionPage(PropertyType.ALGORITHMS_SYNTHESIS, "Synthesis");
   public static final SimpleLeafOptionPage AlgorithmsMinimization =
-    new SupremicaOptionPage(PropertyType.ALGORITHMS_MINIMIZATION, "Algorithms Minimization");
+    new SupremicaOptionPage(PropertyType.ALGORITHMS_MINIMIZATION, "Minimization");
   public static final SimpleLeafOptionPage AlgorithmsBDD =
-    new SupremicaOptionPage(PropertyType.ALGORITHMS_BDD, "Algorithms BDD");
+    new SupremicaOptionPage(PropertyType.ALGORITHMS_BDD, "BDD");
   public static final SimpleLeafOptionPage AlgorithmsHMI =
-    new SupremicaOptionPage(PropertyType.ALGORITHMS_HMI, "Algorithms HMI");
+    new SupremicaOptionPage(PropertyType.ALGORITHMS_HMI, "HMI");
   public static final SimpleLeafOptionPage Misc =
     new SupremicaOptionPage(PropertyType.MISC, "Misc");
 
+  public static final AggregatorOptionPage IDE_AGGREGATOR_OPTION_PAGE =
+    new AggregatorOptionPage("IDE", General, GeneralFile, GeneralLog, Misc);
 
-  public static final AggregatorOptionPage SUPREMICA_AGGREGATOR_OPTION_PAGE =
-    new AggregatorOptionPage("Supremica", General, GeneralLog, GeneralFile, Gui, GuiEditor,
-                           GuiAnalyzer, GuiSimulator, GuiDot, AlgorithmsSynchronization,
-                           AlgorithmsVerification, AlgorithmsSynthesis, AlgorithmsMinimization,
-                           AlgorithmsBDD, AlgorithmsHMI, Misc);
+  public static final AggregatorOptionPage GUI_AGGREGATOR_OPTION_PAGE =
+    new AggregatorOptionPage("GUI", GuiEditor, GuiSimulator, GuiAnalyzer, Gui);
 
+  public static final AggregatorOptionPage ANALYZER_AGGREGATOR_OPTION_PAGE =
+    new AggregatorOptionPage("Supremica Analyzer", AlgorithmsSynchronization,
+                             AlgorithmsVerification, AlgorithmsSynthesis,
+                             AlgorithmsMinimization,
+                             AlgorithmsBDD, AlgorithmsHMI, GuiDot);
 
 
 }

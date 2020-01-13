@@ -160,14 +160,23 @@ public abstract class OptionPage
 
   private static final AggregatorOptionPage[] TOP_LEVEL_AGGREGATORS =
   new AggregatorOptionPage[] {
-    new AggregatorOptionPage("Waters", ConflictCheck, ControllabilityCheck,
+    (AggregatorOptionPage)
+    loadOptionPage("org.supremica.properties.SupremicaOptionPage",
+                   "IDE_AGGREGATOR_OPTION_PAGE"),
+
+    (AggregatorOptionPage)
+    loadOptionPage("org.supremica.properties.SupremicaOptionPage",
+                   "GUI_AGGREGATOR_OPTION_PAGE"),
+
+    new AggregatorOptionPage("Analysis", ConflictCheck, ControllabilityCheck,
                              ControllabilityCheck, ControlLoop,
                              DeadlockCheck, LanguageInclusion,
                              StateCounter, SynchronousProduct, Synthesis,
                              Simplifier),
+
     (AggregatorOptionPage)
     loadOptionPage("org.supremica.properties.SupremicaOptionPage",
-                   "SUPREMICA_AGGREGATOR_OPTION_PAGE")
+                   "ANALYZER_AGGREGATOR_OPTION_PAGE")
   };
 
   public static final AggregatorOptionPage TOP_LEVEL_AGGREGATOR =

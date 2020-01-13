@@ -256,7 +256,7 @@ public abstract class Option<T> implements Cloneable
   }
 
   private static Method loadSaveMethod() {
-    final String className = "org.supremica.properties.WatersProperties";
+    final String className = "org.supremica.properties.SupremicaProperties";
     final String methodName = "savePropertiesLater";
     try {
       return Option.class.getClassLoader()
