@@ -56,7 +56,8 @@ import java.util.List;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.util.BDD.Options;
+import org.supremica.properties.Config;
+import org.supremica.util.BDD.OrderingAlgorithm;
 import org.supremica.util.BDD.PCGNode;
 import org.supremica.util.BDD.solvers.OrderingSolver;
 
@@ -68,9 +69,10 @@ public class PCGAutomataSorter
     {
     }
 
+    @Override
     public Automata sortAutomata(final Automata oorgAutomata)
     {
-        Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
+        Config.BDD_ORDER_ALGO.setValue(OrderingAlgorithm.AO_HEURISTIC_BFS);
         final ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
         //Alphabetic sorting - so that the variable ordering of the corresponding BDDs become the same in every run
         final List<String> automataNames = new ArrayList<String>();
@@ -94,7 +96,7 @@ public class PCGAutomataSorter
 
         final int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
         //Code for finding the (min,max,avg) cardinality of the level-1 dependency set of an automaton
-        double[] degree = new double[orgAutomata.size()];
+        final double[] degree = new double[orgAutomata.size()];
         double minLD = Double.MAX_VALUE;
         double maxLD = Double.MIN_VALUE;
         double avgLD = 0;
@@ -109,7 +111,7 @@ public class PCGAutomataSorter
                        degree[i] ++;
                 }
             }
-            double LD = degree[i] / orgAutomata.size();
+            final double LD = degree[i] / orgAutomata.size();
             if(LD < minLD)
             {
                 minLD = LD;
@@ -118,7 +120,7 @@ public class PCGAutomataSorter
             {
                 maxLD = LD;
             }
-            
+
             avgLD += (LD/orgAutomata.size());
         }
         System.err.println("minLD: "+minLD);
@@ -170,7 +172,7 @@ public class PCGAutomataSorter
     {
         final Alphabet firstAlphabet = new Alphabet(firstAutomaton.getAlphabet());
         final Alphabet secondAlphabet = secondAutomaton.getAlphabet();
-        firstAlphabet.intersect(secondAlphabet);        
+        firstAlphabet.intersect(secondAlphabet);
         return firstAlphabet.size();
     }
 

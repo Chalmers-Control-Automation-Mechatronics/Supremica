@@ -159,6 +159,14 @@ public abstract class Option<T> implements Cloneable
     return true;
   }
 
+  public boolean isEditable() {
+    return mEditable;
+  }
+
+  public void setEditable(final boolean editable) {
+    mEditable = editable;
+  }
+
   //#########################################################################
   //# Value Access
   /**
@@ -295,6 +303,7 @@ public abstract class Option<T> implements Cloneable
   private final String mCommandLineOption;
   private final T mDefaultValue;
   private T mValue;
+  private boolean mEditable = true;
   private List<OptionChangeListener> mListeners;
 
   private static Method saveMethod = loadSaveMethod();

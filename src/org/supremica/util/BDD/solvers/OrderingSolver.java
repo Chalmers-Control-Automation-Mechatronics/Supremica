@@ -1,6 +1,8 @@
 package org.supremica.util.BDD.solvers;
 
-import org.supremica.util.BDD.*;
+import org.supremica.properties.Config;
+import org.supremica.util.BDD.Options;
+import org.supremica.util.BDD.PCGNode;
 
 /**
  * This will replace the PCG ordering herusitics.
@@ -13,14 +15,16 @@ import org.supremica.util.BDD.*;
  */
 public class OrderingSolver
 {
-	private int size, index;
+	private final int size;
+
+  private int index;
 
 	// private HashMap map;
-	private Node[] nodes;
-	private MEC mec;    // used to find disjoing sub-graphs
+	private final Node[] nodes;
+	private final MEC mec;    // used to find disjoing sub-graphs
 	private int[] order;
 
-	public OrderingSolver(int size)
+	public OrderingSolver(final int size)
 	{
 		this.size = size;
 		this.nodes = new Node[size];
@@ -29,9 +33,9 @@ public class OrderingSolver
 		this.order = null;
 	}
 
-	public void addNode(PCGNode n, int[] w, int w_len)
+	public void addNode(final PCGNode n, final int[] w, final int w_len)
 	{
-		Node nod = new Node();
+		final Node nod = new Node();
 
 		nod.org = n;
 		nod.index = index;
@@ -55,15 +59,15 @@ public class OrderingSolver
 		{
 			mec.precomputeLocalWeights();
 
-			Node[][] classes = mec.getClasses();
+			final Node[][] classes = mec.getClasses();
 			int offset = 0;
 
 			order = new int[size];
 
 			for (int g = 0; g < classes.length; g++)
 			{    // list is sorted on size!
-				Node[] class_ = classes[g];
-				Node[] ordred_class = getShortestPath(class_);    // solve localy
+				final Node[] class_ = classes[g];
+				final Node[] ordred_class = getShortestPath(class_);    // solve localy
 
 				// append to list
 				for (int e = 0; e < ordred_class.length; e++)
@@ -72,7 +76,7 @@ public class OrderingSolver
 				}
 			}
 
-			if (Options.debug_on)
+			if (Config.BDD_DEBUG_ON.get())
 			{
 				dump();
 			}
@@ -102,14 +106,14 @@ public class OrderingSolver
 	{
 		mec.precomputeLocalWeights();
 
-		Node[][] classes = mec.getClasses();
-		PCGNode[] ordering = new PCGNode[size];
+		final Node[][] classes = mec.getClasses();
+		final PCGNode[] ordering = new PCGNode[size];
 		int offset = 0;
 
 		for (int g = 0; g < classes.length; g++)
 		{    // list is sorted on size!
-			Node[] class_ = classes[g];
-			Node[] ordred_class = getShortestPath(class_);    // solve localy
+			final Node[] class_ = classes[g];
+			final Node[] ordred_class = getShortestPath(class_);    // solve localy
 
 			// append to list
 			for (int e = 0; e < ordred_class.length; e++)
@@ -122,34 +126,34 @@ public class OrderingSolver
 	// --------------------------------------------------------
 
 	/** get ordering for _one_ (disjoint) subpgrah */
-	private Node[] getShortestPath(Node[] nods)
+	private Node[] getShortestPath(final Node[] nods)
 	{
 		Solver sol = null;
 
-		switch (Options.ordering_algorithm)
+		switch (Config.BDD_ORDER_ALGO.get())
 		{
 
-		case Options.AO_HEURISTIC_TSP :
+		case AO_HEURISTIC_TSP :
 			sol = new TSPSolver(nods);
 			break;
 
-		case Options.AO_HEURISTIC_DFS :
+		case AO_HEURISTIC_DFS :
 			sol = new DFSSolver(nods);
 			break;
 
-		case Options.AO_HEURISTIC_BFS :
+		case AO_HEURISTIC_BFS :
 			sol = new BFSSolver(nods);
 			break;
 
-		case Options.AO_HEURISTIC_STCT :
+		case AO_HEURISTIC_STCT :
 			sol = new STCTSolver(nods);
 			break;
 
-		case Options.AO_HEURISTIC_TSP_STCT :
+		case AO_HEURISTIC_TSP_STCT :
 			sol = new BootstrapSTCTSolver(nods);
 			break;
 
-		case Options.AO_HEURISTIC_TSP_SIFT :
+		case AO_HEURISTIC_TSP_SIFT :
 			sol = new SiftTCPSolver(nods);
 			break;
 		default :

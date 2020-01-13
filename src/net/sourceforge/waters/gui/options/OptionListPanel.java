@@ -91,7 +91,7 @@ public class OptionListPanel extends JScrollPane implements OptionContainer<Simp
     mOptionPanels.clear();
     final boolean persistentOnly = context.getWatersAnalyzerPanel() == null;
     for (final Option<?> option : options) {
-      if (!persistentOnly || option.isPersistent()) {
+      if (option.isEditable() && (!persistentOnly || option.isPersistent())) {
         OptionPanel<?> panel = mSharedOptionPanels.get(option.getID());
         if (panel == null) {
           panel = (OptionPanel<?>) option.createEditor(context);

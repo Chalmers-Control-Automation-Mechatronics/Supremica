@@ -77,7 +77,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationPreselectingHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationSelectingHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.util.BDD.Options;
+import org.supremica.util.BDD.OrderingAlgorithm;
 
 
 /**
@@ -447,20 +447,19 @@ public final class Config
 
     // -- the following where formerly under algorithms.bdd
     // Most of these are ugly integers in BDD.Options... but they have String representations here.
-    public static final ObjectProperty<String> BDD_ORDER_ALGO =
+    public static final ObjectProperty<OrderingAlgorithm> BDD_ORDER_ALGO =
       new ObjectProperty<>(PropertyType.ALGORITHMS_BDD,
                            "bddAutomataOrderingAlgorithm",
-                           Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm],
-                           Options.ORDERING_ALGORITHM_NAMES,
-                           String.class, "Automata ordering algorithm", true);
+                           OrderingAlgorithm.AO_HEURISTIC_FORCE,
+                           OrderingAlgorithm.class, "Automata ordering algorithm");
     public static final IntegerProperty BDD_PARTITION_MAX =
       new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", 10000, "Max partition size");
     public static final BooleanProperty SYNTHESIS_PEAKBDD =
       new BooleanProperty(PropertyType.ALGORITHMS_BDD, "peakBDD", false, "Compute and print peak BDD");
     public static final BooleanProperty BDD_DEBUG_ON =
-      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddDebugOn", Options.debug_on, "Debug on");
+      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddDebugOn", false, "Debug on");
     public static final BooleanProperty BDD_PROFILE_ON =
-      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", Options.profile_on, "Profiling");
+      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", false, "Profiling");
 
     // ALGORITHMS_HMI
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");

@@ -15,12 +15,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
-import org.supremica.automata.BDD.DefaultPCGNode;
 import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.util.BDD.Options;
+import org.supremica.automata.BDD.DefaultPCGNode;
+import org.supremica.properties.Config;
+import org.supremica.util.BDD.OrderingAlgorithm;
 import org.supremica.util.BDD.PCGNode;
 import org.supremica.util.BDD.solvers.OrderingSolver;
 
@@ -31,7 +33,7 @@ public class PCGExtendedAutomataSorter
 
     public List<ExtendedAutomaton> sortAutomata(final List<ExtendedAutomaton> oorgAutomata)
     {
-        Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
+        Config.BDD_ORDER_ALGO.setValue(OrderingAlgorithm.AO_HEURISTIC_BFS);
         final ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
         //Alphabetic sorting - so that the variable ordering of the corresponding BDDs become the same in every run
         final List<String> automataNames = new ArrayList<String>();

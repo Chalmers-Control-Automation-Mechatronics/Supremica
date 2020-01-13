@@ -1,6 +1,7 @@
 package org.supremica.util.BDD.solvers;
 
-import org.supremica.util.BDD.*;
+import org.supremica.properties.Config;
+import org.supremica.util.BDD.Options;
 
 /**
  * ordering solver based on simulated annealing.
@@ -21,18 +22,19 @@ public class STCTSolver
 	protected double overallResult, oldResult;
 	public int improvments;    /* for profiling only: howmany times did we improve our solution? */
 
-	public STCTSolver(Node[] org_)
+	public STCTSolver(final Node[] org_)
 	{
 		super(org_);
 	}
 
-	public void solve()
+	@Override
+  public void solve()
 	{
 		pre_solve();    // fix some initial things first...
 
 		improvments = 0;
 
-		double[] Force = new double[size];
+		final double[] Force = new double[size];
 
 		for (int n = 0; n < 3 * size; n++)
 		{
@@ -53,7 +55,7 @@ public class STCTSolver
 
 					while (true)
 					{
-						int i = max(Force);
+						final int i = max(Force);
 						int newPosition = -1;
 
 						if (Force[i] == 0)
@@ -91,7 +93,7 @@ public class STCTSolver
 						Force[i] = Force[newPosition];
 						Force[newPosition] = tmpd;
 
-						double newResult = eval();
+						final double newResult = eval();
 
 						if (newResult < oldResult)
 						{
@@ -140,7 +142,7 @@ public class STCTSolver
 			}
 		}
 
-		if (Options.profile_on)
+		if (Config.BDD_PROFILE_ON.get())
 		{
 			Options.out.println("STCT:SA algorithm " + ((improvments > 0)
 														? (" imporved automata ordering " + improvments + " times.")
@@ -164,7 +166,7 @@ public class STCTSolver
 	}
 
 	/** return the index of the max element in this vector */
-	private int max(double[] vector)
+	private int max(final double[] vector)
 	{
 		int best_index = 0;
 		double best = Double.NEGATIVE_INFINITY;
@@ -185,13 +187,13 @@ public class STCTSolver
 	 * Force evaluates how likely a given component should be moved to another location
 	 * and in which direction it should go
 	 */
-	private int force(int k)
+	private int force(final int k)
 	{
 		int sum = 0;
 
 		for (int i = 0; i < size; i++)
 		{
-			int curr = work[i].index_local;
+			final int curr = work[i].index_local;
 
 			if ((i != k) && (work[k].wlocal[curr] > 0))
 			{
@@ -203,7 +205,7 @@ public class STCTSolver
 	}
 
 	/** the number of crossing component i */
-	private double cross(int i)
+	private double cross(final int i)
 	{
 		double sum = 0;
 
@@ -244,8 +246,8 @@ public class STCTSolver
 
 		for (int i = 0; i < size; i++)
 		{
-			int j = (int) (Math.random() * size);
-			Node tmp = work[i];
+			final int j = (int) (Math.random() * size);
+			final Node tmp = work[i];
 
 			work[i] = work[j];
 			work[j] = tmp;

@@ -1,6 +1,8 @@
 package org.supremica.util.BDD.solvers;
 
-import org.supremica.util.BDD.*;
+import org.supremica.properties.Config;
+import org.supremica.util.BDD.Options;
+import org.supremica.util.BDD.QuickSort;
 
 /**
  * Ordering solver base class.
@@ -14,10 +16,10 @@ public abstract class Solver
 	protected int size;
 	protected Node[] org, solved;
 
-	private double [] internal_weight; /** for internal sorting */
-	private Node [] internal_object; /** for internal sorting */
+	private final double [] internal_weight; /** for internal sorting */
+	private final Node [] internal_object; /** for internal sorting */
 
-	public Solver(Node[] org_)
+	public Solver(final Node[] org_)
 	{
 		this.org = org_;
 		this.size = org_.length;
@@ -28,12 +30,12 @@ public abstract class Solver
 
 		solve();
 
-		if(Options.profile_on)
+		if(Config.BDD_PROFILE_ON.get())
 		{
-			int [] order = new int[size];
+			final int [] order = new int[size];
 			for(int i = 0; i < order.length; i++) order[i] = solved[i].index;
 
-			double cost = totalCost(order);
+			final double cost = totalCost(order);
 			Options.out.println("--> [Solver] ordering cost = " + cost);
 		}
 	}
@@ -45,7 +47,7 @@ public abstract class Solver
 
 	public abstract void solve();
 
-	protected double cost(int from, int to, int distance)
+	protected double cost(final int from, final int to, final int distance)
 	{
 
 		// this is VERY non-theoretical :)
@@ -56,7 +58,7 @@ public abstract class Solver
 		// return Math.pow( org[from].wlocal[to] * Math.abs(distance), 1.5);
 	}
 
-	protected double totalCost(int[] order)
+	protected double totalCost(final int[] order)
 	{
 		double ret = 0.0;
 
@@ -133,7 +135,7 @@ public abstract class Solver
 	 *
 	 * <p> side-effect: org[].extra3 changed
 	 */
-	protected final void sort(int[] data, int start, int end, int parent)
+	protected final void sort(final int[] data, final int start, final int end, final int parent)
 	{
 
 		// only one element, nothing to do
@@ -183,8 +185,8 @@ public abstract class Solver
 		// 4. ... and write back
 		for(int i = 0; i < count; i++)
 		{
-			int value = internal_object[i].extra3;
-			int index = i + start;
+			final int value = internal_object[i].extra3;
+			final int index = i + start;
 			data[index] =  value;
 		}
 	}

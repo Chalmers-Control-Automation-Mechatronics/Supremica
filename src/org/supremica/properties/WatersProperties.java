@@ -76,8 +76,6 @@ import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 
-import org.supremica.util.BDD.Options;
-
 
 /**
  * Properties for Waters.
@@ -151,8 +149,6 @@ public final class WatersProperties
       }
 
     }
-
-    updateBDDOptions(false);
   }
 
   /**
@@ -203,7 +199,6 @@ public final class WatersProperties
                                      final boolean saveAll)
     throws FileNotFoundException, IOException
   {
-    updateBDDOptions(false);
     try (final OutputStream os = new FileOutputStream(propertyFile)) {
       final BufferedWriter writer =
         new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
@@ -242,42 +237,6 @@ public final class WatersProperties
     final Properties newProperties = new Properties();
     newProperties.load(inStream);
     return newProperties;
-  }
-
-  /*
-   * The problem is that we got two copies of BDD Options. This will make sure
-   * they are both updated
-   *
-   * TO DO: Rewrite the Option code in the BDD Package to support the new
-   * style property handling.
-   */
-  public static void updateBDDOptions(final boolean from_Options)
-  {
-    if (from_Options) {
-      // Options -> Config
-      Config.BDD_ORDER_ALGO
-        .set(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
-      Config.BDD_DEBUG_ON.set(Options.debug_on);
-      Config.BDD_PROFILE_ON.set(Options.profile_on);
-    } else {
-      // Config -> Options
-      Options.ordering_algorithm = indexOf(Config.BDD_ORDER_ALGO.get(),
-                                           Options.ORDERING_ALGORITHM_NAMES);
-      Options.debug_on = Config.BDD_DEBUG_ON.get();
-      Options.profile_on = Config.BDD_PROFILE_ON.get();
-    }
-  }
-
-  /**
-   * Returns the index of object in objects. For the BDD options.
-   */
-  private static int indexOf(final Object object, final Object[] objects)
-  {
-    for (int i = 0; i < objects.length; i++) {
-      if (object.equals(objects[i]))
-        return i;
-    }
-    return -1;
   }
 
 
@@ -418,13 +377,5 @@ public final class WatersProperties
   private static final long SAVE_DELAY = 2000;
   @SuppressWarnings("unused")
   private final static Config CONFIG = Config.getInstance();
-
-
-  //#########################################################################
-  //# Static Initialiser
-  static {
-    // Update values in BDD.Options based on Config.
-    updateBDDOptions(false);
-  }
 
 }

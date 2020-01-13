@@ -87,7 +87,8 @@ public class SupremicaOptionPage extends SimpleLeafOptionPage
           option = new EnumOption<Object>
             (property.getKey(), property.getComment(),
              null, null,
-             ((EnumProperty<?>) property).getLegalValues());
+             ((EnumProperty<?>) property).getLegalValues(),
+             ((EnumProperty<?>) property).get());
         } else if (property instanceof ObjectProperty) {
           final ObjectProperty<?> prop = (ObjectProperty<?>) property;
           final Object[] legalValues = prop.getLegalValues();
@@ -95,7 +96,8 @@ public class SupremicaOptionPage extends SimpleLeafOptionPage
             option = new EnumOption<Object>
               (property.getKey(), property.getComment(),
                null, null,
-               ((ObjectProperty<?>) property).getLegalValues());
+               ((ObjectProperty<?>) property).getLegalValues(),
+               ((ObjectProperty<?>) property).get());
           } else {
             try {
               option = new StringOption(prop.getKey(), prop.getComment(),
@@ -117,6 +119,7 @@ public class SupremicaOptionPage extends SimpleLeafOptionPage
             +property.getClass().getSimpleName());
           continue;
         }
+        option.setEditable(property.isEditable());
         mOptions.add(option);
         add(option);
         option.addPropertyChangeListener(new OptionChangeListener() {

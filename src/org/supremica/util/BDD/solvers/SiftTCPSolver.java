@@ -1,6 +1,7 @@
 package org.supremica.util.BDD.solvers;
 
-import org.supremica.util.BDD.*;
+import org.supremica.properties.Config;
+import org.supremica.util.BDD.Options;
 
 /**
  * try
@@ -12,12 +13,13 @@ public class SiftTCPSolver
 	private Node[] work = null;
 	public int improvments;
 
-	public SiftTCPSolver(Node[] org_)
+	public SiftTCPSolver(final Node[] org_)
 	{
 		super(org_);
 	}
 
-	public void solve()
+	@Override
+  public void solve()
 	{
 		super.solve();
 
@@ -33,16 +35,16 @@ public class SiftTCPSolver
 			work[i] = solved[i];    // start with our TSP solution
 		}
 
-		double best = eval();
+		final double best = eval();
 
 		improvments = 0;
 
 		for (int j = 0; j < size * 5; j++)
 		{
-			int r = (int) (Math.random() * size);
+			final int r = (int) (Math.random() * size);
 
 			// int dir = (Math.random() >= 0.5) ? 3 : -3;
-			int dir = 1 + (int) (Math.random() * (size - 1));
+			final int dir = 1 + (int) (Math.random() * (size - 1));
 			int to = r + dir;
 
 			// wrap around, not very clever, huh?
@@ -84,7 +86,7 @@ public class SiftTCPSolver
 			}
 		}
 
-		if (Options.profile_on)
+		if (Config.BDD_PROFILE_ON.get())
 		{
 			Options.out.println("TCP+sift algorithm " + ((improvments > 0)
 														 ? (" imporved automata ordering " + improvments + " times.")
@@ -96,7 +98,7 @@ public class SiftTCPSolver
 	// taken from STCT
 
 	/** the number of crossing component i */
-	private double cross(int i)
+	private double cross(final int i)
 	{
 		double sum = 0;
 
