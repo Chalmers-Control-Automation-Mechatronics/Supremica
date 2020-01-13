@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.awt.Color;
 import java.io.File;
 import java.util.Set;
 
@@ -115,6 +116,12 @@ public interface OptionContext
    */
   public OptionEditor<String>
   createStringEditor(StringOption option);
+
+  /**
+   * Creates an option editor for a color option.
+   */
+  public OptionEditor<Color>
+  createColorEditor(ColorOption option);
 
   /**
    * Creates an option editor for a simple leaf option page.

@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.options;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,6 +79,8 @@ public abstract class LeafOptionPage extends OptionPage
   {
     return mTitle;
   }
+
+  public abstract List<Option<?>> getOptions();
 
 
   private final String mTitle;

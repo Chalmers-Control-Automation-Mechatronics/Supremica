@@ -37,4 +37,10 @@ public class ComponentKindOption extends Option<ComponentKind>
     return false;
   }
 
+  @Override
+  public void set(final String text)
+  {
+    //Do nothing
+  }
+
 }

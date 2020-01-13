@@ -100,6 +100,35 @@ public class EnumOption<E> extends Option<E>
     return context.createEnumEditor(this);
   }
 
+  @Override
+  public void set(final String text)
+  {
+    final E value = parseObject(text);
+    if (value != null) {
+      setValue(value);
+    }
+    else {
+      final String message = "Enum value '"+value+"' could not be found.";
+      throw new IllegalArgumentException(message);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Parses a string into the enumeration type associated with this property.
+   */
+  private E parseObject(final String name)
+  {
+    for (final E value : mEnumConstants) {
+      if (value.toString().equalsIgnoreCase(name)) {
+        return value;
+      }
+    }
+    return null;
+  }
+
 
   //#########################################################################
   //# Data Members

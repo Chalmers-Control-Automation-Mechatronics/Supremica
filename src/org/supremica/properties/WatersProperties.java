@@ -72,27 +72,37 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
+
 import org.supremica.util.BDD.Options;
 
 
 /**
- * Properties for Supremica. All properties are added in the Config class.
+ * Properties for Waters.
  *
- * @author Knut &Aring;kesson
+ * @author Benjamin Wheeler
  */
 
-public final class SupremicaProperties
+public final class WatersProperties
 {
-  private SupremicaProperties()
+  private WatersProperties()
   {
   }
 
   public static String getProperties()
   {
     final StringBuilder sb = new StringBuilder();
-    for (final Property property : Property.getAllProperties()) {
-      sb.append("# ").append(property.getComment()).append("\n");
-      sb.append(property.toString()).append("\n\n");
+    for (final LeafOptionPage page : OptionPage.OPTION_PAGES) {
+      for (final Option<?> option : page.getOptions()) {
+        if (!option.isPersistent()) continue;
+        sb.append("# ").append(option.getShortName()).append("\n");
+        final String value = option.getAsString();
+        final String escaped = getEscapedString(value, true);
+        sb.append(page.getPrefix()).append('.')
+          .append(option.getID()).append(" ").append(escaped).append("\n\n");
+      }
     }
     return sb.toString();
 
@@ -111,26 +121,37 @@ public final class SupremicaProperties
   private static void updateProperties(final File propertyFile)
     throws FileNotFoundException, IOException
   {
-    if (true) return;
     final Properties propertiesFromFile = buildProperties(propertyFile);
     for (final Enumeration<?> e = propertiesFromFile.keys(); e
       .hasMoreElements();) {
       final String newKey = (String) e.nextElement();
       final String newValue = propertiesFromFile.getProperty(newKey);
 
-      final Property orgProperty = Property.getProperty(newKey);
-      if (orgProperty == null) {
-        System.err.println("Unknown property: " + newKey);
-      } else {
-        try {
-          orgProperty.set(newValue);
-        } catch (final IllegalArgumentException ex) {
-          System.err.println("Invalid argument to key: " + newKey);
+      int index = 0;
+      while (index != -1) {
+        final String prefix = newKey.substring(0, index);
+        final LeafOptionPage page = OptionPage.getOptionPage(prefix);
+        if (page != null) {
+          final String suffix = newKey.substring(index + 1);
+          final Option<?> option = page.get(suffix);
+          if (option != null) {
+            try {
+              option.set(newValue);
+              break;
+            } catch (final IllegalArgumentException ex) {
+              System.err.println("Invalid argument to key: " + newKey);
+              break;
+            }
+          }
         }
+        index = newKey.indexOf('.', index + 1);
       }
+      if (index == -1) {
+        System.err.println("Unknown property: " + newKey);
+      }
+
     }
 
-    // Update values in BDD.Options based on the current Config.
     updateBDDOptions(false);
   }
 
@@ -155,12 +176,11 @@ public final class SupremicaProperties
 
   public static void saveProperties() throws IOException
   {
-    SupremicaProperties.saveProperties(false);
+    WatersProperties.saveProperties(false);
   }
 
   public static void saveProperties(final boolean saveAll) throws IOException
   {
-    if (true) return;//TODO Testing
     if (propertyFile != null) {
       saveProperties(propertyFile, saveAll);
     } else {
@@ -183,27 +203,28 @@ public final class SupremicaProperties
                                      final boolean saveAll)
     throws FileNotFoundException, IOException
   {
-    // Update config from the current values in BDD.Options
-    // (WHY!!? IT SHOULD BE THE OTHER WAY AROUND OR THEY ARE LOST?! /hguo)
-    //updateBDDOptions(true);    // first sync from BDD options
-    updateBDDOptions(false); // Send the new Config values to BDD.Options
-
+    updateBDDOptions(false);
     try (final OutputStream os = new FileOutputStream(propertyFile)) {
       final BufferedWriter writer =
         new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
-      writer.write("# Supremica configuration file\n");
+      writer.write("# Waters configuration file\n");
       writer.write("# Created: " + new Date().toString() + "\n\n");
 
-      for (final Property property : Property.getAllProperties()) {
-        if (saveAll || property.currentValueDifferentFromDefaultValue()) {
-          writer.append("# " + property.getComment() + "\n");
-          final String value = property.getAsString();
-          final String escaped = getEscapedString(value, false);
-          writer.append(property.getPropertyType() + "." + property.getKey() +
-                        " " + escaped + "\n\n");
+      for (final LeafOptionPage page : OptionPage.OPTION_PAGES) {
+        for (final Option<?> option : page.getOptions()) {
+          final String value = option.getAsString();
+          final String defaultValue = option.getDefaultAsString();
+          final boolean different = !(value).equals(defaultValue);
+          if (saveAll || different) {
+            writer.append("# ").append(option.getShortName()).append("\n");
+            final String escapedKey = getEscapedString(option.getID(), true);
+            final String escapedValue = getEscapedString(value, true);
+            writer.append(page.getPrefix()).append('.')
+              .append(escapedKey).append(" ")
+              .append(escapedValue).append("\n\n");
+          }
         }
       }
-
       writer.flush();
     }
   }

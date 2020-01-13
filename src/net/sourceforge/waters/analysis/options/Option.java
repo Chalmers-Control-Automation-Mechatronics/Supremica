@@ -34,6 +34,12 @@
 package net.sourceforge.waters.analysis.options;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
@@ -181,7 +187,9 @@ public abstract class Option<T> implements Cloneable
    */
   public void setValue(final T value)
   {
+    final String oldValue = getAsString();
     mValue = value;
+    firePropertyChanged(oldValue);
   }
 
   /**
@@ -189,7 +197,80 @@ public abstract class Option<T> implements Cloneable
    */
   public void restoreDefaultValue()
   {
+    final String oldValue = getAsString();
     mValue = mDefaultValue;
+    firePropertyChanged(oldValue);
+  }
+
+  public abstract void set(String text);
+
+  public String getAsString() {
+    return ""+mValue;
+  }
+
+  public String getDefaultAsString() {
+    return ""+mDefaultValue;
+  }
+
+  public void addPropertyChangeListener
+  (final OptionChangeListener listener)
+  {
+    if (mListeners == null) {
+      mListeners = new LinkedList<>();
+    }
+    mListeners.add(listener);
+  }
+
+  public void removePropertyChangeListener
+  (final OptionChangeListener listener)
+  {
+    if (mListeners != null) {
+      mListeners.remove(listener);
+      if (mListeners.isEmpty()) {
+        mListeners = null;
+      }
+    }
+  }
+
+  public void firePropertyChanged(final String oldValue) {
+    if (mListeners != null) {
+      final String newValue = getAsString();
+      if (oldValue.equals(newValue)) return;
+      final OptionChangeEvent event =
+        new OptionChangeEvent(this, oldValue, newValue);
+      final List<OptionChangeListener> copy =
+        new ArrayList<>(mListeners);
+      for (final OptionChangeListener listener : copy) {
+        listener.optionChanged(event);
+      }
+    }
+    saveLater();
+  }
+
+  private static Method loadSaveMethod() {
+    final String className = "org.supremica.properties.WatersProperties";
+    final String methodName = "savePropertiesLater";
+    try {
+      return Option.class.getClassLoader()
+        .loadClass(className)
+        .getMethod(methodName);
+    } catch (ClassNotFoundException
+      | NoSuchMethodException
+      | SecurityException exception) {
+      // TODO Auto-generated catch block
+      exception.printStackTrace();
+      return null;
+    }
+  }
+
+  private static void saveLater() {
+    try {
+      saveMethod.invoke(null);
+    } catch (IllegalAccessException | IllegalArgumentException
+      | InvocationTargetException exception) {
+      // TODO Auto-generated catch block
+      exception.printStackTrace();
+    }
   }
 
 
@@ -214,5 +295,8 @@ public abstract class Option<T> implements Cloneable
   private final String mCommandLineOption;
   private final T mDefaultValue;
   private T mValue;
+  private List<OptionChangeListener> mListeners;
+
+  private static Method saveMethod = loadSaveMethod();
 
 }

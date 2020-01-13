@@ -33,56 +33,13 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-
-
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of
- * <CODE>boolean</CODE> type.
- *
- * @author Brandon Bassett
+ * 
+ * @author Benjamin Wheeler
  */
-
-public class BooleanOption extends Option<Boolean>
+public interface OptionChangeListener
 {
-  //#########################################################################
-  //# Constructors
-  public BooleanOption(final String id,
-                       final String shortName,
-                       final String description,
-                       final String commandLineOption,
-                       final boolean defaultValue)
-  {
-   super(id, shortName, description, commandLineOption, defaultValue);
-  }
 
-
-  //#########################################################################
-  //# Type-specific Access
-  public boolean getBooleanValue()
-  {
-    return getValue().booleanValue();
-  }
-
-  public void setValue(final boolean value)
-  {
-    super.setValue(value);
-  }
-
-  @Override
-  public void set(final String text)
-  {
-    final boolean boolval = Boolean.parseBoolean(text);
-    setValue(boolval);
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
-  @Override
-  public OptionEditor<Boolean> createEditor(final OptionContext context)
-  {
-    return context.createBooleanEditor(this);
-  }
+  public void optionChanged(OptionChangeEvent event);
 
 }

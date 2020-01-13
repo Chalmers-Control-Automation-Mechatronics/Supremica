@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -54,6 +56,30 @@ public abstract class SelectorLeafOptionPage extends LeafOptionPage
 
   public abstract List<Option<?>> getOptionsForSelector
     (final SelectorOption<?> selectorOption, final Object key);
+
+  @Override
+  public List<Option<?>> getOptions() {
+    final List<Option<?>> options = new LinkedList<>();
+    final SelectorOption<?> selectorOption = getTopSelectorOption();
+    addOptions(options, selectorOption);
+    return options.stream().distinct().collect(Collectors.toList());
+  }
+
+  private void addOptions(final List<Option<?>> options,
+                          final SelectorOption<?> selectorOption)
+  {
+    options.add(selectorOption);
+    for (final Object key : selectorOption.getEnumConstants()) {
+      final SelectorOption<?> subSelectorOption =
+        getSubSelector(selectorOption, key);
+      if (subSelectorOption != null) {
+        addOptions(options, subSelectorOption);
+      }
+      else {
+        options.addAll(getOptionsForSelector(selectorOption, key));
+      }
+    }
+  }
 
   @Override
   public OptionPageEditor<SelectorLeafOptionPage> createEditor

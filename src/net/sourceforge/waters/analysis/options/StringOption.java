@@ -65,4 +65,10 @@ public class StringOption extends Option<String>
     return context.createStringEditor(this);
   }
 
+  @Override
+  public void set(final String text)
+  {
+    setValue(text);
+  }
+
 }

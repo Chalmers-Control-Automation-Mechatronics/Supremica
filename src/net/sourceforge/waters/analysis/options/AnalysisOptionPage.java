@@ -57,6 +57,7 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
     final List<ModelAnalyzerFactoryLoader> loaders = getLoaders(operation);
     mAlgorithmOption = new AnalysisAlgorithmOption
       (operation.getOptionPagePrefix()+".AlgorithmSelector", loaders, null);
+    add(mAlgorithmOption);
     mOperation = operation;
   }
 

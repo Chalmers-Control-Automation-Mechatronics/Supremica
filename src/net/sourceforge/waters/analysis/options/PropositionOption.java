@@ -71,6 +71,12 @@ public class PropositionOption extends Option<EventProxy>
     return enc.getEventCode(getValue());
   }
 
+  @Override
+  public void set(final String text)
+  {
+    //Do nothing
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Option

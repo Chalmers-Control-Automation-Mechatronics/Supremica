@@ -62,6 +62,7 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
       getFamilies(classNames);
     mFamilyOption = new SimplifierFamilyOption(prefix+".FamilySelector",
                                                factories, null);//TODO
+    add(mFamilyOption);
     for (final AutomatonSimplifierFactory factory : factories) {
       final List<AutomatonSimplifierCreator> creators =
         factory.getSimplifierCreators();
@@ -126,6 +127,7 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
   {
     mCreatorOptionMap.put(factory, creatorOption);
     mCreatorOptions.add(creatorOption);
+    add(creatorOption);
   }
 
   @Override

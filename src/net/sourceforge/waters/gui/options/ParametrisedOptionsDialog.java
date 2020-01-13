@@ -36,7 +36,6 @@ package net.sourceforge.waters.gui.options;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.PatternSyntaxException;
@@ -137,10 +136,6 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     add(buttonsPanel, constraints);
 
     pack();
-    final int height =
-      Math.min(getHeight(),
-               Toolkit.getDefaultToolkit().getScreenSize().height/2);
-    setSize(getWidth(), height);
     setLocationRelativeTo(mIde);
     setVisible(true);
   }

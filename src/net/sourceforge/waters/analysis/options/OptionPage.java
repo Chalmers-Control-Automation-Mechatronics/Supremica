@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,6 +110,20 @@ public abstract class OptionPage
     return null;
   }
 
+  public static OptionPage loadOptionPage(final String className,
+                                                    final String fieldName) {
+    try {
+      final Class<?>cls = OptionPage.class.getClassLoader().loadClass(className);
+      final Field f = cls.getField(fieldName);
+      final OptionPage page = (OptionPage) f.get(null);
+      return page;
+    } catch (ClassNotFoundException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException exception) {
+      // TODO Auto-generated catch block
+      exception.printStackTrace();
+      return null;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -141,13 +156,18 @@ public abstract class OptionPage
      "org.supremica.automata.waters.SupremicaSimplifierFactory",
      ChainSimplifierFactory.class.getName());
 
+
+
   private static final AggregatorOptionPage[] TOP_LEVEL_AGGREGATORS =
   new AggregatorOptionPage[] {
     new AggregatorOptionPage("Waters", ConflictCheck, ControllabilityCheck,
                              ControllabilityCheck, ControlLoop,
                              DeadlockCheck, LanguageInclusion,
                              StateCounter, SynchronousProduct, Synthesis,
-                             Simplifier)
+                             Simplifier),
+    (AggregatorOptionPage)
+    loadOptionPage("org.supremica.properties.SupremicaOptionPage",
+                   "SUPREMICA_AGGREGATOR_OPTION_PAGE")
   };
 
   public static final AggregatorOptionPage TOP_LEVEL_AGGREGATOR =

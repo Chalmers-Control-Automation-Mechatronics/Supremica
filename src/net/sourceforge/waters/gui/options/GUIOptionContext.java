@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.options;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 import java.util.List;
@@ -43,6 +44,7 @@ import javax.swing.Icon;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ColorOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
@@ -205,6 +207,13 @@ public class GUIOptionContext implements OptionContext
   createStringEditor(final StringOption option)
   {
     return new StringOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionEditor<Color>
+  createColorEditor(final ColorOption option)
+  {
+    return new ColorOptionPanel(this, option);
   }
 
   @Override

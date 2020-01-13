@@ -33,56 +33,36 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.awt.Color;
+
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} representing a
- * positive integer. This parameter is represented as an <CODE>int</CODE>
- * value, with an allowable range from 0 to {@link Integer#MAX_VALUE}.
- * The maximum value is typically the default and represents an undefined
- * parameter value.
+ * A configurable parameter of a {@link ModelAnalyzer} of
+ * <CODE>boolean</CODE> type.
  *
- * @author Brandon Bassett, Robi Malik
+ * @author Brandon Bassett
  */
 
-public class PositiveIntOption extends Option<Integer>
+public class ColorOption extends Option<Color>
 {
   //#########################################################################
   //# Constructors
-  /**
-   * Creates a positive integer parameter with {@link Integer#MAX_VALUE}
-   * as its default.
-   */
-  public PositiveIntOption(final String id,
-                           final String shortName,
-                           final String description,
-                           final String commandLineOption)
+  public ColorOption(final String id,
+                       final String shortName,
+                       final String description,
+                       final String commandLineOption,
+                       final Color defaultValue)
   {
-    this(id, shortName, description, commandLineOption, Integer.MAX_VALUE);
-  }
-
-  /**
-   * Creates a positive integer parameter with a specified default.
-   */
-  public PositiveIntOption(final String id,
-                           final String shortName,
-                           final String description,
-                           final String commandLineOption,
-                           final int defaultValue)
-  {
-    super(id, shortName, description, commandLineOption, defaultValue);
+   super(id, shortName, description, commandLineOption, defaultValue);
   }
 
 
   //#########################################################################
   //# Type-specific Access
-  public int getIntValue()
-  {
-    return getValue().intValue();
-  }
-
-  public void setValue(final int value)
+  @Override
+  public void setValue(final Color value)
   {
     super.setValue(value);
   }
@@ -90,21 +70,33 @@ public class PositiveIntOption extends Option<Integer>
   @Override
   public void set(final String text)
   {
-    try {
-      final int value = Integer.parseUnsignedInt(text);
-      setValue(value);
-    } catch(final NumberFormatException e) {
-      throw new IllegalArgumentException(e);
-    }
+    final Color color = Color.decode(text);
+    setValue(color);
+  }
+
+  @Override
+  public String getAsString()
+  {
+    final int rgb = getValue().getRGB() & 0xffffff;
+    final String hex = Integer.toHexString(rgb | 0x1000000);
+    return "#" + hex.substring(1);
+  }
+
+  @Override
+  public String getDefaultAsString()
+  {
+    final int rgb = getDefaultValue().getRGB() & 0xffffff;
+    final String hex = Integer.toHexString(rgb | 0x1000000);
+    return "#" + hex.substring(1);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Option
   @Override
-  public OptionEditor<Integer> createEditor(final OptionContext context)
+  public OptionEditor<Color> createEditor(final OptionContext context)
   {
-    return context.createPositiveIntEditor(this);
+    return context.createColorEditor(this);
   }
 
 }

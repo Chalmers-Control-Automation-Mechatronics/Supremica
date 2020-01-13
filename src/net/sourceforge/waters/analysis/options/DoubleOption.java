@@ -114,6 +114,17 @@ public class DoubleOption extends Option<Double>
     return mMaxValue;
   }
 
+  @Override
+  public void set(final String text)
+  {
+    try {
+      final double value = Double.parseDouble(text);
+      this.setValue(value);
+    } catch(final NumberFormatException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Option

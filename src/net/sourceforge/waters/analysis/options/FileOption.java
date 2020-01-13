@@ -74,4 +74,11 @@ public class FileOption extends Option<File>
     return context.createFileEditor(this);
   }
 
+  @Override
+  public void set(final String text)
+  {
+    final File value = new File(text);
+    setValue(value);
+  }
+
 }

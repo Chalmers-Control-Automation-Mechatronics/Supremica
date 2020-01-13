@@ -96,6 +96,11 @@ public class EventSetOption extends Option<Set<EventProxy>>
     return false;
   }
 
+  @Override
+  public void set(final String text)
+  {
+    //Do nothing
+  }
 
   //#########################################################################
   //# Inner Enumeration EventKind
