@@ -40,7 +40,7 @@ public class Config
     ("generalStateSeparator",
       "State Separator Character", "State separator character", null, ".");
   public static final StringOption GENERAL_STATE_LABEL_SEPARATOR = new StringOption
-    ("generalStateLabelSeparator",
+    ("generalStudentVersion",
       "State Label Separator Character", "State label separator character", null, ".");
   public static final BooleanOption GENERAL_STUDENT_VERSION = new BooleanOption
     ("generalStateLabelSeparator",
@@ -114,7 +114,7 @@ public class Config
     ("automatonVariablesCompiler",
      "Automaton Variables Compiler", "Allow automaton names in EFSM guards", null, false);
   public static final BooleanOption INCLUDE_RAS_SUPPORT = new BooleanOption
-    ("includeRASSuport",
+    ("includeRASSupport",
      "Include RAS Support", "Include RAS support", null, false);
 
 
