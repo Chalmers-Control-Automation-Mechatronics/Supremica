@@ -37,9 +37,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.SupremicaProperties;
+
+import javafx.beans.property.BooleanProperty;
 
 
 /**
@@ -65,20 +68,20 @@ public class ConfigBooleanPropertyAction
   /**
    * Creates a new Boolean property action.
    * @param ide       The IDE.
-   * @param property  The property affected by the action.
+   * @param option    The property affected by the action.
    * @param shortName A short name to describe the action. The short name
    *                  is displayed when the action appears in the menu,
    *                  and the (longer) comment of the property is used as a
    *                  tool tip.
    */
   ConfigBooleanPropertyAction(final IDE ide,
-                              final BooleanProperty property,
+                              final BooleanOption option,
                               final String shortName)
   {
     super(ide);
     putValue(Action.NAME, shortName);
-    putValue(Action.SHORT_DESCRIPTION, property.getComment());
-    mProperty = property;
+    putValue(Action.SHORT_DESCRIPTION, option.getShortName());
+    mOption = option;
     setEnabled(true);
   }
 
@@ -88,14 +91,14 @@ public class ConfigBooleanPropertyAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    mProperty.toggle();
+    mOption.setValue(!mOption.getValue());
     SupremicaProperties.savePropertiesLater();
   }
 
 
   //#########################################################################
   //# Data Members
-  private final BooleanProperty mProperty;
+  private final BooleanOption mOption;
 
 
   //#########################################################################

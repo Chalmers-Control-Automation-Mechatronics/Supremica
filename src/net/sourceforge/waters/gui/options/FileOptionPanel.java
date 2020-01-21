@@ -112,7 +112,7 @@ class FileOptionPanel
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.gridy = 0;
 
-    final File defaultPath = new File(Config.FILE_SAVE_PATH.get());
+    final File defaultPath = new File(Config.FILE_SAVE_PATH.getValue());
     mCell = new FileInputCell(defaultPath, true);
     mCell.setValue(file);
     mCell.setColumns(15);

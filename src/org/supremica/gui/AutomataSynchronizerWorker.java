@@ -88,7 +88,7 @@ public class AutomataSynchronizerWorker
 
             try
             {
-                theSynchronizer = new AutomataSynchronizer(theAutomata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
+                theSynchronizer = new AutomataSynchronizer(theAutomata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.getValue());
             }
             catch (final Exception e)
             {

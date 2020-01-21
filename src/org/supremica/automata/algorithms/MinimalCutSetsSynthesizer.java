@@ -51,7 +51,7 @@ public class MinimalCutSetsSynthesizer
     final AutomataSynchronizer synchronizer =
       new AutomataSynchronizer(theAutomata,
                                synchronizationOptions,
-                               Config.SYNTHESIS_SUP_AS_PLANT.get());
+                               Config.SYNTHESIS_SUP_AS_PLANT.getValue());
     synchronizer.execute();
     this.syncAut = synchronizer.getAutomaton();
     logger.info("Calculating the minimal cut sets...");

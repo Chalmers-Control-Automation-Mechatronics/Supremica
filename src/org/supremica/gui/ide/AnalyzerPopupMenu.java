@@ -106,7 +106,7 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerRenameAction.getMenuItem());
         add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
 
-        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
+        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.getValue())
         {
             final JMenu experimentMenu = new JMenu("Experimental");
             experimentMenu.setToolTipText("Experimental functions (under development)");

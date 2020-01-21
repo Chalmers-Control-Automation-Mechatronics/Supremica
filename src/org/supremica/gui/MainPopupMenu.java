@@ -89,7 +89,7 @@ class MainPopupMenu
         final JMenu viewMenu = new JMenu("View");
         menuHandler.add(viewMenu, 1);
 
-        if (Config.DOT_USE.isTrue())
+        if (Config.DOT_USE.getValue())
         {
             final JMenuItem viewItem = new JMenuItem("View automaton");
             viewItem.setToolTipText("Display graphical representation of the selected automata");
@@ -152,7 +152,7 @@ class MainPopupMenu
         final JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
         synthesizeItem.setToolTipText("Synthesize supervisor");
 
-        if (Config.GENERAL_STUDENT_VERSION.isTrue())
+        if (Config.GENERAL_STUDENT_VERSION.getValue())
         {
             verifyItem.setToolTipText("Verification is disabled--use the Workbench!");
             synthesizeItem.setToolTipText("Synthesis is disabled--use the Workbench!");
@@ -260,7 +260,7 @@ class MainPopupMenu
                 });
                  */
 
-        if (Config.INCLUDE_BOUNDED_UNCON_TOOLS.isTrue())
+        if (Config.INCLUDE_BOUNDED_UNCON_TOOLS.getValue())
         {
             final JMenuItem extendItem = new JMenuItem("Extend");
             menuHandler.add(extendItem, 1);
@@ -416,7 +416,7 @@ class MainPopupMenu
 
         // --------------------------------------------------------------
         // ***************** UNDER DEVELOPMENT MENUES ARE ADDED HERE:
-        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue())
+        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.getValue())
         {
             final JMenu expMenu = new JMenu("Experimental algorithms");
             menuHandler.add(expMenu, 1);

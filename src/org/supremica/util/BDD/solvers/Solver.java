@@ -30,7 +30,7 @@ public abstract class Solver
 
 		solve();
 
-		if(Config.BDD_PROFILE_ON.get())
+		if(Config.BDD_PROFILE_ON.getValue())
 		{
 			final int [] order = new int[size];
 			for(int i = 0; i < order.length; i++) order[i] = solved[i].index;

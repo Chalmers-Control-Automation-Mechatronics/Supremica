@@ -31,38 +31,47 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.util;
+package org.supremica.properties;
 
-
-import net.sourceforge.waters.analysis.bdd.BDDModelVerifier;
-
-import org.supremica.properties.Config;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * A helper class to access Supremica options from Waters code.
- * This class contains static methods to configure model analysers,
- * which can be called through reflection to avoid compile-time dependency
- * on Supremica licensed code.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class ConfigBridge
+public class LegacyOptions
 {
-  public static void configureModelAnalyzer(final BDDModelVerifier verifier)
-  {
-    verifier.setBDDPackage(Config.BDD2_BDD_LIBRARY.getValue());
-    verifier.setInitialSize(Config.BDD2_INITIAL_NODE_TABLE_SIZE.getValue());
-    verifier.setPartitioningSizeLimit(Config.BDD_PARTITION_MAX.getValue());
+
+  public static String get(final String legacyKey) {
+    final String newKey = legacyMap.get(legacyKey);
+    return newKey != null ? newKey : legacyKey;
   }
 
-  public static int getGridSize()
-  {
-    if (Config.GUI_EDITOR_SHOW_GRID.getValue()) {
-      return Config.GUI_EDITOR_GRID_SIZE.getValue();
-    } else {
-      return 1;
-    }
+  private static void put(final String legacyKey, final String newKey) {
+    legacyMap.put(legacyKey, newKey);
   }
+
+  public static void init() {
+    if (init) return;
+
+    //gui->general
+    put("gui.ideFrameWidth", "general.ideFrameWidth");
+    put("gui.ideFrameHeight", "general.ideFrameHeight");
+    put("gui.ideFrameX", "general.ideFrameX");
+    put("gui.ideFrameY", "general.ideFrameY");
+    put("gui.ideFrameMaximized", "general.ideFrameMaximized");
+    //gui->gui.compiler
+    put("gui.includeInstantiation", "gui.compiler.includeInstantiation");
+    put("gui.backgroundCompiler", "gui.compiler.backgroundCompiler");
+    put("gui.optimizingCompiler", "gui.compiler.optimizingCompiler");
+    put("gui.normalizingCompiler", "gui.compiler.normalizingCompiler");
+    put("gui.automatonVariablesCompiler", "gui.compiler.automatonVariablesCompiler");
+    put("gui.includeRASSupport", "gui.compiler.includeRASSupport");
+
+  }
+
+  private static final Map<String, String> legacyMap = new HashMap<>();
+  private static boolean init = false;
+
 }

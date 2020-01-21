@@ -95,7 +95,7 @@ public class DefaultRenderingContext
   public RenderingInformation getRenderingInformation(final Proxy proxy,
                                                       final ColorGroup group)
   {
-    final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.get();
+    final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.getValue();
     final Color color = layout.getColor
       (group, GraphPanel.DragOverStatus.NOTDRAG, false, false, false);
     if (color == null) {

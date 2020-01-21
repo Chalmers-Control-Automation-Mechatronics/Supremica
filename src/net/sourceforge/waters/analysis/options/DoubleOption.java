@@ -99,11 +99,6 @@ public class DoubleOption extends Option<Double>
     return getValue().doubleValue();
   }
 
-  public void setValue(final double value)
-  {
-    super.setValue(value);
-  }
-
   public double getMin()
   {
     return mMinValue;

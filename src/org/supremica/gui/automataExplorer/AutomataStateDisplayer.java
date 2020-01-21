@@ -35,18 +35,27 @@
 
 package org.supremica.gui.automataExplorer;
 
-import org.supremica.automata.algorithms.*;
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.properties.Config;
 
 public class AutomataStateDisplayer
         extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	@SuppressWarnings("unused")
 	private final AutomataStateViewer stateViewer;
     @SuppressWarnings("unused")
@@ -93,7 +102,7 @@ public class AutomataStateDisplayer
         vp.setBackground(Color.white);
     }
 
-    public void setCurrState(int[] currState)
+    public void setCurrState(final int[] currState)
     {
         helper.addStatus(currState);
 
@@ -108,7 +117,7 @@ public class AutomataStateDisplayer
         stateNameBuffer.append(helper.getIndexMap().getStateAt(0, currState[0]).getName());
         for (int i = 1; i < helper.getAutomata().size(); i++)
         {
-            stateNameBuffer.append(Config.GENERAL_STATE_SEPARATOR.get());
+            stateNameBuffer.append(Config.GENERAL_STATE_SEPARATOR.getValue());
             stateNameBuffer.append(helper.getIndexMap().getStateAt(i, currState[i]).getName());
         }
         stateName.setText(stateNameBuffer.toString());

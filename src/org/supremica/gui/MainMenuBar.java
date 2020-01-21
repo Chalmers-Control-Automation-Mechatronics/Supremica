@@ -408,7 +408,7 @@ public class MainMenuBar
             }
         });
 
-        if (Config.INCLUDE_USERINTERFACE.isTrue())
+        if (Config.INCLUDE_USER_INTERFACE.getValue())
         {
 
             // Project.UserInterface
@@ -442,7 +442,7 @@ public class MainMenuBar
             menuProject.addSeparator();
         }
 
-        if (Config.INCLUDE_ANIMATOR.isTrue())
+        if (Config.INCLUDE_ANIMATOR.getValue())
         {
             // Project.Animator
             final JMenuItem menuProjectAnimator = new JMenuItem();
@@ -516,7 +516,7 @@ public class MainMenuBar
         });
 
         // Tools.Animations
-        if (Config.INCLUDE_ANIMATOR.isTrue())
+        if (Config.INCLUDE_ANIMATOR.getValue())
         {
             final JMenu menuToolsAnimations = new JMenu();
 

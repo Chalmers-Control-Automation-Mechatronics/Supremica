@@ -225,7 +225,7 @@ public class EventDeclEditorDialog
     if (mNamePanel == null) {
       // Initialising for the first time. Everything needs to be done.
       // Name panel, basic part ...
-      final boolean advanced = Config.INCLUDE_INSTANTION.isTrue();
+      final boolean advanced = Config.INCLUDE_INSTANTIATION.getValue();
       mNamePanel = new RaisedDialogPanel();
       mNameLabel = new JLabel("Name:");
       final EventNameInputHandler handler = new EventNameInputHandler();

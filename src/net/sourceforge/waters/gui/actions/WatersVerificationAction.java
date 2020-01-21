@@ -39,6 +39,8 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
@@ -56,8 +58,6 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -66,7 +66,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public abstract class WatersVerificationAction
   extends WatersAction
-  implements SupremicaPropertyChangeListener, CompilationObserver
+  implements OptionChangeListener, CompilationObserver
 {
 
   //#########################################################################
@@ -129,7 +129,7 @@ public abstract class WatersVerificationAction
   //#########################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
   @Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
   {
     updateEnabledStatus();
   }
@@ -155,14 +155,14 @@ public abstract class WatersVerificationAction
     throws ClassNotFoundException
   {
     final ModelAnalyzerFactoryLoader loader;
-    if (Config.INCLUDE_WATERS_ANALYZER.isTrue() && mOperation != null) {
+    if (Config.INCLUDE_WATERS_ANALYZER.getValue() && mOperation != null) {
       final String optionPagePrefix =
         mOperation.getOptionPagePrefix();
       loader = (ModelAnalyzerFactoryLoader)
         ((AnalysisOptionPage) OptionPage.getOptionPage(optionPagePrefix))
         .getTopSelectorOption().getValue();
     } else {
-      loader = Config.GUI_ANALYZER_USED_FACTORY.get();
+      loader = Config.GUI_ANALYZER_USED_FACTORY.getValue();
     }
 
     return loader.getModelAnalyzerFactory();

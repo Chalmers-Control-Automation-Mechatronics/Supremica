@@ -48,6 +48,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -87,8 +89,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class ModuleContainer
@@ -117,7 +117,7 @@ public class ModuleContainer
       new WatersAnalyzerPropertyChangeListener();
     Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
       (mWatersAnalyzerPropertyChangeListener);
-    if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+    if (Config.INCLUDE_WATERS_ANALYZER.getValue()) {
       mAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
     } else {
       mAnalyzerPanel = new SupremicaAnalyzerPanel(this, "Analyzer");
@@ -532,15 +532,15 @@ public class ModuleContainer
   //#########################################################################
   //# Inner Class WatersAnalyzerPropertyChangeListener
   private class WatersAnalyzerPropertyChangeListener
-      implements SupremicaPropertyChangeListener
+      implements OptionChangeListener
   {
     @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    public void optionChanged(final OptionChangeEvent event)
     {
       final int index = mTabPanel.indexOfComponent(mAnalyzerPanel);
       final boolean selected = mTabPanel.getSelectedIndex() == index;
       mTabPanel.removeTabAt(index);
-      if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+      if (Config.INCLUDE_WATERS_ANALYZER.getValue()) {
         mAnalyzerPanel =
           new WatersAnalyzerPanel(ModuleContainer.this, "Analyzer");
       } else {
@@ -700,7 +700,7 @@ public class ModuleContainer
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
 
-  private final SupremicaPropertyChangeListener mWatersAnalyzerPropertyChangeListener;
+  private final OptionChangeListener mWatersAnalyzerPropertyChangeListener;
   private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;
   private int mUndoCheckPoint = 0;

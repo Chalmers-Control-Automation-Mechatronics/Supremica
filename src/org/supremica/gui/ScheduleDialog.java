@@ -75,6 +75,7 @@ import org.supremica.automata.algorithms.scheduling.milp.Milp;
 import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
 import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.properties.Config;
 
 
 public class ScheduleDialog
@@ -278,7 +279,7 @@ public class ScheduleDialog
     public void prepareAutoTest()
             throws Exception
     {
-        final File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
+        final File rootDir = new File(Config.FILE_OPEN_PATH.getAsString());
         final File[] files = rootDir.listFiles(new FilenameFilter()
             {
                 @Override

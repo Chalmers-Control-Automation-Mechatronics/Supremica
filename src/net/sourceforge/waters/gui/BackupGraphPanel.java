@@ -215,7 +215,7 @@ public class BackupGraphPanel
       final SimpleComponentSubject comp =
         (SimpleComponentSubject) getGraph().getParent();
       final String name = comp == null ? "graph" : comp.getName();
-      final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
+      final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.getValue();
       mEmbedder = new SpringEmbedder(mSecondaryGraph.getNodesModifiable(),
                                      mSecondaryGraph.getEdgesModifiable());
       mEmbedder.addObserver(this);

@@ -39,6 +39,8 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -58,8 +60,6 @@ import org.apache.logging.log4j.Logger;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 /**
  * <P>The unit that controls background compilation in the IDE.</P>
@@ -83,7 +83,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * while compilation continues.</P>
  *
  * <P>The automatic compilation can be disabled through the configuration
- * option {@link Config#BACKGROUND_COMPILER}. In that case, module changes
+ * option. In that case, module changes
  * no longer a trigger a timer and the module does not get compiled
  * automatically. The compiler is still started when the user switches tabs or
  * requests verification, in which case the {@link CompilationDialog} is
@@ -110,31 +110,34 @@ public class BackgroundCompiler
     mCompiler.setMultiExceptionsEnabled(true);
     mWorker = new CompilationWorker(this, mCompiler, container.getName());
     container.getModule().addModelObserver(this);
-    mEnablementPropertyChangeListener = new SupremicaPropertyChangeListener() {
+
+    mEnablementPropertyChangeListener =
+    new OptionChangeListener() {
       @Override
-      public void propertyChanged(final SupremicaPropertyChangeEvent event)
+      public void optionChanged(final OptionChangeEvent event)
       {
-        setTimerEnabled(Config.BACKGROUND_COMPILER.isTrue());
+        setTimerEnabled(Config.BACKGROUND_COMPILER.getValue());
       }
     };
-    mEnablementPropertyChangeListener.propertyChanged(null);
-    mCompilerPropertyChangeListener = new SupremicaPropertyChangeListener() {
+    mEnablementPropertyChangeListener.optionChanged(null);
+    mCompilerPropertyChangeListener =
+    new OptionChangeListener() {
       @Override
-      public void propertyChanged(final SupremicaPropertyChangeEvent event)
+      public void optionChanged(final OptionChangeEvent event)
       {
         setModuleChanged();
       }
     };
-    Config.BACKGROUND_COMPILER.addPropertyChangeListener
-      (mEnablementPropertyChangeListener);
-    Config.OPTIMIZING_COMPILER.addPropertyChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.EXPAND_EXTENDED_AUTOMATA.addPropertyChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.NORMALIZING_COMPILER.addPropertyChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.AUTOMATON_VARIABLES_COMPILER.addPropertyChangeListener
-      (mCompilerPropertyChangeListener);
+    Config.BACKGROUND_COMPILER
+    .addPropertyChangeListener(mEnablementPropertyChangeListener);
+    Config.OPTIMIZING_COMPILER
+    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    Config.EXPAND_EXTENDED_AUTOMATA
+    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    Config.NORMALIZING_COMPILER
+    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    Config.AUTOMATON_VARIABLES_COMPILER
+    .addPropertyChangeListener(mCompilerPropertyChangeListener);
     mAbortButtonAction = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e)
@@ -144,7 +147,7 @@ public class BackgroundCompiler
       }
     };
     mModuleChanged = true;
-    if (Config.BACKGROUND_COMPILER.isTrue()) {
+    if (Config.BACKGROUND_COMPILER.getValue()) {
       compile(null);
     }
   }
@@ -197,13 +200,13 @@ public class BackgroundCompiler
       mModuleChanged = false;
       mRunning = true;
       mCompiler.setOptimizationEnabled
-        (Config.OPTIMIZING_COMPILER.isTrue());
+        (Config.OPTIMIZING_COMPILER.getValue());
       mCompiler.setExpandingEFATransitions
-        (Config.EXPAND_EXTENDED_AUTOMATA.isTrue());
+        (Config.EXPAND_EXTENDED_AUTOMATA.getValue());
       mCompiler.setNormalizationEnabled
-        (Config.NORMALIZING_COMPILER.isTrue());
+        (Config.NORMALIZING_COMPILER.getValue());
       mCompiler.setAutomatonVariablesEnabled
-        (Config.AUTOMATON_VARIABLES_COMPILER.isTrue());
+        (Config.AUTOMATON_VARIABLES_COMPILER.getValue());
       mCompiler.setInputModule(mModuleContainer.getModule(), true);
       mWorker.compile();
     } else if (mModuleChanged && mRunning) {
@@ -411,8 +414,8 @@ public class BackgroundCompiler
   private final ModuleContainer mModuleContainer;
   private final ModuleCompiler mCompiler;
   private final CompilationWorker mWorker;
-  private final SupremicaPropertyChangeListener mEnablementPropertyChangeListener;
-  private final SupremicaPropertyChangeListener mCompilerPropertyChangeListener;
+  private final OptionChangeListener mEnablementPropertyChangeListener;
+  private final OptionChangeListener mCompilerPropertyChangeListener;
   private final ActionListener mAbortButtonAction;
 
   private Timer mTimer;

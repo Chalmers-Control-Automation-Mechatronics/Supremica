@@ -256,7 +256,7 @@ public class GeneticAlgorithms
 
         try
         {
-            theSynchronizer = new AutomataSynchronizer(automata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
+            theSynchronizer = new AutomataSynchronizer(automata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.getValue());
 
             theSynchronizer.execute();
         }

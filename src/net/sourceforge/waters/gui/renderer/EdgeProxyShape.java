@@ -137,7 +137,7 @@ abstract class EdgeProxyShape
   Shape getArrowHead()
   {
     if (mArrowHead == null) {
-      switch (Config.GUI_EDITOR_EDGEARROW_POSITION.get()) {
+      switch (Config.GUI_EDITOR_EDGEARROW_POSITION.getValue()) {
       case End:
       {
         final Point2D tip = getEndPoint();
@@ -269,7 +269,7 @@ abstract class EdgeProxyShape
   static final double ARROW_ANGLE;// = 0.3 * Math.PI;
   static
   {
-      if (Config.GUI_EDITOR_LAYOUT_MODE.get() == LayoutMode.ChalmersIDES)
+      if (Config.GUI_EDITOR_LAYOUT_MODE.getValue() == LayoutMode.ChalmersIDES)
           ARROW_ANGLE = 0.2 * Math.PI;
       else
           ARROW_ANGLE = 0.3 * Math.PI;

@@ -1,65 +1,15 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
-//###########################################################################
-//# PROJECT: Supremica
-//# PACKAGE: org.supremica.properties
-//# CLASS:   Config
-//###########################################################################
-//# $Id: c9f343494bf80e91ad9f70d162e2394bbd7c39e8 $
-//###########################################################################
-
-/*
- * Supremica Software License Agreement
- *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
- *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
- *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
- *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Knarrhogsgatan 10
- * SE-431 60 MOLNDAL
- * SWEDEN
- *
- * to discuss license terms. No cost evaluation licenses are
- * available.
- *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
- *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
- *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
- *
- * Supremica is owned and represented by KA.
- */
 package org.supremica.properties;
 
 import java.awt.Color;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ColorOption;
+import net.sourceforge.waters.analysis.options.DoubleOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.LegacyEnumOption;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.gui.logging.IDELogLevel;
 import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
 import net.sourceforge.waters.gui.renderer.LayoutMode;
@@ -79,409 +29,432 @@ import org.supremica.automata.algorithms.minimization.MinimizationSelectingHeuri
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.util.BDD.OrderingAlgorithm;
 
-
-/**
- * <P>Configurable Options.</P>
- *
- * <P>All static variables declared in this class are automatically
- * registered by their constructors for loading, saving, and editing.
- * They are initialised on startup of the IDE by reading a properties file
- * whose name is specified with the <CODE>-p</CODE> on the command line.
- * Without the option, the properties are initialised to their hard-coded
- * default values. When the properties dialog is opened, it allows the user
- * to change all registered properties, and they are automatically saved to
- * the properties file (if set) when the dialog is closed.</P>
- *
- * <P>The default for the properties file is <CODE>.supremica</CODE> in the
- * Supremica source directory, when launched from Eclipse. When launched
- * from the Waters startuo scripts, it is <CODE>.waters</CODE> in the user's
- * home directory for Linux or <CODE>waters.properties</CODE> in the user's
- * home directory for Windows.</P>
- *
- * @author Knut &Aring;kesson
- */
-public final class Config
+public class Config
 {
-    // Valid PropertyTypes (see PropertyType.java):
-    //   GENERAL
-    //   GENERAL_LOG
-    //   GENERAL_FILE
-    //   GUI
-    //   GUI_EDITOR
-    //   GUI_ANALYZER
-    //   GUI_SIMULATOR
-    //   GUI_DOT
-    //   ALGORITHMS
-    //   ALGORITHMS_SYNC
-    //   ALGORITHMS_VERIFICATION
-    //   ALGORITHMS_SYNTHESIS
-    //   ALGORITHMS_MINIMIZATION
-    //   ALGORITHMS_BDD
-    //   ALGORITHMS_HMI
-    //   MISC
 
-    // GUI_DOT
-    public static final BooleanProperty DOT_USE = new BooleanProperty(PropertyType.GUI_DOT, "dotUse", true, "Use Dot");
-    public static final ObjectProperty<String> DOT_EXECUTE_COMMAND = new ObjectProperty<String>(PropertyType.GUI_DOT, "dotExecuteCommand", "dot", "Dot command");
-    public static final IntegerProperty DOT_MAX_NBR_OF_STATES =
-      new IntegerProperty(PropertyType.GUI_DOT, "dotMaxNbrOfStatesWithoutWarning",
-                          100, "Max number of states without warning", true, 0);
-    public static final BooleanProperty DOT_LEFT_TO_RIGHT = new BooleanProperty(PropertyType.GUI_DOT, "dotLeftToRight", false, "Layout from left to right, otherwise from top to bottom");
-    public static final BooleanProperty DOT_WITH_STATE_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotWithStateLabels", true, "Draw state names");
-    public static final BooleanProperty DOT_WITH_EVENT_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotWithEventLabels", true, "Draw event labels");
-    public static final BooleanProperty DOT_WITH_CIRCLES = new BooleanProperty(PropertyType.GUI_DOT, "dotWithCircles", false, "Draw circle around state names");
-    public static final BooleanProperty DOT_USE_STATE_COLORS = new BooleanProperty(PropertyType.GUI_DOT, "dotUseStateColors", true, "Use colors for states");
-    public static final BooleanProperty DOT_USE_ARC_COLORS = new BooleanProperty(PropertyType.GUI_DOT, "dotUseArcColors", false, "Use colors for arcs");
-    public static final BooleanProperty DOT_USE_MULTI_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotUseMultiLabels", true, "Draw multiple labels on one arc");
-    public static final BooleanProperty DOT_AUTOMATIC_UPDATE = new BooleanProperty(PropertyType.GUI_DOT, "dotAutomaticUpdate", true, "Do automatic update of the layout");
-
-    // GENERAL
-    public static final ObjectProperty<LookAndFeelOption> GENERAL_LOOKANDFEEL =
-      new ObjectProperty<>(PropertyType.GENERAL, "javaLookAndFeel",
-                           LookAndFeelOption.DEFAULT, LookAndFeelOption.class,
-                           "Java Look&Feel (requires restart)");
-    public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
-    public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
-    public static final BooleanProperty GENERAL_STUDENT_VERSION =
-      new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion",
-                          false, "Student version", false);
-    public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
-
-    // GENERAL_LOG
-    public static final ObjectProperty<IDELogLevel> LOG_GUI_VERBOSITY =
-      new ObjectProperty<>(PropertyType.GENERAL_LOG, "logLevelGUI",
-                           IDELogLevel.INFO,
-                           IDELogLevel.getAllowedValuesForLogPanel(),
-                           IDELogLevel.class,
-                           "Verbosity level for graphical user interface",
-                           true);
-    public static final ObjectProperty<IDELogLevel> LOG_CONSOLE_VERBOSITY =
-      new ObjectProperty<>(PropertyType.GENERAL_LOG, "logLevelConsole",
-                           IDELogLevel.NONE, IDELogLevel.class,
-                           "Verbosity level for console (stderr)");
-    public static final ObjectProperty<String> LOG_FILE =
-      new ObjectProperty<String>(PropertyType.GENERAL_LOG, "logFileName",
-                                 "", "Log file");
-    public static final ObjectProperty<IDELogLevel> LOG_FILE_VERBOSITY =
-      new ObjectProperty<>(PropertyType.GENERAL_LOG, "logLevelFile",
-                           IDELogLevel.NONE, IDELogLevel.class,
-                           "Verbosity level for log file");
-    public static final BooleanProperty GENERAL_REDIRECT_STDOUT =
-      new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout",
-                          false, "Capture stdout (System.out.println) in GUI ");
-    public static final BooleanProperty GENERAL_REDIRECT_STDERR =
-      new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr",
-                          false, "Capture stderr (System.err.println) in GUI ");
-
-    // GENERAL_FILE
-    public static final ObjectProperty<String> FILE_OPEN_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileOpenPath", System.getProperty("user.home"), "Default file open path");
-    public static final ObjectProperty<String> FILE_SAVE_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileSavePath", System.getProperty("user.home"), "Default file save path");
-
-    // GUI
-    public static IntegerProperty GUI_IDE_WIDTH =
-      new IntegerProperty(PropertyType.GUI, "ideFrameWidth",
-                          1024, "Width at which IDE opens", false, 0);
-    public static IntegerProperty GUI_IDE_HEIGHT =
-      new IntegerProperty(PropertyType.GUI, "ideFrameHeight",
-                          768, "Height at which IDE opens", false, 0);
-    public static IntegerProperty GUI_IDE_XPOS =
-      new IntegerProperty(PropertyType.GUI, "ideFrameX",
-                          0, "X position at which IDE opens", false, 0);
-    public static IntegerProperty GUI_IDE_YPOS =
-      new IntegerProperty(PropertyType.GUI, "ideFrameY",
-                          0, "Y position at which IDE opens", false, 0);
-    public static BooleanProperty GUI_IDE_MAXIMIZED =
-      new BooleanProperty(PropertyType.GUI, "ideFrameMaximized", false,
-                          "Whether or not the IDE opens as a maximised window",
-                          false);
-
-    public static final BooleanProperty INCLUDE_INSTANTION =
-      new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
-			  "Enable instantiation and other advanced features");
-    public static final BooleanProperty BACKGROUND_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "backgroundCompiler", true,
-              "Compile automatically while editing");
-    public static final BooleanProperty OPTIMIZING_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "optimizingCompiler", false,
-              "Remove redundant events, transitions, and components " +
-              "when compiling");
-    public static final BooleanProperty NORMALIZING_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,
-              "Use normalising EFSM compiler");
-    public static final BooleanProperty AUTOMATON_VARIABLES_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "automatonVariablesCompiler", false,
-              "Allow automaton names in EFSM guards");
-    public static final BooleanProperty INCLUDE_RAS_SUPPORT =
-      new BooleanProperty(PropertyType.GUI, "includeRASSupport", false,
-              "Include RAS support");
-
-    // GUI_EDITOR
-    public static final ObjectProperty<IconSet> GUI_EDITOR_ICONSET =
-      new ObjectProperty<>(PropertyType.GUI_EDITOR, "iconSet",
-                           IconSet.WATERS_16, IconSet.class,
-                           "Icon set and font scaling (requires restart)");
-    public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
-      new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
-                        Color.WHITE, "Automaton background colour");
-    public static final ObjectProperty<LayoutMode> GUI_EDITOR_LAYOUT_MODE =
-      new ObjectProperty<>(PropertyType.GUI_EDITOR, "layoutMode",
-                           LayoutMode.Default, LayoutMode.class,
-                           "Layout mode");
-    public static final BooleanProperty GUI_EDITOR_DEFAULT_EMPTY_MODULE =
-      new BooleanProperty(PropertyType.GUI_EDITOR, "defaultEmptyModule",
-                          true, "Open with an empty module");
-    public static final BooleanProperty GUI_EDITOR_SHOW_GRID =
-      new BooleanProperty(PropertyType.GUI_EDITOR, "showGrid",
-                          true, "Show grid");
-    public static final IntegerProperty GUI_EDITOR_GRID_SIZE =
-      new IntegerProperty(PropertyType.GUI_EDITOR, "gridSize",
-                          16, "Grid size", true, 4, 64, 4);
-    public static final BooleanProperty GUI_EDITOR_NODES_SNAP_TO_GRID =
-      new BooleanProperty(PropertyType.GUI_EDITOR, "nodesSnapToGrid",
-                          true, "Nodes snap to grid");
-    public static final IntegerProperty GUI_EDITOR_NODE_RADIUS =
-      new IntegerProperty(PropertyType.GUI_EDITOR, "nodeRadius", 6,
-                          "Node size", true, 4, 32, 1);
-    public static final BooleanProperty GUI_EDITOR_STATE_NAMES_HIDDEN =
-      new BooleanProperty(PropertyType.GUI_EDITOR, "hideStateNames",
-                          false, "Suppress state names", false);
-    public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE =
-      new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode",
-                          true, "Control points move with node");
-    public static final EnumProperty<EdgeArrowPosition> GUI_EDITOR_EDGEARROW_POSITION =
-      new EnumProperty<>(PropertyType.GUI_EDITOR, "edgeArrowAtEnd",
-                         EdgeArrowPosition.End,
-                         EdgeArrowPosition.End,
-                         EdgeArrowPosition.Middle,
-                         EdgeArrowPosition.class,
-                         "Edge arrow position");
-    public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT =
-      new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout",
-                          10000, "Maximum layout time", true, 0);
-
-    // GUI_ANALYZER
-    public static final ObjectProperty<ModelAnalyzerFactoryLoader> GUI_ANALYZER_USED_FACTORY =
-      new ObjectProperty<>(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
-                           ModelAnalyzerFactoryLoader.Monolithic,
-                           ModelAnalyzerFactoryLoader.class,
-                           "Model verifier factory used by Editor's Verify menu");
-    public static final BooleanProperty GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS =
-      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSeamlessSynthesis",
-                          true, "Include Seamless Synthesis");
-    public static final BooleanProperty GUI_ANALYZER_INCLUDE_DIAGNOSABILIY =
-      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeDiagnosability", false,
-                          "Include diagnosability check");
-    public static final BooleanProperty GUI_ANALYZER_INCLUDE_HISC =
-      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeHISC", false,
-                          "Include HISC property checks");
-    public static final BooleanProperty GUI_ANALYZER_INCLUDE_SD =
-      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSD", false,
-                          "Include sampled-data property checks");
-    public static final BooleanProperty GUI_ANALYZER_INCLUDE_OP =
-      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeOP", false,
-                          "Include Observer Projection algorithms");
-
-    public static final BooleanProperty GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER =
-      new BooleanProperty(PropertyType.GUI_ANALYZER,
-                          "guiAnalyzerSendPropertiesToAnalyzer", false,
-                          "Send properties to analyzer");
-    public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE =
-      new BooleanProperty(PropertyType.GUI_ANALYZER,
-                          "automatonViewerUseControlledSurface", false,
-                          "Use new controlled surface panel to display an automaton");
-    public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS =
-      new BooleanProperty(PropertyType.GUI_ANALYZER,
-                          "includeBoundedUnconTools", false,
-                          "Include unbounded controllability tools");
-    public static final BooleanProperty INCLUDE_WATERS_ANALYZER =
-      new BooleanProperty(PropertyType.GUI_ANALYZER,
-                          "useWatersAnalyzer", false,
-                          "Use Waters Analyzer");
-
-    // GUI_SIMULATOR
-    public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
-    public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
-    public static final IntegerProperty SIMULATION_CYCLE_TIME =
-      new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime",
-                          100, "Simulator Cycle time (ms)", true, 0);
+  //GENERAL
+  public static final EnumOption<LookAndFeelOption> GENERAL_LOOK_AND_FEEL = new EnumOption<>
+    ("javaLookAndFeel", "Java Look&Feel (requires restart)", "Java Look&Feel (requires restart)",
+      null, LookAndFeelOption.values(), LookAndFeelOption.DEFAULT);
+  public static final StringOption GENERAL_STATE_SEPARATOR = new StringOption
+    ("generalStateSeparator",
+      "State Separator Character", "State separator character", null, ".");
+  public static final StringOption GENERAL_STATE_LABEL_SEPARATOR = new StringOption
+    ("generalStateLabelSeparator",
+      "State Label Separator Character", "State label separator character", null, ".");
+  public static final BooleanOption GENERAL_STUDENT_VERSION = new BooleanOption
+    ("generalStateLabelSeparator",
+     "Student Verison", "Student version", null, false);
+  public static final BooleanOption INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanOption
+    ("includeExperimentalAlgorithms",
+     "Include Experimental Algorithms (requires restart)", "Include experimental algorithms (requires restart)", null, false);
 
 
-    // ALGORITHMS_SYNCHRONIZATION
-    public static final BooleanProperty SYNC_FORBID_UNCON_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncForbidUncontrollableStates", true, "Forbid uncontrollable states when synchronizing");
-    public static final BooleanProperty SYNC_EXPAND_FORBIDDEN_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandUncontrollableStates", true, "Expand forbidden states when synchronizing");
-    public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE =
-      new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION,
-                          "syncInitialHashtableSize", (1 << 14) - 1,
-                          "Initial hash table size", true, 1);
-    public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandHashtable", true, "Expand hashtable");
-    public static final IntegerProperty SYNC_NBR_OF_EXECUTERS =
-      new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION,
-                          "synchNbrOfExecuters", 1,
-                          "Number of synchronization threads", true, 1);
-    public static final ObjectProperty<String> SYNC_AUTOMATON_NAME_SEPARATOR = new ObjectProperty<String>(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchAutomatonNameSeparator", "||", "Automata name separator");
-	public static final BooleanProperty SYNC_UNOBS_EVENTS_SYNC = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncUnobsEventsSync", false, "Unobservable (non-tau) events synchronize");
+  //GENERAL_LOG
+  public static final EnumOption<IDELogLevel> LOG_GUI_VERBOSITY = new EnumOption<>
+  ("logLevelGUI", "Verbosity Level for GUI", "Verbosity level for graphical user interface",
+    null, IDELogLevel.values(), IDELogLevel.INFO);
+  public static final EnumOption<IDELogLevel> LOG_CONSOLE_VERBOSITY = new EnumOption<>
+  ("logLevelConsole", "Verbosity Level for Console", "Verbosity level for console (stderr)",
+    null, IDELogLevel.values(), IDELogLevel.NONE);
+  public static final StringOption LOG_FILE = new StringOption
+    ("logFileName", "Log File", "Log file", null, "");
+  public static final EnumOption<IDELogLevel> LOG_FILE_VERBOSITY = new EnumOption<>
+  ("logLevelFile", "Verbosity Level for Log File", "Verbosity level for log file",
+    null, IDELogLevel.values(), IDELogLevel.NONE);
+  public static final BooleanOption GENERAL_REDIRECT_STDOUT = new BooleanOption
+    ("generalRedirectStdout",
+     "Capture stdout in GUI", "Capture stdout (System.out.println) in GUI", null, false);
+  public static final BooleanOption GENERAL_REDIRECT_STDERR = new BooleanOption
+    ("generalRedirectStderr",
+     "Capture stderr in GUI", "Capture stderr (System.err.println) in GUI", null, false);
 
-    // ALGORITHMS_VERIFICATION
-    public static final ObjectProperty<VerificationType> VERIFY_VERIFICATION_TYPE =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_VERIFICATION,
-                           "verifyVerificationType",
-                           VerificationType.CONTROLLABILITY,
-                           VerificationType.class,
-                           "Default verificaton type");
-    public static final ObjectProperty<VerificationAlgorithm> VERIFY_ALGORITHM_TYPE =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_VERIFICATION,
-                           "verifyAlgorithmType",
-                           VerificationAlgorithm.MODULAR,
-                           VerificationAlgorithm.class,
-                           "Default verificaton algorithm");
-    public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT =
-      new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION,
-                          "verifyExclusionStateLimit", 1000,
-                          "Exclusion state limit", true, 1);
-    public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT =
-      new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION,
-                          "verifyReachabilityStateLimit", 1000,
-                          "Reachability state limit", true, 1);
-    public static final BooleanProperty VERIFY_ONE_EVENT_AT_A_TIME = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyOneEventAtATime", false, "Verify one event at a time");
-    public static final BooleanProperty VERIFY_SKIP_UNCONTROLLABILITY_CHECK = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "skipUncontrollabilityCheck", false, "Skip uncontrollability check");
-    public static final IntegerProperty VERIFY_NBR_OF_ATTEMPTS =
-      new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "nbrOfAttempts",
-                          5, "Number of attempts", true, 1);
-    public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show trace to bad state");
 
-    // ALGORITHMS_SYNTHESIS
-    public static final ObjectProperty<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_SYNTHESIS,
-                           "synthesisSynthesisType",
-                           SynthesisType.NONBLOCKING_CONTROLLABLE,
-                           SynthesisType.class,
-                           "Default synthesis type");
-    public static final ObjectProperty<SynthesisAlgorithm> SYNTHESIS_ALGORITHM_TYPE =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_SYNTHESIS,
-                           "synthesisAlgorithmType",
-                           SynthesisAlgorithm.MONOLITHIC,
-                           SynthesisAlgorithm.class,
-                           "Default synthesis algorithm");
-    public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", true, "Remove forbidden states after synthesis"); // MF changed to true here
-	public static final BooleanProperty SYNTHESIS_RENAME = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisRename", false, "Rename states to generic names (q0, q1, ...)");	// MF
-    public static final BooleanProperty SYNTHESIS_OPTIMIZE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisOptimize", false, "Try to remove supervisors that are not necessary");
-    public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
-    public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissiveIncremental", true, "Use incremental algorithm when synthesizing");
-    public static final BooleanProperty SYNTHESIS_REDUCE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisReduceSupervisors", false, "Try to minimize supervisors");
-    public static final BooleanProperty SYNTHESIS_LOCALIZE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisLocalizeSupervisors", false, "Try to localize supervisors");
-    public static final BooleanProperty SYNTHESIS_PRINT_GUARD = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "generateGuard", false, "Generate guards for the controllable events");
-    public static final BooleanProperty SYNTHESIS_ADD_GUARDS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "addGuards", false, "Add the guards to the model");
-    public static final BooleanProperty SYNTHESIS_SAVE_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveInFile", false, "Save the guard-event pairs in a file");
-    public static final BooleanProperty SYNTHESIS_COMPLEMENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "complementHeuristic", true, "Apply the complement heuristic");
-    public static final BooleanProperty SYNTHESIS_INDEPENDENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "independentHeuristic", true, "Apply the independent heuristic");
-    public static final BooleanProperty SYNTHESIS_SAVE_IDD_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveIDDInFile", false, "Save the guard-event pairs as an IDD in a file");
-    public static final BooleanProperty SYNTHESIS_REACHABILITY = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "reachability", false, "Remove the unreachable states");
-    public static final BooleanProperty SYNTHESIS_OPTIMIZATION = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "optimization", false, "Compute the global optimal time");
-	public static final BooleanProperty SYNTHESIS_SUP_AS_PLANT = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSupsAsPlants", false, "Consider supervisors as plants");
+  //GENERAL_FILE
+  public static final StringOption FILE_OPEN_PATH = new StringOption
+    ("fileOpenPath",
+     "Default File Open Path", "Default file open path", null, System.getProperty("user.home"));
+  public static final StringOption FILE_SAVE_PATH = new StringOption
+    ("fileSavePath",
+     "Default File Save Path", "Default file save path", null, System.getProperty("user.home"));
 
-    // ALGORITHMS_MINIMIZATION
-    public static final ObjectProperty<EquivalenceRelation> MINIMIZATION_EQUIVALENCE_RELATION =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
-                           "minimizationEquivalenceRelation",
-                           EquivalenceRelation.LANGUAGEEQUIVALENCE,
-                           EquivalenceRelation.class,
-                           "Default equivalence relation");
-    public static final BooleanProperty MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationAlsoMinimizeTransitions", true, "Minimize the number of transitions");
-    public static final BooleanProperty MINIMIZATION_KEEP_ORIGINAL = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationKeepOriginal", true, "Keep original");
-    public static final BooleanProperty MINIMIZATION_IGNORE_MARKING = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationIgnoreMarking", false, "Ignore marking");
-    public static final ObjectProperty<MinimizationStrategy> MINIMIZATION_STRATEGY =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
-                           "minimizationStrategy",
-                           MinimizationStrategy.FewestTransitionsFirst,
-                           MinimizationStrategy.class,
-                           "Minimization strategy");
-    public static final ObjectProperty<MinimizationHeuristic> MINIMIZATION_HEURISTIC =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
-                           "minimizationHeuristic",
-                           MinimizationHeuristic.MostLocal,
-                           MinimizationHeuristic.class,
-                           "Minimization heuristics");
-    public static final ObjectProperty<MinimizationPreselectingHeuristic> MINIMIZATION_PRESELECTINGHEURISTIC =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
-                           "minimizationPreselecting",
-                           MinimizationPreselectingHeuristic.AtLeastOneLocalEvent,
-                           MinimizationPreselectingHeuristic.class,
-                           "Minimization Preselecting Heuristics");
-    public static final ObjectProperty<MinimizationSelectingHeuristic> MINIMIZATION_SELECTINGHEURISTIC =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
-                           "minimizationSelectingHeuristic",
-                           MinimizationSelectingHeuristic.MinimumActualStates,
-                           MinimizationSelectingHeuristic.class,
-                           "Minimization Selecting Heuristics");
-    public static final ObjectProperty<String> MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
-    public static final ObjectProperty<String> MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
-    public static final ObjectProperty<String> MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
-    // MF: This one below is purely experimental, remove in production code
-    public static final BooleanProperty MINIMIZATION_USE_TAUEVENT_MAP = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationUseTaueventMap", true, "Use TauEvent map");
 
-    // ALGORITHMS_BDD
-    // New BDD implementation using JavaBDD library
-    // -- the following where formerly under algorithms.bdd2
-    public static final ObjectProperty<BDDPackage> BDD2_BDDLIBRARY =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_BDD, "libraryName",
-                           BDDPackage.JAVA, BDDPackage.class, "BDD Library");
-    public static final IntegerProperty BDD2_INITIALNODETABLESIZE =
-      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "initialNodeTableSize", 1000000, "Initial node table size");
-    public static final IntegerProperty BDD2_CACHESIZE =
-      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "cacheSize", 100000, "Operation cache size");
-    public static final IntegerProperty BDD2_MAXINCREASENODES =
-      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "maxIncreaseNodes", 2500000, "Maximum number of nodes by which to increase node table after garbage collection");
-    public static final DoubleProperty BDD2_INCREASEFACTOR =
-      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "increaseFactor", 2.0,
-                         "Factor by which to increase node table after garbage collection",
-                         true, 0.0);
-    public static final DoubleProperty BDD2_CACHERATIO =
-      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "cacheRatio", 10.0,
-                         "Cache ratio for the operator caches (#tablenodes/#cachenodes)",
-                         true, 0.0);
-    public static final ObjectProperty<BDDPartitioningType> BDD2_PARTITIONING =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_BDD, "partitioning",
-                           BDDPartitioningType.MONOLITHIC,
-                           BDDPartitioningType.class,
-                           "BDD transition partitioning");
+  //GUI_COMPILER
+  public static final PositiveIntOption GUI_IDE_WIDTH = new PositiveIntOption
+    ("ideFrameWidth",
+     "IDE Width", "Width at which IDE opens", null, 1024, false);
+  public static final PositiveIntOption GUI_IDE_HEIGHT = new PositiveIntOption
+    ("ideFrameHeight",
+     "IDE Width", "Height at which IDE opens", null, 768, false);
+  public static final PositiveIntOption GUI_IDE_XPOS = new PositiveIntOption
+    ("ideFrameX",
+     "IDE Width", "X position at which IDE opens", null, 0, false);
+  public static final PositiveIntOption GUI_IDE_YPOS = new PositiveIntOption
+    ("ideFrameY",
+     "IDE Width", "Y position at which IDE opens", null, 0, false);
+  public static final BooleanOption GUI_IDE_MAXIMIZED = new BooleanOption
+    ("ideFrameMaximized",
+     "Maximized Window", "Whether or not the IDE opens as a maximised window",
+     null, false, false);
 
-    // -- the following where formerly under algorithms.bdd
-    // Most of these are ugly integers in BDD.Options... but they have String representations here.
-    public static final ObjectProperty<OrderingAlgorithm> BDD_ORDER_ALGO =
-      new ObjectProperty<>(PropertyType.ALGORITHMS_BDD,
-                           "bddAutomataOrderingAlgorithm",
-                           OrderingAlgorithm.AO_HEURISTIC_FORCE,
-                           OrderingAlgorithm.class, "Automata ordering algorithm");
-    public static final IntegerProperty BDD_PARTITION_MAX =
-      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", 10000, "Max partition size");
-    public static final BooleanProperty SYNTHESIS_PEAKBDD =
-      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "peakBDD", false, "Compute and print peak BDD");
-    public static final BooleanProperty BDD_DEBUG_ON =
-      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddDebugOn", false, "Debug on");
-    public static final BooleanProperty BDD_PROFILE_ON =
-      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", false, "Profiling");
+  public static final BooleanOption INCLUDE_INSTANTIATION = new BooleanOption
+    ("includeInstantiation",
+     "Include Instantiation", "Enable instantiation and other advanced features", null, true);
+  public static final BooleanOption BACKGROUND_COMPILER = new BooleanOption
+    ("backgroundCompiler",
+     "Background Compiler", "Compile automatically while editing", null, true);
+  public static final BooleanOption OPTIMIZING_COMPILER = new BooleanOption
+    ("optimizingCompiler",
+     "Optimizing Compiler", "Remove redundant events, transitions, and components when compiling",
+     null, false);
+  public static final BooleanOption NORMALIZING_COMPILER = new BooleanOption
+    ("normalizingCompiler",
+     "Normalizing Compiler", "Use normalising EFSM compiler", null, false);
+  public static final BooleanOption AUTOMATON_VARIABLES_COMPILER = new BooleanOption
+    ("automatonVariablesCompiler",
+     "Automaton Variables Compiler", "Allow automaton names in EFSM guards", null, false);
+  public static final BooleanOption INCLUDE_RAS_SUPPORT = new BooleanOption
+    ("includeRASSuport",
+     "Include RAS Support", "Include RAS support", null, false);
 
-    // ALGORITHMS_HMI
-    public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
-    public static final BooleanProperty EXPAND_EXTENDED_AUTOMATA = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "expandEFA", true, "Expand extended automata into DFA");
 
-    // MISC
-    public static final BooleanProperty TUM_EXTERNAL_ON =
-      new BooleanProperty(PropertyType.MISC, "tumExternalOn", false, "Activate TUM options");
+  //GUI_EDITOR
+  public static final EnumOption<IconSet> GUI_EDITOR_ICONSET = new EnumOption<>
+  ("iconSet", "Icon Set and Font Scaling (requires restart)", "Icon set and font scaling (requires restart)",
+    null, IconSet.values(), IconSet.WATERS_16);
+  public static final ColorOption GUI_EDITOR_BACKGROUND_COLOR = new ColorOption
+  ("backgroundColor", "Automaton Background Colour", "Automaton background colour",
+    null, Color.WHITE);
+  public static final EnumOption<LayoutMode> GUI_EDITOR_LAYOUT_MODE = new EnumOption<>
+  ("layoutMode", "Layout Mode", "Layout mode",
+    null, LayoutMode.values(), LayoutMode.Default);
+  public static final BooleanOption GUI_EDITOR_DEFAULT_EMPTY_MODULE = new BooleanOption
+    ("defaultEmptyModule",
+     "Open with an Empty Module", "Open with an empty module", null, true);
+  public static final BooleanOption GUI_EDITOR_SHOW_GRID = new BooleanOption
+    ("showGrid",
+     "Show Grid", "Show grid", null, true);
+  public static final PositiveIntOption GUI_EDITOR_GRID_SIZE = new PositiveIntOption
+    ("gridSize",
+     "Grid Size", "Grid size", null, 16, 4, 64);
+  public static final BooleanOption GUI_EDITOR_NODES_SNAP_TO_GRID = new BooleanOption
+    ("nodesSnapToGrid",
+     "Nodes Snap to Grid", "Nodes snap to grid", null, true);
+  public static final PositiveIntOption GUI_EDITOR_NODE_RADIUS = new PositiveIntOption
+    ("nodeRadius",
+     "Node Size", "Node size", null, 6, 4, 32);
+  public static final BooleanOption GUI_EDITOR_STATE_NAMES_HIDDEN = new BooleanOption
+    ("hideStateNames",
+     "Suppress state names", "Suppress state names", null, false);
+  public static final BooleanOption GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE = new BooleanOption
+    ("controlPointsMoveWithNode",
+     "Control points move with node", "Control points move with node", null, true);
+  public static final EnumOption<EdgeArrowPosition> GUI_EDITOR_EDGEARROW_POSITION = new LegacyEnumOption<>
+  ("edgeArrowAtEnd", "Edge Arrow Position", "Edge arrow position",
+    null, EdgeArrowPosition.values(), EdgeArrowPosition.End, EdgeArrowPosition.End, EdgeArrowPosition.Middle);
+  public static final PositiveIntOption GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new PositiveIntOption
+    ("springEmbedderTimeout",
+     "Maximum Layout Time", "Maximum layout time", null, 10000);
 
-    private static Config instance = null;
 
-    /**
-     * This class should only be instantiated to guarantee that it is loaded.
-     */
-    private Config()
-    {
-    }
+  //GUI_ANALYZER
+  public static final EnumOption<ModelAnalyzerFactoryLoader> GUI_ANALYZER_USED_FACTORY =
+  new EnumOption<ModelAnalyzerFactoryLoader>("guiAnalyzerUsedFactory",
+    "Model Verifier Factory Used by Editor's Verify Menu", "Model verifier factory used by Editor's Verify menu",
+    null, ModelAnalyzerFactoryLoader.values(), ModelAnalyzerFactoryLoader.Monolithic);
+  public static final BooleanOption GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS = new BooleanOption
+    ("includeSeamlessSynthesis",
+     "Include Seamless Synthesis", "Include Seamless Synthesis", null, true);
+  public static final BooleanOption GUI_ANALYZER_INCLUDE_DIAGNOSABILIY = new BooleanOption
+    ("includeDiagnosability",
+     "Include Diagnosability Check", "Include diagnosability check", null, false);
+  public static final BooleanOption GUI_ANALYZER_INCLUDE_HISC = new BooleanOption
+    ("includeHISC",
+     "Include HISC Property Checks", "Include HISC property checks", null, false);
+  public static final BooleanOption GUI_ANALYZER_INCLUDE_SD = new BooleanOption
+    ("includeSD",
+     "Include Sampled-Data Property Checks", "Include sampled-data property checks", null, false);
+  public static final BooleanOption GUI_ANALYZER_INCLUDE_OP = new BooleanOption
+    ("includeOP",
+     "Include Observer Projection Algorithms", "Include Observer Projection algorithms", null, false);
+  public static final BooleanOption GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER = new BooleanOption
+    ("guiAnalyzerSendPropertiesToAnalyzer",
+     "Send Properties to Analyzer", "Send properties to analyzer", null, false);
+  public static final BooleanOption GUI_ANALYZER_AUTOMATON_VIEWER_USE_CONTROLLED_SURFACE = new BooleanOption
+    ("automatonViewerUseControlledSurface",
+     "Use New Controlled Surface Panel to Display an Automaton", "Use new controlled surface panel to display an automaton", null, false);
+  public static final BooleanOption INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanOption
+    ("includeBoundedUnconTools",
+     "Include Unbounded Controllability Tools", "Include unbounded controllability tools", null, false);
+  public static final BooleanOption INCLUDE_WATERS_ANALYZER = new BooleanOption
+    ("useWatersAnalyzer",
+     "Use Waters Analyzer", "Use Waters Analyzer", null, false);
 
-    public static Config getInstance()
-    {
-        if (instance == null)
-            instance = new Config();
-        return instance;
-    }
+
+  //GUI_SIMULATOR
+  public static final BooleanOption INCLUDE_ANIMATOR = new BooleanOption
+    ("includeAnimator",
+     "Include 2D Graphical Animator", "Include 2D Graphical Animator", null, false);
+  public static final BooleanOption SIMULATION_IS_EXTERNAL = new BooleanOption
+    ("simulationIsExternal",
+     "External Simulation Process", "External simulation process", null, false);
+  public static final PositiveIntOption SIMULATION_CYCLE_TIME = new PositiveIntOption
+    ("simulationCycleTime",
+     "Simulator Cycle Time (ms)", "Simulator Cycle time (ms)", null, 100);
+
+
+  //GUI_DOT
+  public static final BooleanOption DOT_USE = new BooleanOption
+    ("dotUse",
+     "Use Dot", "Use dot", null, true);
+  public static final StringOption DOT_EXECUTE_COMMAND = new StringOption
+    ("dotExecuteCommand",
+     "Dot Command", "Dot command", null, "dot");
+  public static final PositiveIntOption DOT_MAX_NBR_OF_STATES = new PositiveIntOption
+    ("dotMaxNbrOfStatesWithoutWarning",
+     "Maximum Number of States", "Maximum number of states without warning", null, 100);
+  public static final BooleanOption DOT_LEFT_TO_RIGHT = new BooleanOption
+    ("dotLeftToRight",
+     "Left to Right Layout", "Layout from left to right, otherwise from top to bottom", null, false);
+  public static final BooleanOption DOT_WITH_STATE_LABELS = new BooleanOption
+    ("dotWithStateLabels",
+     "Draw State Names", "Draw state names", null, true);
+  public static final BooleanOption DOT_WITH_EVENT_LABELS = new BooleanOption
+    ("dotWithEventLabels",
+     "Draw Event Labels", "Draw event labels", null, true);
+  public static final BooleanOption DOT_WITH_CIRCLES = new BooleanOption
+    ("dotWithCircles",
+     "Circle State Names", "Draw circle around state names", null, false);
+  public static final BooleanOption DOT_USE_STATE_COLORS = new BooleanOption
+    ("dotUseStateColors",
+     "Use Colors for States", "Use colors for states", null, true);
+  public static final BooleanOption DOT_USE_ARC_COLORS = new BooleanOption
+    ("dotUseArcColors",
+     "Use Colors for Arcs", "Use colors for arcs", null, false);
+  public static final BooleanOption DOT_USE_MULTI_LABELS = new BooleanOption
+    ("dotUseMultiLabels",
+     "Multiple Labels on Arc", "Draw multiple labels on one arc", null, true);
+  public static final BooleanOption DOT_AUTOMATIC_UPDATE = new BooleanOption
+    ("dotAutomaticUpdate",
+     "Automatic Layout Update", "Do automatic update of the layout", null, true);
+
+
+  //ALGORITHMS_SYNCHRONIZATION
+  public static final BooleanOption SYNC_FORBID_UNCON_STATES = new BooleanOption
+    ("syncForbidUncontrollableStates",
+     "Forbid Uncontrollable States when Synchronizing", "Forbid uncontrollable states when synchronizing", null, true);
+  public static final BooleanOption SYNC_EXPAND_FORBIDDEN_STATES = new BooleanOption
+    ("syncExpandUncontrollableStates",
+     "Expand Forbidden States when Synchronizing", "Expand forbidden states when synchronizing", null, true);
+  public static final PositiveIntOption SYNC_INITIAL_HASHTABLE_SIZE = new PositiveIntOption
+    ("syncInitialHashtableSize",
+     "Initial Hash Table Size", "Initial hash table size", null, (1 << 14) - 1, 1, Integer.MAX_VALUE);
+  public static final BooleanOption SYNC_EXPAND_HASHTABLE = new BooleanOption
+    ("syncExpandHashtable",
+     "Expand Hashtable", "Expand hashtable", null, true);
+  public static final PositiveIntOption SYNC_NBR_OF_EXECUTERS = new PositiveIntOption
+    ("synchNbrOfExecuters",
+     "Number of Synchronization Threads", "Number of synchronization threads", null, 1, 1, Integer.MAX_VALUE);
+  public static final StringOption SYNC_AUTOMATON_NAME_SEPARATOR = new StringOption
+    ("synchAutomatonNameSeparator", "Automata Name Deparator", "Automata name separator", null, "||");
+  public static final BooleanOption SYNC_UNOBS_EVENTS_SYNC = new BooleanOption
+    ("syncUnobsEventsSync",
+     "Unobservable (non-tau) Events Dynchronize", "Unobservable (non-tau) events synchronize", null, false);
+
+
+  //ALGORITHMS_VERIFICATION
+  public static final EnumOption<VerificationType> VERIFY_VERIFICATION_TYPE = new EnumOption<>
+  ("verifyVerificationType", "Default Verification Type", "Default verification type",
+    null, VerificationType.values(), VerificationType.CONTROLLABILITY);
+  public static final EnumOption<VerificationAlgorithm> VERIFY_ALGORITHM_TYPE = new EnumOption<>
+  ("verifyAlgorithmType", "Default Verification Algorithm", "Default verification algorithm",
+    null, VerificationAlgorithm.values(), VerificationAlgorithm.MODULAR);
+  public static final PositiveIntOption VERIFY_EXCLUSION_STATE_LIMIT = new PositiveIntOption
+    ("verifyExclusionStateLimit",
+     "Exclusion State Limit", "Exclusion state limit", null, 1000, 1, Integer.MAX_VALUE);
+  public static final PositiveIntOption VERIFY_REACHABILITY_STATE_LIMIT = new PositiveIntOption
+    ("verifyReachabilityStateLimit",
+     "Reachability State Limit", "Reachability state limit", null, 1000, 1, Integer.MAX_VALUE);
+  public static final BooleanOption VERIFY_ONE_EVENT_AT_A_TIME = new BooleanOption
+    ("verifyOneEventAtATime",
+     "Verify One Event at a Time", "Verify one event at a time", null, false);
+  public static final BooleanOption VERIFY_SKIP_UNCONTROLLABILITY_CHECK = new BooleanOption
+    ("skipUncontrollabilityCheck",
+     "Skip Uncontrollability Check", "Skip uncontrollability check", null, false);
+  public static final PositiveIntOption VERIFY_NBR_OF_ATTEMPTS = new PositiveIntOption
+    ("nbrOfAttempts",
+     "Number of Attempts", "Number of attempts", null, 5, 1, Integer.MAX_VALUE);
+  public static final BooleanOption VERIFY_SHOW_BAD_TRACE = new BooleanOption
+    ("showBadTrace",
+     "Show Trace to Bad State", "Show trace to bad state", null, false);
+
+
+  //ALGORITHMS_SYNTHESIS
+  public static final EnumOption<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE = new EnumOption<>
+  ("synthesisSynthesisType", "Default Synthesis Type", "Default synthesis type",
+    null, SynthesisType.values(), SynthesisType.NONBLOCKING_CONTROLLABLE);
+  public static final EnumOption<SynthesisAlgorithm> SYNTHESIS_ALGORITHM_TYPE = new EnumOption<>
+  ("synthesisAlgorithmType", "Default Synthesis Algorithm", "Default synthesis algorithm",
+    null, SynthesisAlgorithm.values(), SynthesisAlgorithm.MONOLITHIC);
+  public static final BooleanOption SYNTHESIS_PURGE = new BooleanOption
+    ("synthesisPurge",
+     "Remove Forbidden States After Synthesis", "Remove forbidden states after synthesis", null, true);
+  public static final BooleanOption SYNTHESIS_RENAME = new BooleanOption
+    ("synthesisRename",
+     "Rename States to Generic Names (q0, q1, ...)", "Rename states to generic names (q0, q1, ...)", null, false);
+  public static final BooleanOption SYNTHESIS_OPTIMIZE = new BooleanOption
+    ("synthesisOptimize",
+     "Try to Remove Supervisors that are not Necessary", "Try to remove supervisors that are not necessary", null, false);
+  public static final BooleanOption SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanOption
+    ("synthesisMaximallyPermissive",
+     "Synthesize a Maximally Permissive Supervisor", "Synthesize a maximally permissive supervisor", null, true);
+  public static final BooleanOption SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanOption
+    ("synthesisMaximallyPermissiveIncremental",
+     "Use Incremental Algorithm when Synthesizing", "Use incremental algorithm when synthesizing", null, true);
+  public static final BooleanOption SYNTHESIS_REDUCE_SUPERVISORS = new BooleanOption
+    ("synthesisReduceSupervisors",
+     "Try to Minimize Supervisors", "Try to minimize supervisors", null, false);
+  public static final BooleanOption SYNTHESIS_LOCALIZE_SUPERVISORS = new BooleanOption
+    ("synthesisLocalizeSupervisors",
+     "Try to Localize Supervisors", "Try to localize supervisors", null, false);
+  public static final BooleanOption SYNTHESIS_PRINT_GUARD = new BooleanOption
+    ("generateGuard",
+     "Generate Guards For the Controllable Events", "Generate guards for the controllable events", null, false);
+  public static final BooleanOption SYNTHESIS_ADD_GUARDS = new BooleanOption
+    ("addGuards",
+     "Add the Guards to the Model", "Add the guards to the model", null, false);
+  public static final BooleanOption SYNTHESIS_SAVE_IN_FILE = new BooleanOption
+    ("saveInFile",
+     "Save the Guard-Event Pairs in a File", "Save the guard-event pairs in a file", null, false);
+  public static final BooleanOption SYNTHESIS_COMPLEMENT_HEURISTIC = new BooleanOption
+    ("complementHeuristic",
+     "Apply the Complement Heuristic", "Apply the complement heuristic", null, true);
+  public static final BooleanOption SYNTHESIS_INDEPENDENT_HEURISTIC = new BooleanOption
+    ("independentHeuristic",
+     "Apply the Independent Heuristic", "Apply the independent heuristic", null, true);
+  public static final BooleanOption SYNTHESIS_SAVE_IDD_IN_FILE = new BooleanOption
+    ("saveIDDInFile",
+     "Save the Guard-Event Pairs as an IDD in a File", "Save the guard-event pairs as an IDD in a file", null, false);
+  public static final BooleanOption SYNTHESIS_REACHABILITY = new BooleanOption
+    ("reachability",
+     "Remove the Unreachable States", "Remove the unreachable states", null, false);
+  public static final BooleanOption SYNTHESIS_OPTIMIZATION = new BooleanOption
+    ("optimization",
+     "Compute the Global Optimal Time", "Compute the global optimal time", null, false);
+  public static final BooleanOption SYNTHESIS_SUP_AS_PLANT = new BooleanOption
+    ("synthesisSupsAsPlants",
+     "Consider Supervisors as Plants", "Consider supervisors as plants", null, false);
+
+
+  //ALGORITHMS_MINIMIZATION
+  public static final EnumOption<EquivalenceRelation> MINIMIZATION_EQUIVALENCE_RELATION = new EnumOption<>
+  ("minimizationEquivalenceRelation", "Default Equivalence Relation", "Default equivalence relation",
+    null, EquivalenceRelation.values(), EquivalenceRelation.LANGUAGEEQUIVALENCE);
+  public static final BooleanOption MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanOption
+    ("minimizationAlsoMinimizeTransitions",
+     "Minimize the Number of Transitions", "Minimize the number of transitions", null, true);
+  public static final BooleanOption MINIMIZATION_KEEP_ORIGINAL = new BooleanOption
+    ("minimizationKeepOriginal",
+     "Keep Original", "Keep original", null, true);
+  public static final BooleanOption MINIMIZATION_IGNORE_MARKING = new BooleanOption
+    ("minimizationIgnoreMarking",
+     "Ignore Marking", "Ignore marking", null, false);
+  public static final EnumOption<MinimizationStrategy> MINIMIZATION_STRATEGY = new EnumOption<>
+  ("minimizationStrategy", "Minimization Strategy", "Minimization strategy",
+    null, MinimizationStrategy.values(), MinimizationStrategy.FewestTransitionsFirst);
+  public static final EnumOption<MinimizationHeuristic> MINIMIZATION_HEURISTIC = new EnumOption<>
+  ("minimizationHeuristic", "Minimization Heuristics", "Minimization heuristics",
+    null, MinimizationHeuristic.values(), MinimizationHeuristic.MostLocal);
+  public static final EnumOption<MinimizationPreselectingHeuristic> MINIMIZATION_PRESELECTING_HEURISTIC = new EnumOption<>
+  ("minimizationPreselecting", "Minimization Preselecting Heuristics", "Minimization Preselecting Heuristics",
+    null, MinimizationPreselectingHeuristic.values(), MinimizationPreselectingHeuristic.AtLeastOneLocalEvent);
+  public static final EnumOption<MinimizationSelectingHeuristic> MINIMIZATION_SELECTING_HEURISTIC = new EnumOption<>
+  ("minimizationSelectingHeuristic", "Minimization Selecting Heuristics", "Minimization Selecting Heuristics",
+    null, MinimizationSelectingHeuristic.values(), MinimizationSelectingHeuristic.MinimumActualStates);
+  public static final StringOption MINIMIZATION_SILENT_EVENT_NAME = new StringOption
+    ("generalSilentEventName", "Silent Event Name", "Silent event name", null, "tau");
+  public static final StringOption MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new StringOption
+    ("generalSilentControllableEventName", "Silent Controllable Event Name", "Silent controllable event name", null, "tau_c");
+  public static final StringOption MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new StringOption
+    ("generalSilentUnontrollableEventName", "Silent Uncontrollable Event Name", "Silent uncontrollable event name", null, "tau_u");
+  public static final BooleanOption MINIMIZATION_USE_TAU_EVENT_MAP = new BooleanOption
+    ("minimizationUseTaueventMap",
+     "Use Tau Event Map", "Use Tau Event Map", null, true);
+
+
+  //ALGORITHMS_BDD
+  public static final EnumOption<BDDPackage> BDD2_BDD_LIBRARY = new EnumOption<>
+  ("libraryName", "BDD Library", "BDD Library",
+    null, BDDPackage.values(), BDDPackage.JAVA);
+  public static final PositiveIntOption BDD2_INITIAL_NODE_TABLE_SIZE = new PositiveIntOption
+    ("initialNodeTableSize",
+     "Initial Node Table Size", "Initial node table size", null, 1000000);
+  public static final PositiveIntOption BDD2_CACHE_SIZE = new PositiveIntOption
+    ("cacheSize",
+     "Operation Cache Size", "Operation cache size", null, 100000);
+  public static final PositiveIntOption BDD2_MAX_INCREASE_NODES = new PositiveIntOption
+    ("maxIncreaseNodes",
+     "Maximum Increase", "Maximum number of nodes by which to increase node table after garbage collection", null, 2500000);
+  public static final DoubleOption BDD2_INCREASE_FACTOR = new DoubleOption
+    ("increaseFactor",
+     "Increase Factor", "Factor by which to increase node table after garbage collection", null,
+     2.0, 0.0, Double.POSITIVE_INFINITY);
+  public static final DoubleOption BDD2_CACHE_RATIO = new DoubleOption
+    ("cacheRatio",
+     "Cache Ratio for the Operator Caches", "Cache ratio for the operator caches (#tablenodes/#cachenodes)", null,
+     10.0, 0.0, Double.POSITIVE_INFINITY);
+  public static final EnumOption<BDDPartitioningType> BDD2_PARTITIONING = new EnumOption<>
+  ("partitioning", "BDD Transition Partitioning", "BDD transition partitioning",
+    null, BDDPartitioningType.values(), BDDPartitioningType.MONOLITHIC);
+  public static final EnumOption<OrderingAlgorithm> BDD_ORDER_ALGO = new EnumOption<>
+  ("bddAutomataOrderingAlgorithm", "Automata ordering algorithm", "Automata ordering algorithm",
+    null, OrderingAlgorithm.values(), OrderingAlgorithm.AO_HEURISTIC_FORCE);
+  public static final PositiveIntOption BDD_PARTITION_MAX = new PositiveIntOption
+    ("bddMaxPartitionSize",
+     "Max Partition Size", "Max partition size", null, 10000);
+
+  public static final BooleanOption SYNTHESIS_PEAK_BDD = new BooleanOption
+    ("peakBDD",
+     "Compute and print peak BDD", "Compute and print peak BDD", null, false);
+  public static final BooleanOption BDD_DEBUG_ON = new BooleanOption
+    ("bddDebugOn",
+     "Debug On", "Debug on", null, false);
+  public static final BooleanOption BDD_PROFILE_ON = new BooleanOption
+    ("bddProfileOn",
+     "Profiling", "profiling", null, false);
+
+
+  //ALGORITHMS_HMI
+  public static final BooleanOption INCLUDE_USER_INTERFACE = new BooleanOption
+    ("includeUserInterface",
+     "Include SwiXML Analyzer Tools", "Include SwiXML analyzer tools", null, false);
+  public static final BooleanOption EXPAND_EXTENDED_AUTOMATA = new BooleanOption
+    ("expandEFA",
+     "Expand Extended Automata", "Expand extended automata into DFA", null, true);
+
+
+  //MISC
+  public static final BooleanOption TUM_EXTERNAL_ON = new BooleanOption
+    ("tumExternalOn",
+     "Activate TUM Options", "Activate TUM options", null, false);
+
+
+
+  private static Config instance = null;
+
+  /**
+   * This class should only be instantiated to guarantee that it is loaded.
+   */
+  private Config()
+  {
+  }
+
+  public static Config getInstance()
+  {
+      if (instance == null)
+          instance = new Config();
+      return instance;
+  }
+
+
 }

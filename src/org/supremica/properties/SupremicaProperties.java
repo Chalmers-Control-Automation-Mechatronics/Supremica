@@ -113,11 +113,13 @@ public final class SupremicaProperties
   private static void updateProperties(final File propertyFile)
     throws FileNotFoundException, IOException
   {
+    LegacyOptions.init();
     final Properties propertiesFromFile = buildProperties(propertyFile);
     for (final Enumeration<?> e = propertiesFromFile.keys(); e
       .hasMoreElements();) {
-      final String newKey = (String) e.nextElement();
-      final String newValue = propertiesFromFile.getProperty(newKey);
+      final String newKeyLegacy = (String) e.nextElement();
+      final String newKey = LegacyOptions.get(newKeyLegacy);
+      final String newValue = propertiesFromFile.getProperty(newKeyLegacy);
 
       int index = 0;
       while (index != -1) {
@@ -370,6 +372,6 @@ public final class SupremicaProperties
   //# Class Constants
   private static final long SAVE_DELAY = 2000;
   @SuppressWarnings("unused")
-  private final static Config CONFIG = Config.getInstance();
+  private final static Config CONFIG_OPTIONS = Config.getInstance();
 
 }

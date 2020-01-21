@@ -37,9 +37,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.analysis.options.EnumOption;
+
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.ObjectProperty;
 import org.supremica.properties.SupremicaProperties;
+
+import javafx.beans.property.ObjectProperty;
 
 
 /**
@@ -65,7 +68,7 @@ public class ConfigEnumPropertyAction<E extends Enum<E>>
   /**
    * Creates a new enumeration property action.
    * @param ide       The IDE.
-   * @param property  The property affected by the action.
+   * @param option    The property affected by the action.
    * @param value     The value assigned to the property when the action
    *                  is triggered.
    * @param comment   A comment to explain the action. Menu items are
@@ -73,14 +76,14 @@ public class ConfigEnumPropertyAction<E extends Enum<E>>
    *                  while the comment is used as a tool tip.
    */
   ConfigEnumPropertyAction(final IDE ide,
-                           final ObjectProperty<E> property,
+                           final EnumOption<E> option,
                            final E value,
                            final String comment)
   {
     super(ide);
     putValue(Action.NAME, value.toString());
     putValue(Action.SHORT_DESCRIPTION, comment);
-    mProperty = property;
+    mOption = option;
     mValue = value;
     setEnabled(true);
   }
@@ -91,7 +94,7 @@ public class ConfigEnumPropertyAction<E extends Enum<E>>
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    if (mProperty.setValue(mValue)) {
+    if (mOption.setValue(mValue)) {
       SupremicaProperties.savePropertiesLater();
     }
   }
@@ -99,7 +102,7 @@ public class ConfigEnumPropertyAction<E extends Enum<E>>
 
   //#########################################################################
   //# Data Members
-  private final ObjectProperty<E> mProperty;
+  private final EnumOption<E> mOption;
   private final E mValue;
 
 

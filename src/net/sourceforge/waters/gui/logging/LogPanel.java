@@ -64,6 +64,9 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
@@ -79,10 +82,7 @@ import org.apache.logging.log4j.core.config.Property;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -434,7 +434,7 @@ public class LogPanel extends JPanel
    * display.
    */
   private abstract class SystemStreamReader extends Thread
-    implements SupremicaPropertyChangeListener
+    implements OptionChangeListener
   {
     //#######################################################################
     //# Constructor
@@ -442,13 +442,13 @@ public class LogPanel extends JPanel
      * Creates a new system stream reader thread. {@link #setup()} must be
      * called before the new thread can do anything useful.
      */
-    private SystemStreamReader(final BooleanProperty property,
+    private SystemStreamReader(final BooleanOption option,
                                final LevelInfo info)
     {
       setDaemon(true);
       mSystemStream = getSystemOut();
-      mProperty = property;
-      mProperty.addPropertyChangeListener(this);
+      mOption = option;
+      mOption.addPropertyChangeListener(this);
       mLevelInfo = info;
     }
 
@@ -482,7 +482,7 @@ public class LogPanel extends JPanel
      */
     private void reconnect() throws IOException
     {
-      if (mProperty.isTrue()) {
+      if (mOption.getBooleanValue()) {
         setSystemOut(mPrintStream);
       } else {
         setSystemOut(mSystemStream);
@@ -517,7 +517,7 @@ public class LogPanel extends JPanel
      * @see #reconnect()
      */
     @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    public void optionChanged(final OptionChangeEvent event)
     {
       try {
         reconnect();
@@ -557,7 +557,7 @@ public class LogPanel extends JPanel
     //#######################################################################
     //# Data Members
     private final PrintStream mSystemStream;
-    private final BooleanProperty mProperty;
+    private final BooleanOption mOption;
     private final LevelInfo mLevelInfo;
 
     private InputStream mPipeIn;

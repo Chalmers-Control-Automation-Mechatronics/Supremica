@@ -62,12 +62,6 @@ public class ColorOption extends Option<Color>
   //#########################################################################
   //# Type-specific Access
   @Override
-  public void setValue(final Color value)
-  {
-    super.setValue(value);
-  }
-
-  @Override
   public void set(final String text)
   {
     final Color color = Color.decode(text);

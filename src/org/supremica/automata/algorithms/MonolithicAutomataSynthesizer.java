@@ -138,7 +138,7 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 		}
 
 		final AutomataSynchronizer syncher = new AutomataSynchronizer(automata,
-				synchronizationOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
+				synchronizationOptions, Config.SYNTHESIS_SUP_AS_PLANT.getValue());
 		syncher.getHelper().setExecutionDialog(executionDialog);
 		threadToStop = syncher;
 		syncher.execute();

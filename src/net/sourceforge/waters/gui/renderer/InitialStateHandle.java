@@ -74,7 +74,7 @@ class InitialStateHandle
       dx = dy = -0.5 * GeometryTools.SQRT2;
     }
     final Point2D normdir = new Point2D.Double(dx, dy);
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     final Point2D border = GeometryTools.getRadialPoint(node, normdir, radius);
     final double x = border.getX() + INITARROW_LENGTH * dx;
     final double y = border.getY() + INITARROW_LENGTH * dy;
@@ -115,7 +115,7 @@ class InitialStateHandle
   @Override
   public boolean isClicked(final Point point)
   {
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get() + 1;
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue() + 1;
     final double distSq = mLine.ptSegDistSq(point);
     final Point2D center = GeometryTools.getPosition(mNode);
     return

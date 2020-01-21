@@ -49,6 +49,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
@@ -60,9 +62,6 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -77,7 +76,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public class ComponentEditorPanel
     extends JPanel
-    implements SupremicaPropertyChangeListener
+    implements OptionChangeListener
 {
 
     //########################################################################
@@ -190,9 +189,9 @@ public class ComponentEditorPanel
 	//#######################################################################
 	//# Interface org.supremica.properties.SupremicaPropertyChangeListener
 	@Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
 	{
-		mSurface.propertyChanged(event);
+		mSurface.optionChanged(event);
 	}
 
 

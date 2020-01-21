@@ -493,7 +493,7 @@ public class SupremicaSynchronousProductBuilder
 
       final AutomataSynchronizer synchronizer =
         new AutomataSynchronizer(automata, mSynchronizationOptions,
-                                 Config.SYNTHESIS_SUP_AS_PLANT.get());
+                                 Config.SYNTHESIS_SUP_AS_PLANT.getValue());
       setSupremicaTask(synchronizer);
       synchronizer.execute();
 

@@ -100,13 +100,13 @@ public abstract class DotViewer
 	private final JMenuBar menuBar = new JMenuBar();
 	private final JToolBar toolBar = new JToolBar();
 	private boolean updateNeeded = false;
-	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", Config.DOT_LEFT_TO_RIGHT.isTrue());
-	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", Config.DOT_WITH_CIRCLES.isTrue());
-	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", Config.DOT_WITH_STATE_LABELS.isTrue());
-	protected JCheckBoxMenuItem withEventLabelsCheckBox = new JCheckBoxMenuItem("Draw event labels", Config.DOT_WITH_EVENT_LABELS.isTrue());
-	protected JCheckBoxMenuItem useStateColorsCheckBox = new JCheckBoxMenuItem("Draw state colors", Config.DOT_USE_STATE_COLORS.isTrue());
-	protected JCheckBoxMenuItem useArcColorsCheckBox = new JCheckBoxMenuItem("Draw arc colors", Config.DOT_USE_ARC_COLORS.isTrue());
-	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", Config.DOT_AUTOMATIC_UPDATE.isTrue());
+	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", Config.DOT_LEFT_TO_RIGHT.getValue());
+	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", Config.DOT_WITH_CIRCLES.getValue());
+	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", Config.DOT_WITH_STATE_LABELS.getValue());
+	protected JCheckBoxMenuItem withEventLabelsCheckBox = new JCheckBoxMenuItem("Draw event labels", Config.DOT_WITH_EVENT_LABELS.getValue());
+	protected JCheckBoxMenuItem useStateColorsCheckBox = new JCheckBoxMenuItem("Draw state colors", Config.DOT_USE_STATE_COLORS.getValue());
+	protected JCheckBoxMenuItem useArcColorsCheckBox = new JCheckBoxMenuItem("Draw arc colors", Config.DOT_USE_ARC_COLORS.getValue());
+	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", Config.DOT_AUTOMATIC_UPDATE.getValue());
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5,
 								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
@@ -624,7 +624,7 @@ public abstract class DotViewer
 			final JFileChooser fileExporter = dlg.getFileExporter();
 
 			// Suggest a reasonable filename based on the name of the automaton...
-			fileExporter.setSelectedFile(new File(Config.FILE_SAVE_PATH.get() + "/" + objectName + "." + dlg.getSelectedValue()));
+			fileExporter.setSelectedFile(new File(Config.FILE_SAVE_PATH.getValue() + "/" + objectName + "." + dlg.getSelectedValue()));
 
 			if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 			{

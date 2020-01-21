@@ -254,9 +254,9 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
     final Map<EventProxy, EventProxy> eventMap = new HashMap<>();
 
     final String[] reservedNames = new String[] {
-      Config.MINIMIZATION_SILENT_EVENT_NAME.get(),
-      Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get(),
-      Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get()
+      Config.MINIMIZATION_SILENT_EVENT_NAME.getValue(),
+      Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getValue(),
+      Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getValue()
     };
 
     final EventEncoding enc = aut instanceof TRAutomatonProxy

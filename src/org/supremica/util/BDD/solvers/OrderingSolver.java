@@ -76,7 +76,7 @@ public class OrderingSolver
 				}
 			}
 
-			if (Config.BDD_DEBUG_ON.get())
+			if (Config.BDD_DEBUG_ON.getValue())
 			{
 				dump();
 			}
@@ -130,7 +130,7 @@ public class OrderingSolver
 	{
 		Solver sol = null;
 
-		switch (Config.BDD_ORDER_ALGO.get())
+		switch (Config.BDD_ORDER_ALGO.getValue())
 		{
 
 		case AO_HEURISTIC_TSP :

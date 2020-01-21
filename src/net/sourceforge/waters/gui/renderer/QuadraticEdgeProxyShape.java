@@ -56,7 +56,7 @@ class QuadraticEdgeProxyShape
   QuadraticEdgeProxyShape(final EdgeProxy edge)
   {
     super(edge);
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     mControl = GeometryTools.getSingleBezierControlPoint(edge);
     mStart = GeometryTools.getRadialStartPoint(edge, mControl, radius);
     mEnd = GeometryTools.getRadialEndPoint(edge, mControl, radius);

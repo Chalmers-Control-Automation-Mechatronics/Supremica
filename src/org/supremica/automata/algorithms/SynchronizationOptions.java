@@ -93,7 +93,7 @@ public class SynchronizationOptions
 	public SynchronizationOptions()
 	// throws SupremicaException
 	{
-		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.get();
+		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.getValue();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.nbrOfExecuters != 1)
 		{
@@ -103,23 +103,23 @@ public class SynchronizationOptions
 		this.syncType = SynchronizationType.PRIORITIZED;
 		assert this.syncType != null;
 
-		this.initialHashtableSize = Config.SYNC_INITIAL_HASHTABLE_SIZE.get();
+		this.initialHashtableSize = Config.SYNC_INITIAL_HASHTABLE_SIZE.getValue();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.initialHashtableSize < 100)
 		{
 			// throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
 		}
 
-		this.expandHashtable = Config.SYNC_EXPAND_HASHTABLE.isTrue();
-		this.forbidUnconStates = Config.SYNC_FORBID_UNCON_STATES.isTrue();
-		this.expandForbiddenStates = Config.SYNC_EXPAND_FORBIDDEN_STATES.isTrue();
+		this.expandHashtable = Config.SYNC_EXPAND_HASHTABLE.getValue();
+		this.forbidUnconStates = Config.SYNC_FORBID_UNCON_STATES.getValue();
+		this.expandForbiddenStates = Config.SYNC_EXPAND_FORBIDDEN_STATES.getValue();
 		this.expandEventsUsingPriority = false;
 		this.buildAutomaton = true;
 		this.useShortStateNames = false;
 		this.requireConsistentControllability = true;
 		this.requireConsistentImmediate = true;
 		this.rememberDisabledEvents = false;
-		this.unobsEventsSynch = Config.SYNC_UNOBS_EVENTS_SYNC.get();
+		this.unobsEventsSynch = Config.SYNC_UNOBS_EVENTS_SYNC.getValue();
 		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getAsString();
 		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getAsString();
         this.EFAMode = false;
@@ -331,7 +331,7 @@ public class SynchronizationOptions
 		options.setForbidUncontrollableStates(false);   // So why was it like that?
 		options.setExpandForbiddenStates(true);
 		options.setExpandHashtable(true);
-		options.setUnobsEventsSynch(Config.SYNC_UNOBS_EVENTS_SYNC.get());
+		options.setUnobsEventsSynch(Config.SYNC_UNOBS_EVENTS_SYNC.getValue());
 		return options;
 	}
 

@@ -61,6 +61,7 @@ public class GeometryAbsentException
 
   //#########################################################################
   //# Messages
+  @Override
   public String getMessage()
   {
     return getMessage(null);
@@ -80,7 +81,7 @@ public class GeometryAbsentException
       buffer.append(" has ");
       buffer.append(mNumNodes);
       buffer.append(" states. Graphs with more than ");
-      final int max = Config.DOT_MAX_NBR_OF_STATES.get();
+      final int max = Config.DOT_MAX_NBR_OF_STATES.getValue();
       buffer.append(max);
       buffer.append(" states cannot be displayed.");
     }

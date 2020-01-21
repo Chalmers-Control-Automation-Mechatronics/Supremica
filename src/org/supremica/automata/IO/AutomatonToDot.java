@@ -49,93 +49,96 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.Vector;
+
 import org.supremica.automata.Arc;
-import org.supremica.automata.MultiArc;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.properties.Config;
+import org.supremica.automata.MultiArc;
+import org.supremica.automata.State;
 import org.supremica.gui.ExportFormat;
+import org.supremica.properties.Config;
 
 public class AutomatonToDot
     implements AutomataSerializer
 {
-    
+
     // We hope that this is the size of an A4 page (isn't 8.5" times 11" ??)
     private static final int DEFAULT_WIDTH = 7;
     private static final int DEFAULT_HEIGHT = 11;
-    private Automaton aut;
-    
-    private boolean leftToRight = Config.DOT_LEFT_TO_RIGHT.isTrue();
-    private boolean withLabel = Config.DOT_WITH_STATE_LABELS.isTrue();
-    private boolean withCircles = Config.DOT_WITH_CIRCLES.isTrue();
-    private boolean useStateColors = Config.DOT_USE_STATE_COLORS.isTrue();
-    private boolean useArcColors = Config.DOT_USE_ARC_COLORS.isTrue();
-    private boolean writeEventLabels = Config.DOT_WITH_EVENT_LABELS.isTrue();
-    
-    public AutomatonToDot(Automaton aut)
+    private final Automaton aut;
+
+    private boolean leftToRight = Config.DOT_LEFT_TO_RIGHT.getValue();
+    private boolean withLabel = Config.DOT_WITH_STATE_LABELS.getValue();
+    private boolean withCircles = Config.DOT_WITH_CIRCLES.getValue();
+    private boolean useStateColors = Config.DOT_USE_STATE_COLORS.getValue();
+    private boolean useArcColors = Config.DOT_USE_ARC_COLORS.getValue();
+    private boolean writeEventLabels = Config.DOT_WITH_EVENT_LABELS.getValue();
+
+    public AutomatonToDot(final Automaton aut)
     {
         this.aut = aut;
     }
-    
+
     public boolean isLeftToRight()
     {
         return leftToRight;
     }
-    
-    public void setLeftToRight(boolean leftToRight)
+
+    public void setLeftToRight(final boolean leftToRight)
     {
         this.leftToRight = leftToRight;
     }
-    
-    public void setWithLabels(boolean withLabel)
+
+    public void setWithLabels(final boolean withLabel)
     {
         this.withLabel = withLabel;
     }
-    
-    public void setWithEventLabels(boolean withLabel)
+
+    public void setWithEventLabels(final boolean withLabel)
     {
         this.writeEventLabels = withLabel;
     }
-    
-    public void setWithCircles(boolean withCircles)
+
+    public void setWithCircles(final boolean withCircles)
     {
         this.withCircles = withCircles;
     }
-    
-    public void setUseStateColors(boolean useStateColors)
+
+    public void setUseStateColors(final boolean useStateColors)
     {
         this.useStateColors = useStateColors;
     }
-    
-    public void setUseArcColors(boolean useArcColors)
+
+    public void setUseArcColors(final boolean useArcColors)
     {
         this.useArcColors = useArcColors;
     }
-    
-    protected String getStateColor(State s)
+
+    protected String getStateColor(final State s)
     {
         if (!useStateColors)
         {
             return "";
         }
-        
+
         if (s.isAccepting() &&!s.isForbidden())
         {
             return ", color = green3";
         }
-        
+
         if (s.isForbidden())
         {
             return ", color = red1";
         }
-        
+
         return "";
     }
-    
-    protected String getArcColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs, boolean is_prop)
+
+    protected String getArcColor(final boolean is_ctrl, final boolean is_prio, final boolean is_imm, final boolean is_eps, final boolean is_obs, final boolean is_prop)
     {
         if (useArcColors)
         {
@@ -148,37 +151,38 @@ public class AutomatonToDot
                 return ", color = red1";
             }
         }
-        
+
         return "";
     }
-    
-    public void serialize(PrintWriter pw)
+
+    @Override
+    public void serialize(final PrintWriter pw)
     throws Exception
     {
         //aut.normalizeStateIdentities();
-        
+
                 /*
                 EnumerateStates en = new EnumerateStates(aut, "q");
                 en.execute();
                  */
-        
-        Vector<State> initialStates = new Vector<State>();
+
+        final Vector<State> initialStates = new Vector<State>();
         final String initPrefix = "__init_";
         String standardShape = null;
         String acceptingShape = null;
         String forbiddenShape = null;
-        
+
         pw.println("digraph state_automaton {");
         pw.println("\tcenter = true;");
-        
+
         // fix page size to this:
         pw.println("\tsize = \"" + DEFAULT_WIDTH + "," + DEFAULT_HEIGHT + "\";");
-        
+
         if (leftToRight)
         {
             pw.println("\trankdir = LR;");
         }
-        
+
         if (withCircles)
         {
             standardShape = "circle";
@@ -197,25 +201,25 @@ public class AutomatonToDot
             pw.println("}");
             pw.flush();
             pw.close();
-            
+
             return;
         }
-        
-        for (Iterator<?> states = aut.stateIterator(); states.hasNext(); )
+
+        for (final Iterator<?> states = aut.stateIterator(); states.hasNext(); )
         {
-            State state = (State) states.next();
-            
+            final State state = (State) states.next();
+
             if (state.isInitial())
             {
                 initialStates.addElement(state);
                 pw.println("\t{node [shape = plaintext, style=invis, label=\"\"] \"" + initPrefix + state.getName() + "\"};");
             }
-            
+
             if (state.isAccepting() &&!state.isForbidden())
             {
                 pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getName() + "\"};");
             }
-            
+
             if (state.isForbidden())
             {
                 pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getName() + "\"};");
@@ -225,93 +229,93 @@ public class AutomatonToDot
                 pw.println("\t{node [shape = " + standardShape + "] \"" + state.getName() + "\"};");
             }
         }
-        
+
         for (int i = 0; i < initialStates.size(); i++)
         {
-            String stateId = initialStates.elementAt(i).getName();
-            
+            final String stateId = initialStates.elementAt(i).getName();
+
             // pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
             // pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
             // pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
             pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
         }
-        
+
         //Alphabet theAlphabet = aut.getAlphabet();
-        for (Iterator<?> states = aut.stateIterator(); states.hasNext(); )
+        for (final Iterator<?> states = aut.stateIterator(); states.hasNext(); )
         {
-            State sourceState = (State) states.next();
-            
+            final State sourceState = (State) states.next();
+
             pw.print("\t\"" + sourceState.getName() + "\" [label = \"");
-            
+
             if (withLabel)
             {
                 pw.print(EncodingHelper.normalize(sourceState.getName(), ExportFormat.DOT, false));
             }
-            
+
             pw.println("\"" + getStateColor(sourceState) + "]; ");
-            
-            
-            for (Iterator<?> arcSets = sourceState.outgoingMultiArcIterator();
+
+
+            for (final Iterator<?> arcSets = sourceState.outgoingMultiArcIterator();
             arcSets.hasNext(); )
             {
                 boolean is_ctrl = true;
                 boolean is_prio = false;
                 boolean is_imm = false;
-                boolean is_eps = false;
+                final boolean is_eps = false;
                 boolean is_obs = false;
                 boolean is_prop = false;
-                MultiArc currArcSet = (MultiArc) arcSets.next();
-                State fromState = currArcSet.getFromState();
-                State toState = currArcSet.getToState();
-                
+                final MultiArc currArcSet = (MultiArc) arcSets.next();
+                final State fromState = currArcSet.getFromState();
+                final State toState = currArcSet.getToState();
+
                 pw.print("\t\"" + fromState.getName() + "\" -> \"" + toState.getName());
-                
+
                 pw.print("\" [ label = \"");
-                
+
                 if (writeEventLabels)
                 {
-                    for (Iterator<?> arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+                    for (final Iterator<?> arcIt = currArcSet.iterator(); arcIt.hasNext(); )
                     {
-                        Arc currArc = (Arc) arcIt.next();
-                        LabeledEvent thisEvent = currArc.getEvent();
-                        
+                        final Arc currArc = (Arc) arcIt.next();
+                        final LabeledEvent thisEvent = currArc.getEvent();
+
                         if (!thisEvent.isControllable())
                         {
                             pw.print("!");
-                            
+
                             is_ctrl = false;
                         }
-                        
+
                         if (!thisEvent.isPrioritized())
                         {
                             pw.print("?");
-                            
+
                             is_prio = true;
                         }
-                        
+
                         if (thisEvent.isImmediate())
                         {
                             pw.print("#");
-                            
+
                             is_imm = true;
                         }
-                        
+
                         if (thisEvent.isProposition())
                         {
                             pw.print("@");
-                            
+
                             is_prop = true;
                         }
-                        
+
                         if (!thisEvent.isObservable())
                         {
                             pw.print("$");
-                            
+
                             is_obs = true;
                         }
-                        
+
                         pw.print(EncodingHelper.normalize(thisEvent.getLabel(), ExportFormat.DOT, false));
-                        
+
                         if (arcIt.hasNext())
                         {
                             pw.print("\\n");
@@ -319,31 +323,32 @@ public class AutomatonToDot
                     }
                 }
                 pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + "];");
-                
+
                 // Commented out large event label font. Did not like this but maybel we can include it as an option.
                 //pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + ", fontname=\"Helvetica\" , fontsize=\"26\"];");
             }
         }
-        
+
         // An attemp to always start at the initial state.
         // The problem is that a rectangle is drawn around the initial state.
         // Ok, new versions of dot seems to be able to deal with this.
-        for (Iterator<State> stateIt = initialStates.iterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = initialStates.iterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             pw.println("\t{ rank = min ;");
             pw.println("\t\t\"" + initPrefix + currState.getName() + "\";");
             pw.println("\t\t\"" + currState.getName() + "\";");
             pw.println("\t}");
         }
-        
+
         pw.println("}");
         pw.flush();
         pw.close();
     }
-    
-    public void serialize(String fileName)
+
+    @Override
+    public void serialize(final String fileName)
     throws Exception
     {
         serialize(new PrintWriter(new FileWriter(fileName)));

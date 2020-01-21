@@ -89,7 +89,7 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     initializeModuleExamples();
     initializeSchedulingExamples();
     initializeOtherExamples();
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       initializeTUMunichExamples();
     }
     //initializeStandardComponents();

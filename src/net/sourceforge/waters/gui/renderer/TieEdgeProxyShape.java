@@ -78,7 +78,7 @@ class TieEdgeProxyShape
     final double startdeg = 90.0 - Math.toDegrees(startangle);
     mArc = new Arc2D.Double(ax, ay, diameter, diameter, startdeg,
                             GeometryTools.SELFLOOP_EXTENT, Arc2D.OPEN);
-    final int noderadius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int noderadius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     final Point2D tangent1 = mArc.getEndPoint();
     final Point2D tangent2 = mArc.getStartPoint();
     mStart = GeometryTools.getRadialStartPoint(edge, tangent1, noderadius);

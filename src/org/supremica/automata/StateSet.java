@@ -20,6 +20,8 @@
 
 package org.supremica.automata;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,10 +32,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import gnu.trove.set.hash.THashSet;
+import net.sourceforge.waters.model.des.StateProxy;
 
 import org.supremica.properties.Config;
-import net.sourceforge.waters.model.des.StateProxy;
 
 
 public class StateSet extends AbstractSet<State> implements Cloneable
@@ -77,16 +78,19 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     return new TreeSet<StateProxy>(mMap.values());
   }
 
+  @Override
   public boolean isEmpty()
   {
     return mMap.isEmpty();
   }
 
+  @Override
   public int size()
   {
     return mMap.size();
   }
 
+  @Override
   public boolean contains(final Object object)
   {
     if (object instanceof State) {
@@ -103,17 +107,20 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     return mMap.get(name);
   }
 
+  @Override
   public Iterator<State> iterator()
   {
     return mMap.values().iterator();
   }
 
+  @Override
   public boolean add(final State state)
   {
     final String name = state.getName();
     return modified(mMap.put(name, state) == null);
   }
 
+  @Override
   public boolean addAll(final Collection<? extends State> collection)
   {
     boolean result = false;
@@ -129,12 +136,14 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     return addAll(states);
   }
 
+  @Override
   public void clear()
   {
     modified(mMap.size() != 0);
     mMap.clear();
   }
 
+  @Override
   public boolean remove(final Object object)
   {
     if (object instanceof State) {
@@ -146,6 +155,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     }
   }
 
+  @Override
   public boolean removeAll(final Collection<?> collection)
   {
     boolean result = false;
@@ -155,6 +165,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     return result;
   }
 
+  @Override
   public boolean retainAll(final Collection<?> collection)
   {
     final int size = collection.size();
@@ -187,6 +198,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
    * return super.equals(states); }
    */
 
+  @Override
   public String toString()
   {
     final StringBuilder buf = new StringBuilder();
@@ -317,7 +329,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     final StateSet statesToExamine = new StateSet();
     statesToExamine.addAll(this);
     while (statesToExamine.size() != 0) {
-      final State currState = (State) statesToExamine.remove();
+      final State currState = statesToExamine.remove();
 
       for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt
         .hasNext();) {
@@ -367,7 +379,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
       // Add to new name
       buf.append(state.getName());
       if (stateit.hasNext()) {
-        buf.append(Config.GENERAL_STATELABEL_SEPARATOR.get());
+        buf.append(Config.GENERAL_STATE_LABEL_SEPARATOR.getValue());
       }
 
       // i |= state.isInitial();
@@ -475,6 +487,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
       }
     }
 
+    @Override
     public boolean hasNext()
     {
       if (arcIterator == null) {
@@ -484,6 +497,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
       return arcIterator.hasNext();
     }
 
+    @Override
     public Arc next() throws NoSuchElementException
     {
       final Arc arc = arcIterator.next();
@@ -510,6 +524,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
       return arc;
     }
 
+    @Override
     public void remove() throws UnsupportedOperationException,
       IllegalStateException
     {

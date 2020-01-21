@@ -51,6 +51,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
@@ -141,9 +144,6 @@ import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.gui.simulator.ExternalEventExecuter;
 import org.supremica.properties.Config;
-import org.supremica.properties.Property;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 /**
  * <P>
@@ -154,7 +154,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * The menu bar is updated dynamically when panels are switched, e.g., when the
  * user changes from the editor to the analyser, or when certain configuration
  * options are changed. This is achieved by registering an {@link Observer} on
- * the {@link IDE}, and a {@link SupremicaPropertyChangeListener} on each of the
+ * the {@link IDE}, and a {@link OptionChangeListener} on each of the
  * properties concerned.
  * </P>
  *
@@ -260,7 +260,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public class IDEMenuBar
   extends JMenuBar
-  implements Observer, SupremicaPropertyChangeListener
+  implements Observer, OptionChangeListener
 {
 
   //#########################################################################
@@ -268,7 +268,7 @@ public class IDEMenuBar
   public IDEMenuBar(final IDE ide)
   {
     mIDE = ide;
-    mProperties = new THashSet<>();
+    mOptions = new THashSet<>();
     createMenus();
     ide.attach(this);
   }
@@ -281,10 +281,10 @@ public class IDEMenuBar
     return mIDE.getActions();
   }
 
-  public void addProperty(final Property property)
+  public void addOption(final Option<?> option)
   {
-    if (mProperties.add(property)) {
-      property.addPropertyChangeListener(this);
+    if (mOptions.add(option)) {
+      option.addPropertyChangeListener(this);
     }
   }
 
@@ -292,7 +292,7 @@ public class IDEMenuBar
   //#######################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
   @Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
   {
     rebuildMenus();
   }
@@ -326,8 +326,8 @@ public class IDEMenuBar
     menu.add(insComp);
     final Action insVar = actions.getAction(InsertVariableAction.class);
     menu.add(insVar);
-    addProperty(Config.INCLUDE_INSTANTION);
-    if (Config.INCLUDE_INSTANTION.isTrue()) {
+    addOption(Config.INCLUDE_INSTANTIATION);
+    if (Config.INCLUDE_INSTANTIATION.getBooleanValue()) {
       final Action insForeach = actions.getAction(InsertForeachAction.class);
       menu.add(insForeach);
       final Action insAlias =
@@ -367,14 +367,14 @@ public class IDEMenuBar
     final Action languageInclusion =
         actions.getAction(VerifyLanguageInclusionAction.class);
     menu.add(languageInclusion);
-    addProperty(Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY);
-    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
+    addOption(Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY);
+    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.getValue()) {
       final Action diagnosability =
         actions.getAction(VerifyDiagnosabilityCheckAction.class);
       menu.add(diagnosability);
     }
-    addProperty(Config.GUI_ANALYZER_INCLUDE_HISC);
-    if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
+    addOption(Config.GUI_ANALYZER_INCLUDE_HISC);
+    if (Config.GUI_ANALYZER_INCLUDE_HISC.getValue()) {
       menu.addSeparator();
       final Action sic5 =
         actions.getAction(VerifySICProperty5Action.class);
@@ -393,8 +393,8 @@ public class IDEMenuBar
         actions.getAction(VerifyHISCCPControllabilityAction.class);
       menu.add(hiscCpCont);
     }
-    addProperty(Config.GUI_ANALYZER_INCLUDE_SD);
-    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
+    addOption(Config.GUI_ANALYZER_INCLUDE_SD);
+    if (Config.GUI_ANALYZER_INCLUDE_SD.getValue()) {
       menu.addSeparator();
       final Action plantComplete =
         actions.getAction(VerifySDPlantCompletenessAction.class);
@@ -432,19 +432,19 @@ public class IDEMenuBar
 
   public void createEditorAnalyzeMenu()
   {
-    addProperty(Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS);
-    if (Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.isTrue()) {
+    addOption(Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS);
+    if (Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.getValue()) {
       final Actions actions = getActions();
       final JMenu menu = new JMenu("Analyze");
       menu.setMnemonic(KeyEvent.VK_Z);  // ALT-A - create automaton?
       menu.add(actions.editorSynthesizerAction.getMenuItem());
-      addProperty(Config.TUM_EXTERNAL_ON);
-      if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      addOption(Config.TUM_EXTERNAL_ON);
+      if (Config.TUM_EXTERNAL_ON.getValue()) {
         menu.add(actions.editorGenerateTextLabelAction.getMenuItem());
         menu.add(actions.editorRemoveGABlocksAction.getMenuItem());
       }
-      addProperty(Config.INCLUDE_EXPERIMENTAL_ALGORITHMS);
-      if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get()) {
+      addOption(Config.INCLUDE_EXPERIMENTAL_ALGORITHMS);
+      if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.getValue()) {
         //IISC Algorithms
         menu.addSeparator();
         menu.add(actions.editorEFASynch.getMenuItem());
@@ -463,8 +463,8 @@ public class IDEMenuBar
     menu.setMnemonic(KeyEvent.VK_T);
     final Action layout = actions.getAction(GraphLayoutAction.class);
     menu.add(layout);
-    addProperty(Config.INCLUDE_INSTANTION);
-    if (Config.INCLUDE_INSTANTION.isTrue()) {
+    addOption(Config.INCLUDE_INSTANTIATION);
+    if (Config.INCLUDE_INSTANTIATION.getBooleanValue()) {
       final Action instantiation =
         actions.getAction(InstantiateModuleAction.class);
       menu.add(instantiation);
@@ -511,8 +511,8 @@ public class IDEMenuBar
 
   public void createSupremicaToolsMenu()
   {
-    addProperty(Config.INCLUDE_ANIMATOR);
-    if (Config.INCLUDE_ANIMATOR.isTrue()) {
+    addOption(Config.INCLUDE_ANIMATOR);
+    if (Config.INCLUDE_ANIMATOR.getValue()) {
       final Actions actions = getActions();
       final JMenu menu = new JMenu("Tools");
       menu.setMnemonic(KeyEvent.VK_T);
@@ -617,8 +617,8 @@ public class IDEMenuBar
     menu.add(newmod);
     final Action open = actions.getAction(OpenAction.class);
     menu.add(open);
-    addProperty(Config.INCLUDE_RAS_SUPPORT);
-    if(Config.INCLUDE_RAS_SUPPORT.isTrue()){
+    addOption(Config.INCLUDE_RAS_SUPPORT);
+    if(Config.INCLUDE_RAS_SUPPORT.getBooleanValue()){
       final Action openRas = actions.getAction(OpenRASAction.class);
       menu.add(openRas);
     }
@@ -809,10 +809,10 @@ public class IDEMenuBar
 
   private void removeListeners()
   {
-    for (final Property property : mProperties) {
-      property.removePropertyChangeListener(this);
+    for (final Option<?> option : mOptions) {
+      option.removePropertyChangeListener(this);
     }
-    mProperties.clear();
+    mOptions.clear();
   }
 
   private MainPanel getActivePanel()
@@ -863,7 +863,7 @@ public class IDEMenuBar
   //#########################################################################
   //# Data Members
   private final IDE mIDE;
-  private final Collection<Property> mProperties;
+  private final Collection<Option<?>> mOptions;
 
 
   //#########################################################################

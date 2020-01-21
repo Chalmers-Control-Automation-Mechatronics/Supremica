@@ -50,8 +50,7 @@
 
 package org.supremica.automata.algorithms;
 
-import org.supremica.properties.BooleanProperty;
-import org.supremica.properties.Config;
+import net.sourceforge.waters.analysis.options.BooleanOption;
 
 
 public enum EquivalenceRelation
@@ -62,7 +61,7 @@ public enum EquivalenceRelation
   /** Language equivalence. */
   LANGUAGEEQUIVALENCE("Language equivalence"),
   /** Observer projection (OP-search) */
-  OP("Observer projection", Config.GUI_ANALYZER_INCLUDE_OP),
+  OP("Observer projection"),//, ConfigOptions.GUI_ANALYZER_INCLUDE_OP),
   /** Conflict equivalence. */
   CONFLICTEQUIVALENCE("Conflict equivalence"),
   /** Supervision equivalence. */
@@ -84,9 +83,9 @@ public enum EquivalenceRelation
   }
 
   private EquivalenceRelation(final String description,
-                              final BooleanProperty property)
+                              final BooleanOption option)
   {
-    mProperty = property;
+    mOption = option;
     mDescription = description;
   }
 
@@ -104,10 +103,10 @@ public enum EquivalenceRelation
   //# Simple Access
   boolean isEnabled()
   {
-    if (mProperty == null) {
+    if (mOption == null) {
       return true;
     } else {
-      return mProperty.isTrue();
+      return mOption.getValue();
     }
   }
 
@@ -148,7 +147,7 @@ public enum EquivalenceRelation
 
   //#########################################################################
   //# Data Members
-  private final BooleanProperty mProperty;
+  private final BooleanOption mOption;
   /** Textual description. */
   private final String mDescription;
 

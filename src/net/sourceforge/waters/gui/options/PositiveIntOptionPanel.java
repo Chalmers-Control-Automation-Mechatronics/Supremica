@@ -88,7 +88,9 @@ class PositiveIntOptionPanel
   {
     final PositiveIntOption option = getOption();
     final int value = option.getValue();
-    final IntegerInputCell cell = new IntegerInputCell();
+    final int minValue = option.getMinValue();
+    final int maxValue = option.getMaxValue();
+    final IntegerInputCell cell = new IntegerInputCell(minValue, maxValue);
     cell.setValue(value);
     cell.setColumns(10);
     final GUIOptionContext context = getContext();

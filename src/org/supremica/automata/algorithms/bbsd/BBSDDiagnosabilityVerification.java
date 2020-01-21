@@ -103,7 +103,7 @@ public class BBSDDiagnosabilityVerification {
                         current.addAutomaton(result);
                         current.addAutomaton(currentGv);
                         // timer4.start();
-                        theSynchronizer = new AutomataSynchronizer(current, new SynchronizationOptions(), Config.SYNTHESIS_SUP_AS_PLANT.get());
+                        theSynchronizer = new AutomataSynchronizer(current, new SynchronizationOptions(), Config.SYNTHESIS_SUP_AS_PLANT.getValue());
                         theSynchronizer.execute();
                         // timer4.stop();
                         result = theSynchronizer.getAutomaton();
@@ -217,7 +217,7 @@ public class BBSDDiagnosabilityVerification {
             try {
                 // timer3.stop();
                 // timer4.start();
-                theSynchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions(), Config.SYNTHESIS_SUP_AS_PLANT.get());
+                theSynchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions(), Config.SYNTHESIS_SUP_AS_PLANT.getValue());
                 theSynchronizer.execute();
                 // timer4.stop();
                 // timer3.start();

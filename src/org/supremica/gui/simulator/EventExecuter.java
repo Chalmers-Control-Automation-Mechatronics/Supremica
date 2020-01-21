@@ -69,7 +69,7 @@ class EventExecuter
         this.theExecuter = theExecuter;
 
 //              eventModel.addListDataListener(this);
-        sleepTime = Config.SIMULATION_CYCLE_TIME.get();
+        sleepTime = Config.SIMULATION_CYCLE_TIME.getValue();
 
         System.out.println("sleepTime = " + sleepTime);    // DEBUG
     }

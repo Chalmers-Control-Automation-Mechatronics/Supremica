@@ -543,14 +543,14 @@ public class AttributesPanel extends JPanel
     //=======================================================================
     // TODO Make responsive to configuration changes ...
     ATTRIBUTE_FACTORIES.add(DefaultAttributeFactory.getInstance());
-    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
+    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.getValue()) {
       ATTRIBUTE_FACTORIES.add(DiagnosabilityAttributeFactory.getInstance());
     }
-    if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
+    if (Config.GUI_ANALYZER_INCLUDE_HISC.getValue()) {
       ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
     }
     // A condition could be added to check if the model contains any clocks
-    if (Config.INCLUDE_RAS_SUPPORT.isTrue()) {
+    if (Config.INCLUDE_RAS_SUPPORT.getValue()) {
       ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
       ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
     }

@@ -52,13 +52,13 @@ import javax.swing.JPanel;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -70,7 +70,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  */
 public class WelcomeScreen
   extends JPanel
-  implements ComponentListener, SupremicaPropertyChangeListener
+  implements ComponentListener, OptionChangeListener
 {
 
   //#########################################################################
@@ -149,7 +149,7 @@ public class WelcomeScreen
   //#########################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
   @Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
   {
     removeAll();
     createContents();

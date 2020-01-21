@@ -88,7 +88,6 @@ import org.supremica.util.ProcessCommandLineArguments;
 
 import org.xml.sax.SAXException;
 
-
 /**
  * The IDE's main window.
  *
@@ -125,13 +124,14 @@ public class IDE
     mModuleNameObserver = new ModuleNameObserver();
 
     // Set frame size and position from configuration file
-    final Dimension size = new Dimension(Config.GUI_IDE_WIDTH.get(),
-                                         Config.GUI_IDE_HEIGHT.get());
+    final Dimension size = new Dimension(Config.GUI_IDE_WIDTH.getValue(),
+                                         Config.GUI_IDE_HEIGHT.getValue());
     setPreferredSize(size);
-    if (Config.GUI_IDE_MAXIMIZED.get()) {
+    if (Config.GUI_IDE_MAXIMIZED.getValue()) {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     } else {
-      setLocation(Config.GUI_IDE_XPOS.get(), Config.GUI_IDE_YPOS.get());
+      setLocation(Config.GUI_IDE_XPOS.getValue(),
+                  Config.GUI_IDE_YPOS.getValue());
     }
     final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
     setIconImages(images);
@@ -313,8 +313,8 @@ public class IDE
   public void componentResized(final ComponentEvent event)
   {
     if (getExtendedState() == Frame.NORMAL) {
-      final boolean changedWidth = Config.GUI_IDE_WIDTH.set(getWidth());
-      final boolean changedHeight = Config.GUI_IDE_HEIGHT.set(getHeight());
+      final boolean changedWidth = Config.GUI_IDE_WIDTH.setValue(getWidth());
+      final boolean changedHeight = Config.GUI_IDE_HEIGHT.setValue(getHeight());
       if (changedWidth || changedHeight) {
         SupremicaProperties.savePropertiesLater();
       }
@@ -325,8 +325,8 @@ public class IDE
   public void componentMoved(final ComponentEvent event)
   {
     if (getExtendedState() == Frame.NORMAL) {
-      final boolean changedX = Config.GUI_IDE_XPOS.set(getX());
-      final boolean changedY = Config.GUI_IDE_YPOS.set(getY());
+      final boolean changedX = Config.GUI_IDE_XPOS.setValue(getX());
+      final boolean changedY = Config.GUI_IDE_YPOS.setValue(getY());
       if (changedX || changedY) {
         SupremicaProperties.savePropertiesLater();
       }
@@ -351,7 +351,8 @@ public class IDE
   {
     final int state = event.getNewState();
     final boolean changed =
-      Config.GUI_IDE_MAXIMIZED.set(state == Frame.MAXIMIZED_BOTH);
+      Config.GUI_IDE_MAXIMIZED
+      .setValue(state == Frame.MAXIMIZED_BOTH);
     if (changed) {
       SupremicaProperties.savePropertiesLater();
     }
@@ -428,13 +429,13 @@ public class IDE
     // Open initial module(s)
     if (hasFiles) {
       ide.openFiles(files);
-    } else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue()) {
+    } else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.getValue()) {
       ide.openEmptyDocument();
     }
     // Show!
     ide.setVisible(true);
     ide.initializeLoggers(hasFiles ||
-                          Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue());
+                          Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.getValue());
   }
 
 

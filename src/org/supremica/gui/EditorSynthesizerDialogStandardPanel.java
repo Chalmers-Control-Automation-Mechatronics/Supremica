@@ -54,9 +54,9 @@ import javax.swing.JTextField;
 
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions.ExpressionType;
+import org.supremica.properties.Config;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
-import org.supremica.properties.Config;
 
 //###########################################################################
 //# Abstract class
@@ -387,7 +387,7 @@ public class EditorSynthesizerDialogStandardPanel
 
 
     // TUM external toolbox for ST code generation
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       tumPanel = new JPanel();
       tumPanel.setBorder(BorderFactory.createTitledBorder(
           "PLC code generation"));
@@ -470,7 +470,7 @@ public class EditorSynthesizerDialogStandardPanel
     constraints.gridy++;
     add(genGuardComputeSupBox, constraints);
     add(optimizationPanel, constraints);
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       constraints.gridy++;
       add(tumPanel, constraints);
     }
@@ -506,7 +506,7 @@ public class EditorSynthesizerDialogStandardPanel
     algorithmSelector.setAlgorithm(selected);
 
     // TUM external toolbox for ST code generation
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       if (!addGuardsBox.isSelected()) {
         genPLCCodeTUMBox.setSelected(false);
         genPLCCodeTUMBox.setEnabled(false);
@@ -562,7 +562,7 @@ public class EditorSynthesizerDialogStandardPanel
     independentHeuristicBox.setSelected(synthesizerOptions.getIndpHeuristic());
     globalClockDomainField.setEnabled(timeOptBox.isSelected());
 
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       genPLCCodeTUMBox.setEnabled(synthesizerOptions.getAddGuards());
 //      typePLCCodeTUMSelector.setSelectedItem(synthesizerOptions.getTypePLCCodeTUM());
 //      plcCodeTUMefaBox.setSelected(synthesizerOptions.getPLCCodeTUMefaBox());
@@ -588,7 +588,7 @@ public class EditorSynthesizerDialogStandardPanel
     synthesizerOptions.setOptimization(timeOptBox.isSelected());
     synthesizerOptions
       .setGlobalClockDomain(Long.parseLong(globalClockDomainField.getText()));
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       synthesizerOptions.setGenPLCCodeTUMBox(genPLCCodeTUMBox.isSelected());
       synthesizerOptions.setTypePLCCodeTUM((String) typePLCCodeTUMSelector.getSelectedItem());
       synthesizerOptions.setPLCCodeTUMefaBox(plcCodeTUMefaBox.isSelected());

@@ -130,14 +130,14 @@ public final class MinimizationOptions
      */
     public MinimizationOptions()
     {
-        equivalenceRelation = Config.MINIMIZATION_EQUIVALENCE_RELATION.get();
-        alsoTransitions = Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get();
-        keepOriginal = Config.MINIMIZATION_KEEP_ORIGINAL.get();
-        ignoreMarking = Config.MINIMIZATION_IGNORE_MARKING.get();
-        minimizationStrategy = Config.MINIMIZATION_STRATEGY.get();
-        minimizationHeuristic = Config.MINIMIZATION_HEURISTIC.get();
-        mMinimizationSelectingHeuristic = Config.MINIMIZATION_SELECTINGHEURISTIC.get();
-        mMinimizationPreselectingHeuristic = Config.MINIMIZATION_PRESELECTINGHEURISTIC.get();
+        equivalenceRelation = Config.MINIMIZATION_EQUIVALENCE_RELATION.getValue();
+        alsoTransitions = Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.getValue();
+        keepOriginal = Config.MINIMIZATION_KEEP_ORIGINAL.getValue();
+        ignoreMarking = Config.MINIMIZATION_IGNORE_MARKING.getValue();
+        minimizationStrategy = Config.MINIMIZATION_STRATEGY.getValue();
+        minimizationHeuristic = Config.MINIMIZATION_HEURISTIC.getValue();
+        mMinimizationSelectingHeuristic = Config.MINIMIZATION_SELECTING_HEURISTIC.getValue();
+        mMinimizationPreselectingHeuristic = Config.MINIMIZATION_PRESELECTING_HEURISTIC.getValue();
         componentSizeLimit = Integer.MAX_VALUE;
     }
 
@@ -360,13 +360,13 @@ public final class MinimizationOptions
     public void saveOptions()
     {
         Config.MINIMIZATION_EQUIVALENCE_RELATION.setValue(equivalenceRelation);
-        Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.set(alsoTransitions);
-        Config.MINIMIZATION_KEEP_ORIGINAL.set(keepOriginal);
-        Config.MINIMIZATION_IGNORE_MARKING.set(ignoreMarking);
+        Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.setValue(alsoTransitions);
+        Config.MINIMIZATION_KEEP_ORIGINAL.setValue(keepOriginal);
+        Config.MINIMIZATION_IGNORE_MARKING.setValue(ignoreMarking);
         Config.MINIMIZATION_STRATEGY.setValue(minimizationStrategy);
         Config.MINIMIZATION_HEURISTIC.setValue(minimizationHeuristic);
-        Config.MINIMIZATION_PRESELECTINGHEURISTIC.setValue(mMinimizationPreselectingHeuristic);
-        Config.MINIMIZATION_SELECTINGHEURISTIC.setValue(mMinimizationSelectingHeuristic);
+        Config.MINIMIZATION_PRESELECTING_HEURISTIC.setValue(mMinimizationPreselectingHeuristic);
+        Config.MINIMIZATION_SELECTING_HEURISTIC.setValue(mMinimizationSelectingHeuristic);
     }
 
     /**

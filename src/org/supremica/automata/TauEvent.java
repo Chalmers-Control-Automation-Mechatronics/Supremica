@@ -56,7 +56,7 @@ public class TauEvent extends LabeledEvent
 
     public static LabeledEvent getOriginalEvent(final LabeledEvent ev) // Because of this change made here (LabeledEvent instead of String as parameter)
     {                                                                   // we can easily change to not use the map but return ev.getOriginalEvent() instead
-      if(Config.MINIMIZATION_USE_TAUEVENT_MAP.isTrue())
+      if(Config.MINIMIZATION_USE_TAU_EVENT_MAP.getValue())
         return toOriginalMap.get(ev.getLabel());
       else // don't use TauEvent map
       {

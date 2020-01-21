@@ -142,7 +142,7 @@ public class STCTSolver
 			}
 		}
 
-		if (Config.BDD_PROFILE_ON.get())
+		if (Config.BDD_PROFILE_ON.getValue())
 		{
 			Options.out.println("STCT:SA algorithm " + ((improvments > 0)
 														? (" imporved automata ordering " + improvments + " times.")

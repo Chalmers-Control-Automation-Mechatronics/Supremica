@@ -48,6 +48,8 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
@@ -58,8 +60,6 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -72,7 +72,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public class GraphPanel
   extends JComponent
-  implements SupremicaPropertyChangeListener, Printable
+  implements OptionChangeListener, Printable
 {
 
   //##########################################################################
@@ -200,9 +200,9 @@ public class GraphPanel
   //#########################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
   @Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
   {
-    setBackground(Config.GUI_EDITOR_BACKGROUND_COLOR.get());
+    setBackground(Config.GUI_EDITOR_BACKGROUND_COLOR.getValue());
     getShapeProducer().clear();
     repaint();
   }
@@ -212,9 +212,9 @@ public class GraphPanel
   //# Repainting
   protected void paintGrid(final Graphics graphics)
   {
-    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
+    if (Config.GUI_EDITOR_SHOW_GRID.getValue()) {
       graphics.setColor(EditorColor.GRIDCOLOR);
-      final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+      final int grid = Config.GUI_EDITOR_GRID_SIZE.getValue();
       final AffineTransform inverse = getInverseTransform();
       final Point pt = new Point(0, 0);
       final Point2D result = inverse.transform(pt, null);
@@ -254,7 +254,7 @@ public class GraphPanel
   @Override
   protected void paintComponent(final Graphics graphics)
   {
-    final Color background = Config.GUI_EDITOR_BACKGROUND_COLOR.get();
+    final Color background = Config.GUI_EDITOR_BACKGROUND_COLOR.getValue();
     graphics.setColor(background);
     graphics.fillRect(0, 0, getWidth(), getHeight());
     final Graphics2D g2d = (Graphics2D) graphics;

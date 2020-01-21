@@ -70,7 +70,7 @@ public enum LayoutMode
       case GROUP_NODE:
         return EditorColor.DEFAULTCOLOR_NODEGROUP;
       case NODE_LABEL:
-        if (Config.GUI_EDITOR_STATE_NAMES_HIDDEN.get()) {
+        if (Config.GUI_EDITOR_STATE_NAMES_HIDDEN.getValue()) {
           return null;
         }
         // fall through ...

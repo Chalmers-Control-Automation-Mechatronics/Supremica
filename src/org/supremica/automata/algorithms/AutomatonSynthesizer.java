@@ -193,7 +193,7 @@ public class AutomatonSynthesizer
             // observerAndSupervisor.setIndicies();
             final SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
             observerSynchOptions.setSynchronizationType(SynchronizationType.FULL);
-            final AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
+            final AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions, Config.SYNTHESIS_SUP_AS_PLANT.getValue());
             observerSynchronizer.execute();
             final Automaton newSystem = observerSynchronizer.getAutomaton();
             logger.info("Number of states in observer||sup: " + newSystem.nbrOfStates() + " nbr forb states: " + newSystem.nbrOfForbiddenStates());

@@ -35,6 +35,9 @@
 
 package org.supremica.gui;
 
+import att.grappa.Graph;
+import att.grappa.Parser;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,9 +49,6 @@ import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.IO.AutomataSerializer;
 import org.supremica.properties.Config;
-
-import att.grappa.Graph;
-import att.grappa.Parser;
 
 
 public class DotBuilder
@@ -219,7 +219,7 @@ public class DotBuilder
 
 	private void initializeStreams(final String arguments)
 	{
-		final String dot_cmd = Config.DOT_EXECUTE_COMMAND.get() + " " + arguments;
+		final String dot_cmd = Config.DOT_EXECUTE_COMMAND.getValue() + " " + arguments;
 
 		try
 		{

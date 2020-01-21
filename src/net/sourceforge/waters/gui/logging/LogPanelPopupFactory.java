@@ -38,6 +38,7 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -45,7 +46,6 @@ import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
-import org.supremica.properties.ObjectProperty;
 
 
 /**
@@ -101,7 +101,7 @@ class LogPanelPopupFactory
     popup.addSeparator();
 
     final JMenu subMenu = new JMenu("Verbosity level");
-    final ObjectProperty<IDELogLevel> property = Config.LOG_GUI_VERBOSITY;
+    final EnumOption<IDELogLevel> option = Config.LOG_GUI_VERBOSITY;
     for (final IDELogLevel level : IDELogLevel.getAllowedValuesForLogPanel()) {
       final String comment;
       if (level == IDELogLevel.ALL) {
@@ -111,9 +111,9 @@ class LogPanelPopupFactory
         comment = "Show " + name + " and more severe messages";
       }
       final IDEAction action =
-        master.getConfigEnumPropertyAction(property, level, comment);
+        master.getConfigEnumPropertyAction(option, level, comment);
       final JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
-      item.setSelected(property.get() == level);
+      item.setSelected(option.getValue() == level);
       subMenu.add(item);
     }
     popup.add(subMenu);
@@ -121,13 +121,13 @@ class LogPanelPopupFactory
       master.getConfigBooleanPropertyAction(Config.GENERAL_REDIRECT_STDOUT,
                                             "Capture stdout");
     final JCheckBoxMenuItem stdoutItem = new JCheckBoxMenuItem(stdoutAction);
-    stdoutItem.setSelected(Config.GENERAL_REDIRECT_STDOUT.isTrue());
+    stdoutItem.setSelected(Config.GENERAL_REDIRECT_STDOUT.getValue());
     popup.add(stdoutItem);
     final IDEAction stderrAction =
       master.getConfigBooleanPropertyAction(Config.GENERAL_REDIRECT_STDERR,
                                             "Capture stderr");
     final JCheckBoxMenuItem stderrItem = new JCheckBoxMenuItem(stderrAction);
-    stderrItem.setSelected(Config.GENERAL_REDIRECT_STDERR.isTrue());
+    stderrItem.setSelected(Config.GENERAL_REDIRECT_STDERR.getValue());
     popup.add(stderrItem);
   }
 

@@ -49,7 +49,8 @@
 
 package org.supremica.automata.algorithms;
 
-import org.supremica.properties.BooleanProperty;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+
 import org.supremica.properties.Config;
 
 
@@ -80,15 +81,16 @@ public enum VerificationType
   }
 
   private VerificationType(final String description,
-                           final BooleanProperty property)
+                           final BooleanOption option)
   {
-    mProperty = property;
+    mOption = option;
     mDescription = description;
   }
 
 
   //#########################################################################
   //# Data Members
+  @Override
   public String toString()
   {
     return mDescription;
@@ -99,10 +101,10 @@ public enum VerificationType
   //# Simple Access
   boolean isEnabled()
   {
-    if (mProperty == null) {
+    if (mOption == null) {
       return true;
     } else {
-      return mProperty.isTrue();
+      return mOption.getValue();
     }
   }
 
@@ -142,7 +144,7 @@ public enum VerificationType
 
   //#########################################################################
   //# Data Members
-  private final BooleanProperty mProperty;
+  private final BooleanOption mOption;
   /** Textual description. */
   private final String mDescription;
 

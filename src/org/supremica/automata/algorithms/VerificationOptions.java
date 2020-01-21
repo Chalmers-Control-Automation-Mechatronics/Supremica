@@ -73,14 +73,14 @@ public final class VerificationOptions
      */
     public VerificationOptions()
     {
-       this(Config.VERIFY_VERIFICATION_TYPE.get(),
-           Config.VERIFY_ALGORITHM_TYPE.get(),
-           Config.VERIFY_EXCLUSION_STATE_LIMIT.get(),
-           Config.VERIFY_REACHABILITY_STATE_LIMIT.get(),
-           Config.VERIFY_ONE_EVENT_AT_A_TIME.get(),
-           Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(),
-           Config.VERIFY_NBR_OF_ATTEMPTS.get(),
-           Config.VERIFY_SHOW_BAD_TRACE.get());
+       this(Config.VERIFY_VERIFICATION_TYPE.getValue(),
+            Config.VERIFY_ALGORITHM_TYPE.getValue(),
+            Config.VERIFY_EXCLUSION_STATE_LIMIT.getValue(),
+            Config.VERIFY_REACHABILITY_STATE_LIMIT.getValue(),
+            Config.VERIFY_ONE_EVENT_AT_A_TIME.getValue(),
+            Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.getValue(),
+            Config.VERIFY_NBR_OF_ATTEMPTS.getValue(),
+            Config.VERIFY_SHOW_BAD_TRACE.getValue());
     }
 
     /**
@@ -208,14 +208,14 @@ public final class VerificationOptions
      */
     public void saveOptions()
     {
-        Config.VERIFY_VERIFICATION_TYPE.setValue(verificationType);
-        Config.VERIFY_ALGORITHM_TYPE.setValue(algorithmType);
-        Config.VERIFY_EXCLUSION_STATE_LIMIT.set(exclusionStateLimit);
-        Config.VERIFY_REACHABILITY_STATE_LIMIT.set(reachabilityStateLimit);
-        Config.VERIFY_ONE_EVENT_AT_A_TIME.set(oneEventAtATime);
-        Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.set(skipUncontrollabilityCheck);
-        Config.VERIFY_NBR_OF_ATTEMPTS.set(nbrOfAttempts);
-        Config.VERIFY_SHOW_BAD_TRACE.set(showBadTrace);
+      Config.VERIFY_VERIFICATION_TYPE.setValue(verificationType);
+      Config.VERIFY_ALGORITHM_TYPE.setValue(algorithmType);
+      Config.VERIFY_EXCLUSION_STATE_LIMIT.setValue(exclusionStateLimit);
+      Config.VERIFY_REACHABILITY_STATE_LIMIT.setValue(reachabilityStateLimit);
+      Config.VERIFY_ONE_EVENT_AT_A_TIME.setValue(oneEventAtATime);
+      Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.setValue(skipUncontrollabilityCheck);
+      Config.VERIFY_NBR_OF_ATTEMPTS.setValue(nbrOfAttempts);
+      Config.VERIFY_SHOW_BAD_TRACE.setValue(showBadTrace);
     }
 
     /**

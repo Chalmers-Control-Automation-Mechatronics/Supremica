@@ -105,20 +105,20 @@ public final class EditorSynthesizerOptions
    */
   public EditorSynthesizerOptions()
   {
-    this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
-         Config.SYNTHESIS_ALGORITHM_TYPE.get(),
-         Config.SYNTHESIS_PURGE.get(),
-         Config.SYNTHESIS_OPTIMIZE.get(),
-         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
-         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
-         Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
-         Config.SYNTHESIS_PRINT_GUARD.get(),
-         Config.SYNTHESIS_ADD_GUARDS.get(),
-         Config.SYNTHESIS_SAVE_IN_FILE.get(),
-         Config.SYNTHESIS_SAVE_IDD_IN_FILE.get(),
-         Config.SYNTHESIS_REACHABILITY.get(),
-         Config.SYNTHESIS_PEAKBDD.get(),
-         Config.SYNTHESIS_OPTIMIZATION.get());
+    this(Config.SYNTHESIS_SYNTHESIS_TYPE.getValue(),
+         Config.SYNTHESIS_ALGORITHM_TYPE.getValue(),
+         Config.SYNTHESIS_PURGE.getValue(),
+         Config.SYNTHESIS_OPTIMIZE.getValue(),
+         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.getValue(),
+         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.getValue(),
+         Config.SYNTHESIS_REDUCE_SUPERVISORS.getValue(),
+         Config.SYNTHESIS_PRINT_GUARD.getValue(),
+         Config.SYNTHESIS_ADD_GUARDS.getValue(),
+         Config.SYNTHESIS_SAVE_IN_FILE.getValue(),
+         Config.SYNTHESIS_SAVE_IDD_IN_FILE.getValue(),
+         Config.SYNTHESIS_REACHABILITY.getValue(),
+         Config.SYNTHESIS_PEAK_BDD.getValue(),
+         Config.SYNTHESIS_OPTIMIZATION.getValue());
   }
 
   /**
@@ -171,15 +171,15 @@ public final class EditorSynthesizerOptions
   {
     Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
     Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
-    Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
+    Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.setValue(maximallyPermissive);
     Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL
-      .set(maximallyPermissiveIncremental);
-    Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
-    Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
-    Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
-    Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
-    Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
-    Config.SYNTHESIS_INDEPENDENT_HEURISTIC.set(indpHeuristic);
+      .setValue(maximallyPermissiveIncremental);
+    Config.SYNTHESIS_PRINT_GUARD.setValue(printGuard);
+    Config.SYNTHESIS_ADD_GUARDS.setValue(addGuards);
+    Config.SYNTHESIS_SAVE_IN_FILE.setValue(saveInFile);
+    Config.SYNTHESIS_SAVE_IDD_IN_FILE.setValue(saveIDDInFile);
+    Config.SYNTHESIS_COMPLEMENT_HEURISTIC.setValue(compHeuristic);
+    Config.SYNTHESIS_INDEPENDENT_HEURISTIC.setValue(indpHeuristic);
   }
 
   /**

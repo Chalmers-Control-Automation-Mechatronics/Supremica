@@ -298,7 +298,7 @@ public class VerificationDialog implements ActionListener
         addSelectable(VerificationAlgorithm.MODULAR);
         addSelectable(VerificationAlgorithm.COMPOSITIONAL);
         addSelectable(VerificationAlgorithm.COMBINED);
-        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue()
+        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.getValue()
             && vtype == VerificationType.CONTROLLABILITY) {
           addSelectable(VerificationAlgorithm.SAT);
         }

@@ -33,7 +33,7 @@ public final class GuardOptions
 
 	public GuardOptions()
 	{
-		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.get();
+		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.getValue();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.nbrOfExecuters > 1 )
 		{

@@ -35,6 +35,8 @@ package net.sourceforge.waters.gui.logging;
 
 import java.io.Serializable;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.logging.log4j.Level;
@@ -54,8 +56,6 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -80,7 +80,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 @Plugin(name = "IDEAppender", category = "Core", elementType = "appender", printObject = true)
 public class IDEAppender
   extends AbstractAppender
-  implements SupremicaPropertyChangeListener
+  implements OptionChangeListener
 {
 
   //#########################################################################
@@ -147,7 +147,7 @@ public class IDEAppender
       mFileAppender.stop();
       mFileAppender = null;
     }
-    final String fileName = Config.LOG_FILE.get();
+    final String fileName = Config.LOG_FILE.getValue();
     if (fileName.length() > 0) {
       final FileAppender.Builder<?> builder = FileAppender.newBuilder();
       builder.setName("logFile");
@@ -181,16 +181,16 @@ public class IDEAppender
       }
     } else {
       final boolean logToGui =
-        Config.LOG_GUI_VERBOSITY.get().isLessSpecificThan(level);
+        Config.LOG_GUI_VERBOSITY.getValue().isLessSpecificThan(level);
       if (logToGui) {
         mLogPanelAppender.append(event);
       }
-      if (Config.LOG_CONSOLE_VERBOSITY.get().isLessSpecificThan(level) &&
-          !(Config.GENERAL_REDIRECT_STDERR.isTrue() && logToGui)) {
+      if (Config.LOG_CONSOLE_VERBOSITY.getValue().isLessSpecificThan(level) &&
+          !(Config.GENERAL_REDIRECT_STDERR.getValue() && logToGui)) {
         mStdErrAppender.append(event);
       }
       if (mFileAppender != null &&
-          Config.LOG_FILE_VERBOSITY.get().isLessSpecificThan(level)) {
+        Config.LOG_FILE_VERBOSITY.getValue().isLessSpecificThan(level)) {
         mFileAppender.append(event);
       }
     }
@@ -200,7 +200,7 @@ public class IDEAppender
   //#########################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
   @Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
   {
     updateLogFile();
   }

@@ -311,7 +311,7 @@ public class VisualProject
     // This is what it should really be like, one task - one function...
     public boolean showAutomatonViewer(final Automaton automaton)
     {
-        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
+        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.getValue();
         if (maxNbrOfStates < automaton.nbrOfStates())
         {
             String msg = "The automata " + automaton + " has " + automaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.";
@@ -482,7 +482,7 @@ public class VisualProject
 
             // ARASH: WAS
             // theSimulator = new SimulatorExecuter(this, false);
-            theSimulator = new SimulatorExecuter(this, Config.SIMULATION_IS_EXTERNAL.isTrue());
+            theSimulator = new SimulatorExecuter(this, Config.SIMULATION_IS_EXTERNAL.getValue());
         }
 
         theSimulator.setVisible(true);

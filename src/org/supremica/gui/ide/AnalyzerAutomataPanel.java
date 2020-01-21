@@ -93,7 +93,7 @@ public class AnalyzerAutomataPanel
       this.moduleContainer = moduleContainer;
       initialize();
       final int width =
-        Math.round(PREFERRED_WIDTH * Config.GUI_IDE_WIDTH.get());
+        Math.round(PREFERRED_WIDTH * Config.GUI_IDE_WIDTH.getValue());
       final Dimension size = new Dimension(width, 0);
       setPreferredSize(size);
     }
@@ -233,7 +233,7 @@ public class AnalyzerAutomataPanel
                         }
                         else if (selectedAutomata.size() == 1)
                         {
-                            if (!Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
+                            if (!Config.GUI_ANALYZER_AUTOMATON_VIEWER_USE_CONTROLLED_SURFACE.getValue())
                             {
                                 final Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
                                 final AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);

@@ -136,7 +136,7 @@ class SynchronizationDialogAdvancedPanel
 		this.synchronizationTypeBox = new JComboBox<SynchronizationType>(SynchronizationType.values());
 		this.synchronizationTypeBox.setToolTipText("Choose the type of composition");
 
-		this.expandForbiddenStatesBox = new JCheckBox(Config.SYNC_EXPAND_FORBIDDEN_STATES.getComment());
+		this.expandForbiddenStatesBox = new JCheckBox(Config.SYNC_EXPAND_FORBIDDEN_STATES.getShortName());
 		this.expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +
 												"examined, otherwise, forbidden states are considered terminal");
 		this.expandForbiddenStatesBox.addActionListener(this);
@@ -149,9 +149,9 @@ class SynchronizationDialogAdvancedPanel
 		 * Changing it on the SynchroniziationOptions dialog holds only for the current invocation.
 		 * (and this is the way it should work for all settings on the dialogs)
 		*/
-		this.unobsEventsSyncBox = new JCheckBox(Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
-		this.unobsEventsSyncBox.setToolTipText("If checked: " + Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
-		this.unobsEventsSyncBox.setSelected(Config.SYNC_UNOBS_EVENTS_SYNC.isTrue());
+		this.unobsEventsSyncBox = new JCheckBox(Config.SYNC_UNOBS_EVENTS_SYNC.getShortName());
+		this.unobsEventsSyncBox.setToolTipText("If checked: " + Config.SYNC_UNOBS_EVENTS_SYNC.getDescription());
+		this.unobsEventsSyncBox.setSelected(Config.SYNC_UNOBS_EVENTS_SYNC.getValue());
 
 		final JPanel choicePanel = new JPanel();
 		choicePanel.setLayout(new FlowLayout());

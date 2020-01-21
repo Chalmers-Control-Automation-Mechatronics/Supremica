@@ -1671,9 +1671,9 @@ public class AutomataVerifier
         final Collection<EventProxy> hidden = new ArrayList<EventProxy>(2);
         final String tau = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
         final String tau_c =
-                Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
+          Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
         final String tau_u =
-                Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
+          Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
         for (final EventProxy event : aut.getEvents()) {
             final String name = event.getName();
             if (name.equals(tau) || name.equals(tau_c) || name.equals(tau_u)) {

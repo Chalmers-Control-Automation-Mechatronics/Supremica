@@ -163,7 +163,7 @@ public class SupremicaAnalyzerPanel
       final ProjectBuildFromWaters builder =
         new ProjectBuildFromWaters(manager);
       builder.setIncludesProperties
-        (Config.GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER.isTrue());
+        (Config.GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER.getValue());
       final Project supremicaProject = builder.build(des);
       final List<String> warnings = builder.getWarnings();
       if (!warnings.isEmpty()) {

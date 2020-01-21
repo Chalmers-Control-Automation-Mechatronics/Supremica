@@ -77,19 +77,19 @@ public class BDDExtendedManager extends BDDAbstractManager {
     public int maxNbrNodes = 0;
 
     public BDDExtendedManager() {
-        this(Config.BDD2_BDDLIBRARY.get());
+        this(Config.BDD2_BDD_LIBRARY.getValue());
     }
 
     public BDDExtendedManager(final BDDPackage bddpackage) {
-        this(bddpackage, Config.BDD2_INITIALNODETABLESIZE.get(), Config.BDD2_CACHESIZE.get());
+        this(bddpackage, Config.BDD2_INITIAL_NODE_TABLE_SIZE.getValue(), Config.BDD2_CACHE_SIZE.getValue());
     }
 
     public BDDExtendedManager(final BDDPackage bddpackage, final int nodenum, final int cachesize) {
         if (factory == null) {
             factory = BDDFactory.init(bddpackage.getBDDPackageName(), nodenum, cachesize);
-            factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
-            factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
-            factory.setCacheRatio(Config.BDD2_CACHERATIO.get());
+            factory.setMaxIncrease(Config.BDD2_MAX_INCREASE_NODES.getValue());
+            factory.setIncreaseFactor(Config.BDD2_INCREASE_FACTOR.getValue());
+            factory.setCacheRatio(Config.BDD2_CACHE_RATIO.getValue());
         }
     }
 

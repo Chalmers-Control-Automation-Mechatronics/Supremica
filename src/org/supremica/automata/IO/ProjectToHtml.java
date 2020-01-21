@@ -95,7 +95,7 @@ public class ProjectToHtml
 			logger.error("ProjectToHtml: You must export to a directory");
 		}
 
-		maxNbrOfStatesInPng = Config.DOT_MAX_NBR_OF_STATES.get();
+		maxNbrOfStatesInPng = Config.DOT_MAX_NBR_OF_STATES.getValue();
 	}
 
 	public void serialize()
@@ -259,7 +259,7 @@ public class ProjectToHtml
 
 					try
 					{
-						dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.get() + " -Tpng");
+						dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.getValue() + " -Tpng");
 					}
 					catch (final IOException ex)
 					{

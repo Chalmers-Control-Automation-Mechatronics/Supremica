@@ -1468,8 +1468,8 @@ public class GraphEditorPanel
    */
   private int findGrid(final double x)
   {
-    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
-      final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+    if (Config.GUI_EDITOR_SHOW_GRID.getValue()) {
+      final int grid = Config.GUI_EDITOR_GRID_SIZE.getValue();
       return grid * (int) Math.round(x / grid);
     } else {
       return (int) Math.round(x);
@@ -1481,8 +1481,8 @@ public class GraphEditorPanel
    */
   private int findGrid(final int x)
   {
-    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
-      final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+    if (Config.GUI_EDITOR_SHOW_GRID.getValue()) {
+      final int grid = Config.GUI_EDITOR_GRID_SIZE.getValue();
       return grid * (int) Math.round((double) x / (double) grid);
     } else {
       return x;
@@ -1802,7 +1802,7 @@ public class GraphEditorPanel
       final boolean nestedError = mErrorVisitor.isRenderedError(orig);
       final boolean error = overlap || nestedError;
 
-      final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.get();
+      final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.getValue();
       final Color color =
         layout.getColor(group, dragOver, selected, error, hasFocus);
       if (color == null) {
@@ -2457,7 +2457,7 @@ public class GraphEditorPanel
       if (mCurrentPoint != null &&
           mFocusedObject == null &&
           mInternalDragAction == null &&
-          Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
+          Config.GUI_EDITOR_NODES_SNAP_TO_GRID.getValue()) {
         final ProxyShapeProducer shaper = getShapeProducer();
         final Point snapped = findGrid(mCurrentPoint);
         if (!snapped.equals(mCurrentPoint)) {
@@ -2488,7 +2488,7 @@ public class GraphEditorPanel
           final Point mousePosition = event.getPoint();
           final Point point = applyInverseTransform(mousePosition);
           final Point snapped;
-          if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
+          if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.getValue()) {
             snapped = findGrid(point);
           } else {
             snapped = point;
@@ -3150,8 +3150,8 @@ public class GraphEditorPanel
       }
       mShouldCommit = true;
       Point2D snap = null;
-      if (Config.GUI_EDITOR_SHOW_GRID.get() &&
-          Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
+      if (Config.GUI_EDITOR_SHOW_GRID.getValue() &&
+        Config.GUI_EDITOR_NODES_SNAP_TO_GRID.getValue()) {
         // Move operation snaps to grid when a node is moved.
         for (final ProxySubject item : getCurrentSelection()) {
           if (item instanceof SimpleNodeSubject) {
@@ -3745,7 +3745,7 @@ public class GraphEditorPanel
     //# Constructors
     private InternalDragActionCreateGroupNode(final Point start)
     {
-      super(Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get() ?
+      super(Config.GUI_EDITOR_NODES_SNAP_TO_GRID.getValue() ?
             findGrid(start) : start);
       clearSelection();
     }
@@ -3755,7 +3755,7 @@ public class GraphEditorPanel
     @Override
     boolean shouldSnapToGrid()
     {
-      return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
+      return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.getValue();
     }
 
     //#######################################################################
@@ -3853,7 +3853,7 @@ public class GraphEditorPanel
     @Override
     boolean shouldSnapToGrid()
     {
-      return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
+      return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.getValue();
     }
 
     //#######################################################################
@@ -4046,7 +4046,7 @@ public class GraphEditorPanel
         Point2D current = getDragCurrent();
         if (!mCanCreateSelfloop) {
           final double dist = mAnchor.distanceSq(current);
-          final int radius = Config.GUI_EDITOR_NODE_RADIUS.get() + 2;
+          final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue() + 2;
           final int threshold = radius * radius;
           if (dist < threshold) {
             return false;

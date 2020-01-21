@@ -81,16 +81,16 @@ public final class SynthesizerOptions
      */
     public SynthesizerOptions()
     {
-        this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
-            Config.SYNTHESIS_ALGORITHM_TYPE.get(),
-            Config.SYNTHESIS_PURGE.get(),
-			Config.SYNTHESIS_RENAME.get(),
-            Config.SYNTHESIS_OPTIMIZE.get(),
-            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
-            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
-            Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
-            Config.SYNTHESIS_LOCALIZE_SUPERVISORS.get(),
-			Config.SYNTHESIS_SUP_AS_PLANT.get());
+        this(Config.SYNTHESIS_SYNTHESIS_TYPE.getValue(),
+            Config.SYNTHESIS_ALGORITHM_TYPE.getValue(),
+            Config.SYNTHESIS_PURGE.getValue(),
+            Config.SYNTHESIS_RENAME.getValue(),
+            Config.SYNTHESIS_OPTIMIZE.getValue(),
+            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.getValue(),
+            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.getValue(),
+            Config.SYNTHESIS_REDUCE_SUPERVISORS.getValue(),
+            Config.SYNTHESIS_LOCALIZE_SUPERVISORS.getValue(),
+            Config.SYNTHESIS_SUP_AS_PLANT.getValue());
     }
 
     /**
@@ -265,14 +265,14 @@ public final class SynthesizerOptions
     {
         Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
         Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
-        Config.SYNTHESIS_PURGE.set(purge);
-		Config.SYNTHESIS_RENAME.set(rename);
-        Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
-        Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
-        Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
-        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
-        Config.SYNTHESIS_LOCALIZE_SUPERVISORS.set(localizeSupervisors);
-		Config.SYNTHESIS_SUP_AS_PLANT.set(supervisorsAsPlants);
+        Config.SYNTHESIS_PURGE.setValue(purge);
+        Config.SYNTHESIS_RENAME.setValue(rename);
+        Config.SYNTHESIS_OPTIMIZE.setValue(removeUnnecessarySupervisors);
+        Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.setValue(maximallyPermissive);
+        Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.setValue(maximallyPermissiveIncremental);
+        Config.SYNTHESIS_REDUCE_SUPERVISORS.setValue(reduceSupervisors);
+        Config.SYNTHESIS_LOCALIZE_SUPERVISORS.setValue(localizeSupervisors);
+        Config.SYNTHESIS_SUP_AS_PLANT.setValue(supervisorsAsPlants);
     }
 
     /**

@@ -86,7 +86,7 @@ public class SiftTCPSolver
 			}
 		}
 
-		if (Config.BDD_PROFILE_ON.get())
+		if (Config.BDD_PROFILE_ON.getValue())
 		{
 			Options.out.println("TCP+sift algorithm " + ((improvments > 0)
 														 ? (" imporved automata ordering " + improvments + " times.")

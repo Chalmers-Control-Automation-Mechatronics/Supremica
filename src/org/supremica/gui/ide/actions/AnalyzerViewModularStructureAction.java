@@ -94,7 +94,7 @@ public class AnalyzerViewModularStructureAction
         }
 
         // Warn if there are too many "states" i.e. automata
-        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
+        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.getValue();
         if (maxNbrOfStates < selectedAutomata.size())
         {
             String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " +

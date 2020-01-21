@@ -53,6 +53,7 @@ public abstract class SimpleLeafOptionPage extends LeafOptionPage
     return context.createSimpleLeafOptionPageEditor(this);
   }
 
+  @Override
   public abstract List<Option<?>> getOptions();
 
 

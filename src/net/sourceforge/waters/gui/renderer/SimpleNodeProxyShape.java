@@ -60,7 +60,7 @@ public class SimpleNodeProxyShape
                        final PropositionIcon.ColorInfo info)
   {
     super(node);
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     final int diameter = radius + radius;
     final Point2D p = getProxy().getPointGeometry().getPoint();
     final Rectangle2D rect =
@@ -116,7 +116,7 @@ public class SimpleNodeProxyShape
     // This rectangle is not the same as the one used to create the
     // mCircleShape! It gives rounding errors!
     // Rectangle2D bounds = mCircleShape.getBounds();
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     final int diameter = radius + radius;
     final Rectangle2D bounds =
       new Rectangle2D.Double(mCircleShape.getX(), mCircleShape.getY(),
@@ -155,7 +155,7 @@ public class SimpleNodeProxyShape
       graphics.fill(arc);
     } else {
       // Draw marking
-      final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.get();
+      final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.getValue();
       if (layoutMode == LayoutMode.ChalmersIDES) {
         // CHALMERS IDES MODE---SINGLE TYPE OF MARKING, DOUBLE CIRCLES
         graphics.setColor(EditorColor.DEFAULTCOLOR);

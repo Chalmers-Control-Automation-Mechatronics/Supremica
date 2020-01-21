@@ -186,7 +186,7 @@ public class EditorSynthesizerAction extends IDEAction
     }
 
     // Remove previous guards/actions if the model is not a "user-defined" EFA
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       if (options.getGenPLCCodeTUMBox()) {
         // If the EFA option is not activated, remove existing guards
         if (!options.getPLCCodeTUMefaBox()) {
@@ -246,7 +246,7 @@ public class EditorSynthesizerAction extends IDEAction
 
     if (bddSynthesizer.nbrOfStates() == 0) {
       logger.info("No guard can be derived from empty supervisor.");
-      if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      if (Config.TUM_EXTERNAL_ON.getValue()) {
         JOptionPane.showMessageDialog(ide.getFrame(),
             "No guard can be derived from empty supervisor.",
             "Error during the symbolic synthesis",
@@ -396,7 +396,7 @@ public class EditorSynthesizerAction extends IDEAction
     // 1) Display info.
     // NOTA: If the supervisor is empty, the code would have already returned before
     //       see if (bddSynthesizer.nbrOfStates() == 0)
-    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+    if (Config.TUM_EXTERNAL_ON.getValue()) {
       final String message;
       if (options.getAddGuards()) {
         message = "Symbolic synthesis completed.\r\n"

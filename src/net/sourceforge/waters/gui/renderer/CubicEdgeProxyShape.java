@@ -54,7 +54,7 @@ class CubicEdgeProxyShape
   {
     super(edge);
     final Point2D[] controls = GeometryTools.getCubicBezierControlPoints(edge);
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     mControl1 = controls[0];
     mControl2 = controls[1];
         mStart = GeometryTools.getRadialStartPoint(edge, mControl1, radius);
@@ -70,6 +70,7 @@ class CubicEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
+  @Override
   public Rectangle2D getBounds2D()
   {
     return GeometryTools.getCubicBoundingBox
@@ -84,21 +85,25 @@ class CubicEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.EdgeProxyShape
+  @Override
   Shape getCurve()
   {
     return mCurve;
   }
 
+  @Override
   Point2D getStartPoint()
   {
     return mStart;
   }
 
+  @Override
   Point2D getEndPoint()
   {
     return mEnd;
   }
 
+  @Override
   Point2D getTurningPoint()
   {
     final double x = 0.125 * (mStart.getX() +
@@ -110,16 +115,19 @@ class CubicEdgeProxyShape
     return new Point2D.Double(x, y);
   }
 
+  @Override
   Point2D getInnerArrowTipPoint()
   {
     return mArrowTip;
   }
 
+  @Override
   Point2D getMidDirection()
   {
     return mMidDirection;
   }
 
+  @Override
   Point2D getEndDirection()
   {
     return GeometryTools.getNormalizedDirection(mControl2, mEnd);

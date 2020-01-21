@@ -186,7 +186,7 @@ public class Supremica
                         return;
                     }
 
-                    if (Config.DOT_USE.isTrue())
+                    if (Config.DOT_USE.getValue())
                     {
                         if (col == TABLE_IDENTITY_COLUMN)
                         {

@@ -51,6 +51,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.AliasesPanel;
 import net.sourceforge.waters.gui.ComponentsTree;
 import net.sourceforge.waters.gui.EventDeclListView;
@@ -72,8 +74,6 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -87,7 +87,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 public class EditorPanel
   extends MainPanel
   implements ModuleWindowInterface, ChangeListener,
-             Subject, SupremicaPropertyChangeListener
+             Subject, OptionChangeListener
 {
 
   //#########################################################################
@@ -109,7 +109,7 @@ public class EditorPanel
     final AliasesPanel aliasesPanel =
       new AliasesPanel(mModuleContainer, manager);
     mAliasesTab = new Tab("Definitions", aliasesPanel);
-    if (Config.INCLUDE_INSTANTION.get()) {
+    if (Config.INCLUDE_INSTANTIATION.getValue()) {
       mAliasesTab.addToTabbedPane();
     }
     mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
@@ -129,7 +129,7 @@ public class EditorPanel
 
     mCommentPanel = new CommentPanel(moduleContainer);
     setRightComponent(mCommentPanel);
-    Config.INCLUDE_INSTANTION.addPropertyChangeListener(this);
+    Config.INCLUDE_INSTANTIATION.addPropertyChangeListener(this);
   }
 
 
@@ -329,9 +329,9 @@ public class EditorPanel
 
 
   @Override
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  public void optionChanged(final OptionChangeEvent event)
   {
-    if (Config.INCLUDE_INSTANTION.get()) {
+    if (Config.INCLUDE_INSTANTIATION.getValue()) {
       mAliasesTab.addToTabbedPane(0);
     } else {
       mAliasesTab.removeFromTabbedPane();

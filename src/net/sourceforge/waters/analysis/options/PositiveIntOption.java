@@ -71,7 +71,40 @@ public class PositiveIntOption extends Option<Integer>
                            final String commandLineOption,
                            final int defaultValue)
   {
+    this(id, shortName, description, commandLineOption, defaultValue,
+         0, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Creates a positive integer parameter with a specified default,
+   * minimum, and maximum.
+   */
+  public PositiveIntOption(final String id,
+                           final String shortName,
+                           final String description,
+                           final String commandLineOption,
+                           final int defaultValue,
+                           final int minValue,
+                           final int maxValue)
+  {
     super(id, shortName, description, commandLineOption, defaultValue);
+    mMinValue = minValue;
+    mMaxValue = maxValue;
+  }
+
+  /**
+   * Creates a positive integer parameter with a specified default
+   * and editable status.
+   */
+  public PositiveIntOption(final String id,
+                           final String shortName,
+                           final String description,
+                           final String commandLineOption,
+                           final int defaultValue,
+                           final boolean editable)
+  {
+    this(id, shortName, description, commandLineOption, defaultValue);
+    setEditable(editable);
   }
 
 
@@ -82,20 +115,14 @@ public class PositiveIntOption extends Option<Integer>
     return getValue().intValue();
   }
 
-  public void setValue(final int value)
+  public int getMinValue()
   {
-    super.setValue(value);
+    return mMinValue;
   }
 
-  @Override
-  public void set(final String text)
+  public int getMaxValue()
   {
-    try {
-      final int value = Integer.parseUnsignedInt(text);
-      setValue(value);
-    } catch(final NumberFormatException e) {
-      throw new IllegalArgumentException(e);
-    }
+    return mMaxValue;
   }
 
 
@@ -106,5 +133,26 @@ public class PositiveIntOption extends Option<Integer>
   {
     return context.createPositiveIntEditor(this);
   }
+
+  @Override
+  public void set(final String text)
+  {
+    try {
+      final int value = Integer.parseUnsignedInt(text);
+      if (value >= mMinValue && value <= mMaxValue) {
+        setValue(value);
+      }
+      else {
+        final String error = "Value "+value
+          +" is out of range; must be between "+mMinValue+" and "+mMaxValue;
+        throw new IllegalArgumentException(error);
+      }
+    } catch(final NumberFormatException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  private final int mMinValue;
+  private final int mMaxValue;
 
 }

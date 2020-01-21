@@ -1687,7 +1687,7 @@ public class ActionMan
         }
 
         // Warn if there are too many "states" i.e. automata
-        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
+        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.getValue();
         if (maxNbrOfStates < selectedAutomata.size())
         {
             String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " +
@@ -1827,16 +1827,17 @@ public class ActionMan
       */
 
     // Variable declared here, wanted it to be local to this func, but...
-    static PropertiesDialog thePropertiesDialog = null;
+//    static PropertiesDialog thePropertiesDialog = null;
 
     public static void configurePreferences_actionPerformed(final Gui gui)
     {
-        if (thePropertiesDialog == null)
-        {
-            thePropertiesDialog = new PropertiesDialog(gui.getFrame());
-        }
-
-        thePropertiesDialog.setVisible(true);
+      System.err.println("Attempted to open old properties!");
+//        if (thePropertiesDialog == null)
+//        {
+//            thePropertiesDialog = new PropertiesDialog(gui.getFrame());
+//        }
+//
+//        thePropertiesDialog.setVisible(true);
     }
 
     // File.Exit action performed

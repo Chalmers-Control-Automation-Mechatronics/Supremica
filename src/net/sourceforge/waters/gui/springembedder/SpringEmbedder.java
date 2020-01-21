@@ -356,7 +356,7 @@ public class SpringEmbedder
     throws GeometryAbsentException
   {
     final int numnodes = mNodes.size();
-    final int maxnodes = Config.DOT_MAX_NBR_OF_STATES.get();
+    final int maxnodes = Config.DOT_MAX_NBR_OF_STATES.getValue();
     if (numnodes > maxnodes) {
       throw new GeometryAbsentException(numnodes);
     }
@@ -438,7 +438,7 @@ public class SpringEmbedder
     mEdgeRepulsion = EDGE_REPULSION;
     mMaxAttraction = 0.5 / maxFanout;
     mCenter = (Point2D) POINT_CENTER.clone();
-    final double diameter = 2.0 * Config.GUI_EDITOR_NODE_RADIUS.get();
+    final double diameter = 2.0 * Config.GUI_EDITOR_NODE_RADIUS.getValue();
     mJumpThresholdSq = diameter * diameter;
     mTotalJumpsAvailable = numNodes;
     mWrapperSet = new WrapperSet();

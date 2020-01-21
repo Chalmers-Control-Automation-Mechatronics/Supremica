@@ -193,11 +193,13 @@ public abstract class Option<T> implements Cloneable
   /**
    * Changes the current value of this option to the given new value.
    */
-  public void setValue(final T value)
+  public boolean setValue(final T value)
   {
     final String oldValue = getAsString();
     mValue = value;
+    final String newValue = getAsString();
     firePropertyChanged(oldValue);
+    return oldValue.equals(newValue);
   }
 
   /**

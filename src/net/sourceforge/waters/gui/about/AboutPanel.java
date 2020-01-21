@@ -87,7 +87,7 @@ public class AboutPanel
   //# Static Methods
   public static void performStudentVersionCheck()
   {
-    if (Config.GENERAL_STUDENT_VERSION.isTrue()) {
+    if (Config.GENERAL_STUDENT_VERSION.getValue()) {
       try {
         System.loadLibrary("waters");
       } catch (final UnsatisfiedLinkError error) {
@@ -223,7 +223,8 @@ public class AboutPanel
     builder.append("Running in Java ");
     builder.append(version.getJavaVersionText());
     builder.append("<BR>");
-    if (Config.DOT_USE.get() && !Config.DOT_EXECUTE_COMMAND.get().equals("")) {
+    if (Config.DOT_USE.getValue()
+      && !(Config.DOT_EXECUTE_COMMAND.getValue()).equals("")) {
       final String dotVersion = getDotVersion();
       if (dotVersion == null) {
         builder.append("GraphViz <span style=\"color: red;\">not found</span><BR>");
@@ -284,7 +285,7 @@ public class AboutPanel
     public void run()
     {
       try {
-        final String command = Config.DOT_EXECUTE_COMMAND.get();
+        final String command = Config.DOT_EXECUTE_COMMAND.getValue();
         final ProcessBuilder builder = new ProcessBuilder(command, "-version");
         builder.redirectErrorStream(true);
         mProcess = builder.start();

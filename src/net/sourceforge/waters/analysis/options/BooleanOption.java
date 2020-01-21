@@ -56,17 +56,23 @@ public class BooleanOption extends Option<Boolean>
    super(id, shortName, description, commandLineOption, defaultValue);
   }
 
+  public BooleanOption(final String id,
+                       final String shortName,
+                       final String description,
+                       final String commandLineOption,
+                       final boolean defaultValue,
+                       final boolean editable)
+  {
+   super(id, shortName, description, commandLineOption, defaultValue);
+   setEditable(editable);
+  }
+
 
   //#########################################################################
   //# Type-specific Access
   public boolean getBooleanValue()
   {
     return getValue().booleanValue();
-  }
-
-  public void setValue(final boolean value)
-  {
-    super.setValue(value);
   }
 
   @Override

@@ -61,7 +61,7 @@ import org.supremica.properties.Config;
  *
  * <P>The icon loader is initialised by calling {@link #initialize()} when the
  * IDE is started. It first sets= the look-and-feel according to the
- * configuration setting {@link Config#GENERAL_LOOKANDFEEL}. After that,
+ * configuration setting {@link Config#GENERAL_LOOK_AND_FEEL}. After that,
  * it tries to guess the appropriate size from the look-and-feels defaults
  * and the scale factor provided by the icon set as specified by
  * {@link Config#GUI_EDITOR_ICONSET}. In addition, icons are loaded statically
@@ -86,11 +86,11 @@ public class IconAndFontLoader
   public static void initialize()
   {
     // 1. Set look and feel
-    final LookAndFeelOption lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
+    final LookAndFeelOption lookAndFeel = Config.GENERAL_LOOK_AND_FEEL.getValue();
     lookAndFeel.setLookAndFeel();
 
     // 2. Scale fonts
-    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
+    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.getValue();
     GLOBAL_SCALE_FACTOR = iconSet.getGlobalScaleFactor();
     final Font normalBase = MetalLookAndFeel.getUserTextFont();
     FONT_NORMAL = normalBase.deriveFont(GLOBAL_SCALE_FACTOR * normalBase.getSize2D());
@@ -166,7 +166,7 @@ public class IconAndFontLoader
   //# Private Static Class Methods
   private static ImageIcon getWatersIcon(final String name)
   {
-    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
+    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.getValue();
     return getWatersIcon(iconSet, name);
   }
 
@@ -202,7 +202,7 @@ public class IconAndFontLoader
 
   private static List<ImageIcon> getIconList(final String name)
   {
-    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
+    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.getValue();
     if (iconSet.isScalable()) {
       final List<ImageIcon> icons = new LinkedList<ImageIcon>();
       for (final IconSet choice : IconSet.values()) {

@@ -242,7 +242,7 @@ public class SearchStates
         for (int i = 0; i < states.length; ++i)
         {
             str.append(states[i][composite_state[i]].getName());
-            str.append(Config.GENERAL_STATE_SEPARATOR.get());
+            str.append(Config.GENERAL_STATE_SEPARATOR.getValue());
         }
 
         // Remove last state separator

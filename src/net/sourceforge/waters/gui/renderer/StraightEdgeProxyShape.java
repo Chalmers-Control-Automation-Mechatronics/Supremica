@@ -54,7 +54,7 @@ class StraightEdgeProxyShape
   StraightEdgeProxyShape(final EdgeProxy edge)
   {
     super(edge);
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.getValue();
     final Point2D start = GeometryTools.getStartPoint(edge);
     final Point2D end = GeometryTools.getEndPoint(edge);
     mStart = GeometryTools.getRadialStartPoint(edge, end, radius);

@@ -31,38 +31,19 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.util;
-
-
-import net.sourceforge.waters.analysis.bdd.BDDModelVerifier;
-
-import org.supremica.properties.Config;
-
+package net.sourceforge.waters.analysis.options;
 
 /**
- * A helper class to access Supremica options from Waters code.
- * This class contains static methods to configure model analysers,
- * which can be called through reflection to avoid compile-time dependency
- * on Supremica licensed code.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class ConfigBridge
+public abstract class DefaultLeafOptionPage extends SimpleLeafOptionPage
 {
-  public static void configureModelAnalyzer(final BDDModelVerifier verifier)
+
+  public DefaultLeafOptionPage(final String prefix, final String title)
   {
-    verifier.setBDDPackage(Config.BDD2_BDD_LIBRARY.getValue());
-    verifier.setInitialSize(Config.BDD2_INITIAL_NODE_TABLE_SIZE.getValue());
-    verifier.setPartitioningSizeLimit(Config.BDD_PARTITION_MAX.getValue());
+    super(prefix, title);
+    for (final Option<?> option : getOptions()) add(option);
   }
 
-  public static int getGridSize()
-  {
-    if (Config.GUI_EDITOR_SHOW_GRID.getValue()) {
-      return Config.GUI_EDITOR_GRID_SIZE.getValue();
-    } else {
-      return 1;
-    }
-  }
 }

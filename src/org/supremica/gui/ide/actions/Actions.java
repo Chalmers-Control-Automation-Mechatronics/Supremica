@@ -155,9 +155,6 @@ public class Actions extends WatersActionManager
     public IDEAction editorReadSpecAction = new EditorReadSpecAction(mIDEActions);
     public IDEAction editorReadFTAction = new EditorReadFisherThompsonAction(mIDEActions);
 
-    // Analyzer Options
-    public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(mIDEActions);
-
     // Analyzer Actions
     public IDEAction analyzerStatisticsAction = new AnalyzerStatisticsAction(mIDEActions);
     public IDEAction analyzerExploreStatesAction = new AnalyzerExploreStatesAction(mIDEActions);

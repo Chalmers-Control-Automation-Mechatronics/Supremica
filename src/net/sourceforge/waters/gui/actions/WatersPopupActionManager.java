@@ -41,6 +41,8 @@ import java.net.URI;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -53,8 +55,8 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.BooleanProperty;
-import org.supremica.properties.ObjectProperty;
+
+import javafx.beans.property.BooleanProperty;
 
 
 public class WatersPopupActionManager
@@ -105,23 +107,23 @@ public class WatersPopupActionManager
    * Creates an action to toggle a {@link BooleanProperty} from Supremica's
    * configuration.
    *
-   * @param property
+   * @param option
    *          The property affected by the action.
    * @param shortName
    *          A short name to describe the action. The short name is displayed
    *          when the action appears in the menu, and the (longer) comment of
    *          the property is used as a tool tip.
    */
-  public IDEAction getConfigBooleanPropertyAction(final BooleanProperty property,
+  public IDEAction getConfigBooleanPropertyAction(final BooleanOption option,
                                                   final String shortName)
   {
-    return new ConfigBooleanPropertyAction(mIDE, property, shortName);
+    return new ConfigBooleanPropertyAction(mIDE, option, shortName);
   }
 
   /**
    * Creates a new enumeration property action.
    *
-   * @param property
+   * @param option
    *          The property affected by the action.
    * @param value
    *          The value assigned to the property when the action is triggered.
@@ -130,11 +132,11 @@ public class WatersPopupActionManager
    *          string representation of the value, while the comment is used as
    *          a tool tip.
    */
-  public <E extends Enum<E>> IDEAction getConfigEnumPropertyAction(final ObjectProperty<E> property,
+  public <E extends Enum<E>> IDEAction getConfigEnumPropertyAction(final EnumOption<E> option,
                                                                    final E value,
                                                                    final String comment)
   {
-    return new ConfigEnumPropertyAction<E>(mIDE, property, value, comment);
+    return new ConfigEnumPropertyAction<E>(mIDE, option, value, comment);
   }
 
   public IDEAction getCopyAction()
