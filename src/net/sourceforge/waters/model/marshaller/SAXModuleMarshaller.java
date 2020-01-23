@@ -88,7 +88,6 @@ public class SAXModuleMarshaller
    *                   in the loaded object model, otherwise all geometry is
    *                   set to <CODE>null</CODE> regardless of the file
    *                   contents.
-   * @throws ParserConfigurationException
    */
   public SAXModuleMarshaller(final ModuleProxyFactory factory,
                              final OperatorTable optable,

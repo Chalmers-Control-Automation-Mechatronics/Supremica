@@ -38,10 +38,8 @@ import java.util.Map;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -123,12 +121,11 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
 
   @Override
   protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory vfactory,
-     final ProductDESProxyFactory desfactory) throws AnalysisConfigurationException
+    (final ProductDESProxyFactory desFactory)
   {
     final LanguageInclusionChecker checker =
-      vfactory.createLanguageInclusionChecker(desfactory);
-    if (mNamedProxy != null) {
+      (LanguageInclusionChecker) super.createModelVerifier(desFactory);
+    if (checker != null && mNamedProxy != null) {
       if (mNamedProxy instanceof AutomatonProxy) {
         final KindTranslator translator = new SingleAutomatonKindTranslator();
         checker.setKindTranslator(translator);

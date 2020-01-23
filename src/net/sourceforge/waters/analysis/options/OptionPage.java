@@ -140,6 +140,8 @@ public abstract class OptionPage
     new AnalysisOptionPage(AnalysisOperation.CONTROL_LOOP_CHECK);
   public static final SelectorLeafOptionPage DeadlockCheck =
     new AnalysisOptionPage(AnalysisOperation.DEADLOCK_CHECK);
+  public static final SelectorLeafOptionPage DiagnosabilityCheck =
+    new AnalysisOptionPage(AnalysisOperation.DIAGNOSABILITY_CHECK);
   public static final SelectorLeafOptionPage LanguageInclusion =
     new AnalysisOptionPage(AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
   public static final SelectorLeafOptionPage StateCounter =
@@ -170,8 +172,9 @@ public abstract class OptionPage
 
     new AggregatorOptionPage("Analysis", ConflictCheck,
                              ControllabilityCheck, ControlLoop,
-                             DeadlockCheck, LanguageInclusion,
-                             StateCounter, SynchronousProduct, Synthesis,
+                             DeadlockCheck, DiagnosabilityCheck,
+                             LanguageInclusion, StateCounter,
+                             SynchronousProduct, Synthesis,
                              Simplifier),
 
     (AggregatorOptionPage)

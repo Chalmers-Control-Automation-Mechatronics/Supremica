@@ -34,9 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -50,23 +48,26 @@ public class VerifyNerodeEquivalenceAction extends WatersVerificationAction
     super(ide);
   }
 
+  @Override
   protected String getCheckName()
   {
     return "SD Controllability iii.2 ";
   }
 
+  @Override
   protected String getFailureDescription()
   {
     return "does not satisfy SD Controllability Point iii.2";
   }
 
+  @Override
   protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+    (final ProductDESProxyFactory desFactory)
   {
     return new MonolithicNerodeEChecker(desFactory);
   }
 
+  @Override
   protected String getSuccessDescription()
   {
     return "satisfies SD Controllability Point iii.2";

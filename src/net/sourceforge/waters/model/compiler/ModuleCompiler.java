@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -104,7 +104,7 @@ import org.xml.sax.SAXException;
  *   getInstance}();</CODE><BR>
  * <CODE>&nbsp;&nbsp;{@link ProxyUnmarshaller}&lt;{@link ModuleProxy}&gt; unmarshaller =
  *   new {@link SAXModuleMarshaller#SAXModuleMarshaller(ModuleProxyFactory,OperatorTable)
- *   JAXBModuleMarshaller}(modFactory, optable);</CODE><BR>
+ *   SAXModuleMarshaller}(modFactory, optable);</CODE><BR>
  * <CODE>&nbsp;&nbsp;{@link DocumentManager} manager =
  *   new {@link DocumentManager#DocumentManager() DocumentManager}();</CODE><BR>
  * <CODE>&nbsp;&nbsp;manager.{@link DocumentManager#registerUnmarshaller(ProxyUnmarshaller)
@@ -122,7 +122,7 @@ import org.xml.sax.SAXException;
  *   <CODE>des</CODE> ...<BR>
  * <CODE>} catch ({@link EvalException} exception) {</CODE><BR>
  * <CODE>&nbsp;&nbsp;// </CODE>module has errors ...<BR>
- * <CODE>} catch ({@link JAXBException} | {@link SAXException} exception) {</CODE><BR>
+ * <CODE>} catch ({@link SAXException} | {@link ParserConfigurationException} exception) {</CODE><BR>
  * <CODE>&nbsp;&nbsp;// </CODE>error setting up XML parsers - should not happen ...<BR>
  * <CODE>}</CODE></P>
  *

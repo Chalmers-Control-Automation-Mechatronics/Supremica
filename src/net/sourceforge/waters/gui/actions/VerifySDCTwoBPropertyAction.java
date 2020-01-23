@@ -34,10 +34,9 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDCTwobVerifier;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -48,30 +47,35 @@ public class VerifySDCTwoBPropertyAction extends WatersVerificationAction
 
   protected VerifySDCTwoBPropertyAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.CONFLICT_CHECK);
   }
 
+  @Override
   protected String getCheckName()
   {
     return "SD controllability ii_b";
   }
 
+  @Override
   protected String getFailureDescription()
   {
     return "does not satisfy SD Controllability Point ii";
   }
 
+  @Override
   protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+    (final ProductDESProxyFactory desFactory)
   {
     final ConflictChecker conflictChecker =
-        factory.createConflictChecker(desFactory);
-    final SDCTwobVerifier verifier =
-        new SDCTwobVerifier(conflictChecker, null, desFactory);
-    return verifier;
+      (ConflictChecker) super.createModelVerifier(desFactory);
+    if (conflictChecker == null) {
+      return null;
+    } else {
+      return new SDCTwobVerifier(conflictChecker, null, desFactory);
+    }
   }
 
+  @Override
   protected String getSuccessDescription()
   {
     return "satisfies SD Controllability Point ii";

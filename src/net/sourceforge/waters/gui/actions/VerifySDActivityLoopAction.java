@@ -34,10 +34,9 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDActivityLoopChecker;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -50,7 +49,7 @@ public class VerifySDActivityLoopAction extends WatersVerificationAction
   //# Constructors
   public VerifySDActivityLoopAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.CONTROL_LOOP_CHECK);
   }
 
 
@@ -69,11 +68,11 @@ public class VerifySDActivityLoopAction extends WatersVerificationAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier
+    (final ProductDESProxyFactory desFactory)
   {
     final ControlLoopChecker checker =
-      factory.createControlLoopChecker(desFactory);
+      (ControlLoopChecker) super.createModelVerifier(desFactory);
     if (checker == null) {
       return null;
     } else {

@@ -34,10 +34,9 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDCFourVerifier;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -48,32 +47,35 @@ public class VerifySDCFourPropertyAction extends WatersVerificationAction
 
   protected VerifySDCFourPropertyAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
   }
 
+  @Override
   protected String getCheckName()
   {
     return "SD Controllability Four";
   }
 
+  @Override
   protected String getFailureDescription()
   {
     return "does not satisfy SD Controllability Point iv ";
   }
 
+  @Override
   protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+    (final ProductDESProxyFactory desFactory)
   {
-    final LanguageInclusionChecker Checker =
-      factory.createLanguageInclusionChecker(desFactory);
-
-
-        final SDCFourVerifier verifier =
-        new SDCFourVerifier(Checker, null, desFactory);
-    return verifier;
+    final LanguageInclusionChecker checker =
+      (LanguageInclusionChecker) super.createModelVerifier(desFactory);
+    if (checker == null) {
+      return null;
+    } else {
+      return new SDCFourVerifier(checker, null, desFactory);
+    }
   }
 
+  @Override
   protected String getSuccessDescription()
   {
     return "satisfies SD Controllability Point iv";

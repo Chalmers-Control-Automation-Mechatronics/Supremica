@@ -33,10 +33,8 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
@@ -57,7 +55,7 @@ public class VerifyDiagnosabilityCheckAction extends WatersVerificationAction
   //# Constructors
   protected VerifyDiagnosabilityCheckAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.DIAGNOSABILITY_CHECK);
   }
 
 
@@ -73,15 +71,6 @@ public class VerifyDiagnosabilityCheckAction extends WatersVerificationAction
   protected String getFailureDescription()
   {
     return "is not diagnosable";
-  }
-
-  @Override
-  protected DiagnosabilityChecker createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
-  {
-    return factory.createDiagnosabilityChecker(desFactory);
   }
 
   @Override

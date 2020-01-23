@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
@@ -57,11 +58,10 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
 
 
 /**
- * @author Andrew Holland, Robi Malik
+ * @author Andrew Holland, Robi Malik, Benjamin Wheeler
  */
 
 public abstract class WatersVerificationAction
@@ -76,7 +76,8 @@ public abstract class WatersVerificationAction
     this(ide, null);
   }
 
-  protected WatersVerificationAction(final IDE ide, final AnalysisOperation operation)
+  protected WatersVerificationAction(final IDE ide,
+                                     final AnalysisOperation operation)
   {
     super(ide);
     mOperation = operation;
@@ -84,7 +85,10 @@ public abstract class WatersVerificationAction
     putValue(Action.NAME, getCheckName() + " check");
     putValue(Action.SHORT_DESCRIPTION,
              "Check for " + getCheckName() + " issues");
-    Config.GUI_ANALYZER_USED_FACTORY.addPropertyChangeListener(this);
+    final EnumOption<ModelAnalyzerFactoryLoader> option = getSelectorOption();
+    if (option != null) {
+      option.addPropertyChangeListener(this);
+    }
     updateEnabledStatus();
   }
 
@@ -151,44 +155,6 @@ public abstract class WatersVerificationAction
 
   //#########################################################################
   //# Factory Access
-  ModelAnalyzerFactory getModelAnalyzerFactory()
-    throws ClassNotFoundException
-  {
-    final ModelAnalyzerFactoryLoader loader;
-    if (Config.INCLUDE_WATERS_ANALYZER.getValue() && mOperation != null) {
-      final String optionPagePrefix =
-        mOperation.getOptionPagePrefix();
-      loader = (ModelAnalyzerFactoryLoader)
-        ((AnalysisOptionPage) OptionPage.getOptionPage(optionPagePrefix))
-        .getTopSelectorOption().getValue();
-    } else {
-      loader = Config.GUI_ANALYZER_USED_FACTORY.getValue();
-    }
-
-    return loader.getModelAnalyzerFactory();
-  }
-
-  ModelVerifier createModelVerifier()
-  {
-    try {
-      final ProductDESProxyFactory desFactory =
-        ProductDESElementFactory.getInstance();
-      final ModelAnalyzerFactory vFactory = getModelAnalyzerFactory();
-      final ModelVerifier verifier = createModelVerifier(vFactory, desFactory);
-      vFactory.configureFromOptions(verifier);
-      return verifier;
-    } catch (final NoClassDefFoundError |
-                   ClassNotFoundException |
-                   UnsupportedOperationException |
-                   UnsatisfiedLinkError |
-                   AnalysisConfigurationException exception) {
-      return null;
-    }
-  }
-
-
-  //#########################################################################
-  // # Abstract Methods
   protected String getCheckName()
   {
     return mOperation.getAnalysisName();
@@ -204,21 +170,70 @@ public abstract class WatersVerificationAction
     return mOperation.getSuccessDescription();
   }
 
-  protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
+  ModelAnalyzerFactory getModelAnalyzerFactory()
+    throws ClassNotFoundException
   {
-    final ModelVerifier verifier = (ModelVerifier)
-      mOperation.createModelAnalyzer(factory, desFactory);
-    final String prefix = mOperation.getOptionPagePrefix();
-    final OptionPage map = OptionPage.getOptionPage(prefix);
-    if (map != null && verifier != null) {
-      for (final Option<?> option : verifier.getOptions(map)) {
-        if (option.isPersistent()) verifier.setOption(option);
-      }
+    final EnumOption<ModelAnalyzerFactoryLoader> option = getSelectorOption();
+    if (option == null) {
+      return null;
+    } else {
+      final ModelAnalyzerFactoryLoader loader = option.getValue();
+      return loader.getModelAnalyzerFactory();
     }
-    return verifier;
+  }
+
+  ModelVerifier createModelVerifier()
+  {
+    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    return createModelVerifier(factory);
+  }
+
+  protected ModelVerifier createModelVerifier
+    (final ProductDESProxyFactory desFactory)
+  {
+    try {
+      final ModelAnalyzerFactory vFactory = getModelAnalyzerFactory();
+      if (vFactory == null) {
+        return null;
+      }
+      final ModelVerifier verifier =
+        (ModelVerifier) mOperation.createModelAnalyzer(vFactory, desFactory);
+      if (verifier == null) {
+        return null;
+      }
+      // TODO Remove this configureFromOptions()
+      vFactory.configureFromOptions(verifier);
+      final String prefix = mOperation.getOptionPagePrefix();
+      final OptionPage map = OptionPage.getOptionPage(prefix);
+      if (map != null) {
+        for (final Option<?> option : verifier.getOptions(map)) {
+          if (option.isPersistent()) {
+            verifier.setOption(option);
+          }
+        }
+      }
+      return verifier;
+    } catch (final ClassNotFoundException |
+                   AnalysisConfigurationException exception) {
+      return null;
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  @SuppressWarnings("unchecked")
+  private EnumOption<ModelAnalyzerFactoryLoader> getSelectorOption()
+  {
+    if (mOperation == null) {
+      return null;
+    } else {
+      final String optionPagePrefix =
+        mOperation.getOptionPagePrefix();
+      final AnalysisOptionPage page =
+        (AnalysisOptionPage) OptionPage.getOptionPage(optionPagePrefix);
+      return (EnumOption<ModelAnalyzerFactoryLoader>) page.getTopSelectorOption();
+    }
   }
 
 

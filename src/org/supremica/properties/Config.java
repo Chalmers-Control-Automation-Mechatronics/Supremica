@@ -15,7 +15,6 @@ import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
 import net.sourceforge.waters.gui.renderer.LayoutMode;
 import net.sourceforge.waters.gui.util.IconSet;
 import net.sourceforge.waters.gui.util.LookAndFeelOption;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.algorithms.EquivalenceRelation;
@@ -40,11 +39,11 @@ public class Config
     ("generalStateSeparator",
       "State Separator Character", "State separator character", null, ".");
   public static final StringOption GENERAL_STATE_LABEL_SEPARATOR = new StringOption
-    ("generalStudentVersion",
+    ("generalStateLabelSeparator",
       "State Label Separator Character", "State label separator character", null, ".");
   public static final BooleanOption GENERAL_STUDENT_VERSION = new BooleanOption
-    ("generalStateLabelSeparator",
-     "Student Verison", "Student version", null, false);
+    ("generalStudentVersion",
+     "Student Verison", "Student version", null, false, false);
   public static final BooleanOption INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanOption
     ("includeExperimentalAlgorithms",
      "Include Experimental Algorithms (requires restart)", "Include experimental algorithms (requires restart)", null, false);
@@ -158,10 +157,6 @@ public class Config
 
 
   //GUI_ANALYZER
-  public static final EnumOption<ModelAnalyzerFactoryLoader> GUI_ANALYZER_USED_FACTORY =
-  new EnumOption<ModelAnalyzerFactoryLoader>("guiAnalyzerUsedFactory",
-    "Model Verifier Factory Used by Editor's Verify Menu", "Model verifier factory used by Editor's Verify menu",
-    null, ModelAnalyzerFactoryLoader.values(), ModelAnalyzerFactoryLoader.Monolithic);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS = new BooleanOption
     ("includeSeamlessSynthesis",
      "Include Seamless Synthesis", "Include Seamless Synthesis", null, true);
@@ -256,7 +251,7 @@ public class Config
     ("synchNbrOfExecuters",
      "Number of Synchronization Threads", "Number of synchronization threads", null, 1, 1, Integer.MAX_VALUE);
   public static final StringOption SYNC_AUTOMATON_NAME_SEPARATOR = new StringOption
-    ("synchAutomatonNameSeparator", "Automata Name Deparator", "Automata name separator", null, "||");
+    ("synchAutomatonNameSeparator", "Automata Name Separator", "Automata name separator", null, "||");
   public static final BooleanOption SYNC_UNOBS_EVENTS_SYNC = new BooleanOption
     ("syncUnobsEventsSync",
      "Unobservable (non-tau) Events Dynchronize", "Unobservable (non-tau) events synchronize", null, false);

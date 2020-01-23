@@ -39,6 +39,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.gui.compiler.CompilationDialog;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -66,9 +67,10 @@ public abstract class WatersAnalyzeHISCAction
 
   //#########################################################################
   //# Constructor
-  protected WatersAnalyzeHISCAction(final IDE ide)
+  protected WatersAnalyzeHISCAction(final IDE ide,
+                                    final AnalysisOperation operation)
   {
-    super(ide);
+    super(ide, operation);
   }
 
 

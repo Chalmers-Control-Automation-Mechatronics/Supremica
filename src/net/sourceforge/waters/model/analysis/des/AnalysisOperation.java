@@ -123,8 +123,8 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation DEADLOCK_CHECK =
-    new AnalysisOperation("waters.analysis.deadlock", "Deadlock Check",
-                          "has a deadlock loop", "is deadlock-loop free")
+    new AnalysisOperation("waters.analysis.deadlock", "Deadlock",
+                          "has a deadlock", "is deadlock free")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -135,10 +135,24 @@ public abstract class AnalysisOperation
     }
   };
 
+  public static final AnalysisOperation DIAGNOSABILITY_CHECK =
+    new AnalysisOperation("waters.analysis.diagnosability", "Diagnosability",
+                          "is npt diagnosable", "is diagnosable")
+  {
+    @Override
+    public DiagnosabilityChecker createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createDiagnosabilityChecker(desFactory);
+    }
+  };
+
   public static final AnalysisOperation LANGUAGE_INCLUSION_CHECK =
-    new AnalysisOperation("waters.analysis.languageinclusion", "Language Inclusion",
-                          "does not satisfy Language Inclusion",
-                          "satisfies Language Inclusion")
+    new AnalysisOperation("waters.analysis.languageinclusion",
+                          "Language Inclusion",
+                          "does not satisfy language inclusion",
+                          "satisfies language inclusion")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer

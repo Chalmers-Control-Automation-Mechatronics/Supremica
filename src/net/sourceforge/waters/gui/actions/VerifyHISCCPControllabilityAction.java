@@ -33,10 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
@@ -59,7 +56,7 @@ public class VerifyHISCCPControllabilityAction
   //# Constructor
   protected VerifyHISCCPControllabilityAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.CONTROLLABILITY_CHECK);
   }
 
 
@@ -79,14 +76,6 @@ public class VerifyHISCCPControllabilityAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
-  {
-    return factory.createControllabilityChecker(desFactory);
-  }
-
-  @Override
   protected String getSuccessDescription()
   {
     return "is locally controllable";
@@ -95,6 +84,6 @@ public class VerifyHISCCPControllabilityAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 3016445666104381980L;
 
 }
