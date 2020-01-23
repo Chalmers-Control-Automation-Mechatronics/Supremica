@@ -78,11 +78,11 @@ public class VerifyHISCCPInterfaceConsistencyAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
+  protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
   {
     final ConflictChecker checker =
-      (ConflictChecker) super.createModelVerifier(desFactory);
+      (ConflictChecker) super.createAndConfigureModelVerifier(desFactory);
     if (checker == null) {
       return null;
     } else {

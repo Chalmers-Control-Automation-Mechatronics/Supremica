@@ -85,7 +85,7 @@ public abstract class AnalysisOperation
 
   public static final AnalysisOperation CONFLICT_CHECK =
     new AnalysisOperation("waters.analysis.conflict", "Conflict",
-                          "is nonblocking", "is blocking")
+                          "is blocking", "is nonblocking")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer

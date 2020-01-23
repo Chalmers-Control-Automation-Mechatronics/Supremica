@@ -77,11 +77,11 @@ public class VerifySICProperty5Action
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
+  protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
   {
     final ConflictChecker conflictChecker =
-      (ConflictChecker) super.createModelVerifier(desFactory);
+      (ConflictChecker) super.createAndConfigureModelVerifier(desFactory);
     if (conflictChecker == null) {
       return null;
     } else {

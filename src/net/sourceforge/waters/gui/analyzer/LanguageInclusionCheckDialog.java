@@ -124,7 +124,7 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
     }
 
     @Override
-    protected ModelAnalyzer createModelAnalyzer()
+    protected ModelAnalyzer createAndConfigureModelAnalyzer()
     {
       return getAnalyzer();
     }

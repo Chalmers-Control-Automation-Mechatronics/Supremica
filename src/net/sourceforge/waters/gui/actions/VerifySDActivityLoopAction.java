@@ -68,11 +68,11 @@ public class VerifySDActivityLoopAction extends WatersVerificationAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
+  protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
   {
     final ControlLoopChecker checker =
-      (ControlLoopChecker) super.createModelVerifier(desFactory);
+      (ControlLoopChecker) super.createAndConfigureModelVerifier(desFactory);
     if (checker == null) {
       return null;
     } else {

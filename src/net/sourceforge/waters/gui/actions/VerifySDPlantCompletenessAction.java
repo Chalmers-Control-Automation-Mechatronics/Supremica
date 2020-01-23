@@ -63,11 +63,11 @@ public class VerifySDPlantCompletenessAction extends WatersVerificationAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
+  protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
   {
     final ControllabilityChecker checker =
-      (ControllabilityChecker) super.createModelVerifier(desFactory);
+      (ControllabilityChecker) super.createAndConfigureModelVerifier(desFactory);
     if (checker == null) {
       return null;
     } else {

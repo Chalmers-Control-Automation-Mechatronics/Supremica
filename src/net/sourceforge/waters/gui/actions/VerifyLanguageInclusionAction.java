@@ -120,11 +120,11 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
+  protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
   {
     final LanguageInclusionChecker checker =
-      (LanguageInclusionChecker) super.createModelVerifier(desFactory);
+      (LanguageInclusionChecker) super.createAndConfigureModelVerifier(desFactory);
     if (checker != null && mNamedProxy != null) {
       if (mNamedProxy instanceof AutomatonProxy) {
         final KindTranslator translator = new SingleAutomatonKindTranslator();

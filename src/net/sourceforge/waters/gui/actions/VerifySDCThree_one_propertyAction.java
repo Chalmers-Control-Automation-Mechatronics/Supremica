@@ -63,11 +63,11 @@ public class VerifySDCThree_one_propertyAction extends WatersVerificationAction
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
+  protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
   {
     final LanguageInclusionChecker checker =
-      (LanguageInclusionChecker) super.createModelVerifier(desFactory);
+      (LanguageInclusionChecker) super.createAndConfigureModelVerifier(desFactory);
     if (checker == null) {
       return null;
     } else {

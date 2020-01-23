@@ -123,7 +123,7 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
     }
 
     @Override
-    protected ModelAnalyzer createModelAnalyzer()
+    protected ModelAnalyzer createAndConfigureModelAnalyzer()
     {
       return getAnalyzer();
     }

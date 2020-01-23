@@ -94,7 +94,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
     pane.add(mBottomPanel, BorderLayout.SOUTH);
     setLocationAndSize();
     setVisible(true);
-    mAnalyzer = createModelAnalyzer();
+    mAnalyzer = createAndConfigureModelAnalyzer();
     mAnalyzer.setModel(des);
     mRunner.setPriority(Thread.MIN_PRIORITY);
     mRunner.start();
@@ -122,7 +122,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   protected abstract String getSuccessText();
 
-  protected abstract ModelAnalyzer createModelAnalyzer();
+  protected abstract ModelAnalyzer createAndConfigureModelAnalyzer();
 
 
   //#########################################################################

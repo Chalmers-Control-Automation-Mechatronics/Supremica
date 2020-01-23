@@ -111,7 +111,7 @@ public abstract class WatersVerificationAction
     final IDE ide = getIDE();
     @SuppressWarnings("unused")
     final VerificationDialog dialog =
-      new VerificationDialog(ide, compiledDES, createModelVerifier());
+      new VerificationDialog(ide, compiledDES, createAndConfigureModelVerifier());
   }
 
   @Override
@@ -188,35 +188,48 @@ public abstract class WatersVerificationAction
     return createModelVerifier(factory);
   }
 
-  protected ModelVerifier createModelVerifier
-    (final ProductDESProxyFactory desFactory)
+  ModelVerifier createModelVerifier(final ProductDESProxyFactory desFactory)
   {
     try {
       final ModelAnalyzerFactory vFactory = getModelAnalyzerFactory();
       if (vFactory == null) {
         return null;
+      } else {
+        final ModelVerifier verifier =
+          (ModelVerifier) mOperation.createModelAnalyzer(vFactory, desFactory);
+        // TODO Remove this configureFromOptions()
+        vFactory.configureFromOptions(verifier);
+        return verifier;
       }
-      final ModelVerifier verifier =
-        (ModelVerifier) mOperation.createModelAnalyzer(vFactory, desFactory);
-      if (verifier == null) {
-        return null;
-      }
-      // TODO Remove this configureFromOptions()
-      vFactory.configureFromOptions(verifier);
-      final String prefix = mOperation.getOptionPagePrefix();
-      final OptionPage map = OptionPage.getOptionPage(prefix);
-      if (map != null) {
-        for (final Option<?> option : verifier.getOptions(map)) {
-          if (option.isPersistent()) {
-            verifier.setOption(option);
-          }
-        }
-      }
-      return verifier;
     } catch (final ClassNotFoundException |
                    AnalysisConfigurationException exception) {
       return null;
     }
+  }
+
+  ModelVerifier createAndConfigureModelVerifier()
+  {
+    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    return createAndConfigureModelVerifier(factory);
+  }
+
+  protected ModelVerifier createAndConfigureModelVerifier
+    (final ProductDESProxyFactory desFactory)
+  {
+    final ModelVerifier verifier = createModelVerifier(desFactory);
+    if (verifier == null) {
+      return null;
+    }
+    final String prefix = mOperation.getOptionPagePrefix();
+    final OptionPage map = OptionPage.getOptionPage(prefix);
+    if (map != null) {
+      for (final Option<?> option : verifier.getOptions(map)) {
+        if (option.isPersistent()) {
+          verifier.setOption(option);
+        }
+      }
+    }
+    return verifier;
   }
 
 
@@ -273,9 +286,9 @@ public abstract class WatersVerificationAction
     }
 
     @Override
-    protected ModelAnalyzer createModelAnalyzer()
+    protected ModelAnalyzer createAndConfigureModelAnalyzer()
     {
-      return WatersVerificationAction.this.createModelVerifier();
+      return WatersVerificationAction.this.createAndConfigureModelVerifier();
     }
 
     //#######################################################################
