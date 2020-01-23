@@ -67,22 +67,14 @@ public enum VerificationType
   //MUTUALLYNONBLOCKING("Mutually nonblocking"),
   LANGUAGEINCLUSION("Language inclusion"),
   /** Observer property (OP-verifier) */
-  // TODO Static references cause NoClassDefFoundError: Could not initialize class
-  OP("Observer property" /*, Config.GUI_ANALYZER_INCLUDE_OP */),
-  DIAGNOSABILITY("Diagnosability" /*, Config.INCLUDE_EXPERIMENTAL_ALGORITHMS */);
+  OP("Observer property"),
+  DIAGNOSABILITY("Diagnosability");
 
 
   //#########################################################################
   //# Constructors
   private VerificationType(final String description)
   {
-    this(description, null);
-  }
-
-  private VerificationType(final String description,
-                           final BooleanOption option)
-  {
-    mOption = option;
     mDescription = description;
   }
 
@@ -105,6 +97,10 @@ public enum VerificationType
     } else {
       return mOption.getValue();
     }
+  }
+
+  public void setConfigOption(final BooleanOption option) {
+    mOption = option;
   }
 
 
@@ -143,7 +139,7 @@ public enum VerificationType
 
   //#########################################################################
   //# Data Members
-  private final BooleanOption mOption;
+  private BooleanOption mOption;
   /** Textual description. */
   private final String mDescription;
 

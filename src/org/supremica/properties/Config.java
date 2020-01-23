@@ -46,7 +46,11 @@ public class Config
      "Student Verison", "Student version", null, false, false);
   public static final BooleanOption INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanOption
     ("includeExperimentalAlgorithms",
-     "Include Experimental Algorithms (requires restart)", "Include experimental algorithms (requires restart)", null, false);
+     "Include Experimental Algorithms (requires restart)", "Include experimental algorithms (requires restart)", null, false) {
+    {
+      VerificationType.DIAGNOSABILITY.setConfigOption(this);
+    }
+  };
 
 
   //GENERAL_LOG
@@ -171,7 +175,11 @@ public class Config
      "Include Sampled-Data Property Checks", "Include sampled-data property checks", null, false);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_OP = new BooleanOption
     ("includeOP",
-     "Include Observer Projection Algorithms", "Include Observer Projection algorithms", null, false);
+     "Include Observer Projection Algorithms", "Include Observer Projection algorithms", null, false) {
+    {
+      VerificationType.OP.setConfigOption(this);
+    }
+  };
   public static final BooleanOption GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER = new BooleanOption
     ("guiAnalyzerSendPropertiesToAnalyzer",
      "Send Properties to Analyzer", "Send properties to analyzer", null, false);
