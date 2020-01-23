@@ -42,14 +42,12 @@ import net.sourceforge.waters.analysis.options.EnumOption;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.SupremicaProperties;
 
-import javafx.beans.property.ObjectProperty;
-
 
 /**
  * <P>An action to change an enumeration-type property.</P>
  *
  * <P>This a generic popup menu action, parameterised with an
- * {@link ObjectProperty} from Supremica's configuration and one value. When
+ * {@link EnumOption} from Supremica's configuration and one value. When
  * triggered, it sets the property to the specified value, and triggers
  * saving of the configuration file if the property was changed.</P>
  *

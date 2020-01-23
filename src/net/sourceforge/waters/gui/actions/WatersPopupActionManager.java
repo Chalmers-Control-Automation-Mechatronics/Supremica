@@ -56,8 +56,6 @@ import net.sourceforge.waters.subject.module.NodeSubject;
 
 import org.supremica.gui.ide.IDE;
 
-import javafx.beans.property.BooleanProperty;
-
 
 public class WatersPopupActionManager
 {
@@ -104,7 +102,7 @@ public class WatersPopupActionManager
   //#########################################################################
   //# Access to Actions
   /**
-   * Creates an action to toggle a {@link BooleanProperty} from Supremica's
+   * Creates an action to toggle a {@link BooleanOption} from Supremica's
    * configuration.
    *
    * @param option

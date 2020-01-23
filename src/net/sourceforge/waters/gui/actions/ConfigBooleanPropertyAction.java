@@ -42,14 +42,12 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.SupremicaProperties;
 
-import javafx.beans.property.BooleanProperty;
-
 
 /**
  * <P>An action to toggle a Boolean property.</P>
  *
  * <P>This a generic popup menu action, parameterised with a
- * {@link BooleanProperty} from Supremica's configuration. When triggered,
+ * {@link BooleanOption} from Supremica's configuration. When triggered,
  * it toggles the value of the property, and saves the changes to the
  * properties file.</P>
  *
