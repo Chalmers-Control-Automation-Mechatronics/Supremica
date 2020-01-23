@@ -51,8 +51,6 @@ package org.supremica.automata.algorithms;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 
-import org.supremica.properties.Config;
-
 
 /**
  * Different types of verification.
@@ -69,8 +67,9 @@ public enum VerificationType
   //MUTUALLYNONBLOCKING("Mutually nonblocking"),
   LANGUAGEINCLUSION("Language inclusion"),
   /** Observer property (OP-verifier) */
-  OP("Observer property", Config.GUI_ANALYZER_INCLUDE_OP),
-  DIAGNOSABILITY("Diagnosability", Config.INCLUDE_EXPERIMENTAL_ALGORITHMS);
+  // TODO Static references cause NoClassDefFoundError: Could not initialize class
+  OP("Observer property" /*, Config.GUI_ANALYZER_INCLUDE_OP */),
+  DIAGNOSABILITY("Diagnosability" /*, Config.INCLUDE_EXPERIMENTAL_ALGORITHMS */);
 
 
   //#########################################################################
