@@ -36,8 +36,6 @@ public class ExtendedAutomataIndexMap {
     public Map<String, Integer> variableStringToIndexMap;
     private final Map<String, Integer> var2initValMap;
     private final Map<String, List<VariableMarkingProxy>> var2markedValMap;
-    private final Map<String,Map<String,Integer>> var2valIndexMap;
-    private final Map<String,Map<Integer,String>> var2indexValMap;
     private Set<String> EFANames = null;
     private Set<String> variableNames = null;
     ExtendedAutomata theExAutomata = null;
@@ -46,8 +44,6 @@ public class ExtendedAutomataIndexMap {
     public ExtendedAutomataIndexMap() {
         var2initValMap = new HashMap<String, Integer>();
         var2markedValMap = new HashMap<String, List<VariableMarkingProxy>>();
-        var2valIndexMap = new HashMap<String,Map<String,Integer>>();
-        var2indexValMap = new HashMap<String,Map<Integer,String>>();
     }
 
     public ExtendedAutomataIndexMap(final ExtendedAutomata theExAutomata) {
@@ -131,20 +127,11 @@ public class ExtendedAutomataIndexMap {
             }
 
             for (int i = lowerBound; i <= upperBound; i++) {
-                String valueLabel;
-                if (theExAutomata.getNonIntegerVarNameSet().contains(varName)) {
-                    // We have an enumeration datatype
-                    valueLabel = theExAutomata.getNonIntVar2IntInstanceMap().get(varName).get(String.valueOf(i));
-                } else {
-                    // We have an integer datatype
-                    valueLabel = String.valueOf(i);
-                }
+                final String valueLabel = theExAutomata.getValOfIndex(varName, i);
                 val2indexMap.put(valueLabel, i);
                 index2valMap.put(i, valueLabel);
                 integerDomain.add(i);
             }
-            var2valIndexMap.put(varName, val2indexMap);
-            var2indexValMap.put(varName, index2valMap);
 
             if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
                 final int initialValue = val2indexMap.get(((BinaryExpressionProxy) var.getInitialStatePredicate()).getRight().toString());
@@ -209,22 +196,6 @@ public class ExtendedAutomataIndexMap {
 
         return 2;
 
-    }
-
-    public Integer getIndexOfVal(final String variableName, final String val) {
-        Integer returnValue = null;
-        if (var2valIndexMap.containsKey(variableName)) {
-            returnValue = var2valIndexMap.get(variableName).get(val);
-        }
-        return returnValue;
-    }
-
-    public String getValOfIndex(final String variableName, final int index) {
-        String returnValue = null;
-        if (var2indexValMap.containsKey(variableName)) {
-            returnValue = var2indexValMap.get(variableName).get(index);
-        }
-        return returnValue;
     }
 
     public int getInitValueofVar(final String var) {

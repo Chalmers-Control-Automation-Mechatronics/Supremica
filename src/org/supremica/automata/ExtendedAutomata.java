@@ -657,6 +657,16 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return stringToExAutomaton;
     }
 
+    public String getValOfIndex(final String variableName, final int index) {
+        String returnValue = null;
+        if (nonIntegerVariables.contains(variableName)) {
+          returnValue = nonIntVar2IntInstanceMap.get(variableName).get(String.valueOf(index));
+        } else {
+          returnValue = String.valueOf(index);
+        }
+        return returnValue;
+    }
+
     public void setDomain(final int domain) {
         this.domain = domain;
     }

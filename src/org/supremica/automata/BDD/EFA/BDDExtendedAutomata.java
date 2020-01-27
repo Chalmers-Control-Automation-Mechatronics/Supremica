@@ -1502,7 +1502,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             for (int i = minValue; i <= maxValue; i++) {
                 final BDD valueBDD = getConstantBDD(getAutVarName(var), i);
                 if (!autStatesBDD.and(valueBDD).isZero() && !valueBDD.and(validStatesBDD).isZero()) {
-                    output.add("" + getIndexMap().getValOfIndex(getAutVarName(var), i));
+                    output.add("" + getExtendedAutomata().getValOfIndex(getAutVarName(var), i));
                 }
             }
 

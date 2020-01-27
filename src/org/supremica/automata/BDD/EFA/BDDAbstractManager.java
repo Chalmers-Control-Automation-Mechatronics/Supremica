@@ -489,7 +489,7 @@ public abstract class BDDAbstractManager {
                 final boolean inDomain = value >= bddExAutomata.theIndexMap.getVariableLowerBound() && value <= bddExAutomata.theIndexMap.getVariableUpperBound();
                 if (inDomain) {
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
-                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), ((IntConstantProxy) expr).getValue()), getZeroBDD());
+                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), value), getZeroBDD());
                 } else {
                     logger.error(expr.toString() + " is out of the bounds. The value will be set to 0!");
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0), getZeroBDD());
