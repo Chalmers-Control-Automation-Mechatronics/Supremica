@@ -180,8 +180,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private Map<String, HashMap<EdgeProxy, BDD>> eventName2EdgeBDDMap;
     private Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap;
 
-    private final int wordsize = 32;
-
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
         locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
@@ -630,7 +628,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
           manager.createSupremicaBDDBitVector(
                                               BDDBitVectoryType,
                                               orgExAutomata.getMinValueofVar(varName) < 0,
-                                              getWordsize(),
                                               tempDomain);
         tempVector = tempVector.saturate(varMinValue, varMaxValue);
         BDDBitVecTempVarsMap.put(theIndexMap.getVariableIndex(var),
@@ -662,7 +659,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
           manager.createSupremicaBDDBitVector(
                                               BDDBitVectoryType,
                                               orgExAutomata.getMinValueofVar(varName) < 0,
-                                              getWordsize(),
                                               sourceDomain);
         sourceVector = sourceVector.saturate(varMinValue, varMaxValue);
         BDDBitVecSourceVarsMap.put(theIndexMap.getVariableIndex(var),
@@ -693,7 +689,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         SupremicaBDDBitVector destVector =
           manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                                               orgExAutomata.getMinValueofVar(varName) < 0,
-                                              getWordsize(),
                                               destDomain);
         destVector = destVector.saturate(varMinValue, varMaxValue);
         BDDBitVecTargetVarsMap.put(theIndexMap.getVariableIndex(var),
@@ -1913,13 +1908,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public Map<EdgeProxy, ExtendedAutomaton> getEdge2ExAutomatonMap() {
       return edge2ExAutomatonMap;
-    }
-
-    /**
-     * @return The number of bits used to represent numbers.
-     */
-    public int getWordsize() {
-        return wordsize;
     }
 }
 
