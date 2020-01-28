@@ -577,4 +577,11 @@ public abstract class SupremicaBDDBitVector
 
     }
 
+    public SupremicaBDDBitVector optimizeSize() {
+
+      final int required = requiredBits();
+      return coerce(required);
+
+    }
+
 }
