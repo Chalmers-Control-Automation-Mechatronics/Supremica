@@ -34,7 +34,6 @@
 package org.supremica.automata.BDD;
 
 import net.sf.javabdd.BDDDomain;
-import net.sf.javabdd.BDDFactory;
 
 import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
@@ -45,20 +44,16 @@ import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
 {
 
-  private BDDFactory factory;
-
   @Override
   protected void setUp() throws Exception
   {
     super.setUp();
-    factory = BDDFactory.init("java", 10, 1000);
   }
 
   @Override
   protected void tearDown() throws Exception
   {
     super.tearDown();
-    factory.done();
   }
 
   public void testModulo1() {

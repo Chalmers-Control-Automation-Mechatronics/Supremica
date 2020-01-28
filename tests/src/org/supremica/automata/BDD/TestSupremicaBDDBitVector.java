@@ -35,23 +35,27 @@ package org.supremica.automata.BDD;
 
 import junit.framework.TestCase;
 
+import net.sf.javabdd.BDDFactory;
+
 /**
  * @author jonkro
  */
 public class TestSupremicaBDDBitVector extends TestCase
 {
 
+  protected BDDFactory factory;
+
   @Override
   protected void setUp() throws Exception
   {
-    // TODO Auto-generated method stub
     super.setUp();
+    factory = BDDFactory.init("java", 10, 1000);
   }
 
   @Override
   protected void tearDown() throws Exception
   {
-    // TODO Auto-generated method stub
+    factory.done();
     super.tearDown();
   }
 
