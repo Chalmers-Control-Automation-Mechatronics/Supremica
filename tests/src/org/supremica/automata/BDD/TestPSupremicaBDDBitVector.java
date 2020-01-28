@@ -127,4 +127,36 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
     assertEquals("[min=15, max=100]", s);
   }
 
+  public void testRequiredBits() {
+    final BDDDomain domain = factory.extDomain(5);
+    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 2);
+    final int required = bitVector.requiredBits();
+
+    assertEquals(2, required);
+  }
+
+  public void testRequiredBitsLarge() {
+    final BDDDomain domain = factory.extDomain(2147483647);
+    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 10000);
+    final int required = bitVector.requiredBits();
+
+    assertEquals(14, required);
+  }
+
+  public void testRequiredBitsHuge() {
+    final BDDDomain domain = factory.extDomain(4294967295L);
+    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 2147483648L);
+    final int required = bitVector.requiredBits();
+
+    assertEquals(32, required);
+  }
+
+  public void testRequiredBitsVariable() {
+    final BDDDomain domain = factory.extDomain(5);
+    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, 32, domain);
+    final int required = bitVector.requiredBits();
+
+    assertEquals(3, required);
+  }
+
 }

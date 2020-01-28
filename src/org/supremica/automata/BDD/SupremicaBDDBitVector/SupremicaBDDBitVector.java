@@ -564,4 +564,17 @@ public abstract class SupremicaBDDBitVector
         return value;
     }
 
+    public int requiredBits() {
+
+      int required = 0;
+      for (int i = 0; i < bitNum; i++) {
+        if (bitvec[i].satCount() > 0) {
+          required = i;
+        }
+      }
+
+      return required+1;
+
+    }
+
 }
