@@ -225,6 +225,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
     @Override
     public ResultOverflows subConsideringOverflows(final SupremicaBDDBitVector that)
     {
+      // TODO: toTwosComplement might result in overflows.
       return addConsideringOverflows(((TCSupremicaBDDBitVector)that).toTwosComplement());
     }
 

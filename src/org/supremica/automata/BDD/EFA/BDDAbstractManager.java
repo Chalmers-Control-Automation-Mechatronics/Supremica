@@ -274,6 +274,10 @@ public abstract class BDDAbstractManager {
                 return new ResultOverflows(tmp, ro.getOverflows());
             } else if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getUnaryMinusOperator())) {
                 final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(), true, updatedVariables);
+                // TODO: toTwosComplement might result in an overflow if the
+                //       bit vector stores the minimum.
+                //       For instance, with 3 bits the minimum is -4. Twos
+                //       complement is 3+1, but that wraps around to -4.
                 return new ResultOverflows(((TCSupremicaBDDBitVector) ro.getResult()).toTwosComplement(), ro.getOverflows());
             } else if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNextOperator())) {
                 final String primedVarName = unExpr.getSubTerm().toString();
