@@ -1,7 +1,7 @@
 package org.supremica.automata.BDD.SupremicaBDDBitVector;
 
 import java.math.BigInteger;
-import java.util.HashSet;
+import java.util.LinkedList;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -113,6 +113,8 @@ public abstract class SupremicaBDDBitVector
 
         return dst;
     }
+
+    abstract public SupremicaBDDBitVector resize(int bitNum);
 
     /**
      * Checks whether the bit vector represents a fixed integer. A bit vector
@@ -461,7 +463,7 @@ public abstract class SupremicaBDDBitVector
 
             // The bit vector is not constant so we want to figure out the set
             // of all values it can take on.
-            final HashSet<Integer> satSet = new HashSet<Integer>();
+            final LinkedList<Integer> satSet = new LinkedList<Integer>();
             // The mask start at zero and is incremented in every loop. When the
             // increment overflows we have looped through all possible bit
             // assignments. In every iteration we compare the mask with this bit
@@ -494,16 +496,14 @@ public abstract class SupremicaBDDBitVector
      * @return The carry bit of the whole operation. This is set to one when the
      * operation overflows.
      */
-    public BDD increment() {
-        BDD carry = mFactory.one();
-        for (int i = 0; i<bitNum; i++) {
-            final BDD res = bitvec[i].xor(carry);
-            carry = bitvec[i].and(carry);
-            bitvec[i] = res;
-        }
-        return carry;
-    }
+    abstract public BDD increment();
 
+    /**
+     * Sets a max and min value of the bit vector.
+     * @param min
+     * @param max
+     * @return a new bit vector with the given bounds
+     */
     public SupremicaBDDBitVector saturate(final int min, final int max) {
         final SupremicaBDDBitVector res = this.copy();
         final SupremicaBDDBitVector maxVec = res.max(min);
@@ -511,6 +511,11 @@ public abstract class SupremicaBDDBitVector
         return minVec;
     }
 
+    /**
+     * Sets a minimum value for the bit vector.
+     * @param val
+     * @return a new bit vector with the given lower bound
+     */
     private SupremicaBDDBitVector min(final int val)
     {
         final SupremicaBDDBitVector constant = buildSupBDDBitVector(bitNum, val);
@@ -522,6 +527,11 @@ public abstract class SupremicaBDDBitVector
         return res;
     }
 
+    /**
+     * Sets a maximum value for the bit vector.
+     * @param val
+     * @return a new bit vector with the given upper bound
+     */
     private SupremicaBDDBitVector max(final int val)
     {
       final SupremicaBDDBitVector constant = buildSupBDDBitVector(bitNum, val);
@@ -533,54 +543,34 @@ public abstract class SupremicaBDDBitVector
       return res;
     }
 
-    public int max() {
+    /**
+     * Finds the maximum value that is represented in the bit vector.
+     * @return maximum value
+     */
+    abstract public int max();
 
-        int value = 0;
-        BDD bdd = mFactory.one();
-        for (int i=bitNum-1; i>=0; i--) {
-            value = value << 1;
-            if ((bitvec[i].and(bdd)).satCount() > 0) {
-                value = value | 1;
-                bdd = bdd.and(bitvec[i]);
-            }
-        }
+    /**
+     * Finds the minimum value that is represented in the bit vector.
+     * @return minimum value
+     */
+    abstract public int min();
 
-        return value;
-    }
+    /**
+     * Finds out how many bits that are required to represent the set of values
+     * that this bit vector represents.
+     * @return required bits
+     */
+    abstract public int requiredBits();
 
-    public int min() {
-
-        int value = 0;
-        BDD bdd = mFactory.one();
-        for (int i=bitNum-1; i>=0; i--) {
-            value = value << 1;
-            if (bitvec[i].not().and(bdd).satCount() < 1) {
-                value = value | 1;
-            } else {
-                bdd = bdd.and(bitvec[i].not());
-            }
-        }
-
-        return value;
-    }
-
-    public int requiredBits() {
-
-      int required = 0;
-      for (int i = 0; i < bitNum; i++) {
-        if (bitvec[i].satCount() > 0) {
-          required = i;
-        }
-      }
-
-      return required+1;
-
-    }
-
+    /**
+     * Reduces the size of the bit vector to match what is needed to store the
+     * set of values.
+     * @return bit vector with less bits
+     */
     public SupremicaBDDBitVector optimizeSize() {
 
       final int required = requiredBits();
-      return coerce(required);
+      return resize(required);
 
     }
 

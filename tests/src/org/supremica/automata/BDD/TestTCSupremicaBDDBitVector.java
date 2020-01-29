@@ -35,13 +35,13 @@ package org.supremica.automata.BDD;
 
 import net.sf.javabdd.BDDDomain;
 
-import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
+import org.supremica.automata.BDD.SupremicaBDDBitVector.TCSupremicaBDDBitVector;
 
 /**
  * @author jonkro
  */
-public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
+public class TestTCSupremicaBDDBitVector extends TestSupremicaBDDBitVector
 {
 
   @Override
@@ -59,7 +59,7 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
   public void testModulo1() {
     final int dividend = 5;
     final int divisor = 4;
-    final PSupremicaBDDBitVector dividendBit = new PSupremicaBDDBitVector(factory, factory.extDomain(dividend+1).varNum(), dividend);
+    final TCSupremicaBDDBitVector dividendBit = new TCSupremicaBDDBitVector(factory, factory.extDomain(dividend+1).varNum(), dividend);
 
     final SupremicaBDDBitVector remainderBit = dividendBit.divmod(divisor, false);
 
@@ -71,39 +71,51 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
   public void testDomains() {
     final int domainSize = 4;
     final BDDDomain domain = factory.extDomain(domainSize+1);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
 
-    final PSupremicaBDDBitVector constant = new PSupremicaBDDBitVector(factory, domainSize, 3);
+    final TCSupremicaBDDBitVector constant = new TCSupremicaBDDBitVector(factory, domainSize, 3);
 
-    assertEquals("[0, 1, 2, 3, 4, 5, 6, 7]", bitVector.toString());
+    final TCSupremicaBDDBitVector constantNeg = new TCSupremicaBDDBitVector(factory, domainSize, -4);
+
+    assertEquals("[-4, -3, -2, -1, 0, 1, 2, 3]", bitVector.toString());
     assertEquals("3", constant.toString());
+    assertEquals("-4", constantNeg.toString());
   }
 
   public void testToString() {
     final int domainSize = 4;
     final BDDDomain domain = factory.extDomain(domainSize+1);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
-    final PSupremicaBDDBitVector constant = new PSupremicaBDDBitVector(factory, 10, 1);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
+    final TCSupremicaBDDBitVector constant = new TCSupremicaBDDBitVector(factory, 10, 1);
     final String s = bitVector.toString();
-    final PSupremicaBDDBitVector newVector = constant.add(bitVector);
+    final TCSupremicaBDDBitVector newVector = constant.add(bitVector);
     final String s1 = newVector.toString();
 
-    assertEquals("[0, 1, 2, 3, 4, 5, 6, 7]", s);
-    assertEquals("[1, 2, 3, 4, 5, 6, 7, 8]", s1);
+    assertEquals("[-4, -3, -2, -1, 0, 1, 2, 3]", s);
+    assertEquals("[-3, -2, -1, 0, 1, 2, 3, 4]", s1);
   }
 
   public void testSaturate() {
-    final BDDDomain domain = factory.extDomain(5);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
+    final BDDDomain domain = factory.extDomain(9);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
     final SupremicaBDDBitVector sat = bitVector.saturate(2, 5);
     final String s = sat.toString();
 
     assertEquals("[2, 3, 4, 5]", s);
   }
 
+  public void testSaturateNeg() {
+    final BDDDomain domain = factory.extDomain(9);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
+    final SupremicaBDDBitVector sat = bitVector.saturate(-3, 4);
+    final String s = sat.toString();
+
+    assertEquals("[-3, -2, -1, 0, 1, 2, 3, 4]", s);
+  }
+
   public void testMinMax() {
-    final BDDDomain domain = factory.extDomain(5);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
+    final BDDDomain domain = factory.extDomain(9);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
     final SupremicaBDDBitVector sat = bitVector.saturate(2, 5);
 
     final int max = sat.max();
@@ -114,8 +126,8 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
   }
 
   public void testLargeToString() {
-    final BDDDomain domain = factory.extDomain(100);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
+    final BDDDomain domain = factory.extDomain(100*2);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
     final SupremicaBDDBitVector sat = bitVector.saturate(15, 100);
     final String s = sat.toString();
 
@@ -124,15 +136,15 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
 
   public void testRequiredBits() {
     final BDDDomain domain = factory.extDomain(5);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 2);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain.varNum(), 2);
     final int required = bitVector.requiredBits();
 
-    assertEquals(2, required);
+    assertEquals(3, required);
   }
 
   public void testRequiredBitsZero() {
     final BDDDomain domain = factory.extDomain(5);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 0);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain.varNum(), 0);
     final int required = bitVector.requiredBits();
 
     assertEquals(0, required);
@@ -140,33 +152,40 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
 
   public void testRequiredBitsLarge() {
     final BDDDomain domain = factory.extDomain(2147483647);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 10000);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain.varNum(), 10000);
     final int required = bitVector.requiredBits();
 
-    assertEquals(14, required);
+    assertEquals(15, required);
   }
 
   public void testRequiredBitsHuge() {
-    final BDDDomain domain = factory.extDomain(4294967295L);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), 2147483648L);
+    final BDDDomain domain = factory.extDomain(4294967297L);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain.varNum(), 2147483648L);
     final int required = bitVector.requiredBits();
 
-    assertEquals(32, required);
+    assertEquals(33, required);
   }
 
   public void testRequiredBitsVariable() {
     final BDDDomain domain = factory.extDomain(5);
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, 32, domain);
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, domain);
     final int required = bitVector.requiredBits();
 
     assertEquals(3, required);
   }
 
-  public void testOptimizeSize() {
-    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, 3, 0);
-    final SupremicaBDDBitVector opt = bitVector.optimizeSize();
+  public void testRequiredBitsNeg() {
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, 5, -1);
+    final int required = bitVector.requiredBits();
 
-    assertEquals(0, opt.length());
+    assertEquals(1, required);
+  }
+
+  public void testRequiredBitsNeg2() {
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, 5, -2);
+    final int required = bitVector.requiredBits();
+
+    assertEquals(2, required);
   }
 
 }
