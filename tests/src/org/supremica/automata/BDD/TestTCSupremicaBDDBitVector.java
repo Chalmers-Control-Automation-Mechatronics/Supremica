@@ -188,4 +188,32 @@ public class TestTCSupremicaBDDBitVector extends TestSupremicaBDDBitVector
     assertEquals(2, required);
   }
 
+  public void testResizeLargerPos() {
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, 2, 1);
+    final SupremicaBDDBitVector resize = bitVector.resize(5);
+
+    assertEquals(1, resize.val());
+  }
+
+  public void testResizeSmallerPos() {
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, 5, 1);
+    final SupremicaBDDBitVector resize = bitVector.resize(2);
+
+    assertEquals(1, resize.val());
+  }
+
+  public void testResizeLargerNeg() {
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, 2, -1);
+    final SupremicaBDDBitVector resize = bitVector.resize(5);
+
+    assertEquals(-1, resize.val());
+  }
+
+  public void testResizeSmallerNeg() {
+    final TCSupremicaBDDBitVector bitVector = new TCSupremicaBDDBitVector(factory, 5, -1);
+    final SupremicaBDDBitVector resize = bitVector.resize(2);
+
+    assertEquals(-1, resize.val());
+  }
+
 }

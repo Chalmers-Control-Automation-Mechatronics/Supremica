@@ -84,14 +84,18 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     @Override
     public int val()
     {
+        // We will shift bits into the variable val.
         int n, val = 0;
 
         for (n = bitvec.length - 1; n >= 0; n--)
             if (bitvec[n].isOne())
+                // This bit is always one, shift a 1 into the result.
                 val = (val << 1) | 1;
             else if (bitvec[n].isZero())
+                // This bit is always zero, shift 0 into the result.
                 val = val << 1;
             else
+                // This bit vector does not represent a constant value.
                 return 0;
 
         return val;
@@ -130,6 +134,8 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 //        if (this.bitNum != r.bitNum)
 //            throw new BDDException("equ operator: The length of the left-side vector is not equal to the right-side!");
 
+        // We will go through all bits and see if they are equal. Chain all
+        // operations with p.
         BDD p = mFactory.one();
         for (int n=0 ; n< getLargerLength(r); n++)
         {
@@ -143,7 +149,9 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
             if(n < r.bitNum)
                 rightBDD = r.bitvec[n];
 
+            // Create BDD expressing equality of the ith bit in this and r.
             final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
+            // And with p to ensure that all bits are equal.
             final BDD tmp2 = tmp1.and(p);
             p = tmp2;
         }
@@ -342,9 +350,12 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       final SupremicaBDDBitVector res = buildSupBDDBitVector(bitNum, false);
 
+      // Go though all bits for the new bit vector.
       for (int i = 0; i < bitNum; i++) {
+        // The default value if the new bit vector is larger.
         BDD z = mFactory.zero();
         if (i < this.bitNum) {
+          // The current bit vector has information.
           z = bitvec[i];
         }
         res.setBit(i, z);
@@ -357,6 +368,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     public BDD increment() {
       BDD carry = mFactory.one();
       for (int i = 0; i<bitNum; i++) {
+        // Half adder
         final BDD res = bitvec[i].xor(carry);
         carry = bitvec[i].and(carry);
         bitvec[i] = res;
@@ -369,10 +381,13 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       int value = 0;
       BDD bdd = mFactory.one();
+      // Start with MSB and find the first bit that can be 1.
       for (int i=bitNum-1; i>=0; i--) {
         value = value << 1;
         if ((bitvec[i].and(bdd)).satCount() > 0) {
+          // This bit can be one, given previous more significant bits.
           value = value | 1;
+          // The max must have this bit satisfiable, so remember that.
           bdd = bdd.and(bitvec[i]);
         }
       }
@@ -385,11 +400,15 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       int value = 0;
       BDD bdd = mFactory.one();
+      // Start with MSB and find the first bit that can be 0.
       for (int i=bitNum-1; i>=0; i--) {
         value = value << 1;
         if (bitvec[i].not().and(bdd).satCount() < 1) {
+          // This bit cannot be zero, given previous more significant bits.
           value = value | 1;
         } else {
+          // This bit can be zero.
+          // The min shall satisfy a zero for this bit, so remember that.
           bdd = bdd.and(bitvec[i].not());
         }
       }
@@ -401,12 +420,14 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     public int requiredBits() {
 
       int required = -1;
+      // Find the MSB that can be one.
       for (int i = 0; i < bitNum; i++) {
         if (bitvec[i].satCount() > 0) {
           required = i;
         }
       }
 
+      // Add one to convert to length from zero based index.
       return required+1;
 
     }

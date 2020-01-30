@@ -112,12 +112,15 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
     @Override
     public int val()
     {
+        // We will shift bits into the variable val.
         int n, val = 0;
         boolean negative = false;
         TCSupremicaBDDBitVector finalBitVec = buildSupBDDBitVector(bitNum);
         if(bitvec[signBitIndex].isOne())
         {
             negative = true;
+            // We have a negative number, so convert to positive since that is
+            // easier to work with.
             finalBitVec = toTwosComplement();
         }
         else
@@ -125,18 +128,30 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
         for (n = finalBitVec.bitNum - 1; n >= 0; n--)
             if (finalBitVec.bitvec[n].isOne())
+              // This bit is always one, shift a 1 into the result.
               val = (val << 1) | 1;
             else if (finalBitVec.bitvec[n].isZero())
+              // This bit is always zero, shift 0 into the result.
               val = val << 1;
             else
-                return 0;
+              // This bit vector does not represent a constant value.
+              return 0;
 
+        // Revert the conversion to positive number.
         if(negative)
             return (0-val);
         else
             return val;
     }
 
+    /**
+     * Create the twos complement of this bit vector. Same as multiply with -1.
+     * Note that twos complement might overflow if the bit vector represents
+     * the minimum value.
+     * For instance, for three bits the minimum is -4. The twos complement of
+     * -4 represented by three bits is -4.
+     * @return the negation of the bit vector.
+     */
     public TCSupremicaBDDBitVector toTwosComplement()
     {
         final TCSupremicaBDDBitVector res = buildSupBDDBitVector(bitNum);
@@ -153,6 +168,8 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 //        if (this.bitNum != r.bitNum)
 //            throw new BDDException("equ operator: The length of the left-side vector is not equal to the right-side!");
 
+        // We will go through all bits and see if they are equal. Chain all
+        // operations with p.
         BDD p = mFactory.one();
         for (int n=0 ; n< getLargerLength(that); n++)
         {
@@ -166,7 +183,9 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
             if(n < that.bitNum)
                 rightBDD = that.bitvec[n];
 
+            // Create BDD expressing equality of the ith bit in this and that.
             final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
+            // And with p to ensure that all bits are equal.
             final BDD tmp2 = tmp1.and(p);
             p = tmp2;
         }
@@ -310,9 +329,13 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       final SupremicaBDDBitVector res = buildSupBDDBitVector(bitNum, false);
 
+      // Go through all bits of the new bit vector.
       for (int i = 0; i < bitNum; i++) {
+        // If the new bit vector is larger we need to pad with the sign bit.
+        // And if the new vector is smaller we need to keep the sign.
         BDD z = bitvec[signBitIndex];
         if (i < this.signBitIndex) {
+          // This bit vector has info, so just copy it.
           z = bitvec[i];
         }
         res.setBit(i, z);
@@ -326,10 +349,13 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       BDD carry = mFactory.one();
       for (int i = 0; i<signBitIndex; i++) {
+        // Half adder
         final BDD res = bitvec[i].xor(carry);
         carry = bitvec[i].and(carry);
         bitvec[i] = res;
       }
+      // Overflows occur when [0 1 .. 1] is incremented. Determine if that has
+      // happened.
       final BDD res = bitvec[signBitIndex].xor(carry);
       carry = bitvec[signBitIndex].not().and(carry);
       bitvec[signBitIndex] = res;
@@ -340,6 +366,8 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       int value = 0;
       BDD bdd = mFactory.one();
+      // We know the maximum is positive, so require the sign bit to be zero and
+      // find the max of the remaining bits.
       bdd = bdd.and(bitvec[signBitIndex].not());
       for (int i=signBitIndex-1; i>=0; i--) {
         value = value << 1;
@@ -356,6 +384,8 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       int value = 0;
       BDD bdd = mFactory.one();
+      // We know that the minimum is positive, so require the sign bit to be
+      // zero and find the minimum of the remaining bits.
       bdd = bdd.and(bitvec[signBitIndex].not());
       for (int i=signBitIndex-1; i>=0; i--) {
         value = value << 1;
@@ -376,9 +406,13 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
       int value = 0;
 
       if (bitvec[signBitIndex].isOne()) {
+        // If all numbers that this vector can represent are negative, then we
+        // can find the maximum by taking the twos complement, find its min, and
+        // multiply with -1.
         t = t.toTwosComplement();
         value = -t.minTC();
       } else {
+        // The max is positive.
         t = (TCSupremicaBDDBitVector) t.copy();
         value = t.maxTC();
       }
@@ -393,9 +427,12 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
       int value = 0;
 
       if (bitvec[signBitIndex].isZero()) {
+        // The minimum is positive.
         t = (TCSupremicaBDDBitVector) t.copy();
         value = t.minTC();
       } else {
+        // The minimum is negative, so we do twos complement and find its max.
+        // Then multiply the result with -1.
         t = t.toTwosComplement();
         value = -t.maxTC();
       }
@@ -406,6 +443,10 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
     @Override
     public int requiredBits() {
 
+      // First check how many bits are required for the positive numbers that
+      // this vector can represent.
+      // We add two later. If no 1s are found for the positive part, then
+      // the bit vector might represent 0, and no bits are required.
       int requiredPos = -2;
       final BDD pos = bitvec[signBitIndex].not();
       for (int i = 0; i < signBitIndex; i++) {
@@ -414,17 +455,25 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         }
       }
 
+      // Then check how many bits are required for the negative numbers that
+      // this vector can represent.
       int requiredNeg = -1;
       final BDD neg = bitvec[signBitIndex];
       if (neg.satCount() > 0 ) {
+        // We know that we have at least one negative number, so at least one
+        // bit is needed. (The one will be added later.)
         requiredNeg = 0;
       }
       for (int i = 0; i < signBitIndex; i++) {
+        // Search for the most significant 1 which is followed by 0.
         if (neg.and(bitvec[i].not()).satCount() > 0) {
           requiredNeg = i+1;
         }
       }
 
+      // Convert to size from zero based index, and use the largest.
+      // Positive indices need to be incremented by two since a sign bit is
+      // needed.
       final int required = Math.max(requiredPos+2, requiredNeg+1);
 
       return required;

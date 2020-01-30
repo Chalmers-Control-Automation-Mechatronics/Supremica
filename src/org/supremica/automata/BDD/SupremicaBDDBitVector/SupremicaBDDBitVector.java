@@ -57,6 +57,10 @@ public abstract class SupremicaBDDBitVector
      */
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum, boolean c);
 
+    /**
+     * Initialize all bits to either one or zero.
+     * @param isTrue true for ones, false for zeros.
+     */
     protected void initialize(final boolean isTrue)
     {
         for (int n = 0; n < bitNum; n++)
@@ -66,11 +70,20 @@ public abstract class SupremicaBDDBitVector
                 bitvec[n] = mFactory.zero();
     }
 
+    /**
+     * Initialize the bits to the corresponding variable in the domain.
+     * See {@link SupremicaBDDBitVector#initialize(int[])}.
+     * @param d a BDD domain.
+     */
     protected void initialize(final BDDDomain d)
     {
         initialize(d.vars());
     }
 
+    /**
+     * Initializes each bit to the ith variable in the current BDD factory.
+     * @param var an array with BDD variable indices
+     */
     protected void initialize(final int[] var)
     {
         if (var.length > bitNum) {
@@ -87,10 +100,22 @@ public abstract class SupremicaBDDBitVector
         }
     }
 
+    /**
+     * Sets the bit vector to represent the specified value.
+     * @param val a constant that the bit vector shall represent.
+     */
     protected abstract void initialize(long val);
 
+    /**
+     * Same as {@link SupremicaBDDBitVector#initialize(long)}
+     * @param val
+     */
     protected abstract void initialize(BigInteger val);
 
+    /**
+     * Create a deep copy of the bit vector.
+     * @return a copy.
+     */
     public SupremicaBDDBitVector copy()
     {
         final SupremicaBDDBitVector dst = buildSupBDDBitVector(bitNum);
@@ -100,6 +125,12 @@ public abstract class SupremicaBDDBitVector
         return dst;
     }
 
+    /**
+     * Copy this bit vector into a new one with specified size. The result is
+     * truncated.
+     * @param bitNum bit size of new bit vector.
+     * @return a bit vector with given size.
+     */
     public SupremicaBDDBitVector coerce(final int bitNum)
     {
         final SupremicaBDDBitVector dst = buildSupBDDBitVector(bitNum);
@@ -114,6 +145,12 @@ public abstract class SupremicaBDDBitVector
         return dst;
     }
 
+    /**
+     * Resize the bit vector and take implementation details into account.
+     * This method should try to return a meaningful bit vector.
+     * @param bitNum bit size of new bit vector.
+     * @return a bit vector with given size.
+     */
     abstract public SupremicaBDDBitVector resize(int bitNum);
 
     /**
@@ -143,6 +180,9 @@ public abstract class SupremicaBDDBitVector
      */
     public abstract int val();
 
+    /**
+     * Free all the BDDs that are used in this bit vector.
+     */
     public void free()
     {
         for (int n = 0; n < bitNum; n++) {
@@ -151,6 +191,12 @@ public abstract class SupremicaBDDBitVector
         bitvec = null;
     }
 
+    /**
+     * Apply a binary operator on two bit vectors.
+     * @param that right hand side of operation.
+     * @param op binary operator.
+     * @return it vector representing the result of the opertion.
+     */
     public SupremicaBDDBitVector map2(final SupremicaBDDBitVector that, final BDDFactory.BDDOp op)
     {
 //        if (bitNum != that.bitNum)
