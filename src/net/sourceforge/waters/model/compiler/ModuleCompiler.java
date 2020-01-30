@@ -36,14 +36,24 @@ package net.sourceforge.waters.model.compiler;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.StringListOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -153,6 +163,7 @@ import org.xml.sax.SAXException;
  * @author Robi Malik
  */
 public class ModuleCompiler extends AbortableCompiler
+  implements Configurable
 {
 
   //#########################################################################
@@ -236,6 +247,87 @@ public class ModuleCompiler extends AbortableCompiler
     super.resetAbort();
     if (mActiveAbortable != null) {
       mActiveAbortable.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage page)
+  {
+    final List<Option<?>> options = new LinkedList<>();
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_AbstractModelAnalyzerFactory_NoOptimisation)) {
+      setOptimizationEnabled(false);
+    }
+    else if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_AbstractModelAnalyzerFactory_HISCModule)) {
+      setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+      setEnabledPropertyNames(null);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_LanguageInclusionChecker_Property)) {
+      final StringListOption opt = (StringListOption) option;
+      final Collection<String> props = opt.getValue();
+      setEnabledPropertyNames(props);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_SecondaryFactory)) {
+      final ChainOption opt = (ChainOption) option;
+      opt.getSecondaryFactory().configure(this);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ConflictChecker_ConfiguredDefaultMarkingString)) {
+      //Default Marking
+      final StringOption opt = (StringOption) option;
+      final String name = opt.getValue();
+      final Collection<String> current = getEnabledPropertyNames();
+      final Collection<String> props;
+      if (current == null || current.isEmpty()) {
+        props = Collections.singletonList(name);
+      } else if (current.contains(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+        final int size = current.size();
+        if (size == 1) {
+          props = Collections.singletonList(name);
+        } else {
+          props = new ArrayList<String>(size);
+          for (final String prop : current) {
+            if (!prop.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+              props.add(prop);
+            }
+          }
+          props.add(name);
+        }
+      } else {
+        final int size = current.size() + 1;
+        props = new ArrayList<String>(size);
+        props.addAll(current);
+        props.add(name);
+      }
+      setEnabledPropositionNames(props);
+      //End of default marking
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ConflictChecker_ConfiguredDefaultMarkingString)) {
+      //Pre Marking
+      final StringOption opt = (StringOption) option;
+      final String name = opt.getValue();
+      final Collection<String> current = getEnabledPropertyNames();
+      final Collection<String> props;
+      if (current == null || current.isEmpty()) {
+        props = new ArrayList<String>(2);
+        props.add(EventDeclProxy.DEFAULT_MARKING_NAME);
+      } else {
+        final int size = current.size() + 1;
+        props = new ArrayList<String>(size);
+        props.addAll(current);
+      }
+      props.add(name);
+      setEnabledPropositionNames(props);
+      //End of pre marking
     }
   }
 

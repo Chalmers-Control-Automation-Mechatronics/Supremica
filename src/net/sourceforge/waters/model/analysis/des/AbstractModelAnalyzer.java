@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,14 +103,35 @@ public abstract class AbstractModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final OptionPage page)
   {
-    return new LinkedList<>();
+    final List<Option<?>> options = new LinkedList<>();
+    if (this instanceof LanguageInclusionChecker) {
+      page.append(options, AbstractModelAnalyzerFactory.
+                  OPTION_LanguageInclusionChecker_Property);
+    }
+    page.append(options, AbstractModelAnalyzerFactory.
+                OPTION_AbstractModelAnalyzerFactory_NoOptimisation);
+    page.append(options, AbstractModelAnalyzerFactory.
+                OPTION_AbstractModelAnalyzerFactory_HISCModule);
+    return options;
   }
 
   @Override
   public void setOption(final Option<?> option)
   {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_LanguageInclusionChecker_Property)) {
+      @SuppressWarnings("unchecked")
+      final Collection<String> props = (Collection<String>) option.getValue();
+      if (!props.isEmpty()) {
+        final LanguageInclusionChecker lchecker =
+          (LanguageInclusionChecker) this;
+        final PropertyKindTranslator translator =
+          new PropertyKindTranslator(props);
+        lchecker.setKindTranslator(translator);
+      }
+    }
   }
 
 
@@ -364,6 +388,63 @@ public abstract class AbstractModelAnalyzer
       final long usage = DefaultAnalysisResult.getCurrentMemoryUsage();
       mAnalysisResult.updatePeakMemoryUsage(usage);
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class PropertyKindTranslator
+  private static class PropertyKindTranslator
+    implements KindTranslator, Serializable
+  {
+    //#######################################################################
+    //# Constructor
+    PropertyKindTranslator(final Collection<String> names)
+    {
+      mUsedPropertyNames = new THashSet<String>(names);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      final ComponentKind kind = aut.getKind();
+      switch (kind) {
+      case PLANT:
+      case SPEC:
+        return ComponentKind.PLANT;
+      case PROPERTY:
+        final String name = aut.getName();
+        if (mUsedPropertyNames.contains(name)) {
+          return ComponentKind.SPEC;
+        } else {
+          return kind;
+        }
+      default:
+        return kind;
+      }
+    }
+
+    @Override
+    public EventKind getEventKind(final EventProxy event)
+    {
+      final EventKind kind = event.getKind();
+      switch (kind) {
+      case CONTROLLABLE:
+      case UNCONTROLLABLE:
+        return EventKind.UNCONTROLLABLE;
+      default:
+        return kind;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Collection<String> mUsedPropertyNames;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 

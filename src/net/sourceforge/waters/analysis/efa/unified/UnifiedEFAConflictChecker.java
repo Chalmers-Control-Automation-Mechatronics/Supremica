@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.efa.unified;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.io.PrintStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
@@ -52,13 +54,27 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionContext;
+import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
+import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
+import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -87,6 +103,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
+  implements ArgumentSource
 {
 
   //#########################################################################
@@ -280,6 +297,107 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
   }
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.cli.ArgumentSource
+  @Override
+  public void addArguments(final CommandLineOptionContext context,
+                           final Configurable analyzer, final LeafOptionPage page)
+  {
+    registerOptions(page);
+    context.generateArgumentsFromOptions(page, analyzer);
+
+    context.addArgument
+      (new CompositionSelectionHeuristicArgument
+        (context, new HeuristicOption<UnifiedEFACandidate>
+          (UnifiedEFACommandLineTool.
+            OPTION_UnifiedEFACommandLineTool_CompositionSelectionHeuristic,
+            null,
+            "Composition selection heuristic", "-compsel")));
+    context.addArgument
+      (new VariableSelectionHeuristicArgument
+        (context, new HeuristicOption<UnifiedEFAVariable>
+          (UnifiedEFACommandLineTool.
+            OPTION_UnifiedEFACommandLineTool_VariableSelectionHeuristic,
+            null,
+            "Variable selection heuristic", "-varsel")));
+  }
+
+  @Override
+  public void registerOptions(final OptionPage page)
+  {
+    page.add(new BooleanOption(UnifiedEFACommandLineTool.
+                               OPTION_UnifiedEFACommandLineTool_PreferLocal, null,
+                               "Enable or disable preference for local variables",
+                               "-loc", false));
+    page.add(new EnumOption<UnifiedEFASimplifierFactory>(UnifiedEFACommandLineTool.
+      OPTION_UnifiedEFACommandLineTool_SimplifierFactory, null,
+                               "Abstraction sequence used for simplification",
+                               "-method", UnifiedEFASimplifierFactory.values()));
+    page.add(new PositiveIntOption(UnifiedEFACommandLineTool.
+                                   OPTION_UnifiedEFACommandLineTool_InternalStateLimit, null,
+                               "Maximum number of states constructed in abstraction attempts",
+                               "-islimit"));
+    page.add(new PositiveIntOption(UnifiedEFACommandLineTool.
+                                   OPTION_UnifiedEFACommandLineTool_InternalTransitionLimit, null,
+                               "Maximum number of transitions constructed in abstraction attempts",
+                               "-itlimit"));
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage page)
+  {
+    final List<Option<?>> options = super.getOptions(page);
+    page.append(options, UnifiedEFACommandLineTool.
+                OPTION_UnifiedEFACommandLineTool_PreferLocal);
+    page.append(options, UnifiedEFACommandLineTool.
+                OPTION_UnifiedEFACommandLineTool_SimplifierFactory);
+    page.append(options, UnifiedEFACommandLineTool.
+                OPTION_UnifiedEFACommandLineTool_InternalStateLimit);
+    page.append(options, UnifiedEFACommandLineTool.
+                OPTION_UnifiedEFACommandLineTool_InternalTransitionLimit);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(UnifiedEFACommandLineTool.
+                     OPTION_UnifiedEFACommandLineTool_PreferLocal)) {
+      final BooleanOption opt = (BooleanOption) option;
+      setUsesLocalVariable(opt.getValue());
+    } else if (option.hasID(UnifiedEFACommandLineTool.
+                            OPTION_UnifiedEFACommandLineTool_SimplifierFactory)) {
+      @SuppressWarnings("unchecked")
+      final EnumOption<UnifiedEFASimplifierFactory> opt =
+        (EnumOption<UnifiedEFASimplifierFactory>) option;
+      final UnifiedEFASimplifierFactory factory = opt.getValue();
+      setSimplifierFactory(factory);
+    } else if (option.hasID(UnifiedEFACommandLineTool.
+                            OPTION_UnifiedEFACommandLineTool_InternalStateLimit)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setInternalStateLimit(opt.getValue());
+    } else if (option.hasID(UnifiedEFACommandLineTool.
+                            OPTION_UnifiedEFACommandLineTool_InternalTransitionLimit)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setInternalTransitionLimit(opt.getValue());
+    } else if (option.hasID(UnifiedEFACommandLineTool.
+                     OPTION_UnifiedEFACommandLineTool_CompositionSelectionHeuristic)) {
+      @SuppressWarnings("unchecked")
+      final Option<SelectionHeuristic<UnifiedEFACandidate>> opt =
+        (Option<SelectionHeuristic<UnifiedEFACandidate>>) option;
+      final SelectionHeuristic<UnifiedEFACandidate> heuristic = opt.getValue();
+      setCompositionSelectionHeuristic(heuristic);
+    } else if (option.hasID(UnifiedEFACommandLineTool.
+                            OPTION_UnifiedEFACommandLineTool_CompositionSelectionHeuristic)) {
+      @SuppressWarnings("unchecked")
+      final Option<SelectionHeuristic<UnifiedEFAVariable>> opt =
+        (Option<SelectionHeuristic<UnifiedEFAVariable>>) option;
+      final SelectionHeuristic<UnifiedEFAVariable> heuristic = opt.getValue();
+      setVariableSelectionHeuristic(heuristic);
+    } else super.setOption(option);
+  }
 
   //#########################################################################
   //# Invocation
@@ -1924,6 +2042,198 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private final Map<AbstractEFAEvent,EventInfo> mEventInfoMap;
     private final Map<UnifiedEFAVariable,VariableInfo> mVariableInfoMap;
     private final Set<UnifiedEFATransitionRelation> mTransitionRelations;
+  }
+
+
+  private static class HeuristicOption<T extends Comparable<? super T>>
+    extends Option<SelectionHeuristic<T>>
+  {
+
+    //#########################################################################
+    //# Constructors
+    public HeuristicOption(final String id,
+                        final String shortName,
+                        final String description,
+                        final String commandLineOption)
+    {
+      super(id, shortName, description, commandLineOption, null);
+    }
+
+
+    //#########################################################################
+    //# Overrides for net.sourceforge.waters.analysis.options.Option
+    @Override
+    public OptionEditor<SelectionHeuristic<T>> createEditor(final OptionContext context)
+    {
+      return null;
+    }
+
+
+    @Override
+    public void set(final String text)
+    {
+    }
+
+    @Override
+    public boolean isPersistent()
+    {
+      return false;
+    }
+
+    @Override
+    public boolean isEditable()
+    {
+      return false;
+    }
+
+  }
+
+  //#########################################################################
+  //# Inner Class HeuristicCommandLineArgument
+  private abstract class
+    AbstractHeuristicCommandLineArgument<T extends Comparable<? super T>>
+    extends CommandLineArgument<SelectionHeuristic<T>>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private AbstractHeuristicCommandLineArgument
+      (final CommandLineOptionContext context,
+       final HeuristicOption<T> option,
+       final EnumFactory<SelectionHeuristic<T>> factory)
+    {
+      super(context, option);
+      mFactory = factory;
+    }
+
+    //#######################################################################
+    //# Printing
+    @Override
+    public void dump(final PrintStream stream, final Object analyzer)
+    {
+      super.dump(stream, analyzer);
+      mFactory.dumpEnumeration(stream, INDENT);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    @Override
+    public void parse(final CommandLineOptionContext context,
+                    final Collection<Configurable> configurables,
+                    final ListIterator<String> iter)
+    {
+      iter.remove();
+      if (iter.hasNext()) {
+        final String name = iter.next();
+
+        SelectionHeuristic<T> chain;
+        final String[] parts = name.split(",");
+        if (parts.length == 1) {
+          final SelectionHeuristic<T> heuristic = mFactory.getEnumValue(name);
+          if (heuristic == null) {
+            System.err.println("Bad value for " + getName() + " option!");
+            mFactory.dumpEnumeration(System.err, 0);
+            System.exit(1);
+          }
+          chain = new ChainSelectionHeuristic<T>(heuristic);
+        } else {
+          @SuppressWarnings("unchecked")
+          final SelectionHeuristic<T>[] heuristics =
+            new SelectionHeuristic[parts.length];
+          for (int i = 0; i < parts.length; i++) {
+            heuristics[i] = mFactory.getEnumValue(parts[i]);
+            if (heuristics[i]  == null) {
+              System.err.println("Bad value for " + getName() + " option!");
+              mFactory.dumpEnumeration(System.err, 0);
+              System.exit(1);
+            }
+          }
+          chain = new ChainSelectionHeuristic<T>(heuristics);
+        }
+        getOption().setValue(chain);
+
+
+        iter.remove();
+        setUsed(true);
+      } else {
+        failMissingValue();
+      }
+
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final EnumFactory<SelectionHeuristic<T>> mFactory;
+
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class CompositionSelectionHeuristicArgument
+  private class CompositionSelectionHeuristicArgument
+    extends AbstractHeuristicCommandLineArgument<UnifiedEFACandidate>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private CompositionSelectionHeuristicArgument(final CommandLineOptionContext context,
+                                                  final HeuristicOption<UnifiedEFACandidate> option)
+    {
+      super(context, option,
+            new CompositionSelectionHeuristicFactory());
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class CompositionSelectionHeuristicFactory
+  private static class CompositionSelectionHeuristicFactory
+    extends ListedEnumFactory<SelectionHeuristic<UnifiedEFACandidate>>
+  {
+    //#######################################################################
+    //# Constructor
+    private CompositionSelectionHeuristicFactory()
+    {
+      register(new CompositionSelectionHeuristicMinS());
+      register(new CompositionSelectionHeuristicMinF1());
+      register(new CompositionSelectionHeuristicMinF2());
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class VariableSelectionHeuristicArgument
+  private class VariableSelectionHeuristicArgument
+    extends AbstractHeuristicCommandLineArgument<UnifiedEFAVariable>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private VariableSelectionHeuristicArgument(final CommandLineOptionContext context,
+                                               final HeuristicOption<UnifiedEFAVariable> option)
+    {
+      super(context, option,
+            new VariableSelectionHeuristicFactory());
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class VariableSelectionHeuristicFactory
+  private static class VariableSelectionHeuristicFactory
+    extends ListedEnumFactory<SelectionHeuristic<UnifiedEFAVariable>>
+  {
+    //#######################################################################
+    //# Constructor
+    private VariableSelectionHeuristicFactory()
+    {
+      register(new VariableSelectionHeuristicMaxE());
+      register(new VariableSelectionHeuristicMaxS());
+      register(new VariableSelectionHeuristicMinD());
+    }
   }
 
 

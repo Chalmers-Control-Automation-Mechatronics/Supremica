@@ -31,9 +31,10 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.cli;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,7 +42,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -50,7 +50,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.FlagOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.ProxyResult;
+import net.sourceforge.waters.model.analysis.Watchdog;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -80,21 +94,18 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
-import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 
 /**
  * @author Robi Malik
  */
 
-public class CommandLineTool
+public class CommandLineTool implements Configurable, ArgumentSource
 {
 
   //#########################################################################
@@ -116,17 +127,26 @@ public class CommandLineTool
    */
   public static void main(final String[] args)
   {
-    Level verbosity = Level.DEBUG;
-    boolean stats = false;
+    final CommandLineTool tool = new CommandLineTool();
+    tool.run(args);
+  }
+
+  public void run(final String[] args)
+  {
+
+    final ConfigurationFactory cfactory =
+      new VerboseLogConfigurationFactory(mVerbosity);
+    ConfigurationFactory.setConfigurationFactory(cfactory);
+
     boolean noargs = false;
-    int timeout = -1;
-    PrintWriter csv = null;
     final Formatter formatter = new Formatter(System.out);
 
     try {
       if (args.length < 2) {
         usage();
       }
+
+      mContext = new CommandLineOptionContext(null);
 
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
@@ -136,7 +156,7 @@ public class CommandLineTool
       final ExpressionParser parser =
         new ExpressionParser(moduleFactory, optable);
       List<ParameterBindingProxy> bindings = null;
-      String wrapperName = null;
+      final String wrapperName = null;
 
       final String factoryName = args[0];
       final List<String> argList = new LinkedList<String>();
@@ -144,24 +164,6 @@ public class CommandLineTool
         final String arg = args[i];
         if (noargs) {
           argList.add(arg);
-        } else if (arg.equals("-q") || arg.equals("-quiet")) {
-          verbosity = null;
-        } else if (arg.equals("-v") || arg.equals("-verbose")) {
-          verbosity = Level.ALL;
-        } else if (arg.equals("-wrapper") && i + 1 < args.length) {
-          wrapperName = args[++i];
-        } else if (arg.equals("-stats")) {
-          stats = true;
-        } else if (arg.equals("-timeout") && i + 1 < args.length) {
-          try {
-            timeout = Integer.parseInt(args[++i]);
-          } catch (final NumberFormatException exception) {
-            usage();
-          }
-        } else if (arg.equals("-csv") && i + 1 < args.length) {
-          final String csvname = args[++i];
-          final OutputStream csvstream = new FileOutputStream(csvname, true);
-          csv = new PrintWriter(csvstream);
         } else if (arg.startsWith("-D")) {
           final int eqpos = arg.indexOf('=', 2);
           if (eqpos > 2) {
@@ -185,11 +187,6 @@ public class CommandLineTool
         }
       }
 
-      if (verbosity != null) {
-        final ConfigurationFactory factory =
-          new VerboseLogConfigurationFactory(verbosity);
-        ConfigurationFactory.setConfigurationFactory(factory);
-      }
 
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
       final ValidUnmarshaller importer =
@@ -208,7 +205,7 @@ public class CommandLineTool
       iter.remove();
 
       final ModelAnalyzerFactoryLoader factoryLoader =
-        CommandLineArgumentEnum.parse(ModelAnalyzerFactoryLoader.class,
+        EnumCommandLineArgument.parse(mContext, ModelAnalyzerFactoryLoader.class,
                                       "model analyser factory", factoryName);
       final ModelAnalyzerFactory factory =
         factoryLoader.getModelAnalyzerFactory();
@@ -216,14 +213,14 @@ public class CommandLineTool
       final String createname = "create" + checkName;
       final Method getcheck =
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
-      final ModelAnalyzer analyzer =
+      mAnalyzer =
         (ModelAnalyzer) getcheck.invoke(factory, desFactory);
       final ModelAnalyzer wrapper;
       final boolean keepPropositions;
       if (wrapperName == null) {
-        wrapper = analyzer;
-        keepPropositions = analyzer instanceof ConflictChecker ||
-                           analyzer instanceof SupervisorSynthesizer;
+        wrapper = mAnalyzer;
+        keepPropositions = mAnalyzer instanceof ConflictChecker ||
+                           mAnalyzer instanceof SupervisorSynthesizer;
       } else {
         @SuppressWarnings("unchecked")
         final Class<ModelVerifier> clazz =
@@ -233,15 +230,30 @@ public class CommandLineTool
         final Class<?> iface = loader.loadClass(ifaceName);
         final Constructor<ModelVerifier> constructor =
           clazz.getConstructor(iface, ProductDESProxyFactory.class);
-        wrapper = constructor.newInstance(analyzer, desFactory);
+        wrapper = constructor.newInstance(mAnalyzer, desFactory);
         keepPropositions = true;
       }
       final Collection<String> empty = Collections.emptyList();
       final ListIterator<String> argIter = argList.listIterator();
-      factory.parse(argIter);
-      factory.configure(analyzer);
-      final Watchdog watchdog = new Watchdog(wrapper, timeout);
-      if (timeout > 0) {
+      mContext.addArgumentSource(this);
+      mContext.addConfigurable(this);
+      mContext.addArgumentSource(factory);
+      mContext.addConfigurable(mAnalyzer);
+
+      mContext.parse(argIter);
+      mContext.configure(this);
+      mContext.configure(mAnalyzer);
+
+      if (mVerbosity != null) {
+        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        final Configuration config = ctx.getConfiguration();
+        final LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+        loggerConfig.setLevel(mVerbosity);
+        ctx.updateLoggers();
+      }
+
+      final Watchdog watchdog = new Watchdog(wrapper, mTimeout);
+      if (mTimeout > 0) {
         watchdog.start();
       }
 
@@ -277,14 +289,14 @@ public class CommandLineTool
             final AnalysisResult result = new DefaultAnalysisResult(wrapper);
             result.setCompileTime(compileTime);
             result.setException(exception);
-            writeCSV(csv, fullName, result, first);
+            writeCSV(mCsv, fullName, result, first);
             continue;
           } finally {
             watchdog.removeAbortable(compiler);
           }
         }
         System.out.print(fullName + " ... ");
-        if (verbosity != null) {
+        if (mVerbosity != null) {
           System.out.println();
         } else {
           System.out.flush();
@@ -292,7 +304,7 @@ public class CommandLineTool
 
         final long start = System.currentTimeMillis();
         wrapper.setModel(des);
-        factory.postConfigure(analyzer);
+        factory.postConfigure(mAnalyzer);
         boolean additions = false;
         try {
           wrapper.run();
@@ -314,7 +326,7 @@ public class CommandLineTool
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
-          if (verbosity != null && result instanceof ProxyResult<?>) {
+          if (mVerbosity != null && result instanceof ProxyResult<?>) {
             final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
             final Proxy proxy = proxyResult.getComputedProxy();
             if (proxy != null) {
@@ -348,7 +360,7 @@ public class CommandLineTool
           if (compileTime >= 0) {
             result.setCompileTime(compileTime);
           }
-          if (stats) {
+          if (mStats) {
             System.out.println(SEPARATOR);
             System.out.println("Statistics:");
             System.out.println("Automata in model: " +
@@ -358,7 +370,7 @@ public class CommandLineTool
             result.print(System.out);
             additions = true;
           }
-          writeCSV(csv, fullName, result, first);
+          writeCSV(mCsv, fullName, result, first);
         }
         if (additions) {
           System.out.println(SEPARATOR);
@@ -378,8 +390,8 @@ public class CommandLineTool
       System.err.println(" caught in main()!");
       exception.printStackTrace(System.err);
     } finally {
-      if (csv != null) {
-        csv.close();
+      if (mCsv != null) {
+        mCsv.close();
       }
       formatter.close();
     }
@@ -430,71 +442,105 @@ public class CommandLineTool
     }
   }
 
+  @Override
+  public List<Option<?>> getOptions(final OptionPage page)
+  {
+    final List<Option<?>> options = new LinkedList<>();
+    page.append(options, OPTION_CommandLineTool_Verbose);
+    page.append(options, OPTION_CommandLineTool_Quiet);
+    page.append(options, OPTION_CommandLineTool_Stats);
+    page.append(options, OPTION_CommandLineTool_Timeout);
+    page.append(options, OPTION_CommandLineTool_Csv);
+    page.append(options, OPTION_CommandLineTool_Help);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(OPTION_CommandLineTool_Verbose)) {
+      mVerbosity = Level.ALL;
+    } else if (option.hasID(OPTION_CommandLineTool_Quiet)) {
+      mVerbosity = Level.OFF;
+    } else if (option.hasID(OPTION_CommandLineTool_Stats)) {
+      mStats = true;
+    } else if (option.hasID(OPTION_CommandLineTool_Timeout)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      mTimeout = opt.getIntValue();
+    } else if (option.hasID(OPTION_CommandLineTool_Csv)) {
+      final FileOption opt = (FileOption) option;
+      OutputStream csvstream;
+      try {
+        csvstream = new FileOutputStream(opt.getValue(), true);
+        mCsv = new PrintWriter(csvstream);
+      } catch (final FileNotFoundException exception) {
+        throw new RuntimeException(exception);
+      }
+    } else if (option.hasID(OPTION_CommandLineTool_Help)) {
+      mContext.helpMessage(mAnalyzer);
+    }
+  }
+
+  public void registerOptions(final OptionPage page) {
+    page.add(new FlagOption(OPTION_CommandLineTool_Verbose, null,
+                            "Verbose output",
+                            "-verbose", "-v"));
+    page.add(new FlagOption(OPTION_CommandLineTool_Quiet, null,
+                            "Quiet output",
+                            "-quiet", "-q"));
+    page.add(new FlagOption(OPTION_CommandLineTool_Stats, null,
+                            "Output statistics",
+                            "-stats"));
+    page.add(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
+                            "Output statistics",
+                            "-timeout"));
+    page.add(new FileOption(OPTION_CommandLineTool_Csv, null,
+                            "CSV output file location",
+                            "-csv"));
+    page.add(new FlagOption(OPTION_CommandLineTool_Help, null,
+                            "Print this message", "-help"));
+  }
+
+  @Override
+  public void addArguments(final CommandLineOptionContext context,
+                           final Configurable configurable,
+                           final LeafOptionPage page)
+  {
+    if (configurable == this) {
+      registerOptions(page);
+      context.generateArgumentsFromOptions(page, this);
+    }
+  }
+
 
   //#########################################################################
-  //# Inner Class VerboseLogConfigurationFactory
-  private static class VerboseLogConfigurationFactory
-    extends ConfigurationFactory
-  {
-    //#######################################################################
-    //# Constructor
-    private VerboseLogConfigurationFactory(final Level verbosity)
-    {
-      mVerbosity = verbosity;
-    }
+  //# Data Members
+  private Level mVerbosity = Level.DEBUG;
+  private boolean mStats = false;
+  private int mTimeout = -1;
+  private PrintWriter mCsv = null;
 
-    //#######################################################################
-    //# Overrides for org.apache.logging.log4j.core.config.ConfigurationFactory
-    @Override
-    public Configuration getConfiguration(final LoggerContext loggerContext,
-                                          final ConfigurationSource source)
-    {
-      return getConfiguration(loggerContext, source.toString(), null);
-    }
-
-    @Override
-    public Configuration getConfiguration(final LoggerContext loggerContext,
-                                          final String name,
-                                          final URI configLocation)
-    {
-      final ConfigurationBuilder<BuiltConfiguration> builder =
-        newConfigurationBuilder();
-      return createConfiguration(name, builder);
-    }
-
-    @Override
-    protected String[] getSupportedTypes()
-    {
-      return new String[] {"*"};
-    }
-
-    //#######################################################################
-    //# Creating the Configuration
-    private Configuration createConfiguration(final String name,
-                                              final ConfigurationBuilder<BuiltConfiguration> builder)
-    {
-      builder.setConfigurationName(name);
-      builder.setStatusLevel(Level.WARN);
-      final AppenderComponentBuilder appenderBuilder =
-        builder.newAppender("stdout", "CONSOLE").
-        addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT);
-      appenderBuilder.add(builder.newLayout("PatternLayout").
-                          addAttribute("pattern", "%-5level %msg%n"));
-      builder.add(appenderBuilder);
-      builder.add(builder.newRootLogger(mVerbosity).
-                  add(builder.newAppenderRef("stdout")));
-      return builder.build();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Level mVerbosity;
-  }
+  private CommandLineOptionContext mContext;
+  private ModelAnalyzer mAnalyzer;
 
 
   //#########################################################################
   //# Class Constants
   private static final String SEPARATOR =
     "------------------------------------------------------------";
+
+  public static final String OPTION_CommandLineTool_Verbose =
+    "CommandLineTool.Verbose";
+  public static final String OPTION_CommandLineTool_Quiet =
+    "CommandLineTool.Quiet";
+  public static final String OPTION_CommandLineTool_Stats =
+    "CommandLineTool.Stats";
+  public static final String OPTION_CommandLineTool_Timeout =
+    "CommandLineTool.Timeout";
+  public static final String OPTION_CommandLineTool_Csv =
+    "CommandLineTool.Csv";
+
+  public static final String OPTION_CommandLineTool_Help =
+    "CommandLineTool.Help";
 
 }

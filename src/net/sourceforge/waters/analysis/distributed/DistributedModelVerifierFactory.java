@@ -33,23 +33,15 @@
 
 package net.sourceforge.waters.analysis.distributed;
 
-import java.io.File;
-import java.rmi.AlreadyBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-
-import net.sourceforge.waters.analysis.distributed.application.DistributedNode;
 import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
-import net.sourceforge.waters.analysis.distributed.application.Server;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.FlagOption;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -78,23 +70,6 @@ public class DistributedModelVerifierFactory
 
 
   //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
-  @Override
-  protected void addArguments()
-  {
-    super.addArguments();
-    addArgument(mHostArgument);
-    addArgument(mPortArgument);
-    addArgument(mNodeCountArgument);
-    addArgument(new ResultsDumpArgument());
-    addArgument(new ShutdownFlagArgument());
-    addArgument(new WalltimeArgument());
-    addArgument(new StateDistributionArgument());
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
   @Override
   public DistributedControllabilityChecker
@@ -111,11 +86,51 @@ public class DistributedModelVerifierFactory
   }
 
   @Override
+  public void registerOptions(final OptionPage db)
+  {
+    db.add(new StringOption
+             (OPTION_DistributedModelVerifierFactory_Host,
+              null,
+              "Serer to submit job to",
+              "-host", null));
+    db.add(new PositiveIntOption
+             (OPTION_DistributedModelVerifierFactory_Port,
+              null,
+              "Port to connect to the server with",
+              "-port", DistributedServer.DEFAULT_PORT));
+    db.add(new PositiveIntOption
+             (OPTION_DistributedModelVerifierFactory_NodeCount,
+              null,
+              "Preferred number of nodes for the job",
+              "-nodes"));
+    db.add(new FileOption
+             (OPTION_DistributedModelVerifierFactory_ResultsDump,
+              null,
+              "File to dump job result into",
+              "-resultsdump"));
+    db.add(new FlagOption
+             (OPTION_DistributedModelVerifierFactory_Shutdown,
+              null,
+              "Shut down the distributed checker after verification",
+              "-shutdown"));
+    db.add(new PositiveIntOption
+             (OPTION_DistributedModelVerifierFactory_Walltime,
+              null,
+              "Sets the time limit for the job",
+              "-walltime"));
+    db.add(new StringOption
+             (OPTION_DistributedModelVerifierFactory_StateDistribution,
+              null,
+              "State distribution method to use",
+              "-statedist", null));
+  }
+
+  @Override
   public void configure(final ModelAnalyzer analyzer)
     throws AnalysisConfigurationException
   {
     super.configure(analyzer);
-    launchLocalServers();
+    ((DistributedSafetyVerifier) analyzer).launchLocalServers();
   }
 
 
@@ -131,207 +146,28 @@ public class DistributedModelVerifierFactory
 
 
   //#########################################################################
-  //# Launching Local Servers
-  private void launchLocalServers()
-  {
-    try {
-      final String hostname = mHostArgument.getHostName();
-      final int port = mPortArgument.getPort();
-      if (hostname.equals("localhost")) {
-	final String name = DistributedServer.DEFAULT_SERVICE_NAME;
-	final Registry registry = LocateRegistry.createRegistry(port);
-	final Server server = new DistributedServer();
-	final Server stub =
-	  (Server) UnicastRemoteObject.exportObject(server, 0);
-	registry.bind(name, stub);
-	final int numnodes = mNodeCountArgument.getNodeCount();
-	for (int i = 0; i < numnodes; i++) {
-	  final DistributedNode node =
-	    new DistributedNode(hostname, port, name);
-	  node.start();
-	}
-      }
-    } catch (final AlreadyBoundException exception) {
-      // Server already running - no problem ...
-    } catch (final RemoteException exception) {
-      throw new WatersRuntimeException(exception);
-    }
-  }
-
-
-  //#########################################################################
-  //# Command Line Arguments
-  /**
-   * Process the host-name command line argument. This
-   * argument is required for the distributed checkers.
-   */
-  private static class HostArgument extends CommandLineArgumentString
-  {
-    private HostArgument()
-    {
-      super("-host",
-	    "Server to submit job to", true);
-    }
-
-    private String getHostName()
-    {
-      return getValue();
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      final String value = getValue();
-      dsv.setHostname(value);
-    }
-  }
-
-
-  private static class ResultsDumpArgument extends CommandLineArgumentString
-  {
-    private ResultsDumpArgument()
-    {
-      super("-resultsdump",
-	    "File to dump job result into");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      final String value = getValue();
-      dsv.setResultsDumpFile(new File(value));
-    }
-  }
-
-
-  private static class PortArgument extends CommandLineArgumentInteger
-  {
-    private PortArgument()
-    {
-      super("-port",
-	    "Port to connect to the server with",
-	    DistributedServer.DEFAULT_PORT);
-    }
-
-    private int getPort()
-    {
-      return getValue();
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      final int value = getValue();
-      dsv.setPort(value);
-    }
-  }
-
-
-  private static class NodeCountArgument extends CommandLineArgumentInteger
-  {
-    private NodeCountArgument()
-    {
-      super("-nodes",
-	    "Preferred number of nodes for the job");
-    }
-
-    private int getNodeCount()
-    {
-      return getValue();
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      final int value = getValue();
-      dsv.setNodeCount(value);
-    }
-  }
-
-
-  private static class ShutdownFlagArgument extends CommandLineArgumentFlag
-  {
-    private ShutdownFlagArgument()
-    {
-      super("-shutdown",
-	    "Shut down the distributed checker after verification");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      dsv.setShutdownAfter(true);
-    }
-  }
-
-
-  private static class WalltimeArgument extends CommandLineArgumentInteger
-  {
-    private WalltimeArgument()
-    {
-      super("-walltime",
-	    "Sets the time limit for the job.");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      dsv.setWalltimeLimit(getValue());
-    }
-  }
-
-
-  @SuppressWarnings("unused")
-  private static class ProcessingThreadCount extends CommandLineArgumentInteger
-  {
-    private ProcessingThreadCount()
-    {
-      super("-procthreads",
-	    "Number of processing threads to run");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      dsv.setProcessingThreadCount(getValue());
-    }
-  }
-
-
-  private static class StateDistributionArgument
-    extends CommandLineArgumentString
-  {
-    private StateDistributionArgument()
-    {
-      super("-statedist",
-	    "State distribution method to use");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
-      dsv.setStateDistribution(getValue());
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
-  private final NodeCountArgument mNodeCountArgument = new NodeCountArgument();
-  private final HostArgument mHostArgument = new HostArgument();
-  private final PortArgument mPortArgument = new PortArgument();
 
 
   //#########################################################################
   //# Class Variables
   private static DistributedModelVerifierFactory theInstance = null;
+
+  public static final String OPTION_DistributedModelVerifierFactory_Host =
+    "DistributedModelVerifierFactory.Host";
+  public static final String OPTION_DistributedModelVerifierFactory_Port =
+    "DistributedModelVerifierFactory.Port";
+  public static final String OPTION_DistributedModelVerifierFactory_NodeCount =
+    "DistributedModelVerifierFactory.NodeCount";
+  public static final String OPTION_DistributedModelVerifierFactory_ResultsDump =
+    "DistributedModelVerifierFactory.ResultsDump";
+  public static final String OPTION_DistributedModelVerifierFactory_Shutdown =
+    "DistributedModelVerifierFactory.Shutdown";
+  public static final String OPTION_DistributedModelVerifierFactory_Walltime =
+    "DistributedModelVerifierFactory.Walltime";
+  public static final String OPTION_DistributedModelVerifierFactory_StateDistribution =
+    "DistributedModelVerifierFactory.StateDistribution";
+
+
 
 }

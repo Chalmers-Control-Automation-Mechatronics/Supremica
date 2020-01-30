@@ -33,11 +33,10 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import java.util.ListIterator;
-
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -48,7 +47,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public interface ModelAnalyzerFactory
+public interface ModelAnalyzerFactory extends ArgumentSource
 {
 
   //#########################################################################
@@ -122,9 +121,11 @@ public interface ModelAnalyzerFactory
   public void registerOptions(OptionPage db);
 
 
-  //#########################################################################
-  //# Command Line Arguments
-  public void parse(ListIterator<String> iter);
+//  //#########################################################################
+//  //# Command Line Arguments
+//  public void parse(CommandLineOptionContext context,
+//                    ModelAnalyzer analyzer,
+//                    ListIterator<String> iter);
 
   /**
    * Configures the given model analyser according to any command line

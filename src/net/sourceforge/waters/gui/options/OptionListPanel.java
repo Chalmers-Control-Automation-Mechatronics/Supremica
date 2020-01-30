@@ -96,6 +96,9 @@ public class OptionListPanel extends JScrollPane implements OptionContainer<Simp
         if (panel == null) {
           panel = (OptionPanel<?>) option.createEditor(context);
         }
+        if (panel == null) {
+          continue;
+        }
         mSharedOptionPanels.put(option.getID(), panel);
         mOptionPanels.add(panel);
         final JLabel label = panel.getLabel();

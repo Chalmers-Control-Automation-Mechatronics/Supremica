@@ -31,103 +31,52 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
 
-import java.awt.Component;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
-public abstract class OptionPanel<T> implements OptionEditor<T>
+/**
+ * A configurable parameter of a {@link ModelAnalyzer} of a
+ * {@link List} of {@link String} type.
+ *
+ * @author Benjamin Wheeler
+ */
+
+public class StringListOption extends Option<List<String>>
 {
   //#########################################################################
   //# Constructors
-  OptionPanel(final GUIOptionContext context,
-              final Option<T> option)
+  public StringListOption(final String id,
+                      final String shortName,
+                      final String description,
+                      final String commandLineOption)
   {
-    mContext = context;
-    mOption = option;
-    mLabel = createLabel();
-    setToolTip(mLabel);
-    mEntryComponent = createEntryComponent();
-    setToolTip(mEntryComponent);
+    super(id, shortName, description, commandLineOption, new LinkedList<>());
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.OptionEditor
+  //# Overrides for net.sourceforge.waters.analysis.options.Option
   @Override
-  public Option<T> getOption()
+  public OptionEditor<List<String>> createEditor(final OptionContext context)
   {
-    return mOption;
+    return null;
   }
 
-
-  //#########################################################################
-  //# Simple Access
-  GUIOptionContext getContext()
+  @Override
+  public void set(final String text)
   {
-    return mContext;
+    getValue().add(text);
   }
 
-  JLabel getLabel()
+  @Override
+  public boolean isPersistent()
   {
-    return mLabel;
+    return false;
   }
-
-  Component getEntryComponent()
-  {
-    return mEntryComponent;
-  }
-
-  abstract boolean commitValue();
-
-
-  //#########################################################################
-  //# GUI
-  JLabel createLabel()
-  {
-    String text = mOption.getShortName();
-    if (text == null) {
-      text = "";
-    }
-    return new JLabel(text);
-  }
-
-  abstract Component createEntryComponent();
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Recursively sets tool tip for component.
-   * @param  comp  Components to have its tool tip set.
-   */
-  void setToolTip(final Component comp)
-  {
-    if (comp instanceof JPanel) {
-      final JPanel panel = (JPanel) comp;
-      for (final Component child : panel.getComponents()) {
-        setToolTip(child);
-      }
-    } else if (comp instanceof JComponent) {
-      final JComponent jComp = (JComponent) comp;
-      final String text = mOption.getDescription();
-      jComp.setToolTipText(text);
-    }
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final GUIOptionContext mContext;
-  private final Option<T> mOption;
-  private final JLabel mLabel;
-  private final Component mEntryComponent;
 
 }

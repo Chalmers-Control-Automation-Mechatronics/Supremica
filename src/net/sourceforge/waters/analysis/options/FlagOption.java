@@ -31,58 +31,70 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
-
-import java.util.ListIterator;
-
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-
+package net.sourceforge.waters.analysis.options;
 
 /**
- * A flag command line argument passed to a {@link ModelAnalyzerFactory}.
- * Flags are optional arguments that can be either present or absent.
- * The status (present or absent) can be queried using the {@link
- * #getValue()} method, but note that configuration of the compiler and the
- * model verifier will only be triggered if the argument is actually
- * present.
+ * A configurable parameter of <CODE>boolean</CODE> type,
+ * for use as a command line flag.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
 
-public abstract class CommandLineArgumentFlag
-  extends CommandLineArgument
+public class FlagOption extends Option<Boolean>
 {
-
   //#########################################################################
   //# Constructors
-  /**
-   * Creates a flag command line argument.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-verbose&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   */
-  protected CommandLineArgumentFlag(final String name,
-                                    final String description)
+  public FlagOption(final String id,
+                       final String shortName,
+                       final String description,
+                       final String commandLineOption)
   {
-    super(name, description);
+   this(id, shortName, description, commandLineOption, null);
+  }
+
+  public FlagOption(final String id,
+                    final String shortName,
+                    final String description,
+                    final String commandLineOption,
+                    final String shortCommandLineOption)
+  {
+    super(id, shortName, description, commandLineOption, true);
+    mShortCommandLineOption = shortCommandLineOption;
   }
 
 
-  //#######################################################################
-  //# Simple Access
-  protected boolean getValue()
-  {
-    return isUsed();
-  }
-
-
-  //#######################################################################
-  //# Parsing
+  //#########################################################################
+  //# Type-specific Access
   @Override
-  public void parse(final ListIterator<String> iter)
+  public void set(final String text) {}
+
+  @Override
+  public boolean isEditable()
   {
-    iter.remove();
-    setUsed(true);
+    return false;
   }
+
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
+
+  public String getShortCommandLineOption()
+  {
+    return mShortCommandLineOption;
+  }
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  @Override
+  public OptionEditor<Boolean> createEditor(final OptionContext context)
+  {
+    return context.createFlagEditor(this);
+  }
+
+  //#########################################################################
+  //# Data Members
+  private final String mShortCommandLineOption;
 
 }

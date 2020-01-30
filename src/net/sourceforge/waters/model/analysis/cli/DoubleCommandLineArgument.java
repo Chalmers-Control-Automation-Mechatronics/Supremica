@@ -31,81 +31,48 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.cli;
 
+import java.util.Collection;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.Option;
 
 /**
- * A string command line argument passed to a {@link ModelAnalyzerFactory}.
- * String command line arguments are specified on the command line by their
- * name followed by a string value, e.g.,
- * <CODE>-marking &quot;:acc&quot;</CODE>. The parsed value is stored
- * in the <CODE>CommandLineArgumentString</CODE> object for retrieval.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public abstract class CommandLineArgumentString
-  extends CommandLineArgument
+public class DoubleCommandLineArgument extends CommandLineArgument<Double>
 {
 
-  //#########################################################################
+//#######################################################################
   //# Constructors
-  /**
-   * Creates an optional command line argument of string type.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-marking&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   */
-  protected CommandLineArgumentString(final String name,
-                                      final String description)
+  public DoubleCommandLineArgument(final CommandLineOptionContext context,
+                                    final Option<Double> option)
   {
-    super(name, description);
+    super(context, option);
   }
-
-  /**
-   * Creates a command line argument of string type.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;marking&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   * @param  required      A flag indicating whether this is a required
-   *                       command line argument. The command line tool
-   *                       will not accept command lines that fail to
-   *                       specify all required arguments.
-   */
-  protected CommandLineArgumentString(final String name,
-                                      final String description,
-                                      final boolean required)
-  {
-    super(name, description, required);
-  }
-
 
   //#######################################################################
   //# Simple Access
   @Override
   protected String getArgumentTemplate()
   {
-    return "<name>";
+    return "<n>";
   }
-
-  protected String getValue()
-  {
-    return mValue;
-  }
-
 
   //#######################################################################
   //# Parsing
   @Override
-  public void parse(final ListIterator<String> iter)
+  public void parse(final CommandLineOptionContext context,
+                    final Collection<Configurable> configurables,
+                    final ListIterator<String> iter)
   {
     iter.remove();
     if (iter.hasNext()) {
-      mValue = iter.next();
+      final String text = iter.next();
+      getOption().set(text);
       iter.remove();
       setUsed(true);
     } else {
@@ -114,8 +81,5 @@ public abstract class CommandLineArgumentString
   }
 
 
-  //#########################################################################
-  //# Data Members
-  private String mValue;
 
 }

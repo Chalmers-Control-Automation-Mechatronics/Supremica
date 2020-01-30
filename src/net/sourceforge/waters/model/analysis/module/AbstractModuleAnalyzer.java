@@ -33,8 +33,11 @@
 
 package net.sourceforge.waters.model.analysis.module;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -182,6 +185,24 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   public void resetAbort()
   {
     mIsAborting = false;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    return new LinkedList<>();
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+  }
+
+  public void registerOptions(final OptionPage page)
+  {
   }
 
 

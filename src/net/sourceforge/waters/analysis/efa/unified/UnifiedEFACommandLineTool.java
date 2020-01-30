@@ -34,39 +34,33 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Formatter;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
-import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
-import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.FlagOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.CommandLineArgument;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
-import net.sourceforge.waters.model.analysis.EnumFactory;
-import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.Watchdog;
+import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
+import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
+import net.sourceforge.waters.model.analysis.cli.VerboseLogConfigurationFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -83,6 +77,13 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+
 
 /**
  * Prototype command line tool to invoke UnifiedEFAConflictChecker.
@@ -91,13 +92,11 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  */
 
 public class UnifiedEFACommandLineTool
+  implements ArgumentSource, Configurable
 {
 
   //#########################################################################
   //# Constructors
-  /**
-   * Dummy constructor to prevent instantiation of this class.
-   */
   private UnifiedEFACommandLineTool()
   {
   }
@@ -110,28 +109,26 @@ public class UnifiedEFACommandLineTool
    * This is a main method to check whether one or more modules are
    * nonblocking using {@link UnifiedEFAConflictChecker}.
    */
-  public static void main(final String[] args)
-  {
-    mArgumentMap = new LinkedHashMap<>();
-    registerArgument(new CompositionSelectionHeuristicArgument());
-    registerArgument(new VariableSelectionHeuristicArgument());
-    registerArgument(new PreferLocalArgument());
-    registerArgument(new SimplifierFactoryArgument());
-    registerArgument(new InternalStateLimitArgument());
-    registerArgument(new InternalTransitionLimitArgument());
-    registerArgument(new HelpArgument());
+  public static void main(final String[] args) {
+    new UnifiedEFACommandLineTool().run(args);
+  }
 
-    boolean verbose = true;
-    boolean stats = false;
+  public void run(final String[] args)
+  {
+
+    final ConfigurationFactory cfactory =
+      new VerboseLogConfigurationFactory(mVerbosity);
+    ConfigurationFactory.setConfigurationFactory(cfactory);
+
     boolean noargs = false;
-    int timeout = -1;
-    PrintWriter csv = null;
     final Formatter formatter = new Formatter(System.out);
 
     try {
       if (args.length < 1) {
         usage();
       }
+
+      mContext = new CommandLineOptionContext(null);
 
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
@@ -145,20 +142,6 @@ public class UnifiedEFACommandLineTool
         final String arg = args[i];
         if (noargs) {
           argList.add(arg);
-        } else if (arg.equals("-q") || arg.equals("-quiet")) {
-          verbose = false;
-        } else if (arg.equals("-stats")) {
-          stats = true;
-        } else if (arg.equals("-timeout") && i + 1 < args.length) {
-          try {
-            timeout = Integer.parseInt(args[++i]);
-          } catch (final NumberFormatException exception) {
-            usage();
-          }
-        } else if (arg.equals("-csv") && i + 1 < args.length) {
-          final String csvname = args[++i];
-          final OutputStream csvstream = new FileOutputStream(csvname, true);
-          csv = new PrintWriter(csvstream);
         } else if (arg.startsWith("-D")) {
           final int eqpos = arg.indexOf('=', 2);
           if (eqpos > 2) {
@@ -182,23 +165,6 @@ public class UnifiedEFACommandLineTool
         }
       }
 
-      final ClassLoader loader = UnifiedEFACommandLineTool.class.getClassLoader();
-      try {
-        final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
-        final Method method0 = lclazz.getMethod("getInstance");
-        final Object loggerfactory = method0.invoke(null);
-        if (verbose) {
-          final Method method =
-            lclazz.getMethod("logToStream", PrintStream.class);
-          method.invoke(loggerfactory, System.err);
-        } else {
-          final Method method = lclazz.getMethod("logToNull");
-          method.invoke(loggerfactory);
-        }
-      } catch (final ClassNotFoundException exception) {
-        // No loggers---no trouble ...
-      }
-
       final ValidUnmarshaller importer =
         new ValidUnmarshaller(moduleFactory, optable);
       final SAXModuleMarshaller moduleMarshaller =
@@ -207,31 +173,31 @@ public class UnifiedEFACommandLineTool
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);
 
-      final UnifiedEFAConflictChecker checker =
-        new UnifiedEFAConflictChecker(moduleFactory);
+      checker = new UnifiedEFAConflictChecker(moduleFactory);
       checker.setDocumentManager(docManager);
       checker.setBindings(bindings);
 
       final ListIterator<String> argIter = argList.listIterator();
-      while (argIter.hasNext()) {
-        final String name = argIter.next();
-        final CommandLineArgument arg = mArgumentMap.get(name);
-        if (arg != null) {
-          arg.parse(argIter);
-        } else if (name.startsWith("-")) {
-          System.err.println("Unsupported option " + name +
-                             ". Try -help to see available options.");
-          System.exit(1);
-        }
-      }
-      for (final CommandLineArgument arg : mArgumentMap.values()) {
-        if (arg.isUsed()) {
-          arg.configureAnalyzer(checker);
+      mContext.addArgumentSource(this);
+      mContext.addConfigurable(this);
+      mContext.addArgumentSource(checker);
+      mContext.addConfigurable(checker);
+      mContext.parse(argIter);
+      mContext.configure(this);
+      mContext.configure(checker);
+
+      if (mVerbosity != null) {
+        if (mVerbosity != null) {
+          final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+          final Configuration config = ctx.getConfiguration();
+          final LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+          loggerConfig.setLevel(mVerbosity);
+          ctx.updateLoggers();
         }
       }
 
-      final Watchdog watchdog = new Watchdog(checker, timeout);
-      if (timeout > 0) {
+      final Watchdog watchdog = new Watchdog(checker, mTimeout);
+      if (mTimeout > 0) {
         watchdog.start();
       }
 
@@ -242,7 +208,7 @@ public class UnifiedEFACommandLineTool
         final String fullName =
           ModuleCompiler.getParametrizedName(module, bindings);
         System.out.print(fullName + " ... ");
-        if (verbose) {
+        if (mVerbosity != null) {
           System.out.println();
         } else {
           System.out.flush();
@@ -270,7 +236,7 @@ public class UnifiedEFACommandLineTool
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
-          if (verbose && result instanceof ProxyResult<?>) {
+          if (mVerbosity != null && result instanceof ProxyResult<?>) {
             final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
             final Proxy proxy = proxyResult.getComputedProxy();
             if (proxy != null) {
@@ -301,28 +267,28 @@ public class UnifiedEFACommandLineTool
         }
         final AnalysisResult result = checker.getAnalysisResult();
         if (result != null) {
-          if (stats) {
+          if (mStats) {
             System.out.println(SEPARATOR);
             System.out.println("Statistics:");
             result.print(System.out);
             additions = true;
           }
-          if (csv != null) {
+          if (mCsv != null) {
             if (first) {
-              csv.print("Model,");
-              result.printCSVHorizontalHeadings(csv);
-              csv.println();
+              mCsv.print("Model,");
+              result.printCSVHorizontalHeadings(mCsv);
+              mCsv.println();
             }
             if (fullName.indexOf(',') >= 0) {
-              csv.print('"');
-              csv.print(fullName);
-              csv.print('"');
+              mCsv.print('"');
+              mCsv.print(fullName);
+              mCsv.print('"');
             } else {
-              csv.print(fullName);
+              mCsv.print(fullName);
             }
-            csv.print(',');
-            result.printCSVHorizontal(csv);
-            csv.println();
+            mCsv.print(',');
+            result.printCSVHorizontal(mCsv);
+            mCsv.println();
           }
         }
         if (additions) {
@@ -334,17 +300,14 @@ public class UnifiedEFACommandLineTool
     } catch (final EvalException | AnalysisException |
                    WatersUnmarshalException | IOException exception) {
       showSupportedException(exception);
-    } catch (final InvocationTargetException exception) {
-      final Throwable cause = exception.getCause();
-      showSupportedException(cause);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.print(ProxyTools.getShortClassName(exception));
       System.err.println(" caught in main()!");
       exception.printStackTrace(System.err);
     } finally {
-      if (csv != null) {
-        csv.close();
+      if (mCsv != null) {
+        mCsv.close();
       }
       formatter.close();
     }
@@ -352,14 +315,80 @@ public class UnifiedEFACommandLineTool
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private static void registerArgument(final CommandLineArgument argument)
+  //# Configuration
+  @Override
+  public List<Option<?>> getOptions(final OptionPage page)
   {
-    for (final String name : argument.getNames()) {
-      mArgumentMap.put(name, argument);
+    final List<Option<?>> options = new LinkedList<>();
+    page.append(options, OPTION_UnifiedEFACommandLineTool_Verbose);
+    page.append(options, OPTION_UnifiedEFACommandLineTool_Quiet);
+    page.append(options, OPTION_UnifiedEFACommandLineTool_Stats);
+    page.append(options, OPTION_UnifiedEFACommandLineTool_Timeout);
+    page.append(options, OPTION_UnifiedEFACommandLineTool_Csv);
+    page.append(options, OPTION_UnifiedEFACommandLineTool_Help);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(OPTION_UnifiedEFACommandLineTool_Verbose)) {
+      mVerbosity = Level.ALL;
+    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Quiet)) {
+      mVerbosity = Level.OFF;
+    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Stats)) {
+      mStats = true;
+    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Timeout)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      mTimeout = opt.getIntValue();
+    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Csv)) {
+      final FileOption opt = (FileOption) option;
+      OutputStream csvstream;
+      try {
+        csvstream = new FileOutputStream(opt.getValue(), true);
+        mCsv = new PrintWriter(csvstream);
+      } catch (final FileNotFoundException exception) {
+        throw new RuntimeException(exception);
+      }
+    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Help)) {
+      mContext.helpMessage(checker);
     }
   }
 
+  public void registerOptions(final OptionPage page) {
+    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
+                            "Verbose output",
+                            "-verbose", "-v"));
+    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
+                            "Quiet output",
+                            "-quiet", "-q"));
+    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
+                            "Output statistics",
+                            "-stats"));
+    page.add(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
+                            "Output statistics",
+                            "-timeout"));
+    page.add(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
+                            "CSV output file location",
+                            "-csv"));
+    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Help, null,
+                            "Print this message", "-help"));
+  }
+
+  @Override
+  public void addArguments(final CommandLineOptionContext context,
+                           final Configurable configurable,
+                           final LeafOptionPage page)
+  {
+    if (configurable == this) {
+      registerOptions(page);
+      context.generateArgumentsFromOptions(page, this);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private static void usage()
   {
     System.err.println
@@ -380,308 +409,48 @@ public class UnifiedEFACommandLineTool
 
 
   //#########################################################################
-  //# Inner Class AbstractHeuristicArgument
-  private static abstract class AbstractHeuristicArgument<T extends Comparable<? super T>>
-    extends CommandLineArgumentString
-  {
-
-    //#######################################################################
-    //# Constructor
-    private AbstractHeuristicArgument(final String name,
-                                      final String description,
-                                      final EnumFactory<SelectionHeuristic<T>> factory)
-    {
-      super(name, description);
-      mFactory = factory;
-    }
-
-    //#######################################################################
-    //# Printing
-    @Override
-    public void dump(final PrintStream stream, final Object analyzer)
-    {
-      super.dump(stream, analyzer);
-      mFactory.dumpEnumeration(stream, INDENT);
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    SelectionHeuristic<T> parse()
-    {
-      final String name = getValue();
-      final String[] parts = name.split(",");
-      final SelectionHeuristic<T> chain;
-      if (parts.length == 1) {
-        final SelectionHeuristic<T> heuristic = mFactory.getEnumValue(name);
-        if (heuristic == null) {
-          System.err.println("Bad value for " + getName() + " option!");
-          mFactory.dumpEnumeration(System.err, 0);
-          System.exit(1);
-        }
-        chain = new ChainSelectionHeuristic<T>(heuristic);
-      } else {
-        @SuppressWarnings("unchecked")
-        final SelectionHeuristic<T>[] heuristics =
-          new SelectionHeuristic[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-          heuristics[i] = mFactory.getEnumValue(parts[i]);
-          if (heuristics[i]  == null) {
-            System.err.println("Bad value for " + getName() + " option!");
-            mFactory.dumpEnumeration(System.err, 0);
-            System.exit(1);
-          }
-        }
-        chain = new ChainSelectionHeuristic<T>(heuristics);
-      }
-      return chain;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final EnumFactory<SelectionHeuristic<T>> mFactory;
-  }
-
-
-  //#########################################################################
-  //# Inner Class CompositionSelectionHeuristicArgument
-  private static class CompositionSelectionHeuristicArgument
-    extends AbstractHeuristicArgument<UnifiedEFACandidate>
-  {
-
-    //#######################################################################
-    //# Constructor
-    private CompositionSelectionHeuristicArgument()
-    {
-      super("-compsel", "Composition selection heuristic",
-            new CompositionSelectionHeuristicFactory());
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final UnifiedEFAConflictChecker checker =
-        (UnifiedEFAConflictChecker) analyzer;
-      final SelectionHeuristic<UnifiedEFACandidate> heuristic = parse();
-      checker.setCompositionSelectionHeuristic(heuristic);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CompositionSelectionHeuristicFactory
-  private static class CompositionSelectionHeuristicFactory
-    extends ListedEnumFactory<SelectionHeuristic<UnifiedEFACandidate>>
-  {
-    //#######################################################################
-    //# Constructor
-    private CompositionSelectionHeuristicFactory()
-    {
-      register(new CompositionSelectionHeuristicMinS());
-      register(new CompositionSelectionHeuristicMinF1());
-      register(new CompositionSelectionHeuristicMinF2());
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class VariableSelectionHeuristicArgument
-  private static class VariableSelectionHeuristicArgument
-    extends AbstractHeuristicArgument<UnifiedEFAVariable>
-  {
-
-    //#######################################################################
-    //# Constructor
-    private VariableSelectionHeuristicArgument()
-    {
-      super("-varsel", "Variable selection heuristic",
-            new VariableSelectionHeuristicFactory());
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final UnifiedEFAConflictChecker checker =
-        (UnifiedEFAConflictChecker) analyzer;
-      final SelectionHeuristic<UnifiedEFAVariable> heuristic = parse();
-      checker.setVariableSelectionHeuristic(heuristic);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class VariableSelectionHeuristicFactory
-  private static class VariableSelectionHeuristicFactory
-    extends ListedEnumFactory<SelectionHeuristic<UnifiedEFAVariable>>
-  {
-    //#######################################################################
-    //# Constructor
-    private VariableSelectionHeuristicFactory()
-    {
-      register(new VariableSelectionHeuristicMaxE());
-      register(new VariableSelectionHeuristicMaxS());
-      register(new VariableSelectionHeuristicMinD());
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class PreferLocalArgument
-  private static class PreferLocalArgument
-    extends CommandLineArgumentBoolean
-  {
-    //#######################################################################
-    //# Constructor
-    private PreferLocalArgument()
-    {
-      super("-loc", "Enable or disable preference for local variables");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final boolean prefer = getValue();
-      final UnifiedEFAConflictChecker checker =
-        (UnifiedEFAConflictChecker) analyzer;
-      checker.setUsesLocalVariable(prefer);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SimplifierFactoryArgument
-  private static class SimplifierFactoryArgument
-    extends CommandLineArgumentEnum<UnifiedEFASimplifierFactory>
-  {
-    //#######################################################################
-    //# Constructor
-    private SimplifierFactoryArgument()
-    {
-      super("-method", "Abstraction sequence used for simplification",
-            UnifiedEFASimplifierFactory.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final UnifiedEFAConflictChecker checker =
-        (UnifiedEFAConflictChecker) analyzer;
-      final UnifiedEFASimplifierFactory factory = getValue();
-      checker.setSimplifierFactory(factory);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class InternalStateLimitArgument
-  private static class InternalStateLimitArgument
-    extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructor
-    private InternalStateLimitArgument()
-    {
-      super("-islimit",
-            "Maximum number of states constructed in abstraction attempts");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final int limit = getValue();
-      final UnifiedEFAConflictChecker checker =
-        (UnifiedEFAConflictChecker) analyzer;
-      checker.setInternalStateLimit(limit);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class InternalTransitionLimitArgument
-  private static class InternalTransitionLimitArgument
-    extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructors
-    private InternalTransitionLimitArgument()
-    {
-      super("-itlimit",
-            "Maximum number of transitions constructed in abstraction\nattempts");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final int limit = getValue();
-      final UnifiedEFAConflictChecker checker =
-        (UnifiedEFAConflictChecker) analyzer;
-      checker.setInternalTransitionLimit(limit);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class HelpArgument
-  private static class HelpArgument extends CommandLineArgumentFlag
-  {
-    //#######################################################################
-    //# Constructors
-    private HelpArgument()
-    {
-      super("-help", "Print this message");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      if (getValue()) {
-        final String name = ProxyTools.getShortClassName(analyzer);
-        System.err.println
-          (name + " supports the following command line options:");
-        final List<String> keys = new ArrayList<>(mArgumentMap.keySet());
-        Collections.sort(keys);
-        for (final String key : keys) {
-          final CommandLineArgument arg = mArgumentMap.get(key);
-          if (arg.getName().startsWith(key)) {
-            arg.dump(System.err, analyzer);
-          }
-        }
-        System.exit(0);
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
-  private static Map<String,CommandLineArgument> mArgumentMap;
+  private Level mVerbosity = Level.DEBUG;
+  private boolean mStats = false;
+  private int mTimeout = -1;
+  private PrintWriter mCsv = null;
 
+  private CommandLineOptionContext mContext;
+  private UnifiedEFAConflictChecker checker;
 
   //#########################################################################
   //# Class Constants
-  private static final String LOGGERFACTORY =
-    "org.supremica.log.LoggerFactory";
+
   private static final String SEPARATOR =
     "------------------------------------------------------------";
+
+  public static final String OPTION_UnifiedEFACommandLineTool_Verbose =
+    "UnifiedEFACommandLineTool.Verbose";
+  public static final String OPTION_UnifiedEFACommandLineTool_Quiet =
+    "UnifiedEFACommandLineTool.Quiet";
+  public static final String OPTION_UnifiedEFACommandLineTool_Stats =
+    "UnifiedEFACommandLineTool.Stats";
+  public static final String OPTION_UnifiedEFACommandLineTool_Timeout =
+    "UnifiedEFACommandLineTool.Timeout";
+  public static final String OPTION_UnifiedEFACommandLineTool_Csv =
+    "UnifiedEFACommandLineTool.Csv";
+
+  public static final String OPTION_UnifiedEFACommandLineTool_Help =
+    "UnifiedEFACommandLineTool.Help";
+
+  public static final String OPTION_UnifiedEFACommandLineTool_PreferLocal =
+    "UnifiedEFACommandLineTool.PreferLocal";
+  public static final String OPTION_UnifiedEFACommandLineTool_SimplifierFactory =
+    "UnifiedEFACommandLineTool.SimplifierFactory";
+  public static final String OPTION_UnifiedEFACommandLineTool_InternalStateLimit =
+    "UnifiedEFACommandLineTool.InternalStateLimit";
+  public static final String OPTION_UnifiedEFACommandLineTool_InternalTransitionLimit =
+    "UnifiedEFACommandLineTool.InternalTransitionLimit";
+
+  public static final String OPTION_UnifiedEFACommandLineTool_CompositionSelectionHeuristic =
+    "UnifiedEFACommandLineTool.CompositionSelectionHeuristic";
+  public static final String OPTION_UnifiedEFACommandLineTool_VariableSelectionHeuristic =
+    "UnifiedEFACommandLineTool.VariableSelectionHeuristic";
+
 
 }

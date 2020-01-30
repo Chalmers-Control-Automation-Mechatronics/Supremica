@@ -31,71 +31,30 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.cli;
 
 import java.io.PrintStream;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 
 /**
- * An enumeration-value command line argument passed to a
- * {@link ModelAnalyzerFactory}.
- * Enumeration command line arguments are specified on the command line by
- * their name followed by a string that represents one of the enumeration
- * objects to be selected. The command line argument knows the enumeration
- * class of the value type and uses it to convert the parsed text to an
- * appropriate object, which is stored in the
- * <CODE>CommandLineArgumentEnum</CODE> object for retrieval.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public abstract class CommandLineArgumentEnum<E extends Enum<E>>
-  extends CommandLineArgument
+public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
 {
 
-  //#########################################################################
-  //# Constructors
-  /**
-   * Creates an optional command line argument of enumeration type.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-heuristic&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   * @param  eclass        The class of the enumeration type for the
-   *                       argument values.
-   */
-  protected CommandLineArgumentEnum(final String name,
-                                    final String description,
-                                    final Class<E> eclass)
+  public EnumCommandLineArgument(final CommandLineOptionContext context,
+                                    final EnumOption<E> option)
   {
-    this(name, description, eclass, false);
+    super(context, option);
+    mEnumFactory = new JavaEnumFactory<E>(option);
   }
-
-  /**
-   * Creates a command line argument of enumeration type.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-heuristic&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   * @param  eclass        The class of the enumeration type for the
-   *                       argument values.
-   * @param  required      A flag indicating whether this is a required
-   *                       command line argument. The command line tool
-   *                       will not accept command lines that fail to
-   *                       specify all required arguments.
-   */
-  protected CommandLineArgumentEnum(final String name,
-                                    final String description,
-                                    final Class<E> eclass,
-                                    final boolean required)
-  {
-    super(name, description, required);
-    mEnumFactory = new JavaEnumFactory<E>(eclass);
-  }
-
 
   //#######################################################################
   //# Simple Access
@@ -105,16 +64,13 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
     return "<value>";
   }
 
-  protected E getValue()
-  {
-    return mValue;
-  }
-
 
   //#########################################################################
   //# Parsing
   @Override
-  public void parse(final ListIterator<String> iter)
+  public void parse(final CommandLineOptionContext context,
+                    final Collection<Configurable> configurables,
+                    final ListIterator<String> iter)
   {
     iter.remove();
     if (iter.hasNext()) {
@@ -129,13 +85,14 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
 
   public void parse(final String arg)
   {
-    mValue = mEnumFactory.getEnumValue(arg);
-    if (mValue == null) {
+    final E value = mEnumFactory.getEnumValue(arg);
+    if (value == null) {
       final String msg = getErrorMessage();
       System.err.println(msg);
       mEnumFactory.dumpEnumeration(System.err, 0);
       System.exit(1);
     }
+    else getOption().setValue(value);
   }
 
 
@@ -153,15 +110,17 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
     return "Bad value for " + getName() + " option!";
   }
 
-
   //#########################################################################
   //# Static Enum Parsing
-  public static <E extends Enum<E>> E parse(final Class<E> eclass,
+  public static <E extends Enum<E>> E parse(final CommandLineOptionContext context,
+                                            final Class<E> eclass,
                                             final String name,
                                             final String value)
   {
-    final CommandLineArgumentEnum<E> parser =
-      new CommandLineArgumentEnum<E>(name, name, eclass) {
+    final EnumOption<E> option =
+      new EnumOption<E>(null, null, null, null, eclass.getEnumConstants());
+    final EnumCommandLineArgument<E> parser =
+      new EnumCommandLineArgument<E>(context, option) {
       @Override
       protected String getErrorMessage()
       {
@@ -175,14 +134,14 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
 
   //#########################################################################
   //# Inner Class JavaEnumFactory
-  private static class JavaEnumFactory<E extends Enum<E>>
+  private static class JavaEnumFactory<E>
     extends EnumFactory<E>
   {
     //#######################################################################
     //# Constructors
-    private JavaEnumFactory(final Class<E> clazz)
+    private JavaEnumFactory(final EnumOption<E> enumOption)
     {
-      mEnumerationClass = clazz;
+      mEnumOption = enumOption;
     }
 
     //#######################################################################
@@ -190,26 +149,23 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
     @Override
     public List<? extends E> getEnumConstants()
     {
-      final E[] array = mEnumerationClass.getEnumConstants();
-      return Arrays.asList(array);
+      return mEnumOption.getEnumConstants();
     }
 
     @Override
     public String getConsoleName(final E item)
     {
-      return item.name();
+      return item.toString();
     }
 
     //#######################################################################
     //# Data Members
-    private final Class<E> mEnumerationClass;
+    private final EnumOption<E> mEnumOption;
 
   }
-
 
   //#########################################################################
   //# Data Members
   private final EnumFactory<E> mEnumFactory;
-  private E mValue;
 
 }
