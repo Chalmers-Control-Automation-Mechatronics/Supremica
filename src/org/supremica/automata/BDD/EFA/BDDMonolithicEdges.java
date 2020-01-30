@@ -509,7 +509,9 @@ public class BDDMonolithicEdges
             final int clockDomain = bddExAutomata.orgExAutomata.getVarDomain(clockComponent.getName());
             final BDD largestValue = manager.getFactory().buildCube(clockDomain - 1, bddExAutomata.tempClockDomains2[clockIndex].vars());
             final BDD largerThanLargest = manager.createSupremicaBDDBitVector(
-                    bddExAutomata.BDDBitVectoryType, bddExAutomata.orgExAutomata.getMinValueofVar(clockComponent.getName()) < 0, bddExAutomata.tempClockDomains1[clockIndex]).gth(
+                    bddExAutomata.BDDBitVectoryType,
+                    bddExAutomata.orgExAutomata.getMinValueofVar(clockComponent.getName()) < 0,
+                    bddExAutomata.tempClockDomains1[clockIndex]).gth(
                     manager.createSupremicaBDDBitVector(
                     bddExAutomata.BDDBitVectoryType, bddExAutomata.tempClockDomains1[clockIndex].size().intValue(), clockDomain - 1));
 

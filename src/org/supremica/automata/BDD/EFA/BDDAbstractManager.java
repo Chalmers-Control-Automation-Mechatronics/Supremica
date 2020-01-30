@@ -82,7 +82,7 @@ public abstract class BDDAbstractManager {
 
     public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final boolean negativesIncluded, final BDDDomain domain) {
         if (P_TC == 0) {
-            return new PSupremicaBDDBitVector(getFactory(), domain);
+            return new PSupremicaBDDBitVector(getFactory(), domain.varNum(), domain);
         } else if (P_TC == 1) {
             final TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), domain);
             if (!negativesIncluded) {
@@ -274,6 +274,10 @@ public abstract class BDDAbstractManager {
                 return new ResultOverflows(tmp, ro.getOverflows());
             } else if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getUnaryMinusOperator())) {
                 final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(), true, updatedVariables);
+                // TODO: toTwosComplement might result in an overflow if the
+                //       bit vector stores the minimum.
+                //       For instance, with 3 bits the minimum is -4. Twos
+                //       complement is 3+1, but that wraps around to -4.
                 return new ResultOverflows(((TCSupremicaBDDBitVector) ro.getResult()).toTwosComplement(), ro.getOverflows());
             } else if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNextOperator())) {
                 final String primedVarName = unExpr.getSubTerm().toString();
@@ -309,20 +313,24 @@ public abstract class BDDAbstractManager {
                 final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final SupremicaBDDBitVector v2 = roRight.getResult();
                 if (v2.isConst()) {
-                    return new ResultOverflows(roLeft.getResult().divmod(v2.val(), false), roLeft.getOverflows().or(roRight.getOverflows()));
+                    return new ResultOverflows(roLeft.getResult().divmod(v2.val(), false).optimizeSize(), roLeft.getOverflows().or(roRight.getOverflows()));
                 } else {
                     throw new IllegalArgumentException("Divisor is not constant");
                 }
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getMinusOperator())) {
                 final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
                 final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
-                final ResultOverflows ro = roLeft.getResult().subConsideringOverflows(roRight.getResult());
-                return new ResultOverflows(ro.getResult(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
+                final int m = Math.max(roLeft.getResult().length(), roRight.getResult().length()) + 1;
+                final SupremicaBDDBitVector left = roLeft.getResult().resize(m);
+                final ResultOverflows ro = left.subConsideringOverflows(roRight.getResult());
+                return new ResultOverflows(ro.getResult().optimizeSize(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getPlusOperator())) {
                 final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
                 final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
-                final ResultOverflows ro = roLeft.getResult().addConsideringOverflows(roRight.getResult());
-                return new ResultOverflows(ro.getResult(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
+                final int m = Math.max(roLeft.getResult().length(), roRight.getResult().length()) + 1;
+                final SupremicaBDDBitVector left = roLeft.getResult().resize(m);
+                final ResultOverflows ro = left.addConsideringOverflows(roRight.getResult());
+                return new ResultOverflows(ro.getResult().optimizeSize(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getEqualsOperator())) {
                 SupremicaBDDBitVector tmp = null;
                 BDD leftOverflows = getZeroBDD();
@@ -442,14 +450,19 @@ public abstract class BDDAbstractManager {
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getDivideOperator())) {
                 final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables).getResult().copy();
                 if (v2.isConst()) {
-                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables).getResult().divmod(v2.val(), true), getZeroBDD());
+                  final SupremicaBDDBitVector left = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables).getResult();
+                  final SupremicaBDDBitVector res = left.divmod(v2.val(), true).optimizeSize();
+                    return new ResultOverflows(res, getZeroBDD());
                 } else {
                     throw new IllegalArgumentException("Divisor is not constant!");
                 }
             }else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getTimesOperator())) {
                 final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables).getResult().copy();
                 if (v2.isConst()) {
-                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables).getResult().mulfixed(v2.val()), getZeroBDD());
+                  SupremicaBDDBitVector left = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables).getResult();
+                  left = left.resize(left.length() + v2.length() + 1);
+                  final SupremicaBDDBitVector res = left.mulfixed(v2.val()).optimizeSize();
+                    return new ResultOverflows(res, getZeroBDD());
                 } else {
                     throw new IllegalArgumentException("Factor is not constant!");
                 }
@@ -484,18 +497,15 @@ public abstract class BDDAbstractManager {
                 }
 
                 return new ResultOverflows(tmp, getZeroBDD());
-            } else {
-                final int value = ((IntConstantProxy) expr).getValue();
-                final boolean inDomain = value >= bddExAutomata.theIndexMap.getVariableLowerBound() && value <= bddExAutomata.theIndexMap.getVariableUpperBound();
-                if (inDomain) {
-                    return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
-                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), value), getZeroBDD());
-                } else {
-                    logger.error(expr.toString() + " is out of the bounds. The value will be set to 0!");
-                    return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0), getZeroBDD());
-                }
-            }
-        }
+			} else {
+			  final int value = ((IntConstantProxy) expr).getValue();
+			  return new ResultOverflows(
+			    createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+			      ((int) Math.pow(2, (int) Math.ceil(Math.log(Math.abs(value) + 1) / Math.log(2)) + 1)),
+			      value),
+			    getZeroBDD());
+			}
+		}
 
         throw new IllegalArgumentException("Type of expression not known!");
     }

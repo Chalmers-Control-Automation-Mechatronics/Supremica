@@ -225,6 +225,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
     @Override
     public ResultOverflows subConsideringOverflows(final SupremicaBDDBitVector that)
     {
+      // TODO: toTwosComplement might result in overflows.
       return addConsideringOverflows(((TCSupremicaBDDBitVector)that).toTwosComplement());
     }
 
@@ -281,7 +282,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
                                final SupremicaBDDBitVector result,
                                final int step)
     {
-      final TCSupremicaBDDBitVector shiftedRemainder = (TCSupremicaBDDBitVector) remainder.shl(1, bitvec[step]);
+      final SupremicaBDDBitVector shiftedRemainder = remainder.shl(1, bitvec[step]);
       final BDD isSmaller = divisor.lte(shiftedRemainder);
       final SupremicaBDDBitVector newResult = result.shl(1, isSmaller);
       final SupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitvec.length, false);
@@ -290,7 +291,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
       for (int n = 0; n < divisor.bitvec.length; n++)
           sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
 
-      final TCSupremicaBDDBitVector newRemainder = shiftedRemainder.sub(sub);
+      final SupremicaBDDBitVector newRemainder = shiftedRemainder.sub(sub);
 
       if (step > 0)
           div_rec(divisor, newRemainder, newResult, step - 1);
@@ -302,6 +303,132 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
       result.replaceWith(newResult);
       remainder.replaceWith(newRemainder);
+    }
+
+    @Override
+    public SupremicaBDDBitVector resize(final int bitNum) {
+
+      final SupremicaBDDBitVector res = buildSupBDDBitVector(bitNum, false);
+
+      for (int i = 0; i < bitNum; i++) {
+        BDD z = bitvec[signBitIndex];
+        if (i < this.signBitIndex) {
+          z = bitvec[i];
+        }
+        res.setBit(i, z);
+      }
+
+      return res;
+    }
+
+    @Override
+    public BDD increment() {
+
+      BDD carry = mFactory.one();
+      for (int i = 0; i<signBitIndex; i++) {
+        final BDD res = bitvec[i].xor(carry);
+        carry = bitvec[i].and(carry);
+        bitvec[i] = res;
+      }
+      final BDD res = bitvec[signBitIndex].xor(carry);
+      carry = bitvec[signBitIndex].not().and(carry);
+      bitvec[signBitIndex] = res;
+      return carry;
+    }
+
+    private int maxTC() {
+
+      int value = 0;
+      BDD bdd = mFactory.one();
+      bdd = bdd.and(bitvec[signBitIndex].not());
+      for (int i=signBitIndex-1; i>=0; i--) {
+        value = value << 1;
+        if ((bitvec[i].and(bdd)).satCount() > 0) {
+          value = value | 1;
+          bdd = bdd.and(bitvec[i]);
+        }
+      }
+
+      return value;
+    }
+
+    private int minTC() {
+
+      int value = 0;
+      BDD bdd = mFactory.one();
+      bdd = bdd.and(bitvec[signBitIndex].not());
+      for (int i=signBitIndex-1; i>=0; i--) {
+        value = value << 1;
+        if (bitvec[i].not().and(bdd).satCount() < 1) {
+          value = value | 1;
+        } else {
+          bdd = bdd.and(bitvec[i].not());
+        }
+      }
+
+      return value;
+    }
+
+    @Override
+    public int max() {
+
+      TCSupremicaBDDBitVector t = (TCSupremicaBDDBitVector) resize(bitNum+1);
+      int value = 0;
+
+      if (bitvec[signBitIndex].isOne()) {
+        t = t.toTwosComplement();
+        value = -t.minTC();
+      } else {
+        t = (TCSupremicaBDDBitVector) t.copy();
+        value = t.maxTC();
+      }
+
+      return value;
+    }
+
+    @Override
+    public int min() {
+
+      TCSupremicaBDDBitVector t = (TCSupremicaBDDBitVector) resize(bitNum+1);
+      int value = 0;
+
+      if (bitvec[signBitIndex].isZero()) {
+        t = (TCSupremicaBDDBitVector) t.copy();
+        value = t.minTC();
+      } else {
+        t = t.toTwosComplement();
+        value = -t.maxTC();
+      }
+
+      return value;
+    }
+
+    @Override
+    public int requiredBits() {
+
+      int requiredPos = -2;
+      final BDD pos = bitvec[signBitIndex].not();
+      for (int i = 0; i < signBitIndex; i++) {
+        if (pos.and(bitvec[i]).satCount() > 0) {
+          requiredPos = i;
+        }
+      }
+
+      int requiredNeg = -1;
+      final BDD neg = bitvec[signBitIndex];
+      if (neg.satCount() > 0 ) {
+        requiredNeg = 0;
+      }
+      for (int i = 0; i < signBitIndex; i++) {
+        if (neg.and(bitvec[i].not()).satCount() > 0) {
+          requiredNeg = i+1;
+        }
+      }
+
+      final int required = Math.max(requiredPos+2, requiredNeg+1);
+
+      return required;
+
     }
 
 }

@@ -30,9 +30,9 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         initialize(val);
     }
 
-    public PSupremicaBDDBitVector(final BDDFactory factory,final BDDDomain d)
+    public PSupremicaBDDBitVector(final BDDFactory factory,final int bitNum, final BDDDomain d)
     {
-      this(factory, d.varNum());
+      this(factory, bitNum);
       initialize(d);
     }
 
@@ -304,7 +304,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     {
         // Shift the msb of the dividend left into the remainder to search for
         // a part of the dividend that are greater than the divisor.
-        final PSupremicaBDDBitVector shiftedRemainder = (PSupremicaBDDBitVector) remainder.shl(1, bitvec[step]);
+        final SupremicaBDDBitVector shiftedRemainder = remainder.shl(1, bitvec[step]);
         final BDD isSmaller = divisor.lte(shiftedRemainder);
         // If the divisor is smaller than the remainder, we can conclude that,
         // at this bit, we have a quotient of 1. Shift previous quotients to the
@@ -320,7 +320,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         for (int n = 0; n < divisor.bitvec.length; n++)
             sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
 
-        final PSupremicaBDDBitVector newRemainder = shiftedRemainder.sub(sub);
+        final SupremicaBDDBitVector newRemainder = shiftedRemainder.sub(sub);
 
         // Do the same for the next less significant bit, if any.
         if (step > 0)
@@ -335,6 +335,80 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         // we want. Bypass them to the top.
         result.replaceWith(newResult);
         remainder.replaceWith(newRemainder);
+    }
+
+    @Override
+    public SupremicaBDDBitVector resize(final int bitNum) {
+
+      final SupremicaBDDBitVector res = buildSupBDDBitVector(bitNum, false);
+
+      for (int i = 0; i < bitNum; i++) {
+        BDD z = mFactory.zero();
+        if (i < this.bitNum) {
+          z = bitvec[i];
+        }
+        res.setBit(i, z);
+      }
+
+      return res;
+    }
+
+    @Override
+    public BDD increment() {
+      BDD carry = mFactory.one();
+      for (int i = 0; i<bitNum; i++) {
+        final BDD res = bitvec[i].xor(carry);
+        carry = bitvec[i].and(carry);
+        bitvec[i] = res;
+      }
+      return carry;
+    }
+
+    @Override
+    public int max() {
+
+      int value = 0;
+      BDD bdd = mFactory.one();
+      for (int i=bitNum-1; i>=0; i--) {
+        value = value << 1;
+        if ((bitvec[i].and(bdd)).satCount() > 0) {
+          value = value | 1;
+          bdd = bdd.and(bitvec[i]);
+        }
+      }
+
+      return value;
+    }
+
+    @Override
+    public int min() {
+
+      int value = 0;
+      BDD bdd = mFactory.one();
+      for (int i=bitNum-1; i>=0; i--) {
+        value = value << 1;
+        if (bitvec[i].not().and(bdd).satCount() < 1) {
+          value = value | 1;
+        } else {
+          bdd = bdd.and(bitvec[i].not());
+        }
+      }
+
+      return value;
+    }
+
+    @Override
+    public int requiredBits() {
+
+      int required = -1;
+      for (int i = 0; i < bitNum; i++) {
+        if (bitvec[i].satCount() > 0) {
+          required = i;
+        }
+      }
+
+      return required+1;
+
     }
 
 }
