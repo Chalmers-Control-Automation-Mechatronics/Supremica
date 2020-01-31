@@ -392,17 +392,6 @@ public abstract class AbstractModelAnalyzerFactory
             "Property for language inclusion check " +
               "(can be used more than once)",
            "-property"));
-    db.add(new FlagOption
-             (AbstractModelAnalyzerFactory.
-               OPTION_AbstractModelAnalyzerFactory_NoOptimisation, null,
-              "Disable compiler optimisation",
-              "-noopt"));
-    db.add(new FlagOption
-             (AbstractModelAnalyzerFactory.
-               OPTION_AbstractModelAnalyzerFactory_HISCModule, null,
-              "Compile as HISC module, "
-               + "only including interfaces of low levels",
-              "-hisc"));
   }
 
 

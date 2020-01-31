@@ -237,6 +237,9 @@ public class CommandLineTool implements Configurable, ArgumentSource
       final ListIterator<String> argIter = argList.listIterator();
       mContext.addArgumentSource(this);
       mContext.addConfigurable(this);
+      final ModuleCompiler dummyCompiler = new ModuleCompiler(null, null, null);
+      mContext.addArgumentSource(dummyCompiler);
+      mContext.addConfigurable(dummyCompiler);
       mContext.addArgumentSource(factory);
       mContext.addConfigurable(mAnalyzer);
 

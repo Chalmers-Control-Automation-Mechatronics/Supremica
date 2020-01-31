@@ -48,11 +48,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.FlagOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
+import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -163,7 +167,7 @@ import org.xml.sax.SAXException;
  * @author Robi Malik
  */
 public class ModuleCompiler extends AbortableCompiler
-  implements Configurable
+  implements Configurable, ArgumentSource
 {
 
   //#########################################################################
@@ -257,6 +261,10 @@ public class ModuleCompiler extends AbortableCompiler
   public List<Option<?>> getOptions(final OptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
+    page.append(options, AbstractModelAnalyzerFactory.
+                OPTION_AbstractModelAnalyzerFactory_NoOptimisation);
+    page.append(options, AbstractModelAnalyzerFactory.
+                OPTION_AbstractModelAnalyzerFactory_HISCModule);
     return options;
   }
 
@@ -266,8 +274,7 @@ public class ModuleCompiler extends AbortableCompiler
     if (option.hasID(AbstractModelAnalyzerFactory.
                      OPTION_AbstractModelAnalyzerFactory_NoOptimisation)) {
       setOptimizationEnabled(false);
-    }
-    else if (option.hasID(AbstractModelAnalyzerFactory.
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
                      OPTION_AbstractModelAnalyzerFactory_HISCModule)) {
       setHISCCompileMode(HISCCompileMode.HISC_HIGH);
       setEnabledPropertyNames(null);
@@ -328,6 +335,30 @@ public class ModuleCompiler extends AbortableCompiler
       props.add(name);
       setEnabledPropositionNames(props);
       //End of pre marking
+    }
+  }
+
+  public void registerOptions(final OptionPage page) {
+    page.add(new FlagOption
+           (AbstractModelAnalyzerFactory.
+             OPTION_AbstractModelAnalyzerFactory_NoOptimisation, null,
+            "Disable compiler optimisation",
+            "-noopt"));
+    page.add(new FlagOption
+           (AbstractModelAnalyzerFactory.
+             OPTION_AbstractModelAnalyzerFactory_HISCModule, null,
+            "Compile as HISC module, "
+             + "only including interfaces of low levels",
+            "-hisc"));
+  }
+
+  @Override
+  public void addArguments(final CommandLineOptionContext context,
+                           final Configurable configurable, final LeafOptionPage page)
+  {
+    if (configurable == this) {
+      registerOptions(page);
+      context.generateArgumentsFromOptions(page, configurable);
     }
   }
 

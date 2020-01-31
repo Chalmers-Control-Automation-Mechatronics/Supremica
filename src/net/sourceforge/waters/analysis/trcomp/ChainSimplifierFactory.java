@@ -42,6 +42,10 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
+import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PropositionOption;
@@ -98,6 +102,44 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
               "in the abstraction sequence.",
               "-lcc",
               true));
+
+
+    //TODO Descriptions and command line options
+    db.add(new EnumOption<OPSearchAutomatonSimplifier.Mode>
+           (OPTION_OPSearchAutomatonSimplifier_OperationMode,
+            "Operation Mode",
+            "",
+            "",
+            OPSearchAutomatonSimplifier.Mode.values(),
+            OPSearchAutomatonSimplifier.Mode.MINIMIZE));
+    db.add(new EventSetOption
+           (OPTION_OPSearchAutomatonSimplifier_HiddenEvents,
+            "Hidden Events",
+            "",
+            "",
+            DefaultKind.PROPER_EVENT,
+            "Selected Events",
+            "Unselected Events"));
+    db.add(new EventSetOption
+           (OPTION_OPSearchAutomatonSimplifier_Propositions,
+            "Propositions",
+            "",
+            "",
+            DefaultKind.PROPOSITION,
+            "Selected Propositions",
+            "Unselected Propositions"));
+    //TODO Needs single event option (generalise proposition option?)
+//    db.add(new ...Option
+//           (OPTION_OPSearchAutomatonSimplifier_OutputHiddenEvent,
+//            "Output Hidden Event",
+//            "",
+//            "",
+//            ...));
+    db.add(new FileOption
+           (OPTION_OPSearchAutomatonSimplifier_LogFile,
+            "Log File",
+            "",
+            ""));
   }
 
 
@@ -365,5 +407,16 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
     "ChainSimplifierFactory.LimitedCertainConflicts";
   public static final String OPTION_ChainSimplifierFactory_WeakObservationEquivalence =
     "ChainSimplifierFactory.WeakObservationEquivalence";
+
+  public static final String OPTION_OPSearchAutomatonSimplifier_OperationMode =
+    "ChainSimplifierFactory.OperationMode";
+  public static final String OPTION_OPSearchAutomatonSimplifier_HiddenEvents =
+    "ChainSimplifierFactory.HiddenEvents";
+  public static final String OPTION_OPSearchAutomatonSimplifier_Propositions =
+    "ChainSimplifierFactory.Propositions";
+  public static final String OPTION_OPSearchAutomatonSimplifier_OutputHiddenEvent =
+    "ChainSimplifierFactory.OutputHiddenEvent";
+  public static final String OPTION_OPSearchAutomatonSimplifier_LogFile =
+    "ChainSimplifierFactory.LogFile";
 
 }

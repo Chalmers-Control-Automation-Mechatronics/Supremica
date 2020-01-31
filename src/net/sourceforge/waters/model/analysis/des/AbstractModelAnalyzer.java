@@ -110,10 +110,6 @@ public abstract class AbstractModelAnalyzer
       page.append(options, AbstractModelAnalyzerFactory.
                   OPTION_LanguageInclusionChecker_Property);
     }
-    page.append(options, AbstractModelAnalyzerFactory.
-                OPTION_AbstractModelAnalyzerFactory_NoOptimisation);
-    page.append(options, AbstractModelAnalyzerFactory.
-                OPTION_AbstractModelAnalyzerFactory_HISCModule);
     return options;
   }
 
