@@ -74,9 +74,14 @@ import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -121,6 +126,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public HashSet<EventDeclProxy> controllableAlphabet = null;
     public HashSet<EventDeclProxy> forcibleAlphabet = null;
     HashSet<EventDeclProxy> plantAlphabet = null;
+    private final Map<String,ConstantAliasProxy> identifierNameToProxy;
 
     final static String LOCAL_VAR_SUFFIX = "_curr";
     final static String CLOCK_PREFIX = "clock:";
@@ -161,6 +167,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         stringToExAutomaton = new HashMap<String, ExtendedAutomaton>();
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
+        identifierNameToProxy = new HashMap<String,ConstantAliasProxy>();
     }
 
     public ExtendedAutomata(final String name) {
@@ -199,23 +206,36 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             eventIdToProxyMap.put(e.getName(), e);
         }
 
+        for (final ConstantAliasProxy constant : module.getConstantAliasList()) {
+          identifierNameToProxy.put(constant.getName(), constant);
+        }
+
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
 
         final ArrayList<Proxy> components = new ArrayList<Proxy>(module.getComponentList());
+        module.getConstantAliasList();
         if (globalClockDomain > 0) {
             components.add(VariableHelper.createIntegerVariable(CLOCK_PREFIX + GLOBAL_PREFIX, 0, globalClockDomain, 0, null));
         }
 
+        // java.lang.ClassCastException
 
         for (final Proxy sub : components) {
             if (sub instanceof VariableComponentProxy) {
                 final VariableComponentProxy var = (VariableComponentProxy) sub;
-                final String range = var.getType().toString();
+                ExpressionProxy expr = var.getType();
+
+                expr = expandNamedConstant(expr);
 
                 int lowerBound = 0;
 
-                if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
-                    lowerBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getLeft().toString());
+                if (expr instanceof BinaryExpressionProxy) {
+                  final BinaryExpressionProxy binExpr = (BinaryExpressionProxy) expr;
+                  final BinaryOperator op = binExpr.getOperator();
+                  if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator())) {
+                    final SimpleExpressionProxy left = binExpr.getLeft();
+                    lowerBound = getExpressionValue(left);
+                  }
                 }
 
                 if (lowerBound < 0) {
@@ -248,40 +268,49 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     parameters.add(var);
                 }
 
+                ExpressionProxy expr = var.getType();
+                expr = expandNamedConstant(expr);
+
                 final String varName = var.getName();
-                final String range = var.getType().toString();
 
                 int lowerBound = 0;
                 int upperBound = 0;
 
-                if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
-                    lowerBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getLeft().toString());
-                    upperBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getRight().toString());
-                } else if (range.contains("[") && range.contains("]")) { // non-integer variable;
-                    nonIntegerVariables.add(varName);
-                    final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
-                    final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
-                    final StringTokenizer token = new StringTokenizer(range, ", [ ]");
-                    int mappedIntValue = 0;
-                    upperBound = token.countTokens()-1;
-                    lowerBound = mappedIntValue;
-                    while(token.hasMoreTokens()) {
-                      final String anInstance = token.nextToken();
-                      final String mappedIntValueString = String.valueOf(mappedIntValue);
-                      varInstanceIntMap.put(anInstance, mappedIntValueString);
-                      varIntInstanceMap.put(mappedIntValueString, anInstance);
-                      mappedIntValue ++;
-                    }
-                    nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
-                    nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
-
-                    if (varName.contains(LOCAL_VAR_SUFFIX)) {
-                      final String nonSuffix = varName.substring(0, varName.indexOf(LOCAL_VAR_SUFFIX));
-                      autCandidateName2Var.put(nonSuffix, var);
-                    }
-                } else {
+                if (expr instanceof BinaryExpressionProxy) {
+                  final BinaryExpressionProxy binExpr = (BinaryExpressionProxy) expr;
+                  final BinaryOperator op = binExpr.getOperator();
+                  if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator())) {
+                    lowerBound = getExpressionValue(binExpr.getLeft());
+                    upperBound = getExpressionValue(binExpr.getRight());
+                  } else {
                     throw new IllegalArgumentException("The variable domain is not defined!");
-                }
+                  }
+                } else if (expr instanceof EnumSetExpressionProxy) { // non-integer variable;
+                  nonIntegerVariables.add(varName);
+                  final EnumSetExpressionProxy enumExpr = (EnumSetExpressionProxy) expr;
+                  final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
+                  final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
+                  int mappedIntValue = 0;
+                  lowerBound = mappedIntValue;
+                  upperBound = enumExpr.getItems().size()-1;
+                  for (final SimpleIdentifierProxy identifier : enumExpr.getItems()) {
+                    final String instanceName = identifier.getName();
+                    final String intString = String.valueOf(mappedIntValue);
+                    varInstanceIntMap.put(instanceName, intString);
+                    varIntInstanceMap.put(intString, instanceName);
+                    mappedIntValue++;
+                  }
+
+                  nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
+                  nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
+
+                  if (varName.contains(LOCAL_VAR_SUFFIX)) {
+                    final String nonSuffix = varName.substring(0, varName.indexOf(LOCAL_VAR_SUFFIX));
+                    autCandidateName2Var.put(nonSuffix, var);
+                  }
+              } else {
+                  throw new IllegalArgumentException("The variable domain is not defined!");
+              }
 
                 final MinMax minMax = new MinMax(lowerBound, upperBound);
                 if (theoNbrOfReachableStates == 0) {
@@ -362,6 +391,36 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
 
         nbrOfEFAsVars = variables.size() + theExAutomata.size();
+    }
+
+    private int getExpressionValue(final SimpleExpressionProxy expr)
+    {
+      int bound = 0;
+      if (expr instanceof IntConstantProxy) {
+        bound = ((IntConstantProxy) expr).getValue();
+      } else if (expr instanceof SimpleIdentifierProxy && identifierNameToProxy.containsKey(((SimpleIdentifierProxy) expr).getName())) {
+        bound = resolveNamedConstant((SimpleIdentifierProxy) expr);
+      }
+      return bound;
+    }
+
+    private ExpressionProxy expandNamedConstant(ExpressionProxy expr)
+    {
+      if (expr instanceof SimpleIdentifierProxy && identifierNameToProxy.containsKey(((SimpleIdentifierProxy) expr).getName())) {
+        expr = identifierNameToProxy.get(((SimpleIdentifierProxy) expr).getName()).getExpression();
+      }
+      return expr;
+    }
+
+    private int resolveNamedConstant(final SimpleIdentifierProxy identifier) {
+      final ConstantAliasProxy constant = identifierNameToProxy.get(identifier.getName());
+      if (constant.getExpression() instanceof IntConstantProxy) {
+        return ((IntConstantProxy)constant.getExpression()).getValue();
+      } else if (constant.getExpression() instanceof SimpleIdentifierProxy && identifierNameToProxy.containsKey(((SimpleIdentifierProxy) constant.getExpression()).getName())) {
+        return resolveNamedConstant((SimpleIdentifierProxy)constant.getExpression());
+      } else {
+        throw new IllegalArgumentException("The variable domain is not defined!");
+      }
     }
 
     public boolean isEventForcible(final EventDeclProxy e){
