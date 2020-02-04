@@ -393,7 +393,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         nbrOfEFAsVars = variables.size() + theExAutomata.size();
     }
 
-    private int getExpressionValue(final SimpleExpressionProxy expr)
+    int getExpressionValue(final SimpleExpressionProxy expr)
     {
       int bound = 0;
       if (expr instanceof IntConstantProxy) {
@@ -404,7 +404,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
       return bound;
     }
 
-    private ExpressionProxy expandNamedConstant(ExpressionProxy expr)
+    ExpressionProxy expandNamedConstant(ExpressionProxy expr)
     {
       if (expr instanceof SimpleIdentifierProxy && identifierNameToProxy.containsKey(((SimpleIdentifierProxy) expr).getName())) {
         expr = identifierNameToProxy.get(((SimpleIdentifierProxy) expr).getName()).getExpression();

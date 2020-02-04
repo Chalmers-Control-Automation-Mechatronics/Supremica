@@ -12,8 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
@@ -109,7 +112,8 @@ public class ExtendedAutomataIndexMap {
             index++;
 
             final String varName = var.getName();
-            final String range = var.getType().toString();
+            ExpressionProxy expr = var.getType();
+            expr = theExAutomata.expandNamedConstant(expr);
             final Map<String, Integer> val2indexMap = new HashMap<String, Integer>();
             final Map<Integer, String> index2valMap = new HashMap<Integer, String>();
 
@@ -133,17 +137,24 @@ public class ExtendedAutomataIndexMap {
                 integerDomain.add(i);
             }
 
-            if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
-                final int initialValue = val2indexMap.get(((BinaryExpressionProxy) var.getInitialStatePredicate()).getRight().toString());
-                var2initValMap.put(varName, initialValue);
+            if (expr instanceof BinaryExpressionProxy) {
+              final BinaryExpressionProxy binExpr = (BinaryExpressionProxy) expr;
+              final BinaryOperator op = binExpr.getOperator();
+              if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator())) {
+                final int initialValue = theExAutomata.getExpressionValue(((BinaryExpressionProxy) var.getInitialStatePredicate()).getRight());
+                final int initialIndex = val2indexMap.get(String.valueOf(initialValue));
+                var2initValMap.put(varName, initialIndex);
                 var2markedValMap.put(varName, var.getVariableMarkings());
+              } else {
+                throw new IllegalArgumentException("The variable domain is not defined!");
+              }
             }
 
-            if (range.contains(",")) {
-                final String initialInstance = ((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString();
-                final int initialValue = Integer.parseInt(theExAutomata.getNonIntVar2InstanceIntMap().get(varName).get(initialInstance));
-                var2initValMap.put(varName, initialValue);
-                var2markedValMap.put(varName, var.getVariableMarkings());
+            if (expr instanceof EnumSetExpressionProxy) { // non-integer variable;
+              final String initialInstance = ((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString();
+              final int initialValue = Integer.parseInt(theExAutomata.getNonIntVar2InstanceIntMap().get(varName).get(initialInstance));
+              var2initValMap.put(varName, initialValue);
+              var2markedValMap.put(varName, var.getVariableMarkings());
             }
         }
 
