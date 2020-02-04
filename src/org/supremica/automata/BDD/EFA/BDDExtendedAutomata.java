@@ -239,7 +239,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         stageVar2BDDTempVarSetMap = new HashMap<VariableComponentProxy, BDDVarSet>();
 
-        initialize();
+        try {
+          initialize();
+        } catch (final RuntimeException e) {
+          this.done();
+          throw e;
+        }
     }
 
     @SuppressWarnings("unchecked")

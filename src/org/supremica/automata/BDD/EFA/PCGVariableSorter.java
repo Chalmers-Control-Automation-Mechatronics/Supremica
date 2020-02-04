@@ -69,8 +69,9 @@ innerLoop:  for(final VariableComponentProxy var:vars)
             CompiledRange range = null;
             try {
                 range = mSimpleExpressionCompiler.getRangeValue(currVar.getType());
-
-            } catch (final EvalException exception) {System.err.println(exception);}
+            } catch (final EvalException exception) {
+                throw exception.getRuntimeException();
+            }
 
             pcgNodeList.add(new DefaultPCGNode(currVar.getName(), range.size()));
         }

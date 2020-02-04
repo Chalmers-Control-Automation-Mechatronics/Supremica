@@ -176,221 +176,235 @@ public class EditorSynthesizerAction extends IDEAction
       ? new ExtendedAutomata(module, (int) options.getGlobalClockDomain())
       : new ExtendedAutomata(module);
 
-    final BDDExtendedSynthesizer bddSynthesizer =
-      new BDDExtendedSynthesizer(exAutomata, options);
+    BDDExtendedSynthesizer bddSynthesizer = null;
+    RuntimeException synthesisException = null;
 
-    if (logger.isDebugEnabled()) {
-      final int nbrBDDVars =
-        bddSynthesizer.getBDDAutomata().getNumberOfUsedBDDVariables();
-      logger.info("Number of used BDD variables: " + nbrBDDVars);
-    }
+    try {
+      bddSynthesizer =
+        new BDDExtendedSynthesizer(exAutomata, options);
 
-    // Remove previous guards/actions if the model is not a "user-defined" EFA
-    if (Config.TUM_EXTERNAL_ON.getValue()) {
-      if (options.getGenPLCCodeTUMBox()) {
-        // If the EFA option is not activated, remove existing guards
-        if (!options.getPLCCodeTUMefaBox()) {
-          GABlocksRemover.RemoveGABlocksAction(ide);
-        } else {
-          logger.debug("\tEFA option is selected. Guard/action blocks and variables have NOT been removed");
-        }
+      if (logger.isDebugEnabled()) {
+        final int nbrBDDVars =
+          bddSynthesizer.getBDDAutomata().getNumberOfUsedBDDVariables();
+        logger.info("Number of used BDD variables: " + nbrBDDVars);
       }
-    }
 
-    // do the work
-    bddSynthesizer.synthesize(options);
-
-    logger.info("Synthesis completed on "
-                + new Date().toString() + ".");
-
-    logger.info("Synthesis completed after "
-                + bddSynthesizer.getSynthesisTimer().toString() + ".");
-    if (options.getOptimization()) {
-      final BDD result = bddSynthesizer.getResult();
-      final long optimalTime =
-        bddSynthesizer.getBDDAutomata().getOptimalTime(result);
-      logger.info("The minimum time to 'safely' reach a marked state from " +
-                  " the initial state: " + optimalTime + ".");
-    }
-
-    if (!options.getOptVaribale().isEmpty()) {
-      logger.info("The minimum value of variable " + options.getOptVaribale()
-                  + " among the reachable marked states is: "
-                  + bddSynthesizer.getBDDAutomata().getMinValueOfVar() + ".");
-    }
-
-    logger.info("The " + options.getSynthesisType().toString()
-                + " supervisor consists of "
-                + bddSynthesizer.nbrOfStates() + " states.");
-
-    if (options.getPeakBDD())
-      logger.info("The maximal number of BDD nodes used is "
-                  + bddSynthesizer.peakBDDNodes());
-
-    final List<VariableComponentProxy> pars =
-      bddSynthesizer.getAutomata().getParameters();
-    if (!pars.isEmpty())
-      logger.info("The feasible values for the parameters are:");
-    for (final VariableComponentProxy variable : pars) {
-      logger.info(bddSynthesizer.getFeasibleValues(variable.getName()));
-    }
-
-    // handle the guards
-    if (!(options.getSaveInFile() || options.getSaveIDDInFile()
-      || options.getPrintGuard() || options.getAddGuards())) {
-      // no guard related option is set, quite silently
-      // Cleanup...
-      bddSynthesizer.done();
-      return;
-    }
-
-    if (bddSynthesizer.nbrOfStates() == 0) {
-      logger.info("No guard can be derived from empty supervisor.");
+      // Remove previous guards/actions if the model is not a "user-defined" EFA
       if (Config.TUM_EXTERNAL_ON.getValue()) {
-        JOptionPane.showMessageDialog(ide.getFrame(),
-            "No guard can be derived from empty supervisor.",
-            "Error during the symbolic synthesis",
-            JOptionPane.ERROR_MESSAGE);
-      }
-      // Cleanup...
-      bddSynthesizer.done();
-      return;
-    }
-
-    // generate guards...
-    bddSynthesizer.generateGuard(eventNames, options);
-    logger.info("The guards were generated in "
-      + bddSynthesizer.getGuardTimer().toString() + ".");
-    // print guards or save them in a excel file.
-    if (options.getSaveInFile() || options.getPrintGuard()) {
-      final Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap =
-        bddSynthesizer.getBDDAutomata().getEdge2ExAutomatonMap();
-      final Map<String,BDDExtendedGuardGenerator> event2GuardGen =
-        bddSynthesizer.getEvent2GuardGen();
-      final Map<String, List<Entry<EdgeProxy,ExtendedAutomaton>>>
-      eventGeoInfo = new HashMap<>();
-      // Make things deterministic...
-      for(final String event: eventNames) {
-        if (!event2GuardGen.containsKey(event))
-           continue;
-        final BDDExtendedGuardGenerator guardGen = event2GuardGen.get(event);
-        final Map<EdgeProxy, String> evensEdge2GuardMap =
-          guardGen.getEdge2GuardMap();
-        final ArrayList<Entry<EdgeProxy, ExtendedAutomaton>> entries =
-           new ArrayList<>();
-        for(final Entry<EdgeProxy, ExtendedAutomaton> e:
-            edge2ExAutomatonMap.entrySet()) {
-          final String edgesGuard = evensEdge2GuardMap.get(e.getKey());
-          if (evensEdge2GuardMap.containsKey(e.getKey()) &&
-             edgesGuard != BDDExtendedGuardGenerator.TRUE) {
-            entries.add(e);
+        if (options.getGenPLCCodeTUMBox()) {
+          // If the EFA option is not activated, remove existing guards
+          if (!options.getPLCCodeTUMefaBox()) {
+            GABlocksRemover.RemoveGABlocksAction(ide);
+          } else {
+            logger.debug("\tEFA option is selected. Guard/action blocks and variables have NOT been removed");
           }
         }
-        Collections.sort(entries, // sort based on automaton and edges names
-                         new Comparator<Entry<EdgeProxy,ExtendedAutomaton>>() {
-          @Override
-          public int compare(final Entry<EdgeProxy,ExtendedAutomaton> o1,
-                             final Entry<EdgeProxy,ExtendedAutomaton> o2)
-          {
-            final String aut1 = o1.getValue().getName();
-            final String aut2 = o2.getValue().getName();
-            if (aut1.equals(aut2)) {
-              final String sourceName1 = o1.getKey().getSource().getName();
-              final String sourceName2 = o2.getKey().getSource().getName();
-              return sourceName1.compareTo(sourceName2);
+      }
+
+      // do the work
+      bddSynthesizer.synthesize(options);
+
+      logger.info("Synthesis completed on "
+        + new Date().toString() + ".");
+
+      logger.info("Synthesis completed after "
+        + bddSynthesizer.getSynthesisTimer().toString() + ".");
+      if (options.getOptimization()) {
+        final BDD result = bddSynthesizer.getResult();
+        final long optimalTime =
+          bddSynthesizer.getBDDAutomata().getOptimalTime(result);
+        logger.info("The minimum time to 'safely' reach a marked state from " +
+          " the initial state: " + optimalTime + ".");
+      }
+
+      if (!options.getOptVaribale().isEmpty()) {
+        logger.info("The minimum value of variable " + options.getOptVaribale()
+        + " among the reachable marked states is: "
+        + bddSynthesizer.getBDDAutomata().getMinValueOfVar() + ".");
+      }
+
+      logger.info("The " + options.getSynthesisType().toString()
+                  + " supervisor consists of "
+                  + bddSynthesizer.nbrOfStates() + " states.");
+
+      if (options.getPeakBDD())
+        logger.info("The maximal number of BDD nodes used is "
+          + bddSynthesizer.peakBDDNodes());
+
+      final List<VariableComponentProxy> pars =
+        bddSynthesizer.getAutomata().getParameters();
+      if (!pars.isEmpty())
+        logger.info("The feasible values for the parameters are:");
+      for (final VariableComponentProxy variable : pars) {
+        logger.info(bddSynthesizer.getFeasibleValues(variable.getName()));
+      }
+
+      // handle the guards
+      if (!(options.getSaveInFile() || options.getSaveIDDInFile()
+        || options.getPrintGuard() || options.getAddGuards())) {
+        // no guard related option is set, quite silently
+        // Cleanup...
+        bddSynthesizer.done();
+        return;
+      }
+
+      if (bddSynthesizer.nbrOfStates() == 0) {
+        logger.info("No guard can be derived from empty supervisor.");
+        if (Config.TUM_EXTERNAL_ON.getValue()) {
+          JOptionPane.showMessageDialog(ide.getFrame(),
+                                        "No guard can be derived from empty supervisor.",
+                                        "Error during the symbolic synthesis",
+                                        JOptionPane.ERROR_MESSAGE);
+        }
+        // Cleanup...
+        bddSynthesizer.done();
+        return;
+      }
+
+      // generate guards...
+      bddSynthesizer.generateGuard(eventNames, options);
+      logger.info("The guards were generated in "
+        + bddSynthesizer.getGuardTimer().toString() + ".");
+      // print guards or save them in a excel file.
+      if (options.getSaveInFile() || options.getPrintGuard()) {
+        final Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap =
+          bddSynthesizer.getBDDAutomata().getEdge2ExAutomatonMap();
+        final Map<String,BDDExtendedGuardGenerator> event2GuardGen =
+          bddSynthesizer.getEvent2GuardGen();
+        final Map<String, List<Entry<EdgeProxy,ExtendedAutomaton>>>
+        eventGeoInfo = new HashMap<>();
+        // Make things deterministic...
+        for(final String event: eventNames) {
+          if (!event2GuardGen.containsKey(event))
+            continue;
+          final BDDExtendedGuardGenerator guardGen = event2GuardGen.get(event);
+          final Map<EdgeProxy, String> evensEdge2GuardMap =
+            guardGen.getEdge2GuardMap();
+          final ArrayList<Entry<EdgeProxy, ExtendedAutomaton>> entries =
+            new ArrayList<>();
+          for(final Entry<EdgeProxy, ExtendedAutomaton> e:
+            edge2ExAutomatonMap.entrySet()) {
+            final String edgesGuard = evensEdge2GuardMap.get(e.getKey());
+            if (evensEdge2GuardMap.containsKey(e.getKey()) &&
+              edgesGuard != BDDExtendedGuardGenerator.TRUE) {
+              entries.add(e);
+            }
+          }
+          Collections.sort(entries, // sort based on automaton and edges names
+                           new Comparator<Entry<EdgeProxy,ExtendedAutomaton>>() {
+            @Override
+            public int compare(final Entry<EdgeProxy,ExtendedAutomaton> o1,
+                               final Entry<EdgeProxy,ExtendedAutomaton> o2)
+            {
+              final String aut1 = o1.getValue().getName();
+              final String aut2 = o2.getValue().getName();
+              if (aut1.equals(aut2)) {
+                final String sourceName1 = o1.getKey().getSource().getName();
+                final String sourceName2 = o2.getKey().getSource().getName();
+                return sourceName1.compareTo(sourceName2);
+              }
+              else {
+                return aut1.compareTo(aut2);
+              }
+            }
+          });
+          eventGeoInfo.put(event, entries);
+        }
+        // Format strings...
+        final List<List<String>> guardInfoList = new ArrayList<>();
+        for(final String event: eventGeoInfo.keySet()) {
+          final List<Entry<EdgeProxy, ExtendedAutomaton>> edge2AutMap =
+            eventGeoInfo.get(event);
+          final Map<EdgeProxy, String> edge2guardMap =
+            event2GuardGen.get(event).getEdge2GuardMap();
+          for(final Entry<EdgeProxy, ExtendedAutomaton> e: edge2AutMap) {
+            final ArrayList<String> entry = new ArrayList<>(4);
+            final String edge =
+              String.format("<%s, %s, %s>",
+                            e.getKey().getSource().getName(),
+                            event,
+                            e.getKey().getTarget().getName());
+            entry.add(edge);
+            final String aut = e.getValue().getName();
+            entry.add(aut);
+            String guard = edge2guardMap.get(e.getKey());
+            final int nbrOfTerms =
+              event2GuardGen.get(event).getGuard2NbrOfTerms().get(guard);
+            if (guard.equals(BDDExtendedGuardGenerator.FALSE)) {
+              guard = "FALSE";
+            }
+            entry.add(guard);
+            entry.add("" + nbrOfTerms);
+            guardInfoList.add(entry);
+          }
+        }
+        // Save guards in a Excel file...
+        if (options.getSaveInFile()) {
+          final JFileChooser chooser = new JFileChooser();
+          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+          chooser.setAcceptAllFileFilterUsed(false);
+          final int returnVal = chooser.showOpenDialog(ide.getFrame());
+          if (returnVal == JFileChooser.APPROVE_OPTION) {
+            final String path = chooser.getSelectedFile().getAbsolutePath();
+            Config.FILE_SAVE_PATH.set(path);
+            String name = module.getName();
+            if (name.isEmpty())
+              name = "event_edge_guard_list";
+            final File file = new File(path + "/" + name + ".xls");
+            try {
+              final FileWriter fstream = new FileWriter(file);
+              final BufferedWriter out = new BufferedWriter(fstream);
+              out.write("Edge <source, event, target>" + "\t"
+                + "Automaton" + "\t"
+                + "Guard expression" + "\t"
+                + "Guard size");
+              out.newLine();
+              out.newLine();
+              for(final List<String> e: guardInfoList) {
+                out.write(String.join("\t", e));
+                out.newLine();
+              }
+              out.close();
+            }
+            catch (final Exception e) {
+              logger.error("Could not save the event-guard pairs in the file: "
+                + e.getMessage());
+            }
+          }
+        }
+        // print guards in the console...
+        if (options.getPrintGuard()) {
+          for (final List<String> e:guardInfoList) {
+            if (e.get(2).equals("FALSE")) {
+              logger.info("Edge " + e.get(0) + " in automaton \""
+                + e.get(1) + "\" is FORBIDDEN.");
             }
             else {
-              return aut1.compareTo(aut2);
+              logger.info("Guard " + e.get(2) + " with the term size " + e.get(3)
+              + " is generated for edge " + e.get(0)
+              + " of automaton \"" + e.get(1) + "\".");
             }
           }
-        });
-        eventGeoInfo.put(event, entries);
-      }
-      // Format strings...
-      final List<List<String>> guardInfoList = new ArrayList<>();
-      for(final String event: eventGeoInfo.keySet()) {
-        final List<Entry<EdgeProxy, ExtendedAutomaton>> edge2AutMap =
-          eventGeoInfo.get(event);
-        final Map<EdgeProxy, String> edge2guardMap =
-          event2GuardGen.get(event).getEdge2GuardMap();
-        for(final Entry<EdgeProxy, ExtendedAutomaton> e: edge2AutMap) {
-          final ArrayList<String> entry = new ArrayList<>(4);
-          final String edge =
-            String.format("<%s, %s, %s>",
-                           e.getKey().getSource().getName(),
-                           event,
-                           e.getKey().getTarget().getName());
-          entry.add(edge);
-          final String aut = e.getValue().getName();
-          entry.add(aut);
-          String guard = edge2guardMap.get(e.getKey());
-          final int nbrOfTerms =
-            event2GuardGen.get(event).getGuard2NbrOfTerms().get(guard);
-          if (guard.equals(BDDExtendedGuardGenerator.FALSE)) {
-            guard = "FALSE";
-          }
-          entry.add(guard);
-          entry.add("" + nbrOfTerms);
-          guardInfoList.add(entry);
         }
       }
-      // Save guards in a Excel file...
-      if (options.getSaveInFile()) {
-        final JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setAcceptAllFileFilterUsed(false);
-        final int returnVal = chooser.showOpenDialog(ide.getFrame());
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          final String path = chooser.getSelectedFile().getAbsolutePath();
-          Config.FILE_SAVE_PATH.set(path);
-          String name = module.getName();
-          if (name.isEmpty())
-            name = "event_edge_guard_list";
-          final File file = new File(path + "/" + name + ".xls");
-          try {
-            final FileWriter fstream = new FileWriter(file);
-            final BufferedWriter out = new BufferedWriter(fstream);
-            out.write("Edge <source, event, target>" + "\t"
-                      + "Automaton" + "\t"
-                      + "Guard expression" + "\t"
-                      + "Guard size");
-            out.newLine();
-            out.newLine();
-            for(final List<String> e: guardInfoList) {
-              out.write(String.join("\t", e));
-              out.newLine();
-            }
-            out.close();
-          }
-          catch (final Exception e) {
-            logger.error("Could not save the event-guard pairs in the file: "
-                         + e.getMessage());
-          }
-        }
+
+      // Add guards and variables generated from automaton to the model...
+      if (options.getAddGuards()) {
+        bddSynthesizer.addGuardsToAutomata();
       }
-      // print guards in the console...
-      if (options.getPrintGuard()) {
-        for (final List<String> e:guardInfoList) {
-          if (e.get(2).equals("FALSE")) {
-            logger.info("Edge " + e.get(0) + " in automaton \""
-                        + e.get(1) + "\" is FORBIDDEN.");
-          }
-          else {
-            logger.info("Guard " + e.get(2) + " with the term size " + e.get(3)
-                        + " is generated for edge " + e.get(0)
-                        + " of automaton \"" + e.get(1) + "\".");
-          }
-        }
+
+      // Cleanup...
+      bddSynthesizer.done();
+    } catch (final RuntimeException e) {
+      synthesisException = e;
+    } finally {
+      if (bddSynthesizer != null) {
+        bddSynthesizer.done();
+      }
+      if (synthesisException != null) {
+        throw synthesisException;
       }
     }
-
-    // Add guards and variables generated from automaton to the model...
-    if (options.getAddGuards()) {
-      bddSynthesizer.addGuardsToAutomata();
-    }
-
-    // Cleanup...
-    bddSynthesizer.done();
 
     // Call TUM PLC Code generator
     // 1) Display info.
