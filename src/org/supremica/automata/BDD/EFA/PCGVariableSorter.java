@@ -14,12 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.DefaultPCGNode;
@@ -62,18 +57,14 @@ innerLoop:  for(final VariableComponentProxy var:vars)
 
 //        orgAutomata = oorgAutomata.clone();
 
-        final SimpleExpressionCompiler mSimpleExpressionCompiler = new SimpleExpressionCompiler(ModuleElementFactory.getInstance(), CompilerOperatorTable.getInstance());
-
         for (final VariableComponentProxy currVar : orgVar)
         {
-            CompiledRange range = null;
-            try {
-                range = mSimpleExpressionCompiler.getRangeValue(currVar.getType());
-            } catch (final EvalException exception) {
-                throw exception.getRuntimeException();
-            }
 
-            pcgNodeList.add(new DefaultPCGNode(currVar.getName(), range.size()));
+            final int max = efa.getMaxValueofVar(currVar.getName());
+            final int min = efa.getMinValueofVar(currVar.getName());
+            final int size = max - min + 1;
+
+            pcgNodeList.add(new DefaultPCGNode(currVar.getName(), size));
         }
         //PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
 
