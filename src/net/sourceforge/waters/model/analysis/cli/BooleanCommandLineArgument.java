@@ -31,65 +31,32 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.cli;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.Option;
 
 /**
- * An Boolean command line argument passed to a {@link ModelAnalyzerFactory}.
- * Boolean command line arguments are specified on the command line by their
- * name to specify a <I>true</I> value, or by their name preceded
- * with&nbsp;&quot;n&quot; to specify a <I>false</I> value. For example
- * <I>&quot;failing events&quot;</I> might be enabled by&nbsp;<CODE>-fe</CODE>
- * and disabled by <CODE>-nfe</CODE>. The recognised value (<I>true</I>
- * or&nbsp;<I>false</I>)is stored in the <CODE>CommandLineArgumentBoolean</CODE>
- * object for retrieval.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public abstract class CommandLineArgumentBoolean
-  extends CommandLineArgument
+public class BooleanCommandLineArgument extends CommandLineArgument<Boolean>
 {
 
-  //#########################################################################
+  //#######################################################################
   //# Constructors
-  /**
-   * Creates an optional command line argument of Boolean type with
-   * with default value <CODE>false</CODE>
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-limit&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   */
-  protected CommandLineArgumentBoolean(final String name,
-                                       final String description)
+  public BooleanCommandLineArgument(final CommandLineOptionContext context,
+                                    final Option<Boolean> option)
   {
-    this(name, description, false);
+    super(context, option);
   }
-
-  /**
-   * Creates an optional command line argument of Boolean type.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-limit&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   * @param  value         Default value for argument.
-   */
-  protected CommandLineArgumentBoolean(final String name,
-                                       final String description,
-                                       final boolean value)
-  {
-    super(name, description);
-    mValue = value;
-  }
-
 
   //#######################################################################
-  //# Simple Access
+  //# Parsing
   @Override
   public String getName()
   {
@@ -116,27 +83,19 @@ public abstract class CommandLineArgumentBoolean
     return "-n" + onName.substring(1);
   }
 
-  protected boolean getValue()
-  {
-    return mValue;
-  }
-
-
   //#######################################################################
   //# Parsing
   @Override
-  public void parse(final ListIterator<String> iter)
+  public void parse(final CommandLineOptionContext context,
+                    final Collection<Configurable> configurables,
+                    final ListIterator<String> iter)
   {
     final String parsed = iter.previous();
     final String onName = getOnName();
-    mValue = parsed.equals(onName);
+    final boolean value = parsed.equals(onName);
+    getOption().setValue(value);
     iter.remove();
     setUsed(true);
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mValue;
 
 }

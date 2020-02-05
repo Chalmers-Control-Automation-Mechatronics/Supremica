@@ -36,6 +36,8 @@ package net.sourceforge.waters.model.analysis;
 import java.io.PrintStream;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
+
 /**
  * An enumeration interface to support enumerated command line arguments.
  * There are different implementations of this interface to support standard

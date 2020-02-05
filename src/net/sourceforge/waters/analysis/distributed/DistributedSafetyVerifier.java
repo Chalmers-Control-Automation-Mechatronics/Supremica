@@ -37,22 +37,32 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.sourceforge.waters.analysis.distributed.application.DistributedNode;
+import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerificationJob;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.SerializableKindTranslator;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -201,6 +211,62 @@ public class DistributedSafetyVerifier
     return false;
   }
 
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, DistributedModelVerifierFactory.
+                OPTION_DistributedModelVerifierFactory_Host);
+    db.append(options, DistributedModelVerifierFactory.
+              OPTION_DistributedModelVerifierFactory_Port);
+    db.append(options, DistributedModelVerifierFactory.
+              OPTION_DistributedModelVerifierFactory_NodeCount);
+    db.append(options, DistributedModelVerifierFactory.
+              OPTION_DistributedModelVerifierFactory_ResultsDump);
+    db.append(options, DistributedModelVerifierFactory.
+              OPTION_DistributedModelVerifierFactory_Shutdown);
+    db.append(options, DistributedModelVerifierFactory.
+              OPTION_DistributedModelVerifierFactory_Walltime);
+    db.append(options, DistributedModelVerifierFactory.
+              OPTION_DistributedModelVerifierFactory_StateDistribution);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(DistributedModelVerifierFactory.
+                     OPTION_DistributedModelVerifierFactory_Host)) {
+      final StringOption opt = (StringOption) option;
+      setHostname(opt.getValue());
+    } else if (option.hasID(DistributedModelVerifierFactory.
+                            OPTION_DistributedModelVerifierFactory_Port)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setPort(opt.getValue());
+    } else if (option.hasID(DistributedModelVerifierFactory.
+                            OPTION_DistributedModelVerifierFactory_NodeCount)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setNodeCount(opt.getValue());
+    } else if (option.hasID(DistributedModelVerifierFactory.
+                            OPTION_DistributedModelVerifierFactory_ResultsDump)) {
+      final FileOption opt = (FileOption) option;
+      setResultsDumpFile(opt.getValue());
+    } else if (option.hasID(DistributedModelVerifierFactory.
+                            OPTION_DistributedModelVerifierFactory_Shutdown)) {
+      setShutdownAfter(true);
+    } else if (option.hasID(DistributedModelVerifierFactory.
+                            OPTION_DistributedModelVerifierFactory_Walltime)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setWalltimeLimit(opt.getValue());
+    } else if (option.hasID(DistributedModelVerifierFactory.
+                            OPTION_DistributedModelVerifierFactory_StateDistribution)) {
+      final StringOption opt = (StringOption) option;
+      setStateDistribution(opt.getValue());
+    } else {
+      super.setOption(option);
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -275,6 +341,34 @@ public class DistributedSafetyVerifier
 	    throw e;
 	  }
       }
+  }
+
+  //#########################################################################
+  //# Launching Local Servers
+  void launchLocalServers()
+  {
+    try {
+      final String hostname = mHostname;
+      final int port = mPort;
+      if (hostname.equals("localhost")) {
+    final String name = DistributedServer.DEFAULT_SERVICE_NAME;
+    final Registry registry = LocateRegistry.createRegistry(port);
+    final Server server = new DistributedServer();
+    final Server stub =
+      (Server) UnicastRemoteObject.exportObject(server, 0);
+    registry.bind(name, stub);
+    final int numnodes = mNodeCount;
+    for (int i = 0; i < numnodes; i++) {
+      final DistributedNode node =
+        new DistributedNode(hostname, port, name);
+      node.start();
+    }
+      }
+    } catch (final AlreadyBoundException exception) {
+      // Server already running - no problem ...
+    } catch (final RemoteException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
 

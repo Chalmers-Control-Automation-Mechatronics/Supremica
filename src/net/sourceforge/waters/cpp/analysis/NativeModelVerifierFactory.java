@@ -36,8 +36,6 @@ package net.sourceforge.waters.cpp.analysis;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -70,19 +68,6 @@ public class NativeModelVerifierFactory
   //# Constructors
   private NativeModelVerifierFactory()
   {
-  }
-
-
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
-  @Override
-  protected void addArguments()
-  {
-    super.addArguments();
-    addArgument(new CommandLineArgumentDumpStateAware());
-    addArgument(new CommandLineArgumentEventTree());
-    addArgument(new CommandLineArgumentTarjan());
   }
 
 
@@ -149,77 +134,12 @@ public class NativeModelVerifierFactory
               "-mode",
               ConflictCheckMode.values(),
               ConflictCheckMode.NO_BACKWARDS_TRANSITIONS));
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentDumpStateAware
-  private static class CommandLineArgumentDumpStateAware
-    extends CommandLineArgumentBoolean
-  {
-    private CommandLineArgumentDumpStateAware()
-    {
-      super("-lds", "Enable or disable stopping in local deadlock states");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      if (verifier instanceof NativeConflictChecker) {
-        final NativeConflictChecker checker = (NativeConflictChecker) verifier;
-        final boolean aware = getValue();
-        checker.setDumpStateAware(aware);
-      } else {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentEventTree
-  private static class CommandLineArgumentEventTree
-    extends CommandLineArgumentBoolean
-  {
-    private CommandLineArgumentEventTree()
-    {
-      super("-et", "Enable or disable event decision tree");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final NativeModelAnalyzer checker = (NativeModelAnalyzer) analyzer;
-      final boolean enabled = getValue();
-      checker.setEventTreeEnabled(enabled);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentTarjan
-  private static class CommandLineArgumentTarjan
-    extends CommandLineArgumentFlag
-  {
-    private CommandLineArgumentTarjan()
-    {
-      super("-tarjan", "Use Tarjan's algorithm for conflict check");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      if (verifier instanceof NativeConflictChecker) {
-        final NativeConflictChecker checker = (NativeConflictChecker) verifier;
-        checker.setConflictCheckMode(ConflictCheckMode.NO_BACKWARDS_TRANSITIONS);
-      } else if (verifier instanceof NativeControlLoopChecker) {
-        // ignore
-      } else {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
-      }
-    }
+    db.add(new BooleanOption
+           (OPTION_NativeConflictChecker_DumpStateAware,
+            "Dump State Aware",
+            "Enable or disable stopping in local deadlock states",
+            "-lds",
+            true));
   }
 
 
@@ -229,5 +149,7 @@ public class NativeModelVerifierFactory
     "NativeModelAnalyzer.EventTreeEnabled";
   public static final String OPTION_NativeConflictChecker_ConflictCheckMode =
     "NativeConflictChecker.ConflictCheckMode";
+  public static final String OPTION_NativeConflictChecker_DumpStateAware =
+    "NativeConflictChecker.DumpStateAware";
 
 }

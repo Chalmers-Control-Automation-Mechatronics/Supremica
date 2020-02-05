@@ -33,48 +33,37 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import gnu.trove.set.hash.THashSet;
-
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
-import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.analysis.distributed.DistributedModelVerifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.FlagOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
+import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.CommandLineArgument;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentStringList;
-import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.EventKind;
-import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
+import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
+import net.sourceforge.waters.model.analysis.cli.CustomStringCommandLineArgument;
+import net.sourceforge.waters.model.analysis.cli.FlagCommandLineArgument;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 /**
@@ -93,37 +82,6 @@ public abstract class AbstractModelAnalyzerFactory
   //# Constructors
   protected AbstractModelAnalyzerFactory()
   {
-    mArgumentMap = new LinkedHashMap<String,CommandLineArgument>(64);
-  }
-
-
-  //#########################################################################
-  //# Configuration
-  protected void addArguments()
-  {
-    addArgument(new EndArgument());
-    addArgument(new HelpArgument());
-    addArgument(new HISCArgument());
-    addArgument(new LimitArgument());
-    addArgument(new MarkingArgument());
-    addArgument(new NoOptimisationArgument());
-    addArgument(new NoOutputArgument());
-    addArgument(new PreMarkingArgument());
-    addArgument(new PropertyArgument());
-    addArgument(new ShortCounterExampleArgument());
-    addArgument(new TransitionLimitArgument());
-  }
-
-  protected void addArgument(final CommandLineArgument argument)
-  {
-    for (final String name : argument.getNames()) {
-      mArgumentMap.put(name, argument);
-    }
-  }
-
-  protected void removeArgument(final String name)
-  {
-    mArgumentMap.remove(name);
   }
 
 
@@ -202,6 +160,71 @@ public abstract class AbstractModelAnalyzerFactory
   }
 
 
+  //#########################################################################
+  //# Command Line Arguments
+  @Override
+  public void configure(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
+  {
+    for (final CommandLineArgument<?> arg : mCommandLineOptionContext.getArgumentMap().values()) {
+      if (arg.isUsed()) {
+        mCommandLineOptionContext.configure(analyzer);
+      }
+    }
+  }
+
+  @Override
+  public void configure(final ModuleCompiler compiler)
+  {
+    mCommandLineOptionContext.configure(compiler);
+  }
+
+  @Override
+  public void postConfigure(final ModelAnalyzer analyzer)
+  throws AnalysisException
+  {
+    for (final CommandLineArgument<?> arg : mCommandLineOptionContext.getArgumentMap().values()) {
+      if (arg.isUsed()) {
+        arg.postConfigure(analyzer);
+      }
+    }
+  }
+
+  //#########################################################################
+  //# Configuration
+  @Override
+  public void addArguments(final CommandLineOptionContext context,
+                              final Configurable configurable,
+                              final LeafOptionPage page)
+  {
+    if (configurable instanceof ModelAnalyzer) {
+      mCommandLineOptionContext = context;
+      registerOptions(page);
+      context.generateArgumentsFromOptions(page, configurable,
+                                   DistributedModelVerifierFactory.
+                                     OPTION_DistributedModelVerifierFactory_Host);
+
+      if (configurable instanceof ConflictChecker) {
+        @SuppressWarnings("unchecked")
+        final Option<EventProxy> markingOption = (Option<EventProxy>)
+          page.get(AbstractModelAnalyzerFactory.OPTION_ConflictChecker_ConfiguredDefaultMarking);
+        context.addArgument(new MarkingArgument(context, markingOption, AbstractModelAnalyzerFactory.
+                                                OPTION_ConflictChecker_ConfiguredDefaultMarkingString));
+        @SuppressWarnings("unchecked")
+        final Option<EventProxy> premarkingOption = (Option<EventProxy>)
+          page.get(AbstractModelAnalyzerFactory.OPTION_ConflictChecker_ConfiguredPreconditionMarking);
+        context.addArgument(new PreMarkingArgument(context, premarkingOption, AbstractModelAnalyzerFactory.
+                                                   OPTION_ConflictChecker_ConfiguredPreconditionMarkingString));
+      }
+
+
+      context.addArgument(new EndArgument(context, new FlagOption
+                                          (null, null,
+                                           "Treat remaining arguments as file names", "--")));
+    }
+  }
+
+
   @Override
   public void registerOptions(final OptionPage db)
   {
@@ -225,6 +248,11 @@ public abstract class AbstractModelAnalyzerFactory
               "Internal transition limit",
               "Maximum number of transitions in intermediate abstraction steps.",
               "-itlimit"));
+    db.add(new ChainOption
+           (OPTION_ModelAnalyzer_SecondaryFactory,
+            null,
+            "Specify secondary model verifier factory and arguments",
+            "-chain"));
 
     db.add(new BooleanOption
              (OPTION_ModelVerifier_DetailedOutputEnabled,
@@ -356,60 +384,14 @@ public abstract class AbstractModelAnalyzerFactory
              (TRCompositionalModelAnalyzerFactory.OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
               "Use weak observation equivalence",
               "",//TODO
-              "",
+              "-woeq",
             false));
-  }
 
-
-  @Override
-  public void parse(final ListIterator<String> iter)
-  {
-    mArgumentMap.clear();
-    addArguments();
-    while (iter.hasNext()) {
-      final String name = iter.next();
-      final CommandLineArgument arg = mArgumentMap.get(name);
-      if (arg != null) {
-        arg.parse(iter);
-      } else if (name.startsWith("-")) {
-        System.err.println("Unsupported option " + name +
-                           ". Try -help to see available options.");
-        System.exit(1);
-      }
-    }
-    checkRequiredArguments();
-  }
-
-  @Override
-  public void configure(final ModelAnalyzer analyzer)
-    throws AnalysisConfigurationException
-  {
-    for (final CommandLineArgument arg : mArgumentMap.values()) {
-      if (arg.isUsed()) {
-        arg.configureAnalyzer(analyzer);
-      }
-    }
-  }
-
-  @Override
-  public void configure(final ModuleCompiler compiler)
-  {
-    for (final CommandLineArgument arg : mArgumentMap.values()) {
-      if (arg.isUsed()) {
-        arg.configureCompiler(compiler);
-      }
-    }
-  }
-
-  @Override
-  public void postConfigure(final ModelAnalyzer analyzer)
-  throws AnalysisException
-  {
-    for (final CommandLineArgument arg : mArgumentMap.values()) {
-      if (arg.isUsed()) {
-        arg.postConfigure(analyzer);
-      }
-    }
+    db.add(new StringListOption
+           (OPTION_LanguageInclusionChecker_Property, null,
+            "Property for language inclusion check " +
+              "(can be used more than once)",
+           "-property"));
   }
 
 
@@ -433,190 +415,24 @@ public abstract class AbstractModelAnalyzerFactory
     return new AnalysisConfigurationException(msg);
   }
 
-  private void checkRequiredArguments()
-  {
-    for (final CommandLineArgument arg : mArgumentMap.values()) {
-      if (arg.isRequired() && !arg.isUsed()) {
-        final String clsname = getClass().getName();
-        final int dotpos = clsname.lastIndexOf('.');
-        final String msg =
-          "Required argument " + arg.getName() + " for " +
-          clsname.substring(dotpos + 1) + " not specified!";
-        CommandLineArgument.fail(msg);
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class EndArgument
-  private class EndArgument extends CommandLineArgument
-  {
-    //#######################################################################
-    //# Constructors
-    private EndArgument()
-    {
-      super("--", "Treat remaining arguments as file names");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void parse(final ListIterator<String> iter)
-    {
-      iter.remove();
-      while (iter.hasNext()) {
-        iter.next();
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class HelpArgument
-  private class HelpArgument extends CommandLineArgumentFlag
-  {
-    //#######################################################################
-    //# Constructors
-    private HelpArgument()
-    {
-      super("-help", "Print this message");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      if (getValue()) {
-        final String name =
-          ProxyTools.getShortClassName(AbstractModelAnalyzerFactory.this);
-        System.err.println
-          (name + " supports the following command line options:");
-        final List<String> keys = new ArrayList<>(mArgumentMap.keySet());
-        Collections.sort(keys);
-        for (final String key : keys) {
-          final CommandLineArgument arg = mArgumentMap.get(key);
-          if (arg.getName().startsWith(key)) {
-            arg.dump(System.err, analyzer);
-          }
-        }
-        System.exit(0);
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class HISCArgument
-  private static class HISCArgument
-    extends CommandLineArgumentFlag
-  {
-    //#######################################################################
-    //# Constructors
-    private HISCArgument()
-    {
-      super("-hisc",
-            "Compile as HISC module, only including interfaces\nof low levels");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureCompiler(final ModuleCompiler compiler)
-    {
-      if (getValue()) {
-        compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
-        compiler.setEnabledPropertyNames(null);
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class LimitArgument
-  private static class LimitArgument extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructors
-    private LimitArgument()
-    {
-      super("-limit",
-            "Maximum number of states/nodes explored");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
-      final int limit = getValue();
-      modelAnalyzer.setNodeLimit(limit);
-    }
-
-  }
-
 
   //#########################################################################
   //# Inner Class MarkingArgument
-  private static class MarkingArgument
-    extends CommandLineArgumentString
+  public static class MarkingArgument
+    extends CustomStringCommandLineArgument<EventProxy>
   {
     //#######################################################################
     //# Constructors
-    private MarkingArgument()
+    public MarkingArgument(final CommandLineOptionContext context,
+                            final Option<EventProxy> option,
+                            final String substituteID)
     {
-      super("-marking",
-            "Name of marking proposition for conflict check");
+      super(context, option, substituteID);
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      if (!(verifier instanceof ConflictChecker)) {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
-      }
-    }
-
-    @Override
-    public void configureCompiler(final ModuleCompiler compiler)
-    {
-      final String name = getValue();
-      final Collection<String> current = compiler.getEnabledPropertyNames();
-      final Collection<String> props;
-      if (current == null || current.isEmpty()) {
-        props = Collections.singletonList(name);
-      } else if (current.contains(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-        final int size = current.size();
-        if (size == 1) {
-          props = Collections.singletonList(name);
-        } else {
-          props = new ArrayList<String>(size);
-          for (final String prop : current) {
-            if (!prop.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-              props.add(prop);
-            }
-          }
-          props.add(name);
-        }
-      } else {
-        final int size = current.size() + 1;
-        props = new ArrayList<String>(size);
-        props.addAll(current);
-        props.add(name);
-      }
-      compiler.setEnabledPropositionNames(props);
-    }
-
     @Override
     public void postConfigure(final ModelAnalyzer analyzer)
     throws EventNotFoundException
@@ -634,98 +450,22 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class NoOptimisationArgument
-  private static class NoOptimisationArgument
-    extends CommandLineArgumentFlag
-  {
-    //#######################################################################
-    //# Constructors
-    private NoOptimisationArgument()
-    {
-      super("-noopt", "Disable compiler optimisation");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureCompiler(final ModuleCompiler compiler)
-    {
-      final boolean opt = !getValue();
-      compiler.setOptimizationEnabled(opt);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class NoOutputArgument
-  private static class NoOutputArgument
-    extends CommandLineArgumentFlag
-  {
-    //#######################################################################
-    //# Constructors
-    private NoOutputArgument()
-    {
-      super("-noout", "Disable counter example/supervisor computation");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
-      final boolean enable = !getValue();
-      modelAnalyzer.setDetailedOutputEnabled(enable);
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class PreMarkingArgument
-  private static class PreMarkingArgument
-    extends CommandLineArgumentString
+  public static class PreMarkingArgument
+    extends CustomStringCommandLineArgument<EventProxy>
   {
     //#######################################################################
     //# Constructors
-    private PreMarkingArgument()
+    public PreMarkingArgument(final CommandLineOptionContext context,
+                               final Option<EventProxy> option,
+                               final String substituteID)
     {
-      super("-premarking",
-            "Name of precondition marking proposition\n" +
-            "for generalised conflict check");
+      super(context, option, substituteID);
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      if (!(verifier instanceof ConflictChecker)) {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
-      }
-    }
-
-    @Override
-    public void configureCompiler(final ModuleCompiler compiler)
-    {
-      final String name = getValue();
-      final Collection<String> current = compiler.getEnabledPropertyNames();
-      final Collection<String> props;
-      if (current == null || current.isEmpty()) {
-        props = new ArrayList<String>(2);
-        props.add(EventDeclProxy.DEFAULT_MARKING_NAME);
-      } else {
-        final int size = current.size() + 1;
-        props = new ArrayList<String>(size);
-        props.addAll(current);
-      }
-      props.add(name);
-      compiler.setEnabledPropositionNames(props);
-    }
-
     @Override
     public void postConfigure(final ModelAnalyzer analyzer)
     throws EventNotFoundException
@@ -743,183 +483,37 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class PropertyArgument
-  private class PropertyArgument
-    extends CommandLineArgumentStringList
+  //# Inner Class EndArgument
+  public static class EndArgument extends FlagCommandLineArgument
   {
     //#######################################################################
     //# Constructors
-    private PropertyArgument()
+    public EndArgument(final CommandLineOptionContext context,
+                        final FlagOption option)
     {
-      super("-property",
-            "Property for language inclusion check\n" +
-            "(can be used more than once)");
-      setUsed(true);
+      super(context, option);
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configureAnalyzer(final Object verifier)
+    public void parse(final CommandLineOptionContext context,
+                      final Collection<Configurable> configurables,
+                      final ListIterator<String> iter)
     {
-      final Collection<String> props = getValues();
-      if (verifier instanceof LanguageInclusionChecker) {
-        if (props.isEmpty()) {
-          setUsed(false);
-        } else {
-          final LanguageInclusionChecker lchecker =
-            (LanguageInclusionChecker) verifier;
-          final Collection<String> names = getValues();
-          final PropertyKindTranslator translator =
-            new PropertyKindTranslator(names);
-          lchecker.setKindTranslator(translator);
-        }
-      } else {
-        if (!props.isEmpty()) {
-          fail("Command line option " + getName() +
-               " is only supported for language inclusion!");
-        }
+      iter.remove();
+      while (iter.hasNext()) {
+        iter.next();
       }
     }
 
-    @Override
-    public void configureCompiler(final ModuleCompiler compiler)
-    {
-      final Collection<String> props = getValues();
-      compiler.setEnabledPropertyNames(props);
-    }
-
-
-    //#######################################################################
-    //# Printing
-    @Override
-    public void dump(final PrintStream stream, final Object analyzer)
-    {
-      if (analyzer instanceof LanguageInclusionChecker) {
-        super.dump(stream, analyzer);
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class ShortCounterExampleArgument
-  private static class ShortCounterExampleArgument
-    extends CommandLineArgumentBoolean
-  {
-    //#######################################################################
-    //# Constructor
-    private ShortCounterExampleArgument()
-    {
-      super("-mince", "Request short counterexample (or not)");
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      if (analyzer instanceof ModelVerifier) {
-        final ModelVerifier verifier = (ModelVerifier) analyzer;
-        final boolean req = getValue();
-        verifier.setShortCounterExampleRequested(req);
-      } else {
-        fail("Command line option " + getName() +
-             " is only supported for verification!");
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class TransitionLimitArgument
-  private static class TransitionLimitArgument
-    extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructors
-    private TransitionLimitArgument()
-    {
-      super("-tlimit",
-            "Maximum number of transitions stored");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
-      final int limit = getValue();
-      modelAnalyzer.setTransitionLimit(limit);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class PropertyKindTranslator
-  private static class PropertyKindTranslator
-    implements KindTranslator, Serializable
-  {
-    //#######################################################################
-    //# Constructor
-    PropertyKindTranslator(final Collection<String> names)
-    {
-      mUsedPropertyNames = new THashSet<String>(names);
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-    @Override
-    public ComponentKind getComponentKind(final AutomatonProxy aut)
-    {
-      final ComponentKind kind = aut.getKind();
-      switch (kind) {
-      case PLANT:
-      case SPEC:
-        return ComponentKind.PLANT;
-      case PROPERTY:
-        final String name = aut.getName();
-        if (mUsedPropertyNames.contains(name)) {
-          return ComponentKind.SPEC;
-        } else {
-          return kind;
-        }
-      default:
-        return kind;
-      }
-    }
-
-    @Override
-    public EventKind getEventKind(final EventProxy event)
-    {
-      final EventKind kind = event.getKind();
-      switch (kind) {
-      case CONTROLLABLE:
-      case UNCONTROLLABLE:
-        return EventKind.UNCONTROLLABLE;
-      default:
-        return kind;
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Collection<String> mUsedPropertyNames;
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 1L;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map<String,CommandLineArgument> mArgumentMap;
-
+  private CommandLineOptionContext mCommandLineOptionContext;
 
   //#########################################################################
   //# Class Constants
@@ -931,6 +525,9 @@ public abstract class AbstractModelAnalyzerFactory
     "ModelAnalyzer.InternalStateLimit";
   public static final String OPTION_ModelAnalyzer_InternalTransitionLimit =
     "ModelAnalyzer.InternalTransitionLimit";
+
+  public static final String OPTION_ModelAnalyzer_SecondaryFactory =
+    "AbstractModelAnalyzerFactory.SecondaryFactory";
 
   public static final String OPTION_ModelVerifier_DetailedOutputEnabled =
     "ModelVerifier.DetailedOutputEnabled";
@@ -944,6 +541,9 @@ public abstract class AbstractModelAnalyzerFactory
 
   public static final String OPTION_ControlLoopChecker_LoopEvents =
     "ControlLoopChecker.LoopEvents";
+
+  public static final String OPTION_LanguageInclusionChecker_Property =
+    "ControlLoopChecker.Property";
 
   public static final String OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking =
     "SupervisorSynthesizer.ConfiguredDefaultMarking";
@@ -974,5 +574,15 @@ public abstract class AbstractModelAnalyzerFactory
     "SynchronousProductBuilder.PruningDeadlocks";
   public static final String OPTION_SynchronousProductBuilder_RemovingSelfloops =
     "SynchronousProductBuilder.RemovingSelfloops";
+
+  public static final String OPTION_AbstractModelAnalyzerFactory_NoOptimisation =
+    "AbstractModelAnalyzerFactory.NoOptimisation";
+  public static final String OPTION_AbstractModelAnalyzerFactory_HISCModule =
+    "AbstractModelAnalyzerFactory.HISCModule";
+
+  public static final String OPTION_ConflictChecker_ConfiguredDefaultMarkingString =
+    "ConflictChecker.ConfiguredDefaultMarkingString";
+  public static final String OPTION_ConflictChecker_ConfiguredPreconditionMarkingString =
+    "ConflictChecker.ConfiguredPreconditionMarkingString";
 
 }

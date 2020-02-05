@@ -58,6 +58,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -69,6 +74,7 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
 import net.sourceforge.waters.analysis.tr.WatersLongIntHashMap;
+import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -360,6 +366,56 @@ public class OPSearchAutomatonSimplifier
     dump(printer);
     printer.flush();
     return writer.toString();
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage page)
+  {
+    final List<Option<?>> options = super.getOptions(page);
+    page.append(options, ChainSimplifierFactory.
+                OPTION_OPSearchAutomatonSimplifier_OperationMode);
+    page.append(options, ChainSimplifierFactory.
+                OPTION_OPSearchAutomatonSimplifier_HiddenEvents);
+    page.append(options, ChainSimplifierFactory.
+                OPTION_OPSearchAutomatonSimplifier_Propositions);
+//    page.append(options, ChainSimplifierFactory.
+//                OPTION_OPSearchAutomatonSimplifier_OutputHiddenEvent);
+    page.append(options, ChainSimplifierFactory.
+                OPTION_OPSearchAutomatonSimplifier_LogFile);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(ChainSimplifierFactory.
+                     OPTION_OPSearchAutomatonSimplifier_OperationMode)) {
+      @SuppressWarnings("unchecked")
+      final
+      EnumOption<Mode> opt = (EnumOption<Mode>) option;
+      setOperationMode(opt.getValue());
+    } else if (option.hasID
+      (ChainSimplifierFactory.
+       OPTION_OPSearchAutomatonSimplifier_HiddenEvents)) {
+      final EventSetOption opt = (EventSetOption) option;
+      setHiddenEvents(opt.getValue());
+    } else if (option.hasID
+      (ChainSimplifierFactory.
+       OPTION_OPSearchAutomatonSimplifier_Propositions)) {
+      final EventSetOption opt = (EventSetOption) option;
+      setPropositions(opt.getValue());
+    } else if (option.hasID
+      (ChainSimplifierFactory.
+       OPTION_OPSearchAutomatonSimplifier_OutputHiddenEvent)) {
+      //TODO
+    } else if (option.hasID
+      (ChainSimplifierFactory.
+       OPTION_OPSearchAutomatonSimplifier_LogFile)) {
+      final FileOption opt = (FileOption) option;
+      setLogFile(opt.getValue());
+    }
   }
 
 

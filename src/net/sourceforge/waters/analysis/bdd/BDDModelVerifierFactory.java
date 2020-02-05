@@ -40,9 +40,6 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -76,22 +73,6 @@ public class BDDModelVerifierFactory
   //# Constructors
   private BDDModelVerifierFactory()
   {
-  }
-
-
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelAnalyzerFactory
-  @Override
-  protected void addArguments()
-  {
-    super.addArguments();
-    addArgument(new CommandLineArgumentPack());
-    addArgument(new CommandLineArgumentOrder());
-    addArgument(new CommandLineArgumentInitialSize());
-    addArgument(new CommandLineArgumentPartitioningStrategy());
-    addArgument(new CommandLineArgumentPartitioningSizeLimit());
-    addArgument(new CommandLineArgumentDynamic());
   }
 
 
@@ -207,158 +188,6 @@ public class BDDModelVerifierFactory
         IllegalAccessException exception) {
         throw new WatersRuntimeException(exception);
       }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentPack
-  private static class CommandLineArgumentPack
-    extends CommandLineArgumentEnum<BDDPackage>
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentPack()
-    {
-      super("-pack", "Specify BDD package", BDDPackage.class);
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final BDDPackage pack = getValue();
-      bddVerifier.setBDDPackage(pack);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentOrder
-  private static class CommandLineArgumentOrder
-    extends CommandLineArgumentEnum<VariableOrdering>
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentOrder()
-    {
-      super("-order", "Set initial variable ordering method",
-            VariableOrdering.class);
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final VariableOrdering ordering = getValue();
-      bddVerifier.setVariableOrdering(ordering);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentDynamic
-  private static class CommandLineArgumentDynamic
-    extends CommandLineArgumentBoolean
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentDynamic()
-    {
-      super("-dynamic", "Enable or disable dynamic variable reordering");
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final boolean enabled = getValue();
-      bddVerifier.setReorderingEnabled(enabled);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentInitialSize
-  private static class CommandLineArgumentInitialSize
-    extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentInitialSize()
-    {
-      super("-size", "Initial size of BDD node table");
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final int size = getValue();
-      bddVerifier.setInitialSize(size);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentOrder
-  private static class CommandLineArgumentPartitioningStrategy
-    extends CommandLineArgumentEnum<TransitionPartitioningStrategy>
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentPartitioningStrategy()
-    {
-      super("-part", "Set transition partitioning strategy",
-            TransitionPartitioningStrategy.class);
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final TransitionPartitioningStrategy strategy = getValue();
-      bddVerifier.setTransitionPartitioningStrategy(strategy);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentParitioningSizeLimit
-  private static class CommandLineArgumentPartitioningSizeLimit
-    extends CommandLineArgumentInteger
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentPartitioningSizeLimit()
-    {
-      super("-plimit", "Maximum BDD size when merging partitioned BDDs");
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final int limit = getValue();
-      bddVerifier.setPartitioningSizeLimit(limit);
     }
   }
 

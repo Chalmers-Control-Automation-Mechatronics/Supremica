@@ -438,6 +438,8 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                        OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled);
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+              OPTION_AbstractTRCompositionalModelAnalyzer_SpecialEvents);
     return options;
   }
 
@@ -495,10 +497,19 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                             OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setUsingWeakObservationEquivalence(boolOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_SpecialEvents)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      final boolean enable = boolOption.getValue();
+      setBlockedEventsEnabled(enable);
+      setFailingEventsEnabled(enable);
+      setSelfloopOnlyEventsEnabled(enable);
+      setAlwaysEnabledEventsEnabled(enable);
     } else {
       super.setOption(option);
     }
   }
+
 
 
   //#########################################################################

@@ -31,70 +31,41 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.cli;
 
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-
 
 /**
- * A command line argument passed to a {@link ModelAnalyzerFactory}.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public abstract class CommandLineArgument
-  implements Comparable<CommandLineArgument>
+public abstract class CommandLineArgument<T> implements OptionEditor<T>,
+  Comparable<CommandLineArgument<?>>
 {
 
   //#########################################################################
   //# Constructors
-  /**
-   * Creates an optional command line argument.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-marking&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   */
-  protected CommandLineArgument(final String name,
-                                final String description)
-  {
-    this(name, description, false);
+  public CommandLineArgument(final CommandLineOptionContext context, final Option<T> option) {
+    mOption = option;
+    mName = option.getCommandLineOption();
   }
-
-  /**
-   * Creates a command line argument.
-   * @param  name          The name of the argument,
-   *                       for example <CODE>&quot;-marking&quot;</CODE>.
-   * @param  description   A textual description of the argument.
-   * @param  required      A flag indicating whether this is a required
-   *                       command line argument. The command line tool
-   *                       will not accept command lines that fail to
-   *                       specify all required arguments.
-   */
-  protected CommandLineArgument(final String name,
-                                final String description,
-                                final boolean required)
-  {
-    mName = name;
-    mDescription = description;
-    mIsRequired = required;
-  }
-
 
   //#########################################################################
   //# Interface java.util.Comparable
   @Override
-  public int compareTo(final CommandLineArgument arg)
+  public int compareTo(final CommandLineArgument<?> arg)
   {
     return mName.compareTo(arg.getName());
   }
-
 
   //#########################################################################
   //# Simple Access
@@ -108,30 +79,13 @@ public abstract class CommandLineArgument
     return Collections.singletonList(mName);
   }
 
-  protected String getArgumentTemplate()
-  {
-    return null;
-  }
-
-  protected String getDescription()
-  {
-    return mDescription;
-  }
-
-  /**
-   * <P>Determines whether this is a required command line argument.</P>
-   * <P>An argument must be required or optional for all model verifiers
-   * of its factory; if more elaborate conditions on arguments are
-   * needed, they have to be implemented by the individual model verifiers.</P>
-   * <P>After parsing all command line arguments, the {@link
-   * ModelAnalyzerFactory} checks whether all required arguments have been
-   * specified, and if this is not the case, it causes configuration to
-   * fail by calling the {@link #fail(String) fail()} method of the
-   * unspecified required argument.</P>
-   */
   public boolean isRequired()
   {
     return mIsRequired;
+  }
+
+  public void setRequired(final boolean required) {
+    mIsRequired = required;
   }
 
   public boolean isUsed()
@@ -139,30 +93,39 @@ public abstract class CommandLineArgument
     return mIsUsed;
   }
 
-  protected void setUsed(final boolean used)
-  {
+  protected void setUsed(final boolean used) {
     mIsUsed = used;
   }
 
+  protected String getArgumentTemplate()
+  {
+    return null;
+  }
+
+  @Override
+  public Option<T> getOption()
+  {
+    return mOption;
+  }
+
+  public void setOption(final Configurable configurable) {
+    if (mIsUsed) configurable.setOption(getOption());
+  }
+
+  public T getValue() {
+    return getOption().getValue();
+  }
 
   //#########################################################################
   //# Parsing
-  public abstract void parse(ListIterator<String> iter);
-
-  public void configureAnalyzer(final Object analyzer)
-    throws AnalysisConfigurationException
-  {
-  }
-
-  public void configureCompiler(final ModuleCompiler compiler)
-  {
-  }
+  public abstract void parse(final CommandLineOptionContext context,
+                             final Collection<Configurable> configurables,
+                             ListIterator<String> iter);
 
   public void postConfigure(final ModelAnalyzer analyzer)
     throws AnalysisException
   {
   }
-
 
   //#########################################################################
   //# Printing
@@ -177,26 +140,38 @@ public abstract class CommandLineArgument
       stream.print(template);
       len += template.length() + 1;
     }
+
+    final Option<T> option = getOption();
+    final String description = option.getDescription();
     doIndent(stream, INDENT - len);
-    final String description = getDescription();
-    int start = 0;
-    int end = description.indexOf('\n');
-    while (end > 0) {
-      final String line = description.substring(start, end);
-      stream.println(line);
-      if (description.length() == end) {
-        return;
+    int column = INDENT;
+    boolean first = true;
+    for (final String word : description.split(" ")) {
+      final int wordLength = word.length();
+      if (first) {
+        first = false;
+      } else {
+        column++;
+        if (column + wordLength > DUMP_WIDTH) {
+          stream.println();
+          column = 0;
+        } else {
+          stream.print(' ');
+          column++;
+        }
       }
-      doIndent(stream, INDENT);
-      start = end + 1;
-      end = description.indexOf('\n', start);
+      if (column == 0) {
+        doIndent(stream, INDENT);
+        column = INDENT;
+      }
+      stream.print(word);
+      column += wordLength;
     }
-    final String rest = description.substring(start);
-    stream.println(rest);
+    stream.println();
   }
 
 
-  protected static void doIndent(final PrintStream stream, final int spaces)
+  public static void doIndent(final PrintStream stream, final int spaces)
   {
     for (int i = 0; i < spaces; i++) {
       stream.print(' ');
@@ -214,20 +189,21 @@ public abstract class CommandLineArgument
 
   protected void failMissingValue()
   {
-    fail("No value specified for command line argument " + getName() + "!");
+    fail("No value specified for command line argument "
+      + mName + "!");
   }
 
 
   //#########################################################################
   //# Data Members
+  private final Option<T> mOption;
   private final String mName;
-  private final String mDescription;
-  private final boolean mIsRequired;
   private boolean mIsUsed;
-
+  private boolean mIsRequired;
 
   //#########################################################################
   //# Class Constants
   protected static final int INDENT = 20;
+  protected static final int DUMP_WIDTH = 75;
 
 }

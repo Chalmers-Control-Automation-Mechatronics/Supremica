@@ -44,13 +44,16 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
@@ -331,10 +334,18 @@ public abstract class AbstractCompositionalModelVerifier
     final List<Option<?>> options = super.getOptions(db);
     db.prepend(options, CompositionalModelAnalyzerFactory.
                         OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled);
+    db.prepend(options, CompositionalModelAnalyzerFactory.
+                        OPTION_AbstractCompositionalModelVerifier_LowerInternalStateLimit);
+    db.prepend(options, CompositionalModelAnalyzerFactory.
+                        OPTION_AbstractCompositionalModelVerifier_UpperInternalStateLimit);
+    db.prepend(options, CompositionalModelAnalyzerFactory.
+                        OPTION_AbstractCompositionalModelVerifier_SpecialEvents);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_ShortCounterExampleRequested);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_DetailedOutputEnabled);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ModelAnalyzer_SecondaryFactory);
     return options;
   }
 
@@ -353,6 +364,24 @@ public abstract class AbstractCompositionalModelVerifier
                             OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setTraceCheckingEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelVerifier_LowerInternalStateLimit)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setLowerInternalStateLimit(opt.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelVerifier_UpperInternalStateLimit)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      setUpperInternalStateLimit(opt.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelVerifier_SpecialEvents)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setUsingSpecialEvents(boolOption.getBooleanValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_SecondaryFactory)) {
+      final ChainOption opt = (ChainOption) option;
+      final ModelAnalyzer secondaryAnalyzer =
+        opt.createSecondaryAnalyzer(this);
+      setMonolithicAnalyzer(secondaryAnalyzer);
     } else {
       super.setOption(option);
     }

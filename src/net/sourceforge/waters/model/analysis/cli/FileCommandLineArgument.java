@@ -31,89 +31,54 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.cli;
 
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.File;
+import java.util.Collection;
+import java.util.ListIterator;
 
-import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
-
+import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.Option;
 
 /**
- * An extensible implementation of the {@link EnumFactory} interface.
- * This enumeration factory simply maintains a list of registered values,
- * one of which can be designated as default.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class ListedEnumFactory<E> extends EnumFactory<E>
+public class FileCommandLineArgument extends CommandLineArgument<File>
 {
 
-  //#########################################################################
-  //# Constructors
-  protected ListedEnumFactory()
+  public FileCommandLineArgument(final CommandLineOptionContext context,
+                                    final Option<File> option)
   {
-    mRegisteredElements = new LinkedList<E>();
+    super(context, option);
   }
 
-
-  //#########################################################################
-  //# Initialisation
-  protected void register(final E item, final boolean isDefault)
-  {
-    register(item);
-    if (isDefault) {
-      mDefaultValue = item;
-    }
-  }
-
-  protected void register(final E item)
-  {
-    mRegisteredElements.add(item);
-  }
-
-  public void setDefaultValue(final E item)
-  {
-    mDefaultValue = item;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.EnumFactory
+  //#######################################################################
+  //# Simple Access
   @Override
-  public List<E> getEnumConstants()
+  protected String getArgumentTemplate()
   {
-    return Collections.unmodifiableList(mRegisteredElements);
+    return "<filename>";
   }
 
+  //#######################################################################
+  //# Parsing
   @Override
-  public E getDefaultValue()
+  public void parse(final CommandLineOptionContext context,
+                    final Collection<Configurable> configurables,
+                    final ListIterator<String> iter)
   {
-    if (mDefaultValue == null) {
-      return super.getDefaultValue();
+    iter.remove();
+    if (iter.hasNext()) {
+      final String text = iter.next();
+      getOption().set(text);
+      iter.remove();
+      setUsed(true);
     } else {
-      return mDefaultValue;
-    }
-  }
-
-  @Override
-  public void dumpEnumeration(final PrintStream stream, final int indent)
-  {
-    super.dumpEnumeration(stream, indent);
-    if (mDefaultValue != null) {
-      CommandLineArgument.doIndent(stream, indent);
-      stream.print("Default is: ");
-      stream.println(mDefaultValue);
+      failMissingValue();
     }
   }
 
 
-  //#########################################################################
-  //# Data Members
-  private final List<E> mRegisteredElements;
-  private E mDefaultValue;
 
 }

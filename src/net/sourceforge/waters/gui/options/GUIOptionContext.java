@@ -44,12 +44,14 @@ import javax.swing.Icon;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.ColorOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.OptionContext;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionPageEditor;
@@ -62,6 +64,7 @@ import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -214,6 +217,18 @@ public class GUIOptionContext implements OptionContext
   createColorEditor(final ColorOption option)
   {
     return new ColorOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionEditor<Boolean> createFlagEditor(final FlagOption option)
+  {
+    return null;
+  }
+
+  @Override
+  public OptionEditor<ModelAnalyzerFactoryLoader> createChainEditor(final ChainOption option)
+  {
+    return null;
   }
 
   @Override

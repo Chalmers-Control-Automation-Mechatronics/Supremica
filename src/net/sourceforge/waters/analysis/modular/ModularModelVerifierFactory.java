@@ -38,11 +38,7 @@ import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -62,21 +58,6 @@ public class ModularModelVerifierFactory
   //# Constructors
   public ModularModelVerifierFactory()
   {
-  }
-
-
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
-  @Override
-  protected void addArguments()
-  {
-    super.addArguments();
-    addArgument(new SecondaryFactoryArgument());
-    addArgument(ModularHeuristicFactory.getMethodArgument());
-    addArgument(ModularHeuristicFactory.getPreferenceArgument());
-    addArgument(new MergeVersionAgument());
-    addArgument(new SelectVersionArgument());
   }
 
 
@@ -170,9 +151,16 @@ public class ModularModelVerifierFactory
               "The heuristic to determine which components to include in " +
               "subsequent verification attempts based on the counterexample " +
               "from the previous attempt.",
-              "-heuristic",
+              "-merge",
               AutomataGroup.MergeVersion.values(),
               AutomataGroup.MergeVersion.MaxCommonEvents));
+    db.add(new EnumOption<AutomataGroup.SelectVersion>
+           (OPTION_ModularControlLoopChecker_SelectVersion,
+            "Select Version",
+            "Method used to select the primary automaton for merging",
+            "-select",
+            AutomataGroup.SelectVersion.values(),
+            AutomataGroup.SelectVersion.Naive));
   }
 
 
@@ -184,100 +172,6 @@ public class ModularModelVerifierFactory
       theInstance = new ModularModelVerifierFactory();
     }
     return theInstance;
-  }
-
-
-  //#########################################################################
-  //# Inner Class SecondaryFactoryArgyment
-  private static class SecondaryFactoryArgument
-    extends CommandLineArgumentChain
-  {
-    //#######################################################################
-    //# Constructors
-    private SecondaryFactoryArgument()
-    {
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-      throws AnalysisConfigurationException
-    {
-      if (analyzer instanceof AbstractModularSafetyVerifier) {
-        final ModelVerifier verifier = (ModelVerifier) analyzer;
-        final AbstractModularSafetyVerifier modular =
-          (AbstractModularSafetyVerifier) verifier;
-        final SafetyVerifier secondaryVerifier =
-          (SafetyVerifier) createSecondaryAnalyzer(verifier);
-        modular.setMonolithicVerifier(secondaryVerifier);
-      } else {
-        failUnsupportedAnalyzerClass(analyzer);
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class MergeVersionAgument
-  private static class MergeVersionAgument
-    extends CommandLineArgumentEnum<AutomataGroup.MergeVersion>
-  {
-    //#######################################################################
-    //# Constructors
-    private MergeVersionAgument()
-    {
-      super("-merge", "Method used to select the secondary automaton for merging",
-            AutomataGroup.MergeVersion.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      final AutomataGroup.MergeVersion method = getValue();
-      if (verifier instanceof ModularControlLoopChecker) {
-        final ModularControlLoopChecker checker =
-          (ModularControlLoopChecker) verifier;
-        checker.setMergeVersion(method);
-      } else {
-        fail(getName() + " option only supported for modular control loop checker!");
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectVersionArgument
-  private static class SelectVersionArgument
-  extends CommandLineArgumentEnum<AutomataGroup.SelectVersion>
-  {
-    //#######################################################################
-    //# Constructors
-    private SelectVersionArgument()
-    {
-      super("-select", "Method used to select the primary automaton for merging",
-            AutomataGroup.SelectVersion.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      final AutomataGroup.SelectVersion method = getValue();
-      if (verifier instanceof ModularControlLoopChecker) {
-        final ModularControlLoopChecker checker =
-          (ModularControlLoopChecker) verifier;
-        checker.setSelectVersion(method);
-      } else {
-        fail(getName() + " option only supported for modular control loop checker!");
-      }
-    }
   }
 
 
@@ -312,5 +206,8 @@ public class ModularModelVerifierFactory
   public static final String
     OPTION_ModularControlLoopChecker_MergeVersion =
     "ModularControlLoopChecker.MergeVersion";
+  public static final String
+    OPTION_ModularControlLoopChecker_SelectVersion =
+    "ModularControlLoopChecker.SelectVersion";
 
 }

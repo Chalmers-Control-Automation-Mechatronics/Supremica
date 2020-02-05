@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.module;
 
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -59,7 +60,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
  */
 
 public interface ModuleAnalyzer
-  extends Abortable
+  extends Abortable, Configurable
 {
 
   //#########################################################################

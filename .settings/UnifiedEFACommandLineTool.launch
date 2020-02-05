@@ -11,7 +11,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.analysis.efa.unified.UnifiedEFACommandLineTool"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-DMAXSEQNO=3&#10;-compsel MinF,MinS&#10;-varsel maxE,MaxS,MinD&#10;-method NB&#10;-uni&#10;${workspace_loc:waters}/examples/waters/tests/profisafe/profisafe_ihost_efa_0b.wmod"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-DMAXSEQNO=3&#10;-compsel MinF1,MinS&#10;-varsel maxE,MaxS,MinD&#10;-method NB&#10;${workspace_loc:waters}/examples/waters/tests/profisafe/profisafe_ihost_efa_0b.wmod"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2048m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
 </launchConfiguration>

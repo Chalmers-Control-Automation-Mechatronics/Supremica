@@ -77,6 +77,10 @@ public abstract class OptionPage
   public void append(final List<Option<?>> list, final String id)
   {
     final Option<?> option = get(id);
+    if (option == null) {
+      System.err.println(id);
+      return;
+    }
     assert option != null;
     list.add(option);
   }

@@ -35,6 +35,7 @@ package net.sourceforge.waters.cpp.analysis;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
@@ -278,6 +279,8 @@ public class NativeConflictChecker
                         OPTION_ConflictChecker_ConfiguredDefaultMarking);
     db.append(options, NativeModelVerifierFactory.
                        OPTION_NativeConflictChecker_ConflictCheckMode);
+    db.append(options, NativeModelVerifierFactory.
+                       OPTION_NativeConflictChecker_DumpStateAware);
     return options;
   }
 
@@ -298,6 +301,10 @@ public class NativeConflictChecker
       final EnumOption<ConflictCheckMode> enumOption =
         (EnumOption<ConflictCheckMode>) option;
       setConflictCheckMode(enumOption.getValue());
+    } else if (option.hasID(NativeModelVerifierFactory.
+                            OPTION_NativeConflictChecker_DumpStateAware)) {
+      final BooleanOption opt = (BooleanOption) option;
+      setDumpStateAware(opt.getValue());
     } else {
       super.setOption(option);
     }

@@ -35,10 +35,13 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -144,6 +147,8 @@ abstract class AbstractModularSafetyVerifier
                         OPTION_AbstractModularSafetyVerifier_HeuristicPreference);
     db.prepend(options, ModularModelVerifierFactory.
                         OPTION_AbstractModularSafetyVerifier_HeuristicMethod);
+    db.append(options, AbstractModelAnalyzerFactory.
+                        OPTION_ModelAnalyzer_SecondaryFactory);
     return options;
   }
 
@@ -161,6 +166,12 @@ abstract class AbstractModularSafetyVerifier
       final EnumOption<ModularHeuristicFactory.Method> enumOption =
         (EnumOption<ModularHeuristicFactory.Method>) option;
       setHeuristicMethod(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_SecondaryFactory)) {
+      final ChainOption opt = (ChainOption) option;
+      final ModelAnalyzer secondaryAnalyzer =
+        opt.createSecondaryAnalyzer(this);
+      setMonolithicVerifier((SafetyVerifier) secondaryAnalyzer);
     } else {
       super.setOption(option);
     }

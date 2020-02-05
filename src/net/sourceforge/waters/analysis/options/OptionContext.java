@@ -37,6 +37,7 @@ import java.awt.Color;
 import java.io.File;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -122,6 +123,18 @@ public interface OptionContext
    */
   public OptionEditor<Color>
   createColorEditor(ColorOption option);
+
+  /**
+   * Creates an option editor for a flag option.
+   */
+  public OptionEditor<Boolean>
+  createFlagEditor(FlagOption option);
+
+  /**
+   * Creates an option editor for a chain option.
+   */
+  public OptionEditor<ModelAnalyzerFactoryLoader>
+  createChainEditor(ChainOption option);
 
   /**
    * Creates an option editor for a simple leaf option page.

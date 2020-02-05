@@ -128,5 +128,5 @@ fi
 
 if [ $OK = 1 ]; then
     eval java -cp "$DIR/Supremica.jar" -enableassertions $MEM1 $MEM2 \
-        $WPACK.model.analysis.CommandLineTool $MAIN_FACTORY $CHECK "$ARGS"
+        $WPACK.model.analysis.cli.CommandLineTool $MAIN_FACTORY $CHECK "$ARGS"
 fi
