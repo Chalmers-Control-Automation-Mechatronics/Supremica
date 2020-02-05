@@ -16,6 +16,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -475,9 +476,16 @@ public abstract class BDDAbstractManager {
 
         } else if (expr instanceof SimpleIdentifierProxy) {
             final String varNameOrInstValue = ((SimpleIdentifierProxy) expr).getName();
-            final Map<String, Integer> varToIndexMap = bddExAutomata.theIndexMap.variableStringToIndexMap;
-            final Integer index = varToIndexMap.get(varNameOrInstValue);
-            return new ResultOverflows(bddExAutomata.getBDDBitVecSource(index), getZeroBDD());
+            if (bddExAutomata.orgExAutomata.getVariableIdentifiers().contains(varNameOrInstValue)) {
+              final Map<String, Integer> varToIndexMap = bddExAutomata.theIndexMap.variableStringToIndexMap;
+              final Integer index = varToIndexMap.get(varNameOrInstValue);
+              return new ResultOverflows(bddExAutomata.getBDDBitVecSource(index), getZeroBDD());
+            } else if (bddExAutomata.orgExAutomata.getNamedConstantIdentifiers().contains(varNameOrInstValue)) {
+              final ExpressionProxy constantExpr = bddExAutomata.orgExAutomata.getNamedConstants().get(varNameOrInstValue).getExpression();
+              return expr2BDDBitVec((SimpleExpressionProxy) constantExpr, guardAction, updatedVariables);
+            } else {
+              throw new IllegalArgumentException(varNameOrInstValue + " is not a known identifier.");
+            }
         }
 		else if (expr instanceof IntConstantProxy)
 		{

@@ -531,6 +531,18 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return variables;
     }
 
+    public List<String> getVariableIdentifiers() {
+      return new ArrayList<String>(var2domainMap.keySet());
+    }
+
+    public Map<String, ConstantAliasProxy> getNamedConstants() {
+      return identifierNameToProxy;
+    }
+
+    public List<String> getNamedConstantIdentifiers() {
+      return new ArrayList<String>(identifierNameToProxy.keySet());
+    }
+
     public Set<String> getNonIntegerVarNameSet() {
         return nonIntegerVariables;
     }
