@@ -698,155 +698,64 @@ public abstract class BDDAbstractManager {
 
         if (operator.equals(operatorTable.getAndOperator())) {
 
-            // The left hand side and right hand side of the operator both must
-            // return boolean values, so use the guard visitor.
-            final Expression2BDDBitVectorVisitor leftVisitor = new GuardExpression2BDDVisitor(updatedVariables);
-            final Expression2BDDBitVectorVisitor rightVisitor = new GuardExpression2BDDVisitor(updatedVariables);
-            final BDDOverflows roLeft = (BDDOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
-            final BDDOverflows roRight = (BDDOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
-            BDD tmp = roLeft.getResult().id();
-            final BDD rightGuard = roRight.getResult();
-            tmp = tmp.and(rightGuard);
-            return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+            final BDDFactory.BDDOp op = BDDFactory.and;
+            return binaryBooleanExpression(binExpr, op);
 
         } else if (operator.equals(operatorTable.getOrOperator())) {
 
-            final Expression2BDDBitVectorVisitor leftVisitor = new GuardExpression2BDDVisitor(updatedVariables);
-            final Expression2BDDBitVectorVisitor rightVisitor = new GuardExpression2BDDVisitor(updatedVariables);
-            final BDDOverflows roLeft = (BDDOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
-            final BDDOverflows roRight = (BDDOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
-            BDD tmp = roLeft.getResult().id();
-            final BDD rightGuard = roRight.getResult();
-            tmp = tmp.or(rightGuard);
-            return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+            final BDDFactory.BDDOp op = BDDFactory.or;
+            return binaryBooleanExpression(binExpr, op);
 
         } else if (operator.equals(operatorTable.getEqualsOperator())) {
 
-          BDD tmp = null;
-          BDD leftOverflows = getZeroBDD();
-          BDD rightOverflows = getZeroBDD();
-          if (isAutVar(binExpr.getLeft().toString())) {
-              final String leftString = binExpr.getLeft().toString();
-              final String locName = binExpr.getRight().toString();
-              final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
-              tmp = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
-                      bddExAutomata.getSourceLocationDomain(autName));
-          }
-          else {
-              final SimpleExpressionProxy left = binExpr.getLeft();
-              final SimpleExpressionProxy right = binExpr.getRight();
-              final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
-              final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-              final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-              final ResultOverflows roLeft = (ResultOverflows) left.acceptVisitor(leftVisitor);
-              ResultOverflows roRight = null;
+          final SupremicaBDDBitVector.BitVectorOp bitVectorOp = SupremicaBDDBitVector.equ;
+          final BDDFactory.BDDOp bddOp = BDDFactory.and;
 
-              String leftVarName = null;
-              if (left instanceof UnaryExpressionProxy) {
-                final UnaryExpressionProxy unExpr = (UnaryExpressionProxy) left;
-                if (unExpr.getOperator().equals(operatorTable.getNextOperator())) {
-                  leftVarName = unExpr.getSubTerm().toString();
-                }
-              } else {
-                leftVarName = left.toString();
-              }
-
-              if (nonIntegerVarNameSet.contains(leftVarName) &&
-                  !nonIntegerVarNameSet.contains(right.toString())) {
-                final Map<String, String> var2InstIntMap =
-                  bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(leftVarName);
-                IntConstantProxy mappedIntProxy = null;
-                if (var2InstIntMap.containsKey(right.toString())) {
-                  mappedIntProxy = new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
-                } else {
-                  mappedIntProxy = new IntConstantSubject(Integer.parseInt(right.toString()));
-                }
-                roRight = (ResultOverflows) mappedIntProxy.acceptVisitor(rightVisitor);
-              } else {
-                roRight = (ResultOverflows) right.acceptVisitor(rightVisitor);
-              }
-              tmp = roLeft.getResult().equ(roRight.getResult());
-              leftOverflows = roLeft.getOverflows();
-              rightOverflows = roRight.getOverflows();
+          // Need to check whether the left hand side expression is a primed
+          // variable, and then extract it.
+          String leftVarName = null;
+          if (binExpr.getLeft() instanceof UnaryExpressionProxy) {
+            final UnaryExpressionProxy unExpr = (UnaryExpressionProxy) binExpr.getLeft();
+            if (unExpr.getOperator().equals(operatorTable.getNextOperator())) {
+              leftVarName = unExpr.getSubTerm().toString();
+            }
+          } else {
+            leftVarName = binExpr.getLeft().toString();
           }
-          return new BDDOverflows(tmp, leftOverflows.or(rightOverflows));
+
+          return binaryEqualityOperator(binExpr, bitVectorOp, bddOp,
+                                        leftVarName);
 
       } else if (operator.equals(operatorTable.getNotEqualsOperator())) {
 
-          BDD tmp = null;
-          BDD leftOverflows = getZeroBDD();
-          BDD rightOverflows = getZeroBDD();
-          if (isAutVar(binExpr.getLeft().toString())) {
-              final String leftString = binExpr.getLeft().toString();
-              final String locName = binExpr.getRight().toString();
-              final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
-              tmp = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
-                      bddExAutomata.getSourceLocationDomain(autName)).not();
-          } else {
-              final SimpleExpressionProxy left = binExpr.getLeft();
-              final SimpleExpressionProxy right = binExpr.getRight();
-              final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-              final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-              final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
-              final ResultOverflows roLeft = (ResultOverflows) left.acceptVisitor(leftVisitor);
-              ResultOverflows roRight = null;
-              if (nonIntegerVarNameSet.contains(left.toString()) &&
-                  !nonIntegerVarNameSet.contains(right.toString())) {
-                final Map<String, String> var2InstIntMap =
-                  bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
-                IntConstantProxy mappedIntProxy = null;
-                if (var2InstIntMap.containsKey(right.toString())) {
-                  mappedIntProxy = new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
-                } else {
-                  mappedIntProxy = new IntConstantSubject(Integer.parseInt(right.toString()));
-                }
-                roRight = (ResultOverflows) mappedIntProxy.acceptVisitor(rightVisitor);
-              } else {
-                roRight = (ResultOverflows) right.acceptVisitor(rightVisitor);
-              }
-              tmp = roLeft.getResult().neq(roRight.getResult());
-              leftOverflows = roLeft.getOverflows();
-              rightOverflows = roRight.getOverflows();
-          }
-          return new BDDOverflows(tmp, leftOverflows.or(rightOverflows));
+          final SupremicaBDDBitVector.BitVectorOp bitVectorOp = SupremicaBDDBitVector.neq;
+          final BDDFactory.BDDOp bddOp = BDDFactory.nand;
+
+          // The method need the name of the left hand side sub expression.
+          final String leftVarName = binExpr.getLeft().toString();
+
+          return binaryEqualityOperator(binExpr, bitVectorOp, bddOp,
+                                             leftVarName);
 
       } else if (operator.equals(operatorTable.getGreaterThanOperator())) {
 
-          // The left hand side and right hand side of the operator both must
-          // return integer values, so use the arithmetic visitor.
-          final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ResultOverflows roLeft = (ResultOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
-          final ResultOverflows roRight = (ResultOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
-          final BDD tmp = roLeft.getResult().gth(roRight.getResult());
-          return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+          final SupremicaBDDBitVector.BitVectorOp op = SupremicaBDDBitVector.gth;
+          return binaryInequalityOperator(binExpr, op);
 
       } else if (operator.equals(operatorTable.getGreaterEqualsOperator())) {
 
-          final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ResultOverflows roLeft = (ResultOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
-          final ResultOverflows roRight = (ResultOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
-          final BDD tmp = roLeft.getResult().gte(roRight.getResult());
-          return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+          final SupremicaBDDBitVector.BitVectorOp op = SupremicaBDDBitVector.gte;
+          return binaryInequalityOperator(binExpr, op);
 
       } else if (operator.equals(operatorTable.getLessThanOperator())) {
 
-          final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ResultOverflows roLeft = (ResultOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
-          final ResultOverflows roRight = (ResultOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
-          final BDD tmp = roLeft.getResult().lth(roRight.getResult());
-          return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+          final SupremicaBDDBitVector.BitVectorOp op = SupremicaBDDBitVector.lth;
+          return binaryInequalityOperator(binExpr, op);
 
       } else if (operator.equals(operatorTable.getLessEqualsOperator())) {
 
-          final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
-          final ResultOverflows roLeft = (ResultOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
-          final ResultOverflows roRight = (ResultOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
-          final BDD tmp = roLeft.getResult().lte(roRight.getResult());
-          return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+          final SupremicaBDDBitVector.BitVectorOp op = SupremicaBDDBitVector.lte;
+          return binaryInequalityOperator(binExpr, op);
 
       } else {
 
@@ -917,6 +826,115 @@ public abstract class BDDAbstractManager {
                                     final BDD overflows)
       {
         return new BDDOverflows(vector.getBit(0), overflows);
+      }
+
+      /**
+       * Parses the left and right hand side of a binary expression and applies
+       * the supplied operators on the results. The results are expected to be
+       * integer values.
+       * @param binExpr A binary expression
+       * @param bitVectorOp The operation on bit vectors if the expression does
+       * not contain automaton names.
+       * @param bddOp The operation on BDDs if the expression contains automaton
+       * names.
+       * @param leftVarName The string representation of the left hand sub
+       * expression.
+       * @return A BDD representing the result.
+       * @throws VisitorException
+       */
+      private BDDOverflows binaryEqualityOperator(final BinaryExpressionProxy binExpr,
+                                                  final SupremicaBDDBitVector.BitVectorOp bitVectorOp,
+                                                  final BDDFactory.BDDOp bddOp,
+                                                  final String leftVarName)
+        throws VisitorException
+      {
+        BDD tmp = null;
+        BDD leftOverflows = getZeroBDD();
+        BDD rightOverflows = getZeroBDD();
+        if (isAutVar(binExpr.getLeft().toString())) {
+            final String leftString = binExpr.getLeft().toString();
+            final String locName = binExpr.getRight().toString();
+            final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
+            tmp = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
+                    bddExAutomata.getSourceLocationDomain(autName));
+            tmp = tmp.apply(tmp, bddOp);
+        } else {
+            final SimpleExpressionProxy left = binExpr.getLeft();
+            final SimpleExpressionProxy right = binExpr.getRight();
+            final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
+            final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
+            final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
+            final ResultOverflows roLeft = (ResultOverflows) left.acceptVisitor(leftVisitor);
+            ResultOverflows roRight = null;
+
+            if (nonIntegerVarNameSet.contains(leftVarName) &&
+                !nonIntegerVarNameSet.contains(right.toString())) {
+              final Map<String, String> var2InstIntMap =
+                bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(leftVarName);
+              IntConstantProxy mappedIntProxy = null;
+              if (var2InstIntMap.containsKey(right.toString())) {
+                mappedIntProxy = new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+              } else {
+                mappedIntProxy = new IntConstantSubject(Integer.parseInt(right.toString()));
+              }
+              roRight = (ResultOverflows) mappedIntProxy.acceptVisitor(rightVisitor);
+            } else {
+              roRight = (ResultOverflows) right.acceptVisitor(rightVisitor);
+            }
+            tmp = roLeft.getResult().apply(roRight.getResult(), bitVectorOp);
+            leftOverflows = roLeft.getOverflows();
+            rightOverflows = roRight.getOverflows();
+        }
+        return new BDDOverflows(tmp, leftOverflows.or(rightOverflows));
+      }
+
+      /**
+       * Parses the left and right hand side of a binary expression and applies
+       * the supplied operator on the results. The two sub-expressions are both
+       * expected to return boolean values.
+       * @param binExpr A binary expression
+       * @param op A BDD operator on boolean values (and, or, etc.)
+       * @return A BDD representing the operation.
+       * @throws VisitorException
+       */
+      private BDDOverflows binaryBooleanExpression(final BinaryExpressionProxy binExpr,
+                                                   final BDDFactory.BDDOp op)
+        throws VisitorException
+      {
+
+        // The left hand side and right hand side of the operator both must
+        // return boolean values, so use the guard visitor.
+        final Expression2BDDBitVectorVisitor leftVisitor = new GuardExpression2BDDVisitor(updatedVariables);
+        final Expression2BDDBitVectorVisitor rightVisitor = new GuardExpression2BDDVisitor(updatedVariables);
+        final BDDOverflows roLeft = (BDDOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
+        final BDDOverflows roRight = (BDDOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
+        BDD tmp = roLeft.getResult().id();
+        final BDD rightGuard = roRight.getResult();
+        tmp = tmp.apply(rightGuard, op);
+        return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
+      }
+
+      /**
+       * Parses the left and right hand side of a binary expression and applies
+       * the supplied operator on the results. The two sub-expressions are both
+       * expected to return integer values.
+       * @param binExpr A binary expression
+       * @param op A comparison operator (less than, greater or equal, etc.).
+       * @return A BDD representing the operation.
+       * @throws VisitorException
+       */
+      private BDDOverflows binaryInequalityOperator(final BinaryExpressionProxy binExpr,
+                                                    final SupremicaBDDBitVector.BitVectorOp op)
+        throws VisitorException
+      {
+        // The left hand side and right hand side of the operator both must
+        // return integer values, so use the arithmetic visitor.
+        final ArithmeticExpression2BDDVisitor leftVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
+        final ArithmeticExpression2BDDVisitor rightVisitor = new ArithmeticExpression2BDDVisitor(updatedVariables);
+        final ResultOverflows roLeft = (ResultOverflows) binExpr.getLeft().acceptVisitor(leftVisitor);
+        final ResultOverflows roRight = (ResultOverflows) binExpr.getRight().acceptVisitor(rightVisitor);
+        final BDD tmp = roLeft.getResult().apply(roRight.getResult(), op);
+        return new BDDOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
       }
     }
 

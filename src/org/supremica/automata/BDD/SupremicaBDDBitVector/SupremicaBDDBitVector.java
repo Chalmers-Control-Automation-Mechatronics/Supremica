@@ -19,6 +19,13 @@ public abstract class SupremicaBDDBitVector
     protected final BDDFactory mFactory;
     protected int bitNum;
 
+    public static final BitVectorOp equ = new EquOp();
+    public static final BitVectorOp neq = new NeqOp();
+    public static final BitVectorOp lth = new LthOp();
+    public static final BitVectorOp lte = new LteOp();
+    public static final BitVectorOp gth = new GthOp();
+    public static final BitVectorOp gte = new GteOp();
+
     protected SupremicaBDDBitVector(final BDDFactory factory, final int bitNum)
     {
         mFactory = factory;
@@ -217,6 +224,10 @@ public abstract class SupremicaBDDBitVector
             res.bitvec[n] = leftBDD.apply(rightBDD, op);
         }
         return res;
+    }
+
+    public BDD apply(final SupremicaBDDBitVector right, final BitVectorOp op) {
+      return op.apply(this, right);
     }
 
     public abstract BDD getBDDThatResultsMaxValue();
@@ -617,6 +628,74 @@ public abstract class SupremicaBDDBitVector
 
       final int required = requiredBits();
       return resize(required);
+
+    }
+
+    public static abstract class BitVectorOp {
+
+      abstract BDD apply(SupremicaBDDBitVector left,
+                                                   SupremicaBDDBitVector right);
+
+    }
+
+    private static class EquOp extends BitVectorOp {
+
+      @Override
+      BDD apply(final SupremicaBDDBitVector left,
+                                  final SupremicaBDDBitVector right)
+      {
+        return left.equ(right);
+      }
+
+    }
+
+    private static class NeqOp extends BitVectorOp {
+
+      @Override
+      BDD apply(final SupremicaBDDBitVector left, final SupremicaBDDBitVector right)
+      {
+        return left.neq(right);
+      }
+
+    }
+
+    private static class LthOp extends BitVectorOp {
+
+      @Override
+      BDD apply(final SupremicaBDDBitVector left, final SupremicaBDDBitVector right)
+      {
+        return left.lth(right);
+      }
+
+    }
+
+    private static class LteOp extends BitVectorOp {
+
+      @Override
+      BDD apply(final SupremicaBDDBitVector left, final SupremicaBDDBitVector right)
+      {
+        return left.lte(right);
+      }
+
+    }
+
+    private static class GthOp extends BitVectorOp {
+
+      @Override
+      BDD apply(final SupremicaBDDBitVector left, final SupremicaBDDBitVector right)
+      {
+        return left.gth(right);
+      }
+
+    }
+
+    private static class GteOp extends BitVectorOp {
+
+      @Override
+      BDD apply(final SupremicaBDDBitVector left, final SupremicaBDDBitVector right)
+      {
+        return left.gte(right);
+      }
 
     }
 
