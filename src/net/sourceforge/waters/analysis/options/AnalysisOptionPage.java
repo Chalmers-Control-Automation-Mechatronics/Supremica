@@ -81,7 +81,9 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
           factory.registerOptions(this);
         }
       } catch (ClassNotFoundException |
-               AnalysisConfigurationException exception) {
+               AnalysisConfigurationException |
+               UnsatisfiedLinkError |
+               NoClassDefFoundError exception) {
         // skip this factory
       }
     }
