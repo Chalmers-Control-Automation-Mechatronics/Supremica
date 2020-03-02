@@ -681,27 +681,29 @@ public class IDEMenuBar
 
   private void createExamplesMenu()
   {
-    final Actions actions = getActions();
-    final ExampleTemplates exTempl = ExampleTemplates.getRefreshedInstance();
-    if (!exTempl.isEmpty()) {
-      final JMenu menu = new JMenu("Examples");
-      menu.setMnemonic(KeyEvent.VK_P);
-      menu.add(actions.toolsTestCasesAction.getMenuItem());
-      for (final TemplateGroup currGroup : exTempl) {
-        final JMenu menuFileNewFromTemplateGroup = new JMenu();
-        menuFileNewFromTemplateGroup.setText(currGroup.getName());
-        menuFileNewFromTemplateGroup.setToolTipText
+    if (!Config.GENERAL_STUDENT_VERSION.getBooleanValue()) {
+      final Actions actions = getActions();
+      final ExampleTemplates exTempl = ExampleTemplates.getRefreshedInstance();
+      if (!exTempl.isEmpty()) {
+        final JMenu menu = new JMenu("Examples");
+        menu.setMnemonic(KeyEvent.VK_P);
+        menu.add(actions.toolsTestCasesAction.getMenuItem());
+        for (final TemplateGroup currGroup : exTempl) {
+          final JMenu menuFileNewFromTemplateGroup = new JMenu();
+          menuFileNewFromTemplateGroup.setText(currGroup.getName());
+          menuFileNewFromTemplateGroup.setToolTipText
           (currGroup.getShortDescription());
-        menu.add(menuFileNewFromTemplateGroup);
-        for (final TemplateItem currItem : currGroup) {
-          final JMenuItem menuItem = new JMenuItem();
-          menuItem.setText(currItem.getName());
-          menuItem.setToolTipText(currItem.getShortDescription());
-          menuFileNewFromTemplateGroup.add(menuItem);
-          menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+          menu.add(menuFileNewFromTemplateGroup);
+          for (final TemplateItem currItem : currGroup) {
+            final JMenuItem menuItem = new JMenuItem();
+            menuItem.setText(currItem.getName());
+            menuItem.setToolTipText(currItem.getShortDescription());
+            menuFileNewFromTemplateGroup.add(menuItem);
+            menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+          }
         }
+        add(menu);
       }
-      add(menu);
     }
   }
 
