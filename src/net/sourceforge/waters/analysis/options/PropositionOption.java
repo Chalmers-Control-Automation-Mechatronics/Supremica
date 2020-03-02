@@ -67,7 +67,8 @@ public class PropositionOption extends Option<EventProxy>
     return mDefaultKind;
   }
 
-  public int getIntegerValue(final EventEncoding enc) {
+  public int getIntegerValue(final EventEncoding enc)
+  {
     return enc.getEventCode(getValue());
   }
 

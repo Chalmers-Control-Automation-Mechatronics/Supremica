@@ -83,23 +83,6 @@ public final class SupremicaProperties
   {
   }
 
-  public static String getProperties()
-  {
-    final StringBuilder sb = new StringBuilder();
-    for (final LeafOptionPage page : OptionPage.OPTION_PAGES) {
-      for (final Option<?> option : page.getOptions()) {
-        if (!option.isPersistent()) continue;
-        sb.append("# ").append(option.getShortName()).append("\n");
-        final String value = option.getAsString();
-        final String escaped = getEscapedString(value, true);
-        sb.append(page.getPrefix()).append('.')
-          .append(option.getID()).append(" ").append(escaped).append("\n\n");
-      }
-    }
-    return sb.toString();
-
-  }
-
   public static void loadProperties(final File theFile)
     throws FileNotFoundException, IOException
   {
@@ -202,17 +185,26 @@ public final class SupremicaProperties
       writer.write("# Created: " + new Date().toString() + "\n\n");
 
       for (final LeafOptionPage page : OptionPage.OPTION_PAGES) {
+        final String prefix = page.getShortName();
         for (final Option<?> option : page.getOptions()) {
-          final String value = option.getAsString();
-          final String defaultValue = option.getDefaultAsString();
-          final boolean different = !(value).equals(defaultValue);
-          if (saveAll || different) {
-            writer.append("# ").append(option.getShortName()).append("\n");
-            final String escapedKey = getEscapedString(option.getID(), true);
-            final String escapedValue = getEscapedString(value, true);
-            writer.append(page.getPrefix()).append('.')
+          if (option.isPersistent()) {
+            final String value = option.getAsString();
+            final String defaultValue = option.getDefaultAsString();
+            final boolean different = !value.equals(defaultValue);
+            if (saveAll || different) {
+              writer.append("# ");
+              if (prefix != null) {
+                writer.append(prefix);
+                writer.append(' ');
+              }
+              writer.append(option.getShortName());
+              writer.append('\n');
+              final String escapedKey = getEscapedString(option.getID(), true);
+              final String escapedValue = getEscapedString(value, true);
+              writer.append(page.getPrefix()).append('.')
               .append(escapedKey).append(" ")
               .append(escapedValue).append("\n\n");
+            }
           }
         }
       }

@@ -47,9 +47,9 @@ public class AnalysisAlgorithmOption
 
   public AnalysisAlgorithmOption
     (final String id,
-     final List<ModelAnalyzerFactoryLoader> loaders,
-     final ModelAnalyzerFactoryLoader defaultKey) {
-    super(id, "Algorithm", loaders, defaultKey);
+     final List<ModelAnalyzerFactoryLoader> loaders)
+  {
+    super(id, "Algorithm", loaders, ModelAnalyzerFactoryLoader.DEFAULT);
   }
 
 }

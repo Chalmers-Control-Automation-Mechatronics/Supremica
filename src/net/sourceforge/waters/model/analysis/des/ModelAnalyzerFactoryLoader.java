@@ -114,4 +114,9 @@ public enum ModelAnalyzerFactoryLoader
   //# Data Members
   private String mClassName;
 
+
+  //#########################################################################
+  //# Class Constants
+  public static final ModelAnalyzerFactoryLoader DEFAULT = Monolithic;
+
 }

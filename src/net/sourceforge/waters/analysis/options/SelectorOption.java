@@ -58,8 +58,8 @@ public abstract class SelectorOption<E> extends EnumOption<E>
   }
 
   private static <E> EnumFactory<E> createFactory
-    (final List<E> keys,
-     final E defaultKey) {
+    (final List<E> keys, final E defaultKey)
+  {
     final EnumFactory<E> enumFactory =
       new ListedEnumFactory<E>() {
       {

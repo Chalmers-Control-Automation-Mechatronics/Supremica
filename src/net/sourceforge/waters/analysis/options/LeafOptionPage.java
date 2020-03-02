@@ -44,6 +44,8 @@ import java.util.Map;
 public abstract class LeafOptionPage extends OptionPage
 {
 
+  //#########################################################################
+  //# Constructor
   public LeafOptionPage(final String prefix, final String title)
   {
     mPrefix = prefix;
@@ -54,7 +56,7 @@ public abstract class LeafOptionPage extends OptionPage
 
 
   //#########################################################################
-  //# Simple Access
+  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
   @Override
   public Option<?> get(final String id)
   {
@@ -80,9 +82,19 @@ public abstract class LeafOptionPage extends OptionPage
     return mTitle;
   }
 
+
+  //#########################################################################
+  //# Specific Access
+  public String getShortName()
+  {
+    return null;
+  }
+
   public abstract List<Option<?>> getOptions();
 
 
+  //#########################################################################
+  //# Data Members
   private final String mTitle;
   private final String mPrefix;
   private final Map<String, Option<?>> mMap;

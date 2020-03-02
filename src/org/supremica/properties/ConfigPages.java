@@ -52,7 +52,7 @@ public class ConfigPages
       return createOptionList
         (INCLUDE_INSTANTIATION, BACKGROUND_COMPILER,
          OPTIMIZING_COMPILER, NORMALIZING_COMPILER,
-         AUTOMATON_VARIABLES_COMPILER, INCLUDE_RAS_SUPPORT);
+         AUTOMATON_VARIABLES_COMPILER);
     }
   };
 
@@ -190,7 +190,7 @@ public class ConfigPages
     @Override
     public List<Option<?>> getOptions()
     {
-      return createOptionList(TUM_EXTERNAL_ON);
+      return createOptionList(TUM_EXTERNAL_ON, INCLUDE_RAS_SUPPORT);
     }
   };
 

@@ -116,9 +116,6 @@ public class Config
   public static final BooleanOption AUTOMATON_VARIABLES_COMPILER = new BooleanOption
     ("automatonVariablesCompiler",
      "Automaton Variables Compiler", "Allow automaton names in EFSM guards", null, false);
-  public static final BooleanOption INCLUDE_RAS_SUPPORT = new BooleanOption
-    ("includeRASSupport",
-     "Include RAS Support", "Include RAS support", null, false);
 
 
   //GUI_EDITOR
@@ -262,7 +259,7 @@ public class Config
     ("synchAutomatonNameSeparator", "Automata Name Separator", "Automata name separator", null, "||");
   public static final BooleanOption SYNC_UNOBS_EVENTS_SYNC = new BooleanOption
     ("syncUnobsEventsSync",
-     "Unobservable (non-tau) Events Dynchronize", "Unobservable (non-tau) events synchronize", null, false);
+     "Unobservable (non-tau) Events Synchronize", "Unobservable (non-tau) events synchronize", null, false);
 
 
   //ALGORITHMS_VERIFICATION
@@ -440,7 +437,9 @@ public class Config
   public static final BooleanOption TUM_EXTERNAL_ON = new BooleanOption
     ("tumExternalOn",
      "Activate TUM Options", "Activate TUM options", null, false);
-
+  public static final BooleanOption INCLUDE_RAS_SUPPORT = new BooleanOption
+    ("includeRASSupport",
+     "Include RAS Support", "Include RAS support", null, false);
 
 
   private static Config instance = null;

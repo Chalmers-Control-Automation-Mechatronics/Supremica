@@ -43,35 +43,37 @@ import java.util.Map;
 public class LegacyOptions
 {
 
-  public static String get(final String legacyKey) {
-    final String newKey = legacyMap.get(legacyKey);
+  public static String get(final String legacyKey)
+  {
+    final String newKey = mLegacyMap.get(legacyKey);
     return newKey != null ? newKey : legacyKey;
   }
 
-  private static void put(final String legacyKey, final String newKey) {
-    legacyMap.put(legacyKey, newKey);
+  public static void init()
+  {
+    if (mLegacyMap.isEmpty()) {
+      //gui->general
+      put("gui.ideFrameWidth", "general.ideFrameWidth");
+      put("gui.ideFrameHeight", "general.ideFrameHeight");
+      put("gui.ideFrameX", "general.ideFrameX");
+      put("gui.ideFrameY", "general.ideFrameY");
+      put("gui.ideFrameMaximized", "general.ideFrameMaximized");
+      //gui->gui.compiler
+      put("gui.includeInstantiation", "gui.compiler.includeInstantiation");
+      put("gui.backgroundCompiler", "gui.compiler.backgroundCompiler");
+      put("gui.optimizingCompiler", "gui.compiler.optimizingCompiler");
+      put("gui.normalizingCompiler", "gui.compiler.normalizingCompiler");
+      put("gui.automatonVariablesCompiler", "gui.compiler.automatonVariablesCompiler");
+      //gui->misc
+      put("gui.includeRASSupport", "misc.includeRASSupport");
+    }
   }
 
-  public static void init() {
-    if (init) return;
-
-    //gui->general
-    put("gui.ideFrameWidth", "general.ideFrameWidth");
-    put("gui.ideFrameHeight", "general.ideFrameHeight");
-    put("gui.ideFrameX", "general.ideFrameX");
-    put("gui.ideFrameY", "general.ideFrameY");
-    put("gui.ideFrameMaximized", "general.ideFrameMaximized");
-    //gui->gui.compiler
-    put("gui.includeInstantiation", "gui.compiler.includeInstantiation");
-    put("gui.backgroundCompiler", "gui.compiler.backgroundCompiler");
-    put("gui.optimizingCompiler", "gui.compiler.optimizingCompiler");
-    put("gui.normalizingCompiler", "gui.compiler.normalizingCompiler");
-    put("gui.automatonVariablesCompiler", "gui.compiler.automatonVariablesCompiler");
-    put("gui.includeRASSupport", "gui.compiler.includeRASSupport");
-
+  private static void put(final String legacyKey, final String newKey)
+  {
+    mLegacyMap.put(legacyKey, newKey);
   }
 
-  private static final Map<String, String> legacyMap = new HashMap<>();
-  private static boolean init = false;
+  private static final Map<String, String> mLegacyMap = new HashMap<>(16);
 
 }

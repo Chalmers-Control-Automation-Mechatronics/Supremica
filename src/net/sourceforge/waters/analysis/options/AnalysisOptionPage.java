@@ -56,9 +56,15 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
     super(operation.getOptionPagePrefix(), operation.getAnalysisName());
     final List<ModelAnalyzerFactoryLoader> loaders = getLoaders(operation);
     mAlgorithmOption = new AnalysisAlgorithmOption
-      (operation.getOptionPagePrefix()+".AlgorithmSelector", loaders, null);
+      (operation.getOptionPagePrefix() + ".Algorithm", loaders);
     add(mAlgorithmOption);
     mOperation = operation;
+  }
+
+  @Override
+  public String getShortName()
+  {
+    return mOperation.getAnalysisName();
   }
 
   public List<ModelAnalyzerFactoryLoader> getLoaders
@@ -114,8 +120,8 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
         final Option<?> optionInstance = get(option.getID());
         options.add(optionInstance);
       }
-    } catch (AnalysisConfigurationException
-      | ClassNotFoundException exception) {
+    } catch (AnalysisConfigurationException |
+             ClassNotFoundException exception) {
       // TODO Auto-generated catch block
       exception.printStackTrace();
     }

@@ -178,9 +178,6 @@ public class ProcessCommandLineArguments
         }
         // Quit after this (even if there were no files)
         quit = true;
-      } else if (args[i].equals("-l") || args[i].equals("--list")) {
-        System.out.println(SupremicaProperties.getProperties());
-        quit = true;
       } else if (args[i].equals("-v") || args[i].equals("--version")) {
         System.out.println(Version.getInstance().toString());
         quit = true;

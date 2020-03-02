@@ -137,7 +137,7 @@ public abstract class AnalysisOperation
 
   public static final AnalysisOperation DIAGNOSABILITY_CHECK =
     new AnalysisOperation("waters.analysis.diagnosability", "Diagnosability",
-                          "is npt diagnosable", "is diagnosable")
+                          "is not diagnosable", "is diagnosable")
   {
     @Override
     public DiagnosabilityChecker createModelAnalyzer

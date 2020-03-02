@@ -72,8 +72,10 @@ public abstract class OptionPage
 
   public abstract String getTitle();
 
+
   //#########################################################################
-  //# Manipulating Option Lists//TODO Move to LeafOptionPage?
+  //# Manipulating Option Lists
+  //TODO Move to LeafOptionPage?
   public void append(final List<Option<?>> list, final String id)
   {
     final Option<?> option = get(id);
@@ -115,22 +117,24 @@ public abstract class OptionPage
   }
 
   public static OptionPage loadOptionPage(final String className,
-                                                    final String fieldName) {
+                                          final String fieldName)
+  {
     try {
       final Class<?>cls = OptionPage.class.getClassLoader().loadClass(className);
       final Field f = cls.getField(fieldName);
       final OptionPage page = (OptionPage) f.get(null);
       return page;
-    } catch (ClassNotFoundException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException exception) {
+    } catch (ClassNotFoundException |
+             NoSuchFieldException |
+             SecurityException |
+             IllegalArgumentException |
+             IllegalAccessException exception) {
       // TODO Auto-generated catch block
       exception.printStackTrace();
       return null;
     }
   }
 
-
-  //#########################################################################
-  //# Data Members
 
   //#########################################################################
   //# Class Constants

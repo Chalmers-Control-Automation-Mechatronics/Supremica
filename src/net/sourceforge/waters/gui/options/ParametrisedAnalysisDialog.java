@@ -98,6 +98,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
       public void selectionChanged()
       {
         updateModelAnalyzer();
+        pack();
       }
     });
 
@@ -131,6 +132,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     DialogCancelAction.register(this);
     add(buttonsPanel, constraints);
 
+    updateModelAnalyzer();
     pack();
     setLocationRelativeTo(mContext.getIDE());
     setVisible(true);
@@ -193,15 +195,15 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     }
   }
 
-  private void updateModelAnalyzer() {
-    pack();
+  private void updateModelAnalyzer()
+  {
     try {
       final ModelAnalyzerFactoryLoader loader =
         (ModelAnalyzerFactoryLoader) mGroupPanel.getSelectedValue();
       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
       mCurrentModelAnalyzer = createAnalyzer(factory);
-    } catch (ClassNotFoundException
-      | AnalysisConfigurationException exception) {
+    } catch (ClassNotFoundException |
+             AnalysisConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
