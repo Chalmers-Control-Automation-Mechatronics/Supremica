@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.trcomp;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
@@ -166,19 +167,6 @@ public class TRCompositionalModelAnalyzerFactory
               false));
 
     db.add(new BooleanOption
-           (OPTION_AbstractTRCompositionalModelAnalyzer_SpecialEvents,
-            null,
-            "Enable or disable blocked, failing, selfloop-only,\n" +
-            "and always enabled events", "-sp",
-            false) {
-      @Override
-      public boolean isPersistent()
-      {
-        return false;
-      }
-    });
-
-    db.add(new BooleanOption
              (OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled,
               "Counterexample debugging",
               "When computing counterexamples, perform debug checks to ensure " +
@@ -203,7 +191,7 @@ public class TRCompositionalModelAnalyzerFactory
     db.add(new EnumOption<TRToolCreator<TransitionRelationSimplifier>>
              (OPTION_TRCompositionalConflictChecker_SimplifierCreator,
               "Abstraction procedure",
-              "Abstraction procedure to simplify automata during TRCompositional " +
+              "Abstraction procedure to simplify automata during compositional " +
               "minimisation.",
               "-method",
               TRCompositionalConflictChecker.getTRSimplifierFactoryStatic()));
@@ -214,6 +202,11 @@ public class TRCompositionalModelAnalyzerFactory
               "abstraction procedure.",
               "-lcc",
               true));
+    db.add(new ChainOption
+             (OPTION_ModelAnalyzer_SecondaryFactory,
+              "Monolithic model analyzer",
+              "Algorithm used to analyze the results of abstraction.",
+              "-chain"));
   }
 
 

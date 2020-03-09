@@ -170,9 +170,9 @@ public class ModularControlLoopChecker
   public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    // TODO loop events - in superclass ...
     db.append(options, ModularModelVerifierFactory.
                        OPTION_ModularControlLoopChecker_MergeVersion);
+    // TODO OPTION_ModelAnalyzer_SecondaryFactory - beware SCC
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_FinalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.

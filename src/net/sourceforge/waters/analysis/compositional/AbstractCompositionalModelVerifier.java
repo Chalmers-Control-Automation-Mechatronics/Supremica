@@ -332,6 +332,8 @@ public abstract class AbstractCompositionalModelVerifier
   public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ModelAnalyzer_SecondaryFactory);
     db.prepend(options, CompositionalModelAnalyzerFactory.
                         OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled);
     db.prepend(options, CompositionalModelAnalyzerFactory.
@@ -344,8 +346,6 @@ public abstract class AbstractCompositionalModelVerifier
                         OPTION_ModelVerifier_ShortCounterExampleRequested);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_DetailedOutputEnabled);
-    db.prepend(options, AbstractModelAnalyzerFactory.
-                        OPTION_ModelAnalyzer_SecondaryFactory);
     return options;
   }
 

@@ -46,7 +46,6 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
-import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
@@ -283,10 +282,6 @@ public class ModuleCompiler extends AbortableCompiler
       final StringListOption opt = (StringListOption) option;
       final Collection<String> props = opt.getValue();
       setEnabledPropertyNames(props);
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_SecondaryFactory)) {
-      final ChainOption opt = (ChainOption) option;
-      opt.getSecondaryFactory().configure(this);
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_ConflictChecker_ConfiguredDefaultMarkingString)) {
       //Default Marking

@@ -36,17 +36,14 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
@@ -149,8 +146,6 @@ public abstract class AbstractTRCompositionalModelVerifier
                         OPTION_ModelVerifier_ShortCounterExampleRequested);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_DetailedOutputEnabled);
-    db.append(options, AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_SecondaryFactory);
     return options;
   }
 
@@ -169,12 +164,6 @@ public abstract class AbstractTRCompositionalModelVerifier
                             OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setOutputCheckingEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(CompositionalModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_SecondaryFactory)) {
-      final ChainOption opt = (ChainOption) option;
-      final ModelAnalyzer secondaryAnalyzer =
-        opt.createSecondaryAnalyzer(this);
-      setMonolithicAnalyzer(secondaryAnalyzer);
     } else {
       super.setOption(option);
     }

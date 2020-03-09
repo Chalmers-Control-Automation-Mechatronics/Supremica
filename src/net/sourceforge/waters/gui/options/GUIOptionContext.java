@@ -226,9 +226,10 @@ public class GUIOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<ModelAnalyzerFactoryLoader> createChainEditor(final ChainOption option)
+  public OptionEditor<ModelAnalyzerFactoryLoader>
+  createChainEditor(final ChainOption option)
   {
-    return null;
+    return createEnumEditor(option);
   }
 
   @Override

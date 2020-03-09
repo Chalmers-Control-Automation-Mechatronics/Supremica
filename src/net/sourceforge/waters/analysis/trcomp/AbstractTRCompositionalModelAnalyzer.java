@@ -61,6 +61,7 @@ import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBu
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.Option;
@@ -421,6 +422,8 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence);
     db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_SecondaryFactory);
+    db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_InternalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_InternalTransitionLimit);
@@ -438,8 +441,6 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                        OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled);
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-              OPTION_AbstractTRCompositionalModelAnalyzer_SpecialEvents);
     return options;
   }
 
@@ -457,6 +458,12 @@ public abstract class AbstractTRCompositionalModelAnalyzer
       final EnumOption<SelectionHeuristic<TRCandidate>> enumOption =
         (EnumOption<SelectionHeuristic<TRCandidate>>) option;
       setSelectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_SecondaryFactory)) {
+      final ChainOption opt = (ChainOption) option;
+      final ModelAnalyzer secondaryAnalyzer =
+        opt.createSecondaryAnalyzer(this);
+      setMonolithicAnalyzer(secondaryAnalyzer);
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_ModelAnalyzer_InternalStateLimit)) {
       final PositiveIntOption intOption = (PositiveIntOption) option;
@@ -497,14 +504,6 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                             OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setUsingWeakObservationEquivalence(boolOption.getValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_SpecialEvents)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      final boolean enable = boolOption.getValue();
-      setBlockedEventsEnabled(enable);
-      setFailingEventsEnabled(enable);
-      setSelfloopOnlyEventsEnabled(enable);
-      setAlwaysEnabledEventsEnabled(enable);
     } else {
       super.setOption(option);
     }

@@ -40,7 +40,6 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.distributed.DistributedModelVerifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.EnumOption;
@@ -53,7 +52,6 @@ import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
-import net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
@@ -162,13 +160,16 @@ public abstract class AbstractModelAnalyzerFactory
 
   //#########################################################################
   //# Command Line Arguments
+  // TODO Option context should be responsible, not factory?
   @Override
   public void configure(final ModelAnalyzer analyzer)
     throws AnalysisConfigurationException
   {
-    for (final CommandLineArgument<?> arg : mCommandLineOptionContext.getArgumentMap().values()) {
-      if (arg.isUsed()) {
-        mCommandLineOptionContext.configure(analyzer);
+    if (mCommandLineOptionContext != null) {
+      for (final CommandLineArgument<?> arg : mCommandLineOptionContext.getArgumentMap().values()) {
+        if (arg.isUsed()) {
+          mCommandLineOptionContext.configure(analyzer);
+        }
       }
     }
   }
@@ -248,11 +249,6 @@ public abstract class AbstractModelAnalyzerFactory
               "Internal transition limit",
               "Maximum number of transitions in intermediate abstraction steps.",
               "-itlimit"));
-    db.add(new ChainOption
-           (OPTION_ModelAnalyzer_SecondaryFactory,
-            null,
-            "Specify secondary model verifier factory and arguments",
-            "-chain"));
 
     db.add(new BooleanOption
              (OPTION_ModelVerifier_DetailedOutputEnabled,
@@ -380,18 +376,12 @@ public abstract class AbstractModelAnalyzerFactory
               "as well as propositions that appear on all states, from the result.",
               "-out",
               true));
-    db.add(new BooleanOption
-             (TRCompositionalModelAnalyzerFactory.OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
-              "Use weak observation equivalence",
-              "",//TODO
-              "-woeq",
-            false));
 
     db.add(new StringListOption
-           (OPTION_LanguageInclusionChecker_Property, null,
-            "Property for language inclusion check " +
+             (OPTION_LanguageInclusionChecker_Property, null,
+              "Property for language inclusion check " +
               "(can be used more than once)",
-           "-property"));
+              "-property"));
   }
 
 

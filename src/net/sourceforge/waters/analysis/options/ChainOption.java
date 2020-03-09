@@ -80,7 +80,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A configurable parameter for chaining {@link ModelAnalyzerFactoryLoader}
+ * A configurable parameter to specify a secondary model analyser factory.
  *
  * @author Benjamin Wheeler
  */
@@ -90,28 +90,18 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
   //#########################################################################
   //# Constructors
   public ChainOption(final String id,
-                    final String shortName,
-                    final String description,
-                    final String commandLineOption)
+                     final String shortName,
+                     final String description,
+                     final String commandLineOption)
   {
    super(id, shortName, description, commandLineOption,
-        ModelAnalyzerFactoryLoader.values());
+         ModelAnalyzerFactoryLoader.values(),
+         ModelAnalyzerFactoryLoader.DEFAULT);
   }
+
 
   //#########################################################################
   //# Type-specific Access
-  @Override
-  public boolean isPersistent()
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isEditable()
-  {
-    return false;
-  }
-
   public void setSecondaryFactory(final ModelAnalyzerFactory secondaryFactory)
   {
     mSecondaryFactory = secondaryFactory;
@@ -131,9 +121,11 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
     return context.createChainEditor(this);
   }
 
+
   //#######################################################################
   //# Configuring the Secondary Verifier
-  public ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer) {
+  public ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer)
+  {
     return createSecondaryAnalyzer(analyzer, false);
   }
 
@@ -160,9 +152,11 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
         if (!referenceOnly) failUnsupportedAnalyzerClass(analyzer);
         return null;
       }
-      if (!referenceOnly) secondaryFactory.configure(secondaryAnalyzer);
+      if (!referenceOnly) {
+        secondaryFactory.configure(secondaryAnalyzer);
+      }
       return secondaryAnalyzer;
-    } catch(final ClassNotFoundException e) {
+    } catch (final ClassNotFoundException exception) {
       fail("Secondary factory not found!");
       return null;
     } catch (final AnalysisConfigurationException exception) {
