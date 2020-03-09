@@ -58,6 +58,7 @@ import javax.swing.JTextPane;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.analysis.options.SelectorOption;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 /**
  *
@@ -68,16 +69,15 @@ public class OptionGroupPanel extends JPanel
 {
 
   public OptionGroupPanel(final GUIOptionContext context,
-                      final SelectorLeafOptionPage page)
+                          final SelectorLeafOptionPage page)
   {
     this(context, page, new HashMap<>());
   }
 
   public OptionGroupPanel(final GUIOptionContext context,
-                      final SelectorLeafOptionPage page,
-                      final Map<String, OptionPanel<?>> optionPanels)
+                          final SelectorLeafOptionPage page,
+                          final Map<String, OptionPanel<?>> optionPanels)
   {
-
     mPage = page;
     mOptionPanes = new HashMap<>();
     mComboBoxes = new HashMap<>();
@@ -93,7 +93,6 @@ public class OptionGroupPanel extends JPanel
     constraints.weightx = 1.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weighty = 0.0;
-
 
     final ActionListener handler = new ActionListener() {
       @Override
@@ -113,7 +112,6 @@ public class OptionGroupPanel extends JPanel
   public void populateOptions(final GUIOptionContext context,
                               final SelectorLeafOptionPage page)
   {
-
     removeAll();
 
     final GridBagConstraints constraints = new GridBagConstraints();
@@ -142,8 +140,8 @@ public class OptionGroupPanel extends JPanel
 
       c.gridx = 0;
       c.insets.right = 10;
-      c.weightx = 0.0f;
-      c.weighty = 0.0f;
+      c.weightx = 0.0;
+      c.weighty = 0.0;
       final String labelText = selectorOption.getShortName();
       if (labelText != null) {
         final JLabel label = new JLabel();
@@ -153,7 +151,7 @@ public class OptionGroupPanel extends JPanel
       }
       c.gridx = 1;
       c.insets.right = 0;
-      c.weightx = 1.0f;
+      c.weightx = 1.0;
       selectionPanel.add(comboBox, c);
       c.gridy++;
 
@@ -162,28 +160,6 @@ public class OptionGroupPanel extends JPanel
 
       selectorOption = page.getSubSelector(selectorOption, selectedItem);
     }
-
-
-    final JTextPane descriptionTextPane = new JTextPane();
-    descriptionTextPane.setContentType("text/html");
-    descriptionTextPane.setBackground(getBackground());
-    //Prevent selection
-    for (final MouseListener l : descriptionTextPane
-      .getListeners(MouseListener.class)) {
-      descriptionTextPane.removeMouseListener(l);
-    }
-
-    final JScrollPane scrollDescription =
-        new JScrollPane(descriptionTextPane) {
-      @Override
-      public Dimension getPreferredSize()
-      {
-        final Dimension d = super.getPreferredSize();
-        d.width = 0;
-        return d;
-      }
-      private static final long serialVersionUID = -7065386236668370127L;
-    };
 
     final OptionListPanel pane = getOptionListPanel(finalSelectorOption, selectedItem);
     final List<Option<?>> options = page.getOptionsForSelector(finalSelectorOption, selectedItem);
@@ -195,14 +171,40 @@ public class OptionGroupPanel extends JPanel
 
     final String description = finalSelectorOption.getDescription(selectedItem);
     if (description != null) {
-      final String text = "<body style='text-align:justify'>"
-        + description + "</body>";
+      final JTextPane descriptionTextPane = new JTextPane();
+      descriptionTextPane.setContentType("text/html");
+      descriptionTextPane.setBackground(getBackground());
+      //Prevent selection
+      for (final MouseListener l : descriptionTextPane
+        .getListeners(MouseListener.class)) {
+        descriptionTextPane.removeMouseListener(l);
+      }
+
+      final JScrollPane scrollDescription =
+        new JScrollPane(descriptionTextPane) {
+        @Override
+        public Dimension getPreferredSize()
+        {
+          final Dimension d = super.getPreferredSize();
+          d.width = 0;
+          return d;
+        }
+        private static final long serialVersionUID = -7065386236668370127L;
+      };
+
+      final StringBuilder builder = new StringBuilder();
+      builder.append("<HTML><BODY STYLE=\"font-size: ");
+      builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+      builder.append("px; font-family: serif; text-align: justify;\">");
+      builder.append(description);
+      builder.append("</BODY></HTML>");
+      final String text = builder.toString();
       descriptionTextPane.setText(text);
       descriptionTextPane.setCaretPosition(0);
       c.gridx = 0;
       c.gridwidth = 2;
-      c.weightx = 1.0f;
-      c.weighty = 1.0f;
+      c.weightx = 1.0;
+      c.weighty = 1.0;
       c.fill = GridBagConstraints.BOTH;
       c.insets.top = 4;
       selectionPanel.add(scrollDescription, c);
@@ -214,7 +216,6 @@ public class OptionGroupPanel extends JPanel
     if (mSelectionChangedListener != null) {
       mSelectionChangedListener.selectionChanged();
     }
-
   }
 
   private OptionListPanel getOptionListPanel
