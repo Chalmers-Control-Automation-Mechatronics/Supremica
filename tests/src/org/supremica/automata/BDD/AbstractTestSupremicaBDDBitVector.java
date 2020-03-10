@@ -40,7 +40,7 @@ import net.sf.javabdd.BDDFactory;
 /**
  * @author jonkro
  */
-public class TestSupremicaBDDBitVector extends TestCase
+public abstract class AbstractTestSupremicaBDDBitVector extends TestCase
 {
 
   protected BDDFactory factory;

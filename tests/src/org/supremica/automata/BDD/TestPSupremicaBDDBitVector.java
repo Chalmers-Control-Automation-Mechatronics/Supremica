@@ -41,7 +41,7 @@ import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 /**
  * @author jonkro
  */
-public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
+public class TestPSupremicaBDDBitVector extends AbstractTestSupremicaBDDBitVector
 {
 
   @Override
