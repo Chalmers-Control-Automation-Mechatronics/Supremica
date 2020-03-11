@@ -66,12 +66,13 @@ import org.supremica.automata.State;
 
 
 public class AutomataToSMV
+	implements AutomataSerializer
 {
 	private final Automata theAutomata;
 	private Alphabet allEvents;
 
 	public AutomataToSMV(final Automata theAutomata)
-		throws Exception
+//		throws Exception
 	{
 		this.theAutomata = theAutomata;
 	}
@@ -557,14 +558,32 @@ public class AutomataToSMV
 		pw.println();
 	}
 
+	// MF This is the old way of doing it
 	public void serializeSMV(final PrintWriter pw)
 		throws Exception
 	{
+		// System.out.println("AutomataToSMV.serialize" + this.theAutomata.toString() + "\n)");
 		initialize();
 		printBeginProgram(pw);
 		printStateModule(pw);
 		printInitialStates(pw);
 		printAutomataModules(pw);
 		printMainModule(pw);
+	}
+	
+	@Override
+	public void serialize(PrintWriter pr)
+		throws Exception
+	{
+		serializeSMV(pr);
+	}
+
+	@Override
+	public void serialize(String fileName)
+		throws Exception
+	{
+		final PrintWriter pw = new PrintWriter(fileName);
+		serialize(pw);
+		pw.close();
 	}
 }

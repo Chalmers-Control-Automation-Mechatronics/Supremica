@@ -57,6 +57,7 @@ import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomatonToDsx;
 import org.supremica.automata.IO.AutomatonToFSM;
+import org.supremica.automata.IO.AutomataToSMV;
 import org.supremica.automata.IO.FileFormats;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ExportDialog;
@@ -80,8 +81,8 @@ public class AnalyzerExportAction
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
 
-        putValue(Action.NAME, "Export");
-        putValue(Action.SHORT_DESCRIPTION, "Export");
+        putValue(Action.NAME, "Export...");
+        putValue(Action.SHORT_DESCRIPTION, "Export to different formats");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Export16.gif")));
@@ -236,6 +237,24 @@ public class AnalyzerExportAction
             return;
         }
 
+		// NuSMV (and derivatives), format ".smv", output to debug view
+		if (exportMode == ExportFormat.SMV_DEBUG)
+		{
+            final AutomataToSMV exporter = new AutomataToSMV(selectedAutomata);
+            final TextFrame textframe = new TextFrame("SMV debug output");
+
+			try
+			{
+				exporter.serialize(textframe.getPrintWriter());
+			}
+			catch (final Exception ex)
+			{
+				logger.debug(ex.getStackTrace());
+			}
+			
+            return;			
+		}
+		
         if (exportMode == ExportFormat.PCG_DEBUG)
         {
             final AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
@@ -309,17 +328,18 @@ public class AnalyzerExportAction
                                                 return;
                                                 }
                  */
-        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
+		
+		// These modes export automata to individual files, one for each automaton
+        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || 
+			(exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
         {
-            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
-            autIt.hasNext(); )
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
             {
                 final Automaton currAutomaton = autIt.next();
-
                 automatonExport(exportMode, currAutomaton);
             }
         }
-        else
+        else	// These modes export whole projects, one or more automata in a single file
         {
             JFileChooser fileExporter = null;
 
@@ -329,6 +349,10 @@ public class AnalyzerExportAction
 
                 //return;
             }
+			else if(exportMode == ExportFormat.SMV)
+			{
+				fileExporter = FileDialogs.getSMVFileExporter();
+			}
             else if(exportMode == ExportFormat.STS)
             {
                 fileExporter = FileDialogs.getSTSFileExporter();
@@ -361,6 +385,11 @@ public class AnalyzerExportAction
                                 final AutomataToXML exporter = new AutomataToXML(selectedAutomata);
                                 exporter.serialize(currFile);
                             }
+							else if(exportMode == ExportFormat.SMV)
+							{
+								final AutomataToSMV exporter = new AutomataToSMV(selectedAutomata);
+                                exporter.serialize(currFile.getAbsolutePath());
+							}
                             else if (exportMode == ExportFormat.STS)
                             {
                                 final Automata automata = selectedAutomata;
@@ -436,12 +465,17 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.STS);
         }
+		else if (exportMode == ExportFormat.SMV)
+		{
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.SMV);
+		}
 /*
         else if (exportMode == ExportFormat.SP)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
         }
   */
+	
         else
         {
             return;
@@ -489,6 +523,13 @@ public class AnalyzerExportAction
                             final AutomataToSTS exporter = new AutomataToSTS(currAutomata);
                             exporter.serialize(currFile);
                         }
+						else if (exportMode == ExportFormat.SMV)
+						{
+                            final Automata currAutomata = new Automata();
+                            currAutomata.addAutomaton(currAutomaton);
+                            final AutomataToSMV exporter = new AutomataToSMV(currAutomata);
+                            exporter.serialize(currFile.getAbsolutePath());							
+						}
 /*
                         else if (exportMode == ExportFormat.SP)
                         {

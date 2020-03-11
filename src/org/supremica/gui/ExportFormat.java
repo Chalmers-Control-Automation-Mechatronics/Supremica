@@ -47,4 +47,5 @@ public enum ExportFormat
 	SSPC,    // ARASH: Sanchez SSPC tool
     STS, STS_DEBUG, //Sajed: State Tree Structure introduced by Chuan Ma and Wonham
 	SMC, SMC_DEBUG,	// MF: State Machine Compiler format (http://smc.sourceforge.net/)
+	SMV, SMV_DEBUG,	// MF: NuSMV model checker format, uses the old AutomataToSMV
 }

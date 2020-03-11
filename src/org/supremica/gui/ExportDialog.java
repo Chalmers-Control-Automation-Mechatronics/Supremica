@@ -54,14 +54,17 @@ public class ExportDialog
 	private static final String sspcString = "sspc";
     private static final String stsString = "sts";
 	private static final String smcString = "smc";
-	private static final Object[] possibleValues = { xmlString, spString,
+	private static final String smvString = "smv";	// The NuSMV model checker format
+	private static final Object[] possibleValues = { xmlString, // spString,
 	dotString, dsxString,
 	fsmString,
 	htmlString,
 	pcgString,
 	sspcString,
     stsString,
-	smcString};
+	smcString,
+	smvString,
+	};
 	private JOptionPane pane = null;
 	private JDialog dialog = null;
 	private JCheckBox checkbox = null;
@@ -169,18 +172,11 @@ public class ExportDialog
 //		}
 		else if (selectedValue == htmlString)
 		{
-			if (checkbox.isSelected())
-			{
-				return ExportFormat.HTML_DEBUG;
-			}
-
-			return ExportFormat.HTML;    // Should return a HtmlExporter object
+			return checkbox.isSelected() ? ExportFormat.HTML_DEBUG : ExportFormat.HTML;    // Should relly return a HtmlExporter object
 		}
 		else if (selectedValue == pcgString)
 		{
-			return (checkbox.isSelected())
-			? ExportFormat.PCG_DEBUG
-				: ExportFormat.PCG;
+			return (checkbox.isSelected()) ? ExportFormat.PCG_DEBUG	: ExportFormat.PCG;
 		}
 		else if (selectedValue == sspcString)
 		{
@@ -188,7 +184,11 @@ public class ExportDialog
 		}
 		else if(selectedValue == smcString)
 		{
-			return (checkbox.isSelected()) ? ExportFormat.SMC_DEBUG : ExportFormat.SMC;
+			return checkbox.isSelected() ? ExportFormat.SMC_DEBUG : ExportFormat.SMC;
+		}
+		else if(selectedValue == smvString)
+		{
+			return checkbox.isSelected() ? ExportFormat.SMV_DEBUG : ExportFormat.SMV;
 		}
 		
 		else

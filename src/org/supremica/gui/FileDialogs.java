@@ -74,6 +74,7 @@ public class FileDialogs
     private FileFilter hybFilter = null;
     private FileFilter hiscFilter = null;
     private FileFilter dsxFilter = null;
+	private FileFilter smvFilter = null;
     @SuppressWarnings("unused")
     private final FileFilter smcFilter = null;
     private FileFilter dotFilter = null;
@@ -274,6 +275,15 @@ public class FileDialogs
         return fileExporter;
     }
 
+	public static JFileChooser getSMVFileExporter()
+	{
+		final JFileChooser fileExporter = fd.getFileExporter();
+        fileExporter.resetChoosableFileFilters();
+        fileExporter.setFileFilter(fd.getSMVFilter());
+
+        return fileExporter;		
+	}
+	
     public static JFileChooser getSTSFileExporter()
     {
         final JFileChooser fileExporter = fd.getFileExporter();
@@ -508,6 +518,13 @@ public class FileDialogs
         return xmlFilter;
     }
 
+	private FileFilter getSMVFilter()
+	{
+		if (this.smvFilter == null)
+			this.smvFilter = this.makeFileFilter(".smv", "SMV files (*.smv)");
+		
+		return smvFilter;
+	}
     private FileFilter getSTSFilter()
     {
         if (stsFilter == null)
