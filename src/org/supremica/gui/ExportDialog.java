@@ -36,16 +36,18 @@
 package org.supremica.gui;
 
 import java.awt.Frame;
-import javax.swing.JOptionPane;
-import javax.swing.JDialog;
+
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 // This class should really act as a factory for exporter objects, but that
 // would mean rewriting the entire export/saveAs functionality. Should I bother?
 public class ExportDialog
 {
 	private static final String xmlString = "xml";
-	private static final String spString = "sp";
+	@SuppressWarnings("unused")
+    private static final String spString = "sp";
 	private static final String dotString = "dot";
 	private static final String dsxString = "dsx";
 	private static final String htmlString = "html";
@@ -70,7 +72,7 @@ public class ExportDialog
 	private JCheckBox checkbox = null;
 	private Object selectedValue = null;
 
-	public ExportDialog(Frame comp)
+	public ExportDialog(final Frame comp)
 	{
 		this.pane = new JOptionPane("Export as::", JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,    // icon
 			null,    // options
@@ -190,7 +192,7 @@ public class ExportDialog
 		{
 			return checkbox.isSelected() ? ExportFormat.SMV_DEBUG : ExportFormat.SMV;
 		}
-		
+
 		else
 		{
 			return ExportFormat.UNKNOWN;
