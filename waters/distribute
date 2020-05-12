@@ -5,7 +5,7 @@
 if [ "$1" = "552" ]
 then
   WWW=$HOME/public_html/compx552-20a
-  INST_DIR=/home/comp452/lib
+  INST_DIR=/home/compx452/lib
 else
   WWW=$HOME/public_html/download_waters
 fi
