@@ -162,7 +162,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
   /**
    * Checks whether an equation is in normalised form. This method is
    * used by the {@link ConstraintPropagator} to determine whether an
-   * equation of the form <CODE>x = <I>sum</I></CODE> is in normalised
+   * equation of the form <CODE>x == <I>sum</I></CODE> is in normalised
    * form. The equation is normalised, if the right-hand side <I>sum</I>
    * is normalised, and the left-hand-side <I>x</I> is either a constant
    * and there are no constants in the right-hand side, or precedes all
@@ -170,7 +170,8 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
    * @param  lhs                The left-hand side <I>x</I> of the equation.
    * @param  rhs                The right-hand side <I>sum</I> of the
    *                            equation.
-   * @param  op
+   * @param  op                 The equality or inequality operator used
+   *                            in the equation.
    * @param  leadTermComparator The comparator to determine the lead term.
    * @return <CODE>true</CODE> if the equation is already normalised,
    *         <CODE>false</CODE> otherwise. A return value of <CODE>true</CODE>

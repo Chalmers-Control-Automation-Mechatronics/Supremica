@@ -48,7 +48,7 @@ import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 /**
  * A LOG4J configuration that ensures minimal logging output for the
- * COMP552 assignments.
+ * COMPX552 assignments.
  *
  * @author Robi Malik
  */
