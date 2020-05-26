@@ -1013,6 +1013,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, UndefinedIdentifierException.class, "'finishLathe'");
   }
 
+  public void testCompile_min_array()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "error_min_array");
+    compileError(module, UndefinedIdentifierException.class, "'id'");
+  }
+
   public void testCompile_error1_small()
     throws IOException, WatersException
   {

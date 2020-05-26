@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="error_min_array">
+<B:Comment>An EFSM compiler test.
+This test checks whether an undefined identifier is reported within an array index within a call to the built-in function \min.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="put"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="Buffer">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-1" Y="-20"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="put"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="100" Y="113"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=" Text="c[0] = \min(c[id]+1,2)">
+<IndexedIdentifier Name="c">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<FunctionCallExpression FunctionName="\min">
+<BinaryExpression Operator="+">
+<IndexedIdentifier Name="c">
+<SimpleIdentifier Name="id"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<IntConstant Value="2"/>
+</FunctionCallExpression>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-144" Y="-9"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="c">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="c">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

@@ -1557,7 +1557,7 @@ public class SimpleExpressionCompiler
           for (final SimpleExpressionProxy simpArg : simpArgs) {
             final CompiledIntRange range =
               mRangeEstimator.estimateIntRange(simpArg, mVariableContext);
-            if (maxLowerLimit < range.getLower()) {
+            if (range != null && maxLowerLimit < range.getLower()) {
               maxLowerLimit = range.getLower();
             }
             ranges[i++] = range;
@@ -1566,10 +1566,12 @@ public class SimpleExpressionCompiler
           i = 0;
           while (iter.hasNext()) {
             iter.next();
-            final int upper = ranges[i].getUpper();
-            if (upper < maxLowerLimit ||
+            if (ranges[i] != null) {
+              final int upper = ranges[i].getUpper();
+              if (upper < maxLowerLimit ||
                 upper == maxLowerLimit && upper > ranges[i].getLower()) {
-              iter.remove();
+                iter.remove();
+              }
             }
             i++;
           }
@@ -1633,7 +1635,7 @@ public class SimpleExpressionCompiler
           for (final SimpleExpressionProxy simpArg : simpArgs) {
             final CompiledIntRange range =
               mRangeEstimator.estimateIntRange(simpArg, mVariableContext);
-            if (minUpperLimit > range.getUpper()) {
+            if (range != null && minUpperLimit > range.getUpper()) {
               minUpperLimit = range.getUpper();
             }
             ranges[i++] = range;
@@ -1642,12 +1644,14 @@ public class SimpleExpressionCompiler
           i = 0;
           while (iter.hasNext()) {
             iter.next();
-            final int lower = ranges[i].getLower();
-            if (lower > minUpperLimit ||
+            if (ranges[i] != null) {
+              final int lower = ranges[i].getLower();
+              if (lower > minUpperLimit ||
                 lower == minUpperLimit && lower < ranges[i].getUpper()) {
-              iter.remove();
+                iter.remove();
+              }
+              i++;
             }
-            i++;
           }
           if (simpArgs.size() == 1) {
             return simpArgs.get(0);
