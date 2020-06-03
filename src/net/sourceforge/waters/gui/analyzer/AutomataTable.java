@@ -37,16 +37,12 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +53,12 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -106,54 +105,29 @@ public class AutomataTable extends JTable implements SelectionOwner
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
     setFillsViewportHeight(true);
-    final AutomataTableModel tableModel = getModel();
-    final TableColumnModel columnModel = getColumnModel();
-    final int columnGap = IconAndFontLoader.getTableColumnGap();
     final int rowHeight = IconAndFontLoader.getPreferredTableRowHeight();
     setRowHeight(rowHeight);
-    final int columnCount = columnModel.getColumnCount();
-    if (columnCount != 0) {
-      final TableColumn column0 = columnModel.getColumn(0);
-      column0.setMinWidth(rowHeight);
-      column0.setMaxWidth(rowHeight);
-      final BufferedImage img =
-        new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-      final Graphics2D g2d = img.createGraphics();
-      final FontMetrics fm = g2d.getFontMetrics(getFont());
-      final String titleName = tableModel.getColumnName(1);
-      final int widthName = fm.stringWidth(titleName);
-      final TableColumn column1 = columnModel.getColumn(1);
-      column1.setMinWidth(widthName + columnGap);
-      column1.setPreferredWidth(2 * widthName);
-      for (int i = 2; i < columnCount; i++) {
-        final TableColumn column = columnModel.getColumn(i);
-        column.setMinWidth(40);
-        column.setMaxWidth(45);
-      }
-      g2d.dispose();
-    }
     getTableHeader().setReorderingAllowed(false);
-    final ListSelectionModel listModel = getSelectionModel();
-    listModel
-      .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    resetColumnWidths();
 
     final IDE ide = mModuleContainer.getIDE();
     final WatersPopupActionManager manager = ide.getPopupActionManager();
     manager.installCutCopyPasteActions(this);
+    addMouseListener(new TableMouseListener());
+    getModel().addTableModelListener(new TableChangeListener());
 
-    this.addMouseListener(new TableMouseListener());
-
-    this.getSelectionModel()
-      .addListSelectionListener(new ListSelectionListener() {
-
-        @Override
-        public void valueChanged(final ListSelectionEvent e)
-        {
-          if (!e.getValueIsAdjusting()) {
-            fireEditorChangedEvent(new SelectionChangedEvent(this));
-          }
+    final ListSelectionModel listModel = getSelectionModel();
+    listModel.setSelectionMode
+      (ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    listModel.addListSelectionListener(new ListSelectionListener() {
+      @Override
+      public void valueChanged(final ListSelectionEvent event)
+      {
+        if (!event.getValueIsAdjusting()) {
+          fireEditorChangedEvent(new SelectionChangedEvent(this));
         }
-      });
+      }
+    });
   }
 
 
@@ -171,17 +145,75 @@ public class AutomataTable extends JTable implements SelectionOwner
     final AutomatonProxy aut = getAutomaton(event);
     if (aut != null) {
       final ComponentKind kind = aut.getKind();
-      String Tooltip = ModuleContext.getComponentKindToolTip(kind);
-      Tooltip += (" " + aut.getName());
-      return Tooltip;
+      return ModuleContext.getComponentKindToolTip(kind) + " " + aut.getName();
     } else {
       return null;
     }
   }
 
+  @Override
+  public Component prepareRenderer(final TableCellRenderer renderer,
+                                   final int row,
+                                   final int column)
+  {
+    final Component component = super.prepareRenderer(renderer, row, column);
+    if (column > NAME_COLUMN) {
+      final int rendererWidth = component.getPreferredSize().width;
+      final int columnGap = getIntercellSpacing().width;
+      final int width = rendererWidth + columnGap;
+      final TableColumn tableColumn = getColumnModel().getColumn(column);
+      if (width > tableColumn.getPreferredWidth()) {
+        tableColumn.setMinWidth(width);
+        tableColumn.setPreferredWidth(width);
+        tableColumn.setMaxWidth(width);
+      }
+    }
+    return component;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
+  private void resetColumnWidths()
+  {
+    final TableColumnModel columnModel = getColumnModel();
+    final int columnCount = columnModel.getColumnCount();
+    if (columnCount != 0) {
+      final TableColumn column0 = columnModel.getColumn(ICON_COLUMN);
+      final int rowHeight = getRowHeight();
+      column0.setMinWidth(rowHeight);
+      column0.setMaxWidth(rowHeight);
+      setColumnWidthFromTitle(NAME_COLUMN);
+      for (int i = NAME_COLUMN + 1; i < columnCount; i++) {
+        setColumnWidthFromTitle(i);
+      }
+    }
+  }
+
+  private void setColumnWidthFromTitle(final int column)
+  {
+    final TableColumnModel columnModel = getColumnModel();
+    final TableColumn tableColumn = columnModel.getColumn(column);
+    TableCellRenderer renderer = tableColumn.getHeaderRenderer();
+    if (renderer == null) {
+      renderer = getTableHeader().getDefaultRenderer();
+    }
+    final Object value = tableColumn.getHeaderValue();
+    final Component comp =
+      renderer.getTableCellRendererComponent(this, value, false,
+                                             false, -1, column);
+    final int rendererWidth = comp.getPreferredSize().width;
+    final int columnGap = getIntercellSpacing().width;
+    final int width = rendererWidth + columnGap;
+    tableColumn.setMinWidth(width);
+    if (column == NAME_COLUMN) {
+      tableColumn.setPreferredWidth(width + rendererWidth);
+    } else {
+      tableColumn.setPreferredWidth(width);
+      tableColumn.setMaxWidth(width);
+    }
+  }
+
   private AutomatonProxy getAutomaton(final MouseEvent event)
   {
     final int row = rowAtPoint(event.getPoint());
@@ -232,7 +264,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
-      final List<Observer> copy = new ArrayList<Observer>(mObservers);
+      final List<Observer> copy = new ArrayList<>(mObservers);
       for (final Observer observer : copy) {
         observer.update(event);
       }
@@ -277,7 +309,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   public List<AutomatonProxy> getCurrentSelection()
   {
     final AutomataTableModel model = getModel();
-    final List<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
+    final List<AutomatonProxy> output = new ArrayList<>();
     for (final int i : this.getSelectedRows()) {
       output.add(model.getAutomaton(i));
     }
@@ -324,22 +356,21 @@ public class AutomataTable extends JTable implements SelectionOwner
   public void addToSelection(final List<? extends Proxy> items)
   {
     final AutomataTableModel model = getModel();
-    final List<Integer> autList = new ArrayList<Integer>();
-    for (final Proxy p : items) {
-      if (p instanceof AutomatonProxy) {
-        autList.add(model.getIndex((AutomatonProxy) p));
+    final TIntArrayList indexList = new TIntArrayList(items.size());
+    for (final Proxy proxy : items) {
+      if (proxy instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        indexList.add(model.getIndex(aut));
       }
     }
-
-    Collections.sort(autList);
-
+    indexList.sort();
     int start = -1;
     int end = -1;
-    for (final int i : autList) {
-      final int position = i;
+    for (int i = 0; i < indexList.size(); i++) {
+      final int position = indexList.get(i);
       if (start == -1) {
         start = end = position;
-      } else if (position > (end + 1)) {
+      } else if (position > end + 1) {
         addRowSelectionInterval(start, end);
         start = end = position;
       } else {
@@ -353,22 +384,21 @@ public class AutomataTable extends JTable implements SelectionOwner
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     final AutomataTableModel model = getModel();
-    final List<Integer> autList = new ArrayList<Integer>();
-    for (final Proxy p : items) {
-      if (p instanceof AutomatonProxy) {
-        autList.add(model.getIndex((AutomatonProxy) p));
+    final TIntArrayList indexList = new TIntArrayList(items.size());
+    for (final Proxy proxy : items) {
+      if (proxy instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        indexList.add(model.getIndex(aut));
       }
     }
-
-    Collections.sort(autList);
-
+    indexList.sort();
     int start = -1;
     int end = -1;
-    for (final int i : autList) {
-      final int position = i;
+    for (int i = 0; i < indexList.size(); i++) {
+      final int position = indexList.get(i);
       if (start == -1) {
         start = end = position;
-      } else if (position > (end + 1)) {
+      } else if (position > end + 1) {
         removeRowSelectionInterval(start, end);
         start = end = position;
       } else {
@@ -651,6 +681,37 @@ public class AutomataTable extends JTable implements SelectionOwner
 
 
   //#########################################################################
+  //# Inner Class TableChangeListener
+  private class TableChangeListener implements TableModelListener, Runnable
+  {
+    //#######################################################################
+    //# Interface javax.swing.event.TableModelListener
+    @Override
+    public void tableChanged(final TableModelEvent event)
+    {
+      switch (event.getType()) {
+      case TableModelEvent.INSERT:
+        SwingUtilities.invokeLater(this);
+        break;
+      case TableModelEvent.DELETE:
+        resetColumnWidths();
+        SwingUtilities.invokeLater(this);
+        break;
+      }
+    }
+
+    //#######################################################################
+    //# Interface java.lang.Runnable
+    @Override
+    public void run()
+    {
+      // Delayed repaint to adjust column widths
+      AutomataTable.this.repaint();
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final WatersAnalyzerPanel mParent;
   private List<Observer> mObservers;
@@ -660,6 +721,8 @@ public class AutomataTable extends JTable implements SelectionOwner
   //#########################################################################
   //# Class Constants
   private static final int RIGHT_PADDING = 8;
+  private static final int ICON_COLUMN = 0;
+  private static final int NAME_COLUMN = 1;
 
   private static final long serialVersionUID = -9036493474591272655L;
 
