@@ -34,6 +34,8 @@
 package net.sourceforge.waters.analysis.comp552;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -116,6 +118,7 @@ public class ControllabilityMain
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
+      final Collection<String> empty = Collections.emptyList();
 
       for (int i = 0; i < args.length; i++) {
         final String name = args[i];
@@ -128,6 +131,7 @@ public class ControllabilityMain
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
+          compiler.setEnabledPropertyNames(empty);
           des = compiler.compile();
         }
         final ControllabilityChecker checker =

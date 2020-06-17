@@ -171,15 +171,6 @@ class TeachingSecurityManager extends SecurityManager
   }
 
   @Override
-  @Deprecated
-  public void checkMemberAccess(final Class<?> clazz, final int which)
-  {
-    if (mEnabled || clazz == getClass()) {
-      super.checkMemberAccess(clazz, which);
-    }
-  }
-
-  @Override
   public void checkPermission(final Permission perm)
   {
     final String name = perm.getName();
@@ -244,13 +235,6 @@ class TeachingSecurityManager extends SecurityManager
   {
     throw new SecurityException
       ("Network access disabled!\n(Attempted set socket a factory.)");
-  }
-
-  @Override
-  @Deprecated
-  public void checkSystemClipboardAccess()
-  {
-    throw new SecurityException("Clipboard access disabled!");
   }
 
 

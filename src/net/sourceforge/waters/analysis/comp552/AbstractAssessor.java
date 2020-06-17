@@ -561,7 +561,7 @@ abstract class AbstractAssessor
           buffer.append(", ");
         }
         final String name = event == null ? "(null)" : event.getName();
-        if (buffer.length() + name.length() > 77) {
+        if (buffer.length() + name.length() > LINE_WIDTH) {
           mReportPrinter.println(buffer);
           buffer.delete(2, buffer.length());
         }
@@ -739,5 +739,10 @@ abstract class AbstractAssessor
   private int mNumCorrectAnswers;
   private int mNumCorrectTraces;
   private int mNumHalfCorrectTraces;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int LINE_WIDTH = 110;  // 77
 
 }
