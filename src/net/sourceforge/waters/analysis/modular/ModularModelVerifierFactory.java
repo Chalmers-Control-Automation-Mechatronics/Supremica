@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
@@ -161,6 +162,13 @@ public class ModularModelVerifierFactory
             "-select",
             AutomataGroup.SelectVersion.values(),
             AutomataGroup.SelectVersion.Naive));
+
+    db.add(new ChainOption
+             (OPTION_ModelAnalyzer_SecondaryFactory,
+              "Monolithic model analyzer",
+              "Algorithm used to analyze the subsystems during modular " +
+              "or incremental processing.",
+              "-chain"));
   }
 
 
