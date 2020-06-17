@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.logging;
 
+import java.io.File;
 import java.io.Serializable;
 
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
@@ -147,11 +148,11 @@ public class IDEAppender
       mFileAppender.stop();
       mFileAppender = null;
     }
-    final String fileName = Config.LOG_FILE.getValue();
-    if (fileName.length() > 0) {
+    final File file = Config.LOG_FILE.getValue();
+    if (file != null) {
       final FileAppender.Builder<?> builder = FileAppender.newBuilder();
       builder.setName("logFile");
-      builder.withFileName(fileName);
+      builder.withFileName(file.toString());
       final PatternLayout.Builder layoutBuilder = PatternLayout.newBuilder();
       layoutBuilder.withPattern("%-5level [%d] %msg%ex%n");
       final Layout<String> layout = layoutBuilder.build();

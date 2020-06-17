@@ -7,6 +7,7 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ColorOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.LegacyEnumOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.StringOption;
@@ -60,8 +61,9 @@ public class Config
   public static final EnumOption<IDELogLevel> LOG_CONSOLE_VERBOSITY = new EnumOption<>
   ("logLevelConsole", "Verbosity Level for Console", "Verbosity level for console (stderr)",
     null, IDELogLevel.values(), IDELogLevel.NONE);
-  public static final StringOption LOG_FILE = new StringOption
-    ("logFileName", "Log File", "Log file", null, "");
+  public static final FileOption LOG_FILE = new FileOption
+    ("logFileName", "Log File",
+     "File to capture log output with log file verbosity", "");
   public static final EnumOption<IDELogLevel> LOG_FILE_VERBOSITY = new EnumOption<>
   ("logLevelFile", "Verbosity Level for Log File", "Verbosity level for log file",
     null, IDELogLevel.values(), IDELogLevel.NONE);

@@ -75,7 +75,7 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     super(ide);
     final ErrorLabel errorLabel = new ErrorLabel();
     mIde = ide;
-    mContext = new GUIOptionContext(null, this, errorLabel);
+    mContext = new GUIOptionContext(ide, this, errorLabel);
     mQuery = new SearchQuery();
 
     final GridBagLayout layout = new GridBagLayout();

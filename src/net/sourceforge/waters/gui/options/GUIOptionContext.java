@@ -86,25 +86,32 @@ public class GUIOptionContext implements OptionContext
 
   //#########################################################################
   //# Constructors
-  public GUIOptionContext(final WatersAnalyzerPanel panel,
-                   final Component dialogParent,
-                   final ErrorDisplay display)
+  public GUIOptionContext(final IDE ide,
+                          final Component dialogParent,
+                          final ErrorDisplay display)
   {
+    mIDE = ide;
+    mModuleContainer = null;
+    mAnalyzerPanel = null;
+    mDialogParent = dialogParent;
+    mErrorDisplay = display;
+    mDES = null;
+  }
+
+  public GUIOptionContext(final WatersAnalyzerPanel panel,
+                          final Component dialogParent,
+                          final ErrorDisplay display)
+  {
+    mModuleContainer = panel.getModuleContainer();
+    mIDE = mModuleContainer.getIDE();
     mAnalyzerPanel = panel;
     mDialogParent = dialogParent;
     mErrorDisplay = display;
-    if (panel != null ) {
-      mModuleContainer = panel.getModuleContainer();
-      final String name = mModuleContainer.getName();
-      final List<AutomatonProxy> automata =
-        panel.getAutomataTable().getOperationArgument();
-      final ProductDESProxyFactory factory = getProductDESProxyFactory();
-      mDES = AutomatonTools.createProductDESProxy(name, automata, factory);
-    }
-    else {
-      mModuleContainer = null;
-      mDES = null;
-    }
+    final String name = mModuleContainer.getName();
+    final List<AutomatonProxy> automata =
+      panel.getAutomataTable().getOperationArgument();
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    mDES = AutomatonTools.createProductDESProxy(name, automata, factory);
   }
 
 
@@ -112,7 +119,7 @@ public class GUIOptionContext implements OptionContext
   //# Simple Access
   public IDE getIDE()
   {
-    return mModuleContainer.getIDE();
+    return mIDE;
   }
 
   public ModuleContainer getModuleContainer()
@@ -294,6 +301,7 @@ public class GUIOptionContext implements OptionContext
 
   //#########################################################################
   //# Data Members
+  private final IDE mIDE;
   private final ModuleContainer mModuleContainer;
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final Component mDialogParent;
