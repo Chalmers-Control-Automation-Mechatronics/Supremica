@@ -1,6 +1,6 @@
 # -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 ###########################################################################
-# Copyright (C) 2004-2019 Robi Malik
+# Copyright (C) 2004-2020 Robi Malik
 ###########################################################################
 # This file is part of Waters.
 # Waters is free software: you can redistribute it and/or modify it under
@@ -39,8 +39,6 @@
 # waters/cpp/src/jni/templates/*
 # waters/xml/xsd/*.xsd
 # waters/xml/xsl/*.xsl
-# Eclipse template: Project -> Properties -> Java Code Style ->
-#                   Code Templates -> Comments -> Files
 ###########################################################################
 
 set gHeaderDir [file join "src" "net" "sourceforge" "waters" "config"]

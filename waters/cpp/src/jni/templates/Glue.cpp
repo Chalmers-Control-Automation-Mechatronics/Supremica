@@ -4,7 +4,7 @@
 //# DO NOT EDIT.
 //# Source: $INPUTFILE$
 //###########################################################################
-//# Copyright (C) 2004-2019 Robi Malik
+//# Copyright (C) 2004-2020 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
