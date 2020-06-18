@@ -6,39 +6,39 @@ PROPFILE=$HOME/.waters
 
 which java > /dev/null 2>&1
 if [ "$?" -eq "0" ]; then
-    JAVAVERSION=`java -version 2>&1`
+    JAVAVERSION=`java -version 2>&1 | sed -n -e 's/^.*version \"\([0-9\.]*\).*$/\1/p'`
     case "$JAVAVERSION" in
-        java\ version\ \"1.8.*) JAVACMD=java
+        1.8.*) JAVACMD=java
         ;;
-        java\ version\ \"9.*) JAVACMD=java --add-modules java.xml.bind 
+        1.*)
         ;;
-        java\ version\ \"10.*) JAVACMD=java --add-modules java.xml.bind 
+	1*|2*|3*|4*|5*|6*|7*|8*|9*) JAVACMD=java
         ;;
     esac
 fi
 
 if [ "$JAVACMD" = "" -a -x $JAVA_HOME/bin/java ]; then
-    JAVAVERSION=`$JAVA_HOME/bin/java -version 2>&1`
+    JAVAVERSION=`$JAVA_HOME/bin/java -version 2>&1 | sed -n -e 's/^.*version \"\([0-9\.]*\).*$/\1/p'`
     case "$JAVAVERSION" in
-	java\ version\ \"1.8.*) JAVACMD=$JAVA_HOME/bin/java
-	;;
-        java\ version\ \"9.*) JAVACMD=$JAVA_HOME/bin/java --add-modules java.xml.bind 
+        1.8.*) JAVACMD=$JAVA_HOME/bin/java
         ;;
-        java\ version\ \"10.*) JAVACMD=$JAVA_HOME/bin/java --add-modules java.xml.bind 
+        1.*)
+        ;;
+	1*|2*|3*|4*|5*|6*|7*|8*|9*) JAVACMD=java
         ;;
     esac
 fi
 
 if [ "$JAVACMD" = "" ]; then
-    export JAVA_HOME=/usr/lib/jvm/java-8-oracle
-    JAVACMD=$JAVA_HOME/bin/java
+#    export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+#    JAVACMD=$JAVA_HOME/bin/java
+#    if [ ! -x $JAVACMD ]; then
+#        export JAVA_HOME=/home/compx452/lib/jdk1.8.0_60
+#        JAVACMD=$JAVA_HOME/bin/java
+#    fi
     if [ ! -x $JAVACMD ]; then
-        export JAVA_HOME=/home/comp452/lib/jdk1.8.0_60
-        JAVACMD=$JAVA_HOME/bin/java
-    fi
-    if [ ! -x $JAVACMD ]; then
-        echo "Cannot find a working installation of Java 8, 9, or 10."
-        echo "Please make sure it is installed and JAVA_HOME points to it."
+        echo "Cannot find a working installation of Java 8 or higher."
+        echo "Please make sure it is the default or JAVA_HOME points to it."
         exit 1
     fi
 fi

@@ -1,3 +1,15 @@
+<H3 STYLE="color: #00008d; font-size: 110%;">New in version 2.6</H3>
+<UL STYLE="padding: 0px; margin-left: 14px;">
+<LI><STRONG>Reorganised options dialog.</STRONG>
+The <I>Options</I> dialog is now organised into two levels of tabs
+and allows the configuration of verification options in the editor as
+well as the analyzer.</LI>
+<LI><STRONG>New analyzer GUI.</STRONG>
+A new analyzer implementation can be activated by checking <I>Use Waters
+Analyzer</I> in the <I>GUI</I> tab and <I>Analyzer</I> sub-tab of the
+<I>Options</I>. The new analyzer has a more modern user interface and gives
+access to more analysis algorithms and options.</LI>
+</UL>
 <H3 STYLE="color: #00008d; font-size: 110%;">New in version 2.5</H3>
 <UL STYLE="padding: 0px; margin-left: 14px;">
 <LI><STRONG>Automaton variables.</STRONG>
@@ -7,17 +19,19 @@ plant <CODE>mach1</CODE> with a state <CODE>idle</CODE>, then a
 guard <CODE>mach1==idle</CODE> in any automaton restricts the events of its
 transition to situations where plant <CODE>mach1</CODE> is in state
 <CODE>idle</CODE>.
-To use this feature, both <I>Use normalising EFSM compiler</I> and <I>Allow
-automaton names in EFSM guards</I> must be checked in the <I>gui</I> tab
-in the <I>Options</I>. Enabling automaton variables introduces additional
-syntax restrictions, as there cannot be clashes between variables,
-automata, state names, and enumeration constants.</LI>
+To use this feature, both <I>Normalising Compiler</I> and <I>Automaton 
+Variables Compiler</I> must be checked in the <I>GUI</I> tab and
+<I>Compiler</I> sub-tab in the <I>Options</I>. Enabling automaton variables
+introduces additional syntax restrictions, as there cannot be clashes between
+variables, automata, state names, and enumeration constants.</LI>
+</UL>
 <H3 STYLE="color: #00008d; font-size: 110%;">New in version 2.4</H3>
 <UL STYLE="padding: 0px; margin-left: 14px;">
 <LI><STRONG>Global font and display scaling.</STRONG>
 It is possible to enlarge all icons and fonts in the IDE by changing
-the <I>Icon set</I> under the <I>gui.editor</I> tab in the <I>Options</I>.
-This setting will take effect the next time you start the IDE.</LI>
+the <I>Icon set</I> in the <I>GUI</I> tab and <I>Editor</I> sub-tab in the
+<I>Options</I>. This setting will take effect the next time you start the
+IDE.</LI>
 <LI><STRONG>Zoom.</STRONG>
 The size at which automata are displayed can be changed using the
 <I>Zoom</I> box in the editor toolbar.</LI>

@@ -15,7 +15,7 @@ SUP_SRC=`readlink -f "$SUP_SRC"`
 SUP_DIST=$SUP_SRC/dist
 W_IN=distrib_inputs
 W_DIST_TMP=waters
-ARCHIVE_PREFIX=waterside252
+ARCHIVE_PREFIX=waterside26
 
 #############################################################################
 
@@ -121,9 +121,8 @@ else
     then
         rm -f $ARCHIVE
     fi
-    cp $W_IN/waters.bat $W_DIST_TMP
     cp $W_IN/waters.vbs $W_DIST_TMP
-    unix2dos $W_DIST_TMP/waters.bat $W_DIST_TMP/waters.vbs \
+    unix2dos $W_DIST_TMP/waters.vbs \
         $W_DIST_TMP/README.$RSUFFIX $W_DIST_TMP/waters.properties >& /dev/null
     zip -r $ARCHIVE $W_DIST_TMP >& /dev/null
 fi
