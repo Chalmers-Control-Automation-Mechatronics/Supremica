@@ -122,7 +122,8 @@ else
         rm -f $ARCHIVE
     fi
     cp $W_IN/waters.vbs $W_DIST_TMP
-    unix2dos $W_DIST_TMP/waters.vbs \
+    cp $W_IN/waters.bat $W_DIST_TMP
+    unix2dos $W_DIST_TMP/waters.vbs $W_DIST_TMP/waters.bat \
         $W_DIST_TMP/README.$RSUFFIX $W_DIST_TMP/waters.properties >& /dev/null
     zip -r $ARCHIVE $W_DIST_TMP >& /dev/null
 fi

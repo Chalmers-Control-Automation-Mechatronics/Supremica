@@ -36,24 +36,11 @@ SHO.Run WatersCmd, 0, False
 
 
 FUNCTION FindJava()
-  options = Array("", "\Wow6432Node")
-  FOR EACH opt IN options
-    javaCmd = FindJavaDefault(opt)
-    IF javaCmd <> "" THEN
-      FindJava = javaCmd
-      EXIT FUNCTION
-    END IF
-    javaCmd = FindJavaVersion(opt, 8)
-    IF javaCmd <> "" THEN
-      FindJava = javaCmd
-      EXIT FUNCTION
-    END IF
-    javaCmd = FindJavaVersion(opt, 32767)
-    IF javaCmd <> "" THEN
-      FindJava = javaCmd
-      EXIT FUNCTION
-    END IF
-  NEXT
+  javaCmd = CheckJavaCommand("java")
+  IF javaCmd <> "" THEN
+    FindJava = javaCmd
+    EXIT FUNCTION
+  END IF
   javaHome = ENV("JAVA_HOME")
   IF javaHome <> "" THEN
     javaCmd = CheckJavaCommand(javaHome & "\bin\java")
@@ -62,79 +49,81 @@ FUNCTION FindJava()
       EXIT FUNCTION
     END IF
   END IF
-  FindJava = CheckJavaCommand("java")
+  javaCmd = FindJavaInRegistry(8)
+  IF javaCmd <> "" THEN
+    FindJava = javaCmd
+    EXIT FUNCTION
+  END IF
+  FindJava = FindJavaInRegistry(32767)
 END FUNCTION
 
-FUNCTION FindJavaDefault(wow6432)
-  prefix = "HKEY_LOCAL_MACHINE\SOFTWARE" & wow6432 & "\JavaSoft"
-  options = Array("\JRE", "\JDK", "\Java Runtime Environment", "\Java Development Kit")
-  FOR EACH opt IN options
-    JavaCmd = FindJavaDefault1(prefix & opt)
-    IF JavaCmd <> "" THEN
-      FindJavaDefault = JavaCmd
-      EXIT FUNCTION
-    END IF
+FUNCTION FindJavaInRegistry(maxVersion)
+  vendors = Array("JavaSoft", "AdoptOpenJDK")
+  wows = Array("", "\Wow6432Node")
+  FOR EACH vendor IN vendors
+    FOR EACH wow IN wows
+      found = FindSpecificJavaInRegistry(wow, vendor, maxVersion)
+      IF found <> "" THEN
+        FindJavaInRegistry = found
+        EXIT FUNCTION
+      END IF
+    NEXT
   NEXT
-  FindJavaDefault = ""
+  FindJavaInRegistry = ""
 END FUNCTION
 
-FUNCTION FindJavaDefault1(group)
-  key = group & "\CurrentVersion"
-  ON ERROR RESUME NEXT
-  version = SHO.RegRead(key)
-  IF err.Number <> 0 THEN
-    err.Clear
-    ON ERROR GOTO 0
-    FindJavaDefault1 = ""
-    EXIT FUNCTION
-  END IF
-  ON ERROR GOTO 0
-  v = GetMajorJavaVersion(version)
-  IF v < 8 THEN
-    FindJavaDefault1 = ""
-    EXIT FUNCTION
-  END IF
-  key = group & "\" & version & "\JavaHome"
-  ON ERROR RESUME NEXT
-  javaHome = SHO.RegRead(key)
-  IF err.Number <> 0 THEN
-    err.Clear
-    ON ERROR GOTO 0
-    FindJavaDefault1 = ""
-    EXIT FUNCTION
-  END IF
-  ON ERROR GOTO 0
-  q = """"
-  FindJavaDefault1 = q & javaHome & "\bin\java" & q
-END FUNCTION
-
-FUNCTION FindJavaVersion(wow6432, maxVersion)
-  prefix = "HKEY_LOCAL_MACHINE\SOFTWARE" & wow6432 & "\JavaSoft"
-  options = Array("\JRE", "\JDK", "\Java Runtime Environment", "\Java Development Kit")
+FUNCTION FindSpecificJavaInRegistry(wow, vendor, maxVersion)
+  hklm = "HKEY_LOCAL_MACHINE\"
+  root = "SOFTWARE"
+  group = root & wow & "\" & vendor
   const HKEY_LOCAL_MACHINE = &H80000002
-  FOR EACH opt IN options
-    REG.EnumKey HKEY_LOCAL_MACHINE, prefix & opt, subKeys
-    IF NOT IsNull(subKeys) THEN
-      FOR EACH version IN subKeys
-        v = GetMajorJavaVersion(version)
-	IF v > 0 AND v <= maxVersion THEN
-          key = group & "\" & version & "\JavaHome"
-          ON ERROR RESUME NEXT
-          javaHome = SHO.RegRead(key)
-          IF err.Number = 0 THEN
-            ON ERROR GOTO 0
-            q = """"
-            FindJavaVersion = q & javaHome & "\bin\java" & q
-            EXIT FUNCTION
-          ELSE
-            err.Clear
-            ON ERROR GOTO 0
+  REG.EnumKey HKEY_LOCAL_MACHINE, group, subKeys
+  IF NOT IsNull(subKeys) THEN
+    FOR EACH subKey IN subKeys
+      subGroup = group & "\" & subKey
+      REG.EnumKey HKEY_LOCAL_MACHINE, subGroup, versions
+      IF NOT IsNull(versions) THEN
+        FOR EACH version IN versions
+          v = GetMajorJavaVersion(version)
+          IF v > 0 AND v <= maxVersion THEN
+            subSubGroup = subGroup & "\" & version
+            IF vendor = "JavaSoft" THEN
+              key = hklm & subSubGroup & "\JavaHome"
+              javaHome = ReadRegistryKey(key)
+            ELSE
+              REG.EnumKey HKEY_LOCAL_MACHINE, subSubGroup, subVersions
+              IF NOT IsNull(subVersions) THEN
+                FOR EACH subVersion IN subVersions
+                  key = hklm & subSubGroup & "\" & subVersion & "\MSI\Path"
+                  javaHome = ReadRegistryKey(key)
+                  IF javaHome <> "" THEN
+                    EXIT FOR
+                  END IF
+                NEXT
+              END IF
+            END IF
+            IF javaHome <> "" THEN
+              q = """"
+              FindSpecificJavaInRegistry = q & javaHome & "\bin\java" & q
+              EXIT FUNCTION
+            END IF  
           END IF
-        END IF
-      NEXT
-    END IF
-  NEXT
-  FindJavaVersion = ""
+        NEXT
+      END IF
+    NEXT
+  END IF
+  FindSpecificJavaInRegistry = ""
+END FUNCTION
+
+FUNCTION ReadRegistryKey(key)
+  ON ERROR RESUME NEXT
+  value = SHO.RegRead(key)
+  IF err.Number <> 0 THEN
+    err.Clear
+    value = ""
+  END IF
+  ON ERROR GOTO 0
+  ReadRegistryKey = value
 END FUNCTION
 
 FUNCTION CheckJavaCommand(cmd)

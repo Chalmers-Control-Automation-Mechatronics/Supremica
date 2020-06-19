@@ -14,9 +14,9 @@ install GraphViz, available from
 Just make sure the dot executable is in your search path.
 This version of Waters/Supremica supports dot versions up to 2.40.
 
-To run the IDE, please execute the script waters.vbs in this
-directory. This script cannot be copied to another place such as your
-desktop, but it is possible to create a shortcut and put that
+To run the IDE, please execute the script waters.vbs or waters.bat in
+this directory. These scripts cannot be copied to another place such
+as your desktop, but it is possible to create a shortcut and put that
 somewhere else.
 
 Have fun!
