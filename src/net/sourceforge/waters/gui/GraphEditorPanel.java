@@ -4096,8 +4096,9 @@ public class GraphEditorPanel
         if (mSource != null && mController.canBeSelected(mSource)) {
           replaceSelection(mSource);
         }
-      } else {
+      } else if (mCopiedEdge != null) {
         if (mAnchor == null) {
+          // When creating new edge ...
           final ProxySubject oldNode =
             (mIsSource ? mOrigEdge.getSource() : mOrigEdge.getTarget());
           final ProxySubject copiedNode =
