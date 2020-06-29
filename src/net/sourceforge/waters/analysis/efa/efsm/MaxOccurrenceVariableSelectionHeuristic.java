@@ -62,7 +62,7 @@ public class MaxOccurrenceVariableSelectionHeuristic
     if (efsmTR == null) {
       return 0;
     } else {
-      final OccursChecker checker = OccursChecker.getInstance();
+      final OccursChecker checker = new OccursChecker();
       final SimpleExpressionProxy varname = var.getVariableName();
       final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
       int occurrences = 0;

@@ -88,7 +88,7 @@ class KnownLiteralReplacementRule extends SimplificationRule
     throws EvalException
   {
     super.match(constraint, propagator);
-    final OccursChecker checker = OccursChecker.getInstance();
+    final OccursChecker checker = new OccursChecker();
     final SimpleExpressionProxy expr = mEXPR.getBoundExpression();
     for (final SimpleExpressionProxy subTerm :
          propagator.getCurrentNormalisedConstraints()) {

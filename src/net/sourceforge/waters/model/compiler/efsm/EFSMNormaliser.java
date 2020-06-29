@@ -66,6 +66,7 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
@@ -76,6 +77,7 @@ import net.sourceforge.waters.model.compiler.efa.EFAVariable;
 import net.sourceforge.waters.model.compiler.efa.EFAVariableCollector;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
@@ -97,6 +99,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 
@@ -1477,13 +1480,13 @@ public class EFSMNormaliser extends AbortableCompiler
      * but the associated updates contain prime variables, then exceptions
      * would be thrown.
      * @param  event The {@link EventDeclProxy} of interest.
-     * @param  ident This is required for location identification
+     * @param  eventIdent This is required for location identification
      *               if an exception is thrown.
      * @return <code>true</code> if the disjoint operation should be performed;
      *         <code>false</code> otherwise.
      */
     private boolean shouldMakeDisjoint(final EventDeclProxy event,
-                                       final IdentifierProxy ident)
+                                       final IdentifierProxy eventIdent)
       throws EvalException
     {
       final EventKind eKind = event.getKind();
@@ -1499,16 +1502,41 @@ public class EFSMNormaliser extends AbortableCompiler
              mGABlockMap.entrySet()) {
           final ConstraintList update = entry.getKey();
           final GuardActionBlockProxy gaBlock = entry.getValue();
-          final Set<EFAVariable> primeVariables = new THashSet<>();
-          collector.collectPrimedVariables(update, primeVariables);
-          if (!primeVariables.isEmpty()) {
-            // Not controllable: Create an exception.
-            for (final EFAVariable var : primeVariables) {
+          final Set<EFAVariable> primedVariables = new THashSet<>();
+          collector.collectPrimedVariables(update, primedVariables);
+          if (!primedVariables.isEmpty()) {
+            // The variable appears primed in the update: we must raise an
+            // EFSMControllabilityException. Let us raise one exception for
+            // each primed variable ...
+            final OccursChecker occursChecker = new OccursChecker();
+            final ModuleEqualityVisitor eq = occursChecker.getEquality();
+            final UnaryOperator prime = mOperatorTable.getNextOperator();
+            for (final EFAVariable var : primedVariables) {
+              final SimpleExpressionProxy varName = var.getVariableName();
+              // First check if the variable appears primed in the guard ...
+              final UnaryExpressionProxy varNamePrimed =
+                mFactory.createUnaryExpressionProxy(prime, varName);
+              final List<SimpleExpressionProxy> guards = gaBlock.getGuards();
+              if (guards != null && !guards.isEmpty()) {
+                final SimpleExpressionProxy guard = guards.get(0);
+                if (occursChecker.occurs(varNamePrimed, guard)) {
+                  final Proxy location = mCompilationInfo.getErrorLocation(guard);
+                  final EFSMControllabilityException exception =
+                    new EFSMControllabilityException(mComponent, var, eventIdent, location);
+                  mCompilationInfo.raise(exception);
+                  continue;
+                }
+              }
+              // Not in the guard - search for an action assigning to it ...
               for (final BinaryExpressionProxy action : gaBlock.getActions()) {
-                final Proxy location = mCompilationInfo.getErrorLocation(action);
-                final EFSMControllabilityException exception =
-                  new EFSMControllabilityException(mComponent, var, ident, location);
-                mCompilationInfo.raise(exception);
+                final SimpleExpressionProxy lhs = action.getLeft();
+                if (eq.equals(varName, lhs)) {
+                  final Proxy location = mCompilationInfo.getErrorLocation(action);
+                  final EFSMControllabilityException exception =
+                    new EFSMControllabilityException(mComponent, var, eventIdent, location);
+                  mCompilationInfo.raise(exception);
+                  break;
+                }
               }
             }
             return false;

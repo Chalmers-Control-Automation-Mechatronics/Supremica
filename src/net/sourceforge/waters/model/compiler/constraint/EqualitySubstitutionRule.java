@@ -90,12 +90,13 @@ class EqualitySubstitutionRule extends SimplificationRule
 
   //#########################################################################
   //# Invocation Interface
+  @Override
   boolean match(final SimpleExpressionProxy constraint,
                 final ConstraintPropagator propagator)
     throws EvalException
   {
     if (super.match(constraint, propagator)) {
-      final OccursChecker checker = OccursChecker.getInstance();
+      final OccursChecker checker = new OccursChecker();
       final SimpleExpressionProxy varname = mVARNAME.getBoundExpression();
       final SimpleExpressionProxy expr = mEXPR.getBoundExpression();
       return !checker.occurs(varname, expr);
@@ -104,11 +105,13 @@ class EqualitySubstitutionRule extends SimplificationRule
     }
   }
 
+  @Override
   boolean isMakingReplacement()
   {
     return true;
   }
 
+  @Override
   void execute(final ConstraintPropagator propagator)
     throws EvalException
   {

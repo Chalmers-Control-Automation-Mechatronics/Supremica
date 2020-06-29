@@ -62,18 +62,17 @@ public class OccursChecker extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Singleton Pattern
-  public static OccursChecker getInstance()
-  {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final OccursChecker INSTANCE = new OccursChecker();
-  }
-
-  private OccursChecker()
+  public OccursChecker()
   {
     mEquality = new ModuleEqualityVisitor(false);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public ModuleEqualityVisitor getEquality()
+  {
+    return mEquality;
   }
 
 

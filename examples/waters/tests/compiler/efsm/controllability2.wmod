@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="controllability2">
+<B:Comment>This example should produce an EFSMControllabilityException because the specification has an uncontrollable event that includes a primed variable in its guard.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="mouse_move"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="cat_move"/>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Name="m">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="c">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="c"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT" Name="cat">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="128" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="cat_move"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="172" Y="113"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="c"/>
+<BinaryExpression Operator="-">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="c"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-7"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="mouse">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="mouse_move"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="142" Y="115"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="m"/>
+<BinaryExpression Operator="-">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="m"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-11"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="spec">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="cat_move"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="143" Y="80"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="|" Text="m==1 | c'!=m">
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="!=">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="c"/>
+</UnaryExpression>
+<SimpleIdentifier Name="m"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-12"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

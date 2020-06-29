@@ -441,7 +441,7 @@ class EFATransitionRelationBuilder extends AbortableCompiler
         final BinaryExpressionProxy binary = (BinaryExpressionProxy) literal;
         final BinaryOperator op = binary.getOperator();
         if (op == mOperatorTable.getEqualsOperator()) {
-          final OccursChecker checker = OccursChecker.getInstance();
+          final OccursChecker checker = new OccursChecker();
           final SimpleExpressionProxy lhs = binary.getLeft();
           final SimpleExpressionProxy rhs = binary.getRight();
           if (mPrimed != null) {

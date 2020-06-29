@@ -432,12 +432,22 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_controllability() throws IOException, WatersException
+  public void testCompile_controllability1() throws IOException, WatersException
   {
     if (isNormalisationEnabled()) {
       final ModuleProxy module =
-        loadModule("tests", "compiler", "efsm", "controllability");
+        loadModule("tests", "compiler", "efsm", "controllability1");
       final String[] culprit = {"'x'", "'event'"};
+      compileError(module, null, EFSMControllabilityException.class, culprit);
+    }
+  }
+
+  public void testCompile_controllability2() throws IOException, WatersException
+  {
+    if (isNormalisationEnabled()) {
+      final ModuleProxy module =
+        loadModule("tests", "compiler", "efsm", "controllability2");
+      final String[] culprit = {"'c'", "'cat_move'"};
       compileError(module, null, EFSMControllabilityException.class, culprit);
     }
   }
