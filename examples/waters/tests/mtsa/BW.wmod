@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="BW">
+<B:Comment>Bidding workflow example based on benchmark from http://mtsa.dc.uba.ar/
+
+/******************************************************************************
+
+An engineering company evaluates projects in order to decide which ones to
+bid for. For this a document describing the project needs to be accepted by
+the company's engineering teams. If all the teams accept it, the document is
+approved. It is discarded if all teams reject it.
+
+There is a need for a workflow that can cope with the requests. We synthesize
+a controller that acts as an enforcer for an emerging workflow that guarantees:
+  a- A document can be reassigned to a team that has rejected it.
+  b- A document cannot be reassigned to a team that has already accepted it.
+  c- Only when a team rejects it after (all possible) re-evaluation can the
+     document be rejected without consensus.
+
+The case study can be scale in two directions:
+1- Teams: The number of engineering teams.
+2- Steps: The (maximum) number of evaluation steps a team can perform.
+
+******************************************************************************/
+
+const N = 2
+const K = 2
+
+const Teams  = N
+const Steps  = K
+
+range Team   = 0..(Teams-1)
+range Step   = 1..Steps
+
+/*****************************************************************************/
+
+
+Crew(Tid=0) = Pending,
+  Pending = (
+    {approve,refuse} -&gt; ERROR  |
+    assign[Tid] -&gt; Assigned[1] ),
+  Assigned[s:Step] = (
+    reject[Tid][s] -&gt; Rejected[s] |
+    accept[Tid]    -&gt; Accepted    ),
+  Rejected[s:Step] = (
+    refuse  -&gt; Pending |
+    approve -&gt; ERROR |
+    assign[Tid] -&gt; if (s &lt; Steps) then Assigned[s+1] else ERROR ),
+  Accepted = (
+    {approve,refuse} -&gt; Pending |
+    assign[Tid] -&gt; ERROR ).
+
+
+Document = Count[0],
+  Count[c:0..Teams-1] = (
+    reject[Team][Steps] -&gt; Rejected |
+    accept[Team] -&gt; Count[c+1] |
+    approve -&gt; ERROR |
+    refuse -&gt; if (c==0) then Document else ERROR ),
+  Count[Teams] = (
+    {accept[Team],reject[Team][Steps]} -&gt; Count[Teams] |
+    approve -&gt; Document |
+    refuse  -&gt; ERROR ),
+  Rejected = (
+    {accept[Team],reject[Team][Steps]} -&gt; Rejected |
+    approve -&gt; ERROR |
+    refuse  -&gt; Document ).
+
+
+/*****************************************************************************/
+
+||Plant = (Document || forall [t:Team] Crew(t)).
+
+controllerSpec Goal = {
+  controllable = {assign[Team], refuse, approve}
+  marking = {refuse, approve}
+  nonblocking
+}
+
+controller ||MonolithicController = Plant~{Goal}.
+
+heuristic ||DirectedController = Plant~{Goal}.</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="K">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Teams">
+<ConstantAliasExpression><SimpleIdentifier Name="N"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Team">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Teams"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Steps">
+<ConstantAliasExpression><SimpleIdentifier Name="K"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Step">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="Steps"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Rejection">
+<ConstantAliasExpression><EnumSetExpression Text="[prelim,final]">
+<SimpleIdentifier Name="prelim"/>
+<SimpleIdentifier Name="final"/>
+</EnumSetExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="approve"/>
+<EventDecl Kind="CONTROLLABLE" Name="refuse"/>
+<EventDecl Kind="CONTROLLABLE" Name="assign">
+<RangeList>
+<SimpleIdentifier Name="Team"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="reject">
+<RangeList>
+<SimpleIdentifier Name="Team"/>
+<SimpleIdentifier Name="Rejection"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="accept">
+<RangeList>
+<SimpleIdentifier Name="Team"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="t">
+<SimpleIdentifier Name="Team"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Crew">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Pending">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ERROR">
+<PointGeometry>
+<Point X="352" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Assigned">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-72" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Rejected">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="272" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Accepted">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-69" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Pending" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Pending" Target="Assigned">
+<LabelBlock>
+<IndexedIdentifier Name="assign">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-69" Y="-6"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Assigned" Target="Rejected">
+<LabelBlock>
+<IndexedIdentifier Name="reject">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="216" Y="171"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Assigned" Target="Accepted">
+<LabelBlock>
+<IndexedIdentifier Name="accept">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-66" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Rejected" Target="Pending">
+<LabelBlock>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Rejected" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="306" Y="119"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Rejected" Target="Assigned">
+<LabelBlock>
+<IndexedIdentifier Name="assign">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="215" Y="186"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&lt;">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Steps"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="14"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Rejected" Target="ERROR">
+<LabelBlock>
+<IndexedIdentifier Name="assign">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="322" Y="131"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Steps"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Accepted" Target="Pending">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-47"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="63" Y="177"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Accepted" Target="ERROR">
+<LabelBlock>
+<IndexedIdentifier Name="assign">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+</LabelBlock>
+<SplineGeometry>
+<Point X="309" Y="227"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Reject">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="reject">
+<SimpleIdentifier Name="t"/>
+<SimpleIdentifier Name="prelim"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&lt;">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Steps"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="14" Y="6"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="reject">
+<SimpleIdentifier Name="t"/>
+<SimpleIdentifier Name="final"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="186" Y="138"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Steps"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="16" Y="-17"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<VariableRange><SimpleIdentifier Name="Step"/>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="t"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="PLANT" Name="Document">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Count">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="64"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-19"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Rejected">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="336" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-69" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ERROR">
+<PointGeometry>
+<Point X="208" Y="336"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CountN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="14" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Count" Target="Rejected">
+<LabelBlock>
+<ForeachEvent Name="t">
+<SimpleIdentifier Name="Team"/>
+<EventList>
+<IndexedIdentifier Name="reject">
+<SimpleIdentifier Name="t"/>
+<SimpleIdentifier Name="final"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="283" Y="118"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Count" Target="Count">
+<LabelBlock>
+<SimpleIdentifier Name="accept"/>
+<LabelGeometry Anchor="NW">
+<Point X="-56" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="32"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&lt;">
+<SimpleIdentifier Name="count"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Teams"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-104" Y="2"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Count" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="222" Y="200"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Count" Target="Count">
+<LabelBlock>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="263" Y="34"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="3"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Count" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="194" Y="200"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="8"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Count" Target="CountN">
+<LabelBlock>
+<SimpleIdentifier Name="accept"/>
+<LabelGeometry Anchor="NW">
+<Point X="-71" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="115" Y="101"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="count"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Teams"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-93" Y="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="CountN" Target="CountN">
+<LabelBlock>
+<SimpleIdentifier Name="accept"/>
+<ForeachEvent Name="t">
+<SimpleIdentifier Name="Team"/>
+<EventList>
+<IndexedIdentifier Name="reject">
+<SimpleIdentifier Name="t"/>
+<SimpleIdentifier Name="final"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="-103" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="21" Y="196"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CountN" Target="Count">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="10"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="CountN" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="-47" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Rejected" Target="Rejected">
+<LabelBlock>
+<SimpleIdentifier Name="accept"/>
+<ForeachEvent Name="t">
+<SimpleIdentifier Name="Team"/>
+<EventList>
+<IndexedIdentifier Name="reject">
+<SimpleIdentifier Name="t"/>
+<SimpleIdentifier Name="final"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="382" Y="194"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Rejected" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Rejected" Target="Count">
+<LabelBlock>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="263" Y="132"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="8"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Marking">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="144" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="assign"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="approve"/>
+<SimpleIdentifier Name="refuse"/>
+<LabelGeometry Anchor="NW">
+<Point X="-56" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="assign"/>
+<LabelGeometry Anchor="NW">
+<Point X="18" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="146" Y="234"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent Name="count">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="Teams"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="count"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

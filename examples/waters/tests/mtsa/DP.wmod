@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="DP">
+<B:Comment>Dining philosophers example based on benchmark from http://mtsa.dc.uba.ar/
+
+/*****************************************************************************
+
+The classic problem where philosophers sit around a table share one fork with
+each adjacent philosopher. The goal is to control the access to the forks
+avoiding a deadlock and allowing each philosopher to alternate between eating
+and thinking while performing required intermediate etiquette steps.
+
+The problem scales in two directions:
+1- Philosophers: The number of philosophers.
+2- Steps: The number of etiquette steps.
+
+*****************************************************************************/
+
+const N = 2
+const K = 2
+
+const Philosophers = N
+const Steps = K
+
+range Phil = 0..Philosophers-1
+
+def LeftP(p) = p
+def RightP(p) = (p+1) % Philosophers
+
+def LeftF(f) = f == 0 ? Philosophers-1 : f-1
+def RightF(f) = f
+
+/*****************************************************************************/
+
+
+Philosopher(Pid=0) = Idle,
+  Idle = (think[Pid] -&gt; Hungry),
+  Hungry = (take[Pid][LeftP(Pid)] -&gt; Etiquete[Steps]),
+  Etiquete[0] = Ready,
+  Etiquete[s:1..Steps] = (step[Pid] -&gt; Etiquete[s-1]),
+  Ready = (
+    take[Pid][RightP(Pid)] -&gt; eat[Pid] -&gt;
+      release[Pid][LeftP(Pid)] -&gt; release[Pid][RightP(Pid)] -&gt; Idle).
+
+
+Fork(Fid=0) = OnTable,
+  OnTable = (
+    take[LeftF(Fid)][Fid]     -&gt; OnHand  |
+    take[RightF(Fid)][Fid]    -&gt; OnHand  ),
+  OnHand  = (
+    release[LeftF(Fid)][Fid]  -&gt; OnTable |
+    release[RightF(Fid)][Fid] -&gt; OnTable ).
+
+
+Monitor(Id=0) = (eat[Id] -&gt; Done),
+  Done = (eat[Id] -&gt; Done | eat.all -&gt; Monitor).
+
+
+/*****************************************************************************/
+
+||Plant = (forall [p:Phil] (Philosopher(p) || Fork(p) || Monitor(p))).
+
+controllerSpec Goal = {
+  controllable = {take[Phil][Phil]}
+  marking = {eat.all}
+  nonblocking
+}
+
+controller ||MonolithicController = Plant~{Goal}.
+
+heuristic ||DirectedController = Plant~{Goal}.</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="K">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Phil">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Steps">
+<ConstantAliasExpression><SimpleIdentifier Name="K"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="think">
+<RangeList>
+<SimpleIdentifier Name="Phil"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="take">
+<RangeList>
+<SimpleIdentifier Name="Phil"/>
+<SimpleIdentifier Name="Phil"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="step">
+<RangeList>
+<SimpleIdentifier Name="Phil"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="release">
+<RangeList>
+<SimpleIdentifier Name="Phil"/>
+<SimpleIdentifier Name="Phil"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="eat">
+<RangeList>
+<SimpleIdentifier Name="Phil"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="eat_all"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="p">
+<SimpleIdentifier Name="Phil"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Philosopher">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Idle">
+<PointGeometry>
+<Point X="144" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Hungry">
+<PointGeometry>
+<Point X="144" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Etiquette">
+<PointGeometry>
+<Point X="144" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Ready">
+<PointGeometry>
+<Point X="144" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S0">
+<PointGeometry>
+<Point X="336" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="336" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="336" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Idle" Target="Hungry">
+<LabelBlock>
+<IndexedIdentifier Name="think">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Hungry" Target="Etiquette">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Steps"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="1"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Etiquette" Target="Etiquette">
+<LabelBlock>
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-70" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="99" Y="241"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-70" Y="-13"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Etiquette" Target="Ready">
+<LabelBlock>
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-11"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Ready" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="take" Text="take[p][(p+1) % N]">
+<SimpleIdentifier Name="p"/>
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="p"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S2">
+<LabelBlock>
+<IndexedIdentifier Name="release">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S2" Target="Idle">
+<LabelBlock>
+<IndexedIdentifier Name="release" Text="release[p][(p+1) % N]">
+<SimpleIdentifier Name="p"/>
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="p"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-57" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="264" Y="107"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Steps"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="step">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Steps"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Fork">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="OnTable">
+<PointGeometry>
+<Point X="160" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="OnHand">
+<PointGeometry>
+<Point X="160" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="OnTable" Target="OnHand">
+<LabelBlock>
+<IndexedIdentifier Name="take">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="take" Text="take[(p+N-1) % N][p]">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="-">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="176"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="OnHand" Target="OnTable">
+<LabelBlock>
+<IndexedIdentifier Name="release">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="release" Text="release[(p+N-1) % N][p]">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="-">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-160" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="176"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Monitor">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Monitor">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Done">
+<PointGeometry>
+<Point X="240" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Monitor" Target="Done">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="85"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Done" Target="Monitor">
+<LabelBlock>
+<SimpleIdentifier Name="eat_all"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="191" Y="107"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Done" Target="Done">
+<LabelBlock>
+<IndexedIdentifier Name="eat">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="242" Y="60"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

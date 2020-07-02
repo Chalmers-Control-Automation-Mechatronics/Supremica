@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="CM">
+<B:Comment>Cat-and-mouse example based on benchmark from http://mtsa.dc.uba.ar/
+
+/*****************************************************************************
+
+Cats and mice are placed in oposite ends of a corridor divided in cells. They
+move one cell at a time by turns (first the mice then the cats). The goal is
+to control the mice in order to reach the center of the corridor while
+avoiding sharing a cell with a cat.
+
+The problem scales in two dimensions:
+1- Criters: The number of cats and mice.
+2- Levels: The number of cells in the corridor (2*Levels+1).
+
+*****************************************************************************/
+
+const Mice = N
+const Cats = N
+const Levels = K
+const Areas = 2*Levels+1
+const Last = Areas-1
+
+const Center = Areas \ 2
+range Area = 0..Areas-1
+
+/*****************************************************************************/
+
+Mouse(Mid=0) = Wait[Areas-1],
+  Next[a:Area] =
+    if (a==Center) then (safe -&gt; cat.turn -&gt; Wait[a])
+    else (cat.turn -&gt; Wait[a]),
+  Wait[a:Area] = (
+    mouse.turn -&gt; Act[a] |
+    cat[0..Cats-1].move[b:Area] -&gt;
+      if (a==b &amp;&amp; a!=Center) then ERROR
+      else Wait[a] ),
+  Act[a:Area] = (
+    mouse[Mid].move[a] -&gt; Next[a] |
+    when (a+1 &lt;= Last) mouse[Mid].move[a+1] -&gt; Next[a+1] |
+    when (a-1 &gt;= 0   ) mouse[Mid].move[a-1] -&gt; Next[a-1] ).
+
+
+Cat(Cid=0) = Next[0],
+  Next[a:Area] = (mouse.turn -&gt; Wait[a]),
+  Wait[a:Area] = (
+    cat.turn   -&gt; Act[a] |
+    mouse[0..Mice-1].move[b:Area] -&gt;
+      if (a==b &amp;&amp; a!=Center) then ERROR
+      else Wait[a] ),
+  Act[a:Area] = (
+    cat[Cid].move[a] -&gt; Next[a] |
+    when (a+1 &lt;= Last) cat[Cid].move[a+1] -&gt; Next[a+1] |
+    when (a-1 &gt;= 0)    cat[Cid].move[a-1] -&gt; Next[a-1] ).
+
+/*****************************************************************************/
+
+||Plant = (
+  forall [m:0..Mice-1] Mouse(m) || forall [c:0..Cats-1] Cat(c)).
+
+controllerSpec Goal = {
+  controllable = {mouse[0..Mice-1].move[Area]}
+  marking = {safe}
+  nonblocking
+}
+
+controller ||MonolithicController = Plant~{Goal}.
+
+heuristic ||DirectedController = Plant~{Goal}.
+</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="K">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Cats">
+<ConstantAliasExpression><SimpleIdentifier Name="N"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Mice">
+<ConstantAliasExpression><SimpleIdentifier Name="N"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Levels">
+<ConstantAliasExpression><SimpleIdentifier Name="K"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Areas">
+<ConstantAliasExpression><BinaryExpression Operator="+">
+<BinaryExpression Operator="*">
+<IntConstant Value="2"/>
+<SimpleIdentifier Name="Levels"/>
+</BinaryExpression>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Last">
+<ConstantAliasExpression><BinaryExpression Operator="-">
+<SimpleIdentifier Name="Areas"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Center">
+<ConstantAliasExpression><BinaryExpression Operator="/">
+<SimpleIdentifier Name="Areas"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Area">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="Last"/>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="cat_turn"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="mouse_turn"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="cat_move">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Cats"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="-1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="mouse_move">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Mice"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="-1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="m">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Mice"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Mouse">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="Wait">
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="Act">
+<PointGeometry>
+<Point X="240" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Next">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="240" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Wait" Target="Act">
+<LabelBlock>
+<SimpleIdentifier Name="mouse_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-60" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Act" Target="Next">
+<LabelBlock>
+<IndexedIdentifier Name="mouse_move">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="-1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="176"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="-=" Text="mouse_pos[m] -= 1">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="28"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Next" Target="Wait">
+<LabelBlock>
+<SimpleIdentifier Name="cat_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Act" Target="Next">
+<LabelBlock>
+<IndexedIdentifier Name="mouse_move">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="37" Y="-49"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="176"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="+=" Text="mouse_pos[m] += 1">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="39" Y="-37"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Act" Target="Next">
+<LabelBlock>
+<IndexedIdentifier Name="mouse_move">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="21" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=" Text="mouse_pos[m] = mouse_pos[m]">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="21" Y="-5"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<VariableRange><SimpleIdentifier Name="Area"/>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Last"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Center"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="c">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Cats"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Cat">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Wait">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-39" Y="2"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Act">
+<PointGeometry>
+<Point X="240" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Next">
+<PointGeometry>
+<Point X="240" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Wait" Target="Act">
+<LabelBlock>
+<SimpleIdentifier Name="cat_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Act" Target="Next">
+<LabelBlock>
+<IndexedIdentifier Name="cat_move">
+<SimpleIdentifier Name="c"/>
+<IntConstant Value="-1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="176"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="-=" Text="cat_pos[c] -= 1">
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="22"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Next" Target="Wait">
+<LabelBlock>
+<SimpleIdentifier Name="mouse_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-67" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Act" Target="Next">
+<LabelBlock>
+<IndexedIdentifier Name="cat_move">
+<SimpleIdentifier Name="c"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="40" Y="-50"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="176"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="+=" Text="cat_pos[c] += 1">
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="42" Y="-38"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Act" Target="Next">
+<LabelBlock>
+<IndexedIdentifier Name="cat_move">
+<SimpleIdentifier Name="c"/>
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="22" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=" Text="cat_pos[c] = cat_pos[c]">
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="25" Y="-6"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<VariableRange><SimpleIdentifier Name="Area"/>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="c">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Cats"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="m">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Mice"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="d">
+<BinaryExpression Operator="..">
+<IntConstant Value="-1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="d"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="Eat">
+<SimpleIdentifier Name="c"/>
+<SimpleIdentifier Name="m"/>
+<SimpleIdentifier Name="d"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="ok">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="80"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-15"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ok" Target="ok">
+<LabelBlock>
+<IndexedIdentifier Name="mouse_move">
+<SimpleIdentifier Name="m"/>
+<SimpleIdentifier Name="d"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="79"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="|" Text="mouse_pos[m]+d==Center | mouse_pos[m]+d!=cat_pos[c]">
+<BinaryExpression Operator="==">
+<BinaryExpression Operator="+">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="d"/>
+</BinaryExpression>
+<SimpleIdentifier Name="Center"/>
+</BinaryExpression>
+<BinaryExpression Operator="!=">
+<BinaryExpression Operator="+">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="d"/>
+</BinaryExpression>
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-4"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="ok" Target="ok">
+<LabelBlock>
+<IndexedIdentifier Name="cat_move">
+<SimpleIdentifier Name="c"/>
+<SimpleIdentifier Name="d"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-105" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="85" Y="82"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="|" Text="mouse_pos[m]==Center | mouse_pos[m]!=cat_pos[c]+d">
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="Center"/>
+</BinaryExpression>
+<BinaryExpression Operator="!=">
+<IndexedIdentifier Name="mouse_pos">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<BinaryExpression Operator="+">
+<IndexedIdentifier Name="cat_pos">
+<SimpleIdentifier Name="c"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="d"/>
+</BinaryExpression>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-357" Y="-4"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

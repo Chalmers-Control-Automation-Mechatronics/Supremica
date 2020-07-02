@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="AT">
+<B:Comment>Air traffic example based on benchmark from http://mtsa.dc.uba.ar/
+
+/*****************************************************************************/
+
+An airport control tower receives requests from planes trying to land.
+The tower needs to signal them when it is safe to approach the ramps and at
+which height they must perform holding maneuvers. If two airplanes enter
+the same height space or ramp there is a chance a crash may occur.
+
+We want a controller that automatically responds to airplanes requests and
+ensures safe usage of the airport space.
+
+The case study can be scaled in the following dimensions:
+1- Planes: maximum number of simultaneous land requests.
+2- Height: number of spaces above the ground where a plane can hold safely.
+
+/*****************************************************************************/
+
+const N = 2
+const K = 2
+
+const Planes  = N
+const Heights = K
+
+range Plane  = 0..(Planes-1)
+range Height = 0..(Heights-1)
+
+/*****************************************************************************/
+
+
+Airplane(P=0) = (
+    requestLand[P] -&gt; descend[P][h:Height] -&gt; Holding[h] |
+    extendFlight[P] -&gt; End),
+  Holding[h:Height] =
+    if (h&gt;0) then (descend[P][h-1] -&gt; Holding[h-1])
+             else (approach[P] -&gt; land[P] -&gt; End),
+  End = (control.all -&gt; Airplane).
+
+
+HeightMonitor(H=0) = Empty,
+  Empty = (
+    descend[p:Plane][H] -&gt; Occupied[p] |
+    when (H&gt;0) descend[Plane][H-1] -&gt; Empty ),
+  Occupied[p:Plane] = (
+    foreach [o:Plane]
+      when (p != o) descend[o][H] -&gt; air.crash[H] -&gt; ERROR |
+      when (p != o &amp;&amp; H&gt;0) descend[o][H-1] -&gt; Occupied[p]  |
+      when (p == o &amp;&amp; H&gt;0) descend[p][H-1] -&gt; Empty |
+      when (p == o &amp;&amp; H==0) land[Plane]    -&gt; Empty ).
+
+
+RampMonitor(R=0) = Empty,
+  Empty = (
+    approach[Plane] -&gt; Occupied ),
+  Occupied = (
+    approach[Plane] -&gt; land.crash -&gt; ERROR |
+    land[Plane]     -&gt; Empty ).
+
+
+ResponseMonitor = (
+  requestLand[p:Plane] -&gt; descend[p][Height] -&gt; ResponseMonitor |
+  {extendFlight[Plane],descend[Plane][Height], approach[Plane]}  -&gt; ResponseMonitor ).
+
+
+/*****************************************************************************/
+
+||Plant = (
+  ResponseMonitor || RampMonitor ||
+  forall [h:Height] HeightMonitor(h) ||
+  forall [p:Plane]  Airplane(p) ).
+
+controllerSpec Goal = {
+  controllable = {descend[Plane][Height], approach[Plane]}
+  marking = {control.all}
+  nonblocking
+}
+
+controller ||MonolithicController = Plant~{Goal}.
+
+heuristic ||DirectedController = Plant~{Goal}.
+</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="K">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Plane">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Height">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="K"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="approach">
+<RangeList>
+<SimpleIdentifier Name="Plane"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="land">
+<RangeList>
+<SimpleIdentifier Name="Plane"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="requestLand">
+<RangeList>
+<SimpleIdentifier Name="Plane"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="descend">
+<RangeList>
+<SimpleIdentifier Name="Plane"/>
+<SimpleIdentifier Name="Height"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="extendFlight">
+<RangeList>
+<SimpleIdentifier Name="Plane"/>
+</RangeList>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="RampMonitor">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Empty">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Occupied">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="land_crash">
+<PointGeometry>
+<Point X="112" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Empty" Target="Occupied">
+<LabelBlock>
+<SimpleIdentifier Name="approach"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="123" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Occupied" Target="land_crash">
+<LabelBlock>
+<SimpleIdentifier Name="approach"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Occupied" Target="Empty">
+<LabelBlock>
+<SimpleIdentifier Name="land"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="101" Y="112"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="ResponseMonitor">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="144" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="extendFlight"/>
+<SimpleIdentifier Name="descend"/>
+<SimpleIdentifier Name="approach"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="97"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="requestLand"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="descend"/>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="152"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="p">
+<SimpleIdentifier Name="Plane"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Airplane">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="End">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S0">
+<PointGeometry>
+<Point X="144" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Holding">
+<PointGeometry>
+<Point X="144" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-57" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="144" Y="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="2"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="End" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="requestLand">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S0" Target="Holding">
+<LabelBlock>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="End" Target="End">
+<LabelBlock>
+<IndexedIdentifier Name="extendFlight">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="190" Y="67"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Holding" Target="Holding">
+<LabelBlock>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="187" Y="225"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;" Text="cur_height[p] &gt; 0">
+<IndexedIdentifier Name="cur_height">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=" Text="cur_height[p] -= 1">
+<IndexedIdentifier Name="cur_height">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-15"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Holding" Target="S1">
+<LabelBlock>
+<IndexedIdentifier Name="approach">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==" Text="cur_height[p] == 0">
+<IndexedIdentifier Name="cur_height">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="4"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S1" Target="End">
+<LabelBlock>
+<IndexedIdentifier Name="land">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="75" Y="187"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="cur_height">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<VariableRange><SimpleIdentifier Name="Height"/>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==" Text="cur_height[p] == 0">
+<IndexedIdentifier Name="cur_height">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="ResponseMonitorForPlane">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="144" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<IndexedIdentifier Name="requestLand">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-79" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="189" Y="97"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="h">
+<SimpleIdentifier Name="Height"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="HeightMonitor">
+<SimpleIdentifier Name="h"/>
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Empty">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Occupied">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="air_crash">
+<PointGeometry>
+<Point X="176" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="13" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Empty" Target="Occupied">
+<LabelBlock>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="h"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="104"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Occupied" Target="air_crash">
+<LabelBlock>
+<ForeachEvent Name="o">
+<SimpleIdentifier Name="Plane"/>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="o"/>
+<SimpleIdentifier Name="p"/>
+</BinaryExpression>
+<EventList>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="o"/>
+<SimpleIdentifier Name="h"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Empty" Target="Empty">
+<LabelBlock>
+<ForeachEvent Name="o">
+<SimpleIdentifier Name="Plane"/>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="o"/>
+<SimpleIdentifier Name="p"/>
+</BinaryExpression>
+<EventList>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="o"/>
+<SimpleIdentifier Name="h"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-53"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="234" Y="51"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="176" Y="48"/>
+</EndPointGeometry>
+</Edge>
+<Edge Source="Occupied" Target="Empty">
+<LabelBlock>
+<ForeachEvent Name="x">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="h"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<EventList>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="h"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<ForeachEvent Name="x">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="h"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<EventList>
+<IndexedIdentifier Name="land">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="-181" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="159" Y="104"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="h"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="descend">
+<SimpleIdentifier Name="p"/>
+<SimpleIdentifier Name="h"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="142" Y="98"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=" Text="cur_height[p] = h">
+<IndexedIdentifier Name="cur_height">
+<SimpleIdentifier Name="p"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="h"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-6"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

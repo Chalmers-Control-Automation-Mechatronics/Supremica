@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="TL">
+<B:Comment>Downloaded from http://mtsa.dc.uba.ar/
+File TL/TL-2-2.fsp.lts
+
+/******************************************************************************
+
+The Transfer Line (TL), first introduced by Wonham, is one of the most
+traditional examples in controller synthesis.
+
+The TL consists of series of machines M(1), M(2), ... , M(n) connected by
+buffers B(1), B(2), ... , B(n) and ending in a special machine called Test Unit
+(TU). A machine M(i) takes work pieces from the buffer B(i−1) (with the
+exception of machine M(1) that takes the work pieces from the outside). After
+an undetermined amount of time, the working machine M(i) outputs a processed
+work piece through buffer B(i). Finally, when a work piece reaches the TU it
+can be accepted and taken out of the system or it can be rejected and placed
+back in buffer B(1) for reprocessing.
+
+The only controllable events in this case study are the taking of work pieces.
+An error ensues if a machine tries to take a work piece from an empty buffer or
+if it tries to place a processed work piece in a full buffer. One of the goals
+for the controller is to avoid the events that lead to errors, the other goal
+is to reach a state where a processed work piece can be accepted or rejected.
+We do not require the controller to achieve accepted pieces as acceptance and
+rejection are not decided by the controller.
+
+The case study can be scaled in three directions:
+1- N: number of interconnected machines.
+2- K: maximum number of work pieces a machine can process simultaneously and
+      and space of the buffers.
+
+******************************************************************************/
+
+const N = 2
+const K = 2
+
+const Machines = N
+const Workload = K
+const Capacity = Workload
+
+/*****************************************************************************/
+
+Machine(Id=0) = Working[0],
+  Working[wl:0..Workload] =
+    (when (wl &lt; Workload) get[Id]   -&gt; Working[wl+1] |
+     when (wl &gt; 0)        put[Id+1] -&gt; Working[wl-1] ).
+
+
+TU = Idle,
+  Idle    = (get[Machines] -&gt; Testing),
+  Testing = (return[1] -&gt; reject -&gt; TU |
+             accept -&gt; TU)
+            +{return[0..Machines]}.
+
+
+Buffer(Id=0) = Operative[0],
+  Operative[c:0..Capacity] = (
+    when (c &gt; 0)         get[Id]    -&gt; Operative[c-1] |
+    when (c == 0)        get[Id]    -&gt; ERROR          |
+    when (c &lt; Capacity)  put[Id]    -&gt; Operative[c+1] |
+    when (c == Capacity) put[Id]    -&gt; ERROR          |
+    when (c &lt; Capacity)  return[Id] -&gt; Operative[c+1] |
+    when (c == Capacity) return[Id] -&gt; ERROR          ).
+
+
+/*****************************************************************************/
+
+||Plant = (forall [m:0..Machines-1] (Machine(m) || Buffer(m+1)) || TU).
+
+controllerSpec Goal = {
+  controllable = {get[0..Machines]}
+  marking = {accept,reject}
+  nonblocking
+}
+
+controller ||MonolithicController = Plant~{Goal}.
+
+heuristic ||DirectedController = Plant~{Goal}.</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="REQUIRED_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="6"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Scope="REQUIRED_PARAMETER" Name="K">
+<ConstantAliasExpression><IntConstant Value="6"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="get">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="put">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="return">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="tauTU"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="m">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Machine">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Working">
+<PointGeometry>
+<Point X="128" Y="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-1" Y="-18"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Working" Target="Working">
+<LabelBlock>
+<IndexedIdentifier Name="get">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="171" Y="114"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="+=" Text="wl[m] += 1">
+<IndexedIdentifier Name="wl">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-3"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Working" Target="Working">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-55" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="87" Y="114"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="-=" Text="wl[m] -= 1">
+<IndexedIdentifier Name="wl">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-71" Y="-6"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="wl">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="K"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="wl">
+<SimpleIdentifier Name="m"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Buffer">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Operative">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-1" Y="-20"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Error">
+<PointGeometry>
+<Point X="240" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Operative" Target="Operative">
+<LabelBlock>
+<IndexedIdentifier Name="get">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="112"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="-=" Text="c[m+1] -= 1">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Operative" Target="Operative">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-71" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="100" Y="113"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="+=" Text="c[m+1] += 1">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-93" Y="-2"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Operative" Target="Operative">
+<LabelBlock>
+<IndexedIdentifier Name="return">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-60" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="157"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=" Text="c[m+1] += 1">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="15"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Operative" Target="Error">
+<LabelBlock>
+<IndexedIdentifier Name="put">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="-39"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="207" Y="183"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<SimpleIdentifier Name="K"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-2" Y="-24"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Operative" Target="Error">
+<LabelBlock>
+<IndexedIdentifier Name="return">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="28" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="198" Y="189"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="m==0 &amp; c[m+1]==K">
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<SimpleIdentifier Name="K"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="31" Y="13"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Operative" Target="Error">
+<LabelBlock>
+<IndexedIdentifier Name="get">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="45" Y="28"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="48" Y="44"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="K"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="c">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="m"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="PLANT" Name="TU">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Idle">
+<PointGeometry>
+<Point X="160" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Testing">
+<PointGeometry>
+<Point X="256" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AcceptReject">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Idle" Target="Testing">
+<LabelBlock>
+<IndexedIdentifier Name="get">
+<SimpleIdentifier Name="N"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AcceptReject" Target="Idle">
+<LabelBlock>
+<SimpleIdentifier Name="tauTU"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Testing" Target="AcceptReject">
+<LabelBlock>
+<SimpleIdentifier Name="tauTU"/>
+<IndexedIdentifier Name="return">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

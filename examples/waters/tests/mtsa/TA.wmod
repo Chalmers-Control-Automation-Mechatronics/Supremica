@@ -1,0 +1,1192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="TA">
+<B:Comment>Travel Agent example based on benchmark from http://mtsa.dc.uba.ar/
+
+/******************************************************************************
+
+A travel agency sells vacation packages on-line by orchestrating existing
+third-party web-services for different amenities (e.g. car rental, flight
+purchase, hotel booking, etc). We want to synthesize an orchestrator based on
+the requirements for the provision of vacation packages and the protocol
+specification of the web-services.
+
+The protocols for the services may vary, one variant is the number of steps
+required for querying availability; in some cases the process requires a
+multiple steps (e.g. querying for flight destination and dates, and if
+successful following with a selection for class). Another variant is that some
+services may require a reservation step which guarantees a purchase order for
+a short period, while others do not, and hence the purchase may fail (e.g. on
+low availability reservation may be disabled in order to maximize concurrency
+between clients. As a result a race condition between two purchase orders may
+arise, and therefore one order will fail).
+
+The example scales in the following dimensions:
+
+1- Amenities: The number of amenities included in the package.
+2- Steps: The maximum number of steps requierd to query a service.
+
+******************************************************************************/
+
+const N = 2
+const K = 2
+
+const Amenities = N
+const Steps = K
+
+range Amenity   = 0..(Amenities-1)
+range Step  = 0..(Steps-1)
+
+/*****************************************************************************/
+
+Agency = (agency.request -&gt; Processing),
+  Processing = (
+    {agency.fail,agency.succ} -&gt; Agency |
+    query[Amenity] -&gt; Processing ).
+
+
+Service(Sid=0) = (
+  {agency.succ,agency.fail} -&gt; Service |
+  query[Sid] -&gt; (
+    unavailable[Sid] -&gt; query.fail[Sid] -&gt; Service |
+    available[Sid] -&gt; steps[Sid][s:Step] -&gt; query.succ[Sid] -&gt; Selection[s] )),
+  Selection[s:Step] =
+    if (s&gt;0) then (select[Sid] -&gt; Selection[s-1])
+    else Booking,
+  Booking  = (
+    committed[Sid]   -&gt;
+      if (Sid==Amenities-1) then Reserve
+      else (query[Sid+1] -&gt; Reserve) |
+    uncommitted[Sid] -&gt;
+      if (Sid==Amenities-1) then Direct
+      else (query[Sid+1] -&gt; Direct) ),
+  Reserve  = (
+    {agency.succ,agency.fail} -&gt; Service |
+    cancel[Sid]   -&gt; Service |
+    purchase[Sid] -&gt;
+    purchase.succ[Sid] -&gt; Service ),
+  Direct  = (
+    {agency.succ,agency.fail} -&gt; Service |
+    cancel[Sid]   -&gt; Service |
+    purchase[Sid] -&gt; (
+      purchase.succ[Sid] -&gt; Service |
+      purchase.fail[Sid] -&gt; Service ) ).
+
+
+ServiceMonitor(Sid=0) = (
+    query[Sid]  -&gt; InQuery          |
+    agency.succ -&gt; ERROR            |
+    agency.fail -&gt; ServiceMonitor   ),
+  InQuery = (
+    query.succ[Sid] -&gt; QuerySucces  |
+    query.fail[Sid] -&gt; QueryFail    |
+    agency.succ -&gt; ERROR            |
+    agency.fail -&gt; ServiceMonitor   ),
+  QuerySucces = (
+    purchase.succ[Sid] -&gt; Success   |
+    purchase.fail[Sid] -&gt; QueryFail |
+    cancel[Sid]        -&gt; QueryFail |
+    agency.succ -&gt; ERROR            |
+    agency.fail -&gt; ServiceMonitor   ),
+  QueryFail = (
+    agency.succ -&gt; ERROR            |
+    agency.fail -&gt; ServiceMonitor   ),
+  Success = (
+    agency.succ -&gt; ServiceMonitor   |
+    agency.fail -&gt; ServiceMonitor   ).
+    
+
+AgencyMonitor = Disallow[0],
+  Disallow[n:0..1] = (
+    agency.fail -&gt; ERROR         |
+    agency.succ -&gt; AgencyMonitor |
+    query.fail[Amenity] -&gt; Allow |
+    uncommitted[Amenity] -&gt; if (n==0) then Disallow[1] else Allow |
+    when (n==1) purchase.fail[Amenity] -&gt; Allow ),
+  Allow = (
+    {agency.fail,agency.succ} -&gt; AgencyMonitor |
+    {query.fail[Amenity],uncommitted[Amenity],purchase.fail[Amenity]} -&gt; Allow ).
+
+
+/*****************************************************************************/
+
+||Plant = (
+  Agency || AgencyMonitor ||
+  forall [a:Amenity] (Service(a) || ServiceMonitor(a)) ).
+
+controllerSpec Goal = {
+  controllable = {cancel[Amenity],purchase[Amenity], agency.succ, agency.fail}
+  marking = {agency.succ, agency.fail}
+  nonblocking
+}
+
+controller ||MonolithicController = Plant~{Goal}.
+
+heuristic ||DirectedController = Plant~{Goal}.</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="K">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="2"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Amenity">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+<ConstantAlias Name="Step">
+<ConstantAliasExpression><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="K"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="agency_request"/>
+<EventDecl Kind="CONTROLLABLE" Name="agency_succ"/>
+<EventDecl Kind="CONTROLLABLE" Name="agency_fail"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="query">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="cancel">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="purchase">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="unavailable">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="query_fail">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="available">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="steps">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+<SimpleIdentifier Name="Step"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="query_succ">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="uncommitted">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="purchase_fail">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="purchase_succ">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="select">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="committed">
+<RangeList>
+<SimpleIdentifier Name="Amenity"/>
+</RangeList>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="Agency">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Agency">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Processing">
+<PointGeometry>
+<Point X="128" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Agency" Target="Processing">
+<LabelBlock>
+<SimpleIdentifier Name="agency_request"/>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Processing" Target="Agency">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<SimpleIdentifier Name="agency_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-86" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Processing" Target="Processing">
+<LabelBlock>
+<SimpleIdentifier Name="query"/>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="253"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="a">
+<SimpleIdentifier Name="Amenity"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="Service">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Service">
+<PointGeometry>
+<Point X="144" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-60" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Selection">
+<PointGeometry>
+<Point X="144" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S0">
+<PointGeometry>
+<Point X="144" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="240" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="144" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point X="144" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Booking">
+<PointGeometry>
+<Point X="144" Y="384"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Reserve">
+<PointGeometry>
+<Point X="144" Y="512"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-60" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Direct">
+<PointGeometry>
+<Point X="288" Y="512"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S4">
+<PointGeometry>
+<Point X="144" Y="448"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S5">
+<PointGeometry>
+<Point X="288" Y="448"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S6">
+<PointGeometry>
+<Point X="144" Y="576"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S7">
+<PointGeometry>
+<Point X="288" Y="576"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="Service" Target="Service">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<SimpleIdentifier Name="agency_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="187" Y="64"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Service" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="query">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<IndexedIdentifier Name="unavailable">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="Service">
+<LabelBlock>
+<IndexedIdentifier Name="query_fail">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S2" Target="S3">
+<LabelBlock>
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S3" Target="Selection">
+<LabelBlock>
+<IndexedIdentifier Name="query_succ">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-21"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S3" Target="Booking">
+<LabelBlock>
+<IndexedIdentifier Name="query_succ">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-91" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="94" Y="322"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-81" Y="-26"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Selection" Target="Selection">
+<LabelBlock>
+<IndexedIdentifier Name="select">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="195" Y="323"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-16"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Selection" Target="Booking">
+<LabelBlock>
+<IndexedIdentifier Name="select">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-1"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S0" Target="S2">
+<LabelBlock>
+<IndexedIdentifier Name="available">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Booking" Target="Reserve">
+<LabelBlock>
+<IndexedIdentifier Name="committed">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-61" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="86" Y="446"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="144" Y="512"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="a"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="16"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Booking" Target="S4">
+<LabelBlock>
+<IndexedIdentifier Name="committed">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="a"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-2"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S4" Target="Reserve">
+<LabelBlock>
+<IndexedIdentifier Name="query">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="a"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Booking" Target="Direct">
+<LabelBlock>
+<IndexedIdentifier Name="uncommitted">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-84" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="248" Y="447"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="a"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="13"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="Booking" Target="S5">
+<LabelBlock>
+<IndexedIdentifier Name="uncommitted">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="19" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="225" Y="404"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="a"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="23" Y="7"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S5" Target="Direct">
+<LabelBlock>
+<IndexedIdentifier Name="query">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="a"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Reserve" Target="Service">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<SimpleIdentifier Name="agency_fail"/>
+<IndexedIdentifier Name="cancel">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-29" Y="390"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Reserve" Target="S6">
+<LabelBlock>
+<IndexedIdentifier Name="purchase">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-80" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S6" Target="Service">
+<LabelBlock>
+<IndexedIdentifier Name="purchase_succ">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="137"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-38" Y="418"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Direct" Target="Service">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<SimpleIdentifier Name="agency_fail"/>
+<IndexedIdentifier Name="cancel">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="373" Y="259"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Direct" Target="S7">
+<LabelBlock>
+<IndexedIdentifier Name="purchase">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S7" Target="Service">
+<LabelBlock>
+<IndexedIdentifier Name="purchase_succ">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="purchase_fail">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="392" Y="285"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="ServiceMonitor">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="ServiceMonitor">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="80"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="1" Y="-23"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ERROR">
+<PointGeometry>
+<Point X="320" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="InQuery">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-60" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="QuerySuccess">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-98" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Success">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="QueryFail">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-25"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="ServiceMonitor"/>
+<NodeRef Name="InQuery"/>
+<NodeRef Name="QuerySuccess"/>
+<NodeRef Name="QueryFail"/>
+<BoxGeometry>
+<Box X="80" Y="32" Width="192" Height="240"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ServiceMonitor" Target="InQuery">
+<LabelBlock>
+<IndexedIdentifier Name="query">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="120"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="G0" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-32"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="272" Y="177"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point X="309" Y="202"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="InQuery" Target="QuerySuccess">
+<LabelBlock>
+<IndexedIdentifier Name="query_succ">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-95" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="InQuery" Target="QueryFail">
+<LabelBlock>
+<IndexedIdentifier Name="query_fail">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="InQuery" Target="ServiceMonitor">
+<LabelBlock>
+<SimpleIdentifier Name="agency_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-78" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="120"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="QuerySuccess" Target="Success">
+<LabelBlock>
+<IndexedIdentifier Name="purchase_succ">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-114" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="QuerySuccess" Target="QueryFail">
+<LabelBlock>
+<IndexedIdentifier Name="purchase_fail">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="cancel">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="G0" Target="ServiceMonitor">
+<LabelBlock>
+<SimpleIdentifier Name="agency_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="80" Y="80"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="Success" Target="ServiceMonitor">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<SimpleIdentifier Name="agency_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-78" Y="78"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="264" Y="212"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent>
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<VariableRange><SimpleIdentifier Name="Step"/>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<ForeachComponent Name="s">
+<SimpleIdentifier Name="Step"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="select_steps">
+<SimpleIdentifier Name="a"/>
+<SimpleIdentifier Name="s"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+<SimpleIdentifier Name="s"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="140" Y="97"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<IndexedIdentifier Name="steps">
+<SimpleIdentifier Name="a"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="s"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-9"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="PLANT" Name="AgencyMonitor">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="Disallow0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="80"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-21"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ERROR">
+<PointGeometry>
+<Point X="352" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Allow">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="Disallow1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="240" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="Disallow1"/>
+<NodeRef Name="Disallow0"/>
+<BoxGeometry>
+<Box X="64" Y="48" Width="208" Height="64"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="G0" Target="ERROR">
+<LabelBlock>
+<SimpleIdentifier Name="agency_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="272" Y="80"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="G0" Target="Disallow0">
+<LabelBlock>
+<SimpleIdentifier Name="agency_succ"/>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="64" Y="80"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="G0" Target="Allow">
+<LabelBlock>
+<SimpleIdentifier Name="query_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="126" Y="112"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="Disallow0" Target="Disallow1">
+<LabelBlock>
+<SimpleIdentifier Name="uncommitted"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="Disallow1" Target="Allow">
+<LabelBlock>
+<SimpleIdentifier Name="uncommitted"/>
+<SimpleIdentifier Name="purchase_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="211" Y="162"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Allow" Target="Disallow0">
+<LabelBlock>
+<SimpleIdentifier Name="agency_fail"/>
+<SimpleIdentifier Name="agency_succ"/>
+<LabelGeometry Anchor="NW">
+<Point X="-90" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="105" Y="137"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="Allow" Target="Allow">
+<LabelBlock>
+<SimpleIdentifier Name="query_fail"/>
+<SimpleIdentifier Name="uncommitted"/>
+<SimpleIdentifier Name="purchase_fail"/>
+<LabelGeometry Anchor="NW">
+<Point X="-94" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="81" Y="195"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
