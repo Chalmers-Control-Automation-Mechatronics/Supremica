@@ -77,6 +77,7 @@ import net.sourceforge.waters.gui.actions.IDEHelpAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.IDESelectAllAction;
+import net.sourceforge.waters.gui.actions.InsertConditionalAction;
 import net.sourceforge.waters.gui.actions.InsertConstantAliasAction;
 import net.sourceforge.waters.gui.actions.InsertEventAliasAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
@@ -328,6 +329,9 @@ public class IDEMenuBar
     menu.add(insVar);
     addOption(Config.INCLUDE_INSTANTIATION);
     if (Config.INCLUDE_INSTANTIATION.getBooleanValue()) {
+      final Action insConditional =
+        actions.getAction(InsertConditionalAction.class);
+      menu.add(insConditional);
       final Action insForeach = actions.getAction(InsertForeachAction.class);
       menu.add(insForeach);
       final Action insAlias =

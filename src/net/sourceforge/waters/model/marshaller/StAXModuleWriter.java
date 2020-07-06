@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -68,6 +69,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ModuleSequenceProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -151,6 +153,18 @@ public class StAXModuleWriter
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
+  }
+
+  @Override
+  public Object visitConditionalProxy(final ConditionalProxy cond)
+    throws VisitorException
+  {
+    writeStartElement(NAMESPACE, mListType.getConditionalName());
+    visitNestedBlockProxy(cond);
+    cond.getGuard().acceptVisitor(this);
+    writeOptionalList(NAMESPACE, mListType.getListName(), cond.getBody());
+    writeEndElement();
+    return null;
   }
 
   @Override
@@ -278,7 +292,8 @@ public class StAXModuleWriter
     throws VisitorException
   {
     writeStartElement(NAMESPACE, mListType.getForeachName());
-    visitNamedProxy(foreach);
+    writeAttribute(SchemaBase.ATTRIB_Name, foreach.getName());
+    visitNestedBlockProxy(foreach);
     foreach.getRange().acceptVisitor(this);
     writeOptionalItem(foreach.getGuard());
     writeOptionalList(NAMESPACE, mListType.getListName(), foreach.getBody());
@@ -469,6 +484,13 @@ public class StAXModuleWriter
     }
     writeEndElement();
     return null;
+  }
+
+  @Override
+  public Object visitNestedBlockProxy(final NestedBlockProxy block)
+    throws VisitorException
+  {
+    return visitProxy(block);
   }
 
   @Override
@@ -668,44 +690,6 @@ public class StAXModuleWriter
     writeIntAttribute(SchemaModule.ATTRIB_X, point.getX());
     writeIntAttribute(SchemaModule.ATTRIB_Y, point.getY());
     writeEndElement();
-  }
-
-
-  //#########################################################################
-  //# Inner Enumeration ListType
-  private static enum ListType
-  {
-    ALIASES(SchemaModule.ELEMENT_EventAliasList,
-            SchemaModule.ELEMENT_ForeachEventAlias),
-    EVENTS(SchemaModule.ELEMENT_EventList,
-           SchemaModule.ELEMENT_ForeachEvent),
-    COMPONENTS(SchemaModule.ELEMENT_ComponentList,
-               SchemaModule.ELEMENT_ForeachComponent);
-
-    //#######################################################################
-    //# Constructor
-    private ListType(final String listName, final String foreachName)
-    {
-      mListName = listName;
-      mForeachName = foreachName;
-    }
-
-    //#######################################################################
-    //# Simple Access
-    private String getListName()
-    {
-      return mListName;
-    }
-
-    private String getForeachName()
-    {
-      return mForeachName;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final String mListName;
-    private final String mForeachName;
   }
 
 

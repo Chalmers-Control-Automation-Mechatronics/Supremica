@@ -45,6 +45,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultProductDESAndModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -60,6 +61,7 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
@@ -160,6 +162,7 @@ public class ProxyNamer {
     mNameMap = new HashMap<Class<? extends Proxy>,NameEntry>(32);
     createEntry(AutomatonProxy.class, "Automaton", "Automata", Proxy.class);
     createEntry(AliasProxy.class, "Alias", "Aliases", Proxy.class);
+    createEntry(ConditionalProxy.class, "Conditional Block", NestedBlockProxy.class);
     createEntry(ConstantAliasProxy.class, "Named Constant", AliasProxy.class);
     createEntry(ComponentProxy.class, "Component", Proxy.class);
     createEntry(EdgeProxy.class, "Edge", Proxy.class, NodeProxy.class);
@@ -167,7 +170,7 @@ public class ProxyNamer {
                 AliasProxy.class);
     createEntry(EventDeclProxy.class, "Event", Proxy.class,
                 ComponentProxy.class);
-    createEntry(ForeachProxy.class, "Foreach Block", Proxy.class);
+    createEntry(ForeachProxy.class, "Foreach Block", NestedBlockProxy.class);
     createEntry(GraphProxy.class, "Graph", "Graph", Proxy.class,
                 SimpleComponentProxy.class);
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
@@ -182,6 +185,7 @@ public class ProxyNamer {
     createEntry(LabelBlockProxy.class, "Labels", "Labels",
                 EdgeProxy.class);
     createEntry(ModuleProxy.class, "Module", Proxy.class);
+    createEntry(NestedBlockProxy.class, "Nested Block", Proxy.class);
     createEntry(NodeProxy.class, "State", Proxy.class);
     createEntry(ParameterBindingProxy.class, "Binding", Proxy.class,
                 InstanceProxy.class);

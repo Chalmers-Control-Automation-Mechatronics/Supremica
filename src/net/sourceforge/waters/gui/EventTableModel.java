@@ -59,6 +59,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -376,9 +377,9 @@ public class EventTableModel
                              final List<? extends Proxy> source)
   {
     for (final Proxy proxy : source) {
-      if (proxy instanceof ForeachProxy) {
-        final ForeachProxy foreach = (ForeachProxy) proxy;
-        final List<Proxy> body = foreach.getBody();
+      if (proxy instanceof NestedBlockProxy) {
+        final NestedBlockProxy block = (NestedBlockProxy) proxy;
+        final List<Proxy> body = block.getBody();
         collectEvents(dest, body);
       } else {
         final IdentifierSubject ident = (IdentifierSubject) proxy;
@@ -755,15 +756,6 @@ public class EventTableModel
     }
 
     @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-      throws VisitorException
-    {
-      final List<? extends Proxy> body = foreach.getBody();
-      visitCollection(body);
-      return null;
-    }
-
-    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -796,6 +788,15 @@ public class EventTableModel
     {
       final List<? extends Proxy> eventlist = expr.getEventIdentifierList();
       visitCollection(eventlist);
+      return null;
+    }
+
+    @Override
+    public Object visitNestedBlockProxy(final NestedBlockProxy block)
+      throws VisitorException
+    {
+      final List<? extends Proxy> body = block.getBody();
+      visitCollection(body);
       return null;
     }
 

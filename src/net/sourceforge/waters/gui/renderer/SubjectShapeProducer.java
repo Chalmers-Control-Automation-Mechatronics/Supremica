@@ -47,6 +47,7 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -55,7 +56,6 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -172,8 +172,8 @@ public class SubjectShapeProducer
         removeMapping((GuardActionBlockProxy) parent);
       } else if (parent instanceof GraphProxy) {
         removeMapping((Subject) event.getValue());
-      }else if(parent instanceof ForeachSubject){
-        removeMapping((LabelBlockProxy)SubjectTools.
+      } else if (parent instanceof NestedBlockProxy) {
+        removeMapping((LabelBlockProxy) SubjectTools.
                       getAncestor(parent, LabelBlockSubject.class));
       }
       break;

@@ -116,11 +116,7 @@ It has 6692 reachable states and the diameter is 66.</ns2:Comment>
                                             <IndexedIdentifier Name="white_win_y">
                                                 <SimpleIdentifier Name="y"/>
                                             </IndexedIdentifier>
-                                            <ForeachEvent Name=":dummy">
-                                                <BinaryExpression Operator="..">
-                                                    <IntConstant Value="0"/>
-                                                    <IntConstant Value="0"/>
-                                                </BinaryExpression>
+                                            <ConditionalEvent>
                                                 <BinaryExpression Operator="==">
                                                     <SimpleIdentifier Name="x"/>
                                                     <SimpleIdentifier Name="y"/>
@@ -128,12 +124,8 @@ It has 6692 reachable states and the diameter is 66.</ns2:Comment>
                                                 <EventList>
                                                     <SimpleIdentifier Name="white_win_d1"/>
                                                 </EventList>
-                                            </ForeachEvent>
-                                            <ForeachEvent Name=":dummy">
-                                                <BinaryExpression Operator="..">
-                                                    <IntConstant Value="0"/>
-                                                    <IntConstant Value="0"/>
-                                                </BinaryExpression>
+                                            </ConditionalEvent>
+                                            <ConditionalEvent>
                                                 <BinaryExpression Operator="==">
                                                     <SimpleIdentifier Name="x"/>
                                                     <BinaryExpression Operator="+">
@@ -147,7 +139,7 @@ It has 6692 reachable states and the diameter is 66.</ns2:Comment>
                                                 <EventList>
                                                     <SimpleIdentifier Name="white_win_d2"/>
                                                 </EventList>
-                                            </ForeachEvent>
+                                            </ConditionalEvent>
                                             <SimpleIdentifier Name="draw"/>
                                         </LabelBlock>
                                     </Edge>
@@ -167,11 +159,7 @@ It has 6692 reachable states and the diameter is 66.</ns2:Comment>
                                             <IndexedIdentifier Name="black_win_y">
                                                 <SimpleIdentifier Name="y"/>
                                             </IndexedIdentifier>
-                                            <ForeachEvent Name=":dummy">
-                                                <BinaryExpression Operator="..">
-                                                    <IntConstant Value="0"/>
-                                                    <IntConstant Value="0"/>
-                                                </BinaryExpression>
+                                            <ConditionalEvent>
                                                 <BinaryExpression Operator="==">
                                                     <SimpleIdentifier Name="x"/>
                                                     <SimpleIdentifier Name="y"/>
@@ -179,12 +167,8 @@ It has 6692 reachable states and the diameter is 66.</ns2:Comment>
                                                 <EventList>
                                                     <SimpleIdentifier Name="black_win_d1"/>
                                                 </EventList>
-                                            </ForeachEvent>
-                                            <ForeachEvent Name=":dummy">
-                                                <BinaryExpression Operator="..">
-                                                    <IntConstant Value="0"/>
-                                                    <IntConstant Value="0"/>
-                                                </BinaryExpression>
+                                            </ConditionalEvent>
+                                            <ConditionalEvent>
                                                 <BinaryExpression Operator="==">
                                                     <SimpleIdentifier Name="x"/>
                                                     <BinaryExpression Operator="+">
@@ -198,7 +182,7 @@ It has 6692 reachable states and the diameter is 66.</ns2:Comment>
                                                 <EventList>
                                                     <SimpleIdentifier Name="black_win_d2"/>
                                                 </EventList>
-                                            </ForeachEvent>
+                                            </ConditionalEvent>
                                             <SimpleIdentifier Name="draw"/>
                                         </LabelBlock>
                                     </Edge>

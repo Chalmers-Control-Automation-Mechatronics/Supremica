@@ -63,6 +63,7 @@ class ComponentsTreePopupFactory
 
   //#########################################################################
   //# Shared Menu Items
+  @Override
   protected void addItemSpecificMenuItems(final Proxy proxy)
   {
     try {
@@ -72,6 +73,7 @@ class ComponentsTreePopupFactory
     }
   }
 
+  @Override
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
@@ -82,9 +84,10 @@ class ComponentsTreePopupFactory
     popup.add(newaut);
     final IDEAction newvar = master.getInsertVariableAction();
     popup.add(newvar);
-    final IDEAction newfor = master.getInsertForeachComponentAction();
-    popup.add(newfor);
-    // TODO
+    final IDEAction newCond = master.getInsertConditionalAction();
+    popup.add(newCond);
+    final IDEAction newFor = master.getInsertForeachAction();
+    popup.add(newFor);
     final IDEAction newinst = master.getInsertInstanceAction();
     popup.add(newinst);
     final IDEAction showcomment = master.getShowModuleCommentAction();
@@ -100,6 +103,7 @@ class ComponentsTreePopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       addPropertiesAndDeleteMenuItems(proxy);
@@ -108,6 +112,7 @@ class ComponentsTreePopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
     public Object visitInstanceProxy(final InstanceProxy inst)
     {
       visitProxy(inst);
@@ -122,6 +127,7 @@ class ComponentsTreePopupFactory
       return null;
     }
 
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       visitProxy(comp);

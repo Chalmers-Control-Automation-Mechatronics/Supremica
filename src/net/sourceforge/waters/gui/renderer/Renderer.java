@@ -41,10 +41,10 @@ import java.util.PriorityQueue;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -158,13 +158,9 @@ public class Renderer
   {
     for (final Proxy proxy : list) {
       addToQueue(proxy, ColorGroup.GRAPH_ITEM);
-      if (proxy instanceof ForeachProxy){
-        final ForeachProxy foreach = (ForeachProxy) proxy;
-        listToRender(foreach.getBody());
-        addToQueue(foreach.getRange(), ColorGroup.GRAPH_ITEM);
-        if(foreach.getGuard() != null) {
-          addToQueue(foreach.getGuard(), ColorGroup.GRAPH_ITEM);
-        }
+      if (proxy instanceof NestedBlockProxy) {
+        final NestedBlockProxy block = (NestedBlockProxy) proxy;
+        listToRender(block.getBody());
       }
     }
   }
@@ -185,7 +181,7 @@ public class Renderer
   //#########################################################################
   //# Inner Class ShapeToRender
   /**
-   * Just a wrapper class to aid with setting up priority Queue
+   * Wrapper class to aid with setting up priority Queue
    */
   private class ShapeToRender
     implements Comparable<ShapeToRender>
@@ -211,7 +207,6 @@ public class Renderer
     {
       return mStatus.getPriority() - o.mStatus.getPriority();
     }
-
   }
 
 

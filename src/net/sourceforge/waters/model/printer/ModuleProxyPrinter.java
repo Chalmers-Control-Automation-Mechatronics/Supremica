@@ -57,6 +57,7 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -79,6 +80,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ModuleSequenceProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -241,6 +243,16 @@ public class ModuleProxyPrinter
   }
 
   @Override
+  public Object visitConditionalProxy(final ConditionalProxy proxy)
+    throws VisitorException
+  {
+    print("IF ");
+    final SimpleExpressionProxy guard = proxy.getGuard();
+    guard.acceptVisitor(this);
+    return visitNestedBlockProxy(proxy);
+  }
+
+  @Override
   public Object visitConstantAliasProxy(final ConstantAliasProxy proxy)
     throws VisitorException
   {
@@ -343,8 +355,7 @@ public class ModuleProxyPrinter
   }
 
   @Override
-  public Object visitForeachProxy
-      (final ForeachProxy proxy)
+  public Object visitForeachProxy(final ForeachProxy proxy)
     throws VisitorException
   {
     print("FOR ");
@@ -357,9 +368,7 @@ public class ModuleProxyPrinter
       print(" WHERE ");
       guard.acceptVisitor(this);
     }
-    print(' ');
-    printEmptyCollection(proxy.getBody());
-    return null;
+    return visitNestedBlockProxy(proxy);
   }
 
   @Override
@@ -572,6 +581,15 @@ public class ModuleProxyPrinter
     for (final ModuleProxy module : proxy.getModules()) {
       visitModuleProxy(module);
     }
+    return null;
+  }
+
+  @Override
+  public Object visitNestedBlockProxy(final NestedBlockProxy proxy)
+    throws VisitorException
+  {
+    print(' ');
+    printEmptyCollection(proxy.getBody());
     return null;
   }
 

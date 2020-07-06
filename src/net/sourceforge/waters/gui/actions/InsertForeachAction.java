@@ -57,7 +57,7 @@ import org.supremica.gui.ide.IDE;
  * The action to create a new foreach block for a module.
  * This action merely pops up the foreach block creation dialog
  * ({@link ForeachEditorDialog});
- * the actual forach block creation is done when the dialog is committed.
+ * the actual foreach block creation is done when the dialog is committed.
  *
  * @author Robi Malik
  */

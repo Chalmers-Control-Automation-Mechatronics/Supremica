@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 
@@ -64,6 +65,7 @@ public class InsertConstantAliasAction
     super(ide);
     putValue(Action.NAME, "New Named Constant ...");
     putValue(Action.SHORT_DESCRIPTION, "Add a constant definition to the module");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_CONSTANT);
   }
 

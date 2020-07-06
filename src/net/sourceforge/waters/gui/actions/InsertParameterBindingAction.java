@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 
@@ -72,6 +73,7 @@ public class InsertParameterBindingAction
     super(ide);
     putValue(Action.NAME, "New Parameter Binding ...");
     putValue(Action.SHORT_DESCRIPTION, "Add parameter binding to the module");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_BINDING);
   }
 

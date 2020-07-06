@@ -152,6 +152,7 @@
 <xs:group name="EventAliasListEntry">
   <xs:choice>
     <xs:element ref="M:EventAlias"/>
+    <xs:element ref="M:ConditionalEventAlias"/>
     <xs:element ref="M:ForeachEventAlias"/>
   </xs:choice>
 </xs:group>
@@ -162,6 +163,18 @@
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
           <xs:element ref="M:EventListExpression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ConditionalEventAlias">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ConditionalType">
+        <xs:sequence>
+          <xs:element ref="M:EventAliasList" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -266,9 +279,22 @@
 <xs:group name="EventListEntry">
   <xs:choice>
     <xs:group ref="M:Identifier"/>
+    <xs:element ref="M:ConditionalEvent"/>
     <xs:element ref="M:ForeachEvent"/>
   </xs:choice>
 </xs:group>
+
+<xs:element name="ConditionalEvent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ConditionalType">
+        <xs:sequence>
+          <xs:element ref="M:EventList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
 
 <xs:element name="ForeachEvent">
   <xs:complexType>
@@ -311,6 +337,7 @@
     <xs:element ref="M:SimpleComponent"/>
     <xs:element ref="M:VariableComponent"/>
     <xs:element ref="M:Instance"/>
+    <xs:element ref="M:ConditionalComponent"/>
     <xs:element ref="M:ForeachComponent"/>
   </xs:choice>
 </xs:group>
@@ -401,6 +428,18 @@
       <xs:extension base="B:NamedType">
         <xs:sequence>
           <xs:group ref="M:Expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ConditionalComponent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ConditionalType">
+        <xs:sequence>
+          <xs:element ref="M:ComponentList" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -769,9 +808,10 @@
 
 <xs:group name="ArithmeticOrRangeExpression">
   <xs:choice>
-    <xs:element ref="M:SimpleIdentifier"/>
-    <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IndexedIdentifier"/>
+    <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:FunctionCallExpression"/>
@@ -921,6 +961,16 @@
 <!-- ==================================================================== -->
 <!-- Types                                                                -->
 <!-- ==================================================================== -->
+
+<xs:complexType name="ConditionalType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:group ref="M:ArithmeticExpression" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
 
 <xs:complexType name="ForeachType">
   <xs:complexContent>

@@ -74,7 +74,8 @@ public interface EventListExpressionProxy extends ExpressionProxy {
    * Gets the list of event identifiers constituting this event list
    * expression. Each element is of type {@link
    * net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or
-   * {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
+   * {@link net.sourceforge.waters.model.module.ConditionalProxy ConditionalProxy}
+   * or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @return A list of identifiers or expressions.
    */
   public List<Proxy> getEventIdentifierList();

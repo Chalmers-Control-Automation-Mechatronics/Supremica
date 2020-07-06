@@ -59,6 +59,7 @@ class AliasesTreePopupFactory
 
   //#########################################################################
   //# Shared Menu Items
+  @Override
   protected void addItemSpecificMenuItems(final Proxy proxy)
   {
     try {
@@ -68,6 +69,7 @@ class AliasesTreePopupFactory
     }
   }
 
+  @Override
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
@@ -78,9 +80,13 @@ class AliasesTreePopupFactory
     popup.add(showalias);
     final IDEAction showeventalias = master.getInsertEventAliasAction();
     popup.add(showeventalias);
-    final IDEAction newfor = master.getInsertForeachComponentAction();
-    if(newfor.isEnabled()){
-      popup.add(newfor);
+    final IDEAction newCond = master.getInsertConditionalAction();
+    if (newCond.isEnabled()) {
+      popup.add(newCond);
+    }
+    final IDEAction newFor = master.getInsertForeachAction();
+    if (newFor.isEnabled()) {
+      popup.add(newFor);
     }
     final IDEAction showcomment = master.getShowModuleCommentAction();
     popup.add(showcomment);
@@ -95,6 +101,7 @@ class AliasesTreePopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       addPropertiesAndDeleteMenuItems(proxy);

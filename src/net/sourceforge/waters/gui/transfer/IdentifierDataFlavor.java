@@ -39,6 +39,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
@@ -51,6 +52,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -81,8 +83,8 @@ class IdentifierDataFlavor extends ModuleDataFlavor
   /**
    * Returns whether the given data can produce a non-empty transferable
    * with the identifier data flavour. This is the case if at least one
-   * of the elements is or contains a foreach block or an item that can be
-   * converted to an identifier.
+   * of the elements is or contains a conditional or foreach block or an
+   * item that can be converted to an identifier.
    */
   boolean supports(final Collection<? extends Proxy> data)
   {
@@ -148,7 +150,7 @@ class IdentifierDataFlavor extends ModuleDataFlavor
     }
 
     @Override
-    public Boolean visitForeachProxy(final ForeachProxy foreach)
+    public Boolean visitNestedBlockProxy(final NestedBlockProxy nested)
     {
       return true;
     }
@@ -204,6 +206,24 @@ class IdentifierDataFlavor extends ModuleDataFlavor
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
+    public Object visitConditionalProxy(final ConditionalProxy cond)
+    throws VisitorException
+    {
+      final ModuleProxyCloner cloner = mFactory.getCloner();
+      final SimpleExpressionProxy guard = cond.getGuard();
+      final SimpleExpressionProxy newGuard =
+        (SimpleExpressionProxy) cloner.getClone(guard);
+      final List<Proxy> backup = mExportList;
+      final List<Proxy> body = cond.getBody();
+      visitCollection(body);
+      final ConditionalProxy newCond =
+        mFactory.createConditionalProxy(mExportList, newGuard);
+      mExportList = backup;
+      mExportList.add(newCond);
+      return null;
+    }
+
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
     {
@@ -240,7 +260,7 @@ class IdentifierDataFlavor extends ModuleDataFlavor
       final List<Proxy> body = foreach.getBody();
       visitCollection(body);
       final ForeachProxy newForeach =
-        mFactory.createForeachProxy(name, newRange, newGuard, mExportList);
+        mFactory.createForeachProxy(mExportList, name, newRange, newGuard);
       mExportList = backup;
       mExportList.add(newForeach);
       return null;

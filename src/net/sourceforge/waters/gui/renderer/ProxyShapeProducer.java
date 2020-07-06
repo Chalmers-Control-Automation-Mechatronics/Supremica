@@ -57,6 +57,7 @@ import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -430,6 +431,12 @@ public class ProxyShapeProducer
         lshape = createEdgeLabelShape(proxy, x + indent, ly, font);
         mMap.put(proxy, lshape);
         adjustRect(lshape, indent);
+      } else if (proxy instanceof ConditionalProxy) {
+        final ConditionalProxy cond = (ConditionalProxy) proxy;
+        lshape = createConditionalLabelShape(cond, x + indent, ly);
+        mMap.put(proxy, lshape);
+        adjustRect(lshape, indent);
+        createListShape(cond.getBody(), x, y, indent + 10);
       } else if (proxy instanceof ForeachProxy) {
         final ForeachProxy foreach = (ForeachProxy) proxy;
         lshape = createForeachLabelShape(foreach, x + indent, ly);
@@ -437,7 +444,6 @@ public class ProxyShapeProducer
         adjustRect(lshape, indent);
         createListShape(foreach.getBody(), x, y, indent + 10);
       }
-
     }
   }
 
@@ -457,6 +463,18 @@ public class ProxyShapeProducer
     }
   }
 
+
+  private AttributedLabelShape createConditionalLabelShape
+    (final ConditionalProxy cond, final int x, final int y)
+  {
+    final Font keyword = EditorColor.DEFAULT_FONT.deriveFont(Font.BOLD);
+    final AttributedLabelShapeBuilder builder =
+      new AttributedLabelShapeBuilder(EditorColor.DEFAULT_FONT);
+    builder.add(keyword, "IF");
+    builder.add(" ");
+    builder.add(cond.getGuard());
+    return builder.create(cond, x, y, mMap);
+  }
 
   GuardActionBlockProxyShape createGuardActionBlockShape
     (final GuardActionBlockProxy block,
@@ -537,12 +555,12 @@ public class ProxyShapeProducer
     return new LabelShape(label, x, y, font, text);
   }
 
-  private AbstractLabelShape createForeachLabelShape(final ForeachProxy foreach,
-                                                     final int x, final int y)
+  private AttributedLabelShape createForeachLabelShape
+    (final ForeachProxy foreach, final int x, final int y)
   {
     final Font keyword = EditorColor.DEFAULT_FONT.deriveFont(Font.BOLD);
-    final ForeachLabelShapeBuilder builder =
-      new ForeachLabelShapeBuilder(EditorColor.DEFAULT_FONT);
+    final AttributedLabelShapeBuilder builder =
+      new AttributedLabelShapeBuilder(EditorColor.DEFAULT_FONT);
     builder.add(keyword, "FOR");
     builder.add(" " + foreach.getName() + " ");
     builder.add(keyword, "IN");
@@ -556,7 +574,6 @@ public class ProxyShapeProducer
     }
     return builder.create(foreach, x, y, mMap);
   }
-
 
 
   //#########################################################################

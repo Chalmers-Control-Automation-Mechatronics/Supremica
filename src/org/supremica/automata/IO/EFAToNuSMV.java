@@ -18,9 +18,7 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.EventKind;
-import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -28,45 +26,20 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.BoxGeometryProxy;
-import net.sourceforge.waters.model.module.ColorGeometryProxy;
-import net.sourceforge.waters.model.module.ComponentProxy;
-import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
-import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
-import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ModuleSequenceProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.PointGeometryProxy;
-import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SplineGeometryProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -563,10 +536,11 @@ public class EFAToNuSMV {
     }
 
 
-    private static class ExpressionToSmvVisitorTransConstraint implements ModuleProxyVisitor {
+    private static class ExpressionToSmvVisitorTransConstraint
+      extends DefaultModuleProxyVisitor {
 
         @Override
-        public Object visitAliasProxy(final AliasProxy proxy) throws VisitorException {
+        public Object visitProxy(final Proxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -609,214 +583,6 @@ public class EFAToNuSMV {
                 throw new IllegalArgumentException("unrecognized operator: " + op);
             }
         }
-
-        @Override
-        public Object visitBoxGeometryProxy(final BoxGeometryProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitColorGeometryProxy(final ColorGeometryProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitComponentProxy(final ComponentProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitConstantAliasProxy(final ConstantAliasProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitEdgeProxy(final EdgeProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitEnumSetExpressionProxy(final EnumSetExpressionProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitEventAliasProxy(final EventAliasProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitEventDeclProxy(final EventDeclProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitEventListExpressionProxy(final EventListExpressionProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitExpressionProxy(final ExpressionProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitForeachProxy(final ForeachProxy proxy) throws VisitorException {
-          throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitFunctionCallExpressionProxy(final FunctionCallExpressionProxy proxy) throws VisitorException {
-          throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitGraphProxy(final GraphProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitGroupNodeProxy(final GroupNodeProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitGuardActionBlockProxy(final GuardActionBlockProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitIdentifiedProxy(final IdentifiedProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitIdentifierProxy(final IdentifierProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitInstanceProxy(final InstanceProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitIntConstantProxy(final IntConstantProxy proxy) throws VisitorException {
-            return Integer.toString(proxy.getValue());
-        }
-
-        @Override
-        public Object visitLabelBlockProxy(final LabelBlockProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitLabelGeometryProxy(final LabelGeometryProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitModuleProxy(final ModuleProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitModuleSequenceProxy(final ModuleSequenceProxy proxy)
-        {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitNodeProxy(final NodeProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitParameterBindingProxy(final ParameterBindingProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitPlainEventListProxy(final PlainEventListProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitPointGeometryProxy(final PointGeometryProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitQualifiedIdentifierProxy(final QualifiedIdentifierProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitSimpleComponentProxy(final SimpleComponentProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitSimpleExpressionProxy(final SimpleExpressionProxy proxy) throws VisitorException {
-            System.err.println("\n\nHello world!!\n\n");
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy) throws VisitorException {
-            return proxy.getName();
-        }
-
-        @Override
-        public Object visitSimpleNodeProxy(final SimpleNodeProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitSplineGeometryProxy(final SplineGeometryProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitUnaryExpressionProxy(final UnaryExpressionProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitVariableComponentProxy(final VariableComponentProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitVariableMarkingProxy(final VariableMarkingProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitProxy(final Proxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitGeometryProxy(final GeometryProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitNamedProxy(final NamedProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Object visitDocumentProxy(final DocumentProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
     }
 
     public static interface SpecPrinter {

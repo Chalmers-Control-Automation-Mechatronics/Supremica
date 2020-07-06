@@ -94,13 +94,13 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -113,12 +113,12 @@ import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NestedBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
@@ -664,11 +664,11 @@ public abstract class ModuleTree
 
   private void expand(final ProxySubject subject)
   {
-    if (subject instanceof ForeachSubject) {
-      final ForeachSubject foreach = (ForeachSubject) subject;
+    if (subject instanceof NestedBlockSubject) {
+      final NestedBlockSubject nested = (NestedBlockSubject) subject;
       final TreePath path = mModel.createPath(subject);
       expandPath(path);
-      final List<? extends ProxySubject> body = foreach.getBodyModifiable();
+      final List<? extends ProxySubject> body = nested.getBodyModifiable();
       expandAll(body);
     }
   }
@@ -1169,10 +1169,10 @@ public abstract class ModuleTree
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Proxy> visitForeachProxy(final ForeachProxy foreach)
+    public List<Proxy> visitNestedBlockProxy(final NestedBlockProxy nested)
     {
       try {
-        final ForeachSubject subject = (ForeachSubject) foreach;
+        final NestedBlockSubject subject = (NestedBlockSubject) nested;
         if (SubjectTools.getAncestor(subject, EventAliasSubject.class,
                                      ParameterBindingSubject.class) != null) {
           return modifyList(subject.getBodyModifiable());
@@ -1311,13 +1311,13 @@ public abstract class ModuleTree
     }
 
     @Override
-    public DataFlavor visitForeachProxy(final ForeachProxy foreach)
+    public DataFlavor visitNestedBlockProxy(final NestedBlockProxy nested)
       throws VisitorException
     {
-      final Subject subject = (Subject) foreach;
+      final Subject subject = (Subject) nested;
       if (SubjectTools.getAncestor(subject, EventAliasSubject.class,
                                    ParameterBindingSubject.class) != null) {
-        if (!isInList(foreach.getBody())) {
+        if (!isInList(nested.getBody())) {
           return WatersDataFlavor.IDENTIFIER;
         }
         return null;

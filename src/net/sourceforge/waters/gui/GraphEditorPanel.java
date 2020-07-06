@@ -131,7 +131,6 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -140,6 +139,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -158,7 +158,6 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
@@ -168,6 +167,7 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NestedBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
@@ -614,15 +614,16 @@ public class GraphEditorPanel
     // Are there any event labels?
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
-      if (subject.getParent().getParent() instanceof LabelBlockSubject) {
+      final Subject parent = subject.getParent();
+      final Subject grandParent = parent.getParent();
+      if (grandParent instanceof LabelBlockSubject) {
         final ListSubject<AbstractSubject> eventlist =
-          (ListSubject<AbstractSubject>) subject.getParent();
+          (ListSubject<AbstractSubject>) parent;
         eventlists.put(eventlist, true);
-      }
-      else if (subject.getParent().getParent() instanceof ForeachSubject){
-        final ForeachSubject foreach = (ForeachSubject)subject.getParent().getParent();
+      } else if (grandParent instanceof NestedBlockSubject){
+        final NestedBlockSubject block = (NestedBlockSubject) grandParent;
         final ListSubject<AbstractSubject> eventlist =
-          foreach.getBodyModifiable();
+          block.getBodyModifiable();
         eventlists.put(eventlist, true);
       }
     }
@@ -696,7 +697,7 @@ public class GraphEditorPanel
         final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
         edges.add(edge);
       } else if (proxy instanceof IdentifierSubject ||
-                 proxy instanceof ForeachSubject) {
+                 proxy instanceof NestedBlockSubject) {
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
         final List<?> untyped = inspos.getList();
@@ -750,7 +751,7 @@ public class GraphEditorPanel
       } else if (proxy instanceof EdgeSubject) {
         edges.remove(proxy);
       } else if (proxy instanceof IdentifierSubject ||
-                 proxy instanceof ForeachSubject) {
+                 proxy instanceof NestedBlockSubject) {
         final ListInsertPosition inspos =
           (ListInsertPosition) insert.getInsertPosition();
         final List<? extends ProxySubject> eventlist = inspos.getList();
@@ -793,7 +794,7 @@ public class GraphEditorPanel
       final Set<Proxy> scrollable = new THashSet<Proxy>();
       for (Proxy proxy : list) {
         if (proxy instanceof IdentifierSubject ||
-            proxy instanceof ForeachSubject) {
+            proxy instanceof NestedBlockSubject) {
           final Subject subject = (Subject) proxy;
           final ProxySubject parent =
             (ProxySubject) SubjectTools.getAncestor(subject,
@@ -1303,7 +1304,7 @@ public class GraphEditorPanel
   private boolean labelsAreSelected()
   {
     for (final ProxySubject proxy : getCurrentSelection()) {
-      if (proxy instanceof ForeachSubject) {
+      if (proxy instanceof NestedBlockSubject) {
         return true;
       } else if (proxy instanceof IdentifierSubject) {
         return true;
@@ -1341,7 +1342,7 @@ public class GraphEditorPanel
     final ProxySubject original = getOriginal(item);
     if (original == null) {
       return false;
-    } else if (original.getParent() instanceof ForeachProxy) {
+    } else if (original.getParent() instanceof NestedBlockProxy) {
       return isSelected((Proxy) original.getParent());
     } else {
       return isSelected(original);
@@ -1548,11 +1549,11 @@ public class GraphEditorPanel
       final LabelBlockProxy block = edge.getLabelBlock();
       final List<Proxy> events = block.getEventIdentifierList();
       final Collection<Proxy> collection2 = new LinkedList<Proxy>();
-      for(final Proxy sub : events){
+      for (final Proxy sub : events){
         collectFocusableObjectAtPosition(sub, point, collection2);
-        if(sub instanceof ForeachSubject){
-          final ForeachSubject foreach = (ForeachSubject)sub;
-          iterateForeach(foreach, point, collection2);
+        if (sub instanceof NestedBlockSubject){
+          final NestedBlockSubject nested = (NestedBlockSubject) sub;
+          iterateNested(nested, point, collection2);
         }
       }
       //only select the labelblock if the focus is on the labels within or if
@@ -1568,17 +1569,17 @@ public class GraphEditorPanel
     return collection;
   }
 
-  private void iterateForeach(final ForeachSubject foreach,
-                              final Point point,
-                              final Collection<Proxy> collection){
-    for(final ProxySubject sub : foreach.getBodyModifiable()){
+  private void iterateNested(final NestedBlockSubject nested,
+                             final Point point,
+                             final Collection<Proxy> collection)
+  {
+    for (final ProxySubject sub : nested.getBodyModifiable()) {
       collectFocusableObjectAtPosition(sub, point, collection);
-      if(sub instanceof ForeachSubject){
-        final ForeachSubject foreach2 = (ForeachSubject)sub;
-        iterateForeach(foreach2, point, collection);
+      if (sub instanceof NestedBlockSubject) {
+        final NestedBlockSubject nested2 = (NestedBlockSubject) sub;
+        iterateNested(nested2, point, collection);
       }
     }
-
   }
 
   private void collectFocusableObjectAtPosition
@@ -1669,10 +1670,10 @@ public class GraphEditorPanel
       if (shape.getShape().contains(point)) {
         return (ProxySubject) proxy;
       }
-      if (proxy instanceof ForeachSubject) {
-        final ForeachSubject foreach = (ForeachSubject) proxy;
+      if (proxy instanceof NestedBlockSubject) {
+        final NestedBlockSubject nested = (NestedBlockSubject) proxy;
         final ProxySubject sub =
-          getLabelToBeSelected(foreach.getBodyModifiable(), point);
+          getLabelToBeSelected(nested.getBodyModifiable(), point);
         if (sub != null) {
           return sub;
         }
@@ -1994,7 +1995,8 @@ public class GraphEditorPanel
     private List<ProxySubject> getListOfSelectedLabels(){
       final List<ProxySubject> list = new LinkedList<ProxySubject>();
       for (final ProxySubject sub : getCurrentSelection()) {
-        if (sub instanceof IdentifierSubject || sub instanceof ForeachSubject) {
+        if (sub instanceof IdentifierSubject ||
+            sub instanceof NestedBlockSubject) {
           list.add(sub);
         }
       }
@@ -2014,9 +2016,9 @@ public class GraphEditorPanel
           (Proxy)child.getParent().getParent())){
           return true;
         }
-        if(child instanceof ForeachSubject){
-          final ForeachSubject foreach  = (ForeachSubject)child;
-          if(iterate(foreach.getBodyModifiable(), range, eq, item, 0)){
+        if(child instanceof NestedBlockSubject){
+          final NestedBlockSubject nested  = (NestedBlockSubject) child;
+          if (iterate(nested.getBodyModifiable(), range, eq, item, 0)) {
             return true;
           }
         }
@@ -2037,10 +2039,10 @@ public class GraphEditorPanel
       if(anchorPoint < endPoint){
         //down
         boolean found = false;
-        if(anchor instanceof ForeachSubject){
-          final ForeachSubject foreach = (ForeachSubject) anchor;
-          found = iterate(foreach.getBodyModifiable(), rangeSelection, eq, item, 0);
-          if(found){
+        if (anchor instanceof NestedBlockSubject) {
+          final NestedBlockSubject nested = (NestedBlockSubject) anchor;
+          found = iterate(nested.getBodyModifiable(), rangeSelection, eq, item, 0);
+          if (found) {
             replaceSelection(rangeSelection);
             return;
           }
@@ -2062,11 +2064,10 @@ public class GraphEditorPanel
       while (!found) {
         final ProxySubject parent =
           (ProxySubject) current.getParent().getParent();
-        if (parent instanceof ForeachSubject) {
-          final ForeachSubject foreach = (ForeachSubject) parent;
-           final int index = foreach.getBodyModifiable().indexOf(current) + add;
-          found =
-            iterate(foreach.getBodyModifiable(), range, eq, end, index);
+        if (parent instanceof NestedBlockSubject) {
+          final NestedBlockSubject nested = (NestedBlockSubject) parent;
+          final int index = nested.getBodyModifiable().indexOf(current) + add;
+          found = iterate(nested.getBodyModifiable(), range, eq, end, index);
         } else if (parent instanceof LabelBlockSubject) {
           final LabelBlockSubject block = (LabelBlockSubject) parent;
           final int index = block.getEventIdentifierListModifiable().indexOf(current) + add;
@@ -2101,7 +2102,7 @@ public class GraphEditorPanel
         if (event.isShiftDown() || event.isControlDown()) {
           if (isSelected(item)) {
             if (item instanceof IdentifierSubject ||
-                item instanceof ForeachSubject) {
+                item instanceof NestedBlockSubject) {
               removeFromSelection(item);
             } else {
               if (list.isEmpty()) {
@@ -2110,7 +2111,7 @@ public class GraphEditorPanel
             }
           } else {
             if (item instanceof IdentifierSubject ||
-                item instanceof ForeachSubject){
+                item instanceof NestedBlockSubject) {
               if (list.isEmpty()) {
                 if (mSelection.size() > 1) {
                   // If there are more things selected, toggle the label block.
@@ -2138,7 +2139,7 @@ public class GraphEditorPanel
               replaceSelection(item);
             }
           } else if (item instanceof IdentifierSubject ||
-                     item instanceof ForeachSubject) {
+                     item instanceof NestedBlockSubject) {
             replaceSelection(item);
           }
         }
@@ -2159,7 +2160,7 @@ public class GraphEditorPanel
         if (event.isShiftDown() || event.isControlDown()) {
           if (!isSelected(item)) {
             if (item instanceof IdentifierSubject ||
-                item instanceof ForeachSubject) {
+                item instanceof NestedBlockSubject) {
               if (!list.isEmpty()) {
                 if (event.isShiftDown()) {
                   addRangeToSelection(item);
@@ -2177,7 +2178,7 @@ public class GraphEditorPanel
             }
           } else {
             if (item instanceof IdentifierSubject ||
-                item instanceof ForeachSubject) {
+                item instanceof NestedBlockSubject) {
               if (!list.isEmpty() && event.isShiftDown()) {
                 addRangeToSelection(item);
                 mItem = null;
@@ -2187,7 +2188,7 @@ public class GraphEditorPanel
         } else {
           if (!isSelected(item)) {
             if (!(item instanceof IdentifierSubject) &&
-                !(item instanceof ForeachSubject)) {
+                !(item instanceof NestedBlockSubject)) {
               replaceSelection(item);
             }
           }
@@ -2336,7 +2337,8 @@ public class GraphEditorPanel
         return 3;
       } else if (item instanceof GroupNodeProxy) {
         return 2;
-      } else if (item instanceof IdentifierProxy || item instanceof ForeachProxy) {
+      } else if (item instanceof IdentifierProxy ||
+                 item instanceof NestedBlockProxy) {
         return 1;
       }else {
         return -1;
@@ -2637,7 +2639,8 @@ public class GraphEditorPanel
       } else if (item instanceof LabelBlockProxy ||
                  item instanceof GuardActionBlockProxy) {
         return 2;
-      } else if (item instanceof IdentifierSubject || item instanceof ForeachProxy) {
+      } else if (item instanceof IdentifierSubject ||
+                 item instanceof NestedBlockProxy) {
         return 1;
       }else {
         return -1;
@@ -2651,7 +2654,8 @@ public class GraphEditorPanel
         item instanceof EdgeSubject ||
         item instanceof LabelBlockSubject ||
         item instanceof GuardActionBlockSubject ||
-        item instanceof IdentifierSubject || item instanceof ForeachSubject;
+        item instanceof IdentifierSubject ||
+        item instanceof NestedBlockSubject;
     }
 
     //#######################################################################
@@ -3405,8 +3409,8 @@ public class GraphEditorPanel
                 mY = rect.getMaxY();
                 mDropIndex++;
               }
-              if (item instanceof ForeachSubject) {
-                if (descendForeachBlock((ForeachSubject) item, rect, point, dropAction)) {
+              if (item instanceof NestedBlockSubject) {
+                if (descendNestedBlock((NestedBlockSubject) item, rect, point, dropAction)) {
                   break;
                 }
               }
@@ -3535,50 +3539,49 @@ public class GraphEditorPanel
           if(isSelected(subject)){
             result.add(subject);
           }
-        }
-        else if(subject instanceof ForeachSubject){
-          final ForeachSubject foreach = (ForeachSubject) subject;
-          if(isSelected(subject)){
+        } else if (subject instanceof NestedBlockSubject) {
+          final NestedBlockSubject nested = (NestedBlockSubject) subject;
+          if (isSelected(subject)) {
             result.add(subject);
           }
-          getSelections(foreach.getBodyModifiable(), result);
+          getSelections(nested.getBodyModifiable(), result);
         }
       }
       return result;
     }
 
-    private void setLineAtEnd(final ForeachSubject foreach)
+    private void setLineAtEnd(final NestedBlockSubject nested)
     {
-      final List<Proxy> list = foreach.getBody();
+      final List<Proxy> list = nested.getBody();
       Proxy proxy = null;
       if (list.size() == 0) {
-        proxy = foreach;
+        proxy = nested;
       } else {
         proxy = list.get(list.size() - 1);
       }
       final ProxyShape shape = getShapeProducer().getShape(proxy);
       final Rectangle2D rect = shape.getShape().getBounds();
-      if (proxy instanceof ForeachSubject && list.size() > 0) {
-        final ForeachSubject nextForeach = (ForeachSubject) proxy;
-        setLineAtEnd(nextForeach);
+      if (proxy instanceof NestedBlockSubject && list.size() > 0) {
+        final NestedBlockSubject nextNested = (NestedBlockSubject) proxy;
+        setLineAtEnd(nextNested);
       } else {
         mY = rect.getMaxY();
       }
       mX = rect.getMinX();
     }
 
-    private boolean descendForeachBlock(final ForeachSubject foreach,
-                                        final Rectangle2D rect,
-                                        final Point point,
-                                        final int dropAction)
+    private boolean descendNestedBlock(final NestedBlockSubject nested,
+                                       final Rectangle2D rect,
+                                       final Point point,
+                                       final int dropAction)
     {
       int drop = 0;
       if (point.getY() < rect.getCenterY() + 5
           && point.getY() > rect.getCenterY() - 5) {
-        mDropIndex = foreach.getBody().size();
+        mDropIndex = nested.getBody().size();
         mRect = rect;
-        mDropList = foreach.getBodyModifiable();
-        setLineAtEnd(foreach);
+        mDropList = nested.getBodyModifiable();
+        setLineAtEnd(nested);
         if(mDropList.isEmpty()){
           mY = 0;
         }
@@ -3586,22 +3589,22 @@ public class GraphEditorPanel
       } else {
         mRect = null;
       }
-      for (final Proxy proxy : foreach.getBody()) {
+      for (final Proxy proxy : nested.getBody()) {
         final ProxyShape shape2 = getShapeProducer().getShape(proxy);
         final Rectangle2D rect2 = shape2.getShape().getBounds();
         if (point.getY() < rect2.getCenterY()) {
           mY = rect2.getMinY();
           mX = rect2.getMinX();
           mDropIndex = drop;
-          mDropList = foreach.getBodyModifiable();
+          mDropList = nested.getBodyModifiable();
           return true;
         } else {
           drop++;
           mY = rect2.getMaxY();
         }
         mRect = null;
-        if (proxy instanceof ForeachSubject) {
-          if (descendForeachBlock((ForeachSubject) proxy, rect2, point, dropAction)) {
+        if (proxy instanceof NestedBlockSubject) {
+          if (descendNestedBlock((NestedBlockSubject) proxy, rect2, point, dropAction)) {
             return true;
           }
         }
@@ -4376,12 +4379,6 @@ public class GraphEditorPanel
     }
 
     @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-    {
-      return null;
-    }
-
-    @Override
     public Object visitGuardActionBlockProxy
       (final GuardActionBlockProxy block)
     {
@@ -4415,6 +4412,12 @@ public class GraphEditorPanel
         final LabelGeometrySubject label0 = (LabelGeometrySubject) label;
         getSecondaryGraph().moveLabelGeometry(label0, mDeltaX, mDeltaY);
       }
+      return null;
+    }
+
+    @Override
+    public Object visitNestedBlockProxy(final NestedBlockProxy nested)
+    {
       return null;
     }
 
@@ -4685,7 +4688,7 @@ public class GraphEditorPanel
     {
       boolean geoMove = false;
       for (final ProxySubject proxy : getCurrentSelection()) {
-        if (proxy instanceof ForeachSubject) {
+        if (proxy instanceof NestedBlockSubject) {
           return false;
         } else if (proxy instanceof IdentifierSubject) {
           return false;
@@ -4737,9 +4740,9 @@ public class GraphEditorPanel
             insertList = getInitialList(parent);
             index = insertList.indexOf(parent);
           }
-        } else if (insertList.get(index - 1) instanceof ForeachSubject) {
-          final ForeachSubject sibling =
-            (ForeachSubject) insertList.get(index - 1);
+        } else if (insertList.get(index - 1) instanceof NestedBlockSubject) {
+          final NestedBlockSubject sibling =
+            (NestedBlockSubject) insertList.get(index - 1);
           insertList = sibling.getBodyModifiable();
           index = -1;
         } else {
@@ -4756,9 +4759,9 @@ public class GraphEditorPanel
             insertList = getInitialList(parent);
             index = insertList.indexOf(parent) + 1;
           }
-        } else if (insertList.get(index + 1) instanceof ForeachSubject) {
-          final ForeachSubject sibling =
-            (ForeachSubject) insertList.get(index + 1);
+        } else if (insertList.get(index + 1) instanceof NestedBlockSubject) {
+          final NestedBlockSubject sibling =
+            (NestedBlockSubject) insertList.get(index + 1);
           insertList = sibling.getBodyModifiable();
           index = 0;
         } else {
@@ -4819,8 +4822,8 @@ public class GraphEditorPanel
     private ListSubject<? extends ProxySubject> getInitialList(final ProxySubject proxy)
     {
       final ProxySubject parent = SubjectTools.getProxyParent(proxy);
-      if (parent instanceof ForeachSubject) {
-        return ((ForeachSubject) parent).getBodyModifiable();
+      if (parent instanceof NestedBlockSubject) {
+        return ((NestedBlockSubject) parent).getBodyModifiable();
       } else {
         return ((LabelBlockSubject) parent).getEventIdentifierListModifiable();
       }
@@ -4834,8 +4837,9 @@ public class GraphEditorPanel
       int i = 0;
       while (i < oldList.size()) {
         final ProxySubject proxy = oldList.get(i);
-        if ((proxy instanceof IdentifierSubject || proxy instanceof ForeachSubject)
-            && !hasAncestorInSelection(proxy, getCurrentSelection())) {
+        if ((proxy instanceof IdentifierSubject ||
+             proxy instanceof NestedBlockSubject) &&
+            !hasAncestorInSelection(proxy, getCurrentSelection())) {
           newList.add(proxy);
           i++;
         } else {
@@ -4853,8 +4857,8 @@ public class GraphEditorPanel
     {
       for (int i = 0; i < proxies.size(); i++) {
         if (SubjectTools.isAncestor(proxies.get(i), proxy)) {
-          if (proxies.get(i) instanceof ForeachSubject
-              && proxies.get(i) != proxy) {
+          if (proxies.get(i) instanceof NestedBlockSubject &&
+              proxies.get(i) != proxy) {
             return true;
           }
         }
@@ -5104,12 +5108,6 @@ public class GraphEditorPanel
     }
 
     @Override
-    public Proxy visitForeachProxy(final ForeachProxy foreach)
-    {
-      return visitEventListMember(foreach);
-    }
-
-    @Override
     public Object visitGeometryProxy(final GeometryProxy proxy)
       throws VisitorException
     {
@@ -5152,6 +5150,12 @@ public class GraphEditorPanel
       (final LabelGeometryProxy geo)
     {
       return geo;
+    }
+
+    @Override
+    public Proxy visitNestedBlockProxy(final NestedBlockProxy nested)
+    {
+      return visitEventListMember(nested);
     }
 
     @Override
@@ -5572,11 +5576,11 @@ public class GraphEditorPanel
         change |= addToSet(block);
         if (subject instanceof IdentifierSubject) {
           change |= addToSet(subject);
-        } else if (subject instanceof ForeachSubject) {
-          final ForeachSubject foreach = (ForeachSubject) subject;
+        } else if (subject instanceof NestedBlockSubject) {
+          final NestedBlockSubject nested = (NestedBlockSubject) subject;
           change |= addToSet(subject);
           if (addChildren) {
-            change |= addChildren(foreach);
+            change |= addChildren(nested);
           }
         }
       } else {
@@ -5598,14 +5602,14 @@ public class GraphEditorPanel
       return change;
     }
 
-    private boolean addChildren(final ForeachSubject foreach)
+    private boolean addChildren(final NestedBlockSubject nested)
     {
-      final ListSubject<AbstractSubject> list = foreach.getBodyModifiable();
+      final ListSubject<AbstractSubject> list = nested.getBodyModifiable();
       boolean change = false;
       for (final ProxySubject p : list) {
         change |= addToSet(p);
-        if (p instanceof ForeachSubject) {
-          change |= addChildren((ForeachSubject) p);
+        if (p instanceof NestedBlockSubject) {
+          change |= addChildren((NestedBlockSubject) p);
         }
       }
       return change;

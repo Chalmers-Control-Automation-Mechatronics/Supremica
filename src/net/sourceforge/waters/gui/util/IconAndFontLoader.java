@@ -271,6 +271,8 @@ public class IconAndFontLoader
   private static final String NAME_ANALYZER_SYNTH = "analyzer_synth";
   private static final String NAME_APPLICATION = "application";
   private static final String NAME_BINDING = "binding";
+  private static final String NAME_CONDITIONAL = "conditional";
+  private static final String NAME_CONDITIONAL_ERROR = "conditional_error";
   private static final String NAME_CONSOLE_DEBUG = "debug";
   private static final String NAME_CONSOLE_ERROR = "error";
   private static final String NAME_CONSOLE_INFO = "info";
@@ -292,6 +294,7 @@ public class IconAndFontLoader
   private static final String NAME_INSTANCE_ERROR = "instance_error";
   private static final String NAME_NEW_AUTOMATON = "new_automaton";
   private static final String NAME_NEW_BINDING = "new_binding";
+  private static final String NAME_NEW_CONDITIONAL = "new_conditional";
   private static final String NAME_NEW_CONSTANT = "new_constant";
   private static final String NAME_NEW_EVENT = "new_event";
   private static final String NAME_NEW_EVENT_ALIAS = "new_event_alias";
@@ -353,6 +356,10 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_ANALYZER_SYNTH =
     getWatersIcon(NAME_ANALYZER_SYNTH);
   public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
+  public static final ImageIcon ICON_CONDITIONAL =
+    getWatersIcon(NAME_CONDITIONAL);
+  public static final ImageIcon ICON_CONDITIONAL_ERROR =
+    getWatersIcon(NAME_CONDITIONAL_ERROR);
   public static final ImageIcon ICON_CONSTANT = getWatersIcon(NAME_CONSTANT);
   public static final ImageIcon ICON_CONSOLE_DEBUG =
     getWatersIcon(NAME_CONSOLE_DEBUG);
@@ -381,6 +388,8 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_NEW_AUTOMATON =
     getWatersIcon(NAME_NEW_AUTOMATON);
   public static final ImageIcon ICON_NEW_BINDING = getWatersIcon(NAME_NEW_BINDING);
+  public static final ImageIcon ICON_NEW_CONDITIONAL =
+    getWatersIcon(NAME_NEW_CONDITIONAL);
   public static final ImageIcon ICON_NEW_CONSTANT = getWatersIcon(NAME_NEW_CONSTANT);
   public static final ImageIcon ICON_NEW_EVENT = getWatersIcon(NAME_NEW_EVENT);
   public static final ImageIcon ICON_NEW_EVENT_ALIAS = getWatersIcon(NAME_NEW_EVENT_ALIAS);

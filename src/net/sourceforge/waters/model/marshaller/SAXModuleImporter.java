@@ -53,6 +53,7 @@ import net.sourceforge.waters.model.module.AnchorPosition;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -118,6 +119,33 @@ public class SAXModuleImporter
           return new BinaryExpressionProxyHandler(parent);
         }
       });
+    registerHandler(SchemaModule.ELEMENT_ConditionalComponent,
+      new SAXHandlerCreator<ConditionalProxy>() {
+        @Override
+        AbstractContentHandler<ConditionalProxy> createHandler
+          (final AbstractContentHandler<?> parent)
+        {
+          return new ConditionalProxyHandler(parent, ListType.COMPONENTS);
+        }
+      });
+    registerHandler(SchemaModule.ELEMENT_ConditionalEvent,
+      new SAXHandlerCreator<ConditionalProxy>() {
+        @Override
+        AbstractContentHandler<ConditionalProxy> createHandler
+          (final AbstractContentHandler<?> parent)
+        {
+          return new ConditionalProxyHandler(parent, ListType.EVENTS);
+        }
+      });
+    registerHandler(SchemaModule.ELEMENT_ConditionalEventAlias,
+      new SAXHandlerCreator<ConditionalProxy>() {
+        @Override
+        AbstractContentHandler<ConditionalProxy> createHandler
+          (final AbstractContentHandler<?> parent)
+        {
+          return new ConditionalProxyHandler(parent, ListType.ALIASES);
+        }
+      });
     registerHandler(SchemaModule.ELEMENT_ConstantAlias,
       new SAXHandlerCreator<ConstantAliasProxy>() {
         @Override
@@ -178,8 +206,7 @@ public class SAXModuleImporter
         AbstractContentHandler<ForeachProxy> createHandler
           (final AbstractContentHandler<?> parent)
         {
-          return new ForeachProxyHandler(parent,
-                                         SchemaModule.ELEMENT_ComponentList);
+          return new ForeachProxyHandler(parent, ListType.COMPONENTS);
         }
       });
     registerHandler(SchemaModule.ELEMENT_ForeachEvent,
@@ -188,8 +215,7 @@ public class SAXModuleImporter
         AbstractContentHandler<ForeachProxy> createHandler
           (final AbstractContentHandler<?> parent)
         {
-          return new ForeachProxyHandler(parent,
-                                         SchemaModule.ELEMENT_EventList);
+          return new ForeachProxyHandler(parent, ListType.EVENTS);
         }
       });
     registerHandler(SchemaModule.ELEMENT_ForeachEventAlias,
@@ -198,8 +224,7 @@ public class SAXModuleImporter
         AbstractContentHandler<ForeachProxy> createHandler
           (final AbstractContentHandler<?> parent)
         {
-          return new ForeachProxyHandler(parent,
-                                         SchemaModule.ELEMENT_EventAliasList);
+          return new ForeachProxyHandler(parent, ListType.ALIASES);
         }
       });
     registerHandler(SchemaModule.ELEMENT_FunctionCallExpression,
@@ -554,6 +579,75 @@ public class SAXModuleImporter
 
 
   //#########################################################################
+  //# Inner Class ForeachProxyHandler
+  private class ForeachProxyHandler
+    extends AbstractContentHandler<ForeachProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private ForeachProxyHandler(final AbstractContentHandler<?> parent,
+                                final ListType type)
+    {
+      super(parent);
+      mListType = type;
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<ForeachProxy>
+    @Override
+    void setAttribute(final String localName, final String value)
+      throws SAXParseException
+    {
+      if (localName.equals(SchemaBase.ATTRIB_Name)) {
+        mName = value;
+      }
+    }
+
+    @Override
+    public void startSubElement(final String localName,
+                                final Attributes atts)
+      throws SAXParseException
+    {
+      if (mListType.getListName().equals(localName)) {
+        mBodyHandler = new GenericListHandler<>(this, Proxy.class);
+        pushHandler(mBodyHandler);
+      } else {
+        final AbstractContentHandler<?> handler =
+          pushHandler(localName, atts);
+        if (handler instanceof SimpleExpressionProxyHandler) {
+          if (mRangeHandler == null) {
+            mRangeHandler = (SimpleExpressionProxyHandler<?>) handler;
+          } else if (mGuardHandler == null) {
+            mGuardHandler = (SimpleExpressionProxyHandler<?>) handler;
+          }
+        }
+      }
+    }
+
+    @Override
+    ForeachProxy getResult()
+      throws SAXParseException
+    {
+      final SimpleExpressionProxy range =
+        mRangeHandler == null ? null : mRangeHandler.getResult();
+      final SimpleExpressionProxy guard =
+        mGuardHandler == null ? null : mGuardHandler.getResult();
+      final List<Proxy> body =
+        mBodyHandler == null ? null : mBodyHandler.getResult();
+      return mFactory.createForeachProxy(body, mName, range, guard);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ListType mListType;
+    private String mName = null;
+    private SimpleExpressionProxyHandler<?> mRangeHandler = null;
+    private SimpleExpressionProxyHandler<?> mGuardHandler = null;
+    private ListHandler<Proxy> mBodyHandler = null;
+  }
+
+
+  //#########################################################################
   //# Inner Class ConstantAliasProxyHandler
   private class ConstantAliasProxyHandler
     extends IdentifiedProxyHandler<ConstantAliasProxy>
@@ -900,6 +994,7 @@ public class SAXModuleImporter
       final Object result = subHandler.getResult();
       if (result != null &&
           (result instanceof IdentifierProxy ||
+           result instanceof ConditionalProxy ||
            result instanceof ForeachProxy)) {
         final Proxy proxy = (Proxy) result;
         mEventList.add(proxy);
@@ -920,35 +1015,34 @@ public class SAXModuleImporter
 
 
   //#########################################################################
-  //# Inner Class ForeachProxyHandler
-  private class ForeachProxyHandler
-    extends NamedProxyHandler<ForeachProxy>
+  //# Inner Class ConditionalProxyHandler
+  private class ConditionalProxyHandler
+    extends AbstractContentHandler<ConditionalProxy>
   {
     //#######################################################################
     //# Constructor
-    private ForeachProxyHandler(final AbstractContentHandler<?> parent,
-                                final String key)
+    private ConditionalProxyHandler(final AbstractContentHandler<?> parent,
+                                    final ListType type)
     {
       super(parent);
-      mListKey = key;
+      mListType = type;
     }
 
     //#######################################################################
-    //# Overrides for AbstractContentHandler<ForeachProxy>
+    //# Overrides for AbstractContentHandler<ConditionalProxy>
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
       throws SAXParseException
     {
-      if (localName.equals(mListKey)) {
+      if (mListType.getListName().equals(localName)) {
         mBodyHandler = new GenericListHandler<>(this, Proxy.class);
         pushHandler(mBodyHandler);
       } else {
-        final AbstractContentHandler<?> handler = pushHandler(localName, atts);
+        final AbstractContentHandler<?> handler =
+          pushHandler(localName, atts);
         if (handler instanceof SimpleExpressionProxyHandler) {
-          if (mRangeHandler == null) {
-            mRangeHandler = (SimpleExpressionProxyHandler<?>) handler;
-          } else if (mGuardHandler == null) {
+          if (mGuardHandler == null) {
             mGuardHandler = (SimpleExpressionProxyHandler<?>) handler;
           }
         }
@@ -956,23 +1050,19 @@ public class SAXModuleImporter
     }
 
     @Override
-    ForeachProxy getResult()
+    ConditionalProxy getResult()
       throws SAXParseException
     {
-      final String name = getName();
-      final SimpleExpressionProxy range =
-        mRangeHandler == null ? null : mRangeHandler.getResult();
       final SimpleExpressionProxy guard =
         mGuardHandler == null ? null : mGuardHandler.getResult();
       final List<Proxy> body =
         mBodyHandler == null ? null : mBodyHandler.getResult();
-      return mFactory.createForeachProxy(name, range, guard, body);
+      return mFactory.createConditionalProxy(body, guard);
     }
 
     //#######################################################################
     //# Data Members
-    private final String mListKey;
-    private SimpleExpressionProxyHandler<?> mRangeHandler = null;
+    private final ListType mListType;
     private SimpleExpressionProxyHandler<?> mGuardHandler = null;
     private ListHandler<Proxy> mBodyHandler = null;
   }

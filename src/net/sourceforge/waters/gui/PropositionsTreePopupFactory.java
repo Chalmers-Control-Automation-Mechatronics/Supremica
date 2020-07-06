@@ -74,7 +74,7 @@ class PropositionsTreePopupFactory
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     popup.addSeparator();
-    final IDEAction newfor = master.getInsertForeachComponentAction();
+    final IDEAction newfor = master.getInsertForeachAction();
     if(newfor.isEnabled()){
       popup.add(newfor);
     }

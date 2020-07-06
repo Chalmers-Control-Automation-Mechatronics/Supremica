@@ -42,6 +42,7 @@ import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.AutomatonPropertiesDialog;
+import net.sourceforge.waters.gui.dialog.ConditionalEditorDialog;
 import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
@@ -59,6 +60,7 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultProductDESAndModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -70,6 +72,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.subject.module.ConditionalSubject;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
@@ -227,6 +230,19 @@ public class IDEPropertiesAction extends WatersAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Boolean visitConditionalProxy(final ConditionalProxy cond)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final ConditionalSubject subject = (ConditionalSubject) cond;
+        final FocusTracker tracker = getFocusTracker();
+        final SelectionOwner panel = tracker.getWatersSelectionOwner();
+        new ConditionalEditorDialog(root, panel, subject);
+      }
+      return true;
+    }
+
     @Override
     public Boolean visitConstantAliasProxy(final ConstantAliasProxy decl)
     {

@@ -81,6 +81,7 @@ import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -444,6 +445,27 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       throw wrap(mCompilationInfo.getExceptions());
     }
     return null;
+  }
+
+  @Override
+  public Object visitConditionalProxy(final ConditionalProxy cond)
+    throws VisitorException
+  {
+    try {
+      // TODO Add support for EFSM variables
+      final SimpleExpressionProxy guard = cond.getGuard();
+      final SimpleExpressionProxy value =
+        mSimpleExpressionCompiler.eval(guard, mContext);
+      final boolean boolValue =
+        mSimpleExpressionCompiler.getBooleanValue(value);
+      if (boolValue) {
+        final List<Proxy> body = cond.getBody();
+        visitCollection(body);
+      }
+      return null;
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    }
   }
 
   @Override

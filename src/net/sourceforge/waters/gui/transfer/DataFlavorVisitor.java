@@ -50,12 +50,12 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
@@ -244,18 +244,6 @@ class DataFlavorVisitor
   }
 
   @Override
-  public List<WatersDataFlavor> visitForeachProxy(final ForeachProxy foreach)
-    throws VisitorException
-  {
-    final Collection<? extends Proxy> body = foreach.getBody();
-    if (body.isEmpty()) {
-      return LIST_FOREACH;
-    } else {
-      return visitCollection(body);
-    }
-  }
-
-  @Override
   public List<WatersDataFlavor> visitGuardActionBlockProxy
     (final GuardActionBlockProxy block)
   {
@@ -301,6 +289,19 @@ class DataFlavorVisitor
     (final LabelGeometryProxy geo)
   {
     return LIST_LABEL_GEOMETRY;
+  }
+
+  @Override
+  public List<WatersDataFlavor> visitNestedBlockProxy
+    (final NestedBlockProxy block)
+    throws VisitorException
+  {
+    final Collection<? extends Proxy> body = block.getBody();
+    if (body.isEmpty()) {
+      return LIST_NESTED_BLOCK;
+    } else {
+      return visitCollection(body);
+    }
   }
 
   @Override
@@ -374,7 +375,7 @@ class DataFlavorVisitor
     Collections.singletonList(WatersDataFlavor.GUARD_ACTION_BLOCK);
   private static final List<WatersDataFlavor> LIST_IDENTIFIER =
     Collections.singletonList(WatersDataFlavor.IDENTIFIER);
-  private static final List<WatersDataFlavor> LIST_FOREACH =
+  private static final List<WatersDataFlavor> LIST_NESTED_BLOCK =
     Arrays.asList(new WatersDataFlavor[]{WatersDataFlavor.COMPONENT,
                                          WatersDataFlavor.EVENT_ALIAS,
                                          WatersDataFlavor.IDENTIFIER});

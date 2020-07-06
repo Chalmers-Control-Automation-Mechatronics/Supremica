@@ -58,6 +58,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
@@ -71,6 +72,7 @@ import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -1094,19 +1096,6 @@ public class ModuleContext
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
-    public Boolean visitForeachProxy(final ForeachProxy foreach)
-      throws VisitorException
-    {
-      for (final Proxy proxy : foreach.getBody()) {
-        final boolean candrop = (Boolean) proxy.acceptVisitor(this);
-        if (!candrop) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    @Override
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
       final EventKind kind = guessEventKind(ident);
@@ -1120,6 +1109,19 @@ public class ModuleContext
         }
         return false;
       }
+    }
+
+    @Override
+    public Boolean visitNestedBlockProxy(final NestedBlockProxy block)
+      throws VisitorException
+    {
+      for (final Proxy proxy : block.getBody()) {
+        final boolean canDrop = (Boolean) proxy.acceptVisitor(this);
+        if (!canDrop) {
+          return false;
+        }
+      }
+      return true;
     }
 
     //#######################################################################
@@ -1201,6 +1203,16 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Icon visitConditionalProxy(final ConditionalProxy cond)
+    {
+      if (hasErrorIcon(cond)) {
+        return IconAndFontLoader.ICON_CONDITIONAL_ERROR;
+      } else {
+        return IconAndFontLoader.ICON_CONDITIONAL;
+      }
+    }
+
     @Override
     public Icon visitConstantAliasProxy(final ConstantAliasProxy var)
     {

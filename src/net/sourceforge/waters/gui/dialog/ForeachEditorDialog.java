@@ -267,7 +267,7 @@ public class ForeachEditorDialog
     mainlayout.setConstraints(mRangeLabel, constraints);
     mMainPanel.add(mRangeLabel);
     // mRangeInput
-    mVariableInput.setColumns(20);
+    mRangeInput.setColumns(20);
     constraints.gridx++;
     constraints.gridwidth = 1;
     constraints.weightx = 1.0;
@@ -282,7 +282,7 @@ public class ForeachEditorDialog
     mainlayout.setConstraints(mGuardLabel, constraints);
     mMainPanel.add(mGuardLabel);
     // mGuardInput
-    mVariableInput.setColumns(20);
+    mGuardInput.setColumns(20);
     constraints.gridx++;
     constraints.gridwidth = 1;
     constraints.weightx = 1.0;

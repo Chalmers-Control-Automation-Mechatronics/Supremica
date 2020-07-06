@@ -48,11 +48,11 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.CollectionSubject;
@@ -65,9 +65,9 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.NestedBlockSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
@@ -428,10 +428,11 @@ class ModuleTreeModel
     }
 
     @Override
-    public ListSubject<? extends ProxySubject> visitForeachProxy(final ForeachProxy foreach)
+    public ListSubject<? extends ProxySubject> visitNestedBlockProxy
+      (final NestedBlockProxy nested)
     {
-      final ForeachSubject foreachSub = (ForeachSubject) foreach;
-      return foreachSub.getBodyModifiable();
+      final NestedBlockSubject nestedSub = (NestedBlockSubject) nested;
+      return nestedSub.getBodyModifiable();
     }
 
     @Override

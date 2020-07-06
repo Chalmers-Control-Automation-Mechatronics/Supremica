@@ -44,6 +44,7 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -154,6 +155,25 @@ public class HTMLPrinter
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.printer.ModuleProxyVisitor
+  @Override
+  public Object visitConditionalProxy(final ConditionalProxy proxy)
+    throws VisitorException
+  {
+    final ModuleCompilationErrors errors =
+      mModuleContext.getCompilationErrors();
+    printHTML("<TABLE cellspacing=0 cellpadding=0><TR>");
+    printHTML("<TD><B>IF</B>&nbsp;</TD>");
+    final SimpleExpressionProxy guard = proxy.getGuard();
+    if (errors.isUnderlined(guard)) {
+      printHTML("<TD " + UNDERLINE_STYLE + ">");
+    } else {
+      printHTML("<TD>");
+    }
+    guard.acceptVisitor(this);
+    printHTML("</TD></TR></TABLE>");
+    return null;
+  }
+
   @Override
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)

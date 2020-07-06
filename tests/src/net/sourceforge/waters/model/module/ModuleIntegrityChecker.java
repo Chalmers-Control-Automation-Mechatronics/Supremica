@@ -98,9 +98,9 @@ public class ModuleIntegrityChecker
       } else if (proxy instanceof InstanceProxy) {
         final InstanceProxy inst = (InstanceProxy) proxy;
         checkInstanceIntegrity(inst);
-      } else if (proxy instanceof ForeachProxy) {
-        final ForeachProxy foreach = (ForeachProxy) proxy;
-        final List<Proxy> body = foreach.getBody();
+      } else if (proxy instanceof NestedBlockProxy) {
+        final NestedBlockProxy block = (NestedBlockProxy) proxy;
+        final List<Proxy> body = block.getBody();
         checkComponentListIntegrity(body);
       } else {
         Assert.fail("Bad component type " + proxy.getClass().getName());

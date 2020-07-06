@@ -14,7 +14,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.supremica.gui.ide.IDE"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-p &quot;${workspace_loc:waters}/.supremica&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-p &quot;${workspace_loc:waters}/.supremica&quot;&#10;&quot;${workspace_loc:waters}/examples/waters/tests/synthesis/cat_mouse_unsup1.wmod&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-Dlog4j.configurationFile=&quot;${workspace_loc:waters}/templates/log4j2.xml&quot;&#10;-enableassertions"/>
 </launchConfiguration>

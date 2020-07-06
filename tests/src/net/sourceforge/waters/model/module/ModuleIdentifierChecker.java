@@ -38,23 +38,12 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.IdentifiedProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
@@ -86,6 +75,7 @@ public class ModuleIdentifierChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public void check(final ModuleProxy module)
     throws Exception
   {
@@ -130,6 +120,7 @@ public class ModuleIdentifierChecker
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
@@ -138,6 +129,7 @@ public class ModuleIdentifierChecker
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
     {
@@ -145,6 +137,7 @@ public class ModuleIdentifierChecker
       return visitEventListExpressionProxy(block);
     }
 
+    @Override
     public Object visitEventListExpressionProxy
       (final EventListExpressionProxy expr)
     throws VisitorException
@@ -154,6 +147,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
     {
@@ -164,6 +158,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitGraphProxy(final GraphProxy graph)
     throws VisitorException
     {
@@ -178,6 +173,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitIdentifiedProxy(final IdentifiedProxy proxy)
     throws VisitorException
     {
@@ -188,6 +184,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
     throws VisitorException
@@ -197,6 +194,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
     {
@@ -214,6 +212,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitNodeProxy(final NodeProxy node)
     throws VisitorException
     {
@@ -222,6 +221,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy ident)
     throws VisitorException
@@ -232,6 +232,7 @@ public class ModuleIdentifierChecker
       return comp.acceptVisitor(this);
     }
 
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     throws VisitorException
     {
@@ -243,6 +244,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     throws VisitorException
     {
@@ -251,6 +253,7 @@ public class ModuleIdentifierChecker
       return null;
     }
 
+    @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
     {
@@ -262,7 +265,7 @@ public class ModuleIdentifierChecker
 
     //#######################################################################
     //# Auxiliary Methods
-    private void checkName(final String name, final NamedProxy owner)
+    private void checkName(final String name, final Proxy owner)
     {
       mNameOwner = owner;
       checkName(name);
@@ -308,7 +311,7 @@ public class ModuleIdentifierChecker
     //# Data Members
     private final ExpressionParser mParser;
 
-    private NamedProxy mNameOwner;
+    private Proxy mNameOwner;
     private ModuleProxy mCurrentModule;
     private SimpleComponentProxy mCurrentComponent;
   }

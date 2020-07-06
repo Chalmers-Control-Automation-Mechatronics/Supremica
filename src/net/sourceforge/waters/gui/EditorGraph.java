@@ -61,6 +61,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -71,6 +72,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -85,6 +87,7 @@ import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
+import net.sourceforge.waters.subject.module.ConditionalSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
@@ -93,6 +96,7 @@ import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.NestedBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -2071,6 +2075,17 @@ class EditorGraph
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
+    public ChangeRecord visitConditionalProxy(final ConditionalProxy fake)
+      throws VisitorException
+    {
+      final ConditionalSubject oCond = (ConditionalSubject) mOriginal;
+      final ConditionalSubject fCond = (ConditionalSubject) mFake;
+      visitNestedBlockProxy(fake);
+      visitProxies(oCond.getGuard(), fCond.getGuard());
+      return null;
+    }
+
+    @Override
     public ChangeRecord visitEdgeProxy(final EdgeProxy fake)
     {
       final EdgeSubject oedge = (EdgeSubject) mOriginal;
@@ -2082,17 +2097,12 @@ class EditorGraph
     public ChangeRecord visitForeachProxy(final ForeachProxy fake)
       throws VisitorException
     {
-      final ForeachSubject oforeach = (ForeachSubject) mOriginal;
-      final ForeachSubject fforeach = (ForeachSubject) mFake;
-      new LabelChangeRecord(oforeach, fforeach);
-      final ListSubject<? extends ProxySubject> originalList =
-        oforeach.getBodyModifiable();
-      final ListSubject<? extends ProxySubject> fakeList =
-        fforeach.getBodyModifiable();
-      visitLists(originalList, fakeList);
-      visitProxies(oforeach.getRange(), fforeach.getRange());
-      if (oforeach.getGuard() != null) {
-        visitProxies(oforeach.getGuard(), fforeach.getGuard());
+      final ForeachSubject oForeach = (ForeachSubject) mOriginal;
+      final ForeachSubject fForeach = (ForeachSubject) mFake;
+      visitNestedBlockProxy(fake);
+      visitProxies(oForeach.getRange(), fForeach.getRange());
+      if (oForeach.getGuard() != null) {
+        visitProxies(oForeach.getGuard(), fForeach.getGuard());
       }
       return null;
     }
@@ -2130,6 +2140,21 @@ class EditorGraph
       final LabelGeometrySubject ogeo = (LabelGeometrySubject) mOriginal;
       final LabelGeometrySubject fgeo = (LabelGeometrySubject) mFake;
       return new LabelGeometryChangeRecord(ogeo, fgeo, mKind);
+    }
+
+    @Override
+    public ChangeRecord visitNestedBlockProxy(final NestedBlockProxy fake)
+      throws VisitorException
+    {
+      final NestedBlockSubject oBlock = (NestedBlockSubject) mOriginal;
+      final NestedBlockSubject fBlock = (NestedBlockSubject) mFake;
+      new LabelChangeRecord(oBlock, fBlock);
+      final ListSubject<? extends ProxySubject> originalList =
+        oBlock.getBodyModifiable();
+      final ListSubject<? extends ProxySubject> fakeList =
+        fBlock.getBodyModifiable();
+      visitLists(originalList, fakeList);
+      return null;
     }
 
     @Override

@@ -33,10 +33,7 @@
 
 package net.sourceforge.waters.model.module;
 
-import java.util.List;
-
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 
 
 /**
@@ -85,46 +82,32 @@ import net.sourceforge.waters.model.base.Proxy;
  * indicating <I>false</I> and other numbers indicating
  * <CODE>true</CODE>. The body of a foreach construct will only be
  * evaluated for those entries in the range where the guard evaluates to
- * <I>true</I>.  A missing guard is assumed to be always <I>true</I>. In
+ * <I>true</I>. A missing guard is assumed to be always <I>true</I>. In
  * the above examples, only the last foreach construct has a guard,
  * <CODE>i&nbsp;!=&nbsp;j</CODE>.</DD>
  * <DT><I>Body.</I></DT>
  * <DD>A list of entries that are to be evaluated for each assignment of
  * the dummy variable to an element in the range, provided that the guard
- * is satisfied. The type of entries in the body varies depending on the
- * type of foreach construct-see the subclasses. In most cases, nested
- * foreach constructs are possible in addition to leaf entries. In the
- * above examples, the bodies contain only a single entry, but the number
- * of entries in a foreach body is not limited in general.</DD>
+ * is satisfied. Nested foreach constructs are possible in addition to leaf
+ * entries of various types. In the above examples, the bodies contain only
+ * a single entry, but the number of entries in a foreach body is not
+ * limited in general.</DD>
  * </DL>
- *
- * <P>There are different types of foreach constructs, depending on the
- * context in which they can occur, and on the types of entries their
- * bodies can contain.</P>
- *
- * <UL>
- * <LI><I>Foreach-component</I> constructs occur in the <I>component list</I>
- * of a module. Their body entries can be of type {@link SimpleComponentProxy},
- * {@link VariableComponentProxy}, {@link InstanceProxy}, or
- * {@link ForeachProxy}.</LI>
- * <LI><I>Foreach-event</I> constructs occur in <I>event lists</I> ({@link
- * EventListExpressionProxy}), which may occur on a graph's edge, in an alias
- * definition, or in the actual parameter of an instance. Their body entries
- * can be of type {@link IdentifierProxy} or {@link ForeachProxy}.</LI>
- * <LI><I>Foreach-event-alias</I> constructs occur in the <I>event alias
- * list</I> of a module. Their body entres can be of type
- * {@link EventAliasProxy} or {@link ForeachProxy}.</LI>
- * </UL>
  *
  * @author Robi Malik
  */
 // @short foreach construct
 
-public interface ForeachProxy extends NamedProxy
+public interface ForeachProxy extends NestedBlockProxy
 {
 
   //#########################################################################
   //# Getters and Setters
+  /**
+   * Gets the name of the dummy variable of this foreach construct.
+   */
+  public String getName();
+
   /**
    * Gets the range of this foreach construct.
    * @return An expression that evaluates to a range and represents the range
@@ -139,12 +122,5 @@ public interface ForeachProxy extends NamedProxy
    */
   // @optional
   public SimpleExpressionProxy getGuard();
-
-  /**
-   * Gets the body of this foreach construct.
-   * @return The list of body elements. The possible types of
-   *         elements depends on the particular type of foreach construct.
-   */
-  public List<Proxy> getBody();
 
 }

@@ -45,14 +45,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 
-public class ForeachLabelShapeBuilder
+public class AttributedLabelShapeBuilder
 {
 
   //##########################################################################
   //# Constructor
-  public ForeachLabelShapeBuilder(final Font defaultFont)
+  public AttributedLabelShapeBuilder(final Font defaultFont)
   {
     mEntries = new ArrayList<Entry>();
     mFont = defaultFont;
@@ -85,8 +84,10 @@ public class ForeachLabelShapeBuilder
 
   //##########################################################################
   //# Invocation
-  public ForeachLabelShape create(final ForeachProxy foreach, final int x,
-                                  final int y, final Map<Proxy,ProxyShape> map)
+  public AttributedLabelShape create(final Proxy proxy,
+                                     final int x,
+                                     final int y,
+                                     final Map<Proxy,ProxyShape> map)
   {
     final StringBuilder sb = new StringBuilder();
     for (final Entry e : mEntries) {
@@ -105,7 +106,7 @@ public class ForeachLabelShapeBuilder
       }
       start = end;
     }
-    return new ForeachLabelShape(foreach, x, y, mFont, mText);
+    return new AttributedLabelShape(proxy, x, y, mFont, mText);
   }
 
 

@@ -38,11 +38,12 @@ import java.util.Collection;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -58,6 +59,7 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -101,6 +103,7 @@ class ModuleHierarchyChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ProxyVisitor
+  @Override
   public Object visitProxy(final Proxy proxy)
   {
     return null;
@@ -109,6 +112,7 @@ class ModuleHierarchyChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Object visitAliasProxy
       (final AliasProxy proxy)
     throws VisitorException
@@ -119,6 +123,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitBinaryExpressionProxy
       (final BinaryExpressionProxy proxy)
     throws VisitorException
@@ -131,17 +136,28 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitColorGeometryProxy
       (final ColorGeometryProxy proxy)
     throws VisitorException
   {
     final ColorGeometrySubject subject = (ColorGeometrySubject) proxy;
     visitGeometryProxy(proxy);
-    final Collection<?> colors = subject.getColorSetModifiable(); 
+    final Collection<?> colors = subject.getColorSetModifiable();
     visitSimpleCollectionChild(colors, proxy);
     return null;
  }
 
+  @Override
+  public Object visitConditionalProxy(final ConditionalProxy proxy)
+    throws VisitorException
+  {
+    final SimpleExpressionProxy guard = proxy.getGuard();
+    visitProxyChild(guard, proxy);
+    return visitNestedBlockProxy(proxy);
+  }
+
+  @Override
   public Object visitEdgeProxy
       (final EdgeProxy proxy)
     throws VisitorException
@@ -162,6 +178,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitEnumSetExpressionProxy
       (final EnumSetExpressionProxy proxy)
     throws VisitorException
@@ -174,6 +191,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -188,6 +206,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitEventListExpressionProxy
       (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -201,21 +220,18 @@ class ModuleHierarchyChecker
     return null;
   }
 
-  public Object visitForeachProxy
-      (final ForeachProxy proxy)
+  @Override
+  public Object visitForeachProxy(final ForeachProxy proxy)
     throws VisitorException
   {
-    final ForeachSubject subject = (ForeachSubject) proxy;
-    visitNamedProxy(proxy);
     final SimpleExpressionProxy range = proxy.getRange();
     visitProxyChild(range, proxy);
     final SimpleExpressionProxy guard = proxy.getGuard();
     visitOptionalProxyChild(guard, proxy);
-    final Collection<AbstractSubject> body = subject.getBodyModifiable();
-    visitProxyCollectionChild(body, proxy);
-    return null;
+    return visitNestedBlockProxy(proxy);
   }
 
+  @Override
   public Object visitGraphProxy
       (final GraphProxy proxy)
     throws VisitorException
@@ -234,6 +250,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitGroupNodeProxy
       (final GroupNodeProxy proxy)
     throws VisitorException
@@ -251,6 +268,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy proxy)
     throws VisitorException
@@ -263,6 +281,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitIdentifiedProxy
       (final IdentifiedProxy proxy)
     throws VisitorException
@@ -273,6 +292,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitInstanceProxy
       (final InstanceProxy proxy)
     throws VisitorException
@@ -285,6 +305,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitLabelBlockProxy
       (final LabelBlockProxy proxy)
     throws VisitorException
@@ -295,6 +316,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitModuleProxy
       (final ModuleProxy proxy)
     throws VisitorException
@@ -316,6 +338,17 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
+  public Object visitNestedBlockProxy(final NestedBlockProxy proxy)
+    throws VisitorException
+  {
+    final NestedBlockSubject subject = (NestedBlockSubject) proxy;
+    final Collection<AbstractSubject> body = subject.getBodyModifiable();
+    visitProxyCollectionChild(body, proxy);
+    return null;
+  }
+
+  @Override
   public Object visitNodeProxy
       (final NodeProxy proxy)
     throws VisitorException
@@ -326,6 +359,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -336,6 +370,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitSimpleNodeProxy
       (final SimpleNodeProxy proxy)
     throws VisitorException
@@ -348,17 +383,19 @@ class ModuleHierarchyChecker
     return visitNodeProxy(proxy);
   }
 
+  @Override
   public Object visitSplineGeometryProxy
       (final SplineGeometryProxy proxy)
     throws VisitorException
   {
     final SplineGeometrySubject subject = (SplineGeometrySubject) proxy;
     visitGeometryProxy(proxy);
-    final Collection<?> points = subject.getPointsModifiable(); 
+    final Collection<?> points = subject.getPointsModifiable();
     visitSimpleCollectionChild(points, proxy);
     return visitGeometryProxy(proxy);
   }
 
+  @Override
   public Object visitUnaryExpressionProxy
       (final UnaryExpressionProxy proxy)
     throws VisitorException
@@ -369,6 +406,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitVariableComponentProxy
       (final VariableComponentProxy proxy)
     throws VisitorException
@@ -385,6 +423,7 @@ class ModuleHierarchyChecker
     return null;
   }
 
+  @Override
   public Object visitVariableMarkingProxy
       (final VariableMarkingProxy proxy)
     throws VisitorException

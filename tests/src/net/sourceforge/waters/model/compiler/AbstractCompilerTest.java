@@ -335,6 +335,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_tictactoe_incomplete()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("handwritten", "tictactoe_incomplete");
+    testCompile(module);
+  }
+
   public void testCompile_transferline()
     throws IOException, WatersException
   {

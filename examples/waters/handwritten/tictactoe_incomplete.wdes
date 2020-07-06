@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="tictactoe_incomplete">
+<B:Comment>An imcomplete model of a tic tac toe game. 
+The size of the game board can be parametrised. The model uses event aliases in the 'game_over' model and the 'white_never_wins' model. The model is fails to disallow moves after one of the players has completed a row, and as a result no least restrictive supervisor exists. A complete version of the game is stored as tictactoe.
+The model is not controllable and nonblocking.
+It has 6692 reachable states and the diameter is 66.</B:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Name="black[1][1]"/>
+<Event Kind="CONTROLLABLE" Name="black[1][2]"/>
+<Event Kind="CONTROLLABLE" Name="black[1][3]"/>
+<Event Kind="CONTROLLABLE" Name="black[2][1]"/>
+<Event Kind="CONTROLLABLE" Name="black[2][2]"/>
+<Event Kind="CONTROLLABLE" Name="black[2][3]"/>
+<Event Kind="CONTROLLABLE" Name="black[3][1]"/>
+<Event Kind="CONTROLLABLE" Name="black[3][2]"/>
+<Event Kind="CONTROLLABLE" Name="black[3][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_d1"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_d2"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_x[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_x[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_x[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_y[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_y[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="black_win_y[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="draw"/>
+<Event Kind="UNCONTROLLABLE" Name="white[1][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[1][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[1][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[2][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[2][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[2][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[3][1]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[3][2]"/>
+<Event Kind="UNCONTROLLABLE" Name="white[3][3]"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_d1"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_d2"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_x[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_x[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_x[3]"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_y[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_y[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="white_win_y[3]"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="square[1][1]">
+<EventRefList>
+<EventRef Name="black[1][1]"/>
+<EventRef Name="black_win_d1"/>
+<EventRef Name="black_win_x[1]"/>
+<EventRef Name="black_win_y[1]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[1][1]"/>
+<EventRef Name="white_win_d1"/>
+<EventRef Name="white_win_x[1]"/>
+<EventRef Name="white_win_y[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[1][1]" Target="white"/>
+<Transition Source="free" Event="black[1][1]" Target="black"/>
+<Transition Source="white" Event="white_win_x[1]" Target="white"/>
+<Transition Source="white" Event="white_win_y[1]" Target="white"/>
+<Transition Source="white" Event="white_win_d1" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[1]" Target="black"/>
+<Transition Source="black" Event="black_win_y[1]" Target="black"/>
+<Transition Source="black" Event="black_win_d1" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[1][2]">
+<EventRefList>
+<EventRef Name="black[1][2]"/>
+<EventRef Name="black_win_x[1]"/>
+<EventRef Name="black_win_y[2]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[1][2]"/>
+<EventRef Name="white_win_x[1]"/>
+<EventRef Name="white_win_y[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[1][2]" Target="white"/>
+<Transition Source="free" Event="black[1][2]" Target="black"/>
+<Transition Source="white" Event="white_win_x[1]" Target="white"/>
+<Transition Source="white" Event="white_win_y[2]" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[1]" Target="black"/>
+<Transition Source="black" Event="black_win_y[2]" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[1][3]">
+<EventRefList>
+<EventRef Name="black[1][3]"/>
+<EventRef Name="black_win_d2"/>
+<EventRef Name="black_win_x[1]"/>
+<EventRef Name="black_win_y[3]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[1][3]"/>
+<EventRef Name="white_win_d2"/>
+<EventRef Name="white_win_x[1]"/>
+<EventRef Name="white_win_y[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[1][3]" Target="white"/>
+<Transition Source="free" Event="black[1][3]" Target="black"/>
+<Transition Source="white" Event="white_win_x[1]" Target="white"/>
+<Transition Source="white" Event="white_win_y[3]" Target="white"/>
+<Transition Source="white" Event="white_win_d2" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[1]" Target="black"/>
+<Transition Source="black" Event="black_win_y[3]" Target="black"/>
+<Transition Source="black" Event="black_win_d2" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[2][1]">
+<EventRefList>
+<EventRef Name="black[2][1]"/>
+<EventRef Name="black_win_x[2]"/>
+<EventRef Name="black_win_y[1]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[2][1]"/>
+<EventRef Name="white_win_x[2]"/>
+<EventRef Name="white_win_y[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[2][1]" Target="white"/>
+<Transition Source="free" Event="black[2][1]" Target="black"/>
+<Transition Source="white" Event="white_win_x[2]" Target="white"/>
+<Transition Source="white" Event="white_win_y[1]" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[2]" Target="black"/>
+<Transition Source="black" Event="black_win_y[1]" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[2][2]">
+<EventRefList>
+<EventRef Name="black[2][2]"/>
+<EventRef Name="black_win_d1"/>
+<EventRef Name="black_win_d2"/>
+<EventRef Name="black_win_x[2]"/>
+<EventRef Name="black_win_y[2]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[2][2]"/>
+<EventRef Name="white_win_d1"/>
+<EventRef Name="white_win_d2"/>
+<EventRef Name="white_win_x[2]"/>
+<EventRef Name="white_win_y[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[2][2]" Target="white"/>
+<Transition Source="free" Event="black[2][2]" Target="black"/>
+<Transition Source="white" Event="white_win_x[2]" Target="white"/>
+<Transition Source="white" Event="white_win_y[2]" Target="white"/>
+<Transition Source="white" Event="white_win_d1" Target="white"/>
+<Transition Source="white" Event="white_win_d2" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[2]" Target="black"/>
+<Transition Source="black" Event="black_win_y[2]" Target="black"/>
+<Transition Source="black" Event="black_win_d1" Target="black"/>
+<Transition Source="black" Event="black_win_d2" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[2][3]">
+<EventRefList>
+<EventRef Name="black[2][3]"/>
+<EventRef Name="black_win_x[2]"/>
+<EventRef Name="black_win_y[3]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[2][3]"/>
+<EventRef Name="white_win_x[2]"/>
+<EventRef Name="white_win_y[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[2][3]" Target="white"/>
+<Transition Source="free" Event="black[2][3]" Target="black"/>
+<Transition Source="white" Event="white_win_x[2]" Target="white"/>
+<Transition Source="white" Event="white_win_y[3]" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[2]" Target="black"/>
+<Transition Source="black" Event="black_win_y[3]" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[3][1]">
+<EventRefList>
+<EventRef Name="black[3][1]"/>
+<EventRef Name="black_win_d2"/>
+<EventRef Name="black_win_x[3]"/>
+<EventRef Name="black_win_y[1]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[3][1]"/>
+<EventRef Name="white_win_d2"/>
+<EventRef Name="white_win_x[3]"/>
+<EventRef Name="white_win_y[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[3][1]" Target="white"/>
+<Transition Source="free" Event="black[3][1]" Target="black"/>
+<Transition Source="white" Event="white_win_x[3]" Target="white"/>
+<Transition Source="white" Event="white_win_y[1]" Target="white"/>
+<Transition Source="white" Event="white_win_d2" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[3]" Target="black"/>
+<Transition Source="black" Event="black_win_y[1]" Target="black"/>
+<Transition Source="black" Event="black_win_d2" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[3][2]">
+<EventRefList>
+<EventRef Name="black[3][2]"/>
+<EventRef Name="black_win_x[3]"/>
+<EventRef Name="black_win_y[2]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[3][2]"/>
+<EventRef Name="white_win_x[3]"/>
+<EventRef Name="white_win_y[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[3][2]" Target="white"/>
+<Transition Source="free" Event="black[3][2]" Target="black"/>
+<Transition Source="white" Event="white_win_x[3]" Target="white"/>
+<Transition Source="white" Event="white_win_y[2]" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[3]" Target="black"/>
+<Transition Source="black" Event="black_win_y[2]" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="square[3][3]">
+<EventRefList>
+<EventRef Name="black[3][3]"/>
+<EventRef Name="black_win_d1"/>
+<EventRef Name="black_win_x[3]"/>
+<EventRef Name="black_win_y[3]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white[3][3]"/>
+<EventRef Name="white_win_d1"/>
+<EventRef Name="white_win_x[3]"/>
+<EventRef Name="white_win_y[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="free" Event="white[3][3]" Target="white"/>
+<Transition Source="free" Event="black[3][3]" Target="black"/>
+<Transition Source="white" Event="white_win_x[3]" Target="white"/>
+<Transition Source="white" Event="white_win_y[3]" Target="white"/>
+<Transition Source="white" Event="white_win_d1" Target="white"/>
+<Transition Source="white" Event="draw" Target="white"/>
+<Transition Source="black" Event="black_win_x[3]" Target="black"/>
+<Transition Source="black" Event="black_win_y[3]" Target="black"/>
+<Transition Source="black" Event="black_win_d1" Target="black"/>
+<Transition Source="black" Event="draw" Target="black"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="turn">
+<EventRefList>
+<EventRef Name="black[1][1]"/>
+<EventRef Name="black[1][2]"/>
+<EventRef Name="black[1][3]"/>
+<EventRef Name="black[2][1]"/>
+<EventRef Name="black[2][2]"/>
+<EventRef Name="black[2][3]"/>
+<EventRef Name="black[3][1]"/>
+<EventRef Name="black[3][2]"/>
+<EventRef Name="black[3][3]"/>
+<EventRef Name="white[1][1]"/>
+<EventRef Name="white[1][2]"/>
+<EventRef Name="white[1][3]"/>
+<EventRef Name="white[2][1]"/>
+<EventRef Name="white[2][2]"/>
+<EventRef Name="white[2][3]"/>
+<EventRef Name="white[3][1]"/>
+<EventRef Name="white[3][2]"/>
+<EventRef Name="white[3][3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="white"/>
+<State Name="black"/>
+</StateList>
+<TransitionList>
+<Transition Source="white" Event="white[1][1]" Target="black"/>
+<Transition Source="white" Event="white[1][2]" Target="black"/>
+<Transition Source="white" Event="white[1][3]" Target="black"/>
+<Transition Source="white" Event="white[2][1]" Target="black"/>
+<Transition Source="white" Event="white[2][2]" Target="black"/>
+<Transition Source="white" Event="white[2][3]" Target="black"/>
+<Transition Source="white" Event="white[3][1]" Target="black"/>
+<Transition Source="white" Event="white[3][2]" Target="black"/>
+<Transition Source="white" Event="white[3][3]" Target="black"/>
+<Transition Source="black" Event="black[1][1]" Target="white"/>
+<Transition Source="black" Event="black[1][2]" Target="white"/>
+<Transition Source="black" Event="black[1][3]" Target="white"/>
+<Transition Source="black" Event="black[2][1]" Target="white"/>
+<Transition Source="black" Event="black[2][2]" Target="white"/>
+<Transition Source="black" Event="black[2][3]" Target="white"/>
+<Transition Source="black" Event="black[3][1]" Target="white"/>
+<Transition Source="black" Event="black[3][2]" Target="white"/>
+<Transition Source="black" Event="black[3][3]" Target="white"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="game_over">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="black_win_d1"/>
+<EventRef Name="black_win_d2"/>
+<EventRef Name="black_win_x[1]"/>
+<EventRef Name="black_win_x[2]"/>
+<EventRef Name="black_win_x[3]"/>
+<EventRef Name="black_win_y[1]"/>
+<EventRef Name="black_win_y[2]"/>
+<EventRef Name="black_win_y[3]"/>
+<EventRef Name="draw"/>
+<EventRef Name="white_win_d1"/>
+<EventRef Name="white_win_d2"/>
+<EventRef Name="white_win_x[1]"/>
+<EventRef Name="white_win_x[2]"/>
+<EventRef Name="white_win_x[3]"/>
+<EventRef Name="white_win_y[1]"/>
+<EventRef Name="white_win_y[2]"/>
+<EventRef Name="white_win_y[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="game"/>
+<State Name="over">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Source="game" Event="white_win_x[1]" Target="over"/>
+<Transition Source="game" Event="white_win_x[2]" Target="over"/>
+<Transition Source="game" Event="white_win_x[3]" Target="over"/>
+<Transition Source="game" Event="white_win_y[1]" Target="over"/>
+<Transition Source="game" Event="white_win_y[2]" Target="over"/>
+<Transition Source="game" Event="white_win_y[3]" Target="over"/>
+<Transition Source="game" Event="white_win_d1" Target="over"/>
+<Transition Source="game" Event="white_win_d2" Target="over"/>
+<Transition Source="game" Event="black_win_x[1]" Target="over"/>
+<Transition Source="game" Event="black_win_x[2]" Target="over"/>
+<Transition Source="game" Event="black_win_x[3]" Target="over"/>
+<Transition Source="game" Event="black_win_y[1]" Target="over"/>
+<Transition Source="game" Event="black_win_y[2]" Target="over"/>
+<Transition Source="game" Event="black_win_y[3]" Target="over"/>
+<Transition Source="game" Event="black_win_d1" Target="over"/>
+<Transition Source="game" Event="black_win_d2" Target="over"/>
+<Transition Source="game" Event="draw" Target="over"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="white_never_wins">
+<EventRefList>
+<EventRef Name="white_win_d1"/>
+<EventRef Name="white_win_d2"/>
+<EventRef Name="white_win_x[1]"/>
+<EventRef Name="white_win_x[2]"/>
+<EventRef Name="white_win_x[3]"/>
+<EventRef Name="white_win_y[1]"/>
+<EventRef Name="white_win_y[2]"/>
+<EventRef Name="white_win_y[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="init"/>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>
