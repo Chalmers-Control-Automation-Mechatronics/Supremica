@@ -442,6 +442,10 @@ public class Config
   public static final BooleanOption INCLUDE_RAS_SUPPORT = new BooleanOption
     ("includeRASSupport",
      "Include RAS Support", "Include RAS support", null, false);
+  public static final BooleanOption INCLUDE_FT_SUPPORT = new BooleanOption
+    ("includeFTSupport",
+     "Include FT Support",
+     "Support for the XML fault tree format from SystemWaver", null, false);
 
 
   private static Config instance = null;

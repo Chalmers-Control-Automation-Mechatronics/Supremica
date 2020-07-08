@@ -622,7 +622,7 @@ public class IDEMenuBar
     final Action open = actions.getAction(OpenAction.class);
     menu.add(open);
     addOption(Config.INCLUDE_RAS_SUPPORT);
-    if(Config.INCLUDE_RAS_SUPPORT.getBooleanValue()){
+    if (Config.INCLUDE_RAS_SUPPORT.getBooleanValue()) {
       final Action openRas = actions.getAction(OpenRASAction.class);
       menu.add(openRas);
     }
@@ -635,10 +635,13 @@ public class IDEMenuBar
     menu.addSeparator();
     final Action importAction = actions.getAction(ImportAction.class);
     menu.add(importAction);
-    final Action openFT = actions.getAction(OpenFTAction.class);
-    menu.add(openFT);
-    final Action openFTSpec = actions.getAction(OpenFTSpecAction.class);
-    menu.add(openFTSpec);
+    addOption(Config.INCLUDE_FT_SUPPORT);
+    if (Config.INCLUDE_FT_SUPPORT.getBooleanValue()) {
+      final Action openFT = actions.getAction(OpenFTAction.class);
+      menu.add(openFT);
+      final Action openFTSpec = actions.getAction(OpenFTSpecAction.class);
+      menu.add(openFTSpec);
+    }
     //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
     final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
     menu.add(epsprint);

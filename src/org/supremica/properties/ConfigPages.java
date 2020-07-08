@@ -190,7 +190,7 @@ public class ConfigPages
     @Override
     public List<Option<?>> getOptions()
     {
-      return createOptionList(TUM_EXTERNAL_ON, INCLUDE_RAS_SUPPORT);
+      return createOptionList(TUM_EXTERNAL_ON, INCLUDE_RAS_SUPPORT, INCLUDE_FT_SUPPORT);
     }
   };
 
