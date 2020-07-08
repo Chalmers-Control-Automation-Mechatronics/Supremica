@@ -35,10 +35,12 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
@@ -67,12 +69,14 @@ public class ShowModuleCommentAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_M);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_EDIT);
     updateEnabledStatus();
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();
@@ -86,6 +90,7 @@ public class ShowModuleCommentAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.CONTAINER_SWITCH) {

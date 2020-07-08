@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 
@@ -41,6 +42,7 @@ import net.sourceforge.waters.gui.analyzer.AnalyzerHideDialog;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -60,6 +62,8 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
     super(ide);
     putValue(Action.NAME, "Hide Events ...");
     putValue(Action.SHORT_DESCRIPTION, "Hide events in the selected automaton");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_H);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_HIDE);
     updateEnabledStatus();
   }
 

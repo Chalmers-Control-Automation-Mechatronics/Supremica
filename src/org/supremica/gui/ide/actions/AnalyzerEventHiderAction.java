@@ -39,11 +39,11 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Automata;
 import org.supremica.gui.EventHider;
-import org.supremica.gui.ide.IDE;
 
 
 public class AnalyzerEventHiderAction
@@ -62,7 +62,7 @@ public class AnalyzerEventHiderAction
         putValue(Action.SHORT_DESCRIPTION, "Hide the identity of events (making them unobservable)");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/supremica/hide16.gif")));
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_HIDE);
     }
 
     @Override

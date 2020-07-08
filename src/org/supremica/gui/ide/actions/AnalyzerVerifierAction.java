@@ -41,10 +41,10 @@ import java.net.URI;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 import org.supremica.automata.Automata;
@@ -55,7 +55,6 @@ import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.AutomataVerificationWorker;
 import org.supremica.gui.VerificationDialog;
 import org.supremica.gui.ide.DocumentContainer;
-import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -74,7 +73,7 @@ public class AnalyzerVerifierAction
         putValue(Action.SHORT_DESCRIPTION, "Run verification on the selected automata");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_V));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/verify16.gif")));
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
     }
 
     @Override

@@ -284,12 +284,14 @@ public class IconAndFontLoader
     "controllable_error";
   private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
     "controllable_unobservable";
+  private static final String NAME_EDIT = "edit";
   private static final String NAME_EVENT = "event";
   private static final String NAME_EVENT_ALIAS = "event_alias";
   private static final String NAME_EVENT_ALIAS_ERROR = "event_alias_error";
   private static final String NAME_FOREACH = "foreach";
   private static final String NAME_FOREACH_ERROR = "foreach_error";
   private static final String NAME_FORBIDDEN = "ForbiddenState16";
+  private static final String NAME_HIDE = "hide";
   private static final String NAME_INSTANCE = "instance";
   private static final String NAME_INSTANCE_ERROR = "instance_error";
   private static final String NAME_NEW_AUTOMATON = "new_automaton";
@@ -377,6 +379,7 @@ public class IconAndFontLoader
     getWatersIcon(NAME_CONTROLLABLE_OBSERVABLE_ERROR);
   public static final ImageIcon ICON_CONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_UNOBSERVABLE);
+  public static final ImageIcon ICON_EDIT = getWatersIcon(NAME_EDIT);
   public static final ImageIcon ICON_EVENT = getWatersIcon(NAME_EVENT);
   public static final ImageIcon ICON_EVENT_ALIAS = getWatersIcon(NAME_EVENT_ALIAS);
   public static final ImageIcon ICON_EVENT_ALIAS_ERROR =
@@ -384,6 +387,7 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_FORBIDDEN = getSupremicaIcon(NAME_FORBIDDEN);
   public static final ImageIcon ICON_FOREACH = getWatersIcon(NAME_FOREACH);
   public static final ImageIcon ICON_FOREACH_ERROR = getWatersIcon(NAME_FOREACH_ERROR);
+  public static final ImageIcon ICON_HIDE = getWatersIcon(NAME_HIDE);
   public static final ImageIcon ICON_INSTANCE = getWatersIcon(NAME_INSTANCE);
   public static final ImageIcon ICON_INSTANCE_ERROR =
     getWatersIcon(NAME_INSTANCE_ERROR);

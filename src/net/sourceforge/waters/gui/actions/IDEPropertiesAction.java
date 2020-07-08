@@ -57,6 +57,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -120,6 +121,7 @@ public class IDEPropertiesAction extends WatersAction
     super(ide);
     mActionArgument = arg;
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_EDIT);
     mVisitor = new PropertiesVisitor();
     updateEnabledStatus();
   }
