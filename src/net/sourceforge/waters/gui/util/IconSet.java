@@ -40,6 +40,7 @@ public enum IconSet
   WATERS_16("16x16", IconSet.REFERENCE_SIZE),
   WATERS_20("20x20", 20),
   WATERS_24("24x24", 24),
+  WATERS_32("32x32", 32),
   SUPREMICA("supremica", IconSet.REFERENCE_SIZE);
 
 
