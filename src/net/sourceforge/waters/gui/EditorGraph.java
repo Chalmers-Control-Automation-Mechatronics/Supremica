@@ -2101,9 +2101,6 @@ class EditorGraph
       final ForeachSubject fForeach = (ForeachSubject) mFake;
       visitNestedBlockProxy(fake);
       visitProxies(oForeach.getRange(), fForeach.getRange());
-      if (oForeach.getGuard() != null) {
-        visitProxies(oForeach.getGuard(), fForeach.getGuard());
-      }
       return null;
     }
 

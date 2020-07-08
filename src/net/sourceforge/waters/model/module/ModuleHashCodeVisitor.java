@@ -283,9 +283,6 @@ public class ModuleHashCodeVisitor
     final SimpleExpressionProxy range = proxy.getRange();
     result *= 5;
     result += computeProxyHashCode(range);
-    final SimpleExpressionProxy guard = proxy.getGuard();
-    result *= 5;
-    result += computeProxyHashCode(guard);
     return result;
   }
 

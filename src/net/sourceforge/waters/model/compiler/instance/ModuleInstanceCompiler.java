@@ -677,18 +677,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       for (final SimpleExpressionProxy item : crange.getValues()) {
         try {
           mContext = new SingleBindingContext(mFactory, name, item, root);
-          final SimpleExpressionProxy guard = foreach.getGuard();
-          if (guard == null) {
-            visitCollection(body);
-          } else {
-            final SimpleExpressionProxy gvalue =
-              mSimpleExpressionCompiler.eval(guard, mContext);
-            final boolean gboolean =
-              mSimpleExpressionCompiler.getBooleanValue(gvalue);
-            if (gboolean) {
-              visitCollection(body);
-            }
-          }
+          visitCollection(body);
         } finally {
           mContext = root;
         }

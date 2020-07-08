@@ -414,11 +414,6 @@ public class ModuleEqualityVisitor
       if (!mNonReportingEqualityVisitor.equals(range1, range2)) {
         return reportAttributeMismatch("range", range1, range2);
       }
-      final SimpleExpressionProxy guard1 = proxy.getGuard();
-      final SimpleExpressionProxy guard2 = expected.getGuard();
-      if (!mNonReportingEqualityVisitor.equals(guard1, guard2)) {
-        return reportAttributeMismatch("guard", guard1, guard2);
-      }
       return true;
     } else {
       return false;

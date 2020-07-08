@@ -64,24 +64,20 @@ public final class ForeachElement
    * @param body The list of body objects of the new foreach construct, or <CODE>null</CODE> if empty.
    * @param name The name of the dummy variable of the new foreach construct.
    * @param range The range of the new foreach construct.
-   * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
    */
   public ForeachElement(final Collection<? extends Proxy> body,
                         final String name,
-                        final SimpleExpressionProxy range,
-                        final SimpleExpressionProxy guard)
+                        final SimpleExpressionProxy range)
   {
     super(body);
     mName = name;
     mRange = range;
-    mGuard = guard;
   }
 
   /**
    * Creates a new foreach construct using default values.
    * This constructor creates a foreach construct with
-   * an empty list of body objects and
-   * the guard set to <CODE>null</CODE>.
+   * an empty list of body objects.
    * @param name The name of the dummy variable of the new foreach construct.
    * @param range The range of the new foreach construct.
    */
@@ -90,8 +86,7 @@ public final class ForeachElement
   {
     this(null,
          name,
-         range,
-         null);
+         range);
   }
 
 
@@ -134,21 +129,15 @@ public final class ForeachElement
     return mRange;
   }
 
-  public SimpleExpressionProxy getGuard()
-  {
-    return mGuard;
-  }
-
 
   //#########################################################################
   //# Data Members
   private final String mName;
   private final SimpleExpressionProxy mRange;
-  private final SimpleExpressionProxy mGuard;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -7317672384697200481L;
+  private static final long serialVersionUID = 5561734081433945027L;
 
 }

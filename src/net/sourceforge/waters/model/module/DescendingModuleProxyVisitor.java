@@ -207,10 +207,6 @@ public class DescendingModuleProxyVisitor
     visitNestedBlockProxy(proxy);
     final SimpleExpressionProxy range = proxy.getRange();
     range.acceptVisitor(this);
-    final SimpleExpressionProxy guard = proxy.getGuard();
-    if (guard != null) {
-      guard.acceptVisitor(this);
-    }
     return null;
   }
 

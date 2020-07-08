@@ -206,19 +206,7 @@ public class HTMLPrinter
       printHTML("<TD>");
     }
     range.acceptVisitor(this);
-    printHTML("</TD>");
-    final SimpleExpressionProxy guard = proxy.getGuard();
-    if (guard != null) {
-      printHTML("<TD>&nbsp;<B>WHERE</B>&nbsp;</TD>");
-      if (errors.isUnderlined(guard)) {
-        printHTML("<TD " + UNDERLINE_STYLE + ">");
-      } else {
-        printHTML("<TD>");
-      }
-      guard.acceptVisitor(this);
-      printHTML("</TD>");
-    }
-    printHTML("</TR></TABLE>");
+    printHTML("</TD></TR></TABLE>");
     return null;
   }
 

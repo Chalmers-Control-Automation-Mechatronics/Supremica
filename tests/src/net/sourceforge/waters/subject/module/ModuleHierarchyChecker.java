@@ -226,8 +226,6 @@ class ModuleHierarchyChecker
   {
     final SimpleExpressionProxy range = proxy.getRange();
     visitProxyChild(range, proxy);
-    final SimpleExpressionProxy guard = proxy.getGuard();
-    visitOptionalProxyChild(guard, proxy);
     return visitNestedBlockProxy(proxy);
   }
 

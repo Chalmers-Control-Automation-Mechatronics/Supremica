@@ -255,13 +255,11 @@ public class ModuleElementFactory
   public ForeachElement createForeachProxy
       (final Collection<? extends Proxy> body,
        final String name,
-       final SimpleExpressionProxy range,
-       final SimpleExpressionProxy guard)
+       final SimpleExpressionProxy range)
   {
     return new ForeachElement(body,
                               name,
-                              range,
-                              guard);
+                              range);
   }
 
   public ForeachElement createForeachProxy

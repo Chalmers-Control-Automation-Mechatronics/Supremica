@@ -243,19 +243,16 @@ public interface ModuleProxyFactory
    * @param body The list of body objects of the new foreach construct, or <CODE>null</CODE> if empty.
    * @param name The name of the dummy variable of the new foreach construct.
    * @param range The range of the new foreach construct.
-   * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
    */
   public ForeachProxy createForeachProxy
       (Collection<? extends Proxy> body,
        String name,
-       SimpleExpressionProxy range,
-       SimpleExpressionProxy guard);
+       SimpleExpressionProxy range);
 
   /**
    * Creates a new foreach construct using default values.
    * This method creates a foreach construct with
-   * an empty list of body objects and
-   * the guard set to <CODE>null</CODE>.
+   * an empty list of body objects.
    * @param name The name of the dummy variable of the new foreach construct.
    * @param range The range of the new foreach construct.
    */

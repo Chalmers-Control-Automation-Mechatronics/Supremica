@@ -156,8 +156,7 @@ public class ProxyNamerTest extends AbstractWatersTest
       mFactory.createSimpleIdentifierProxy("range");
     final ForeachProxy inner = mFactory.createForeachProxy("j", range);
     final List<ForeachProxy> list = Collections.singletonList(inner);
-    final ForeachProxy outer =
-      mFactory.createForeachProxy(list, "j", range, null);
+    final ForeachProxy outer = mFactory.createForeachProxy(list, "j", range);
     testName("Foreach Blocks", outer);
   }
 
@@ -170,8 +169,7 @@ public class ProxyNamerTest extends AbstractWatersTest
     final List<SimpleComponentProxy> list = Collections.singletonList(comp);
     final SimpleExpressionProxy range =
       mFactory.createSimpleIdentifierProxy("range");
-    final ForeachProxy foreach =
-      mFactory.createForeachProxy(list, "i", range, null);
+    final ForeachProxy foreach = mFactory.createForeachProxy(list, "i", range);
     testName("Automata", foreach);
   }
 
@@ -181,8 +179,7 @@ public class ProxyNamerTest extends AbstractWatersTest
     final List<IdentifierProxy> list = Collections.singletonList(ident);
     final SimpleExpressionProxy range =
       mFactory.createSimpleIdentifierProxy("range");
-    final ForeachProxy foreach =
-      mFactory.createForeachProxy(list, "i", range, null);
+    final ForeachProxy foreach = mFactory.createForeachProxy(list, "i", range);
     testName("Labels", foreach);
   }
 

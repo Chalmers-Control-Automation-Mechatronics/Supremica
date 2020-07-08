@@ -54,15 +54,17 @@ import net.sourceforge.waters.model.base.NamedProxy;
  * </PRE>
  *
  * <P>A more complicated example is the following, which consists of two
- * nested foreach constructs and includes a guard, creating instances
+ * nested foreach constructs and a conditional block ({@link
+ * ConditionalProxy}), creating instances
  * <CODE>square[1][2]</CODE>, <CODE>square[1][3]</CODE>,
  * <CODE>square[2][1]</CODE>, <CODE>square[2][3]</CODE>,
  * <CODE>square[3][2]</CODE>, and <CODE>square[3][3]</CODE>.</P>
  *
  * <PRE>
  *   FOREACH i IN 1..3
- *     FOREACH j IN 1..3 WHERE i != j
- *       instance square[i][j] = square(...);
+ *     FOREACH j IN 1..3
+ *       IF i != j
+ *         instance square[i][j] = square(...);
  * </PRE>
  *
  * <P>Every foreach construct contains the following information.</P>
@@ -77,14 +79,6 @@ import net.sourceforge.waters.model.base.NamedProxy;
  * <DD>An expression that evaluates to the range of values to be assumed
  * by the dummy variable during iteration. In the examples above, the
  * ranges are <CODE>1..2</CODE> or&nbsp;<CODE>1..2</CODE>, respectively.</DD>
- * <DT><I>Guard.</I></DT>
- * <DD>An optional expression that evaluates to an integer, <CODE>0</CODE>
- * indicating <I>false</I> and other numbers indicating
- * <CODE>true</CODE>. The body of a foreach construct will only be
- * evaluated for those entries in the range where the guard evaluates to
- * <I>true</I>. A missing guard is assumed to be always <I>true</I>. In
- * the above examples, only the last foreach construct has a guard,
- * <CODE>i&nbsp;!=&nbsp;j</CODE>.</DD>
  * <DT><I>Body.</I></DT>
  * <DD>A list of entries that are to be evaluated for each assignment of
  * the dummy variable to an element in the range, provided that the guard
@@ -114,13 +108,5 @@ public interface ForeachProxy extends NestedBlockProxy
    *         of iteration.
    */
   public SimpleExpressionProxy getRange();
-
-  /**
-   * Gets the guard of this foreach construct.
-   * @return An expression that evaluates to an integer and represents the
-   *         guard, or <CODE>null</CODE> to indicate that there is no guard.
-   */
-  // @optional
-  public SimpleExpressionProxy getGuard();
 
 }

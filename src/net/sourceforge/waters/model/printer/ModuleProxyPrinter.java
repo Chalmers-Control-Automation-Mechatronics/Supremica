@@ -363,11 +363,6 @@ public class ModuleProxyPrinter
     print(" IN ");
     final SimpleExpressionProxy range = proxy.getRange();
     range.acceptVisitor(this);
-    final SimpleExpressionProxy guard = proxy.getGuard();
-    if (guard != null) {
-      print(" WHERE ");
-      guard.acceptVisitor(this);
-    }
     return visitNestedBlockProxy(proxy);
   }
 

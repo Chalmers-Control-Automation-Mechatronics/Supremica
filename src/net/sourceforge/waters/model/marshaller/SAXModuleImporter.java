@@ -38,6 +38,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -634,7 +635,14 @@ public class SAXModuleImporter
         mGuardHandler == null ? null : mGuardHandler.getResult();
       final List<Proxy> body =
         mBodyHandler == null ? null : mBodyHandler.getResult();
-      return mFactory.createForeachProxy(body, mName, range, guard);
+      if (guard == null) {
+        return mFactory.createForeachProxy(body, mName, range);
+      } else {
+        final ConditionalProxy cond =
+          mFactory.createConditionalProxy(body, guard);
+        final List<Proxy> list = Collections.singletonList(cond);
+        return mFactory.createForeachProxy(list, mName, range);
+      }
     }
 
     //#######################################################################

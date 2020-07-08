@@ -191,12 +191,6 @@ public class ForeachEditorDialog
     mRangeInput.addSimpleDocumentListener(okEnablement);
     mRangeInput.setToolTipText
       ("Enter the index range, e.g., 1..10 or [a,b,c].");
-    mGuardLabel = new JLabel("Guard:");
-    final SimpleExpressionProxy oldGuard = template.getGuard();
-    mGuardInput =
-      new SimpleExpressionInputCell(oldGuard, Operator.TYPE_BOOLEAN, parser, true);
-    mGuardInput.addActionListener(commitHandler);
-    mGuardInput.setToolTipText("Optionally enter a Boolean expression.");
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -204,7 +198,6 @@ public class ForeachEditorDialog
     mErrorPanel.add(mErrorLabel);
     mVariableInput.setErrorDisplay(mErrorLabel);
     mRangeInput.setErrorDisplay(mErrorLabel);
-    mGuardInput.setErrorDisplay(mErrorLabel);
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
@@ -274,21 +267,6 @@ public class ForeachEditorDialog
     constraints.fill = GridBagConstraints.HORIZONTAL;
     mainlayout.setConstraints(mRangeInput, constraints);
     mMainPanel.add(mRangeInput);
-    // mGuardLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mGuardLabel, constraints);
-    mMainPanel.add(mGuardLabel);
-    // mGuardInput
-    mGuardInput.setColumns(20);
-    constraints.gridx++;
-    constraints.gridwidth = 1;
-    constraints.weightx = 1.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mGuardInput, constraints);
-    mMainPanel.add(mGuardInput);
 
     // Error and buttons panel do not need layouting.
 
@@ -343,14 +321,10 @@ public class ForeachEditorDialog
       final SimpleExpressionSubject range0 =
         (SimpleExpressionSubject) mRangeInput.getValue();
       final SimpleExpressionSubject range = makeUnique(range0);
-      final SimpleExpressionSubject guard0 =
-        (SimpleExpressionSubject) mGuardInput.getValue();
-      final SimpleExpressionSubject guard = makeUnique(guard0);
       if (mForeach == null) {
         final ForeachSubject template = TEMPLATE.clone();
         template.setName(name);
         template.setRange(range);
-        template.setGuard(guard);
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
         final Command command = new InsertCommand(list, mPanel, mRoot);
@@ -362,18 +336,13 @@ public class ForeachEditorDialog
         final SimpleExpressionSubject oldrange = mForeach.getRange();
         final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final boolean rangechange = !eq.equals(range, oldrange);
-        final SimpleExpressionSubject oldguard = mForeach.getGuard();
-        final boolean guardchange = !eq.equals(guard, oldguard);
-        if (namechange || rangechange || guardchange) {
+        if (namechange || rangechange) {
           final ForeachSubject template = mForeach.clone();
           if (namechange) {
             template.setName(name);
           }
           if (rangechange) {
             template.setRange(range);
-          }
-          if (guardchange) {
-            template.setGuard(guard);
           }
           final Command command = new EditCommand(mForeach, template, mPanel);
           executeCommand(command);
@@ -434,8 +403,6 @@ public class ForeachEditorDialog
   private SimpleExpressionInputCell mVariableInput;
   private JLabel mRangeLabel;
   private SimpleExpressionInputCell mRangeInput;
-  private JLabel mGuardLabel;
-  private SimpleExpressionInputCell mGuardInput;
 
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;

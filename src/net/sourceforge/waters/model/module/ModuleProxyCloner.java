@@ -329,13 +329,9 @@ public class ModuleProxyCloner
     final SimpleExpressionProxy range0 = proxy.getRange();
     final SimpleExpressionProxy range =
       (SimpleExpressionProxy) cloneProxy(range0);
-    final SimpleExpressionProxy guard0 = proxy.getGuard();
-    final SimpleExpressionProxy guard =
-      (SimpleExpressionProxy) cloneProxy(guard0);
     return mFactory.createForeachProxy(body,
                                        name,
-                                       range,
-                                       guard);
+                                       range);
   }
 
   @Override

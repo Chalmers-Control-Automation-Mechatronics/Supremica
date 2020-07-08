@@ -295,7 +295,6 @@ public class StAXModuleWriter
     writeAttribute(SchemaBase.ATTRIB_Name, foreach.getName());
     visitNestedBlockProxy(foreach);
     foreach.getRange().acceptVisitor(this);
-    writeOptionalItem(foreach.getGuard());
     writeOptionalList(NAMESPACE, mListType.getListName(), foreach.getBody());
     writeEndElement();
     return null;

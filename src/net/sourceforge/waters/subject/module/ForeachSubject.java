@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -73,28 +72,21 @@ public final class ForeachSubject
    * @param body The list of body objects of the new foreach construct, or <CODE>null</CODE> if empty.
    * @param name The name of the dummy variable of the new foreach construct.
    * @param range The range of the new foreach construct.
-   * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
    */
   public ForeachSubject(final Collection<? extends Proxy> body,
                         final String name,
-                        final SimpleExpressionProxy range,
-                        final SimpleExpressionProxy guard)
+                        final SimpleExpressionProxy range)
   {
     super(body);
     mName = name;
     mRange = (SimpleExpressionSubject) range;
     mRange.setParent(this);
-    mGuard = (SimpleExpressionSubject) guard;
-    if (mGuard != null) {
-      mGuard.setParent(this);
-    }
   }
 
   /**
    * Creates a new foreach construct using default values.
    * This constructor creates a foreach construct with
-   * an empty list of body objects and
-   * the guard set to <CODE>null</CODE>.
+   * an empty list of body objects.
    * @param name The name of the dummy variable of the new foreach construct.
    * @param range The range of the new foreach construct.
    */
@@ -103,8 +95,7 @@ public final class ForeachSubject
   {
     this(null,
          name,
-         range,
-         null);
+         range);
   }
 
 
@@ -135,15 +126,6 @@ public final class ForeachSubject
         mRange = (SimpleExpressionSubject) newValue;
         mRange.setParent(this);
         return ModelChangeEvent.createStateChanged(this);
-      case 4:
-        if (mGuard != null) {
-          mGuard.setParent(null);
-        }
-        mGuard = (SimpleExpressionSubject) newValue;
-        if (mGuard != null) {
-          mGuard.setParent(this);
-        }
-        return ModelChangeEvent.createStateChanged(this);
       default:
         return null;
       }
@@ -171,22 +153,6 @@ public final class ForeachSubject
       final SimpleExpressionSubject clone3 = downcast.mRange.clone();
       final UndoInfo step3 = new ReplacementUndoInfo(3, mRange, clone3);
       info.add(step3);
-    }
-    final boolean null4a = mGuard == null;
-    final boolean null4b = downcast.mGuard == null;
-    if (null4a != null4b ||
-        !null4a && mGuard.getClass() != downcast.mGuard.getClass()) {
-      if (boundary ==  null || !boundary.contains(mGuard)) {
-        final SimpleExpressionSubject clone4 =
-          ProxyTools.clone(downcast.mGuard);
-        final UndoInfo step4 = new ReplacementUndoInfo(4, mGuard, clone4);
-        info.add(step4);
-      }
-    } else if (!null4a) {
-      final UndoInfo step4 = mGuard.createUndoInfo(downcast.mGuard, boundary);
-      if (step4 != null) {
-        info.add(step4);
-      }
     }
   }
 
@@ -221,11 +187,6 @@ public final class ForeachSubject
     return mRange;
   }
 
-  public SimpleExpressionSubject getGuard()
-  {
-    return mGuard;
-  }
-
 
   //#########################################################################
   //# Setters
@@ -255,29 +216,10 @@ public final class ForeachSubject
     fireStateChanged();
   }
 
-  /**
-   * Sets the guard of this foreach construct.
-   */
-  public void setGuard(final SimpleExpressionSubject guard)
-  {
-    if (mGuard == guard) {
-      return;
-    }
-    if (guard != null) {
-      guard.setParent(this);
-    }
-    if (mGuard != null) {
-      mGuard.setParent(null);
-    }
-    mGuard = guard;
-    fireStateChanged();
-  }
-
 
   //#########################################################################
   //# Data Members
   private String mName;
   private SimpleExpressionSubject mRange;
-  private SimpleExpressionSubject mGuard;
 
 }

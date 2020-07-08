@@ -560,6 +560,8 @@ heuristic ||DirectedController = Plant~{Goal}.
 <LabelBlock>
 <ForeachEvent Name="o">
 <SimpleIdentifier Name="Plane"/>
+<EventList>
+<ConditionalEvent>
 <BinaryExpression Operator="!=">
 <SimpleIdentifier Name="o"/>
 <SimpleIdentifier Name="p"/>
@@ -570,9 +572,11 @@ heuristic ||DirectedController = Plant~{Goal}.
 <SimpleIdentifier Name="h"/>
 </IndexedIdentifier>
 </EventList>
+</ConditionalEvent>
+</EventList>
 </ForeachEvent>
 <LabelGeometry Anchor="NW">
-<Point X="7" Y="-18"/>
+<Point X="2" Y="-25"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -580,6 +584,8 @@ heuristic ||DirectedController = Plant~{Goal}.
 <LabelBlock>
 <ForeachEvent Name="o">
 <SimpleIdentifier Name="Plane"/>
+<EventList>
+<ConditionalEvent>
 <BinaryExpression Operator="!=">
 <SimpleIdentifier Name="o"/>
 <SimpleIdentifier Name="p"/>
@@ -590,9 +596,11 @@ heuristic ||DirectedController = Plant~{Goal}.
 <SimpleIdentifier Name="h"/>
 </IndexedIdentifier>
 </EventList>
+</ConditionalEvent>
+</EventList>
 </ForeachEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-33" Y="-53"/>
+<Point X="-19" Y="-53"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -604,11 +612,7 @@ heuristic ||DirectedController = Plant~{Goal}.
 </Edge>
 <Edge Source="Occupied" Target="Empty">
 <LabelBlock>
-<ForeachEvent Name="x">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
+<ConditionalEvent>
 <BinaryExpression Operator="&gt;">
 <SimpleIdentifier Name="h"/>
 <IntConstant Value="0"/>
@@ -622,12 +626,8 @@ heuristic ||DirectedController = Plant~{Goal}.
 </BinaryExpression>
 </IndexedIdentifier>
 </EventList>
-</ForeachEvent>
-<ForeachEvent Name="x">
-<BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
+</ConditionalEvent>
+<ConditionalEvent>
 <BinaryExpression Operator="==">
 <SimpleIdentifier Name="h"/>
 <IntConstant Value="0"/>
@@ -637,9 +637,9 @@ heuristic ||DirectedController = Plant~{Goal}.
 <SimpleIdentifier Name="p"/>
 </IndexedIdentifier>
 </EventList>
-</ForeachEvent>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-181" Y="-25"/>
+<Point X="-119" Y="-26"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>

@@ -253,14 +253,11 @@ class IdentifierDataFlavor extends ModuleDataFlavor
       final SimpleExpressionProxy range = foreach.getRange();
       final SimpleExpressionProxy newRange =
         (SimpleExpressionProxy) cloner.getClone(range);
-      final SimpleExpressionProxy guard = foreach.getGuard();
-      final SimpleExpressionProxy newGuard =
-        (SimpleExpressionProxy) cloner.getClone(guard);
       final List<Proxy> backup = mExportList;
       final List<Proxy> body = foreach.getBody();
       visitCollection(body);
       final ForeachProxy newForeach =
-        mFactory.createForeachProxy(mExportList, name, newRange, newGuard);
+        mFactory.createForeachProxy(mExportList, name, newRange);
       mExportList = backup;
       mExportList.add(newForeach);
       return null;

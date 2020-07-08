@@ -39,6 +39,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -80,6 +81,15 @@ public class PlainTextPrinter
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.printer.ModuleProxyVisitor
   @Override
+  public Object visitConditionalProxy(final ConditionalProxy proxy)
+    throws VisitorException
+  {
+    print("IF ");
+    final SimpleExpressionProxy guard = proxy.getGuard();
+    return guard.acceptVisitor(this);
+  }
+
+  @Override
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -95,21 +105,14 @@ public class PlainTextPrinter
   }
 
   @Override
-  public Object visitForeachProxy
-      (final ForeachProxy proxy)
+  public Object visitForeachProxy(final ForeachProxy proxy)
     throws VisitorException
   {
     print("FOR ");
     print(proxy.getName());
     print(" IN ");
     final SimpleExpressionProxy range = proxy.getRange();
-    range.acceptVisitor(this);
-    final SimpleExpressionProxy guard = proxy.getGuard();
-    if (guard != null) {
-      print(" WHERE ");
-      guard.acceptVisitor(this);
-    }
-    return null;
+    return range.acceptVisitor(this);
   }
 
   @Override
@@ -132,8 +135,7 @@ public class PlainTextPrinter
     print(proxy.getName());
     print(" = ");
     final ExpressionProxy expression = proxy.getExpression();
-    expression.acceptVisitor(this);
-    return null;
+    return expression.acceptVisitor(this);
   }
 
   @Override
@@ -142,8 +144,7 @@ public class PlainTextPrinter
     throws VisitorException
   {
     final IdentifierProxy identifier = proxy.getIdentifier();
-    identifier.acceptVisitor(this);
-    return null;
+    return identifier.acceptVisitor(this);
   }
 
 }

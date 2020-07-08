@@ -566,12 +566,6 @@ public class ProxyShapeProducer
     builder.add(keyword, "IN");
     builder.add(" ");
     builder.add(foreach.getRange());
-    if (foreach.getGuard() != null) {
-      builder.add(" ");
-      builder.add(keyword, "WHERE");
-      builder.add(" ");
-      builder.add(foreach.getGuard());
-    }
     return builder.create(foreach, x, y, mMap);
   }
 
