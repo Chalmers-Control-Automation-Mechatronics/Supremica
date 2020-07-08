@@ -46,6 +46,7 @@ import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -85,6 +86,7 @@ public abstract class WatersVerificationAction
     putValue(Action.NAME, getCheckName() + " check");
     putValue(Action.SHORT_DESCRIPTION,
              "Check for " + getCheckName() + " issues");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
     final EnumOption<ModelAnalyzerFactoryLoader> option = getSelectorOption();
     if (option != null) {
       option.addPropertyChangeListener(this);

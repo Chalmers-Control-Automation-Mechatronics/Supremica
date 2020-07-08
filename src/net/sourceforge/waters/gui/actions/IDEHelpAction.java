@@ -37,7 +37,8 @@ import java.awt.event.ActionEvent;
 
 import javax.help.CSH;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.help.ContentHelp;
 import org.supremica.gui.ide.IDE;
@@ -62,8 +63,7 @@ public class IDEHelpAction extends IDEAction
     super(ide);
     putValue(Action.NAME, "Supervisory Control ...");
     putValue(Action.SHORT_DESCRIPTION, "Information on supervisory control theory");
-    putValue(Action.SMALL_ICON, new ImageIcon
-      (IDE.class.getResource("/toolbarButtonGraphics/development/WebComponent16.gif")));
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_WWW);
     final ContentHelp help = new ContentHelp();
     mHelpDisplayer =
       new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());

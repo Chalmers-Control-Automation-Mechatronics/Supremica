@@ -40,6 +40,7 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.LanguageInclusionCheckDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
@@ -61,7 +62,7 @@ public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
   {
     super(ide);
     putValue(Action.NAME, "Language Inclusion Check ...");
-    //putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
     //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
     //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
     updateEnabledStatus();

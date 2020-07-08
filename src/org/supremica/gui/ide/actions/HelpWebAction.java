@@ -39,35 +39,40 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 
-import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
 import org.supremica.util.BrowserControl;
 
 
-public class HelpWebAction
-	extends IDEAction
+public class HelpWebAction extends IDEAction
 {
-	private static final long serialVersionUID = 1L;
 
-	public HelpWebAction(final List<IDEAction> actionList)
-	{
-		super(actionList);
+  //#########################################################################
+  //# Constructor
+  public HelpWebAction(final List<IDEAction> actionList)
+  {
+    super(actionList);
+    putValue(Action.NAME, "Supremica Website ...");
+    putValue(Action.SHORT_DESCRIPTION, "Supremica on the Web");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_WWW);
+  }
 
-		putValue(Action.NAME, "Supremica Website ...");
-		putValue(Action.SHORT_DESCRIPTION, "Supremica on the Web");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/development/WebComponent16.gif")));
-	}
-
-	@Override
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent e)
-	{
-		doAction();
-	}
+  {
+    doAction();
+  }
 
-	@Override
+  @Override
   public void doAction()
-	{
-		BrowserControl.displayURL("http://www.supremica.org");
-	}
+  {
+    BrowserControl.displayURL("http://www.supremica.org");
+  }
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -6581792380846714376L;
 }

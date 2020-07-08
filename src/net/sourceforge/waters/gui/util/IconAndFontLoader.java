@@ -344,7 +344,9 @@ public class IconAndFontLoader
     "uncontrollable_error";
   private static final String NAME_UNCONTROLLABLE_UNOBSERVABLE =
     "uncontrollable_unobservable";
+  private static final String NAME_WWW = "www";
   private static final String NAME_VARIABLE = "variable";
+  private static final String NAME_VERIFY = "verify";
   private static final String NAME_YES = "yes";
 
 
@@ -436,7 +438,9 @@ public class IconAndFontLoader
     getWatersIcon(NAME_UNCONTROLLABLE_OBSERVABLE_ERROR);
   public static final ImageIcon ICON_UNCONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
+  public static final ImageIcon ICON_WWW = getWatersIcon(NAME_WWW);
   public static final ImageIcon ICON_VARIABLE = getWatersIcon(NAME_VARIABLE);
+  public static final ImageIcon ICON_VERIFY = getWatersIcon(NAME_VERIFY);
   public static final ImageIcon ICON_YES = getWatersIcon(NAME_YES);
 
   // Simulator
