@@ -43,6 +43,7 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -69,6 +70,7 @@ public class InsertNodeSelfloopAction
     mActionArgument = arg;
     putValue(Action.NAME, "Add Selfloop");
     putValue(Action.SHORT_DESCRIPTION, "Add a selfloop to this state");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SELFLOOP);
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
     setEnabled(true);
   }

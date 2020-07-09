@@ -49,6 +49,7 @@ import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -93,6 +94,7 @@ public class EditNodeInitialAction
   {
     super(ide);
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_I);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_INITIAL);
     final SimpleNodeSubject node = (SimpleNodeSubject) arg;
     mInitial = node.isInitial();
     final GraphSubject graph = (GraphSubject) node.getParent().getParent();

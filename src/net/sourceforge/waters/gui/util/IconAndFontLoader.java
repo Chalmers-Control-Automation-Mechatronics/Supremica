@@ -292,6 +292,7 @@ public class IconAndFontLoader
   private static final String NAME_FOREACH_ERROR = "foreach_error";
   private static final String NAME_FORBIDDEN = "ForbiddenState16";
   private static final String NAME_HIDE = "hide";
+  private static final String NAME_INITIAL = "initial";
   private static final String NAME_INSTANCE = "instance";
   private static final String NAME_INSTANCE_ERROR = "instance_error";
   private static final String NAME_NEW_AUTOMATON = "new_automaton";
@@ -315,6 +316,7 @@ public class IconAndFontLoader
   private static final String NAME_SIMULATOR_AUTOSTEP = "simulator_autostep";
   private static final String NAME_SIMULATOR_TO_END = "simulator_to_end";
   private static final String NAME_SIMULATOR_TO_START = "simulator_to_start";
+  private static final String NAME_SELFLOOP = "selfloop";
   private static final String NAME_SPEC = "specification";
   private static final String NAME_SPEC_ERROR = "specification_error";
   private static final String NAME_SUPERVISOR = "supervisor";
@@ -388,6 +390,7 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_FOREACH = getWatersIcon(NAME_FOREACH);
   public static final ImageIcon ICON_FOREACH_ERROR = getWatersIcon(NAME_FOREACH_ERROR);
   public static final ImageIcon ICON_HIDE = getWatersIcon(NAME_HIDE);
+  public static final ImageIcon ICON_INITIAL = getWatersIcon(NAME_INITIAL);
   public static final ImageIcon ICON_INSTANCE = getWatersIcon(NAME_INSTANCE);
   public static final ImageIcon ICON_INSTANCE_ERROR =
     getWatersIcon(NAME_INSTANCE_ERROR);
@@ -408,6 +411,7 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_PROPERTY = getWatersIcon(NAME_PROPERTY);
   public static final ImageIcon ICON_PROPERTY_ERROR =
     getWatersIcon(NAME_PROPERTY_ERROR);
+  public static final ImageIcon ICON_SELFLOOP = getWatersIcon(NAME_SELFLOOP);
   public static final ImageIcon ICON_SPEC = getWatersIcon(NAME_SPEC);
   public static final ImageIcon ICON_SPEC_ERROR = getWatersIcon(NAME_SPEC_ERROR);
   public static final ImageIcon ICON_SUPERVISOR = getWatersIcon(NAME_SUPERVISOR);
