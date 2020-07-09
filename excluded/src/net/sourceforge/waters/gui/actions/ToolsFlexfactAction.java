@@ -75,7 +75,6 @@ public class ToolsFlexfactAction
         putValue(Action.SHORT_DESCRIPTION, "Establish connection with the Flexfact simulator");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/processeditor/icon.ico")));
     }
 
     @Override

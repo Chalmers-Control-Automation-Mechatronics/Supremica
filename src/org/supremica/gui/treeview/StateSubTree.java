@@ -35,7 +35,9 @@
 
 package org.supremica.gui.treeview;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
 import org.supremica.automata.State;
 import org.supremica.gui.Supremica;
 
@@ -48,30 +50,30 @@ public class StateSubTree
     private static ImageIcon markedStateIcon = new ImageIcon(Supremica.class.getResource("/icons/MarkedState16.gif"));
     private static ImageIcon markedInitialStateIcon = new ImageIcon(Supremica.class.getResource("/icons/MarkedInitialState16.gif"));
     private static ImageIcon forbiddenInitialStateIcon = new ImageIcon(Supremica.class.getResource("/icons/ForbiddenInitialState16.gif"));
-    private static ImageIcon initialStateIcon = new ImageIcon(Supremica.class.getResource("/icons/InitialState16.gif"));
+    private static ImageIcon initialStateIcon = new ImageIcon(Supremica.class.getResource("/icons/supremica/initial.gif"));
     private static ImageIcon forbiddenStateIcon = new ImageIcon(Supremica.class.getResource("/icons/ForbiddenState16.gif"));
 
-    public StateSubTree(State state)
+    public StateSubTree(final State state)
     {
         super(state);    // Note that this also caches the state for quick access
 
         if (state.isInitial())
         {
-            SupremicaTreeNode initial = new SupremicaTreeNode("initial");
+            final SupremicaTreeNode initial = new SupremicaTreeNode("initial");
 
             add(initial);
         }
 
         if (state.isForbidden())
         {
-            SupremicaTreeNode forbidden = new SupremicaTreeNode("forbidden");
+            final SupremicaTreeNode forbidden = new SupremicaTreeNode("forbidden");
 
             add(forbidden);
         }
 
         if (state.isAccepting())
         {
-            SupremicaTreeNode accepting = new SupremicaTreeNode("accepting");
+            final SupremicaTreeNode accepting = new SupremicaTreeNode("accepting");
 
             add(accepting);
         }
@@ -81,7 +83,7 @@ public class StateSubTree
     // That is, the number of initial/accepting/forbidden leaf nodes
     public int numDirectLeafs()
     {
-        State state = (State) getUserObject();
+        final State state = (State) getUserObject();
         int directleafs = 0;
 
         if (state.isInitial())
@@ -102,6 +104,7 @@ public class StateSubTree
         return directleafs;
     }
 
+    @Override
     public Icon getOpenIcon()
     {
         //return null;
@@ -134,18 +137,21 @@ public class StateSubTree
         }
     }
 
+    @Override
     public Icon getClosedIcon()
     {
         //return null;
         return getOpenIcon();
     }
 
+    @Override
     public Icon getLeafIcon()
-    {        
+    {
         //return null;
         return getOpenIcon();
     }
 
+    @Override
     public String toString()
     {
         return ((State) userObject).getName();
