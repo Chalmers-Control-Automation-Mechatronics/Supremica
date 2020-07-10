@@ -39,6 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -76,6 +77,7 @@ public class DesktopEditAction extends WatersDesktopAction
       putValue(Action.NAME, "Edit Automaton");
     }
     putValue(Action.SHORT_DESCRIPTION, "Open this automaton in the editor");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_EDIT_AUTOMATON);
     setEnabled(comp != null);
   }
 

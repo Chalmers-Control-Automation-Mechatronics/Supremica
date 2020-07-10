@@ -39,6 +39,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -70,8 +71,9 @@ public class ShowGraphAction
   {
     super(ide);
     mActionArgument = arg;
-    putValue(Action.NAME, "Show Automaton");
-    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
+    putValue(Action.NAME, "Edit Automaton");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_E);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_EDIT_AUTOMATON);
     updateEnabledStatus();
   }
 
@@ -114,10 +116,11 @@ public class ShowGraphAction
     }
     setEnabled(enabled);
     if (enabled) {
-      putValue(Action.SHORT_DESCRIPTION, "Show the graph for this automaton");
+      putValue(Action.SHORT_DESCRIPTION,
+               "Show and edit the graph for this automaton");
     } else {
       putValue(Action.SHORT_DESCRIPTION,
-               "Show the graph for the selected automaton");
+               "Show and edit the graph for the selected automaton");
     }
   }
 

@@ -285,6 +285,7 @@ public class IconAndFontLoader
   private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
     "controllable_unobservable";
   private static final String NAME_EDIT = "edit";
+  private static final String NAME_EDIT_AUTOMATON = "edit_automaton";
   private static final String NAME_EVENT = "event";
   private static final String NAME_EVENT_ALIAS = "event_alias";
   private static final String NAME_EVENT_ALIAS_ERROR = "event_alias_error";
@@ -382,6 +383,8 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_CONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_EDIT = getWatersIcon(NAME_EDIT);
+  public static final ImageIcon ICON_EDIT_AUTOMATON =
+    getWatersIcon(NAME_EDIT_AUTOMATON);
   public static final ImageIcon ICON_EVENT = getWatersIcon(NAME_EVENT);
   public static final ImageIcon ICON_EVENT_ALIAS = getWatersIcon(NAME_EVENT_ALIAS);
   public static final ImageIcon ICON_EVENT_ALIAS_ERROR =
