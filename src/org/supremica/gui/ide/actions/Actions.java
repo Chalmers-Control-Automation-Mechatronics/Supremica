@@ -62,7 +62,6 @@ public class Actions extends WatersActionManager
         addAction(new SaveAction(ide));
         addAction(new SaveAsAction(ide));
         addAction(new ImportAction(ide));
-        addAction(new CloseAction(ide));
         addAction(new ExitAction(ide));
 
         mIDE = ide;

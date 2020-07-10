@@ -271,6 +271,7 @@ public class IconAndFontLoader
   private static final String NAME_ANALYZER_SYNTH = "analyzer_synth";
   private static final String NAME_APPLICATION = "application";
   private static final String NAME_BINDING = "binding";
+  private static final String NAME_CLOSE = "close";
   private static final String NAME_CONDITIONAL = "conditional";
   private static final String NAME_CONDITIONAL_ERROR = "conditional_error";
   private static final String NAME_CONSOLE_DEBUG = "debug";
@@ -363,6 +364,7 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_ANALYZER_SYNTH =
     getWatersIcon(NAME_ANALYZER_SYNTH);
   public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
+  public static final ImageIcon ICON_CLOSE = getWatersIcon(NAME_CLOSE);
   public static final ImageIcon ICON_CONDITIONAL =
     getWatersIcon(NAME_CONDITIONAL);
   public static final ImageIcon ICON_CONDITIONAL_ERROR =

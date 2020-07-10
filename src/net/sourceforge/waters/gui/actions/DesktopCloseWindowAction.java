@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
@@ -58,6 +59,7 @@ public class DesktopCloseWindowAction extends WatersDesktopAction
       putValue(Action.NAME, "Close " + kindName);
     }
     putValue(Action.SHORT_DESCRIPTION, "Close this Automaton window");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_CLOSE);
     setEnabled(true);
   }
 

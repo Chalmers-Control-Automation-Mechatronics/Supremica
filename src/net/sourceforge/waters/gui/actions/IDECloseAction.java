@@ -33,70 +33,72 @@
 //# carries forward this exception.
 //###########################################################################
 
-package org.supremica.gui.ide.actions;
+package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
 
-public class CloseAction
-    extends net.sourceforge.waters.gui.actions.IDEAction
+/**
+ * An action to close the current module.
+ */
+public class IDECloseAction extends IDEAction
 {
 
-	//#######################################################################
-    //# Constructor
-    CloseAction(final IDE ide)
-    {
-        super(ide);
-        setEnabled(false);
-        putValue(Action.NAME, "Close");
-        putValue(Action.SHORT_DESCRIPTION, "Close the current module");
+  //#########################################################################
+  //# Constructor
+  IDECloseAction(final IDE ide)
+  {
+    super(ide);
+    setEnabled(false);
+    putValue(Action.NAME, "Close");
+    putValue(Action.SHORT_DESCRIPTION, "Close the current module");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_CLOSE);
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    final IDE ide = getIDE();
+    final DocumentContainerManager manager =
+      ide.getDocumentContainerManager();
+    manager.closeActiveContainer();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
+  {
+    switch (event.getKind()) {
+    case CONTAINER_SWITCH:
+      final IDE ide = getIDE();
+      final DocumentContainerManager manager =
+        ide.getDocumentContainerManager();
+      final DocumentContainer container = manager.getActiveContainer();
+      final boolean enabled = container != null;
+      setEnabled(enabled);
+      break;
+    default:
+      break;
     }
+  }
 
 
-    //#######################################################################
-    //# Interface java.awt.event.ActionListener
-    @Override
-    public void actionPerformed(final ActionEvent event)
-    {
-        final IDE ide = getIDE();
-        final DocumentContainerManager manager =
-            ide.getDocumentContainerManager();
-        manager.closeActiveContainer();
-    }
-
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.observer.Observer
-    @Override
-    public void update(final EditorChangedEvent event)
-    {
-        switch (event.getKind()) {
-        case CONTAINER_SWITCH:
-            final IDE ide = getIDE();
-            final DocumentContainerManager manager =
-                ide.getDocumentContainerManager();
-            final DocumentContainer container = manager.getActiveContainer();
-            final boolean enabled = container != null;
-            setEnabled(enabled);
-
-
-            break;
-        default:
-            break;
-        }
-    }
-
-
-	//#######################################################################
-    //# Class Constants
-	private static final long serialVersionUID = 1L;
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1745838946692264741L;
 
 }
