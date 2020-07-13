@@ -189,14 +189,6 @@ public class IconAndFontLoader
     return null;
   }
 
-  private static ImageIcon getSupremicaIcon(final String name)
-  {
-    final Class<?> cls = IconAndFontLoader.class;
-    final String resourcename = "/icons/" + name + ".gif";
-    final URL resource = cls.getResource(resourcename);
-    return new ImageIcon(resource);
-  }
-
   private static List<ImageIcon> getIconList(final String name)
   {
     final IconSet iconSet = Config.GUI_EDITOR_ICONSET.getValue();
@@ -292,7 +284,6 @@ public class IconAndFontLoader
   private static final String NAME_EVENT_ALIAS_ERROR = "event_alias_error";
   private static final String NAME_FOREACH = "foreach";
   private static final String NAME_FOREACH_ERROR = "foreach_error";
-  private static final String NAME_FORBIDDEN = "ForbiddenState16";
   private static final String NAME_HIDE = "hide";
   private static final String NAME_INITIAL = "initial";
   private static final String NAME_INSTANCE = "instance";
@@ -391,7 +382,6 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_EVENT_ALIAS = getWatersIcon(NAME_EVENT_ALIAS);
   public static final ImageIcon ICON_EVENT_ALIAS_ERROR =
     getWatersIcon(NAME_EVENT_ALIAS_ERROR);
-  public static final ImageIcon ICON_FORBIDDEN = getSupremicaIcon(NAME_FORBIDDEN);
   public static final ImageIcon ICON_FOREACH = getWatersIcon(NAME_FOREACH);
   public static final ImageIcon ICON_FOREACH_ERROR = getWatersIcon(NAME_FOREACH_ERROR);
   public static final ImageIcon ICON_HIDE = getWatersIcon(NAME_HIDE);

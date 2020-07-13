@@ -88,6 +88,15 @@ public class PropositionIcon implements Icon
     return MARKED_ICON;
   }
 
+  public static PropositionIcon getForbiddenIcon()
+  {
+    if (FORBIDDEN_ICON == null) {
+      final ColorInfo info = getForbiddenColors();
+      FORBIDDEN_ICON = new PropositionIcon(info);
+    }
+    return FORBIDDEN_ICON;
+  }
+
   public static ColorInfo getNeutralColors()
   {
     if (NEUTRAL_COLORS == null) {
@@ -112,6 +121,14 @@ public class PropositionIcon implements Icon
     return MARKED_COLORS;
   }
 
+  public static ColorInfo getForbiddenColors()
+  {
+    if (FORBIDDEN_COLORS == null) {
+      FORBIDDEN_COLORS = new ColorInfo(null, true);
+    }
+    return FORBIDDEN_COLORS;
+  }
+
 
   //#########################################################################
   //# Constructors
@@ -128,16 +145,19 @@ public class PropositionIcon implements Icon
 
   //#########################################################################
   //# Interface javax.swing.Icon
+  @Override
   public int getIconHeight()
   {
     return SIZE;
   }
 
+  @Override
   public int getIconWidth()
   {
     return SIZE;
   }
 
+  @Override
   public void paintIcon(final Component comp, final Graphics graphics,
                         final int x, final int y)
   {
@@ -157,6 +177,7 @@ public class PropositionIcon implements Icon
 
   //#######################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     return mColorInfo.toString();
@@ -194,13 +215,28 @@ public class PropositionIcon implements Icon
 
     //#######################################################################
     //# Overrides for java.lang.Object
+    @Override
     public String toString()
     {
-      if (mForbidden) {
-        return mList.toString() + ",forbidden";
-      } else {
-        return mList.toString();
+      final StringBuilder builder = new StringBuilder();
+      boolean first = true;
+      if (mList != null) {
+        for (final Color color : mList) {
+          if (first) {
+            first = false;
+          } else {
+            builder.append(',');
+          }
+          builder.append(color);
+        }
       }
+      if (mForbidden) {
+        if (!first) {
+          builder.append(',');
+        }
+        builder.append("forbidden");
+      }
+      return builder.toString();
     }
 
     //#######################################################################
@@ -243,8 +279,10 @@ public class PropositionIcon implements Icon
   private static ColorInfo MARKED_COLORS;
   private static ColorInfo NEUTRAL_COLORS;
   private static ColorInfo UNMARKED_COLORS;
+  private static ColorInfo FORBIDDEN_COLORS;
 
   private static PropositionIcon MARKED_ICON;
   private static PropositionIcon UNMARKED_ICON;
+  private static PropositionIcon FORBIDDEN_ICON;
 
 }

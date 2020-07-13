@@ -267,9 +267,9 @@ public class ModuleContext
     final EventDeclProxy decl = getEventDecl(name);
     if (decl != null) {
       return getEventDeclIcon(decl, false);
-    } else if (ident instanceof SimpleIdentifierProxy
-               && name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-      return IconAndFontLoader.ICON_FORBIDDEN;
+    } else if (ident instanceof SimpleIdentifierProxy &&
+               name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+      return PropositionIcon.getForbiddenIcon();
     } else {
       return PropositionIcon.getDefaultMarkedIcon();
     }
@@ -737,7 +737,7 @@ public class ModuleContext
         final Color color = geo.getColorSet().iterator().next();
         return PropositionIcon.getIcon(color);
       } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-        return IconAndFontLoader.ICON_FORBIDDEN;
+        return PropositionIcon.getForbiddenIcon();
       } else {
         return PropositionIcon.getDefaultMarkedIcon();
       }
