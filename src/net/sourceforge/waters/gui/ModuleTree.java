@@ -554,29 +554,34 @@ public abstract class ModuleTree
     if (list.isEmpty()) {
       return;
     }
-    final ModuleTreeModel model = getModuleTreeModel();
-    final Iterator<? extends Proxy> iter = list.iterator();
-    final Proxy next = iter.next();
-    final ProxySubject first;
-    if (next != model.getRoot() || isRootVisible()) {
-      first = (ProxySubject) next;
-    } else if (iter.hasNext()) {
-      first = (ProxySubject) iter.next();
-    } else {
-      return;
+    final Iterator<? extends Proxy> iter1 = list.iterator();
+    ProxySubject first = null;
+    Rectangle rect = null;
+    // Try to find the first visible node in list.
+    while (rect == null && iter1.hasNext()) {
+      first = (ProxySubject) iter1.next();
+      rect = getBounds(first); // returns null if root or collapsed subtree
     }
-    final TreePath firstpath = model.createPath(first);
-    final Rectangle rect = getPathBounds(firstpath);
-    final int size = list.size();
-    if (size > 1) {
-      final ProxySubject last =
-        (ProxySubject) list.listIterator(size).previous();
-      final TreePath lastpath = model.createPath(last);
-      final Rectangle lastrect = getPathBounds(lastpath);
-      final int y = lastrect.y + lastrect.height;
-      rect.height = y - rect.y;
+    // Also find the last visible node and extend the rectangle to include it.
+    if (iter1.hasNext()) {
+      final int size = list.size();
+      final ListIterator<? extends Proxy> iter2 = list.listIterator(size);
+      while (iter2.hasPrevious()) {
+        final ProxySubject last = (ProxySubject) iter2.previous();
+        if (last == first) {
+          break;
+        }
+        final Rectangle rect2 = getBounds(last);
+        if (rect2 != null) {
+          final int y = rect2.y + rect2.height;
+          rect.height = y - rect.y;
+          break;
+        }
+      }
     }
-    scrollRectToVisible(rect);
+    if (rect != null) {
+      scrollRectToVisible(rect);
+    }
   }
 
   @Override
@@ -670,6 +675,24 @@ public abstract class ModuleTree
       expandPath(path);
       final List<? extends ProxySubject> body = nested.getBodyModifiable();
       expandAll(body);
+    }
+  }
+
+  /**
+   * Computes the bounding box of the given tree element.
+   * @param  item   The Waters object to be checked.
+   * @return The bounding box indicating where the item's node appears
+   *         in the tree view, or <CODE>null</CODE> if the item is the
+   *         invisible root node or inside a collapsed subtree.
+   */
+  private Rectangle getBounds(final ProxySubject item)
+  {
+    final ModuleTreeModel model = getModuleTreeModel();
+    if (item == model.getRoot() && !isRootVisible()) {
+      return null;
+    } else {
+      final TreePath path = model.createPath(item);
+      return getPathBounds(path);
     }
   }
 
