@@ -124,9 +124,9 @@ public class IDE
     mModuleNameObserver = new ModuleNameObserver();
 
     // Set frame size and position from configuration file
-    final Dimension size = new Dimension(Config.GUI_IDE_WIDTH.getValue(),
-                                         Config.GUI_IDE_HEIGHT.getValue());
-    setPreferredSize(size);
+    mRequestedSize = new Dimension(Config.GUI_IDE_WIDTH.getValue(),
+                                   Config.GUI_IDE_HEIGHT.getValue());
+    setPreferredSize(mRequestedSize);
     if (Config.GUI_IDE_MAXIMIZED.getValue()) {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     } else {
@@ -313,8 +313,24 @@ public class IDE
   public void componentResized(final ComponentEvent event)
   {
     if (getExtendedState() == Frame.NORMAL) {
-      final boolean changedWidth = Config.GUI_IDE_WIDTH.setValue(getWidth());
-      final boolean changedHeight = Config.GUI_IDE_HEIGHT.setValue(getHeight());
+      int width = getWidth();
+      int height = getHeight();
+      // The component-resized event also occurs when opening the first time.
+      // At this point, the actual size may not be exactly the same as the
+      // preferred size that was requested. Then storing the actual size in
+      // the properties may cause a gradual change of size over several
+      // sessions. To avoid, we check whether the size is close to the
+      // requested size, and if it is, use the requested preferred size
+      // instead of the actual size for the properties.
+      if (mRequestedSize != null &&
+          Math.abs(mRequestedSize.width - width) < 16 &&
+          Math.abs(mRequestedSize.height - height) < 16) {
+        width = mRequestedSize.width;
+        height = mRequestedSize.height;
+        mRequestedSize = null;
+      }
+      final boolean changedWidth = Config.GUI_IDE_WIDTH.setValue(width);
+      final boolean changedHeight = Config.GUI_IDE_HEIGHT.setValue(height);
       if (changedWidth || changedHeight) {
         SupremicaProperties.savePropertiesLater();
       }
@@ -555,6 +571,10 @@ public class IDE
   private final JSplitPane mSplitPaneVertical;
   private final LogPanel mLogPanel;
   private final JFileChooser mFileChooser;
+  /**
+   * The preferred size set during construction of the frame.
+   */
+  private Dimension mRequestedSize;
 
 
   //#########################################################################
