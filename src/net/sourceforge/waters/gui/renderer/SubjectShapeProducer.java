@@ -44,7 +44,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NestedBlockProxy;
@@ -56,12 +55,13 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
@@ -128,20 +128,6 @@ public class SubjectShapeProducer
 
 
   //#########################################################################
-  //# Cleaning the Cache
-  private void removeMapping(final Subject subject)
-  {
-    final Proxy proxy = (Proxy) subject;
-    removeMapping(proxy);
-  }
-
-  private void removeMapping(final Proxy proxy)
-  {
-    mRemoveMappingVisitor.removeMapping(proxy);
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   @Override
   public void modelChanged(final ModelChangeEvent event)
@@ -189,39 +175,35 @@ public class SubjectShapeProducer
       if (esource instanceof EdgeProxy ||
           esource instanceof SimpleNodeProxy){
         removeMapping(esource);
-      } else if (esource instanceof IdentifierProxy) {
-        final IdentifierSubject simple = (IdentifierSubject) esource;
-        final Subject ancestor =
-          SubjectTools.getAncestor(simple, SimpleNodeSubject.class,
-                                           LabelBlockSubject.class);
-        if (ancestor != null) {
-          removeMapping(ancestor);
+      } else if (esource instanceof SimpleExpressionProxy) {
+        if (isEventNameChange(esource)) {
+          removeLabelBlockMappings();
+          removeMarkedNodeMappings(); // if renaming from/to :forbidden
+        } else {
+          final SimpleExpressionSubject expr =
+            (SimpleExpressionSubject) esource;
+          final Subject ancestor =
+            SubjectTools.getAncestor(expr, SimpleNodeSubject.class,
+                                     LabelBlockSubject.class);
+          if (ancestor != null) {
+            removeMapping(ancestor);
+          }
         }
       } else if (esource instanceof EventDeclProxy) {
-        final EventDeclProxy decl = (EventDeclProxy) esource;
-        // remove all labelblock mappings with an identifier with this name
-        for(final EdgeProxy edge : getGraph().getEdges()){
-          final LabelBlockProxy block = edge.getLabelBlock();
-          removeMapping(block);
-        }
-        removeMapping(decl);
-      } else if (esource == getGraph()
-                 && getGraph().getBlockedEvents() == null
-                 && mOldBlockedEventsList != null) {
+        removeLabelBlockMappings();
+        removeMarkedNodeMappings(); // if renaming from/to :forbidden
+      } else if (esource == graph &&
+                 graph.getBlockedEvents() == null &&
+                 mOldBlockedEventsList != null) {
         removeMapping(mOldBlockedEventsList);
         mOldBlockedEventsList = null;
       }
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
       if (esource instanceof EventDeclProxy) {
-        for (final NodeProxy node : getGraph().getNodes()) {
-          final EventListExpressionProxy props = node.getPropositions();
-          if (!props.getEventIdentifierList().isEmpty()) {
-            removeMapping(node);
-          }
-        }
+        removeMarkedNodeMappings();
       } else if (esource instanceof NodeProxy) {
-        for (final EdgeProxy edge : getGraph().getEdges()) {
+        for (final EdgeProxy edge : graph.getEdges()) {
           if (edge.getSource() == esource || edge.getTarget() == esource) {
             removeMapping(edge);
           }
@@ -293,6 +275,57 @@ public class SubjectShapeProducer
       final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
       final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
       return createNodeLabelShape(geo, node);
+    }
+  }
+
+
+  //#########################################################################
+  //# Cleaning the Cache
+  private void removeLabelBlockMappings()
+  {
+    final GraphProxy graph = getGraph();
+    for (final EdgeProxy edge : graph.getEdges()) {
+      final LabelBlockProxy block = edge.getLabelBlock();
+      removeMapping(block);
+    }
+    final LabelBlockProxy block = graph.getBlockedEvents();
+    if (block != null) {
+      removeMapping(block);
+    }
+  }
+
+  private void removeMarkedNodeMappings()
+  {
+    for (final NodeProxy node : getGraph().getNodes()) {
+      final EventListExpressionProxy props = node.getPropositions();
+      if (!props.getEventIdentifierList().isEmpty()) {
+        removeMapping(node);
+      }
+    }
+  }
+
+  private void removeMapping(final Subject subject)
+  {
+    final Proxy proxy = (Proxy) subject;
+    removeMapping(proxy);
+  }
+
+  private void removeMapping(final Proxy proxy)
+  {
+    mRemoveMappingVisitor.removeMapping(proxy);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private boolean isEventNameChange(final Subject esource)
+  {
+    final EventDeclSubject decl =
+      SubjectTools.getAncestor(esource, EventDeclSubject.class);
+    if (decl != null) {
+      return SubjectTools.isAncestor(decl.getIdentifier(), esource);
+    } else {
+      return false;
     }
   }
 

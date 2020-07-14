@@ -164,7 +164,10 @@ public class BackupGraphPanel
   {
     final GraphSubject graph = getGraph();
     graph.removeModelObserver(mGraphModelObserver);
-    getModule().removeModelObserver(mGraphModelObserver);
+    final ModuleSubject module = getModule();
+    if (module != null) {
+      module.getEventDeclListModifiable().removeModelObserver(mGraphModelObserver);
+    }
     super.close();
   }
 
@@ -178,8 +181,9 @@ public class BackupGraphPanel
   {
     final GraphSubject graph = getGraph();
     graph.addModelObserver(mGraphModelObserver);
-    if(getModule() != null){
-      getModule().getEventDeclListModifiable().addModelObserver(mGraphModelObserver);
+    final ModuleSubject module = getModule();
+    if (module != null) {
+      module.getEventDeclListModifiable().addModelObserver(mGraphModelObserver);
     }
   }
 
