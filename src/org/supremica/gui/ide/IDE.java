@@ -72,7 +72,9 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -268,7 +270,7 @@ public class IDE
           mSplitPaneVertical.setDividerLocation(dividerLocation);
         }
       });
-      mModuleNameObserver.setModule(container);
+      mModuleNameObserver.setModuleContainer(container);
       updateWindowTitle();
       break;
     case MAINPANEL_SWITCH:
@@ -509,9 +511,20 @@ public class IDE
     @Override
     public void modelChanged(final ModelChangeEvent event)
     {
-      if (event.getSource() == mModule &&
-          event.getKind() == ModelChangeEvent.NAME_CHANGED) {
+      final net.sourceforge.waters.subject.base.Subject sender = event.getSource();
+      final int kind = event.getKind();
+      if (sender == mModule && kind == ModelChangeEvent.NAME_CHANGED) {
         updateWindowTitle();
+      } else if (kind == ModelChangeEvent.NAME_CHANGED ||
+                 kind == ModelChangeEvent.STATE_CHANGED) {
+        final ComponentEditorPanel panel = getActiveComponentEditorPanel();
+        if (panel != null) {
+          final SimpleComponentSubject comp = panel.getComponent();
+          if (comp == sender ||
+              SubjectTools.isAncestor(comp.getIdentifier(), sender)) {
+            updateWindowTitle();
+          }
+        }
       }
     }
 
@@ -523,15 +536,14 @@ public class IDE
 
     //#######################################################################
     //# Module Switching
-    private void setModule(final DocumentContainer container)
+    private void setModuleContainer(final DocumentContainer container)
     {
       if (container instanceof ModuleContainer) {
         final ModuleContainer moduleContainer = (ModuleContainer) container;
         final ModuleSubject module = moduleContainer.getModule();
         setModule(module);
       } else {
-        final ModuleSubject module = null;
-        setModule(module);
+        setModule(null);
       }
     }
 
