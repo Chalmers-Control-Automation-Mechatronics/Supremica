@@ -213,7 +213,7 @@ public class EventTableModel
 
   //#########################################################################
   //# More Specific Access
-  IdentifierSubject getIdentifier(final int row)
+  public IdentifierSubject getIdentifier(final int row)
   {
     final EventEntry entry = mEvents.get(row);
     return entry.getName();

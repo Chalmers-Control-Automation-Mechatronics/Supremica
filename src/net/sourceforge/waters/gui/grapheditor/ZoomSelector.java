@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.editor;
+package net.sourceforge.waters.gui.grapheditor;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;

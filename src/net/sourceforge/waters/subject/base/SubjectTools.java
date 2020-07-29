@@ -99,18 +99,18 @@ public class SubjectTools
    * Possible ancestors include the object itself.
    * @return The closest ancestor of the given subject, which can be assigned
    *         to a variable of the given class, or <CODE>null</CODE> if no such
-   *         ancestor can be found.
+   *         ancestor can be found or the argument is <CODE>null</CODE>.
    */
   public static <S extends Subject> S
     getAncestor(Subject subject, final Class<? extends S> clazz)
   {
-    do {
+    while (subject != null) {
       final Class<? extends Subject> current = subject.getClass();
       if (clazz.isAssignableFrom(current)) {
         return clazz.cast(subject);
       }
       subject = subject.getParent();
-    } while (subject != null);
+    }
     return null;
   }
 
@@ -118,21 +118,21 @@ public class SubjectTools
    * Finds the closest ancestor, which is an instance of one of two given
    * classes. Possible ancestors include the object itself.
    * @return The closest ancestor of this subject, which can be assigned to
-   *         a variable one of the given classes, or <CODE>null</CODE> if
-   *         no such ancestor can be found.
+   *         a variable one of the given classes, or <CODE>null</CODE> if no
+   *         such ancestor can be found or the argument is <CODE>null</CODE>.
    */
   public static Subject getAncestor(Subject subject,
                                     final Class<? extends Subject> clazz1,
                                     final Class<? extends Subject> clazz2)
   {
-    do {
+    while (subject != null) {
       final Class<? extends Subject> current = subject.getClass();
       if (clazz1.isAssignableFrom(current) ||
           clazz2.isAssignableFrom(current)) {
         return subject;
       }
       subject = subject.getParent();
-    } while (subject != null);
+    }
     return null;
   }
 
