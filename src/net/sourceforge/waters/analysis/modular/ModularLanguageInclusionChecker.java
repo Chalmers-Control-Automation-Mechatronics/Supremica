@@ -145,15 +145,11 @@ public class ModularLanguageInclusionChecker
         new ArrayList<>(getModel().getAutomata().size());
       final KindTranslator translator = getKindTranslator();
       for (final AutomatonProxy aut : getModel().getAutomata()) {
-        switch (translator.getComponentKind(aut)) {
-        case PLANT:
+        final ComponentKind kind = translator.getComponentKind(aut);
+        if (kind == ComponentKind.PLANT) {
           automata.add(aut);
-          break;
-        case SPEC:
+        } else if (kind == ComponentKind.SPEC) {
           properties.add(aut);
-          break;
-        default:
-          break;
         }
       }
       Collections.sort(properties);
