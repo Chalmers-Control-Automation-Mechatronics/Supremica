@@ -86,7 +86,7 @@ public class ConditionalTRSimplifier
    * Adds a simplification step to this conditional simplifier.
    * This methods adds the given transition relation simplifier to the
    * end of the encapsulated simplifier chain.
-   * @returns The index position of the added simplifier in the chain.
+   * @return The index position of the added simplifier in the chain.
    */
   public int add(final TransitionRelationSimplifier step)
   {

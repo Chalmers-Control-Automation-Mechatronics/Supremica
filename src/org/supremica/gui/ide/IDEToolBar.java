@@ -65,7 +65,7 @@ import net.sourceforge.waters.gui.actions.ToolNodeAction;
 import net.sourceforge.waters.gui.actions.ToolSelectAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
-import net.sourceforge.waters.gui.editor.ZoomSelector;
+import net.sourceforge.waters.gui.grapheditor.ZoomSelector;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;

@@ -80,7 +80,6 @@ public class CoreachabilityTRSimplifier
    * If this setting is true, the dump state is considered as coreachable
    * (but not marked), so it is only removed if it becomes unreachable
    * by the removal of other states.
-   * @param keeping
    */
   public void setKeepingDumpState(final boolean keeping)
   {

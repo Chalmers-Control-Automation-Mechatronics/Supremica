@@ -436,13 +436,13 @@ public class ProxyShapeProducer
         lshape = createConditionalLabelShape(cond, x + indent, ly);
         mMap.put(proxy, lshape);
         adjustRect(lshape, indent);
-        createListShape(cond.getBody(), x, y, indent + 10);
+        createListShape(cond.getBody(), x, y, indent + NESTED_INDENTATION);
       } else if (proxy instanceof ForeachProxy) {
         final ForeachProxy foreach = (ForeachProxy) proxy;
         lshape = createForeachLabelShape(foreach, x + indent, ly);
         mMap.put(proxy, lshape);
         adjustRect(lshape, indent);
-        createListShape(foreach.getBody(), x, y, indent + 10);
+        createListShape(foreach.getBody(), x, y, indent + NESTED_INDENTATION);
       }
     }
   }
@@ -583,6 +583,8 @@ public class ProxyShapeProducer
 
   //#########################################################################
   //# Class Constants
+  public static final int NESTED_INDENTATION = 10;
+
   private static final String BLOCKED_HEADER = "BLOCKED:";
   private static final double BORDER = 5;
 }

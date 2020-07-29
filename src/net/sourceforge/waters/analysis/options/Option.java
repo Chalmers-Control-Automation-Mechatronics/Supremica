@@ -101,7 +101,7 @@ public abstract class Option<T> implements Cloneable
   /**
    * Gets the ID of this option.
    * The naming convention for options is
-   * &quot;&langle;<I>prefix</I>&rangle;.&langle;<I>name</I>&rangle;&quot;,
+   * &quot;&lt;<I>prefix</I>&gt;.&lt;<I>name</I>&gt;&quot;,
    * where the <I>prefix</I> corresponds to the name of the class where
    * the option is defined, and the <I>name</I> corresponds to the methods
    * used to get and set the option value in that class.
