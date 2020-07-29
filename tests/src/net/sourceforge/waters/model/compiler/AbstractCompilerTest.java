@@ -1216,6 +1216,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, UndefinedIdentifierException.class, "'undefvar'");
   }
 
+  public void testCompile_verriegel3_error()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "verriegel3_error");
+    compileError(module, UndefinedIdentifierException.class, "'x'");
+  }
+
 
   //#########################################################################
   //# Customisation

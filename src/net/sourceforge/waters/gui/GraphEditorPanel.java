@@ -3076,25 +3076,14 @@ public class GraphEditorPanel
       if (mShouldCommit) {
         super.commitSecondaryGraph();
         adjustSize();
-        assert mMoveVisitor != null;
         final List<ProxySubject> movedObjects =
           new ArrayList<>(mMoveVisitor.mMovedObjects);
         scrollToVisible(movedObjects);
       }
-      mMoveVisitor = null;
     }
-
-    @Override
-    void cancelDrag(final Point point)
-    {
-      super.cancelDrag(point);
-      mMoveVisitor = null;
-    }
-
 
     //#######################################################################
     //# Data Members
-
     private final Point2D mSnapPoint;
     private MoveVisitor mMoveVisitor;
     private boolean mShouldCommit;

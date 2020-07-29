@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="verriegel3">
-<B:Comment>Central locking model - original version - 3 doors
-The model is controllable and nonblocking. It has 968358552 reachable states and the diameter is 90.
-The property 'sicherheit_vr3' represents the property that the car's rear doors are only locked if a locking command from one of the keyholes has occurred before. A test for language inclusion verifies this property.
-The property 'sicherheit_er' represents the property that the car's driver door is only unlocked if an unlocking command from one of the keyholes has occurred before. This property is not satisfied in the model and can be verified as a (failed) language inclusion test.</B:Comment>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="verriegel3_error">
+<B:Comment>A test case for EFSM compilation.
+This is a large model (from central locking, verriegel3) with a single erroneous guard, whose event occurs in several other components.
+The test is to ensure that the error is detected in reasonable time and without running out of memory.</B:Comment>
 <ConstantAliasList>
 <ConstantAlias Name="HeckTueren">
 <ConstantAliasExpression><EnumSetExpression>
@@ -302,18 +301,18 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":0">
-<NodeRef Name="AU2"/>
 <NodeRef Name="AU1"/>
 <NodeRef Name="AU3"/>
+<NodeRef Name="AU2"/>
 <BoxGeometry>
 <Box X="112" Y="256" Width="144" Height="240"/>
 </BoxGeometry>
 </GroupNode>
 <GroupNode Name=":1">
 <NodeRef Name="ER"/>
-<NodeRef Name=":0"/>
 <NodeRef Name="VR"/>
 <NodeRef Name="FS"/>
+<NodeRef Name=":0"/>
 <BoxGeometry>
 <Box X="32" Y="64" Width="336" Height="448"/>
 </BoxGeometry>
@@ -670,6 +669,17 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SplineGeometry>
 <Point X="80" Y="74"/>
 </SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;" Text="x &gt; 0">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="20"/>
+</LabelGeometry>
+</GuardActionBlock>
 </Edge>
 </EdgeList>
 </Graph>
@@ -1163,17 +1173,17 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="ZS"/>
-<NodeRef Name="SER"/>
-<NodeRef Name="RQER"/>
 <NodeRef Name="RQVR"/>
 <NodeRef Name="ER"/>
+<NodeRef Name="SER"/>
 <NodeRef Name="RQSER"/>
-<NodeRef Name="VR"/>
 <NodeRef Name="COD"/>
-<NodeRef Name="TSTZS"/>
-<NodeRef Name="RQZS"/>
+<NodeRef Name="VR"/>
 <NodeRef Name="IN"/>
+<NodeRef Name="RQZS"/>
+<NodeRef Name="TSTZS"/>
+<NodeRef Name="RQER"/>
+<NodeRef Name="ZS"/>
 <BoxGeometry>
 <Box X="112" Y="16" Width="480" Height="416"/>
 </BoxGeometry>
@@ -2206,30 +2216,30 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":0">
+<NodeRef Name="zs6"/>
+<NodeRef Name="vr6"/>
 <NodeRef Name="er3"/>
-<NodeRef Name="zs8"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="ZS"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="vr7"/>
-<NodeRef Name="zs7"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="zs3"/>
+<NodeRef Name="zs9"/>
 <NodeRef Name="zs4"/>
+<NodeRef Name="zs8"/>
+<NodeRef Name="vr7"/>
+<NodeRef Name="VR"/>
 <NodeRef Name="vr5"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="vr4"/>
 <NodeRef Name="ER"/>
 <NodeRef Name="vr8"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs6"/>
-<NodeRef Name="VR"/>
+<NodeRef Name="zs7"/>
 <NodeRef Name="IN"/>
-<NodeRef Name="zs9"/>
-<NodeRef Name="vr6"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs5"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="vr3"/>
 <BoxGeometry>
 <Box X="80" Y="48" Width="512" Height="432"/>
 </BoxGeometry>
@@ -3766,30 +3776,30 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="vr3"/>
-<NodeRef Name="zs3"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="zs6"/>
-<NodeRef Name="vr7"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="ZS"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="zs9"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="vr6"/>
-<NodeRef Name="ER"/>
 <NodeRef Name="vr1"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="vr7"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="vr8"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="zs3"/>
 <NodeRef Name="zs7"/>
 <NodeRef Name="vr5"/>
-<NodeRef Name="er3"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="zs4"/>
 <NodeRef Name="zs8"/>
-<NodeRef Name="vr8"/>
-<NodeRef Name="VR"/>
-<NodeRef Name="IN"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="zs6"/>
+<NodeRef Name="zs9"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="zs5"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="vr6"/>
+<NodeRef Name="zs1"/>
 <BoxGeometry>
 <Box X="48" Y="16" Width="544" Height="432"/>
 </BoxGeometry>
@@ -4871,20 +4881,20 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="er3"/>
-<NodeRef Name="er4"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="vr5"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="zs3"/>
 <NodeRef Name="vr1"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="er2"/>
+<NodeRef Name="vr2"/>
 <NodeRef Name="er1"/>
-<NodeRef Name="vr4"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="er4"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="er3"/>
 <NodeRef Name="IN"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="er2"/>
 <BoxGeometry>
 <Box X="48" Y="64" Width="512" Height="496"/>
 </BoxGeometry>
@@ -5350,21 +5360,21 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":0">
-<NodeRef Name="vr3"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="er4"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="zs3b"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="IN"/>
-<NodeRef Name="er3"/>
-<NodeRef Name="vr4"/>
 <NodeRef Name="zs3a"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="zs5"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="er4"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="zs3b"/>
 <BoxGeometry>
 <Box X="32" Y="16" Width="512" Height="544"/>
 </BoxGeometry>
@@ -6689,118 +6699,6 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelBlock>
 <SplineGeometry>
 <Point X="152" Y="79"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="PROPERTY" Name="sicherheit_vr3">
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IN">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="48" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="5" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RQ">
-<PointGeometry>
-<Point X="160" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-21" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IN" Target="RQ">
-<LabelBlock>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<LabelGeometry Anchor="NW">
-<Point X="-19" Y="-65"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="RQ" Target="RQ">
-<LabelBlock>
-<IndexedIdentifier Name="MZS_an">
-<SimpleIdentifier Name="HT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<LabelGeometry Anchor="NW">
-<Point X="-43" Y="-93"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="201" Y="113"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="PROPERTY" Name="sicherheit_er">
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IN">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="64" Y="96"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-10" Y="9"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RQ">
-<PointGeometry>
-<Point X="160" Y="96"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-9" Y="8"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IN" Target="RQ">
-<LabelBlock>
-<SimpleIdentifier Name="CS"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<LabelGeometry Anchor="NW">
-<Point X="-18" Y="-75"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="RQ" Target="RQ">
-<LabelBlock>
-<SimpleIdentifier Name="CS"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<IndexedIdentifier Name="MER_an">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-3" Y="-39"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="200" Y="97"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>
