@@ -1152,8 +1152,10 @@ public class EFSMNormaliser extends AbortableCompiler
           if (update != null) {
             final ConstraintPropagator subPropagator =
               new ConstraintPropagator(propagator);
-            subPropagator.addConstraints(update);
-            subPropagator.propagate();
+            if (!update.isTrue()) {
+              subPropagator.addConstraints(update);
+              subPropagator.propagate();
+            }
             if (!subPropagator.isUnsatisfiable()) {
               final List<EFAIdentifier> identifiers =
                 combineUpdates(index + 1, subPropagator, second);
@@ -1245,8 +1247,10 @@ public class EFSMNormaliser extends AbortableCompiler
     private void addUpdate(final ConstraintList update,
                            final GuardActionBlockProxy gaBlock)
     {
-      mUpdates.add(update);
-      mGABlockMap.put(update, gaBlock);
+      if (!mGABlockMap.containsKey(update)) {
+        mGABlockMap.put(update, gaBlock);
+        mUpdates.add(update);
+      }
     }
 
     private List<ConstraintList> getUpdates()
@@ -1566,10 +1570,10 @@ public class EFSMNormaliser extends AbortableCompiler
     private Map<ConstraintList,EFAEventList> mUpdateMap;
 
     /**
-     * A map from each original update to the guard action block from which
-     * the update originates.
+     * A map from each original update to the first guard action block from
+     * which the update originates.
      */
-    private final Map<ConstraintList, GuardActionBlockProxy> mGABlockMap;
+    private final Map<ConstraintList,GuardActionBlockProxy> mGABlockMap;
 
     /**
      * A list that contains the additional complementary guards which are not
