@@ -59,6 +59,7 @@ import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -217,6 +218,13 @@ public class GUIOptionContext implements OptionContext
   createStringEditor(final StringOption option)
   {
     return new StringOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionEditor<List<String>>
+  createStringListEditor(final StringListOption option)
+  {
+    return null;
   }
 
   @Override

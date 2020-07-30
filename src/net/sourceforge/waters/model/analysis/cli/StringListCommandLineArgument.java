@@ -43,8 +43,10 @@ import net.sourceforge.waters.analysis.options.Option;
 public class StringListCommandLineArgument extends CommandLineArgument<List<String>>
 {
 
+  //#######################################################################
+  //# Constructor
   public StringListCommandLineArgument(final CommandLineOptionContext context,
-                                    final Option<List<String>> option)
+                                       final Option<List<String>> option)
   {
     super(context, option);
   }

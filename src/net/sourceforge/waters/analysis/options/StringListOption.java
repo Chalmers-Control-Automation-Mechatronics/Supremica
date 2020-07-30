@@ -64,7 +64,7 @@ public class StringListOption extends Option<List<String>>
   @Override
   public OptionEditor<List<String>> createEditor(final OptionContext context)
   {
-    return null;
+    return context.createStringListEditor(this);
   }
 
   @Override

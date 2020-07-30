@@ -279,6 +279,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
           if (!keepPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }
+          compiler.setEnabledPropositionNames(empty);
           factory.configure(compiler);
           watchdog.addAbortable(compiler);
           try {
@@ -449,11 +450,11 @@ public class CommandLineTool implements Configurable, ArgumentSource
   public List<Option<?>> getOptions(final OptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
-    page.append(options, OPTION_CommandLineTool_Verbose);
     page.append(options, OPTION_CommandLineTool_Quiet);
+    page.append(options, OPTION_CommandLineTool_Verbose);
     page.append(options, OPTION_CommandLineTool_Stats);
-    page.append(options, OPTION_CommandLineTool_Timeout);
     page.append(options, OPTION_CommandLineTool_Csv);
+    page.append(options, OPTION_CommandLineTool_Timeout);
     page.append(options, OPTION_CommandLineTool_Help);
     return options;
   }
@@ -461,15 +462,12 @@ public class CommandLineTool implements Configurable, ArgumentSource
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(OPTION_CommandLineTool_Verbose)) {
-      mVerbosity = Level.ALL;
-    } else if (option.hasID(OPTION_CommandLineTool_Quiet)) {
+    if (option.hasID(OPTION_CommandLineTool_Quiet)) {
       mVerbosity = Level.OFF;
+    } else if (option.hasID(OPTION_CommandLineTool_Verbose)) {
+      mVerbosity = Level.ALL;
     } else if (option.hasID(OPTION_CommandLineTool_Stats)) {
       mStats = true;
-    } else if (option.hasID(OPTION_CommandLineTool_Timeout)) {
-      final PositiveIntOption opt = (PositiveIntOption) option;
-      mTimeout = opt.getIntValue();
     } else if (option.hasID(OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
       OutputStream csvstream;
@@ -479,27 +477,31 @@ public class CommandLineTool implements Configurable, ArgumentSource
       } catch (final FileNotFoundException exception) {
         throw new RuntimeException(exception);
       }
+    } else if (option.hasID(OPTION_CommandLineTool_Timeout)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      mTimeout = opt.getIntValue();
     } else if (option.hasID(OPTION_CommandLineTool_Help)) {
       mContext.helpMessage(mAnalyzer);
     }
   }
 
-  public void registerOptions(final OptionPage page) {
+  public void registerOptions(final OptionPage page)
+  {
+    page.add(new FlagOption(OPTION_CommandLineTool_Quiet, null,
+                            "Suppress all log output",
+                            "-quiet", "-q"));
     page.add(new FlagOption(OPTION_CommandLineTool_Verbose, null,
                             "Verbose output",
                             "-verbose", "-v"));
-    page.add(new FlagOption(OPTION_CommandLineTool_Quiet, null,
-                            "Quiet output",
-                            "-quiet", "-q"));
     page.add(new FlagOption(OPTION_CommandLineTool_Stats, null,
                             "Output statistics",
                             "-stats"));
-    page.add(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
-                            "Output statistics",
-                            "-timeout"));
     page.add(new FileOption(OPTION_CommandLineTool_Csv, null,
-                            "CSV output file location",
+                            "CSV output file name",
                             "-csv"));
+    page.add(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
+                                   "Maximum allowed runtime in seconds",
+                                   "-timeout"));
     page.add(new FlagOption(OPTION_CommandLineTool_Help, null,
                             "Print this message", "-help"));
   }

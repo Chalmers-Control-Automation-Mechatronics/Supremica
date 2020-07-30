@@ -379,7 +379,7 @@ public abstract class AbstractModelAnalyzerFactory
 
     db.add(new StringListOption
              (OPTION_LanguageInclusionChecker_Property, null,
-              "Property for language inclusion check " +
+              "Name of a property to be checked " +
               "(can be used more than once)",
               "-property"));
   }
@@ -533,7 +533,7 @@ public abstract class AbstractModelAnalyzerFactory
     "ControlLoopChecker.LoopEvents";
 
   public static final String OPTION_LanguageInclusionChecker_Property =
-    "ControlLoopChecker.Property";
+    "LanguageInclusionChecker.Property";
 
   public static final String OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking =
     "SupervisorSynthesizer.ConfiguredDefaultMarking";

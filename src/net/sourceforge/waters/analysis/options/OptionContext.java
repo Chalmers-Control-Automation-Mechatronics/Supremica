@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.options;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -117,6 +118,12 @@ public interface OptionContext
    */
   public OptionEditor<String>
   createStringEditor(StringOption option);
+
+  /**
+   * Creates an option editor for a string list option.
+   */
+  public OptionEditor<List<String>>
+  createStringListEditor(StringListOption option);
 
   /**
    * Creates an option editor for a color option.

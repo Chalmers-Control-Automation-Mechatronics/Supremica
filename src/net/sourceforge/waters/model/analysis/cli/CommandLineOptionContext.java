@@ -64,6 +64,7 @@ import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -145,6 +146,13 @@ public class CommandLineOptionContext implements OptionContext
   public OptionEditor<String> createStringEditor(final StringOption option)
   {
     return new StringCommandLineArgument(this, option);
+  }
+
+  @Override
+  public OptionEditor<List<String>>
+  createStringListEditor(final StringListOption option)
+  {
+    return new StringListCommandLineArgument(this, option);
   }
 
   @Override
@@ -239,23 +247,21 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   public void generateArgumentsFromOptions(final LeafOptionPage page,
-                                              final Configurable source,
-                                              final String... requiredOptions) {
+                                           final Configurable source,
+                                           final String... requiredOptions)
+  {
     final List<Option<?>> options = source.getOptions(page);
-
     for (final Option<?> option : options) {
       final CommandLineArgument<?> arg =
         (CommandLineArgument<?>) option.createEditor(this);
-      boolean required = false;
-      for (final String id : requiredOptions) {
-        if (option.getID().equals(id)) {
-          required = true;
-          break;
-        }
-      }
-      if (required) arg.setRequired(true);
       if (arg == null) {
         continue;
+      }
+      for (final String id : requiredOptions) {
+        if (option.getID().equals(id)) {
+          arg.setRequired(true);
+          break;
+        }
       }
       addArgument(arg);
     }
@@ -281,7 +287,8 @@ public class CommandLineOptionContext implements OptionContext
     return mConfigurables;
   }
 
-  public void helpMessage(final Configurable configurable) {
+  public void helpMessage(final Configurable configurable)
+  {
     final String name = configurable.getClass().getSimpleName();
     System.err.println
       (name + " supports the following command line options:");
