@@ -99,9 +99,9 @@ public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
   //#########################################################################
   //# Printing
   @Override
-  public void dump(final PrintStream stream, final Object analyzer)
+  public void dump(final PrintStream stream)
   {
-    super.dump(stream, analyzer);
+    super.dump(stream);
     mEnumFactory.dumpEnumeration(stream, INDENT);
   }
 

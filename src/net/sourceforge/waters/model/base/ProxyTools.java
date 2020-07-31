@@ -188,13 +188,7 @@ public class ProxyTools
 
   public static String getShortClassName(final Class<?> clazz)
   {
-    final String name = clazz.getName();
-    final int splitPos = name.lastIndexOf('.');
-    if (splitPos < 0) {
-      return name;
-    } else {
-      return name.substring(splitPos + 1);
-    }
+    return clazz.getSimpleName();
   }
 
 

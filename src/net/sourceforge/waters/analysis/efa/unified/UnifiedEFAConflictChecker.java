@@ -2109,9 +2109,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream, final Object analyzer)
+    public void dump(final PrintStream stream)
     {
-      super.dump(stream, analyzer);
+      super.dump(stream);
       mFactory.dumpEnumeration(stream, INDENT);
     }
 

@@ -35,6 +35,7 @@ package net.sourceforge.waters.model.analysis.cli;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -287,20 +288,16 @@ public class CommandLineOptionContext implements OptionContext
     return mConfigurables;
   }
 
-  public void helpMessage(final Configurable configurable)
+  public void showHelpMessage(final PrintStream stream)
   {
-    final String name = configurable.getClass().getSimpleName();
-    System.err.println
-      (name + " supports the following command line options:");
     final List<String> keys = new ArrayList<>(mArgumentMap.keySet());
     Collections.sort(keys);
     for (final String key : keys) {
       final CommandLineArgument<?> arg = mArgumentMap.get(key);
       if (arg.getName().startsWith(key)) {
-        arg.dump(System.err, configurable);
+        arg.dump(stream);
       }
     }
-    System.exit(0);
   }
 
   public void configure(final Configurable configurable) {

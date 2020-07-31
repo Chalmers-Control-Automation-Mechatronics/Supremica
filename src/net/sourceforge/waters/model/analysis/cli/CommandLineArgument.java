@@ -129,7 +129,7 @@ public abstract class CommandLineArgument<T> implements OptionEditor<T>,
 
   //#########################################################################
   //# Printing
-  public void dump(final PrintStream stream, final Object analyzer)
+  public void dump(final PrintStream stream)
   {
     final String name = getName();
     final String template = getArgumentTemplate();

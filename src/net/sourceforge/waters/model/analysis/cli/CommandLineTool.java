@@ -74,6 +74,7 @@ import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -187,7 +188,6 @@ public class CommandLineTool implements Configurable, ArgumentSource
         }
       }
 
-
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
       final ValidUnmarshaller importer =
         new ValidUnmarshaller(moduleFactory, optable);
@@ -260,7 +260,6 @@ public class CommandLineTool implements Configurable, ArgumentSource
         watchdog.start();
       }
 
-      boolean first = true;
       for (final String name : argList) {
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
@@ -279,7 +278,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
           if (!keepPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }
-          compiler.setEnabledPropositionNames(empty);
+          compiler.setEnabledPropertyNames(empty);
           factory.configure(compiler);
           watchdog.addAbortable(compiler);
           try {
@@ -293,14 +292,14 @@ public class CommandLineTool implements Configurable, ArgumentSource
             final AnalysisResult result = new DefaultAnalysisResult(wrapper);
             result.setCompileTime(compileTime);
             result.setException(exception);
-            writeCSV(mCsv, fullName, result, first);
+            writeCSV(fullName, result);
             continue;
           } finally {
             watchdog.removeAbortable(compiler);
           }
         }
         System.out.print(fullName + " ... ");
-        if (mVerbosity != null) {
+        if (mVerbosity != Level.OFF) {
           System.out.println();
         } else {
           System.out.flush();
@@ -330,7 +329,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
-          if (mVerbosity != null && result instanceof ProxyResult<?>) {
+          if (result instanceof ProxyResult<?>) {
             final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
             final Proxy proxy = proxyResult.getComputedProxy();
             if (proxy != null) {
@@ -374,12 +373,11 @@ public class CommandLineTool implements Configurable, ArgumentSource
             result.print(System.out);
             additions = true;
           }
-          writeCSV(mCsv, fullName, result, first);
+          writeCSV(fullName, result);
         }
         if (additions) {
           System.out.println(SEPARATOR);
         }
-        first = false;
       }
 
     } catch (final EvalException | AnalysisException |
@@ -403,49 +401,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private static void usage()
-  {
-    System.err.println
-      ("USAGE: java CommandLineTool <factory>  [options] <checker> <file> ...");
-    System.exit(1);
-  }
-
-  private static void showSupportedException(final Throwable exception)
-  {
-    System.err.print("FATAL ERROR (");
-    System.err.print(ProxyTools.getShortClassName(exception));
-    System.err.println(")");
-    final String msg = exception.getMessage();
-    if (msg != null) {
-      System.err.println(exception.getMessage());
-    }
-  }
-
-  private static void writeCSV(final PrintWriter csv,
-                               final String fullName,
-                               final AnalysisResult result,
-                               final boolean first)
-  {
-    if (csv != null) {
-      if (first) {
-        csv.print("Model,");
-        result.printCSVHorizontalHeadings(csv);
-        csv.println();
-      }
-      if (fullName.indexOf(',') >= 0) {
-        csv.print('"');
-        csv.print(fullName);
-        csv.print('"');
-      } else {
-        csv.print(fullName);
-      }
-      csv.print(',');
-      result.printCSVHorizontal(csv);
-      csv.println();
-    }
-  }
-
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
   public List<Option<?>> getOptions(final OptionPage page)
   {
@@ -470,22 +426,41 @@ public class CommandLineTool implements Configurable, ArgumentSource
       mStats = true;
     } else if (option.hasID(OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
-      OutputStream csvstream;
       try {
-        csvstream = new FileOutputStream(opt.getValue(), true);
-        mCsv = new PrintWriter(csvstream);
+        final OutputStream stream = new FileOutputStream(opt.getValue(), true);
+        mCsv = new PrintWriter(stream);
       } catch (final FileNotFoundException exception) {
-        throw new RuntimeException(exception);
+        throw new WatersRuntimeException(exception);
       }
     } else if (option.hasID(OPTION_CommandLineTool_Timeout)) {
       final PositiveIntOption opt = (PositiveIntOption) option;
       mTimeout = opt.getIntValue();
     } else if (option.hasID(OPTION_CommandLineTool_Help)) {
-      mContext.helpMessage(mAnalyzer);
+      System.err.print(ProxyTools.getShortClassName(mAnalyzer));
+      System.err.println(" supports the following command line options:");
+      mContext.showHelpMessage(System.err);
+      System.exit(0);
     }
   }
 
-  public void registerOptions(final OptionPage page)
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.cli.ArgumentSource
+  @Override
+  public void addArguments(final CommandLineOptionContext context,
+                           final Configurable configurable,
+                           final LeafOptionPage page)
+  {
+    if (configurable == this) {
+      registerOptions(page);
+      context.generateArgumentsFromOptions(page, this);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void registerOptions(final OptionPage page)
   {
     page.add(new FlagOption(OPTION_CommandLineTool_Quiet, null,
                             "Suppress all log output",
@@ -506,14 +481,43 @@ public class CommandLineTool implements Configurable, ArgumentSource
                             "Print this message", "-help"));
   }
 
-  @Override
-  public void addArguments(final CommandLineOptionContext context,
-                           final Configurable configurable,
-                           final LeafOptionPage page)
+  private void writeCSV(final String fullName, final AnalysisResult result)
   {
-    if (configurable == this) {
-      registerOptions(page);
-      context.generateArgumentsFromOptions(page, this);
+    if (mCsv != null) {
+      if (mCsvFirst) {
+        mCsvFirst = false;
+        mCsv.print("Model,");
+        result.printCSVHorizontalHeadings(mCsv);
+        mCsv.println();
+      }
+      if (fullName.indexOf(',') >= 0) {
+        mCsv.print('"');
+        mCsv.print(fullName);
+        mCsv.print('"');
+      } else {
+        mCsv.print(fullName);
+      }
+      mCsv.print(',');
+      result.printCSVHorizontal(mCsv);
+      mCsv.println();
+    }
+  }
+
+  private static void usage()
+  {
+    System.err.println
+      ("USAGE: java CommandLineTool <factory>  <checker> [options] <file> ...");
+    System.exit(1);
+  }
+
+  private static void showSupportedException(final Throwable exception)
+  {
+    System.err.print("FATAL ERROR (");
+    System.err.print(ProxyTools.getShortClassName(exception));
+    System.err.println(")");
+    final String msg = exception.getMessage();
+    if (msg != null) {
+      System.err.println(exception.getMessage());
     }
   }
 
@@ -524,6 +528,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
   private boolean mStats = false;
   private int mTimeout = -1;
   private PrintWriter mCsv = null;
+  private boolean mCsvFirst = true;
 
   private CommandLineOptionContext mContext;
   private ModelAnalyzer mAnalyzer;
@@ -544,7 +549,6 @@ public class CommandLineTool implements Configurable, ArgumentSource
     "CommandLineTool.Timeout";
   public static final String OPTION_CommandLineTool_Csv =
     "CommandLineTool.Csv";
-
   public static final String OPTION_CommandLineTool_Help =
     "CommandLineTool.Help";
 

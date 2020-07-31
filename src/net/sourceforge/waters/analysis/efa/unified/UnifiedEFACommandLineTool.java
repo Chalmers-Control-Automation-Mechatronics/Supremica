@@ -187,17 +187,14 @@ public class UnifiedEFACommandLineTool
       mContext.configure(checker);
 
       if (mVerbosity != null) {
-        if (mVerbosity != null) {
-          final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-          final Configuration config = ctx.getConfiguration();
-          final LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
-          loggerConfig.setLevel(mVerbosity);
-          ctx.updateLoggers();
-        }
+        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        final Configuration config = ctx.getConfiguration();
+        final LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+        loggerConfig.setLevel(mVerbosity);
+        ctx.updateLoggers();
       }
-
-      final Watchdog watchdog = new Watchdog(checker, mTimeout);
       if (mTimeout > 0) {
+        final Watchdog watchdog = new Watchdog(checker, mTimeout);
         watchdog.start();
       }
 
@@ -351,7 +348,10 @@ public class UnifiedEFACommandLineTool
         throw new RuntimeException(exception);
       }
     } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Help)) {
-      mContext.helpMessage(checker);
+      System.err.print(ProxyTools.getShortClassName(checker));
+      System.err.println(" supports the following command line options:");
+      mContext.showHelpMessage(System.err);
+      System.exit(0);
     }
   }
 
