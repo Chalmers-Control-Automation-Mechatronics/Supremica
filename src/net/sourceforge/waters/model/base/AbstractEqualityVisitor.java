@@ -249,6 +249,25 @@ public abstract class AbstractEqualityVisitor
   }
 
   /**
+   * Checks whether the first collection contains items equal to each
+   * element of the second collection, using the equality defined by this
+   * visitor.
+   * @param container The collection expected to contain elements.
+   * @param contents  The collection of elements expected to be contained
+   *                  in the container.
+   */
+  public boolean containsAll(final Collection<? extends Proxy> container,
+                             final Collection<? extends Proxy> contents)
+  {
+    for (final Proxy proxy : contents) {
+      if (!contains(container, proxy)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Checks whether the given two collections of proxies have a non-empty
    * intersection, using the equality defined by this visitor.
    */
