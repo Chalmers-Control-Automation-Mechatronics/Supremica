@@ -103,22 +103,22 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NestedBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.gui.ide.ComponentEditorPanel;
@@ -1225,17 +1225,6 @@ public class GraphEventPanel
     }
 
     @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-      throws VisitorException
-    {
-      final ForeachSubject subject = (ForeachSubject) foreach;
-      final ListSubject<? extends ProxySubject> body =
-        subject.getBodyModifiable();
-      processList(body);
-      return null;
-    }
-
-    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -1259,6 +1248,17 @@ public class GraphEventPanel
       final ListSubject<? extends ProxySubject> eventlist =
         subject.getEventIdentifierListModifiable();
       processList(eventlist);
+      return null;
+    }
+
+    @Override
+    public Object visitNestedBlockProxy(final NestedBlockProxy block)
+      throws VisitorException
+    {
+      final NestedBlockSubject subject = (NestedBlockSubject) block;
+      final ListSubject<? extends ProxySubject> body =
+        subject.getBodyModifiable();
+      processList(body);
       return null;
     }
 
@@ -1341,17 +1341,6 @@ public class GraphEventPanel
     }
 
     @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-      throws VisitorException
-    {
-      final ForeachSubject subject = (ForeachSubject) foreach;
-      final ListSubject<? extends ProxySubject> body =
-        subject.getBodyModifiable();
-      processList(body);
-      return null;
-    }
-
-    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -1375,6 +1364,17 @@ public class GraphEventPanel
       final ListSubject<? extends ProxySubject> eventlist =
         subject.getEventIdentifierListModifiable();
       processList(eventlist);
+      return null;
+    }
+
+    @Override
+    public Object visitNestedBlockProxy(final NestedBlockProxy block)
+      throws VisitorException
+    {
+      final NestedBlockSubject subject = (NestedBlockSubject) block;
+      final ListSubject<? extends ProxySubject> body =
+        subject.getBodyModifiable();
+      processList(body);
       return null;
     }
 

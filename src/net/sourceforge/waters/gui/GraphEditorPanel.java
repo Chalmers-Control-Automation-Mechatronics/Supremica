@@ -3154,7 +3154,7 @@ public class GraphEditorPanel
           mDropAction == DnDConstants.ACTION_MOVE) {
         final Transferable transferable = support.getTransferable();
         if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
-          elist = mIdentifierPasteVisitor.getIndentifierPasteTarget
+          elist = mIdentifierPasteVisitor.getIdentifierPasteTarget
             (mFocusedObject, transferable);
         }
       }
@@ -4832,10 +4832,10 @@ public class GraphEditorPanel
     private boolean canPaste(final Proxy focussed,
                              final Transferable transferable)
     {
-      return getIndentifierPasteTarget(focussed, transferable) != null;
+      return getIdentifierPasteTarget(focussed, transferable) != null;
     }
 
-    private ListSubject<AbstractSubject> getIndentifierPasteTarget
+    private ListSubject<AbstractSubject> getIdentifierPasteTarget
       (final Proxy focussed, final Transferable transferable)
     {
       try {

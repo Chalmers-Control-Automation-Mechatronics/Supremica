@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="verriegel3">
 <B:Comment>Central locking model - original version - 3 doors
 The model is controllable and nonblocking. It has 968358552 reachable states and the diameter is 90.
@@ -21,22 +21,9 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias Name="NichtFahrerTueren">
-<ConstantAliasExpression><EnumSetExpression>
-<SimpleIdentifier Name="BT"/>
-<SimpleIdentifier Name="HT"/>
-</EnumSetExpression>
-</ConstantAliasExpression>
-</ConstantAlias>
 <ConstantAlias Name="Counters">
 <ConstantAliasExpression><EnumSetExpression>
 <SimpleIdentifier Name="WSP"/>
-</EnumSetExpression>
-</ConstantAliasExpression>
-</ConstantAlias>
-<ConstantAlias Name="FahrerTueren">
-<ConstantAliasExpression><EnumSetExpression>
-<SimpleIdentifier Name="FT"/>
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
@@ -146,11 +133,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="Tueren"/>
 </RangeList>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="soft_SER">
-<RangeList>
-<SimpleIdentifier Name="Tueren"/>
-</RangeList>
-</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="soft_SER"/>
 <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
 <EventDecl Kind="CONTROLLABLE" Name="time_ZS">
 <RangeList>
@@ -236,11 +219,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <EventDecl Kind="UNCONTROLLABLE" Name="VR_FS"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="VR_FT"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="VR_HK"/>
-<EventDecl Kind="CONTROLLABLE" Name="done_SER">
-<RangeList>
-<SimpleIdentifier Name="Tueren"/>
-</RangeList>
-</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="done_SER"/>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
@@ -252,7 +231,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="192" Y="368"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="10" Y="14"/>
+<Point X="9" Y="-8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="AU3">
@@ -260,7 +239,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="192" Y="448"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-9" Y="23"/>
+<Point X="9" Y="-9"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="AU1">
@@ -268,7 +247,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="192" Y="288"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="8" Y="14"/>
+<Point X="9" Y="-8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="FS">
@@ -276,7 +255,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="192" Y="208"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="8" Y="15"/>
+<Point X="9" Y="2"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Initial="true" Name="VR">
@@ -287,7 +266,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="128" Y="128"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-21" Y="-5"/>
+<Point X="11" Y="-9"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="ER">
@@ -298,22 +277,22 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="256" Y="128"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="6" Y="-6"/>
+<Point X="7" Y="-1"/>
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":0">
-<NodeRef Name="AU2"/>
 <NodeRef Name="AU1"/>
 <NodeRef Name="AU3"/>
+<NodeRef Name="AU2"/>
 <BoxGeometry>
 <Box X="112" Y="256" Width="144" Height="240"/>
 </BoxGeometry>
 </GroupNode>
 <GroupNode Name=":1">
-<NodeRef Name="ER"/>
-<NodeRef Name=":0"/>
 <NodeRef Name="VR"/>
 <NodeRef Name="FS"/>
+<NodeRef Name=":0"/>
+<NodeRef Name="ER"/>
 <BoxGeometry>
 <Box X="32" Y="64" Width="336" Height="448"/>
 </BoxGeometry>
@@ -347,7 +326,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <LabelBlock>
 <SimpleIdentifier Name="SERFS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-9" Y="-5"/>
+<Point X="-1" Y="-10"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -357,9 +336,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="VR" Target="ER">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <LabelGeometry Anchor="NW">
 <Point X="-32" Y="-29"/>
 </LabelGeometry>
@@ -443,11 +420,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="ZS"/>
 <SimpleIdentifier Name="TAST"/>
 <LabelGeometry Anchor="NW">
-<Point X="8" Y="-52"/>
+<Point X="4" Y="-36"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="258" Y="211"/>
+<Point X="289" Y="200"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="FS" Target="VR">
@@ -468,9 +445,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="FS" Target="AU1">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <LabelGeometry Anchor="NW">
 <Point X="-43" Y="-23"/>
 </LabelGeometry>
@@ -485,7 +460,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="FS"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-23" Y="-14"/>
+<Point X="-16" Y="-15"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -534,9 +509,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TAST"/>
 <SimpleIdentifier Name="wsp"/>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <IndexedIdentifier Name="reset">
 <SimpleIdentifier Name="FS"/>
 </IndexedIdentifier>
@@ -682,7 +655,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="160" Y="96"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="2" Y="20"/>
+<Point X="6" Y="2"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="ZS">
@@ -693,7 +666,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="528" Y="208"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-28" Y="4"/>
+<Point X="-31" Y="-5"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Initial="true" Name="IN">
@@ -704,7 +677,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="416" Y="96"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-8" Y="21"/>
+<Point X="-9" Y="9"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="CS1a">
@@ -712,7 +685,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="288" Y="96"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="5" Y="19"/>
+<Point X="6" Y="0"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="RUN">
@@ -720,7 +693,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="304" Y="208"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-29" Y="-9"/>
+<Point X="-30" Y="-17"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="XX">
@@ -728,7 +701,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="416" Y="336"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-9" Y="9"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="CS2">
@@ -736,7 +709,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="48" Y="208"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-19" Y="-11"/>
+<Point X="-35" Y="-8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="CS1">
@@ -744,7 +717,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="176" Y="208"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-28" Y="13"/>
+<Point X="-31" Y="1"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -808,9 +781,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="ZS" Target="IN">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <SimpleIdentifier Name="soft_VR"/>
 <LabelGeometry Anchor="NW">
 <Point X="-28" Y="-13"/>
@@ -876,9 +847,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="XX" Target="RUN">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <SimpleIdentifier Name="soft_VR"/>
 <LabelGeometry Anchor="NW">
 <Point X="-23" Y="7"/>
@@ -902,9 +871,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="IN" Target="IN">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <SimpleIdentifier Name="soft_VR"/>
 <SimpleIdentifier Name="CS"/>
 <LabelGeometry Anchor="NW">
@@ -1022,9 +989,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="RUN" Target="RUN">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <SimpleIdentifier Name="soft_VR"/>
 <LabelGeometry Anchor="NW">
 <Point X="-26" Y="-8"/>
@@ -1039,35 +1004,13 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </SimpleComponent>
 <SimpleComponent Kind="SPEC" Name="decoder">
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="autom_VR"/>
-<SimpleIdentifier Name="ER"/>
-<SimpleIdentifier Name="is_cod_er"/>
-<SimpleIdentifier Name="is_cod_ser"/>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-<SimpleIdentifier Name="TAST"/>
-<SimpleIdentifier Name="ZS"/>
-<SimpleIdentifier Name="ZSA"/>
-<SimpleIdentifier Name="ZSI"/>
-<LabelGeometry Anchor="NW">
-<Point X="5" Y="5"/>
-</LabelGeometry>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="RQZS">
 <PointGeometry>
 <Point X="544" Y="144"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-11" Y="-10"/>
+<Point X="-17" Y="-20"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="RQSER">
@@ -1075,7 +1018,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="160" Y="144"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-17" Y="-11"/>
+<Point X="-22" Y="-23"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="ZS">
@@ -1102,7 +1045,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="416" Y="144"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="1" Y="-9"/>
+<Point X="-1" Y="-21"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="VR">
@@ -1129,7 +1072,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="288" Y="144"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-28" Y="-9"/>
+<Point X="-31" Y="-23"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="SER">
@@ -1159,21 +1102,21 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="352" Y="48"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-4" Y="-11"/>
+<Point X="1" Y="-17"/>
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="ZS"/>
-<NodeRef Name="SER"/>
-<NodeRef Name="RQER"/>
-<NodeRef Name="RQVR"/>
-<NodeRef Name="ER"/>
-<NodeRef Name="RQSER"/>
-<NodeRef Name="VR"/>
 <NodeRef Name="COD"/>
 <NodeRef Name="TSTZS"/>
-<NodeRef Name="RQZS"/>
+<NodeRef Name="RQSER"/>
 <NodeRef Name="IN"/>
+<NodeRef Name="RQVR"/>
+<NodeRef Name="RQZS"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="SER"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="RQER"/>
+<NodeRef Name="VR"/>
 <BoxGeometry>
 <Box X="112" Y="16" Width="480" Height="416"/>
 </BoxGeometry>
@@ -1214,9 +1157,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </Edge>
 <Edge Source="RQSER" Target="SER">
 <LabelBlock>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <LabelGeometry Anchor="NW">
 <Point X="-24" Y="-38"/>
 </LabelGeometry>
@@ -1459,7 +1400,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="112" Y="320"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-22" Y="14"/>
+<Point X="-21" Y="3"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="C1">
@@ -1467,7 +1408,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="272" Y="320"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="7" Y="16"/>
+<Point X="8" Y="3"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -1612,8 +1553,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <PointGeometry>
 <Point X="96" Y="176"/>
 </PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-13"/>
+</InitialArrowGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="FS">
@@ -1621,7 +1565,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="208" Y="176"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -1704,8 +1648,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <PointGeometry>
 <Point X="80" Y="176"/>
 </PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-14"/>
+</InitialArrowGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="VR">
@@ -1713,7 +1660,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="192" Y="176"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -1796,8 +1743,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <PointGeometry>
 <Point X="64" Y="176"/>
 </PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-13"/>
+</InitialArrowGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="VR">
@@ -1805,7 +1755,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="176" Y="176"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -1888,8 +1838,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <PointGeometry>
 <Point X="64" Y="144"/>
 </PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-12"/>
+</InitialArrowGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="VR">
@@ -1897,7 +1850,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="176" Y="144"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-8" Y="24"/>
+<Point X="-8" Y="8"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -1929,7 +1882,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="ER_FS"/>
 <SimpleIdentifier Name="TASTVR"/>
 <LabelGeometry Anchor="NW">
-<Point X="-2" Y="-124"/>
+<Point X="-26" Y="-148"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -1943,7 +1896,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="VR_HK"/>
 <SimpleIdentifier Name="VR_FS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-35" Y="-10"/>
+<Point X="-25" Y="0"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -1961,7 +1914,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="ER_FS"/>
 <SimpleIdentifier Name="TASTVR"/>
 <LabelGeometry Anchor="NW">
-<Point X="-12" Y="-62"/>
+<Point X="-26" Y="-64"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -1972,17 +1925,17 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </Graph>
 </SimpleComponent>
 <ForeachComponent Name="TUER">
-<SimpleIdentifier Name="FahrerTueren"/>
+<SimpleIdentifier Name="Tueren"/>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
-<IndexedIdentifier Name="ftuer">
+<IndexedIdentifier Name="tuer">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
 <SimpleNode Name="cs3">
 <PointGeometry>
-<Point X="336" Y="528"/>
+<Point X="336" Y="560"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="-3" Y="5"/>
@@ -1990,15 +1943,15 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </SimpleNode>
 <SimpleNode Name="cs1">
 <PointGeometry>
-<Point X="176" Y="528"/>
+<Point X="144" Y="560"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-29" Y="4"/>
+<Point X="-34" Y="-4"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="cs2">
 <PointGeometry>
-<Point X="256" Y="528"/>
+<Point X="240" Y="560"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="-12" Y="9"/>
@@ -2006,7 +1959,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </SimpleNode>
 <SimpleNode Name="zs8">
 <PointGeometry>
-<Point X="512" Y="448"/>
+<Point X="528" Y="464"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="8" Y="3"/>
@@ -2017,7 +1970,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point X="464" Y="448"/>
+<Point X="464" Y="464"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="-17" Y="7"/>
@@ -2084,7 +2037,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point X="336" Y="304"/>
+<Point X="336" Y="320"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="6" Y="1"/>
@@ -2183,7 +2136,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Point X="208" Y="400"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="10" Y="6"/>
+<Point X="-29" Y="1"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="VR">
@@ -2191,7 +2144,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point X="208" Y="448"/>
+<Point X="208" Y="464"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="6" Y="4"/>
@@ -2199,39 +2152,39 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </SimpleNode>
 <SimpleNode Name="vr8">
 <PointGeometry>
-<Point X="160" Y="448"/>
+<Point X="144" Y="464"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="-26" Y="2"/>
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":0">
-<NodeRef Name="er3"/>
-<NodeRef Name="zs8"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="ZS"/>
-<NodeRef Name="vr3"/>
+<NodeRef Name="zs3"/>
 <NodeRef Name="er1"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="vr7"/>
-<NodeRef Name="zs7"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="zs2"/>
+<NodeRef Name="er2"/>
 <NodeRef Name="vr4"/>
 <NodeRef Name="zs5"/>
-<NodeRef Name="zs3"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="vr5"/>
-<NodeRef Name="ER"/>
-<NodeRef Name="vr8"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs6"/>
+<NodeRef Name="vr3"/>
 <NodeRef Name="VR"/>
-<NodeRef Name="IN"/>
+<NodeRef Name="ER"/>
 <NodeRef Name="zs9"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="vr8"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="zs7"/>
+<NodeRef Name="zs8"/>
+<NodeRef Name="zs6"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="vr7"/>
 <NodeRef Name="vr6"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="er3"/>
 <BoxGeometry>
-<Box X="80" Y="48" Width="512" Height="432"/>
+<Box X="80" Y="48" Width="512" Height="464"/>
 </BoxGeometry>
 </GroupNode>
 </NodeList>
@@ -2239,40 +2192,61 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="vr7" Target="VR">
 <LabelBlock>
 <SimpleIdentifier Name="done_VR"/>
+<ConditionalEvent>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="TUER"/>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="done_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-53" Y="-7"/>
+<Point X="-43" Y="-19"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
 <Edge Source="ER" Target="er3">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
+<ConditionalEvent>
+<BinaryExpression Operator="==">
 <SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-89" Y="-15"/>
+<Point X="-90" Y="-27"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="320" Y="282"/>
+<Point X="315" Y="291"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="ER" Target="vr5">
 <LabelBlock>
 <SimpleIdentifier Name="soft_VR"/>
 <LabelGeometry Anchor="NW">
-<Point X="-43" Y="3"/>
+<Point X="-46" Y="-2"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="267" Y="315"/>
+</SplineGeometry>
 </Edge>
 <Edge Source="ER" Target="zs5">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ZS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-19" Y="-2"/>
+<Point X="-10" Y="0"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="402" Y="316"/>
+</SplineGeometry>
 </Edge>
 <Edge Source="zs4" Target="zs5">
 <LabelBlock>
@@ -2320,11 +2294,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-36" Y="-11"/>
+<Point X="-72" Y="-14"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="171" Y="410"/>
+<Point X="159" Y="413"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="vr8" Target="vr1">
@@ -2337,7 +2311,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="100" Y="188"/>
+<Point X="91" Y="188"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="zs6" Target="zs7">
@@ -2456,7 +2430,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="503" Y="412"/>
+<Point X="516" Y="416"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="zs8" Target="zs1">
@@ -2469,7 +2443,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="572" Y="188"/>
+<Point X="581" Y="188"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="cs1" Target="cs2">
@@ -2478,7 +2452,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-59" Y="-18"/>
+<Point X="-59" Y="-20"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2491,11 +2465,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-46" Y="-19"/>
+<Point X="-50" Y="-15"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="176" Y="562"/>
+<Point X="144" Y="594"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="zs1" Target="zs2">
@@ -2514,7 +2488,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-86" Y="-3"/>
+<Point X="-48" Y="-10"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2541,8 +2515,17 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="VR" Target="vr8">
 <LabelBlock>
 <SimpleIdentifier Name="soft_VR"/>
+<ConditionalEvent>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="TUER"/>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-22" Y="4"/>
+<Point X="-28" Y="2"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2550,32 +2533,38 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <LabelBlock>
 <SimpleIdentifier Name="soft_ZS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-107" Y="71"/>
+<Point X="-60" Y="-1"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="344" Y="351"/>
+<Point X="318" Y="421"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="VR" Target="er1">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
+<ConditionalEvent>
+<BinaryExpression Operator="==">
 <SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
 <Point X="-65" Y="44"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="287" Y="316"/>
+<Point X="288" Y="324"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="cs3" Target="ER">
 <LabelBlock>
 <SimpleIdentifier Name="CS_ok"/>
 <LabelGeometry Anchor="NW">
-<Point X="4" Y="71"/>
+<Point X="7" Y="86"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2585,11 +2574,11 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-38" Y="-10"/>
+<Point X="-38" Y="-2"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="256" Y="560"/>
+<Point X="240" Y="592"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="cs2" Target="cs3">
@@ -2605,11 +2594,17 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="er3" Target="ER">
 <LabelBlock>
 <SimpleIdentifier Name="done_ER"/>
-<IndexedIdentifier Name="done_SER">
+<ConditionalEvent>
+<BinaryExpression Operator="==">
 <SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="done_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="3" Y="-14"/>
+<Point X="2" Y="-23"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2619,7 +2614,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-84" Y="-2"/>
+<Point X="-48" Y="-2"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2632,7 +2627,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-63" Y="-12"/>
+<Point X="-68" Y="-17"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -2678,26 +2673,41 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="ZS" Target="vr1">
 <LabelBlock>
 <SimpleIdentifier Name="soft_VR"/>
+<ConditionalEvent>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="TUER"/>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="68" Y="103"/>
+<Point X="-4" Y="23"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="305" Y="303"/>
+<Point X="347" Y="408"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="ZS" Target="er1">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
+<ConditionalEvent>
+<BinaryExpression Operator="==">
 <SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-26" Y="30"/>
+<Point X="-31" Y="15"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="384" Y="323"/>
+<Point X="383" Y="332"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="ZS" Target="zs8">
@@ -2712,29 +2722,47 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <LabelBlock>
 <SimpleIdentifier Name="soft_CS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-47" Y="-5"/>
+<Point X="-58" Y="-6"/>
 </LabelGeometry>
 </LabelBlock>
+<StartPointGeometry>
+<Point X="101" Y="512"/>
+</StartPointGeometry>
 <SplineGeometry>
-<Point X="135" Y="503"/>
+<Point X="112" Y="544"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="IN" Target="vr1">
 <LabelBlock>
 <SimpleIdentifier Name="soft_VR"/>
+<ConditionalEvent>
+<BinaryExpression Operator="!=">
+<SimpleIdentifier Name="TUER"/>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="-26" Y="-16"/>
+<Point X="-81" Y="-43"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
 <Edge Source="IN" Target="er1">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
+<ConditionalEvent>
+<BinaryExpression Operator="==">
 <SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="FT"/>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="soft_SER"/>
+</EventList>
+</ConditionalEvent>
 <LabelGeometry Anchor="NW">
-<Point X="1" Y="-16"/>
+<Point X="-52" Y="-17"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
@@ -2742,268 +2770,13 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <LabelBlock>
 <SimpleIdentifier Name="soft_ZS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-10" Y="-16"/>
+<Point X="-15" Y="-24"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="NAME">
-<EnumSetExpression>
-<SimpleIdentifier Name="WSP"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="ircount">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IN">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="64" Y="32"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-14" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="144" Y="32"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="0" Y="6"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IN" Target="IN">
-<LabelBlock>
-<IndexedIdentifier Name="reset_ctr">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-35" Y="-37"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="31" Y="28"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="IN" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="inc_ctr">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-5" Y="-19"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="105" Y="20"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="RUN" Target="IN">
-<LabelBlock>
-<IndexedIdentifier Name="ctr_lt_max">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="ctr_ge_max">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-42" Y="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="104" Y="47"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<SimpleComponent Kind="SPEC" Name="kein_zs">
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="AUF">
-<PointGeometry>
-<Point X="48" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-13" Y="9"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="ZU">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="144" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-8" Y="9"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="AUF" Target="AUF">
-<LabelBlock>
-<SimpleIdentifier Name="kein_ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-13" Y="-31"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="12" Y="43"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="AUF" Target="ZU">
-<LabelBlock>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-32" Y="1"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="96" Y="58"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="ZU" Target="AUF">
-<LabelBlock>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-30" Y="-19"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="96" Y="38"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="ZU" Target="ZU">
-<LabelBlock>
-<SimpleIdentifier Name="ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-22" Y="-28"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="183" Y="47"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="SPEC" Name="keine_wsp">
-<Graph>
-<NodeList>
-<SimpleNode Name="WSP">
-<PointGeometry>
-<Point X="192" Y="144"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-16" Y="14"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="IDLE">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="80" Y="144"/>
-</PointGeometry>
-<InitialArrowGeometry>
-<Point X="0" Y="-16"/>
-</InitialArrowGeometry>
-<LabelGeometry>
-<Point X="-17" Y="14"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="WSP" Target="WSP">
-<LabelBlock>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="TASTVR"/>
-<LabelGeometry Anchor="NW">
-<Point X="-20" Y="-84"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="224" Y="144"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="WSP" Target="IDLE">
-<LabelBlock>
-<SimpleIdentifier Name="ER"/>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="TAST"/>
-<SimpleIdentifier Name="ZS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="wsp"/>
-<LabelGeometry Anchor="NW">
-<Point X="-28" Y="-12"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="131" Y="160"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="IDLE" Target="WSP">
-<LabelBlock>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="TASTVR"/>
-<LabelGeometry Anchor="NW">
-<Point X="-14" Y="-118"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="136" Y="127"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="IDLE" Target="IDLE">
-<LabelBlock>
-<SimpleIdentifier Name="soft_CS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-32" Y="-29"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="45" Y="144"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
-<ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="mer">
 <SimpleIdentifier Name="TUER"/>
@@ -3060,11 +2833,6 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
-<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="merguard">
 <SimpleIdentifier Name="TUER"/>
@@ -3149,72 +2917,6 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="HeckTueren"/>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="mvr">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IDLE">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="64" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-39" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="160" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="12" Y="7"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IDLE" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="MVR_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-39" Y="1"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="110" Y="62"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="RUN" Target="IDLE">
-<LabelBlock>
-<IndexedIdentifier Name="MVR_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-41" Y="-14"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="112" Y="34"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
-<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="mvrguard">
 <SimpleIdentifier Name="TUER"/>
@@ -3302,1050 +3004,6 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="VorderTueren"/>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="mvrstzv">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IDLE">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="48" Y="80"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-20" Y="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="160" Y="80"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-13" Y="6"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IDLE" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="MVR_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-42" Y="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="100" Y="98"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="RUN" Target="IDLE">
-<LabelBlock>
-<IndexedIdentifier Name="MVR_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-46" Y="-22"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="104" Y="63"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="RUN" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="STZV">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-41" Y="-26"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="199" Y="80"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="HeckTueren"/>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="mzs">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IDLE">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="32" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-14" Y="8"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="128" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-13" Y="6"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IDLE" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="MZS_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-39" Y="1"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="78" Y="63"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="RUN" Target="IDLE">
-<LabelBlock>
-<IndexedIdentifier Name="MZS_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-44" Y="-20"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="80" Y="34"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="HeckTueren"/>
-<ComponentList>
-<SimpleComponent Kind="SPEC">
-<IndexedIdentifier Name="mzsguard">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IDLE">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="128" Y="160"/>
-</PointGeometry>
-<InitialArrowGeometry>
-<Point X="-1" Y="-15"/>
-</InitialArrowGeometry>
-<LabelGeometry>
-<Point X="-13" Y="8"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="224" Y="160"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-16" Y="7"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="RUN" Target="IDLE">
-<LabelBlock>
-<IndexedIdentifier Name="MZS_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-43" Y="-20"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="176" Y="146"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="IDLE" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="MZS_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-41" Y="1"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="176" Y="175"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="IDLE" Target="IDLE">
-<LabelBlock>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-72" Y="-44"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="89" Y="158"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="NichtFahrerTueren"/>
-<ComponentList>
-<SimpleComponent Kind="SPEC">
-<IndexedIdentifier Name="nftuer">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="cs2">
-<PointGeometry>
-<Point X="240" Y="512"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-13" Y="22"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="cs1">
-<PointGeometry>
-<Point X="160" Y="512"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-30" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="cs3">
-<PointGeometry>
-<Point X="320" Y="512"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-7" Y="19"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr1">
-<PointGeometry>
-<Point X="176" Y="96"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="11" Y="9"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr2">
-<PointGeometry>
-<Point X="176" Y="144"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="11" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr3">
-<PointGeometry>
-<Point X="176" Y="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="10" Y="3"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr4">
-<PointGeometry>
-<Point X="176" Y="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="10" Y="3"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr5">
-<PointGeometry>
-<Point X="176" Y="288"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="9" Y="-5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr6">
-<PointGeometry>
-<Point X="176" Y="336"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="11" Y="6"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr7">
-<PointGeometry>
-<Point X="176" Y="384"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="12" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="VR">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="176" Y="432"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="11" Y="8"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="vr8">
-<PointGeometry>
-<Point X="128" Y="432"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-27" Y="7"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs8">
-<PointGeometry>
-<Point X="512" Y="432"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="5" Y="16"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="ZS">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="464" Y="432"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-14" Y="20"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs7">
-<PointGeometry>
-<Point X="464" Y="384"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-27" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs6">
-<PointGeometry>
-<Point X="464" Y="336"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-28" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs5">
-<PointGeometry>
-<Point X="464" Y="288"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-28" Y="-3"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs4">
-<PointGeometry>
-<Point X="464" Y="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-27" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs3">
-<PointGeometry>
-<Point X="464" Y="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-27" Y="6"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs2">
-<PointGeometry>
-<Point X="464" Y="144"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-27" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs1">
-<PointGeometry>
-<Point X="464" Y="96"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-27" Y="8"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="zs9">
-<PointGeometry>
-<Point X="416" Y="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="2" Y="-10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="ER">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="320" Y="288"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="6" Y="-4"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="er3">
-<PointGeometry>
-<Point X="320" Y="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="10" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="er2">
-<PointGeometry>
-<Point X="320" Y="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-28" Y="6"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="er1">
-<PointGeometry>
-<Point X="320" Y="144"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="10" Y="2"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="IN">
-<PointGeometry>
-<Point X="320" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="11" Y="1"/>
-</LabelGeometry>
-</SimpleNode>
-<GroupNode Name=":1">
-<NodeRef Name="vr3"/>
-<NodeRef Name="zs3"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="zs6"/>
-<NodeRef Name="vr7"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="ZS"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="zs9"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="vr6"/>
-<NodeRef Name="ER"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="zs7"/>
-<NodeRef Name="vr5"/>
-<NodeRef Name="er3"/>
-<NodeRef Name="zs8"/>
-<NodeRef Name="vr8"/>
-<NodeRef Name="VR"/>
-<NodeRef Name="IN"/>
-<BoxGeometry>
-<Box X="48" Y="16" Width="544" Height="432"/>
-</BoxGeometry>
-</GroupNode>
-</NodeList>
-<EdgeList>
-<Edge Source="zs6" Target="zs6">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-25" Y="-14"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="503" Y="334"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="zs6" Target="zs7">
-<LabelBlock>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="3" Y="-8"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="cs3" Target="ER">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<LabelGeometry Anchor="NW">
-<Point X="4" Y="74"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr3" Target="vr4">
-<LabelBlock>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-82" Y="-9"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source=":1" Target="cs1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_CS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-49" Y="-1"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="145" Y="474"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="zs5" Target="zs6">
-<LabelBlock>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="2" Y="-9"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="ER" Target="vr5">
-<LabelBlock>
-<SimpleIdentifier Name="soft_VR"/>
-<LabelGeometry Anchor="NW">
-<Point X="12" Y="-11"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="ER" Target="zs5">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-49" Y="-12"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="ER" Target="er3">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ER"/>
-<LabelGeometry Anchor="NW">
-<Point X="-42" Y="-6"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="309" Y="264"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="er1" Target="er2">
-<LabelBlock>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-95" Y="-5"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr8" Target="vr1">
-<LabelBlock>
-<IndexedIdentifier Name="async">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="2" Y="-16"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="68" Y="252"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="vr8" Target="vr7">
-<LabelBlock>
-<IndexedIdentifier Name="sync">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-40" Y="-13"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="136" Y="392"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="zs8" Target="zs7">
-<LabelBlock>
-<IndexedIdentifier Name="sync">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-21" Y="-13"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="506" Y="392"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="zs8" Target="zs1">
-<LabelBlock>
-<IndexedIdentifier Name="async">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-65" Y="21"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="572" Y="252"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="vr6" Target="vr6">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-54" Y="-11"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="140" Y="334"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="vr6" Target="vr7">
-<LabelBlock>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-84" Y="-2"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr1" Target="vr2">
-<LabelBlock>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-88" Y="-5"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="VR" Target="vr8">
-<LabelBlock>
-<SimpleIdentifier Name="soft_VR"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-23" Y="2"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="VR" Target="zs9">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-101" Y="49"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="345" Y="337"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="VR" Target="er1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ER"/>
-<LabelGeometry Anchor="NW">
-<Point X="-46" Y="36"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="245" Y="273"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="ZS" Target="zs8">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-20" Y="6"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="ZS" Target="er1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ER"/>
-<LabelGeometry Anchor="NW">
-<Point X="5" Y="69"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="404" Y="235"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="ZS" Target="vr1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_VR"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="58" Y="69"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="284" Y="326"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="zs7" Target="ZS">
-<LabelBlock>
-<SimpleIdentifier Name="done_ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-1" Y="-10"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs4" Target="zs5">
-<LabelBlock>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="3" Y="-8"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr5" Target="vr6">
-<LabelBlock>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-85" Y="-9"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr7" Target="VR">
-<LabelBlock>
-<SimpleIdentifier Name="done_VR"/>
-<IndexedIdentifier Name="done_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-55" Y="-9"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="er3" Target="ER">
-<LabelBlock>
-<SimpleIdentifier Name="done_ER"/>
-<LabelGeometry Anchor="NW">
-<Point X="1" Y="-9"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs3" Target="zs4">
-<LabelBlock>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="3" Y="-6"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="cs2" Target="cs2">
-<LabelBlock>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-37" Y="-15"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="242" Y="553"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="cs2" Target="cs3">
-<LabelBlock>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-32" Y="-21"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs9" Target="zs5">
-<LabelBlock>
-<IndexedIdentifier Name="sync">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-43" Y="-23"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs9" Target="zs1">
-<LabelBlock>
-<IndexedIdentifier Name="async">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-65" Y="-20"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="cs1" Target="cs1">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-44" Y="-22"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="159" Y="552"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="cs1" Target="cs2">
-<LabelBlock>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-42" Y="-19"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs1" Target="zs2">
-<LabelBlock>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="2" Y="-9"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr2" Target="vr3">
-<LabelBlock>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-87" Y="-2"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr2" Target="vr2">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-54" Y="-13"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="139" Y="146"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="IN" Target="er1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ER"/>
-<LabelGeometry Anchor="NW">
-<Point X="1" Y="0"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="IN" Target="vr1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_VR"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-23" Y="-18"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="IN" Target="zs1">
-<LabelBlock>
-<SimpleIdentifier Name="soft_ZS"/>
-<LabelGeometry Anchor="NW">
-<Point X="-12" Y="-15"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="er2" Target="er2">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-26" Y="-14"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="358" Y="189"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="er2" Target="er3">
-<LabelBlock>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-44" Y="-7"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="vr4" Target="vr5">
-<LabelBlock>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-83" Y="-10"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs2" Target="zs3">
-<LabelBlock>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="3" Y="-2"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="zs2" Target="zs2">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-26" Y="-13"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="502" Y="145"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="NAME">
-<EnumSetExpression>
-<SimpleIdentifier Name="WSP"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="SPEC">
-<IndexedIdentifier Name="noreset">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<Graph>
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="5" Y="5"/>
-</LabelGeometry>
-</LabelBlock>
-<NodeList>
-<SimpleNode Initial="true" Name="s0">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="48" Y="48"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="12" Y="5"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
-<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sync">
 <SimpleIdentifier Name="TUER"/>
@@ -4613,78 +3271,6 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="NAME">
-<EnumSetExpression>
-<SimpleIdentifier Name="WSP"/>
-<SimpleIdentifier Name="FS"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="timer">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="IDLE">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="64" Y="128"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-15" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="176" Y="128"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="-9" Y="11"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="IDLE" Target="RUN">
-<LabelBlock>
-<IndexedIdentifier Name="time">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-29" Y="1"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="119" Y="142"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="RUN" Target="IDLE">
-<LabelBlock>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-38" Y="-37"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="119" Y="115"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
-<ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="tklemme">
 <SimpleIdentifier Name="TUER"/>
@@ -4744,11 +3330,282 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </EdgeList>
 </Graph>
 </SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="ttimer">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-18" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="160" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="101" Y="79"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-36"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="44"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="ttimguard">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="224" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="0" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="166" Y="46"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="78"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-64" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="76" Y="61"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="TUER">
 <SimpleIdentifier Name="VorderTueren"/>
 <ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="mvrstzv">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-20" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="160" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="100" Y="98"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="199" Y="80"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="tmotor1">
 <SimpleIdentifier Name="TUER"/>
@@ -4871,20 +3728,20 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="er3"/>
-<NodeRef Name="er4"/>
-<NodeRef Name="vr2"/>
 <NodeRef Name="vr5"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="zs3"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="vr4"/>
 <NodeRef Name="IN"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="er4"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="zs2"/>
 <BoxGeometry>
 <Box X="48" Y="64" Width="512" Height="496"/>
 </BoxGeometry>
@@ -5220,6 +4077,205 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <ForeachComponent Name="TUER">
 <SimpleIdentifier Name="HeckTueren"/>
 <ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="mvr">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-39" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="160" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="110" Y="62"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="34"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="mzs">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="32" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-14" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="128" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MZS_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="78" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MZS_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="80" Y="34"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="mzsguard">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-1" Y="-15"/>
+</InitialArrowGeometry>
+<LabelGeometry>
+<Point X="-13" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="224" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-16" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MZS_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="146"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MZS_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-72" Y="-44"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="89" Y="158"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="tmotor2">
 <SimpleIdentifier Name="TUER"/>
@@ -5350,21 +4406,21 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":0">
-<NodeRef Name="vr3"/>
-<NodeRef Name="zs1"/>
+<NodeRef Name="zs3a"/>
+<NodeRef Name="zs5"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="IN"/>
 <NodeRef Name="er4"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs4"/>
 <NodeRef Name="vr2"/>
 <NodeRef Name="er1"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="zs4"/>
+<NodeRef Name="vr3"/>
 <NodeRef Name="zs3b"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="IN"/>
-<NodeRef Name="er3"/>
+<NodeRef Name="zs2"/>
 <NodeRef Name="vr4"/>
-<NodeRef Name="zs3a"/>
+<NodeRef Name="er3"/>
 <BoxGeometry>
 <Box X="32" Y="16" Width="512" Height="544"/>
 </BoxGeometry>
@@ -5711,12 +4767,15 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 </SimpleComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
+<ForeachComponent Name="NAME">
+<EnumSetExpression>
+<SimpleIdentifier Name="WSP"/>
+<SimpleIdentifier Name="FS"/>
+</EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="ttimer">
-<SimpleIdentifier Name="TUER"/>
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="NAME"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -5725,204 +4784,334 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point X="48" Y="64"/>
+<Point X="64" Y="128"/>
 </PointGeometry>
 <LabelGeometry>
-<Point X="-18" Y="8"/>
+<Point X="-15" Y="10"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="RUN">
 <PointGeometry>
-<Point X="160" Y="64"/>
+<Point X="176" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-9" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="119" Y="142"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="119" Y="115"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="NAME">
+<EnumSetExpression>
+<SimpleIdentifier Name="WSP"/>
+</EnumSetExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="ircount">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="32"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-14" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="144" Y="32"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="0" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="reset_ctr">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="31" Y="28"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="inc_ctr">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="105" Y="20"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="ctr_lt_max">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="ctr_ge_max">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="47"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="noreset">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="NAME"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC" Name="kein_zs">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="AUF">
+<PointGeometry>
+<Point X="48" Y="48"/>
 </PointGeometry>
 <LabelGeometry>
 <Point X="-13" Y="9"/>
 </LabelGeometry>
 </SimpleNode>
+<SimpleNode Name="ZU">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="144" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="IDLE" Target="RUN">
+<Edge Source="AUF" Target="AUF">
 <LabelBlock>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="kein_ZS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-48" Y="0"/>
+<Point X="-13" Y="-31"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="101" Y="79"/>
+<Point X="12" Y="43"/>
 </SplineGeometry>
 </Edge>
-<Edge Source="RUN" Target="IDLE">
+<Edge Source="AUF" Target="ZU">
 <LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="FT"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-46" Y="-36"/>
+<Point X="-32" Y="1"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="104" Y="44"/>
+<Point X="96" Y="58"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="38"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="ZU">
+<LabelBlock>
+<SimpleIdentifier Name="ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="183" Y="47"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TUER">
-<SimpleIdentifier Name="Tueren"/>
-<ComponentList>
-<SimpleComponent Kind="SPEC">
-<IndexedIdentifier Name="ttimguard">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleComponent Kind="SPEC" Name="keine_wsp">
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
+<SimpleNode Name="WSP">
+<PointGeometry>
+<Point X="192" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-16" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
-<Point X="112" Y="64"/>
+<Point X="80" Y="144"/>
 </PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="-16"/>
+</InitialArrowGeometry>
 <LabelGeometry>
-<Point X="-11" Y="20"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="RUN">
-<PointGeometry>
-<Point X="224" Y="64"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="0" Y="21"/>
+<Point X="-17" Y="14"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="RUN" Target="IDLE">
+<Edge Source="WSP" Target="WSP">
 <LabelBlock>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="TASTVR"/>
 <LabelGeometry Anchor="NW">
-<Point X="-29" Y="-15"/>
+<Point X="-20" Y="-84"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="166" Y="46"/>
+<Point X="224" Y="144"/>
 </SplineGeometry>
 </Edge>
-<Edge Source="IDLE" Target="RUN">
+<Edge Source="WSP" Target="IDLE">
 <LabelBlock>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="ER"/>
+<SimpleIdentifier Name="SER"/>
+<SimpleIdentifier Name="SERFS"/>
+<SimpleIdentifier Name="TAST"/>
+<SimpleIdentifier Name="ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="wsp"/>
 <LabelGeometry Anchor="NW">
-<Point X="-32" Y="-7"/>
+<Point X="-28" Y="-12"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="164" Y="78"/>
+<Point X="131" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="WSP">
+<LabelBlock>
+<SimpleIdentifier Name="ER_BT"/>
+<SimpleIdentifier Name="ER_FS"/>
+<SimpleIdentifier Name="ER_FT"/>
+<SimpleIdentifier Name="ER_HK"/>
+<SimpleIdentifier Name="VR_BT"/>
+<SimpleIdentifier Name="VR_FS"/>
+<SimpleIdentifier Name="VR_FT"/>
+<SimpleIdentifier Name="VR_HK"/>
+<SimpleIdentifier Name="TASTVR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-118"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="136" Y="127"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="IDLE" Target="IDLE">
 <LabelBlock>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_CS"/>
 <LabelGeometry Anchor="NW">
-<Point X="-64" Y="-28"/>
+<Point X="-32" Y="-29"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="76" Y="61"/>
+<Point X="45" Y="144"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
 <SimpleComponent Kind="SPEC" Name="warten">
 <Graph>
 <NodeList>
@@ -5969,9 +5158,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="IDLE" Target="RUN">
 <LabelBlock>
 <SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="soft_SER"/>
 <SimpleIdentifier Name="soft_VR"/>
 <SimpleIdentifier Name="soft_ZS"/>
 <SimpleIdentifier Name="soft_CS"/>
@@ -5986,9 +5173,7 @@ The property 'sicherheit_er' represents the property that the car's driver door 
 <Edge Source="RUN" Target="IDLE">
 <LabelBlock>
 <SimpleIdentifier Name="done_ER"/>
-<IndexedIdentifier Name="done_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
+<SimpleIdentifier Name="done_SER"/>
 <SimpleIdentifier Name="done_VR"/>
 <SimpleIdentifier Name="done_ZS"/>
 <SimpleIdentifier Name="CS_ok"/>
