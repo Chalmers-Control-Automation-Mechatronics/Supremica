@@ -388,12 +388,13 @@ public abstract class ModuleTree
   }
 
   @Override
-  public Proxy getSelectableAncestor(final Proxy item)
+  public Proxy getSelectableAncestor(final Proxy proxy)
   {
     final ModuleTreeModel model = getModuleTreeModel();
-    if (item == model.getRoot()) {
+    if (proxy == model.getRoot()) {
       return null;
     } else {
+      final ProxySubject item = (ProxySubject) proxy;
       return model.getVisibleAncestorInTree(item);
     }
   }

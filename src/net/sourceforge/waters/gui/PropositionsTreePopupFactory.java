@@ -59,6 +59,7 @@ class PropositionsTreePopupFactory
 
   //#########################################################################
   //# Shared Menu Items
+  @Override
   protected void addItemSpecificMenuItems(final Proxy proxy)
   {
     try {
@@ -68,16 +69,17 @@ class PropositionsTreePopupFactory
     }
   }
 
+  @Override
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     popup.addSeparator();
-    final IDEAction newfor = master.getInsertForeachAction();
-    if(newfor.isEnabled()){
-      popup.add(newfor);
-    }
+    final IDEAction newFor = master.getInsertForeachAction();
+    popup.add(newFor);
+    final IDEAction newCond = master.getInsertConditionalAction();
+    popup.add(newCond);
   }
 
 
@@ -89,6 +91,7 @@ class PropositionsTreePopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       addPropertiesAndDeleteMenuItems(proxy);
