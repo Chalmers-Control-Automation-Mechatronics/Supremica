@@ -72,7 +72,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_SYNTHESIS = new DefaultLeafOptionPage("algorithms.synthesis", "Synthesis") {
+  public static final SimpleLeafOptionPage ALGORITHMS_SYNTHESIS =
+    new DefaultLeafOptionPage("algorithms.synthesis", "Synthesis") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -89,7 +90,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage GUI_ANALYZER = new DefaultLeafOptionPage("gui.analyzer", "Analyzer") {
+  public static final SimpleLeafOptionPage GUI_ANALYZER =
+    new DefaultLeafOptionPage("gui.analyzer", "Analyzer") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -103,7 +105,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage GUI_SIMULATOR = new DefaultLeafOptionPage("gui.simulator", "Simulator") {
+  public static final SimpleLeafOptionPage GUI_SIMULATOR =
+    new DefaultLeafOptionPage("gui.simulator", "Simulator") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -112,7 +115,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage GUI_DOT = new DefaultLeafOptionPage("gui.dot", "Dot") {
+  public static final SimpleLeafOptionPage GUI_DOT =
+    new DefaultLeafOptionPage("gui.dot", "Dot") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -124,7 +128,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_SYNCHRONIZATION = new DefaultLeafOptionPage("algorithms.synchronization", "Synchronization") {
+  public static final SimpleLeafOptionPage ALGORITHMS_SYNCHRONIZATION =
+    new DefaultLeafOptionPage("algorithms.synchronization", "Synchronization") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -136,7 +141,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_VERIFICATION = new DefaultLeafOptionPage("algorithms.verification", "Verification") {
+  public static final SimpleLeafOptionPage ALGORITHMS_VERIFICATION =
+    new DefaultLeafOptionPage("algorithms.verification", "Verification") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -148,7 +154,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_MINIMIZATION = new DefaultLeafOptionPage("algorithms.minimization", "Minimization") {
+  public static final SimpleLeafOptionPage ALGORITHMS_MINIMIZATION =
+    new DefaultLeafOptionPage("algorithms.minimization", "Minimization") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -164,7 +171,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_BDD = new DefaultLeafOptionPage("algorithms.bdd", "BDD") {
+  public static final SimpleLeafOptionPage ALGORITHMS_BDD =
+    new DefaultLeafOptionPage("algorithms.bdd", "BDD") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -177,7 +185,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_HMI = new DefaultLeafOptionPage("algorithms.hmi", "HMI") {
+  public static final SimpleLeafOptionPage ALGORITHMS_HMI =
+    new DefaultLeafOptionPage("algorithms.hmi", "HMI") {
     @Override
     public List<Option<?>> getOptions()
     {
@@ -186,7 +195,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage MISC = new DefaultLeafOptionPage("misc", "Misc") {
+  public static final SimpleLeafOptionPage MISC =
+    new DefaultLeafOptionPage("misc", "Misc") {
     @Override
     public List<Option<?>> getOptions()
     {

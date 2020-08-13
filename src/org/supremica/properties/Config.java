@@ -131,8 +131,8 @@ public class Config
   ("layoutMode", "Layout Mode", "Layout mode",
     null, LayoutMode.values(), LayoutMode.Default);
   public static final BooleanOption GUI_EDITOR_DEFAULT_EMPTY_MODULE = new BooleanOption
-    ("defaultEmptyModule",
-     "Open with an Empty Module", "Open with an empty module", null, true);
+    ("defaultEmptyModule", "Open with an Empty Module",
+     "Open an empty module when launching Supremica without options", null, true);
   public static final BooleanOption GUI_EDITOR_SHOW_GRID = new BooleanOption
     ("showGrid",
      "Show Grid", "Show grid", null, true);
@@ -143,11 +143,11 @@ public class Config
     ("nodesSnapToGrid",
      "Nodes Snap to Grid", "Nodes snap to grid", null, true);
   public static final PositiveIntOption GUI_EDITOR_NODE_RADIUS = new PositiveIntOption
-    ("nodeRadius",
-     "Node Size", "Node size", null, 6, 4, 32);
+    ("nodeRadius", "Node Size",
+     "Radius of simple nodes in graph editor", null, 6, 4, 32);
   public static final BooleanOption GUI_EDITOR_STATE_NAMES_HIDDEN = new BooleanOption
-    ("hideStateNames",
-     "Suppress state names", "Suppress state names", null, false);
+    ("hideStateNames", "Suppress state names",
+     "Do not display state names in graph editor", null, false);
   public static final BooleanOption GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE = new BooleanOption
     ("controlPointsMoveWithNode",
      "Control points move with node", "Control points move with node", null, true);
@@ -155,42 +155,44 @@ public class Config
   ("edgeArrowAtEnd", "Edge Arrow Position", "Edge arrow position",
     null, EdgeArrowPosition.values(), EdgeArrowPosition.End, EdgeArrowPosition.End, EdgeArrowPosition.Middle);
   public static final PositiveIntOption GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new PositiveIntOption
-    ("springEmbedderTimeout",
-     "Maximum Layout Time", "Maximum layout time", null, 10000);
+    ("springEmbedderTimeout", "Maximum Layout Time",
+     "Maximum time (in milliseconds) before stopping automatic graph layout", null, 10000);
 
 
   //GUI_ANALYZER
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS = new BooleanOption
-    ("includeSeamlessSynthesis",
-     "Include Seamless Synthesis", "Include Seamless Synthesis", null, true);
+    ("includeSeamlessSynthesis", "Include Seamless Synthesis",
+     "Include symbolic synthesis option in editor's Analyze menu", null, true);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_DIAGNOSABILIY = new BooleanOption
-    ("includeDiagnosability",
-     "Include Diagnosability Check", "Include diagnosability check", null, false);
+    ("includeDiagnosability", "Include Diagnosability Check",
+     "Add diagnosability check in editor's Verify menu", null, false);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_HISC = new BooleanOption
-    ("includeHISC",
-     "Include HISC Property Checks", "Include HISC property checks", null, false);
+    ("includeHISC", "Include HISC Checks",
+     "Add Hierachical Interface-Based Supervisory Coontrol (HOSC) property checks " +
+     "in editor's Verify menu", null, false);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SD = new BooleanOption
-    ("includeSD",
-     "Include Sampled-Data Property Checks", "Include sampled-data property checks", null, false);
+    ("includeSD", "Include Sampled-Data Checks",
+     "Add sampled-data property checks in editor's Verify menu", null, false);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_OP = new BooleanOption
-    ("includeOP",
-     "Include Observer Projection Algorithms", "Include Observer Projection algorithms", null, false) {
+    ("includeOP", "Include Observer Projection Algorithms",
+     "Include Observer Projection (OP) in Supremica analyzer", null, false) {
     {
       VerificationType.OP.setConfigOption(this);
     }
   };
   public static final BooleanOption GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER = new BooleanOption
-    ("guiAnalyzerSendPropertiesToAnalyzer",
-     "Send Properties to Analyzer", "Send properties to analyzer", null, false);
+    ("guiAnalyzerSendPropertiesToAnalyzer", "Send properties to analyzer",
+     "Display property automata from the editor in Supremica analyzer", null, false);
   public static final BooleanOption GUI_ANALYZER_AUTOMATON_VIEWER_USE_CONTROLLED_SURFACE = new BooleanOption
     ("automatonViewerUseControlledSurface",
-     "Use New Controlled Surface Panel to Display an Automaton", "Use new controlled surface panel to display an automaton", null, false);
+     "Use controlled surface panel to display automata",
+     "Use new controlled surface panel to display an automaton", null, false);
   public static final BooleanOption INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanOption
     ("includeBoundedUnconTools",
      "Include Unbounded Controllability Tools", "Include unbounded controllability tools", null, false);
   public static final BooleanOption INCLUDE_WATERS_ANALYZER = new BooleanOption
-    ("useWatersAnalyzer",
-     "Use Waters Analyzer", "Use Waters Analyzer", null, false);
+    ("useWatersAnalyzer", "Use Waters Analyzer",
+     "Analyzer tab uses new Waters analyzer instead of Supremica", null, false);
 
 
   //GUI_SIMULATOR
@@ -202,7 +204,7 @@ public class Config
      "External Simulation Process", "External simulation process", null, false);
   public static final PositiveIntOption SIMULATION_CYCLE_TIME = new PositiveIntOption
     ("simulationCycleTime",
-     "Simulator Cycle Time (ms)", "Simulator Cycle time (ms)", null, 100);
+     "Simulator Cycle Time", "Simulator cycle time in milliseconds", null, 100);
 
 
   //GUI_DOT
@@ -287,8 +289,8 @@ public class Config
     ("nbrOfAttempts",
      "Number of Attempts", "Number of attempts", null, 5, 1, Integer.MAX_VALUE);
   public static final BooleanOption VERIFY_SHOW_BAD_TRACE = new BooleanOption
-    ("showBadTrace",
-     "Show Trace to Bad State", "Show trace to bad state", null, false);
+    ("showBadTrace", "Show trace to bad state",
+     "Show counterexample as info in log", null, false);
 
 
   //ALGORITHMS_SYNTHESIS
@@ -443,8 +445,7 @@ public class Config
     ("includeRASSupport",
      "Include RAS Support", "Include RAS support", null, false);
   public static final BooleanOption INCLUDE_FT_SUPPORT = new BooleanOption
-    ("includeFTSupport",
-     "Include FT Support",
+    ("includeFTSupport", "Include FT Support",
      "Support for the XML fault tree format from SystemWaver", null, false);
 
 
@@ -463,6 +464,5 @@ public class Config
           instance = new Config();
       return instance;
   }
-
 
 }
