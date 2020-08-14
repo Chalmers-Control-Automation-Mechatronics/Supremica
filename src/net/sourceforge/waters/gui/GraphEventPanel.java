@@ -1182,26 +1182,13 @@ public class GraphEventPanel
 
 
   //#########################################################################
-  //# Inner Class DeleteVisitor
-  private class DeleteVisitor extends DefaultModuleProxyVisitor
+  //# Inner Class AbstractLabelVisitor
+  private abstract class AbstractLabelVisitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
-    //# Invocation
-    private void addDeletionVictims(final List<? extends Proxy> items,
-                                    final List<InsertInfo> inserts)
-    {
-      try {
-        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-        mItems = new ProxyAccessorHashSet<>(eq, items);
-        mInserts = inserts;
-        final SimpleComponentProxy comp = mRoot.getComponent();
-        final GraphProxy graph = comp.getGraph();
-        graph.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      }
-    }
+    //# Hooks
+    abstract void processList(final ListSubject<? extends ProxySubject> list)
+      throws VisitorException;
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
@@ -1269,10 +1256,34 @@ public class GraphEventPanel
       final PlainEventListProxy props = node.getPropositions();
       return visitPlainEventListProxy(props);
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class DeleteVisitor
+  private class DeleteVisitor extends AbstractLabelVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private void addDeletionVictims(final List<? extends Proxy> items,
+                                    final List<InsertInfo> inserts)
+    {
+      try {
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+        mItems = new ProxyAccessorHashSet<>(eq, items);
+        mInserts = inserts;
+        final SimpleComponentProxy comp = mRoot.getComponent();
+        final GraphProxy graph = comp.getGraph();
+        graph.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
 
     //#######################################################################
-    //# Auxiliary Methods
-    private void processList(final ListSubject<? extends ProxySubject> list)
+    //# Overrides for base class AbstractLabelVisitor
+    @Override
+    void processList(final ListSubject<? extends ProxySubject> list)
       throws VisitorException
     {
       int pos = 0;
@@ -1292,15 +1303,13 @@ public class GraphEventPanel
     //# Data Members
     private ProxyAccessorSet<Proxy> mItems;
     private List<InsertInfo> mInserts;
-
   }
 
 
   //#########################################################################
   //# Inner Class ReplaceVisitor
-  private class ReplaceVisitor extends DefaultModuleProxyVisitor
+  private class ReplaceVisitor extends AbstractLabelVisitor
   {
-
     //#######################################################################
     //# Invocation
     private void addReplacements(final IdentifierProxy old,
@@ -1320,75 +1329,9 @@ public class GraphEventPanel
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    //# Overrides for base class AbstractLabelVisitor
     @Override
-    public Object visitProxy(final Proxy proxy)
-    {
-      return null;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    @Override
-    public Object visitEdgeProxy(final EdgeProxy edge)
-      throws VisitorException
-    {
-      final LabelBlockProxy block = edge.getLabelBlock();
-      if (block != null) {
-        visitLabelBlockProxy(block);
-      }
-      return null;
-    }
-
-    @Override
-    public Object visitGraphProxy(final GraphProxy graph)
-      throws VisitorException
-    {
-      final LabelBlockProxy blocked = graph.getBlockedEvents();
-      if (blocked != null) {
-        visitLabelBlockProxy(blocked);
-      }
-      final Collection<NodeProxy> nodes = graph.getNodes();
-      visitCollection(nodes);
-      final Collection<EdgeProxy> edges = graph.getEdges();
-      visitCollection(edges);
-      return null;
-    }
-
-    @Override
-    public Object visitEventListExpressionProxy(final EventListExpressionProxy expr)
-      throws VisitorException
-    {
-      final EventListExpressionSubject subject =
-        (EventListExpressionSubject) expr;
-      final ListSubject<? extends ProxySubject> eventlist =
-        subject.getEventIdentifierListModifiable();
-      processList(eventlist);
-      return null;
-    }
-
-    @Override
-    public Object visitNestedBlockProxy(final NestedBlockProxy block)
-      throws VisitorException
-    {
-      final NestedBlockSubject subject = (NestedBlockSubject) block;
-      final ListSubject<? extends ProxySubject> body =
-        subject.getBodyModifiable();
-      processList(body);
-      return null;
-    }
-
-    @Override
-    public Object visitNodeProxy(final NodeProxy node)
-      throws VisitorException
-    {
-      final PlainEventListProxy props = node.getPropositions();
-      return visitPlainEventListProxy(props);
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void processList(final ListSubject<? extends ProxySubject> list)
+    void processList(final ListSubject<? extends ProxySubject> list)
       throws VisitorException
     {
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
@@ -1417,7 +1360,6 @@ public class GraphEventPanel
     private IdentifierProxy mOldProxy;
     private IdentifierProxy mNewProxy;
     private List<ReplaceInfo> mReplacements;
-
   }
 
 
