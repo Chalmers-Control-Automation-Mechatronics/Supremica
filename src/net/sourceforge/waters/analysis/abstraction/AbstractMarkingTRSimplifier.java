@@ -150,6 +150,9 @@ public abstract class AbstractMarkingTRSimplifier
     return false;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
   public List<Option<?>> getOptions(final OptionPage db)
   {

@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
@@ -67,7 +68,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
   public TRAutomatonBuilder(final ProductDESProxyFactory factory,
                             final TransitionRelationSimplifier simp) {
     super(factory);
-    mSimp = simp;
+    mSimplifier = simp;
   }
 
 
@@ -76,7 +77,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
   @Override
   public List<Option<?>> getOptions(final OptionPage db)
   {
-    final List<Option<?>> options = mSimp.getOptions(db);
+    final List<Option<?>> options = mSimplifier.getOptions(db);
     return options;
   }
 
@@ -93,7 +94,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
       final PropositionOption propOption = (PropositionOption) option;
       mDefaultMarking = propOption.getValue();
     } else {
-      mSimp.setOption(option);
+      mSimplifier.setOption(option);
     }
   }
 
@@ -108,22 +109,21 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
 
     final ProductDESProxy des = getModel();
     final AutomatonProxy aut = des.getAutomata().iterator().next();
-    final KindTranslator translator = getKindTranslator();
-    int config = mSimp.getPreferredInputConfiguration();
+    int config = mSimplifier.getPreferredInputConfiguration();
     if ((config & ListBufferTransitionRelation.CONFIG_ALL) == 0) {
-      config ^= ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+      config |= ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     }
     if (aut instanceof TRAutomatonProxy) {
-      mTrAut = new TRAutomatonProxy((TRAutomatonProxy)aut, config);
+      mTrAut = new TRAutomatonProxy((TRAutomatonProxy) aut, config);
+    } else {
+      final KindTranslator translator = getKindTranslator();
+      final StateProxy dumpState = TRAutomatonProxy.findDumpState(aut);
+      mTrAut = new TRAutomatonProxy(aut, translator, dumpState, config);
     }
-    else {
-      mTrAut = new TRAutomatonProxy(aut, translator, config);
-    }
-
     final EventEncoding enc = mTrAut.getEventEncoding();
     final int preconditionID = enc.getEventCode(mPreconditionMarking);
     final int defaultID = enc.getEventCode(mDefaultMarking);
-    mSimp.setPropositions(preconditionID, defaultID);
+    mSimplifier.setPropositions(preconditionID, defaultID);
   }
 
   @Override
@@ -132,8 +132,8 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
     try {
       setUp();
       final ListBufferTransitionRelation tr = mTrAut.getTransitionRelation();
-      mSimp.setTransitionRelation(tr);
-      mSimp.run();
+      mSimplifier.setTransitionRelation(tr);
+      mSimplifier.run();
       mTrAut.setName(mOutputName);
       return setProxyResult(mTrAut);
     } finally {
@@ -169,7 +169,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
 
   //#########################################################################
   //# Data Members
-  private final TransitionRelationSimplifier mSimp;
+  private final TransitionRelationSimplifier mSimplifier;
 
   private EventProxy mPreconditionMarking;
   private EventProxy mDefaultMarking;

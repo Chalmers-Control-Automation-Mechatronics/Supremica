@@ -89,6 +89,15 @@ public class StepSimplifierFactory extends TRSimplifierFactory
         return new ObservationEquivalenceTRSimplifier();
       }
     });
+    creators.add(new TRSimplifierCreator("Special Events",
+      "Hide local events, remove selfloops with selfloop-only events," +
+      "remove blocked events, and redirect failing events.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new SpecialEventsTRSimplifier();
+      }
+    });
     creators.add(new TRSimplifierCreator("Subset Construction",
       "Make a nondeterministic automaton deterministic using the " +
       "subset construction algorithm.") {
@@ -98,13 +107,13 @@ public class StepSimplifierFactory extends TRSimplifierFactory
         return new SubsetConstructionTRSimplifier();
       }
     });
-    creators.add(new TRSimplifierCreator("Special Events",
-      "Hide local events, remove selfloops with selfloop-only events," +
-      "remove blocked events, and redirect failing events.") {
+    creators.add(new TRSimplifierCreator("Supervisor Reduction",
+      "Simplify a supervisor using the Su/Wonham " +
+      "supervisor reduction algorithm.") {
       @Override
       protected TransitionRelationSimplifier createTRSimplifier()
       {
-        return new SpecialEventsTRSimplifier();
+        return new SuWonhamSupervisorReductionTRSimplifier();
       }
     });
     creators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",

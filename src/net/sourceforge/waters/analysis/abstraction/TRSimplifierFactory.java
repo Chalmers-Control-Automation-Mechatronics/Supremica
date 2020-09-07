@@ -153,6 +153,14 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
               "-rtus",
               true));
 
+    db.add(new EnumOption<SuWonhamSupervisorReductionTRSimplifier.PairOrdering>
+             (OPTION_SuWonhamSupervisorReduction_PairOrdering,
+               "Pair ordering",
+               "The strategy to determine which pairs are merged first " +
+               "by Su/Wonham suoervisor reduction.",
+               "-por",
+               SuWonhamSupervisorReductionTRSimplifier.PairOrdering.values()));
+
     db.add(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
               "Failing events as selfloops",
@@ -214,6 +222,9 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
 
   public static final String OPTION_SpecialEvents_LocalEvents =
     "SpecialEventsTRSimplifier.LocalEvents";
+
+  public static final String OPTION_SuWonhamSupervisorReduction_PairOrdering =
+    "SuWonhamSupervisorReductionTRSimplifier.PairOrdering";
 
   public static final String OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence =
     "SynthesisObservationEquivalenceTRSimplifier.UsesWeakSynthesisObservationEquivalence";

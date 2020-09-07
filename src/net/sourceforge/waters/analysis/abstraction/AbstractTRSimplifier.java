@@ -320,13 +320,6 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
-  /**
-   * Returns the options supported by this configurable.
-   * @param  db   Option database containing parameters.
-   * @return List of options from the given database that are supported
-   *         by the configurable. The list should be ordered to support
-   *         reasonable presentation to the user.
-   */
   @Override
   public List<Option<?>> getOptions(final OptionPage db)
   {
@@ -338,22 +331,13 @@ public abstract class AbstractTRSimplifier
     return options;
   }
 
-  /**
-   * Configures the configurable using the given option. This method
-   * retrieves the current value from the option and assigns it to
-   * the configurable.
-   * @param  option  The option to be used, which should be an element
-   *                 of the list returned by a previous call to
-   *                 {@link #getOptions(OptionPage) getOptions()}.
-   */
   @Override
   public void setOption(final Option<?> option)
   {
     if (option.hasID(StepSimplifierFactory.OPTION_Abstract_StateLimit)) {
       final PositiveIntOption propOption = (PositiveIntOption) option;
       setStateLimit(propOption.getValue());
-    }
-    else if (option.hasID(StepSimplifierFactory.OPTION_Abstract_TransitionLimit)) {
+    } else if (option.hasID(StepSimplifierFactory.OPTION_Abstract_TransitionLimit)) {
       final PositiveIntOption propOption = (PositiveIntOption) option;
       setTransitionLimit(propOption.getValue());
     }

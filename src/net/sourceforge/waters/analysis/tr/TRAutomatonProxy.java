@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -49,6 +50,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -129,6 +131,50 @@ public class TRAutomatonProxy
     }
   }
 
+  public static StateProxy findDumpState(final AutomatonProxy aut)
+  {
+    boolean hasProposition = false;
+    for (final EventProxy event : aut.getEvents()) {
+      if (event.getKind() == EventKind.PROPOSITION) {
+        hasProposition = true;
+        break;
+      }
+    }
+    if (!hasProposition) {
+      return null;
+    }
+    final Set<StateProxy> states = aut.getStates();
+    final Set<StateProxy> candidates = new THashSet<>(states.size());
+    StateProxy namedCandidate = null;
+    for (final StateProxy state : states) {
+      if (state.getPropositions().isEmpty()) {
+        candidates.add(state);
+        if (state.getName().equals(DUMP_NAME)) {
+          namedCandidate = state;
+        }
+      }
+    }
+    if (candidates.isEmpty()) {
+      return null;
+    }
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      final StateProxy source = trans.getSource();
+      if (candidates.remove(source) && candidates.isEmpty()) {
+        return null;
+      }
+    }
+    if (candidates.contains(namedCandidate)) {
+      return namedCandidate;
+    } else {
+      for (final StateProxy state : states) {
+        if (candidates.contains(state)) {
+          return state;
+        }
+      }
+      return null;
+    }
+  }
+
 
   //#########################################################################
   //# Constructors
@@ -147,7 +193,16 @@ public class TRAutomatonProxy
                           final int config)
     throws OverflowException
   {
-    this(aut, new EventEncoding(aut, translator), config);
+    this(aut, translator, null, config);
+  }
+
+  public TRAutomatonProxy(final AutomatonProxy aut,
+                          final KindTranslator translator,
+                          final StateProxy dumpState,
+                          final int config)
+    throws OverflowException
+  {
+    this(aut, new EventEncoding(aut, translator), dumpState, config);
   }
 
   public TRAutomatonProxy(final AutomatonProxy aut,
@@ -694,6 +749,8 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Class Constants
+  private static final String DUMP_NAME = ":dump";
+
   private static final long serialVersionUID = 8587507142812682383L;
 
 }
