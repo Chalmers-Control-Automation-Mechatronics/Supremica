@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="nested_groups_2">
+<B:Comment>A compiler test involving nested groups.
+This tests whether the event b can be defined at a group containing another group containing a state where it is also defined.
+The transition from the state should take precedence.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+<EventDecl Kind="CONTROLLABLE" Name="b"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="nested_groups">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="176" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="176" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="176" Y="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="S1"/>
+<NodeRef Name="S0"/>
+<BoxGeometry>
+<Box X="144" Y="80" Width="64" Height="144"/>
+</BoxGeometry>
+</GroupNode>
+<GroupNode Name="G1">
+<NodeRef Name="S2"/>
+<NodeRef Name="G0"/>
+<BoxGeometry>
+<Box X="128" Y="64" Width="96" Height="240"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="G0" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="177" Y="224"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="G1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="224" Y="79"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point X="188" Y="57"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

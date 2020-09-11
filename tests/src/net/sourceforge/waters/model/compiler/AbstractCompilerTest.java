@@ -246,10 +246,19 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_nested_groups() throws IOException, WatersException
+  public void testCompile_nested_groups_1()
+    throws IOException, WatersException
   {
     final ModuleProxy module =
-      loadModule("tests", "compiler", "groupnode", "nested_groups");
+      loadModule("tests", "compiler", "groupnode", "nested_groups_1");
+    testCompile(module);
+  }
+
+  public void testCompile_nested_groups_2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nested_groups_2");
     testCompile(module);
   }
 

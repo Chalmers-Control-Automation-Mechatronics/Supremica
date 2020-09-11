@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="nested_groups_1">
+<B:Comment>A simple compiler test involving nested groups.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+<EventDecl Kind="CONTROLLABLE" Name="b"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="nested_groups">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="176" Y="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-1" Y="-51"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="32" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="304" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="S0"/>
+<BoxGeometry>
+<Box X="144" Y="64" Width="64" Height="64"/>
+</BoxGeometry>
+</GroupNode>
+<GroupNode Name="G1">
+<NodeRef Name="G0"/>
+<BoxGeometry>
+<Box X="112" Y="32" Width="128" Height="128"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="262" Y="69"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="G1" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="240" Y="96"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="G0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="144" Y="97"/>
+</StartPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
