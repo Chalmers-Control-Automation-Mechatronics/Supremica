@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -123,34 +125,51 @@ class ComponentDataFlavor extends ModuleDataFlavor
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
-    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
-    final List<Proxy> proxyList = new ArrayList<Proxy>();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-    final ProductDESProxyFactory factoryDES =
-      ProductDESElementFactory.getInstance();
     final ProxyCloner cloner = factory.getCloner();
-    ProductDESImporter importer = null;
+    final ProductDESProxyFactory desFactory =
+      ProductDESElementFactory.getInstance();
+    final List<Proxy> proxyList = new ArrayList<>(data.size());
+    final List<AutomatonProxy> autList = new ArrayList<>(data.size());
+    final Set<String> names = new THashSet<>(data.size());
     for (final Proxy p : data) {
       if (p instanceof AutomatonProxy) {
-        autList.add((AutomatonProxy) p);
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        final String baseName = aut.getName();
+        String name = baseName;
+        int suffix = 0;
+        while (!names.add(name)) {
+          suffix++;
+          name = baseName + ':' + suffix;
+        }
+        if (suffix == 0) {
+          autList.add(aut);
+        } else {
+          final AutomatonProxy renamed =
+            desFactory.createAutomatonProxy(name, aut.getKind(), aut.getEvents(),
+                                            aut.getStates(), aut.getTransitions());
+          autList.add(renamed);
+        }
       } else {
         proxyList.add(cloner.getClone(p));
       }
     }
-    importer = new ProductDESImporter(factory);
-    final ProductDESProxy product = AutomatonTools
-      .createProductDESProxy("importFromAnalyzer", autList, factoryDES);
-    ModuleProxy module = null;
-    try {
-      module = importer.importModule(product);
-    } catch (final ParseException exception) {
-      final Logger logger = LogManager.getLogger();
-      final String msg = exception.getMessage();
-      logger.error(msg);
-    }
-    if (module != null) {
-      proxyList.addAll(module.getComponentList());
-      proxyList.addAll(module.getEventDeclList());
+    if (!autList.isEmpty()) {
+      final ProductDESImporter importer = new ProductDESImporter(factory);
+      final ProductDESProxy product = AutomatonTools.createProductDESProxy
+        (":import", autList, desFactory);
+      ModuleProxy module = null;
+      try {
+        module = importer.importModule(product);
+      } catch (final ParseException exception) {
+        final Logger logger = LogManager.getLogger();
+        final String msg = exception.getMessage();
+        logger.error(msg);
+      }
+      if (module != null) {
+        proxyList.addAll(module.getComponentList());
+        proxyList.addAll(module.getEventDeclList());
+      }
     }
     return proxyList;
   }
