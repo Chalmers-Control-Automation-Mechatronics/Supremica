@@ -57,6 +57,7 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -172,6 +173,22 @@ public class TRAutomatonProxy
         }
       }
       return null;
+    }
+  }
+
+  public static AutomatonProxy renameAutomaton(final AutomatonProxy aut,
+                                               final String name)
+  {
+    if (name.equals(aut.getName())) {
+      return aut;
+    } else if (aut instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy trAut = (TRAutomatonProxy) aut;
+      trAut.setName(name);
+      return trAut;
+    } else {
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      return AutomatonTools.renameAutomaton(aut, name, factory);
     }
   }
 

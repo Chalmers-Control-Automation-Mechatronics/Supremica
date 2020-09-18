@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
@@ -157,13 +154,8 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
       } else {
         final GUIOptionContext context = getContext();
         final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
-        final AutomataTableModel model = panel.getAutomataTableModel();
-        model.insertRow(aut);
-        final List<AutomatonProxy> list = Arrays.asList(new AutomatonProxy[] {aut});
         final AutomataTable table = panel.getAutomataTable();
-        panel.getAutomataTable().scrollToVisible(list);
-        table.clearSelection();
-        table.addToSelection(list);
+        table.insertAndSelect(aut);
         return "Successfully produced synchronous product.";
       }
     }

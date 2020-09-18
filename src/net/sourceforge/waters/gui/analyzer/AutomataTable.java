@@ -43,6 +43,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -434,19 +437,10 @@ public class AutomataTable extends JTable implements SelectionOwner
       for (final Proxy proxy : data) {
         final AutomatonProxy aut = (AutomatonProxy) proxy;
         final AutomataTableModel model = getModel();
-        final String originalName = aut.getName();
-        String newName = aut.getName();
-        int count = 1;
-        while (model.containsAutomatonName(newName)) {
-          if (count == 1) {
-            newName = "copy_of_" + originalName;
-          } else {
-            newName = "copy" + count + "_of_" + originalName;
-          }
-          count++;
-        }
+        final String oldName = aut.getName();
+        final String newName = model.getUniqueAutomatonName(oldName);
         final AutomatonProxy cloned;
-        if (count == 1) {
+        if (oldName == newName) {
           cloned = cloner.clone(aut);
         } else {
           cloned = cloner.clone(aut, newName);
@@ -558,6 +552,30 @@ public class AutomataTable extends JTable implements SelectionOwner
     } else {
       return getAllSelectableItems();
     }
+  }
+
+  public void insertAndSelect(final AutomatonProxy aut)
+  {
+    final List<AutomatonProxy> list = Collections.singletonList(aut);
+    insertAndSelect(list);
+  }
+
+  public void insertAndSelect
+    (final Collection<? extends AutomatonProxy> automata)
+  {
+    final AutomataTableModel model = getModel();
+    final List<AutomatonProxy> renamedAutomata = new ArrayList<>(automata.size());
+    for (final AutomatonProxy aut : automata) {
+      final String name = aut.getName();
+      final String uniqueName = model.getUniqueAutomatonName(name);
+      final AutomatonProxy renamedAut =
+        TRAutomatonProxy.renameAutomaton(aut, uniqueName);
+      renamedAutomata.add(renamedAut);
+    }
+    model.insertRows(renamedAutomata);
+    scrollToVisible(renamedAutomata);
+    clearSelection();
+    addToSelection(renamedAutomata);
   }
 
 

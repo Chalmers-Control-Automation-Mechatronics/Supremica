@@ -196,10 +196,11 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
            OPTION_AutomatonSimplifierFactory_KeepOriginal);
         final boolean keepOriginal = keepOriginalOption.getBooleanValue();
         if (keepOriginal) {
-          final String newName = model.getUnusedName(aut.getName());
+          final String newName = model.getUniqueAutomatonName(aut.getName());
           builder.setOutputName(newName);
+        } else {
+          builder.setOutputName(aut.getName());
         }
-        else builder.setOutputName(aut.getName());
 
         for (final Option<?> option : mGroupPanel.getSelectedOptions()) {
           builder.setOption(option);

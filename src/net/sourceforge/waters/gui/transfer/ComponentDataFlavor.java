@@ -131,25 +131,18 @@ class ComponentDataFlavor extends ModuleDataFlavor
       ProductDESElementFactory.getInstance();
     final List<Proxy> proxyList = new ArrayList<>(data.size());
     final List<AutomatonProxy> autList = new ArrayList<>(data.size());
-    final Set<String> names = new THashSet<>(data.size());
+    final Set<String> uniqueNames = new THashSet<>(data.size());
     for (final Proxy p : data) {
       if (p instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) p;
-        final String baseName = aut.getName();
-        String name = baseName;
-        int suffix = 0;
-        while (!names.add(name)) {
-          suffix++;
-          name = baseName + ':' + suffix;
+        AutomatonProxy aut = (AutomatonProxy) p;
+        final String name = aut.getName();
+        final String uniqueName =
+          AutomatonTools.getUniqueName(name, uniqueNames);
+        uniqueNames.add(uniqueName);
+        if (name != uniqueName) {
+          aut = AutomatonTools.renameAutomaton(aut, uniqueName, desFactory);
         }
-        if (suffix == 0) {
-          autList.add(aut);
-        } else {
-          final AutomatonProxy renamed =
-            desFactory.createAutomatonProxy(name, aut.getKind(), aut.getEvents(),
-                                            aut.getStates(), aut.getTransitions());
-          autList.add(renamed);
-        }
+        autList.add(aut);
       } else {
         proxyList.add(cloner.getClone(p));
       }

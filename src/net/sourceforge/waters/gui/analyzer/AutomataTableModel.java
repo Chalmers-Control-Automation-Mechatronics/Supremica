@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,8 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -51,7 +50,9 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -126,6 +127,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   {
     for (int i = end; i >= start; i--) {
       final AutomatonProxy aut = mAutomataList.remove(i);
+      mAutomataNames.remove(aut.getName());
       removeFromDisplayMap(aut);
     }
     fireTableRowsDeleted(start, end);
@@ -135,60 +137,28 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   {
     final int count = mAutomataList.size();
     mAutomataList.addAll(insertList);
+    for (final AutomatonProxy aut : insertList) {
+      mAutomataNames.add(aut.getName());
+    }
     fireTableRowsInserted(count, count + (insertList.size()-1));
   }
 
-  public void insertRow(final AutomatonProxy insert)
+  public void insertRow(final AutomatonProxy aut)
   {
-    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
-    autList.add(insert);
-    insertRows(autList);
+    final List<AutomatonProxy> list = Collections.singletonList(aut);
+    insertRows(list);
   }
 
-  public String getUnusedName(String name)
+  public String getUniqueAutomatonName(final String name)
   {
-    String nameStart;
-    String nameEnd;
-    int index;
-    if (name.endsWith("]")) {
-      index = name.lastIndexOf('[');
-    } else index = name.length();
-    nameStart = name.substring(0, index);
-    nameEnd = name.substring(index);
-    final Pattern p = Pattern.compile("(.*):(\\d+)$");
-    final Matcher m = p.matcher(nameStart);
-    int startValue = 0;
-    if (m.find()) {
-      final String valueString = m.group(2);
-      try {
-        startValue = Integer.parseInt(valueString);
-      }
-      catch (final NumberFormatException e) {
-        //Default to zero
-      }
-      nameStart = nameStart.substring(0, m.end(1));
-    }
-    for (int n=startValue;; n++) {
-      if (n == 0) name = nameStart + nameEnd;
-      else name = nameStart + ":" + n + nameEnd;
-      if (!containsAutomatonName(name)) break;
-    }
-    return name;
-  }
-
-  boolean containsAutomatonName(final String name)
-  {
-    for (final AutomatonProxy aut : mAutomataList)
-      if (aut.getName().equals(name) == true)
-        return true;
-    return false;
+    return AutomatonTools.getUniqueName(name, mAutomataNames);
   }
 
   public void checkNewAutomatonName(final IdentifierProxy ident)
     throws ParseException
   {
     final String name = ident.toString();
-    if (containsAutomatonName(name)) {
+    if (mAutomataNames.contains(name)) {
       final StringBuilder buffer = new StringBuilder("Name '");
       buffer.append(name);
       buffer.append("' is already taken by an automaton!");
@@ -200,19 +170,25 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   public void replaceAutomaton(final AutomatonProxy oldAut,
                                final AutomatonProxy newAut)
   {
-    int i = 0;
-    for (final AutomatonProxy aut : mAutomataList) {
-      if (aut == oldAut) {
-        mAutomataList.set(i, newAut);
-        break;
+    final int i = mAutomataList.indexOf(oldAut);
+    if (i >= 0) {
+      mAutomataList.set(i, newAut);
+      final String oldName = oldAut.getName();
+      final String newName = newAut.getName();
+      if (!oldName.equals(newName)) {
+        mAutomataNames.remove(oldName);
+        mAutomataNames.add(newName);
       }
-      i++;
-    }
-    fireTableRowsUpdated(i, i);
-    final SimpleComponentSubject comp = mDisplayMap.get(oldAut);
-    if (comp != null) {
-      mDisplayMap.remove(oldAut);
-      mDisplayMap.put(newAut, comp);
+      fireTableRowsUpdated(i, i);
+      final SimpleComponentSubject comp = mDisplayMap.get(oldAut);
+      if (comp != null) {
+        mDisplayMap.remove(oldAut);
+        mDisplayMap.put(newAut, comp);
+      }
+    } else {
+      throw new IllegalArgumentException(ProxyTools.getShortClassName(this) +
+                                         " does not contain the automaton '" +
+                                         oldAut.getName() + "'!");
     }
   }
 
@@ -342,16 +318,18 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
       if (newDES != null) {
         mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
         Collections.sort(mAutomataList);
+        mAutomataNames = new THashSet<>(mAutomataList.size());
         mEventMap = new HashMap<>(mCompiledDES.getEvents().size());
         for (final AutomatonProxy aut : mAutomataList) {
-          final Set<EventProxy> eventList = aut.getEvents();
-          for (final EventProxy event : eventList) {
+          mAutomataNames.add(aut.getName());
+          for (final EventProxy event : aut.getEvents()) {
             final String name = event.getName();
             mEventMap.put(name, event);
           }
         }
       } else {
         mAutomataList = new ArrayList<>();
+        mAutomataNames = Collections.emptySet();
         mEventMap = Collections.emptyMap();
       }
       mDisplayMap = new HashMap<>();
@@ -362,9 +340,11 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
 
   //#########################################################################
   //# Data Members
+  private final ModuleContainer mModuleContainer;
+
   private ProductDESProxy mCompiledDES;
   private List<AutomatonProxy> mAutomataList;
-  private final ModuleContainer mModuleContainer;
+  private Set<String> mAutomataNames;
   private Map<String,EventProxy> mEventMap;
   private Map<AutomatonProxy,SimpleComponentSubject> mDisplayMap;
 

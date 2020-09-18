@@ -33,9 +33,7 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -124,13 +122,8 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
       if (supervisors != null) {
         final GUIOptionContext context = getContext();
         final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
-        final AutomataTableModel model = panel.getAutomataTableModel();
-        model.insertRows(supervisors);
         final AutomataTable table = panel.getAutomataTable();
-        final List<AutomatonProxy> list = new ArrayList<>(supervisors);
-        panel.getAutomataTable().scrollToVisible(list);
-        table.clearSelection();
-        table.addToSelection(list);
+        table.insertAndSelect(supervisors);
       }
     }
 

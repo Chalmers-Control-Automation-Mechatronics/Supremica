@@ -171,6 +171,7 @@ public final class AutomatonTools
    * @param  aut      The automaton to be duplicated.
    * @param  name     The name to be given to the copy.
    * @param  factory  Factory to construct automaton.
+   * @see #getUniqueName(String,Set) getUniqueName()
    */
   public static AutomatonProxy renameAutomaton(final AutomatonProxy aut,
                                                final String name,
@@ -299,6 +300,47 @@ public final class AutomatonTools
       }
     }
     return null;
+  }
+
+  /**
+   * Modifies a proposed automaton or event name to be unique.
+   * @param  name         The proposed name to be made unique.
+   * @param  uniqueNames  Set of already used names.
+   * @return If the given set <CODE>uniqueNames</CODE> does not contain the
+   *         proposed <CODE>name</CODE>, then this proposed <CODE>name</CODE>
+   *         is returned. Otherwise, a modified name is formed, typically
+   *         by appending &quot;<CODE>:</CODE>&langle;<I>n</I>&rangle;&quot;
+   *         for some integer &langle;<I>n</I>&rangle; to form a name not
+   *         contained in <CODE>uniqueNames</CODE>.
+   * @see #renameAutomaton(AutomatonProxy, String, ProductDESProxyFactory)
+   *      renameAutomaton()
+   */
+  public static String getUniqueName(final String name,
+                                     final Set<String> uniqueNames)
+  {
+    if (uniqueNames.contains(name)) {
+      String prefix = name;
+      final int end = name.length() - 1;
+      if (end >= 0) {
+        char ch = name.charAt(end);
+        int p = end;
+        while (Character.isDigit(ch) && p > 0) {
+          ch = name.charAt(--p);
+        }
+        if (p < end && ch == ':') {
+          prefix = name.substring(0, p);
+        }
+      }
+      int suffix = 1;
+      String suffixedName;
+      do {
+        suffixedName = prefix + ':' + suffix;
+        suffix++;
+      } while (uniqueNames.contains(suffixedName));
+      return suffixedName;
+    } else {
+      return name;
+    }
   }
 
   /**
