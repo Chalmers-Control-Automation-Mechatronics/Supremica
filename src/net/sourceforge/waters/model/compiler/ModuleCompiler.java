@@ -283,53 +283,30 @@ public class ModuleCompiler extends AbortableCompiler
       final Collection<String> props = opt.getValue();
       setEnabledPropertyNames(props);
     } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ConflictChecker_ConfiguredDefaultMarkingString)) {
-      //Default Marking
+                            OPTION_ConflictChecker_ConfiguredDefaultMarkingString) ||
+               option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ConflictChecker_ConfiguredPreconditionMarkingString)) {
       final StringOption opt = (StringOption) option;
       final String name = opt.getValue();
-      final Collection<String> current = getEnabledPropertyNames();
-      final Collection<String> props;
+      final Collection<String> current = getEnabledPropositionNames();
       if (current == null || current.isEmpty()) {
-        props = Collections.singletonList(name);
-      } else if (current.contains(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-        final int size = current.size();
-        if (size == 1) {
-          props = Collections.singletonList(name);
-        } else {
-          props = new ArrayList<String>(size);
-          for (final String prop : current) {
-            if (!prop.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-              props.add(prop);
-            }
-          }
+        final Collection<String> props;
+        if (option.hasID(AbstractModelAnalyzerFactory.
+                         OPTION_ConflictChecker_ConfiguredPreconditionMarkingString)) {
+          props = new ArrayList<>(2);
+          props.add(EventDeclProxy.DEFAULT_MARKING_NAME);
           props.add(name);
+        } else {
+          props = Collections.singletonList(name);
         }
-      } else {
+        setEnabledPropositionNames(props);
+      } else if (!current.contains(name)) {
         final int size = current.size() + 1;
-        props = new ArrayList<String>(size);
+        final Collection<String> props = new ArrayList<>(size);
         props.addAll(current);
         props.add(name);
+        setEnabledPropositionNames(props);
       }
-      setEnabledPropositionNames(props);
-      //End of default marking
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ConflictChecker_ConfiguredDefaultMarkingString)) {
-      //Pre Marking
-      final StringOption opt = (StringOption) option;
-      final String name = opt.getValue();
-      final Collection<String> current = getEnabledPropertyNames();
-      final Collection<String> props;
-      if (current == null || current.isEmpty()) {
-        props = new ArrayList<String>(2);
-        props.add(EventDeclProxy.DEFAULT_MARKING_NAME);
-      } else {
-        final int size = current.size() + 1;
-        props = new ArrayList<String>(size);
-        props.addAll(current);
-      }
-      props.add(name);
-      setEnabledPropositionNames(props);
-      //End of pre marking
     }
   }
 
