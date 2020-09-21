@@ -49,6 +49,8 @@ interface CompiledEvent
 
   public boolean isObservable();
 
+  public boolean hasConditional();
+
   public List<CompiledRange> getIndexRanges();
 
   public CompiledEvent find(SimpleExpressionProxy index)

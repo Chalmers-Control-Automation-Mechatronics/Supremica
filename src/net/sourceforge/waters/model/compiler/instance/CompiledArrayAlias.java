@@ -105,6 +105,12 @@ class CompiledArrayAlias implements CompiledEvent
   }
 
   @Override
+  public boolean hasConditional()
+  {
+    return false;
+  }
+
+  @Override
   public List<CompiledRange> getIndexRanges()
   {
     return Collections.emptyList();

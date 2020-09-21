@@ -60,17 +60,26 @@ class CompiledArrayEvent implements CompiledEvent
 
   //#######################################################################
   //# Interface net.sourceforge.waters.model.compiler.Event
+  @Override
   public int getKindMask()
   {
     final EventKind kind = mDecl.getKind();
     return EventKindMask.getMask(kind);
   }
 
+  @Override
   public boolean isObservable()
   {
     return mDecl.isObservable();
   }
 
+  @Override
+  public boolean hasConditional()
+  {
+    return false;
+  }
+
+  @Override
   public List<CompiledRange> getIndexRanges()
   {
     final List<CompiledRange> ranges = mDecl.getRanges();
@@ -79,6 +88,7 @@ class CompiledArrayEvent implements CompiledEvent
     return ranges.subList(start, end);
   }
 
+  @Override
   public CompiledEvent find(final SimpleExpressionProxy index)
     throws EvalException
   {
@@ -91,11 +101,13 @@ class CompiledArrayEvent implements CompiledEvent
     return mDecl.getCompiledEvent(indexes);
   }
 
+  @Override
   public SourceInfo getSourceInfo()
   {
     return null;
   }
 
+  @Override
   public Iterator<CompiledEvent> getChildrenIterator()
   {
     return new ArrayEventIterator();
@@ -126,11 +138,13 @@ class CompiledArrayEvent implements CompiledEvent
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return mRangeIterator.hasNext();
     }
 
+    @Override
     public CompiledEvent next()
     {
       final SimpleExpressionProxy next = mRangeIterator.next();
@@ -138,11 +152,12 @@ class CompiledArrayEvent implements CompiledEvent
       return mDecl.getCompiledEvent(mMoreIndexes);
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
         ("ArrayEventIterator does not support remove() operation!");
-    } 
+    }
 
     //#######################################################################
     //# Data Members

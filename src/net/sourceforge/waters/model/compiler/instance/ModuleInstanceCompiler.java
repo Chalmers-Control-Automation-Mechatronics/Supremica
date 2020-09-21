@@ -451,20 +451,32 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   public Object visitConditionalProxy(final ConditionalProxy cond)
     throws VisitorException
   {
+    final CompiledEventList oldEventList = mCurrentEventList;
     try {
-      // TODO Add support for EFSM variables
       final SimpleExpressionProxy guard = cond.getGuard();
-      final SimpleExpressionProxy value =
-        mSimpleExpressionCompiler.eval(guard, mContext);
-      final boolean boolValue =
-        mSimpleExpressionCompiler.getBooleanValue(value);
-      if (boolValue) {
+      final SimpleExpressionProxy compiledGuard =
+        mSimpleExpressionCompiler.simplify(guard, mContext);
+      if (mSimpleExpressionCompiler.isAtomicValue(compiledGuard, mContext)) {
+        final boolean boolValue =
+          mSimpleExpressionCompiler.getBooleanValue(compiledGuard);
+        if (boolValue) {
+          final List<Proxy> body = cond.getBody();
+          visitCollection(body);
+        }
+      } else {
+        final int mask = mCurrentEventList.getAllowedKindMask();
+        mCurrentEventList = new CompiledEventList(mask);
         final List<Proxy> body = cond.getBody();
         visitCollection(body);
+        final CompiledEventConditional conditional =
+          new CompiledEventConditional(compiledGuard, mCurrentEventList);
+        oldEventList.addEvent(conditional);
       }
       return null;
     } catch (final EvalException exception) {
       throw wrap(exception);
+    } finally {
+      mCurrentEventList = oldEventList;
     }
   }
 
@@ -497,7 +509,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   }
 
   @Override
-  public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+  public Object visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
   {
     try {
@@ -530,18 +542,11 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
             }
           }
         }
+        mHasEFAElements |= ga1 != null;
       }
-      mHasEFAElements |= ga1 != null;
-      final NodeProxy source0 = edge.getSource();
-      final NodeProxy source1 = mNodeMap.get(source0);
-      final NodeProxy target0 = edge.getTarget();
-      final NodeProxy target1 = mNodeMap.get(target0);
-      final LabelBlockProxy labels1 = createLabelBlock(events);
-      final EdgeProxy compiled = mFactory.createEdgeProxy
-        (source1, target1, labels1, ga1, null, null, null);
-      mCompilationInfo.add(compiled, edge);
-      mCurrentEdges.add(compiled);
-      return compiled;
+      mHasEFAElements |= events.hasConditional();
+      createConditionalEdges(edge, ga1, events);
+      return null;
     } catch (final EvalException exception) {
       throw wrap(exception);
     } finally {
@@ -1240,6 +1245,99 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     } else {
       return binding;
     }
+  }
+
+  private void createConditionalEdges(final EdgeProxy edge0,
+                                      final GuardActionBlockProxy ga0,
+                                      final CompiledEventList list0)
+  {
+    CompiledEventList list1;
+    if (list0.hasConditional()) {
+      list1 = new CompiledEventList();
+      final Iterator<CompiledEvent> iter = list0.getChildrenIterator();
+      while (iter.hasNext()) {
+        final CompiledEvent child = iter.next();
+        if (child instanceof CompiledEventConditional) {
+          final CompiledEventConditional conditional =
+            (CompiledEventConditional) child;
+          final SimpleExpressionProxy guard = conditional.getCondition();
+          final GuardActionBlockProxy ga1 = createRefinedGuard(ga0, guard);
+          final CompiledEventList body = conditional.getBody();
+          createConditionalEdges(edge0, ga1, body);
+        } else {
+          try {
+            list1.addEvent(child);
+          } catch (final EventKindException exception) {
+            // list0 has been compiled already---can't happen anymore
+            throw exception.getRuntimeException();
+          }
+        }
+      }
+    } else {
+      list1 = list0;
+    }
+    if (!list1.isEmpty()) {
+      final NodeProxy source0 = edge0.getSource();
+      final NodeProxy source1 = mNodeMap.get(source0);
+      final NodeProxy target0 = edge0.getTarget();
+      final NodeProxy target1 = mNodeMap.get(target0);
+      final LabelBlockProxy block1 = createLabelBlock(list1);
+      final EdgeProxy edge1 = mFactory.createEdgeProxy
+        (source1, target1, block1, ga0, null, null, null);
+      mCompilationInfo.add(edge1, edge0);
+      mCurrentEdges.add(edge1);
+    }
+  }
+
+  private GuardActionBlockProxy createRefinedGuard
+    (final GuardActionBlockProxy ga0,
+     final SimpleExpressionProxy guard0)
+  {
+    if (ga0 == null) {
+      if (mOperatorTable.isAssignment(guard0)) {
+        final BinaryExpressionProxy action1 =
+          (BinaryExpressionProxy) mCloner.getClone(guard0);
+        final List<BinaryExpressionProxy> actions1 =
+          Collections.singletonList(action1);
+        return mFactory.createGuardActionBlockProxy(null, actions1, null);
+      } else {
+        final SimpleExpressionProxy guard1 =
+          (SimpleExpressionProxy) mCloner.getClone(guard0);
+        final List<SimpleExpressionProxy> guards1 =
+          Collections.singletonList(guard1);
+        return mFactory.createGuardActionBlockProxy(guards1, null, null);
+      }
+    } else {
+      final List<SimpleExpressionProxy> guards0 = ga0.getGuards();
+      final List<BinaryExpressionProxy> actions0 = ga0.getActions();
+      final List<SimpleExpressionProxy> guards1;
+      final List<BinaryExpressionProxy> actions1;
+      if (mOperatorTable.isAssignment(guard0)) {
+        final BinaryExpressionProxy action0 = (BinaryExpressionProxy) guard0;
+        guards1 = mCloner.getClonedList(guards0);
+        actions1 = extendList(actions0, action0);
+      } else {
+        guards1 = extendList(guards0, guard0);
+        actions1 = mCloner.getClonedList(actions0);
+      }
+      return mFactory.createGuardActionBlockProxy(guards1, actions1, null);
+    }
+  }
+
+  private <T extends SimpleExpressionProxy> List<T>
+  extendList(final List<T> list0, final T expr0)
+  {
+    final int size = list0.size() + 1;
+    final List<T> list1 = new ArrayList<>(size);
+    for (final T e0 : list0) {
+      @SuppressWarnings("unchecked")
+      final T e1 = (T) mCloner.getClone(e0);
+      list1.add(e1);
+    }
+    @SuppressWarnings("unchecked")
+    final T expr1 = (T) mCloner.getClone(expr0);
+    list1.add(expr1);
+    return list1;
   }
 
   private LabelBlockProxy createLabelBlock(final CompiledEventList events)

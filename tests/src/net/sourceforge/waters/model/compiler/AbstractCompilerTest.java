@@ -695,6 +695,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_patrik3()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "patrik3");
+    testCompile(module);
+  }
+
   public void testCompile_primeAndConst()
     throws IOException, WatersException
   {

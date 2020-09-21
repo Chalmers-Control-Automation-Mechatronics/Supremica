@@ -304,7 +304,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mAssigningMap.get(op);
   }
 
-
   public BuiltInFunction getIteFunction()
   {
     return mIteFunction;
@@ -324,7 +323,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Checks whether the given expression is a not-expression.
+   * Gets the subterm of a negated expression.
    * @param   expr    The expression to be checked.
    * @return  If the given expression is a not-expression, its subterm is
    *          returned, otherwise <CODE>null</CODE> is returned.
@@ -338,6 +337,23 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
     return null;
+  }
+
+  /**
+   * Checks whether the given expression is an assignment.
+   * @return  <CODE>true</CODE> if the given expression is a binary
+   *          expression with an assignment operator such as = or&nbsp;+=,
+   *          <CODE>false</CODE> otherwise.
+   */
+  public boolean isAssignment(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof BinaryExpressionProxy) {
+      final BinaryExpressionProxy binary = (BinaryExpressionProxy) expr;
+      final BinaryOperator op = binary.getOperator();
+      return getAssigningOperator(op) != null;
+    } else {
+      return false;
+    }
   }
 
 

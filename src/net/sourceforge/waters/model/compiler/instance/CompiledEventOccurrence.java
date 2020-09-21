@@ -58,32 +58,44 @@ class CompiledEventOccurrence implements CompiledEvent
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.instance.CompiledEvent
+  @Override
   public int getKindMask()
   {
     return mEvent.getKindMask();
   }
 
+  @Override
   public boolean isObservable()
   {
     return mEvent.isObservable();
   }
 
+  @Override
+  public boolean hasConditional()
+  {
+    return false;
+  }
+
+  @Override
   public List<CompiledRange> getIndexRanges()
   {
     return mEvent.getIndexRanges();
   }
 
-  public CompiledEvent find(SimpleExpressionProxy index)
+  @Override
+  public CompiledEvent find(final SimpleExpressionProxy index)
     throws EvalException
   {
     return mEvent.find(index);
   }
 
+  @Override
   public SourceInfo getSourceInfo()
   {
     return mSourceInfo;
   }
 
+  @Override
   public Iterator<CompiledEvent> getChildrenIterator()
   {
     return Collections.singletonList(mEvent).iterator();

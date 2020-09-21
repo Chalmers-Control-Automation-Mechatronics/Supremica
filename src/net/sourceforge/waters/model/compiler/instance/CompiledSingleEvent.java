@@ -68,6 +68,7 @@ class CompiledSingleEvent implements CompiledEvent
    * Gets a string representation of this event.
    * Used for exceptions.
    */
+  @Override
   public String toString()
   {
     try {
@@ -115,33 +116,45 @@ class CompiledSingleEvent implements CompiledEvent
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.instance.CompiledEvent
+  @Override
   public int getKindMask()
   {
     final EventKind kind = mDecl.getKind();
     return EventKindMask.getMask(kind);
   }
 
+  @Override
   public boolean isObservable()
   {
     return mDecl.isObservable();
   }
 
+  @Override
+  public boolean hasConditional()
+  {
+    return false;
+  }
+
+  @Override
   public List<CompiledRange> getIndexRanges()
   {
     return Collections.emptyList();
   }
 
+  @Override
   public CompiledEvent find(final SimpleExpressionProxy index)
     throws IndexOutOfRangeException
   {
     throw new IndexOutOfRangeException(this);
   }
 
+  @Override
   public SourceInfo getSourceInfo()
   {
     return null;
   }
 
+  @Override
   public Iterator<CompiledEvent> getChildrenIterator()
   {
     return null;
