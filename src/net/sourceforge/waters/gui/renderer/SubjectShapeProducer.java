@@ -266,7 +266,8 @@ public class SubjectShapeProducer
   }
 
   @Override
-  public LabelShape visitLabelGeometryProxy(final LabelGeometryProxy geo)
+  public LabelShape visitLabelGeometryProxy
+    (final LabelGeometryProxy geo)
   {
     final LabelShape shape = (LabelShape) lookup(geo);
     if (shape != null) {
@@ -274,7 +275,7 @@ public class SubjectShapeProducer
     } else {
       final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
       final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
-      return createNodeLabelShape(geo, node);
+      return createNodeLabelShape(node);
     }
   }
 

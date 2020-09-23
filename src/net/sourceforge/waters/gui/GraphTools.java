@@ -92,7 +92,7 @@ public class GraphTools {
     final boolean initial = nodes.isEmpty();
     final PointGeometrySubject geo = new PointGeometrySubject(pos);
     final LabelGeometrySubject label =
-      new LabelGeometrySubject(LabelShape.DEFAULT_OFFSET);
+      new LabelGeometrySubject(LabelShape.DEFAULT_NODE_LABEL_OFFSET);
     return new SimpleNodeSubject(name, null, null, initial, geo, null, label);
   }
 

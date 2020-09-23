@@ -35,110 +35,331 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
+import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
-public class LabelShape extends AbstractLabelShape
+public class LabelShape extends AbstractProxyShape
 {
 
   //##########################################################################
   //# Constructors
-  public LabelShape(final Proxy proxy, final int x, final int y,
-                    final Font font)
+  LabelShape(final ConditionalProxy cond,
+             final double x,
+             final double y,
+             final Font font)
   {
-    this(proxy, x, y, font, proxy.toString());
+    this(cond, x, y, new AttributedStringBuilder(cond, font));
   }
 
-  public LabelShape(final Proxy proxy, final int x, final int y,
-                    final Font font, final String name)
+  LabelShape(final ForeachProxy foreach,
+             final double x,
+             final double y,
+             final Font font)
+  {
+    this(foreach, x, y, new AttributedStringBuilder(foreach, font));
+  }
+
+  LabelShape(final SimpleExpressionProxy expr,
+             final double x,
+             final double y,
+             final Font font)
+  {
+    this(expr, x, y, new AttributedStringBuilder(expr, font));
+  }
+
+  LabelShape(final SimpleNodeProxy node,
+             final double x,
+             final double y,
+             final Font font)
+  {
+    this(node.getLabelGeometry(), x, y, new AttributedStringBuilder(node, font));
+  }
+
+  LabelShape(final LabelBlockProxy block,
+             final double x,
+             final double y,
+             final String title,
+             final Font font)
+  {
+    this(block, x, y, new AttributedStringBuilder(block, title, font));
+  }
+
+  private LabelShape(final Proxy proxy,
+                     final double x,
+                     final double y,
+                     final AttributedStringBuilder builder)
   {
     super(proxy);
-    mFont = font;
-    mPoint = new Point(x + 2, y + font.getSize());
-    mName = name;
-    final Rectangle2D rect = calculateBounds(mName, mFont);
-    mBounds = new RoundRectangle2D.Double(x, y, rect.getWidth() + 4,
-        rect.getHeight() + 4, CORNER_RADIUS, CORNER_RADIUS);
-    mUnderline = new UnderlineShape(proxy, mPoint.x + rect.getMinX(),
-        mPoint.y, rect.getWidth(), font);
-  }
-
-  public LabelShape(final SimpleNodeProxy node, final Font font)
-  {
-    super(node.getLabelGeometry());
-    mFont = font;
-    final Point2D nodepos = node.getPointGeometry().getPoint();
-    final LabelGeometryProxy geom = node.getLabelGeometry();
-    final Point2D offset = (geom == null) ? DEFAULT_OFFSET : geom.getOffset();
-    final int x = (int) Math.round(nodepos.getX() + offset.getX());
-    final int y = (int) Math.round(nodepos.getY() + offset.getY());
-    mPoint = new Point(x + 2, y + font.getSize());
-    mName = node.getName();
-    final Rectangle2D rect = calculateBounds(mName, mFont);
-    // Unfortunately there are some ac hoc constants here to get
-    // these to conform with the corresponding label blocks
-    mBounds = new RoundRectangle2D.Double(x, y - 2, rect.getWidth() + 5,
-        rect.getHeight() + 10, CORNER_RADIUS, CORNER_RADIUS);
-    mUnderline = new UnderlineShape(geom, mPoint.x + rect.getMinX(),
-        mPoint.y, rect.getWidth(), font);
+    mText = builder.createAttributedString();
+    final LineMetrics metrics = builder.getLineMetrics(mText);
+    final FontRenderContext context = new FontRenderContext(null, true, true);
+    final TextLayout layout = new TextLayout(mText.getIterator(), context);
+    final Rectangle2D bounds = layout.getBounds();
+    final double width = bounds.getWidth() + 1.0;  // calculated is too short?
+    final double height = metrics.getHeight();
+    mBounds = new Rectangle2D.Double(x + bounds.getX(), y, width, height);
+    mAscent = metrics.getAscent();
+    mUnderlineShape =
+      builder.createUnderlineShape(proxy, mText, mBounds, metrics);
   }
 
 
   //##########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
   @Override
-  public RoundRectangle2D getShape()
+  public Rectangle2D getShape()
   {
     return mBounds;
   }
 
   @Override
-  public void draw(final Graphics2D graphics,final RenderingInformation status)
+  public void draw(final Graphics2D graphics,
+                   final RenderingInformation status)
   {
     if (status.isFocused()) {
       graphics.setColor(status.getShadowColor());
       graphics.fill(getShape());
     }
-    graphics.setFont(mFont);
     graphics.setColor(status.getColor());
-    graphics.drawString(mName, mPoint.x, mPoint.y);
-    mUnderline.draw(graphics, status);
+    final int x = (int) Math.round(mBounds.getX());
+    final int y = (int) Math.round(mBounds.getY() + mAscent);
+    graphics.drawString(mText.getIterator(), x, y);
+    if (mUnderlineShape != null) {
+      mUnderlineShape.draw(graphics, status);
+    }
   }
 
 
   //##########################################################################
-  //# Auxiliary Methods
-  protected Rectangle2D calculateBounds(final String name, final Font font)
+  //# Inner Class AttributedStringBuilder
+  private static class AttributedStringBuilder
   {
-    final FontRenderContext context = new FontRenderContext(null, true, true);
-    final TextLayout layout = new TextLayout(name, font, context);
-    return layout.getBounds();
+    //########################################################################
+    //# Constructor
+    private AttributedStringBuilder(final ConditionalProxy cond,
+                                    final Font font)
+    {
+      this(font);
+      appendEmphasisedText("IF", true, false);
+      appendPlainText(" ");
+      appendUnderlinedProxy(cond.getGuard());
+    }
+
+    private AttributedStringBuilder(final ForeachProxy foreach,
+                                    final Font font)
+    {
+      this(font);
+      appendEmphasisedText("FOR", true, false);
+      appendPlainText(" " + foreach.getName() + " ");
+      appendEmphasisedText("IN", true, false);
+      appendPlainText(" ");
+      appendUnderlinedProxy(foreach.getRange());
+    }
+
+    private AttributedStringBuilder(final SimpleExpressionProxy expr,
+                                    final Font font)
+    {
+      this(font);
+      appendUnderlinedProxy(expr);
+    }
+
+    private AttributedStringBuilder(final SimpleNodeProxy node,
+                                    final Font font)
+    {
+      this(font);
+      appendUnderlinedText(node.getName(), false, false);
+    }
+
+    private AttributedStringBuilder(final LabelBlockProxy block,
+                                    final String title,
+                                    final Font font)
+    {
+      this(font);
+      appendUnderlinedText(title, true, false);
+    }
+
+    private AttributedStringBuilder(final Font font)
+    {
+      mFont = font;
+      mStringBuilder = new StringBuilder();
+      mAttributeInfoList = new LinkedList<>();
+    }
+
+    //########################################################################
+    //# String Construction
+    private void appendPlainText(final String text)
+    {
+      appendEmphasisedText(text, false, false);
+    }
+
+    private void appendEmphasisedText(final String text,
+                                      final boolean bold,
+                                      final boolean italic)
+    {
+      final int start = mStringBuilder.length();
+      mStringBuilder.append(text);
+      final int end = mStringBuilder.length();
+      final AttributeInfo info =
+        new AttributeInfo(start, end, bold, italic, false);
+      mAttributeInfoList.add(info);
+    }
+
+    private void appendUnderlinedProxy(final Proxy proxy)
+    {
+      final String text = ProxyPrinter.getPrintString(proxy);
+      appendUnderlinedText(text, false, false);
+    }
+
+    private void appendUnderlinedText(final String text,
+                                      final boolean bold,
+                                      final boolean italic)
+    {
+      final int start = mStringBuilder.length();
+      mStringBuilder.append(text);
+      final int end = mStringBuilder.length();
+      final AttributeInfo info =
+        new AttributeInfo(start, end, bold, italic, true);
+      mAttributeInfoList.add(info);
+    }
+
+    private AttributedString createAttributedString()
+    {
+      final AttributedString string =
+        new AttributedString(mStringBuilder.toString());
+      for (final AttributeInfo info : mAttributeInfoList) {
+        info.apply(string, mFont);
+      }
+      return string;
+    }
+
+    private LineMetrics getLineMetrics(final AttributedString string)
+    {
+      final AttributedCharacterIterator iter = string.getIterator();
+      final FontRenderContext context = new FontRenderContext(null, true, true);
+      return mFont.getLineMetrics(iter, 0, iter.getEndIndex(), context);
+    }
+
+    private UnderlineShape createUnderlineShape(final Proxy proxy,
+                                                final AttributedString string,
+                                                final Rectangle2D bounds,
+                                                final LineMetrics metrics)
+    {
+      final FontRenderContext context = new FontRenderContext(null, true, true);
+      final TextLayout layout = new TextLayout(string.getIterator(), context);
+      final double x = bounds.getX();
+      final double y = bounds.getY() +
+        metrics.getAscent() + metrics.getUnderlineOffset();
+      for (final AttributeInfo info : mAttributeInfoList) {
+        final UnderlineShape shape =
+          info.createUnderlineShape(proxy, string, layout, x, y);
+        if (shape != null) {
+          return shape;
+        }
+      }
+      return null;
+    }
+
+    //########################################################################
+    //# Data Members
+    private final Font mFont;
+    private final StringBuilder mStringBuilder;
+    private final List<AttributeInfo> mAttributeInfoList;
+  }
+
+
+  //##########################################################################
+  //# Inner Class AttributeInfo
+  private static class AttributeInfo
+  {
+    //########################################################################
+    //# Constructor
+    private AttributeInfo(final int start,
+                          final int end,
+                          final boolean bold,
+                          final boolean italic,
+                          final boolean underlined)
+    {
+      mStart = start;
+      mEnd = end;
+      mBold = bold;
+      mItalic = italic;
+      mUnderlined = underlined;
+    }
+
+    //########################################################################
+    //# String Construction
+    private void apply(final AttributedString string, Font font)
+    {
+      if (mBold) {
+        font = font.deriveFont(Font.BOLD);
+      }
+      if (mItalic) {
+        font = font.deriveFont(Font.ITALIC);
+      }
+      final Map<TextAttribute,?> attribs = font.getAttributes();
+      string.addAttributes(attribs, mStart, mEnd);
+    }
+
+    private UnderlineShape createUnderlineShape(final Proxy proxy,
+                                                final AttributedString string,
+                                                final TextLayout layout,
+                                                final double x,
+                                                final double y)
+    {
+      if (mUnderlined) {
+        final Shape shape = layout.getLogicalHighlightShape(mStart, mEnd);
+        final Rectangle2D bounds = shape.getBounds2D();
+        final double xStart = x + bounds.getX();
+        final double width = bounds.getWidth();
+        return new UnderlineShape(proxy, xStart, y, width);
+      } else {
+        return null;
+      }
+    }
+
+    //########################################################################
+    //# Data Members
+    private final int mStart;
+    private final int mEnd;
+    private final boolean mBold;
+    private final boolean mItalic;
+    private final boolean mUnderlined;
   }
 
 
   //##########################################################################
   //# Data Members
-  private final Point mPoint;
-  private final RoundRectangle2D mBounds;
-  private final Font mFont;
-  private final String mName;
-  private final UnderlineShape mUnderline;
+  private final AttributedString mText;
+  private final Rectangle2D mBounds;
+  private final double mAscent;
+  private final UnderlineShape mUnderlineShape;
 
 
   //##########################################################################
   //# Class Constants
-  public static final int DEFAULT_OFFSET_X = 0;
-  public static final int DEFAULT_OFFSET_Y = 10;
-  public static final Point DEFAULT_OFFSET =
-      new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+  public static final int DEFAULT_NODE_LABEL_OFFSET_X = 0;
+  public static final int DEFAULT_NODE_LABEL_OFFSET_Y = 10;
+  public static final Point2D DEFAULT_NODE_LABEL_OFFSET =
+    new Point2D.Double(DEFAULT_NODE_LABEL_OFFSET_X,
+                       DEFAULT_NODE_LABEL_OFFSET_Y);
 
 }

@@ -185,11 +185,6 @@ public class EditorColor
    */
   public static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
   /**
-   * An enhanced version of the default font for headers.
-   * This presently is only used for the header of blocked events lists.
-   */
-  public static final Font HEADER_FONT = DEFAULT_FONT.deriveFont(Font.BOLD);
-  /**
    * The default font for uncontrollable events.
    * This is an italic version of the default font.
    */

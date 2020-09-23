@@ -37,6 +37,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -49,27 +50,35 @@ public class LabelBlockProxyShape
   //#########################################################################
   //# Constructor
   public LabelBlockProxyShape(final LabelBlockProxy block,
-                              final RoundRectangle2D bounds)
+                              final Rectangle2D textBounds)
   {
     super(block);
-    mShape = bounds;
-    mHeight = bounds.getHeight();
+    mTextBounds = textBounds;
+    final double x0 = textBounds.getMinX() - INSETS;
+    final double y0 = textBounds.getMinY() - INSETS;
+    final double width = textBounds.getWidth() + 2 * INSETS;
+    final double height = textBounds.getHeight() + 2 * INSETS;
+    mShape =
+      new RoundRectangle2D.Double(x0, y0, width, height, ARC_SIZE, ARC_SIZE);
   }
 
 
   //#########################################################################
   //# Simple Access
-  boolean shouldBeDrawn(){
+  public Rectangle2D getTextBounds()
+  {
+    return mTextBounds;
+  }
+
+  boolean shouldBeDrawn()
+  {
     return !getProxy().getEventIdentifierList().isEmpty();
   }
 
-  double getHeight()
-  {
-    return mHeight;
-  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RendererShape
+  @Override
   public Shape getShape()
   {
     return mShape;
@@ -78,6 +87,7 @@ public class LabelBlockProxyShape
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
+  @Override
   public LabelBlockProxy getProxy()
   {
     return (LabelBlockProxy) super.getProxy();
@@ -86,6 +96,7 @@ public class LabelBlockProxyShape
 
   //#########################################################################
   //# Drawing
+  @Override
   public void draw(final Graphics2D g2d, final RenderingInformation status)
   {
     final Shape shape = getShape();
@@ -106,14 +117,16 @@ public class LabelBlockProxyShape
 
   //#########################################################################
   //# Data Members
-  private final Shape mShape;
-  private final double mHeight;
+  private final RoundRectangle2D mShape;
+  private final Rectangle2D mTextBounds;
 
 
   //#########################################################################
   //# Class Constants
-  public static final int DEFAULTARCW = 8;
-  public static final int DEFAULTARCH = 8;
+  public static final int INSETS = 2;
+  public static final int ARC_SIZE = 8;
+  public static final int INDENTATION = 10;
+
   public static final int DEFAULT_OFFSET_X = 0;
   public static final int DEFAULT_OFFSET_Y = 10;
   public static final Point2D DEFAULT_OFFSET =

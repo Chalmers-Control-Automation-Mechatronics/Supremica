@@ -36,7 +36,6 @@ package net.sourceforge.waters.gui.renderer;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -71,7 +70,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
-import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 
@@ -254,8 +252,7 @@ public class ProxyShapeProducer
   public SimpleNodeProxyShape visitSimpleNodeProxy(final SimpleNodeProxy simple)
   {
     final SimpleNodeProxyShape shape = createSimpleNodeProxyShape(simple);
-    final LabelGeometryProxy geo = simple.getLabelGeometry();
-    createNodeLabelShape(geo, simple);
+    createNodeLabelShape(simple);
     return shape;
   }
 
@@ -324,12 +321,17 @@ public class ProxyShapeProducer
     return shape;
   }
 
-  LabelShape createNodeLabelShape(final LabelGeometryProxy geo,
-                                  final SimpleNodeProxy simple)
+  LabelShape createNodeLabelShape(final SimpleNodeProxy node)
   {
+    final LabelGeometryProxy geo = node.getLabelGeometry();
     LabelShape shape = (LabelShape) lookup(geo);
     if (shape == null) {
-      shape = new LabelShape(simple, EditorColor.DEFAULT_FONT);
+      final Point2D nodePos = node.getPointGeometry().getPoint();
+      final Point2D offset =
+        geo == null ? LabelShape.DEFAULT_NODE_LABEL_OFFSET : geo.getOffset();
+      final double x = nodePos.getX() + offset.getX();
+      final double y = nodePos.getY() + offset.getY();
+      shape = new LabelShape(node, x, y, EditorColor.DEFAULT_FONT);
       mMap.put(geo, shape);
     }
     return shape;
@@ -366,114 +368,95 @@ public class ProxyShapeProducer
   }
 
   LabelBlockProxyShape createLabelBlockShape
-    (final LabelBlockProxy block,
-     final EdgeProxyShape eshape)
+    (final LabelBlockProxy block, final EdgeProxyShape edgeShape)
   {
     LabelBlockProxyShape shape = (LabelBlockProxyShape) lookup(block);
     if (shape == null) {
-      mWidth = 0;
-      mHeight = 1;
-      double x;
-      double y;
+      final FontRenderContext context = new FontRenderContext(null, true, true);
+      final Font font = EditorColor.DEFAULT_FONT;
+      final Rectangle2D charBounds = font.getMaxCharBounds(context);
+      final double baseLineSkip = charBounds.getHeight();
+      double x0, y0;
       final LabelGeometryProxy geo = block.getGeometry();
       if (geo == null) {
-        x = LabelBlockProxyShape.DEFAULT_OFFSET_X;
-        y = LabelBlockProxyShape.DEFAULT_OFFSET_Y;
+        x0 = LabelBlockProxyShape.DEFAULT_OFFSET_X;
+        y0 = LabelBlockProxyShape.DEFAULT_OFFSET_Y;
       } else {
         final Point2D offset = geo.getOffset();
-        x = offset.getX();
-        y = offset.getY();
+        x0 = offset.getX();
+        y0 = offset.getY();
       }
-      if (eshape != null) {
-        final Point2D turn = eshape.getTurningPoint();
-        x += turn.getX();
-        y += turn.getY();
+      if (edgeShape != null) {
+        final Point2D turn = edgeShape.getTurningPoint();
+        x0 += turn.getX();
+        y0 += turn.getY();
+      }
+      x0 += LabelBlockProxyShape.INSETS;
+      y0 += LabelBlockProxyShape.INSETS;
+      final double x = x0;
+      final double y = y0;
+      mMaxY = y;
+      mMaxX = x;
+      createListShape(block.getEventIdentifierList(), x, y, baseLineSkip);
+      final double width = mMaxX - x0;
+      final double height = mMaxY - y0;
+      final Rectangle2D textBounds =
+        new Rectangle2D.Double(x0, y0, width, height);
+      if (edgeShape != null) {
+        shape = new LabelBlockProxyShape(block, textBounds);
       } else {
         // Oh no! It's the blocked events list!
-        final TextLayout text =
-          new TextLayout(BLOCKED_HEADER, EditorColor.HEADER_FONT,
-                         new FontRenderContext(null, true, true));
-        mWidth = (int) text.getBounds().getWidth();
-      }
-      final int lx = (int) Math.round(x) + 1;
-
-      createListShape(block.getEventIdentifierList(), lx, y, 0);
-
-      mHeight += 4;
-      mWidth += 3;
-      final RoundRectangle2D bounds =
-        new RoundRectangle2D.Double(x, y, mWidth, mHeight,
-                                    LabelBlockProxyShape.DEFAULTARCW,
-                                    LabelBlockProxyShape.DEFAULTARCH);
-      if (eshape != null) {
-        shape = new LabelBlockProxyShape(block, bounds);
-      } else {
-        shape = new TitledLabelBlockProxyShape
-          (block, bounds, BLOCKED_HEADER, EditorColor.HEADER_FONT);
+        shape = TitledLabelBlockProxyShape.createShape
+          (block, textBounds,
+           TitledLabelBlockProxyShape.BLOCKED_HEADER,
+           EditorColor.DEFAULT_FONT, baseLineSkip);
       }
       mMap.put(block, shape);
     }
     return shape;
   }
 
-  private void createListShape(final List<Proxy> list, final int x,
-                               final double y, final int indent)
+  private double createListShape(final List<Proxy> list,
+                                 final double x,
+                                 double y,
+                                 final double baseLineSkip)
   {
     for (final Proxy proxy : list) {
-      final int ly = (int) Math.round(y + mHeight);
-      Font font = EditorColor.DEFAULT_FONT;
-      mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
-      AbstractLabelShape lshape = null;
+      LabelShape shape = null;
       if (proxy instanceof IdentifierProxy) {
         final IdentifierProxy ident = (IdentifierProxy) proxy;
-        font = mRenderingContext.getFont(ident);
-        mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
-        lshape = createEdgeLabelShape(proxy, x + indent, ly, font);
-        mMap.put(proxy, lshape);
-        adjustRect(lshape, indent);
+        shape = createEdgeLabelShape(ident, x, y, EditorColor.DEFAULT_FONT);
+        mMap.put(proxy, shape);
+        y += baseLineSkip;
       } else if (proxy instanceof ConditionalProxy) {
         final ConditionalProxy cond = (ConditionalProxy) proxy;
-        lshape = createConditionalLabelShape(cond, x + indent, ly);
-        mMap.put(proxy, lshape);
-        adjustRect(lshape, indent);
-        createListShape(cond.getBody(), x, y, indent + NESTED_INDENTATION);
+        shape = createConditionalLabelShape(cond, x, y);
+        mMap.put(proxy, shape);
+        y += baseLineSkip;
+        y = createListShape(cond.getBody(),
+                            x + LabelBlockProxyShape.INDENTATION, y,
+                            baseLineSkip);
       } else if (proxy instanceof ForeachProxy) {
         final ForeachProxy foreach = (ForeachProxy) proxy;
-        lshape = createForeachLabelShape(foreach, x + indent, ly);
-        mMap.put(proxy, lshape);
-        adjustRect(lshape, indent);
-        createListShape(foreach.getBody(), x, y, indent + NESTED_INDENTATION);
+        shape = createForeachLabelShape(foreach, x, y);
+        mMap.put(proxy, shape);
+        y += baseLineSkip;
+        y = createListShape(foreach.getBody(),
+                            x + LabelBlockProxyShape.INDENTATION, y,
+                            baseLineSkip);
       }
+      final Rectangle2D bounds = shape.getBounds2D();
+      mMaxX = Math.max(mMaxX, bounds.getMaxX());
+      mMaxY = Math.max(mMaxY, bounds.getMaxY());
     }
-  }
-
-  private Rectangle2D mMaxBounds;
-  private double mMaxHeight = 0;
-
-  private void adjustRect(final AbstractLabelShape shape, final int indent)
-  {
-    if(mMaxHeight < mMaxBounds.getHeight()){
-      mMaxHeight = mMaxBounds.getHeight();
-    }
-    final RoundRectangle2D lrect = shape.getShape();
-    lrect.setFrame(lrect.getX(), lrect.getY(), lrect.getWidth(), mMaxHeight);
-    mHeight += mMaxHeight;
-    if (mWidth < lrect.getWidth() + indent) {
-      mWidth = (int) lrect.getWidth() + indent;
-    }
+    return y;
   }
 
 
-  private AttributedLabelShape createConditionalLabelShape
-    (final ConditionalProxy cond, final int x, final int y)
+  private LabelShape createConditionalLabelShape
+    (final ConditionalProxy cond, final double x, final double y)
   {
-    final Font keyword = EditorColor.DEFAULT_FONT.deriveFont(Font.BOLD);
-    final AttributedLabelShapeBuilder builder =
-      new AttributedLabelShapeBuilder(EditorColor.DEFAULT_FONT);
-    builder.add(keyword, "IF");
-    builder.add(" ");
-    builder.add(cond.getGuard());
-    return builder.create(cond, x, y, mMap);
+    return new LabelShape(cond, x, y, EditorColor.DEFAULT_FONT);
   }
 
   GuardActionBlockProxyShape createGuardActionBlockShape
@@ -509,10 +492,10 @@ public class ProxyShapeProducer
           final LabelShape lshape =
             createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
           mMap.put(guard, lshape);
-          final RoundRectangle2D lrect = lshape.getShape();
-          height += lrect.getHeight();
-          if (width < lrect.getWidth()) {
-            width = lrect.getWidth();
+          final Rectangle2D rect = lshape.getShape();
+          height += rect.getHeight();
+          if (width < rect.getWidth()) {
+            width = rect.getWidth();
           }
         }
       }
@@ -522,10 +505,10 @@ public class ProxyShapeProducer
         final LabelShape lshape =
           createEdgeLabelShape(action, lx, ly, EditorColor.DEFAULT_FONT);
         mMap.put(action, lshape);
-        final RoundRectangle2D lrect = lshape.getShape();
-        height += lrect.getHeight();
-        if (width < lrect.getWidth()) {
-          width = lrect.getWidth();
+        final Rectangle2D rect = lshape.getShape();
+        height += rect.getHeight();
+        if (width < rect.getWidth()) {
+          width = rect.getWidth();
         }
       }
       final RoundRectangle2D bounds =
@@ -538,35 +521,26 @@ public class ProxyShapeProducer
     return shape;
   }
 
-  private LabelShape createEdgeLabelShape(final Proxy label,
-                                          final int x, final int y,
-                                          final Font font)
+  private LabelShape createEdgeLabelShape(final SimpleExpressionProxy expr,
+                                                    final double x,
+                                                    final double y,
+                                                    final Font font)
   {
-    Proxy shown = label;
-    if (mBindings != null && label instanceof SimpleExpressionProxy) {
-      final SimpleExpressionProxy expr = (SimpleExpressionProxy) label;
+    SimpleExpressionProxy shown = expr;
+    if (mBindings != null) {
       try {
         shown = mCompiler.simplify(expr, mBindings);
       } catch (final EvalException exception) {
         // OK, use the original label
       }
     }
-    final String text = ModuleProxyPrinter.getPrintString(shown);
-    return new LabelShape(label, x, y, font, text);
+    return new LabelShape(shown, x, y, font);
   }
 
-  private AttributedLabelShape createForeachLabelShape
-    (final ForeachProxy foreach, final int x, final int y)
+  private LabelShape createForeachLabelShape
+    (final ForeachProxy foreach, final double x, final double y)
   {
-    final Font keyword = EditorColor.DEFAULT_FONT.deriveFont(Font.BOLD);
-    final AttributedLabelShapeBuilder builder =
-      new AttributedLabelShapeBuilder(EditorColor.DEFAULT_FONT);
-    builder.add(keyword, "FOR");
-    builder.add(" " + foreach.getName() + " ");
-    builder.add(keyword, "IN");
-    builder.add(" ");
-    builder.add(foreach.getRange());
-    return builder.create(foreach, x, y, mMap);
+    return new LabelShape(foreach, x, y, EditorColor.DEFAULT_FONT);
   }
 
 
@@ -577,14 +551,11 @@ public class ProxyShapeProducer
   private final Map<Proxy,ProxyShape> mMap;
   private final SimpleExpressionCompiler mCompiler;
   private final BindingContext mBindings;
-  private double mHeight;
-  private double mWidth;
+  private double mMaxX;
+  private double mMaxY;
 
 
   //#########################################################################
   //# Class Constants
-  public static final int NESTED_INDENTATION = 10;
-
-  private static final String BLOCKED_HEADER = "BLOCKED:";
   private static final double BORDER = 5;
 }

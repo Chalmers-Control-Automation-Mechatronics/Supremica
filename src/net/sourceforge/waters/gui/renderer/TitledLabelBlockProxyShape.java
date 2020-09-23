@@ -36,20 +36,17 @@ package net.sourceforge.waters.gui.renderer;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 
 
 /**
- * <P>A peculiar type of label block to support blocked events list.
- * In addition to the normal label block, it displays a title in
+ * <P>A peculiar type of label block to support blocked events lists.
+ * In addition to the normal label block, it displays a bold title in
  * a given font on top of the list.</P>
  *
- * @author Simon Ware
+ * @author Simon Ware, Robi Malik
  */
 
 public class TitledLabelBlockProxyShape
@@ -58,82 +55,79 @@ public class TitledLabelBlockProxyShape
 
   //#########################################################################
   //# Constructor
-  public TitledLabelBlockProxyShape(final LabelBlockProxy block,
-                                    final RoundRectangle2D bounds,
-                                    final String title,
-                                    final Font font)
+  static TitledLabelBlockProxyShape createShape(final LabelBlockProxy block,
+                                                final Rectangle2D textBounds,
+                                                final String title,
+                                                final Font font,
+                                                final double baseLineSkip)
   {
-    super(block, bounds);
-    mTitle = title;
-    mFont = font;
-    final Rectangle2D titleBounds = getTitleBounds();
-    mUnderline = new UnderlineShape(block, titleBounds.getMinX(),
-        titleBounds.getMaxY(), titleBounds.getWidth(), font);
+    final double x0 = textBounds.getX() - LabelBlockProxyShape.INSETS;
+    final double y0 =
+      textBounds.getY() - LabelBlockProxyShape.INSETS - baseLineSkip;
+    final LabelShape titleShape = new LabelShape(block, x0, y0, title, font);
+    final Rectangle2D titleBounds = titleShape.getBounds2D();
+    final double titleWidth = titleBounds.getWidth();
+    final double margins = 2 * LabelBlockProxyShape.INSETS;
+    if (titleWidth > textBounds.getWidth() + margins) {
+      textBounds.setRect(textBounds.getX(), textBounds.getY(),
+                         titleWidth - margins, textBounds.getHeight());
+    }
+    return new TitledLabelBlockProxyShape(block, textBounds, titleShape);
+  }
+
+  private TitledLabelBlockProxyShape(final LabelBlockProxy block,
+                                     final Rectangle2D textBounds,
+                                     final LabelShape titleShape)
+  {
+    super(block, textBounds);
+    mTitleShape = titleShape;
+    final Rectangle2D titleBounds = titleShape.getBounds2D();
+    final Rectangle2D labelBounds = super.getBounds2D();
+    mCombinedBounds = new Rectangle2D.Double();
+    Rectangle2D.union(titleBounds, labelBounds, mCombinedBounds);
   }
 
 
   //#########################################################################
-  //# Simple Access
+  //# Overrides for net.sourceforge.waters.gui.renderer.LabelBlockProxyShape
   @Override
-  boolean shouldBeDrawn(){
+  boolean shouldBeDrawn()
+  {
     return true;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.renderer.RendererShape
   @Override
   public Rectangle2D getBounds2D()
   {
-    return getTitleBounds();
+    return mCombinedBounds;
   }
 
   @Override
   public boolean isClicked(final Point point)
   {
-    return super.isClicked(point) || getTitleBounds().contains(point);
+    return super.isClicked(point) || mTitleShape.isClicked(point);
   }
 
-
-  //#########################################################################
-  //# Drawing
   @Override
-  public void draw(final Graphics2D g, final RenderingInformation status)
+  public void draw(final Graphics2D graphics,
+                   final RenderingInformation status)
   {
-    super.draw(g, status);
-    final Rectangle2D titleBounds = getTitleBounds();
-    final int x = (int) titleBounds.getMinX();
-    final int y = (int) titleBounds.getMaxY();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                       RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                       RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-    g.setFont(mFont);
-    g.setStroke(BASICSTROKE);
-    g.setColor(status.getColor());
-    g.drawString(mTitle, x, y);
-    mUnderline.draw(g, status);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private Rectangle2D getTitleBounds()
-  {
-    final Rectangle2D shapeBounds = getShape().getBounds2D();
-    final double x = shapeBounds.getX();
-    final double y = shapeBounds.getY();
-    final FontRenderContext context =
-      new FontRenderContext(mFont.getTransform(), false, false);
-    final Rectangle2D titleBounds = mFont.getStringBounds(mTitle, context);
-    final double width = titleBounds.getWidth();
-    final double height = titleBounds.getHeight();
-    titleBounds.setRect(x, y - height - 2, width, height);
-    return titleBounds;
+    super.draw(graphics, status);
+    mTitleShape.draw(graphics, status);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final String mTitle;
-  private final Font mFont;
-  private final UnderlineShape mUnderline;
+  private final LabelShape mTitleShape;
+  private final Rectangle2D mCombinedBounds;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String BLOCKED_HEADER = "BLOCKED:";
 
 }

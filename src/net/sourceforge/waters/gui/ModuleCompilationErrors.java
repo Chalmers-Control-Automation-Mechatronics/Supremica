@@ -45,7 +45,6 @@ import java.util.Set;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -158,10 +157,6 @@ public class ModuleCompilationErrors
         mErrors.put(location, errors);
       }
       errors.add(error);
-      // Condition and foreach blocks get individual underlines
-      if (location instanceof NestedBlockProxy) {
-        location = child;
-      }
       mUnderlines.add(location);
       // Increment error counts of ancestors
       while (location != null) {

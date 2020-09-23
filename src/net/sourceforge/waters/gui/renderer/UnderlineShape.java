@@ -34,12 +34,9 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.BasicStroke;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.awt.geom.Line2D;
 
 import net.sourceforge.waters.gui.EditorColor;
@@ -51,14 +48,13 @@ public class UnderlineShape extends AbstractProxyShape
 
   //##########################################################################
   //# Constructor
-  public UnderlineShape(final Proxy proxy, final double x, final double y,
-                        final double width, final Font font)
+  public UnderlineShape(final Proxy proxy,
+                        final double x,
+                        final double y,
+                        final double width)
   {
     super(proxy);
-    final FontRenderContext context = new FontRenderContext(null, true, true);
-    final LineMetrics metrics = font.getLineMetrics("", context);
-    final float offset = metrics.getUnderlineOffset();
-    mLine = new Line2D.Double(x, y + offset, x + width, y + offset);
+    mLine = new Line2D.Double(x, y, x + width, y);
   }
 
 

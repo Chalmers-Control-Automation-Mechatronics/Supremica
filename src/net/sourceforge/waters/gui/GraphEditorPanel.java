@@ -104,6 +104,7 @@ import net.sourceforge.waters.gui.renderer.GeneralShape;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.Handle.HandleType;
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.LayoutMode;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
@@ -3167,15 +3168,17 @@ public class GraphEditorPanel
         final ProxySubject parent = SubjectTools.getProxyParent(elist);
         if (mFocusedObject == parent) {
           // Drop on focused label block: show precise insert position
-          final ProxyShape shape = getShapeProducer().getShape(parent);
-          final Rectangle2D bounds = shape.getShape().getBounds();
-          mY = bounds.getMinY();
+          final LabelBlockProxyShape shape =
+            (LabelBlockProxyShape) getShapeProducer().getShape(parent);
+          final Rectangle2D textBounds = shape.getTextBounds();
+          mY = textBounds.getY();
           if (!findDropPosition(elist, point.getY())) {
-            mX = bounds.getMinX();
+            mX = textBounds.getX();
             mDropTarget = elist;
             mDropPosition = -1;
           }
-          mLine = new Line2D.Double(mX, mY, bounds.getMaxX(), mY);
+          final double maxX = textBounds.getMaxX();
+          mLine = new Line2D.Double(mX, mY, maxX, mY);
         } else {
           // Drop on edge or node: drop at end of list and do not show line
           mDropTarget = elist;
@@ -3362,7 +3365,7 @@ public class GraphEditorPanel
       for (int i = 0; i < list.size(); i++) {
         final ProxySubject item = list.get(i);
         final ProxyShape shape = getShapeProducer().getShape(item);
-        final Rectangle2D bounds = shape.getShape().getBounds();
+        final Rectangle2D bounds = shape.getBounds2D();
         if (y < bounds.getMaxY()) {
           if (item instanceof NestedBlockSubject) {
             final double margin = 0.25 * bounds.getHeight();
@@ -3372,13 +3375,13 @@ public class GraphEditorPanel
               mDropPosition = i;
             } else if (y >= bounds.getMaxY() - margin) {
               final NestedBlockSubject nested = (NestedBlockSubject) item;
-              mX = bounds.getMinX() + ProxyShapeProducer.NESTED_INDENTATION;
+              mX = bounds.getMinX() + LabelBlockProxyShape.INDENTATION;
               mY = bounds.getMaxY();
               mDropTarget = nested.getBodyModifiable();
               mDropPosition = 0;
             } else {
               final NestedBlockSubject nested = (NestedBlockSubject) item;
-              mX = bounds.getMinX() + ProxyShapeProducer.NESTED_INDENTATION;
+              mX = bounds.getMinX() + LabelBlockProxyShape.INDENTATION;
               mY = getBottomY(nested);
               mDropTarget = nested.getBodyModifiable();
               mDropPosition = -1;

@@ -48,11 +48,12 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -88,10 +89,9 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     super.setUp();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final SAXModuleMarshaller modmarshaller =
-      new SAXModuleMarshaller(factory, optable);
+    mModuleMarshaller = new SAXModuleMarshaller(factory, optable);
     mDocumentManager = new DocumentManager();
-    mDocumentManager.registerUnmarshaller(modmarshaller);
+    mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mPrinter = new EPSPrinterVisitor();
   }
 
@@ -108,56 +108,30 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
   }
   */
 
-  public void testTransferline() throws Exception
+  public void testAT() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "transferline.wmod";
-    printGraphs(group, name);
+    printGraphs("tests", "mtsa", "AT.wmod");
   }
 
   public void testKoordwsp() throws Exception
   {
-    final String group = "valid";
-    final String dir  = "central_locking";
-    final String name = "koordwsp.wmod";
-    printGraphs(group, dir, name);
+    printGraphs("valid", "central_locking", "koordwsp.wmod");
+  }
+
+  public void testTransferline() throws Exception
+  {
+    printGraphs("handwritten", "transferline.wmod");
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  protected void printGraphs(final String group, final String name)
+  protected void printGraphs(final String... path)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    printGraphs(groupdir, name);
-  }
-
-  protected void printGraphs(final String group,
-			     final String subdir,
-			     final String name)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    printGraphs(groupdir, subdir, name);
-  }
-
-  protected void printGraphs(final File groupdir,
-			     final String subdir,
-			     final String name)
-    throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    printGraphs(dir, name);
-  }
-
-  protected void printGraphs(final File dir, final String name)
-    throws Exception
-  {
-    final File filename = new File(dir, name);
-    printGraphs(filename);
+    final String ext = mModuleMarshaller.getDefaultExtension();
+    final File file = getInputFile(path, ext);
+    printGraphs(file);
   }
 
   protected void printGraphs(final File filename)
@@ -174,7 +148,6 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
   private class EPSPrinterVisitor
     extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private void processModule(final ModuleProxy module)
@@ -195,14 +168,12 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     /**
-     * Visit the children of foreach constructs in the component list.
+     * Skip instances and variables.
      */
     @Override
-    public Object visitForeachProxy(final ForeachProxy foreach)
-      throws VisitorException
+    public Object visitComponentProxy(final ComponentProxy comp)
     {
-      final Collection<Proxy> body = foreach.getBody();
-      return visitCollection(body);
+      return null;
     }
 
     /**
@@ -217,33 +188,44 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     }
 
     /**
-     * Visit simpleComponent and output eps-file.
-     * The only reason that visitGraphProxy is not used instead is that we
-     * need the name ...
+     * Visit the children of conditional and foreach constructs in the
+     * component list.
+     */
+    @Override
+    public Object visitNestedBlockProxy(final NestedBlockProxy block)
+      throws VisitorException
+    {
+      final Collection<Proxy> body = block.getBody();
+      return visitCollection(body);
+    }
+
+    /**
+     * Visit simple components and output eps-files.
+     * The reason why visitGraphProxy is not used is because we need the name.
      */
     @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
       throws VisitorException
     {
       try {
-	final File dir = getOutputDirectory();
-	final String name = comp.getName();
-	final File file = new File(dir, name + ".eps");
-	final GraphProxy graph = comp.getGraph();
-	final EPSGraphPrinter printer = new EPSGraphPrinter(graph, file);
-	printer.print();
-	return null;
+        final File dir = getOutputDirectory();
+        final String name = comp.getName();
+        final File file = new File(dir, name + ".eps");
+        final GraphProxy graph = comp.getGraph();
+        final EPSGraphPrinter printer = new EPSGraphPrinter(graph, file);
+        printer.print();
+        return null;
       } catch (final IOException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
-
   }
 
 
   //#########################################################################
   //# Data Members
   private DocumentManager mDocumentManager;
+  private SAXModuleMarshaller mModuleMarshaller;
   private EPSPrinterVisitor mPrinter;
 
 }
