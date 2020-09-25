@@ -72,6 +72,7 @@ import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
 
 
@@ -89,15 +90,28 @@ import org.supremica.gui.ide.IDE;
 public class ForeachEditorDialog
   extends JDialog
 {
+  //#########################################################################
+  //# Static Invocation
+  public static void showDialog(final ForeachSubject foreach,
+                                final SelectionOwner panel,
+                                final ComponentEditorPanel root)
+  {
+    final ModuleWindowInterface rroot = root.getModuleWindowInterface();
+    new ForeachEditorDialog(rroot, panel, foreach);
+  }
+
+
 
   //#########################################################################
   //# Constructors
-  public ForeachEditorDialog(final ModuleWindowInterface root, final SelectionOwner panel)
+  public ForeachEditorDialog(final ModuleWindowInterface root,
+                             final SelectionOwner panel)
   {
     this(root, panel, null);
   }
 
-  public ForeachEditorDialog(final ModuleWindowInterface root, final SelectionOwner panel,
+  public ForeachEditorDialog(final ModuleWindowInterface root,
+                             final SelectionOwner panel,
                              final ForeachSubject foreach)
   {
     super(root.getRootWindow());

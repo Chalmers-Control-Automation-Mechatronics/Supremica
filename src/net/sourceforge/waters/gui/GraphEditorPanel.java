@@ -88,7 +88,9 @@ import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.dialog.ConditionalEditorDialog;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
+import net.sourceforge.waters.gui.dialog.ForeachEditorDialog;
 import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
 import net.sourceforge.waters.gui.dialog.SimpleIdentifierInputHandler;
@@ -155,7 +157,9 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.ConditionalSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
@@ -1931,6 +1935,28 @@ public class GraphEditorPanel
       }
     }
 
+    /**
+     * Handles a double-click event on a label block.
+     * This method checks whether there is a nested block (conditional or
+     * foreach) at the mouse position, and if so invokes an editor dialog.
+     */
+    void handleLabelBlockDoubleClick(final MouseEvent event)
+    {
+      final ProxySubject item = getDraggableItem(event, true);
+      if (item != null && item instanceof NestedBlockSubject) {
+        if (item instanceof ConditionalSubject) {
+          final ConditionalSubject cond = (ConditionalSubject) item;
+          ConditionalEditorDialog.showDialog
+            (cond, GraphEditorPanel.this, mRoot);
+        } else if (item instanceof ForeachSubject) {
+          final ForeachSubject foreach = (ForeachSubject) item;
+          ForeachEditorDialog.showDialog
+            (foreach, GraphEditorPanel.this, mRoot);
+        }
+      }
+    }
+
+
     //#######################################################################
     //# Additional Callbacks
     /**
@@ -2163,6 +2189,8 @@ public class GraphEditorPanel
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
           EdgeEditorDialog.showDialog(edge, mRoot);
+        } else if (mFocusedObject instanceof LabelBlockSubject) {
+          handleLabelBlockDoubleClick(event);
         } else if (mFocusedObject instanceof NodeSubject) {
           final NodeSubject node = (NodeSubject) mFocusedObject;
           NodeEditorDialog.showDialog(mModuleContainer,
@@ -2478,6 +2506,8 @@ public class GraphEditorPanel
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
           EdgeEditorDialog.showDialog(edge, mRoot);
+        } else if (mFocusedObject instanceof LabelBlockSubject) {
+          handleLabelBlockDoubleClick(event);
         }
       }
     }

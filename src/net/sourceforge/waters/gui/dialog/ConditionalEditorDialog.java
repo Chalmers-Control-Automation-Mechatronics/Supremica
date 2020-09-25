@@ -72,6 +72,7 @@ import net.sourceforge.waters.subject.module.ConditionalSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
 
 
@@ -89,6 +90,17 @@ import org.supremica.gui.ide.IDE;
 public class ConditionalEditorDialog
   extends JDialog
 {
+  //#########################################################################
+  //# Static Invocation
+  public static void showDialog(final ConditionalSubject cond,
+                                final SelectionOwner panel,
+                                final ComponentEditorPanel root)
+  {
+    final ModuleWindowInterface rroot = root.getModuleWindowInterface();
+    new ConditionalEditorDialog(rroot, panel, cond);
+  }
+
+
   //#########################################################################
   //# Constructors
   public ConditionalEditorDialog(final ModuleWindowInterface root,
