@@ -448,7 +448,7 @@ public class LogPanel extends JPanel
       setDaemon(true);
       mSystemStream = getSystemOut();
       mOption = option;
-      mOption.addPropertyChangeListener(this);
+      mOption.addOptionChangeListener(this);
       mLevelInfo = info;
     }
 

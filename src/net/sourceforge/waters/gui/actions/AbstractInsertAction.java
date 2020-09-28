@@ -33,80 +33,98 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.Action;
-
-import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.dialog.ForeachEditorDialog;
+import net.sourceforge.waters.analysis.options.OptionChangeEvent;
+import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.plain.module.ForeachElement;
-import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.Config;
 
 
 /**
- * The action to create a new foreach block for a module.
- * This action merely pops up the foreach block creation dialog
- * ({@link ForeachEditorDialog});
- * the actual foreach block creation is done when the dialog is committed.
+ * An abstract insertion action for instantiation-related features.
+ *
+ * This action supports smarter action enablement by registering a
+ * listener on the option {@link Config#INCLUDE_INSTANTIATION} and to
+ * selection changes. The action is enabled if {@link
+ * Config#INCLUDE_INSTANTIATION} is selected. Additionally, it is possible
+ * to implement a type-dependent check to determine whether the currently
+ * active panel can accept an insertion.
  *
  * @author Robi Malik
  */
 
-public class InsertForeachAction
-  extends AbstractInsertAction
+public abstract class AbstractInsertAction
+  extends WatersAction
+  implements OptionChangeListener
 {
 
   //#########################################################################
   //# Constructors
-  InsertForeachAction(final IDE ide)
+  AbstractInsertAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "New Foreach Block ...");
-    putValue(Action.SHORT_DESCRIPTION, "Insert a FOR loop (repetion)");
-    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_FOREACH);
+    Config.INCLUDE_INSTANTIATION.addOptionChangeListener(this);
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Interface net.sourceforge.waters.gui.observer.Observer
   @Override
-  public void actionPerformed(final ActionEvent event)
+  public void update(final EditorChangedEvent event)
   {
-    final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    if (root != null) {
-      final FocusTracker tracker = getFocusTracker();
-      final SelectionOwner panel = tracker.getWatersSelectionOwner();
-      new ForeachEditorDialog(root, panel);
+    switch (event.getKind()) {
+    case CONTAINER_SWITCH:
+    case MAINPANEL_SWITCH:
+    case SELECTION_CHANGED:
+      updateEnabledStatus();
+      break;
+    default:
+      break;
     }
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.actions.AbstractInsertAction
+  //# Interface net.sourceforge.waters.analysis.options.OptionChangeListener
   @Override
+  public void optionChanged(final OptionChangeEvent event)
+  {
+    updateEnabledStatus();
+  }
+
+
+  //#########################################################################
+  //# Hooks
   boolean canInsert(final SelectionOwner panel)
   {
-    return panel.canPaste(TRANSFERABLE);
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    if (Config.INCLUDE_INSTANTIATION.getValue()) {
+      final FocusTracker tracker = getFocusTracker();
+      final SelectionOwner panel = tracker.getWatersSelectionOwner();
+      if (panel != null) {
+        final boolean enabled = canInsert(panel);
+        setEnabled(enabled);
+      } else {
+        setEnabled(false);
+      }
+    } else {
+      setEnabled(false);
+    }
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -5366630696210376372L;
-
-  private static final ForeachProxy TEMPLATE =
-    new ForeachElement(":dummy", new SimpleIdentifierElement(":dummy"));
-  private static final Transferable TRANSFERABLE =
-    WatersDataFlavor.createTransferable(TEMPLATE);
+  private static final long serialVersionUID = -5439319945242479630L;
 
 }

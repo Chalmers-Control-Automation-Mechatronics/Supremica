@@ -285,7 +285,7 @@ public class IDEMenuBar
   public void addOption(final Option<?> option)
   {
     if (mOptions.add(option)) {
-      option.addPropertyChangeListener(this);
+      option.addOptionChangeListener(this);
     }
   }
 
@@ -819,7 +819,7 @@ public class IDEMenuBar
   private void removeListeners()
   {
     for (final Option<?> option : mOptions) {
-      option.removePropertyChangeListener(this);
+      option.removeOptionChangeListener(this);
     }
     mOptions.clear();
   }

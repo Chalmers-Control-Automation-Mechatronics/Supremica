@@ -116,7 +116,7 @@ public class IDEPropertiesAction extends WatersAction
     this(ide, null);
   }
 
-  IDEPropertiesAction(final IDE ide, final Proxy arg)
+  public IDEPropertiesAction(final IDE ide, final Proxy arg)
   {
     super(ide);
     mActionArgument = arg;
@@ -125,6 +125,7 @@ public class IDEPropertiesAction extends WatersAction
     mVisitor = new PropertiesVisitor();
     updateEnabledStatus();
   }
+
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -135,6 +136,7 @@ public class IDEPropertiesAction extends WatersAction
     mVisitor.editProperties(proxy);
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
   @Override
@@ -144,6 +146,7 @@ public class IDEPropertiesAction extends WatersAction
       updateEnabledStatus();
     }
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -369,10 +372,12 @@ public class IDEPropertiesAction extends WatersAction
     private boolean mDoEdit;
   }
 
+
   //#########################################################################
   //# Data Members
   private final Proxy mActionArgument;
   private final PropertiesVisitor mVisitor;
+
 
   //#########################################################################
   //# Class Constants

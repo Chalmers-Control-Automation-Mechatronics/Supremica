@@ -82,16 +82,22 @@ class ComponentsTreePopupFactory
     popup.addSeparator();
     final IDEAction newaut = master.getInsertSimpleComponentAction();
     popup.add(newaut);
-    final IDEAction newvar = master.getInsertVariableAction();
-    popup.add(newvar);
+    final IDEAction newVar = master.getInsertVariableAction();
+    if (newVar.isEnabled()) {
+      popup.add(newVar);
+    }
     final IDEAction newCond = master.getInsertConditionalAction();
-    popup.add(newCond);
+    if (newCond.isEnabled()) {
+      popup.add(newCond);
+    }
     final IDEAction newFor = master.getInsertForeachAction();
-    popup.add(newFor);
-    final IDEAction newinst = master.getInsertInstanceAction();
-    popup.add(newinst);
-    final IDEAction showcomment = master.getShowModuleCommentAction();
-    popup.add(showcomment);
+    if (newFor.isEnabled()) {
+      popup.add(newFor);
+    }
+    final IDEAction newInst = master.getInsertInstanceAction();
+    if (newInst.isEnabled()) {
+      popup.add(newInst);
+    }
   }
 
 

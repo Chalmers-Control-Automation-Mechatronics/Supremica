@@ -115,7 +115,7 @@ public class ModuleContainer
     mTabPanel.add(mSimulatorPanel);
     mWatersAnalyzerPropertyChangeListener =
       new WatersAnalyzerPropertyChangeListener();
-    Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
+    Config.INCLUDE_WATERS_ANALYZER.addOptionChangeListener
       (mWatersAnalyzerPropertyChangeListener);
     if (Config.INCLUDE_WATERS_ANALYZER.getValue()) {
       mAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
@@ -177,7 +177,7 @@ public class ModuleContainer
   public void close()
   {
     mEditorPanel.close();
-    Config.INCLUDE_WATERS_ANALYZER.removePropertyChangeListener
+    Config.INCLUDE_WATERS_ANALYZER.removeOptionChangeListener
       (mWatersAnalyzerPropertyChangeListener);
     mBackgroundCompiler.terminate();
   }

@@ -55,7 +55,7 @@ import org.supremica.gui.ide.IDE;
  */
 
 public class InsertInstanceAction
-  extends WatersAction
+  extends AbstractInsertAction
 {
 
   //#########################################################################
@@ -84,6 +84,6 @@ public class InsertInstanceAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -378995629150396673L;
 
 }

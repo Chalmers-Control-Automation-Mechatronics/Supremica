@@ -41,7 +41,6 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.ConditionalEditorDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -62,7 +61,7 @@ import org.supremica.gui.ide.IDE;
  */
 
 public class InsertConditionalAction
-  extends WatersAction
+  extends AbstractInsertAction
 {
   //#########################################################################
   //# Constructors
@@ -70,7 +69,8 @@ public class InsertConditionalAction
   {
     super(ide);
     putValue(Action.NAME, "New Conditional Block ...");
-    putValue(Action.SHORT_DESCRIPTION, "Add a conditional block to the module");
+    putValue(Action.SHORT_DESCRIPTION,
+             "Insert a conditional block (IF statement)");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_CONDITIONAL);
   }
@@ -85,45 +85,24 @@ public class InsertConditionalAction
     if (root != null) {
       final FocusTracker tracker = getFocusTracker();
       final SelectionOwner panel = tracker.getWatersSelectionOwner();
-
       new ConditionalEditorDialog(root, panel);
     }
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
+  //# Overrides for net.sourceforge.waters.gui.actions.AbstractInsertAction
   @Override
-  public void update(final EditorChangedEvent event)
+  boolean canInsert(final SelectionOwner panel)
   {
-    switch (event.getKind()) {
-    case SELECTION_CHANGED:
-      updateEnabledStatus();
-      break;
-    default:
-      break;
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
-  {
-    final FocusTracker tracker = getFocusTracker();
-    final SelectionOwner panel = tracker.getWatersSelectionOwner();
-    if (panel != null) {
-      final boolean enabled = panel.canPaste(TRANSFERABLE);
-      setEnabled(enabled);
-    } else {
-      setEnabled(false);
-    }
+    return panel.canPaste(TRANSFERABLE);
   }
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -5317533915428205304L;
+
   private static final ConditionalElement TEMPLATE =
     new ConditionalElement(new SimpleIdentifierElement(":dummy"));
   private static final Transferable TRANSFERABLE =

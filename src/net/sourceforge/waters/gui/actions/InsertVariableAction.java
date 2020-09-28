@@ -56,7 +56,7 @@ import org.supremica.gui.ide.IDE;
  */
 
 public class InsertVariableAction
-  extends WatersAction
+  extends AbstractInsertAction
 {
 
   //#########################################################################
@@ -87,6 +87,6 @@ public class InsertVariableAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 7034251311458228477L;
 
 }

@@ -81,6 +81,7 @@ import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
+import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
@@ -88,9 +89,7 @@ import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.gui.dialog.ConditionalEditorDialog;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
-import net.sourceforge.waters.gui.dialog.ForeachEditorDialog;
 import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
 import net.sourceforge.waters.gui.dialog.SimpleIdentifierInputHandler;
@@ -157,9 +156,7 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
-import net.sourceforge.waters.subject.module.ConditionalSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
@@ -321,18 +318,18 @@ public class GraphEditorPanel
   public void registerSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
-    Config.GUI_EDITOR_ICONSET.addPropertyChangeListener(this);
-    Config.GUI_EDITOR_SHOW_GRID.addPropertyChangeListener(this);
-    Config.GUI_EDITOR_GRID_SIZE.addPropertyChangeListener(this);
+    Config.GUI_EDITOR_ICONSET.addOptionChangeListener(this);
+    Config.GUI_EDITOR_SHOW_GRID.addOptionChangeListener(this);
+    Config.GUI_EDITOR_GRID_SIZE.addOptionChangeListener(this);
   }
 
   @Override
   public void unregisterSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
-    Config.GUI_EDITOR_ICONSET.removePropertyChangeListener(this);
-    Config.GUI_EDITOR_SHOW_GRID.removePropertyChangeListener(this);
-    Config.GUI_EDITOR_GRID_SIZE.removePropertyChangeListener(this);
+    Config.GUI_EDITOR_ICONSET.removeOptionChangeListener(this);
+    Config.GUI_EDITOR_SHOW_GRID.removeOptionChangeListener(this);
+    Config.GUI_EDITOR_GRID_SIZE.removeOptionChangeListener(this);
   }
 
 
@@ -1944,15 +1941,9 @@ public class GraphEditorPanel
     {
       final ProxySubject item = getDraggableItem(event, true);
       if (item != null && item instanceof NestedBlockSubject) {
-        if (item instanceof ConditionalSubject) {
-          final ConditionalSubject cond = (ConditionalSubject) item;
-          ConditionalEditorDialog.showDialog
-            (cond, GraphEditorPanel.this, mRoot);
-        } else if (item instanceof ForeachSubject) {
-          final ForeachSubject foreach = (ForeachSubject) item;
-          ForeachEditorDialog.showDialog
-            (foreach, GraphEditorPanel.this, mRoot);
-        }
+        final IDE ide = mRoot.getModuleWindowInterface().getRootWindow();
+        final IDEAction action = new IDEPropertiesAction(ide, item);
+        action.execute(event.getSource());
       }
     }
 
@@ -2026,8 +2017,7 @@ public class GraphEditorPanel
 
       final Point mousePosition = event.getPoint();
       mStartPoint = applyInverseTransform(mousePosition);
-      mPopupFactory.maybeShowPopup(GraphEditorPanel.this, event,
-                                   mFocusedObject);
+      maybeShowPopup(event);
     }
 
     @Override
@@ -2035,8 +2025,7 @@ public class GraphEditorPanel
     {
       // LogManager.getLogger().info("ToolController.mouseReleased");
       mStartPoint = null;
-      mPopupFactory.maybeShowPopup
-        (GraphEditorPanel.this, event, mFocusedObject);
+      maybeShowPopup(event);
       if (mInternalDragAction != null) {
         final Point mousePosition = event.getPoint();
         final Point point = applyInverseTransform(mousePosition);
@@ -2098,6 +2087,20 @@ public class GraphEditorPanel
       final Point mousePosition = event.getPoint();
       final Point point = applyInverseTransform(mousePosition);
       updateHighlighting(point);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void maybeShowPopup(final MouseEvent event)
+    {
+      ProxySubject item = null;
+      if (mFocusedObject instanceof LabelBlockProxy) {
+        item = getDraggableItem(event, true);
+      }
+      if (item == null) {
+        item = mFocusedObject;
+      }
+      mPopupFactory.maybeShowPopup(GraphEditorPanel.this, event, item);
     }
 
     //#######################################################################

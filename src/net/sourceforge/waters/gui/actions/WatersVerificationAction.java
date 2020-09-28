@@ -89,7 +89,7 @@ public abstract class WatersVerificationAction
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
     final EnumOption<ModelAnalyzerFactoryLoader> option = getSelectorOption();
     if (option != null) {
-      option.addPropertyChangeListener(this);
+      option.addOptionChangeListener(this);
     }
     updateEnabledStatus();
   }

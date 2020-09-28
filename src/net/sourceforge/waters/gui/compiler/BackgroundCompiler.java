@@ -129,15 +129,15 @@ public class BackgroundCompiler
       }
     };
     Config.BACKGROUND_COMPILER
-    .addPropertyChangeListener(mEnablementPropertyChangeListener);
+    .addOptionChangeListener(mEnablementPropertyChangeListener);
     Config.OPTIMIZING_COMPILER
-    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    .addOptionChangeListener(mCompilerPropertyChangeListener);
     Config.EXPAND_EXTENDED_AUTOMATA
-    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    .addOptionChangeListener(mCompilerPropertyChangeListener);
     Config.NORMALIZING_COMPILER
-    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    .addOptionChangeListener(mCompilerPropertyChangeListener);
     Config.AUTOMATON_VARIABLES_COMPILER
-    .addPropertyChangeListener(mCompilerPropertyChangeListener);
+    .addOptionChangeListener(mCompilerPropertyChangeListener);
     mAbortButtonAction = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e)
@@ -238,15 +238,15 @@ public class BackgroundCompiler
    */
   public void terminate()
   {
-    Config.OPTIMIZING_COMPILER.removePropertyChangeListener
+    Config.OPTIMIZING_COMPILER.removeOptionChangeListener
       (mCompilerPropertyChangeListener);
-    Config.EXPAND_EXTENDED_AUTOMATA.removePropertyChangeListener
+    Config.EXPAND_EXTENDED_AUTOMATA.removeOptionChangeListener
       (mCompilerPropertyChangeListener);
-    Config.NORMALIZING_COMPILER.removePropertyChangeListener
+    Config.NORMALIZING_COMPILER.removeOptionChangeListener
       (mCompilerPropertyChangeListener);
-    Config.AUTOMATON_VARIABLES_COMPILER.removePropertyChangeListener
+    Config.AUTOMATON_VARIABLES_COMPILER.removeOptionChangeListener
       (mCompilerPropertyChangeListener);
-    Config.BACKGROUND_COMPILER.removePropertyChangeListener
+    Config.BACKGROUND_COMPILER.removeOptionChangeListener
       (mEnablementPropertyChangeListener);
     setTimerEnabled(false);
     mWorker.terminate();

@@ -222,8 +222,7 @@ public abstract class Option<T> implements Cloneable
     return ""+mDefaultValue;
   }
 
-  public void addPropertyChangeListener
-  (final OptionChangeListener listener)
+  public void addOptionChangeListener(final OptionChangeListener listener)
   {
     if (mListeners == null) {
       mListeners = new LinkedList<>();
@@ -231,8 +230,7 @@ public abstract class Option<T> implements Cloneable
     mListeners.add(listener);
   }
 
-  public void removePropertyChangeListener
-  (final OptionChangeListener listener)
+  public void removeOptionChangeListener(final OptionChangeListener listener)
   {
     if (mListeners != null) {
       mListeners.remove(listener);

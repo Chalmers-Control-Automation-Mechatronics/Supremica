@@ -166,7 +166,7 @@ public class IDEAppender
 
   private void registerPropertyChangeListener()
   {
-    Config.LOG_FILE.addPropertyChangeListener(this);
+    Config.LOG_FILE.addOptionChangeListener(this);
   }
 
 

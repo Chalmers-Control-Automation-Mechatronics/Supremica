@@ -81,8 +81,8 @@ public class WelcomeScreen
     createContents();
     setBackground(new Color(240, 255, 255));
     addComponentListener(this);
-    Config.DOT_USE.addPropertyChangeListener(this);
-    Config.DOT_EXECUTE_COMMAND.addPropertyChangeListener(this);
+    Config.DOT_USE.addOptionChangeListener(this);
+    Config.DOT_EXECUTE_COMMAND.addOptionChangeListener(this);
   }
 
 

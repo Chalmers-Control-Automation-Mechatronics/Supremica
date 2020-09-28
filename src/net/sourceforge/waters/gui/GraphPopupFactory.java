@@ -118,6 +118,14 @@ class GraphPopupFactory
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     popup.addSeparator();
+    final IDEAction newCond = master.getInsertConditionalAction();
+    if (newCond.isEnabled()) {
+      popup.add(newCond);
+    }
+    final IDEAction newFor = master.getInsertForeachAction();
+    if (newFor.isEnabled()) {
+      popup.add(newFor);
+    }
     final IDEAction newevent = master.getInsertEventDeclAction();
     popup.add(newevent);
     final IDEAction layout = master.getGraphLayoutAction();

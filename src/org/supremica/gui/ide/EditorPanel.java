@@ -129,7 +129,7 @@ public class EditorPanel
 
     mCommentPanel = new CommentPanel(moduleContainer);
     setRightComponent(mCommentPanel);
-    Config.INCLUDE_INSTANTIATION.addPropertyChangeListener(this);
+    Config.INCLUDE_INSTANTIATION.addOptionChangeListener(this);
   }
 
 
