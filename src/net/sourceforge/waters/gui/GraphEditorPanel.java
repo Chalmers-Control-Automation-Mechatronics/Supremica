@@ -89,6 +89,7 @@ import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.compiler.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
@@ -129,8 +130,10 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -1737,12 +1740,10 @@ public class GraphEditorPanel
       }
       final boolean hasFocus = isTrackedFocusOwner();
       final ProxySubject orig = getOriginal(item);
-      final ModuleCompilationErrors errors =
-        getModuleContext().getCompilationErrors();
-      final boolean overlap = isOverlap(item);
-      final boolean nestedError = mErrorVisitor.isRenderedError(orig);
-      final boolean error = overlap || nestedError;
-
+      final ErrorRendering errorRendering =
+        mErrorVisitor.getErrorRendering(orig);
+      final boolean error =
+        isOverlap(item) || errorRendering == ErrorRendering.COLOURED;
       final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.getValue();
       final Color color =
         layout.getColor(group, dragOver, selected, error, hasFocus);
@@ -1750,9 +1751,9 @@ public class GraphEditorPanel
         return null;
       }
       final Color shadow = EditorColor.shadow(color);
-      final boolean showHandles =  selected &&
+      final boolean underlined = errorRendering == ErrorRendering.UNDERLINED;
+      final boolean showHandles = selected &&
         mSelection.getMode() == GraphSelection.SelectionMode.SUBGRAPH_SINGLE;
-      final boolean underlined = errors.isUnderlined(orig);
       int priority = getPriority(item);
       if (mDontDraw.contains(item)) {
         priority = -1;
@@ -1770,55 +1771,100 @@ public class GraphEditorPanel
 
 
   //#########################################################################
+  //# Inner Enumeration ErrorRendering
+  private static enum ErrorRendering {
+    NONE,
+    UNDERLINED,
+    COLOURED
+  }
+
+
+  //#########################################################################
   //# Inner Class ErrorVisitor
   private class ErrorVisitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
-    public boolean isRenderedError(final Proxy proxy)
+    private ErrorRendering getErrorRendering(final Proxy proxy)
     {
       try {
-        return (Boolean) proxy.acceptVisitor(this);
+        return (ErrorRendering) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     @Override
-    public Boolean visitProxy(final Proxy proxy)
+    public ErrorRendering visitProxy(final Proxy proxy)
     {
-      return false;
-    }
-
-    @Override
-    public Boolean visitEdgeProxy(final EdgeProxy edge)
-    {
-      final LabelBlockProxy block = edge.getLabelBlock();
-      if (block != null && block.getEventIdentifierList().isEmpty()) {
-        final ModuleCompilationErrors errors =
-          getModuleContext().getCompilationErrors();
-        return errors.hasErrorIcon(edge);
+      final ModuleCompilationErrors errors = getErrors();
+      if (errors.isUnderlined(proxy)) {
+        return ErrorRendering.UNDERLINED;
+      } else if (errors.hasErrorIcon(proxy)) {
+        return ErrorRendering.COLOURED;
       } else {
-        return false;
+        return ErrorRendering.NONE;
       }
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
-    public Boolean visitLabelGeometryProxy(final LabelGeometryProxy geo)
+    public Object visitConditionalProxy(final ConditionalProxy cond)
+      throws VisitorException
     {
-      final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
-      final ProxySubject parent = (ProxySubject) subject.getParent();
-      return isRenderedError(parent);
+      final SimpleExpressionProxy guard = cond.getGuard();
+      return guard.acceptVisitor(this);
     }
 
     @Override
-    public Boolean visitSimpleNodeProxy(final SimpleNodeProxy node)
+    public ErrorRendering visitEdgeProxy(final EdgeProxy edge)
     {
-      final ModuleCompilationErrors errors =
-        getModuleContext().getCompilationErrors();
-      return errors.hasErrorIcon(node);
+      final LabelBlockProxy block = edge.getLabelBlock();
+      if (block != null && block.getEventIdentifierList().isEmpty()) {
+        final ModuleCompilationErrors errors = getErrors();
+        if (errors.hasErrorIcon(edge)) {
+          return ErrorRendering.COLOURED;
+        }
+      }
+      return ErrorRendering.NONE;
+    }
+
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy range = foreach.getRange();
+      return range.acceptVisitor(this);
+    }
+
+    @Override
+    public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
+      throws VisitorException
+    {
+      final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
+      final ProxySubject parent = (ProxySubject) subject.getParent();
+      return parent.acceptVisitor(this);
+    }
+
+    @Override
+    public ErrorRendering visitNodeProxy(final NodeProxy node)
+    {
+      final ModuleCompilationErrors errors = getErrors();
+      if (errors.hasErrorIcon(node)) {
+        return ErrorRendering.COLOURED;
+      } else {
+        return ErrorRendering.NONE;
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private ModuleCompilationErrors getErrors()
+    {
+      return getModuleContext().getCompilationErrors();
     }
   }
 

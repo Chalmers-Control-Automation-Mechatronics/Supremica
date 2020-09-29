@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.compiler;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
@@ -42,9 +42,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -87,7 +89,6 @@ public class ModuleCompilationErrors
 
   /**
    * Creates a string representation of all the errors at the location.
-   *
    * @param location    The location for which to get the error message.
    * @return The string, or <CODE>null</CODE> if there are no errors.
    */
@@ -97,12 +98,16 @@ public class ModuleCompilationErrors
     if (errors == null) {
       return null;
     }
+    final Set<String> unique = new THashSet<>(errors.size());
     final StringBuilder sb = new StringBuilder();
     sb.append("<HTML>");
     for (final EvalException error : errors) {
-      final String message = error.getMessage() + "\n";
-      final String escaped = HTMLPrinter.encodeInHTML(message);
-      sb.append(escaped);
+      final String message = error.getMessage();
+      if (unique.add(message)) {
+        final String escaped = HTMLPrinter.encodeInHTML(message);
+        sb.append(escaped);
+        sb.append("<BR/>");
+      }
     }
     sb.append("</HTML>");
     return sb.toString();
@@ -110,25 +115,24 @@ public class ModuleCompilationErrors
 
   /**
    * Creates a summary of all the errors at the location and its descendants.
-   *
    * @param location    The location for which to get the summary.
    * @return The summary, or <CODE>null</CODE> if there are no errors.
    */
   public String getSummaryMessage(final Proxy location)
   {
     final int count = mErrorCounts.get(location);
-    if (count == 0) {
+    switch (count) {
+    case 0:
       return null;
+    case 1:
+      return getDetailedMessage(location);
+    default:
+      final StringBuilder builder = new StringBuilder();
+      builder.append(count);
+      builder.append(" errors in ");
+      builder.append(ProxyNamer.getItemClassName(location));
+      return builder.toString();
     }
-    final StringBuilder sb = new StringBuilder();
-    sb.append(count);
-    sb.append(" error");
-    if (count != 1) {
-      sb.append("s");
-    }
-    sb.append(" in ");
-    sb.append(ProxyNamer.getItemClassName(location));
-    return sb.toString();
   }
 
   /**
@@ -157,6 +161,10 @@ public class ModuleCompilationErrors
         mErrors.put(location, errors);
       }
       errors.add(error);
+      // Condition and foreach blocks get individual underlines
+      if (location instanceof NestedBlockProxy) {
+        location = child;
+      }
       mUnderlines.add(location);
       // Increment error counts of ancestors
       while (location != null) {
@@ -176,11 +184,13 @@ public class ModuleCompilationErrors
     return mErrorCounts.keySet();
   }
 
+
   //#########################################################################
   //# Data Members
   private final Map<ProxySubject, List<EvalException>> mErrors;
   private final TObjectIntHashMap<ProxySubject> mErrorCounts;
   private final Set<ProxySubject> mUnderlines;
+
 
   //#########################################################################
   //# Class Constants

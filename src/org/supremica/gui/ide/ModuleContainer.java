@@ -50,7 +50,6 @@ import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
-import net.sourceforge.waters.gui.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.command.Command;
@@ -60,6 +59,7 @@ import net.sourceforge.waters.gui.command.WatersUndoManager;
 import net.sourceforge.waters.gui.compiler.BackgroundCompiler;
 import net.sourceforge.waters.gui.compiler.CompilationDialog;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
+import net.sourceforge.waters.gui.compiler.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;

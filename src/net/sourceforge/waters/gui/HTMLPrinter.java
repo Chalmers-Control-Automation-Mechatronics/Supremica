@@ -40,6 +40,7 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import net.sourceforge.waters.gui.compiler.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -305,7 +306,7 @@ public class HTMLPrinter
           case '&':  mOut.write("&amp;");    break;
           case '"':  mOut.write("&quot;");   break;
           case '\'': mOut.write("&#39;");    break;
-          case '\n': mOut.write("<BR />\n"); break;
+          case '\n': mOut.write("<BR/>\n"); break;
           default:   mOut.write(cbuf[i]);    break;
           }
         }
