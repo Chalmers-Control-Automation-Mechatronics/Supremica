@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="action_conflict_2">
+<B:Comment>A group node compiler test that involves that involves the computation of a default guard for a transition with a variable update.
+The transisition from S0 to S1 should be alllowed when the transition from S0 to S2 is not possible.
+The guard of the transition from S0 to S1 should be: ! \exists y' @ (x == 0 &amp; y' == y+1).
+This is not yet supported, so compiling module only produces an ActionSyntaxException.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="action_conflict">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="224" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="320" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="224" Y="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="S0"/>
+<BoxGeometry>
+<Box X="192" Y="176" Width="64" Height="64"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="G0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="256" Y="208"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="S0" Target="S2">
+<LabelBlock>
+<ConditionalEvent>
+<BinaryExpression Operator="&amp;" Text="(x==0) &amp; (y'==y+1)">
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="y"/>
+</UnaryExpression>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="e"/>
+</EventList>
+</ConditionalEvent>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="224" Y="208"/>
+</StartPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent Name="x">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="y">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

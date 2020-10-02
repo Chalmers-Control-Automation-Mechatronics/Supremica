@@ -56,10 +56,12 @@ import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.compiler.constraint.PrimedVariableCollector;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
+import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
 import net.sourceforge.waters.model.compiler.efa.EFAModuleContext;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -81,6 +83,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
@@ -121,6 +124,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mCompilationInfo, mOperatorTable);
     mEquality = new ModuleEqualityVisitor(false);
+    mPrimedVariableFinder = new PrimedVariableCollector(mOperatorTable, null);
     mInputModule = module;
     mCloner = new SourceInfoCloner(factory, compilationInfo);
   }
@@ -357,6 +361,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
                                  mOperatorTable, mRootContext);
       final GuardActionBlockProxy ga = edge.getGuardActionBlock();
       final List<BinaryExpressionProxy> actions;
+      UnaryExpressionProxy primedVar = null;
       if (ga != null) {
         final List<SimpleExpressionProxy> guards = ga.getGuards();
         if (guards != null && !guards.isEmpty()) {
@@ -371,6 +376,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
           if (propagator.isUnsatisfiable()) {
             return;
           }
+          primedVar = mPrimedVariableFinder.containsPrimedVariable(guard);
         }
         actions = ga.getActions();
       } else {
@@ -382,7 +388,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
         final IdentifierProxy ident = (IdentifierProxy) proxy;
         try {
           final ConstraintList guard = propagator.getAllConstraints();
-          addGuard(ident, guard);
+          addGuard(ident, guard, actions, primedVar);
           createEdges(ident, propagator, actions, target);
         } catch (final EvalException exception) {
           exception.provideLocation(ident);
@@ -403,11 +409,18 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
         addEdge(ident, guard, actions, target);
       } else {
         for (final CompiledNode child : mChildren) {
-          final List<ConstraintList> guards = child.getGuards(ident);
+          final GuardInfo info = child.getGuards(ident);
           final ConstraintPropagator childPropagator;
-          if (guards == null) {
+          if (info == null) {
             childPropagator = propagator;
           } else {
+            final SimpleExpressionProxy action = info.getFirstAction();
+            if (action != null) {
+              final String msg = "Variable updates are not yet supported " +
+                                 "in combination with group nodes.";
+              throw new ActionSyntaxException(msg, action);
+            }
+            final List<ConstraintList> guards = info.getGuards();
             childPropagator = new ConstraintPropagator(propagator);
             for (final ConstraintList guard : guards) {
               childPropagator.addNegation(guard);
@@ -423,19 +436,22 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     }
 
     private void addGuard(final IdentifierProxy ident,
-                          final ConstraintList guard)
+                          final ConstraintList guard,
+                          final List<BinaryExpressionProxy> actions,
+                          final UnaryExpressionProxy primedVar)
     {
       final ProxyAccessor<IdentifierProxy> accessor =
         mGuards.createAccessor(ident);
-      List<ConstraintList> list = mGuards.get(accessor);
-      if (list == null) {
-        list = new LinkedList<>();
-        mGuards.put(accessor, list);
+      GuardInfo info = mGuards.get(accessor);
+      if (info == null) {
+        info = new GuardInfo();
+        mGuards.put(accessor, info);
       }
-      list.add(guard);
+      info.addGuard(guard);
+      info.addAction(actions, primedVar);
     }
 
-    private List<ConstraintList> getGuards(final IdentifierProxy ident)
+    private GuardInfo getGuards(final IdentifierProxy ident)
     {
       return mGuards.getByProxy(ident);
     }
@@ -517,10 +533,50 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     private final NodeProxy mInputNode;
     private final List<EdgeProxy> mInputEdges = new LinkedList<>();
     private final List<CompiledNode> mChildren = new LinkedList<>();
-    private final ProxyAccessorMap<IdentifierProxy,List<ConstraintList>> mGuards =
+    private final ProxyAccessorMap<IdentifierProxy,GuardInfo> mGuards =
       new ProxyAccessorHashMap<>(mEquality);
     private final Map<TargetInfo,List<IdentifierProxy>> mOutputEdges =
       new LinkedHashMap<>();
+  }
+
+
+  //#########################################################################
+  //# Inner Class GuardInfo
+  private static class GuardInfo
+  {
+    //#######################################################################
+    //# Simple Access
+    private List<ConstraintList> getGuards()
+    {
+      return mGuards;
+    }
+
+    private SimpleExpressionProxy getFirstAction()
+    {
+      return mFirstAction;
+    }
+
+    private void addGuard(final ConstraintList guard)
+    {
+      mGuards.add(guard);
+    }
+
+    private void addAction(final List<BinaryExpressionProxy> actions,
+                           final UnaryExpressionProxy primedVar)
+    {
+      if (mFirstAction == null) {
+        if (!actions.isEmpty()) {
+          mFirstAction = actions.iterator().next();
+        } else {
+          mFirstAction = primedVar;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<ConstraintList> mGuards = new LinkedList<>();
+    private SimpleExpressionProxy mFirstAction;
   }
 
 
@@ -606,6 +662,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
   private final CompilationInfo mCompilationInfo;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleEqualityVisitor mEquality;
+  private final PrimedVariableCollector mPrimedVariableFinder;
   private final ModuleProxyCloner mCloner;
   private boolean mIsAborting;
 }

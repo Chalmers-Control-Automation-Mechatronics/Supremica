@@ -246,45 +246,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_nested_groups_1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "groupnode", "nested_groups_1");
-    testCompile(module);
-  }
-
-  public void testCompile_nested_groups_2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "groupnode", "nested_groups_2");
-    testCompile(module);
-  }
-
-  public void testCompile_nodegroup1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "groupnode", "nodegroup1");
-    testCompile(module);
-  }
-
-  public void testCompile_nodegroup2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "groupnode", "nodegroup2");
-    testCompile(module);
-  }
-
-  public void testCompile_nodegroup4()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "groupnode", "nodegroup4");
-    testCompile(module);
-  }
 
   public void testCompile_notDiag2()
     throws IOException, WatersException
@@ -398,6 +359,105 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("handwritten", "winemerchant");
+    testCompile(module);
+  }
+
+
+  //#########################################################################
+  //# Successful Test Cases using Group Nodes
+  public void testCompile_action_conflict_1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "action_conflict_1");
+    compileError(module, ActionSyntaxException.class);
+  }
+
+  public void testCompile_action_conflict_2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "action_conflict_2");
+    compileError(module, ActionSyntaxException.class);
+  }
+
+  public void testCompile_guard_conflict_1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "guard_conflict_1");
+    testCompile(module);
+  }
+
+  public void testCompile_guard_conflict_2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "guard_conflict_2");
+    testCompile(module);
+  }
+
+  public void testCompile_nested_groups_1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nested_groups_1");
+    testCompile(module);
+  }
+
+  public void testCompile_nested_groups_2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nested_groups_2");
+    testCompile(module);
+  }
+
+  public void testCompile_nodegroup1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup1");
+    testCompile(module);
+  }
+
+  public void testCompile_nodegroup2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup2");
+    testCompile(module);
+  }
+
+  public void testCompile_nodegroup3()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup3");
+    compileError(module, NondeterministicModuleException.class, "'q0'", "'e'");
+  }
+
+  public void testCompile_nodegroup4()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup4");
+    testCompile(module);
+  }
+
+  public void testCompile_nodegroup_efa1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup_efa1");
+    testCompile(module);
+  }
+
+  public void testCompile_nodegroup_efa2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup_efa2");
     testCompile(module);
   }
 
@@ -590,20 +650,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_guard_conflict_1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "groupnode", "guard_conflict_1");
-    testCompile(module);
-  }
-
-  public void testCompile_guard_conflict_2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "groupnode", "guard_conflict_2");
-    testCompile(module);
-  }
-
   public void testCompile_increment()
   throws IOException, WatersException
   {
@@ -643,20 +689,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "martijn1");
-    testCompile(module);
-  }
-
-  public void testCompile_nodegroup_efa1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "groupnode", "nodegroup_efa1");
-    testCompile(module);
-  }
-
-  public void testCompile_nodegroup_efa2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "groupnode", "nodegroup_efa2");
     testCompile(module);
   }
 
@@ -1202,13 +1234,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module = loadModule("tests", "compiler", "graph", "markus1");
     compileError(module, NondeterministicModuleException.class, "'s0'", "'a'");
-  }
-
-  public void testCompile_nodegroup3()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "groupnode", "nodegroup3");
-    compileError(module, NondeterministicModuleException.class, "'q0'", "'e'");
   }
 
   public void testCompile_twoinit()
