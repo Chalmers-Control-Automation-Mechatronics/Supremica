@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="nondetvar2">
+<B:Comment>A test that involves two variables that are explicitly specified to change nondeterministically on a transition.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="efsm">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="128" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="128" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="a'==a' &amp; b'==b'">
+<BinaryExpression Operator="==">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="a"/>
+</UnaryExpression>
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="a"/>
+</UnaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="b"/>
+</UnaryExpression>
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="b"/>
+</UnaryExpression>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent Name="a">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="a"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="b">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="b"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="conditional01">
+<B:Comment>A compiler test with a conditional block that includes both a guard and an assignment.
+This is to ensure that the condition is correctly separated into a guard/action block, or that both types can be handled correctly when compiling using conditionals.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="action_conflict">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="224" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="224" Y="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S2">
+<LabelBlock>
+<ConditionalEvent>
+<BinaryExpression Operator="&amp;" Text="(x==0) &amp; (y+=1)">
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<EventList>
+<SimpleIdentifier Name="e"/>
+</EventList>
+</ConditionalEvent>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="224" Y="208"/>
+</StartPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent Name="x">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="y">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

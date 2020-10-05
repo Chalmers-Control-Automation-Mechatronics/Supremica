@@ -254,10 +254,10 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
   }
 
   /**
-   * Visits a {@link SimpleComponentProxy} of a {@link ModuleProxy}.</P>
+   * Visits a {@link SimpleComponentProxy} of a {@link ModuleProxy}.
    * If the graph of a component contains group nodes, a new component is
    * created and added to the result list of components.
-   * Otherwise, the component is added to the list unchanged.</P>
+   * Otherwise, the component is added to the list unchanged.
    */
   @Override
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)

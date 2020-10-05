@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="conditional01">
+<B:Comment>A compiler test with a conditional block that includes both a guard and an assignment.
+This is to ensure that the condition is correctly separated into a guard/action block, or that both types can be handled correctly when compiling using conditionals.</B:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="e"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="action_conflict">
+<EventRefList>
+<EventRef Name="e"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="e" Target="S2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="y">
+<EventRefList>
+<EventRef Name="e"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Event="e" Target="1"/>
+<Transition Source="1" Event="e" Target="2"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

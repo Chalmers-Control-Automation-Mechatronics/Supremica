@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:ProductDES Name="nondetvar" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
-    <Comment>A test that involves an EFA variable that is explicitly specified to change nondeterministically on a transition.</Comment>
+<ns2:ProductDES Name="nondetvar1" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A test that involves an EFSM variable that is explicitly specified to change nondeterministically on a transition.</Comment>
     <ns2:EventList>
         <ns2:Event Kind="CONTROLLABLE" Name="e"/>
     </ns2:EventList>

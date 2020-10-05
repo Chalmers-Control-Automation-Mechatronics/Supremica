@@ -370,7 +370,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "groupnode", "action_conflict_1");
-    compileError(module, ActionSyntaxException.class);
+    compileError(module, ActionSyntaxException.class, "group nodes");
   }
 
   public void testCompile_action_conflict_2()
@@ -378,7 +378,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "groupnode", "action_conflict_2");
-    compileError(module, ActionSyntaxException.class);
+    compileError(module, ActionSyntaxException.class, "group nodes");
+  }
+
+  public void testCompile_action_conflict_3()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "action_conflict_3");
+    compileError(module, ActionSyntaxException.class, "group nodes");
   }
 
   public void testCompile_guard_conflict_1()
@@ -505,6 +513,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "blocked_event");
+    testCompile(module);
+  }
+
+  public void testCompile_conditional01()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "conditional01");
     testCompile(module);
   }
 
@@ -692,10 +708,19 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_nondetvar()
+  public void testCompile_nondetvar1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "nondetvar");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "nondetvar1");
+    testCompile(module);
+  }
+
+  public void testCompile_nondetvar2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "nondetvar2");
     testCompile(module);
   }
 

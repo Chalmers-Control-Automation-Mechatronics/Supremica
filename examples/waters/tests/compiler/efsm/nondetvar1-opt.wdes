@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="nondetvar"
+<ProductDES Name="nondetvar1"
   xmlns:ns2="http://waters.sourceforge.net/xsd/base"
   xmlns="http://waters.sourceforge.net/xsd/des">
-<ns2:Comment>A test that involves an EFA variable that is explicitly specified to change nondeterministically on a transition.</ns2:Comment>
+<ns2:Comment>A test that involves an EFSM variable that is explicitly specified to change nondeterministically on a transition.</ns2:Comment>
 <EventList>
 <Event Kind="CONTROLLABLE" Name="e"/>
 </EventList>
