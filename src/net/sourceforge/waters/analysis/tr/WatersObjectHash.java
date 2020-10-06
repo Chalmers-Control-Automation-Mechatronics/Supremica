@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.impl.hash.THash;
+import gnu.trove.impl.hash.TObjectHash;
 import gnu.trove.procedure.TObjectProcedure;
 import gnu.trove.strategy.HashingStrategy;
 
@@ -46,11 +47,11 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
- * An open addressed hashing implementation for Object types.
+ * A modified version of GNU Trove's {@link TObjectHash} implementation to
+ * allow hash sets to be created with a configurable hashing strategy.
+ * Most of this code is taken from GNU Trove&nbsp;2.
  *
- * This code is taken from GNU Trove&nbsp;2.
- *
- * @author Eric D. Friedman
+ * @author Eric D. Friedman, Robi Malik
  */
 
 @SuppressWarnings("unchecked")
@@ -70,8 +71,8 @@ abstract public class WatersObjectHash<T>
   protected static final Object REMOVED = new Object(), FREE = new Object();
 
   /**
-   * Creates a new <code>TObjectHash</code> instance with the default capacity
-   * and load factor.
+   * Creates a new <code>WatersObjectHash</code> instance with the default
+   * capacity and load factor.
    */
   public WatersObjectHash()
   {
@@ -80,9 +81,8 @@ abstract public class WatersObjectHash<T>
   }
 
   /**
-   * Creates a new <code>TObjectHash</code> instance with the default capacity
+   * Creates a new <code>WatersObjectHash</code> instance with the default capacity
    * and load factor and a custom hashing strategy.
-   *
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
@@ -92,10 +92,9 @@ abstract public class WatersObjectHash<T>
   }
 
   /**
-   * Creates a new <code>TObjectHash</code> instance whose capacity is the
-   * next highest prime above <tt>initialCapacity + 1</tt> unless that value
-   * is already prime.
-   *
+   * Creates a new <code>WatersObjectHash</code> instance whose capacity is
+   * the next highest prime above <tt>initialCapacity + 1</tt> unless that
+   * value is already prime.
    * @param initialCapacity
    *          an <code>int</code> value
    */
@@ -106,10 +105,9 @@ abstract public class WatersObjectHash<T>
   }
 
   /**
-   * Creates a new <code>TObjectHash</code> instance whose capacity is the
-   * next highest prime above <tt>initialCapacity + 1</tt> unless that value
-   * is already prime. Uses the specified custom hashing strategy.
-   *
+   * Creates a new <code>WatersObjectHash</code> instance whose capacity is
+   * the next highest prime above <tt>initialCapacity + 1</tt> unless that
+   * value is already prime. Uses the specified custom hashing strategy.
    * @param initialCapacity
    *          an <code>int</code> value
    * @param strategy
@@ -123,9 +121,8 @@ abstract public class WatersObjectHash<T>
   }
 
   /**
-   * Creates a new <code>TObjectHash</code> instance with a prime value at or
-   * near the specified capacity and load factor.
-   *
+   * Creates a new <code>WatersObjectHash</code> instance with a prime value
+   * at or near the specified capacity and load factor.
    * @param initialCapacity
    *          used to find a prime capacity for the table.
    * @param loadFactor
@@ -139,10 +136,9 @@ abstract public class WatersObjectHash<T>
   }
 
   /**
-   * Creates a new <code>TObjectHash</code> instance with a prime value at or
-   * near the specified capacity and load factor. Uses the specified custom
-   * hashing strategy.
-   *
+   * Creates a new <code>WatersObjectHash</code> instance with a prime value
+   * at or near the specified capacity and load factor. Uses the specified
+   * custom hashing strategy.
    * @param initialCapacity
    *          used to find a prime capacity for the table.
    * @param loadFactor
@@ -151,8 +147,9 @@ abstract public class WatersObjectHash<T>
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
-  public WatersObjectHash(final int initialCapacity, final float loadFactor,
-                     final HashingStrategy<T> strategy)
+  public WatersObjectHash(final int initialCapacity,
+                          final float loadFactor,
+                          final HashingStrategy<T> strategy)
   {
     super(initialCapacity, loadFactor);
     this._hashingStrategy = strategy;

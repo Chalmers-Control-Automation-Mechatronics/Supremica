@@ -186,7 +186,7 @@ public final class AutomatonTools
 
   /**
    * Returns whether the given product DES is deterministic.
-   * An product DES is considered as deterministic if all its
+   * A product DES is considered as deterministic if all its
    * automata are deterministic.
    * @see #isDeterministic(AutomatonProxy)
    */
@@ -222,7 +222,7 @@ public final class AutomatonTools
       }
     }
     final Set<TransitionProxy> transitions =
-      new WatersHashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+      new WatersHashSet<>(TransitionHashingStrategy.INSTANCE);
     for (final TransitionProxy trans : aut.getTransitions()) {
       if (!transitions.add(trans)) {
         return false;
@@ -257,7 +257,7 @@ public final class AutomatonTools
       }
     }
     final Set<TransitionProxy> transitions =
-      new WatersHashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+      new WatersHashSet<>(TransitionHashingStrategy.INSTANCE);
     for (final TransitionProxy trans : aut.getTransitions()) {
       if (!transitions.add(trans)) {
         final StateProxy source = trans.getSource();

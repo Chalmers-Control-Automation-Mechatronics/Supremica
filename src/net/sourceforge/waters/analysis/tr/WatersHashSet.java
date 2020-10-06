@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.procedure.TObjectProcedure;
 import gnu.trove.procedure.array.ToObjectArrayProceedure;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.strategy.HashingStrategy;
 
 import java.lang.reflect.Array;
@@ -45,32 +46,28 @@ import java.util.Set;
 
 
 /**
- * An implementation of the {@link Set} interface that uses an open-addressed
- * hash table to store its contents.
+ * A modified version of GNU Trove's {@link THashSet} implementation to allow
+ * hash sets to be created with a configurable hashing strategy. Most of this
+ * code is taken from GNU Trove&nbsp;2.
  *
- * This code is taken from GNU Trove&nbsp;2.
- *
- * @author Eric D. Friedman
+ * @author Eric D. Friedman, Robi Malik
  */
 
 public class WatersHashSet<E>
   extends WatersObjectHash<E> implements Set<E>, Iterable<E>
 {
 
-  static final long serialVersionUID = 1L;
-
   /**
-   * Creates a new <code>THashSet</code> instance with the default capacity
-   * and load factor.
+   * Creates a new <code>WatersHashSet</code> instance with the default
+   * capacity and load factor.
    */
   public WatersHashSet()
   {
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance with the default capacity
-   * and load factor.
-   *
+   * Creates a new <code>WatersHashSet</code> instance with the default
+   * capacity and load factor.
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
@@ -80,10 +77,9 @@ public class WatersHashSet<E>
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance with a prime capacity equal
-   * to or greater than <tt>initialCapacity</tt> and with the default load
-   * factor.
-   *
+   * Creates a new <code>WatersHashSet</code> instance with a prime capacity
+   * equal to or greater than <tt>initialCapacity</tt> and with the default
+   * load factor.
    * @param initialCapacity
    *          an <code>int</code> value
    */
@@ -93,10 +89,9 @@ public class WatersHashSet<E>
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance with a prime capacity equal
-   * to or greater than <tt>initialCapacity</tt> and with the default load
-   * factor.
-   *
+   * Creates a new <code>WatersHashSet</code> instance with a prime capacity
+   * equal to or greater than <tt>initialCapacity</tt> and with the default
+   * load factor.
    * @param initialCapacity
    *          an <code>int</code> value
    * @param strategy
@@ -109,10 +104,9 @@ public class WatersHashSet<E>
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance with a prime capacity equal
-   * to or greater than <tt>initialCapacity</tt> and with the specified load
-   * factor.
-   *
+   * Creates a new <code>WatersHashSet</code> instance with a prime capacity
+   * equal to or greater than <tt>initialCapacity</tt> and with the specified
+   * load factor.
    * @param initialCapacity
    *          an <code>int</code> value
    * @param loadFactor
@@ -124,10 +118,9 @@ public class WatersHashSet<E>
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance with a prime capacity equal
-   * to or greater than <tt>initialCapacity</tt> and with the specified load
-   * factor.
-   *
+   * Creates a new <code>WatersHashSet</code> instance with a prime capacity
+   * equal to or greater than <tt>initialCapacity</tt> and with the specified
+   * load factor.
    * @param initialCapacity
    *          an <code>int</code> value
    * @param loadFactor
@@ -135,16 +128,16 @@ public class WatersHashSet<E>
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
-  public WatersHashSet(final int initialCapacity, final float loadFactor,
-                  final HashingStrategy<E> strategy)
+  public WatersHashSet(final int initialCapacity,
+                       final float loadFactor,
+                       final HashingStrategy<E> strategy)
   {
     super(initialCapacity, loadFactor, strategy);
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance containing the elements of
-   * <tt>collection</tt>.
-   *
+   * Creates a new <code>WatersHashSet</code> instance containing the elements
+   * of <tt>collection</tt>.
    * @param collection
    *          a <code>Collection</code> value
    */
@@ -155,16 +148,15 @@ public class WatersHashSet<E>
   }
 
   /**
-   * Creates a new <code>THashSet</code> instance containing the elements of
-   * <tt>collection</tt>.
-   *
+   * Creates a new <code>WatersHashSet</code> instance containing the elements
+   * of <tt>collection</tt>.
    * @param collection
    *          a <code>Collection</code> value
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
   public WatersHashSet(final Collection<? extends E> collection,
-                  final HashingStrategy<E> strategy)
+                       final HashingStrategy<E> strategy)
   {
     this(collection.size(), strategy);
     addAll(collection);
