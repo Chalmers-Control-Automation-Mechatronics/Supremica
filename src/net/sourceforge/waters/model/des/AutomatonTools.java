@@ -309,8 +309,8 @@ public final class AutomatonTools
    * @return If the given set <CODE>uniqueNames</CODE> does not contain the
    *         proposed <CODE>name</CODE>, then this proposed <CODE>name</CODE>
    *         is returned. Otherwise, a modified name is formed, typically
-   *         by appending &quot;<CODE>:</CODE>&langle;<I>n</I>&rangle;&quot;
-   *         for some integer &langle;<I>n</I>&rangle; to form a name not
+   *         by appending &quot;<CODE>:</CODE>&lt;<I>n</I>&gt;&quot;
+   *         for some integer &lt;<I>n</I>&gt; to form a name not
    *         contained in <CODE>uniqueNames</CODE>.
    * @see #renameAutomaton(AutomatonProxy, String, ProductDESProxyFactory)
    *      renameAutomaton()
