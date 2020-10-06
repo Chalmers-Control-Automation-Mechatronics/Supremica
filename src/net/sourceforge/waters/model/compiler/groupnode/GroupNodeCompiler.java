@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.compiler.groupnode;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,6 +68,7 @@ import net.sourceforge.waters.model.compiler.efa.EFAModuleContext;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -94,9 +97,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * input and produces another module as the output. It assumes that the input
  * module has neither nested blocks nor instantiations, and it removes the
  * group nodes by explicitly creating new edges between their simple child
- * nodes ({@link SimpleNodeProxy}). This compiler also rewrites guards
- * to reflect overriding in nested groups, and passes them to the next pass
- * of the {@link ModuleCompiler}.</P>
+ * nodes ({@link SimpleNodeProxy}).</P>
  *
  * <P>It is ensured that the resultant module only contains objects of the
  * following types:</P>
@@ -107,8 +108,18 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * <LI>{@link VariableComponentProxy}.</LI>
  * </UL>
  *
+ * <P>The group node compiler also rewrites conditional blocks and
+ * guard/action blocks to reflect overriding in nested groups, and passes
+ * them to the next pass of the {@link ModuleCompiler}. In this case, it
+ * determines automatically whether the input module uses conditional blocks
+ * or guard/action blocks, and outputs a compatible module. That is, in
+ * addition to the above, the output module may include conditional blocks
+ * ({@link ConditionalProxy}) or guard/action blocks ({@link
+ * GuardActionBlockProxy}) on edges, if these are found in the input.</P>
+ *
  * @author Roger Su, Robi Malik
  */
+
 public class GroupNodeCompiler extends DefaultModuleProxyVisitor
   implements Abortable
 {
@@ -210,14 +221,15 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
       return graph;
     }
 
+    mUsingGuardActionBlocks = false;
     for (final EdgeProxy edge : graph.getEdges()) {
       checkAbort();
+      mUsingGuardActionBlocks |= edge.getGuardActionBlock() != null;
       final NodeProxy source = edge.getSource();
       final CompiledNode compiledSource = nodeMap.get(source);
       compiledSource.addEdge(edge);
     }
 
-    mNumberOfOutputEdges = 0;
     final List<NodeProxy> simpleNodes = new ArrayList<>(numSimpleNodes);
     for (final CompiledNode node : compiledNodes) {
       if (node.isSimple()) {
@@ -225,8 +237,11 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
       }
       node.createEdges();
     }
-
-    final List<EdgeProxy> newEdges = new ArrayList<>(mNumberOfOutputEdges);
+    int numEdges = 0;
+    for (final CompiledNode node : compiledNodes) {
+      numEdges += node.getNumberOfOutputEdges();
+    }
+    final List<EdgeProxy> newEdges = new ArrayList<>(numEdges);
     for (final CompiledNode node : compiledNodes) {
       node.collectOutputEdges(newEdges);
     }
@@ -299,6 +314,102 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
 
 
   //#########################################################################
+  //# Inner Class EdgeCreationVisitor
+  private class EdgeCreationVisitor extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Constructor
+    EdgeCreationVisitor(final CompiledNode source)
+    {
+      mSource = source;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitConditionalProxy(final ConditionalProxy cond)
+      throws VisitorException
+    {
+      final ConstraintPropagator oldPropagator = mPropagator;
+      final SimpleExpressionProxy guard = cond.getGuard();
+      try {
+        mPropagator = new ConstraintPropagator(mPropagator);
+        mPropagator.addConstraint(guard);
+        mPropagator.propagate();
+        if (!mPropagator.isUnsatisfiable()) {
+          visitCollection(cond.getBody());
+        }
+        return null;
+      } catch (final EvalException exception) {
+        exception.provideLocation(guard);
+        throw wrap(exception);
+      } finally {
+        mPropagator = oldPropagator;
+      }
+    }
+
+    @Override
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      checkAbort();
+      mPropagator = new ConstraintPropagator(mFactory, mCompilationInfo,
+                                             mOperatorTable, mRootContext);
+      mPrimedVar = null;
+      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+      if (ga != null) {
+        final List<SimpleExpressionProxy> guards = ga.getGuards();
+        if (guards != null && !guards.isEmpty()) {
+          final SimpleExpressionProxy guard = guards.get(0);
+          mPropagator.addConstraint(guard);
+          try {
+            mPropagator.propagate();
+          } catch (final EvalException exception) {
+            exception.provideLocation(guard);
+            throw wrap(exception);
+          }
+          if (mPropagator.isUnsatisfiable()) {
+            return null;
+          }
+          mPrimedVar = mPrimedVariableFinder.containsPrimedVariable(guard);
+        }
+        mActions = ga.getActions();
+      } else {
+        mActions = Collections.emptyList();
+      }
+      mTarget = (SimpleNodeProxy) edge.getTarget();
+      final LabelBlockProxy block = edge.getLabelBlock();
+      visitCollection(block.getEventIdentifierList());
+      return null;
+    }
+
+    @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
+    {
+      try {
+        final ConstraintList guard = mPropagator.getAllConstraints();
+        mSource.addGuard(ident, guard, mActions, mPrimedVar);
+        mSource.createEdges(ident, mPropagator, mActions, mTarget);
+        return null;
+      } catch (final EvalException exception) {
+        exception.provideLocation(ident);
+        throw wrap(exception);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final CompiledNode mSource;
+
+    private ConstraintPropagator mPropagator;
+    private List<BinaryExpressionProxy> mActions;
+    private UnaryExpressionProxy mPrimedVar;
+    private SimpleNodeProxy mTarget;
+  }
+
+
+  //#########################################################################
   //# Inner Class CompiledNode
   /**
    * A representation of a node ({@link NodeProxy}) with additional
@@ -343,55 +454,16 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     private void createEdges()
       throws VisitorException
     {
+      final EdgeCreationVisitor visitor = new EdgeCreationVisitor(this);
       for (final EdgeProxy edge : mInputEdges) {
         try {
-          createEdges(edge);
-        } catch (final EvalException exception) {
-          mCompilationInfo.raiseInVisitor(exception);
-        }
-      }
-    }
-
-    private void createEdges(final EdgeProxy edge)
-      throws EvalException, VisitorException
-    {
-      checkAbort();
-      final ConstraintPropagator propagator =
-        new ConstraintPropagator(mFactory, mCompilationInfo,
-                                 mOperatorTable, mRootContext);
-      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-      final List<BinaryExpressionProxy> actions;
-      UnaryExpressionProxy primedVar = null;
-      if (ga != null) {
-        final List<SimpleExpressionProxy> guards = ga.getGuards();
-        if (guards != null && !guards.isEmpty()) {
-          final SimpleExpressionProxy guard = guards.get(0);
-          propagator.addConstraint(guard);
-          try {
-            propagator.propagate();
-          } catch (final EvalException exception) {
-            exception.provideLocation(guard);
-            throw exception;
+          visitor.visitEdgeProxy(edge);
+        } catch (final VisitorException exception) {
+          final Throwable cause = exception.getCause();
+          if (cause instanceof EvalException) {
+            final EvalException evalException = (EvalException) cause;
+            mCompilationInfo.raiseInVisitor(evalException);
           }
-          if (propagator.isUnsatisfiable()) {
-            return;
-          }
-          primedVar = mPrimedVariableFinder.containsPrimedVariable(guard);
-        }
-        actions = ga.getActions();
-      } else {
-        actions = Collections.emptyList();
-      }
-      final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
-      final LabelBlockProxy block = edge.getLabelBlock();
-      for (final Proxy proxy : block.getEventIdentifierList()) {
-        final IdentifierProxy ident = (IdentifierProxy) proxy;
-        try {
-          final ConstraintList guard = propagator.getAllConstraints();
-          addGuard(ident, guard, actions, primedVar);
-          createEdges(ident, propagator, actions, target);
-        } catch (final EvalException exception) {
-          exception.provideLocation(ident);
           throw exception;
         }
       }
@@ -403,10 +475,20 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
                              final SimpleNodeProxy target)
       throws EvalException, VisitorException
     {
+      createEdges(ident, propagator, actions, target, true);
+    }
+
+    private void createEdges(final IdentifierProxy ident,
+                             final ConstraintPropagator propagator,
+                             final List<BinaryExpressionProxy> actions,
+                             final SimpleNodeProxy target,
+                             final boolean original)
+      throws EvalException, VisitorException
+    {
       checkAbort();
       if (mSimple) {
         final ConstraintList guard = propagator.getAllConstraints();
-        addEdge(ident, guard, actions, target);
+        addEdge(ident, guard, actions, target, original);
       } else {
         for (final CompiledNode child : mChildren) {
           final GuardInfo info = child.getGuards(ident);
@@ -430,7 +512,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
               continue;
             }
           }
-          child.createEdges(ident, childPropagator, actions, target);
+          child.createEdges(ident, childPropagator, actions, target, false);
         }
       }
     }
@@ -459,7 +541,8 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     private void addEdge(final IdentifierProxy ident,
                          final ConstraintList guard,
                          final List<BinaryExpressionProxy> actions,
-                         final SimpleNodeProxy target)
+                         final SimpleNodeProxy target,
+                         final boolean original)
     {
       final TargetInfo info = new TargetInfo(guard, actions, target);
       List<IdentifierProxy> list = mOutputEdges.get(info);
@@ -468,18 +551,54 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
         mOutputEdges.put(info, list);
       }
       list.add(ident);
-      mNumberOfOutputEdges++;
+      if (!original) {
+        mModifiedTargets.add(target);
+      }
     }
 
     //#######################################################################
     //# Output
+    private int getNumberOfOutputEdges()
+    {
+      if (!mSimple) {
+        return 0;
+      } else if (mUsingGuardActionBlocks) {
+        return mOutputEdges.size();
+      } else {
+        final Set<SimpleNodeProxy> targets = new THashSet<>(mOutputEdges.size());
+        for (final TargetInfo info : mOutputEdges.keySet()) {
+          final SimpleNodeProxy target = info.getTarget();
+          targets.add(target);
+        }
+        return targets.size();
+      }
+    }
+
     private void collectOutputEdges(final List<EdgeProxy> output)
     {
       if (mSimple) {
-        final SimpleNodeProxy source = (SimpleNodeProxy) mInputNode;
-        for (final Map.Entry<TargetInfo,List<IdentifierProxy>> entry :
-             mOutputEdges.entrySet()) {
-          final TargetInfo info = entry.getKey();
+        for (final EdgeProxy edge : mInputEdges) {
+          final NodeProxy target = edge.getTarget();
+          if (!mModifiedTargets.contains(target)) {
+            output.add(edge);
+          }
+        }
+        if (mUsingGuardActionBlocks) {
+          collectOutputEdgesGA(output);
+        } else {
+          collectOutputEdgesConditional(output);
+        }
+      }
+    }
+
+    private void collectOutputEdgesGA(final List<EdgeProxy> output)
+    {
+      final SimpleNodeProxy source = (SimpleNodeProxy) mInputNode;
+      for (final Map.Entry<TargetInfo,List<IdentifierProxy>> entry :
+           mOutputEdges.entrySet()) {
+        final TargetInfo info = entry.getKey();
+        final SimpleNodeProxy target = info.getTarget();
+        if (mModifiedTargets.contains(target)) {
           final ConstraintList guard = info.getGuard();
           final List<SimpleExpressionProxy> guards;
           if (guard.isTrue()) {
@@ -499,22 +618,88 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
             ga = mFactory.createGuardActionBlockProxy
               (guards, clonedActions, null);
           }
-          final SimpleNodeProxy target = info.getTarget();
           final List<IdentifierProxy> labels = entry.getValue();
           final List<Proxy> clonedLabels = new ArrayList<>(labels.size());
           final ProxyAccessorSet<IdentifierProxy> uniqueLebels =
             new ProxyAccessorHashSet<>(mEquality, labels.size());
-          for (final IdentifierProxy label : labels) {
-            if (uniqueLebels.addProxy(label)) {
-              final Proxy clonedLabel = mCloner.getClone(label);
-              clonedLabels.add(clonedLabel);
-            }
-          }
+          collectUniqueLabels(labels, uniqueLebels, clonedLabels);
           final LabelBlockProxy block =
             mFactory.createLabelBlockProxy(clonedLabels, null);
           final EdgeProxy edge =
             mFactory.createEdgeProxy(source, target, block, ga, null, null, null);
           output.add(edge);
+        }
+      }
+    }
+
+    private void collectOutputEdgesConditional(final List<EdgeProxy> output)
+    {
+      final int numEntries = mOutputEdges.size() - mModifiedTargets.size();
+      final Map<SimpleNodeProxy,List<TargetInfo>> targetMap =
+        new LinkedHashMap<>(numEntries);
+      for (final TargetInfo info : mOutputEdges.keySet()) {
+        assert info.getActions().isEmpty();
+        final SimpleNodeProxy target = info.getTarget();
+        if (mModifiedTargets.contains(target)) {
+          List<TargetInfo> list = targetMap.get(target);
+          if (list == null) {
+            list = new LinkedList<>();
+            targetMap.put(target, list);
+          }
+          list.add(info);
+        }
+      }
+      final SimpleNodeProxy source = (SimpleNodeProxy) mInputNode;
+      for (final Map.Entry<SimpleNodeProxy,List<TargetInfo>> entry :
+           targetMap.entrySet()) {
+        int size = 0;
+        for (final TargetInfo info : entry.getValue()) {
+          final ConstraintList guard = info.getGuard();
+          if (guard.isTrue()) {
+            final List<IdentifierProxy> labels = mOutputEdges.get(info);
+            size += labels.size();
+          } else {
+            size++;
+          }
+        }
+        final List<Proxy> labelBlockBody = new ArrayList<>(size);
+        final ProxyAccessorSet<IdentifierProxy> uniqueLebels =
+          new ProxyAccessorHashSet<>(mEquality, size);
+        for (final TargetInfo info : entry.getValue()) {
+          final ConstraintList guard = info.getGuard();
+          final List<IdentifierProxy> labels = mOutputEdges.get(info);
+          if (guard.isTrue()) {
+            collectUniqueLabels(labels, uniqueLebels, labelBlockBody);
+          } else {
+            final int numLabels = labels.size();
+            final List<Proxy> condLabels = new ArrayList<>(numLabels);
+            final ProxyAccessorSet<IdentifierProxy> condUniqueLebels =
+              new ProxyAccessorHashSet<>(mEquality, numLabels);
+            collectUniqueLabels(labels, condUniqueLebels, condLabels);
+            final SimpleExpressionProxy guardExpression =
+              guard.createExpression(mFactory, mOperatorTable.getAndOperator());
+            final ConditionalProxy cond =
+              mFactory.createConditionalProxy(condLabels, guardExpression);
+            labelBlockBody.add(cond);
+          }
+        }
+        final LabelBlockProxy block =
+          mFactory.createLabelBlockProxy(labelBlockBody, null);
+        final SimpleNodeProxy target = entry.getKey();
+        final EdgeProxy edge =
+          mFactory.createEdgeProxy(source, target, block, null, null, null, null);
+        output.add(edge);
+      }
+    }
+
+    private void collectUniqueLabels(final List<IdentifierProxy> input,
+                                     final ProxyAccessorSet<IdentifierProxy> unique,
+                                     final List<Proxy> output)
+    {
+      for (final IdentifierProxy label : input) {
+        if (unique.addProxy(label)) {
+          final Proxy clonedLabel = mCloner.getClone(label);
+          output.add(clonedLabel);
         }
       }
     }
@@ -537,6 +722,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
       new ProxyAccessorHashMap<>(mEquality);
     private final Map<TargetInfo,List<IdentifierProxy>> mOutputEdges =
       new LinkedHashMap<>();
+    private final Set<SimpleNodeProxy> mModifiedTargets = new THashSet<>();
   }
 
 
@@ -653,8 +839,8 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
   private List<ComponentProxy> mComponents; // The list of output components
   private EFAModuleContext mRootContext;
 
-  // This variables is reset for every graph.
-  private int mNumberOfOutputEdges;
+  // This variable is reset for every graph.
+  private boolean mUsingGuardActionBlocks;
 
   // These variables are utilities used by the compiler.
   private final ModuleProxyFactory mFactory;
