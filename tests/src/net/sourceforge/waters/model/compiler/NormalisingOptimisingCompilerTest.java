@@ -33,14 +33,8 @@
 
 package net.sourceforge.waters.model.compiler;
 
-import java.io.IOException;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import net.sourceforge.waters.model.base.WatersException;
-import net.sourceforge.waters.model.compiler.efsm.EFSMControllabilityException;
-import net.sourceforge.waters.model.module.ModuleProxy;
 
 
 public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
@@ -55,21 +49,6 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
   public static void main(final String[] args)
   {
     junit.textui.TestRunner.run(suite());
-  }
-
-
-  //#########################################################################
-  //# Overridden Test Cases
-  @Override
-  public void testCompile_EFATransferLine()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("efa", "transferline_efa");
-    final String[] culprit1 = {"'bufferA[1].c'", "'acceptT[0]'"};
-    final String[] culprit2 = {"'bufferA[1].c'", "'rejectT[1]'"};
-    final String[] culprit3 = {"'bufferB[1].c'", "'finishM[1]'"};
-    compileError(module, null, EFSMControllabilityException.class,
-                 culprit1, culprit2, culprit3);
   }
 
 

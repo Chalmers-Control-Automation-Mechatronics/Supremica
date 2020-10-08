@@ -33,15 +33,17 @@
 
 package net.sourceforge.waters.model.compiler;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -125,8 +127,10 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       compile(module);
       fail("Expected InstantiationException not caught!");
     } catch (final WatersException exception) {
-      final String[] culprit = {"'" + instname + "'"};
-      checkExceptions(module, exception, InstantiationException.class, culprit);
+      final String culprit = "'" + instname + "'";
+      final ExpectedException expected =
+        new ExpectedException(InstantiationException.class, culprit);
+      checkExceptions(module, exception, expected);
     }
   }
 
@@ -597,11 +601,16 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module = loadModule("efa", "transferline_efa");
     if (isNormalisationEnabled()) {
-      final String[] culprit1 = {"'bufferA[1].c'", "'acceptT[0]'"};
-      final String[] culprit2 = {"'bufferA[1].c'", "'rejectT[1]'"};
-      final String[] culprit3 = {"'bufferB[1].c'", "'finishM[1]'"};
-      compileError(module, null, EFSMControllabilityException.class,
-                   culprit1, culprit2, culprit3);
+      final ExpectedException expected1 =
+        new ExpectedException(EFSMControllabilityException.class,
+                              "'bufferA[1].c'", "'acceptT[0]'");
+      final ExpectedException expected2 =
+        new ExpectedException(EFSMControllabilityException.class,
+                              "'bufferA[1].c'", "'rejectT[1]'");
+      final ExpectedException expected3 =
+        new ExpectedException(EFSMControllabilityException.class,
+                              "'bufferB[1].c'", "'finishM[1]'");
+      compileError(module, null, expected1, expected2, expected3);
     } else {
       testCompile(module);
     }
@@ -1076,8 +1085,19 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_assignmentInGuard2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "assignment_in_guard2");
-    compileError(module, ActionSyntaxException.class, "Assignment operator =");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "assignment_in_guard2");
+    final ExpectedException expected1 =
+      new ExpectedException(ActionSyntaxException.class,
+                            "Assignment operator =");
+    if (isNormalisationEnabled()) {
+      final ExpectedException expected2 =
+        new ExpectedException(EFSMControllabilityException.class,
+                              "'spec'", "'c'", "'put'");
+      compileError(module, null, expected1, expected2);
+    } else {
+      compileError(module, null, expected1);
+    }
   }
 
   public void testCompile_bad_enum()
@@ -1119,11 +1139,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_error2_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler", "instance", "error2_small");
-    final String[] culprit1 = {"required parameter 'break'"};
-    final String[] culprit2 = {"required parameter 'repair'"};
-    compileError(module, null, InstantiationException.class,
-                 culprit1, culprit2);
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "error2_small");
+    final ExpectedException expected1 =
+      new ExpectedException(InstantiationException.class,
+                            "required parameter 'break'");
+    final ExpectedException expected2 =
+      new ExpectedException(InstantiationException.class,
+                            "required parameter 'repair'");
+    compileError(module, null, expected1, expected2);
   }
 
   public void testCompile_error3_small()
@@ -1136,11 +1160,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_error4_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler", "instance", "error4_small");
-    final String[] culprit1 = {"'start1'"};
-    final String[] culprit2 = {"'start2'"};
-    compileError(module, null, InstantiationException.class,
-                 culprit1, culprit2);
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "error4_small");
+    final ExpectedException expected1 =
+      new ExpectedException(InstantiationException.class, "'start1'");
+    final ExpectedException expected2 =
+      new ExpectedException(InstantiationException.class, "'start2'");
+    compileError(module, null, expected1, expected2);
   }
 
   public void testCompile_error5_small()
@@ -1326,36 +1352,37 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   private void compileError(final ModuleProxy module,
-                            final Class<? extends WatersException> exclass,
-                            final String... culprit)
+                            final Class<? extends EvalException> exclass,
+                            final String... culprits)
     throws IOException, WatersException
   {
-    final String[][] culprits = {culprit};
     compileError(module, null, exclass, culprits);
   }
 
   private void compileError(final ModuleProxy module,
                             final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String... culprit)
+                            final Class<? extends EvalException> exclass,
+                            final String... culprits)
     throws IOException, WatersException
   {
-    final String[][] culprits = {culprit};
-    compileError(module, bindings, exclass, culprits);
+    final ExpectedException expected =
+      new ExpectedException(exclass, culprits);
+    compileError(module, bindings, expected);
   }
 
   protected void compileError(final ModuleProxy module,
                               final List<ParameterBindingProxy> bindings,
-                              final Class<? extends WatersException> exclass,
-                              final String[]... culprits)
+                              final ExpectedException... expected)
     throws IOException, WatersException
   {
+    assertTrue("Invalid test, does not specify any expected exceptions!",
+               expected.length > 0);
     try {
       final ProductDESProxy des = compile(module, bindings);
       save(module, bindings, des);
-      fail("Expected " + exclass.getSimpleName() + " not caught!");
+      fail("Expected " + expected[0].getSimpleName() + " not caught!");
     } catch (final WatersException exception) {
-      checkExceptions(module, exception, exclass, culprits);
+      checkExceptions(module, exception, expected);
     }
   }
 
@@ -1480,121 +1507,70 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     return mModuleFactory.createParameterBindingProxy(name, expr);
   }
 
-  /**
-   * Asserts that the exception mentions at least one culprit.
-   */
-  private void assertMentionsAny(final WatersException exception,
-                                 final String[][] culprits)
-  {
-    if (culprits.length == 1) {
-      assertMentionsAll(exception, culprits[0]);
-    } else {
-      for (final String[] culprit : culprits) {
-        if (mentionsAll(exception, culprit)) {
-          return;
-        }
-      }
-      fail("Caught " + exception.getClass().getSimpleName() +
-           " as expected, but message '" + exception.getMessage() +
-           "' does not mention any of the culprits: " +
-           Arrays.deepToString(culprits) + "!");
-    }
-  }
-
-  /**
-   * Checks if the exception mentions all of the phrases in the culprit.
-   */
-  private boolean mentionsAll(final WatersException exception,
-                              final String[] culprit)
-  {
-    final String msg = exception.getMessage();
-    for (final String phrase : culprit) {
-      if (!msg.contains(phrase)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Asserts that the exception has the right type, mentions one of the
-   * culprits, and has a valid location.
-   */
-  private void checkException(final ModuleProxy module,
-                              final WatersException exception,
-                              final Class<? extends WatersException> exclass,
-                              final String[]... culprits)
-  {
-    assertEquals("Wrong exception type!", exclass, exception.getClass());
-    final String msg = exception.getMessage();
-    assertNotNull("Caught " + exclass.getSimpleName() +
-                  " as expected, but no error message found!", msg);
-    assertMentionsAny(exception, culprits);
-    if (exception instanceof EvalException) {
-      final EvalException evalException = (EvalException) exception;
-      final Proxy location = evalException.getLocation();
-      assertNotNull("Caught " + exclass.getSimpleName() + " <" + msg +
-                    "> provides no location!",
-                    location);
-      if (mCompiler.isSourceInfoEnabled()) {
-        assertTrue("Caught " + exception.getClass().getSimpleName() + " <" +
-                   msg + "> in " + location.getClass().getSimpleName() +
-                   " which is not in the module!",
-                   mDescendantCheckVisitor.isDescendant(location, module));
-      }
-    }
-  }
-
-  /**
-   * Asserts that the exception fulfils all the requirements.
-   * <CODE>MultiEvalExceptions</CODE> are handled appropriately.
-   */
   private void checkExceptions(final ModuleProxy module,
-                               final WatersException exception,
-                               final Class<? extends WatersException> exclass,
-                               final String[]... culprits)
+                               final WatersException caught,
+                               final ExpectedException... expected)
   {
-    assertTrue("Invalid test, does not specify any culprits!",
-               culprits.length > 0);
     final boolean multi = mCompiler.isMultiExceptionsEnabled();
-    if (multi && EvalException.class.isAssignableFrom(exclass)) {
+    if (multi) {
       assertEquals("Not a MultiEvalException!",
-                   MultiEvalException.class, exception.getClass());
-      final EvalException evalException = (EvalException) exception;
-      final List<EvalException> exceptions = evalException.getAll();
-      assertTrue("Caught MultiEvalException as expected, " +
-                 "but it does not contain any exceptions!",
-                 exceptions.size() > 0);
-      boolean found = false;
-      for (final EvalException ex : exceptions) {
-        final String msg = ex.getMessage();
-        assertNotNull("Caught " + ProxyTools.getShortClassName(ex) +
-                      " without any error message!", msg);
-        final Proxy location = ex.getLocation();
-        assertNotNull("Caught " + ProxyTools.getShortClassName(ex) +
-                      " <" + msg + "> provides no location!",
-                      location);
-        if (mCompiler.isSourceInfoEnabled()) {
-          assertTrue("Caught " + ProxyTools.getShortClassName(ex) + " <" +
-                     msg + "> in " + ProxyTools.getShortClassName(location) +
-                     " which is not in the module!",
-                     mDescendantCheckVisitor.isDescendant(location, module));
-        }
-        if (ex.getClass() == exclass) {
-          for (final String[] culprit : culprits) {
-            if (mentionsAll(ex, culprit)) {
-              found = true;
-              break;
-            }
+                   MultiEvalException.class, caught.getClass());
+      final EvalException caughtEval = (EvalException) caught;
+      final List<EvalException> allCaught = caughtEval.getAll();
+      final Set<EvalException> covered = new THashSet<>(allCaught.size());
+      for (final ExpectedException expected1 : expected) {
+        checkException(module, caughtEval, expected1, covered);
+      }
+      if (covered.size() < allCaught.size()) {
+        for (final EvalException caught1 : allCaught) {
+          if (!covered.contains(caught1)) {
+            fail("The caught MultiEvalException contains an unexcepted " +
+                 ProxyTools.getShortClassName(caught1) + " <" +
+                 caught1.getMessage() + ">!");
           }
         }
       }
-      assertTrue("Did not catch expected " + exclass.getSimpleName() +
-                 " that mentions the culprits: " +
-                 Arrays.deepToString(culprits) + "!",
-                 found);
     } else {
-      checkException(module, exception, exclass, culprits[0]);
+      final EvalException caughtEval = (EvalException) caught;
+      final List<EvalException> allCaught = caughtEval.getAll();
+      assertEquals("Multiple exceptions are diabled, " +
+                   "but did not produce exactly one exception!",
+                   1, allCaught.size());
+      final EvalException firstECaught = allCaught.get(0);
+      final ExpectedException firstExpected = expected[0];
+      checkException(module, firstECaught, firstExpected, null);
+    }
+  }
+
+  private void checkException(final ModuleProxy module,
+                              final EvalException caught,
+                              final ExpectedException expected,
+                              final Set<EvalException> covered)
+  {
+    boolean found = false;
+    for (final EvalException caught1 : caught.getAll()) {
+      final String msg = caught1.getMessage();
+      assertNotNull("Caught " + ProxyTools.getShortClassName(caught1) +
+                    " without any error message!", msg);
+      final Proxy location = caught1.getLocation();
+      assertNotNull("Caught " + ProxyTools.getShortClassName(caught1) +
+                    " <" + msg + "> provides no location!",
+                    location);
+      if (mCompiler.isSourceInfoEnabled()) {
+        assertTrue("Caught " + ProxyTools.getShortClassName(caught1) + " <" +
+                   msg + "> in " + ProxyTools.getShortClassName(location) +
+                   " which is not in the module!",
+                   mDescendantCheckVisitor.isDescendant(location, module));
+      }
+      if (expected.matches(caught1)) {
+        found = true;
+        if (covered != null) {
+          covered.add(caught1);
+        }
+      }
+    }
+    if (!found) {
+      fail(expected.getMessage());
     }
   }
 
@@ -1865,6 +1841,86 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     private final ProductDESProxy mOutputDES;
     private final DescendantCheckVisitor mDescendantChecker;
     private SimpleComponentProxy mCurrentComponent;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ExpectedException
+  /**
+   * A collection of information about an expected {@link EvalException}.
+   * Consists of the class of exception, plus zero or more culprit strings
+   * that are all expected to be mentioned in the exception message.
+   */
+  private static class ExpectedException
+  {
+    //#######################################################################
+    //# Constructor
+    private ExpectedException(final Class<? extends EvalException> clazz,
+                              final String... culprits)
+    {
+      mExceptionClass = clazz;
+      mCulprits = culprits;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    public String getSimpleName()
+    {
+      return mExceptionClass.getSimpleName();
+    }
+
+    private boolean matches(final EvalException exception)
+    {
+      if (!mExceptionClass.isAssignableFrom(exception.getClass())) {
+        return false;
+      } else {
+        final String msg = exception.getMessage();
+        for (final String culprit : mCulprits) {
+          if (!msg.contains(culprit)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+
+    private String getMessage()
+    {
+      final StringBuilder builder =
+        new StringBuilder("Did not catch expected ");
+      builder.append(mExceptionClass.getSimpleName());
+      switch (mCulprits.length) {
+      case 0:
+        break;
+      case 1:
+        builder.append(" that mentions the culprit '");
+        builder.append(mCulprits[0]);
+        builder.append('\'');
+        break;
+      default:
+        builder.append(" that mentions the culprits");
+        for (int i = 0; i < mCulprits.length; i++) {
+          if (i > 0) {
+            if (mCulprits.length > 2) {
+              builder.append(',');
+            }
+            if (i == mCulprits.length - 2) {
+              builder.append(" and");
+            }
+          }
+          builder.append(" '");
+          builder.append(mCulprits[0]);
+          builder.append('\'');
+        }
+      }
+      builder.append('!');
+      return builder.toString();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Class<? extends EvalException> mExceptionClass;
+    private final String[] mCulprits;
   }
 
 
