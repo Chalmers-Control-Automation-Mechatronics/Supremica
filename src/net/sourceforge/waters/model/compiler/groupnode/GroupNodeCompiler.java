@@ -52,10 +52,9 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.constraint.PrimedVariableCollector;
@@ -120,7 +119,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * @author Roger Su, Robi Malik
  */
 
-public class GroupNodeCompiler extends DefaultModuleProxyVisitor
+public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
   implements Abortable
 {
   //#########################################################################
@@ -129,45 +128,15 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
                            final CompilationInfo compilationInfo,
                            final ModuleProxy module)
   {
+    super(compilationInfo);
     mFactory = factory;
-    mCompilationInfo = compilationInfo;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mCompilationInfo, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, compilationInfo, mOperatorTable);
     mEquality = new ModuleEqualityVisitor(false);
     mPrimedVariableFinder = new PrimedVariableCollector(mOperatorTable, null);
     mInputModule = module;
     mCloner = new SourceInfoCloner(factory, compilationInfo);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-  private void checkAbort()
-    throws VisitorException
-  {
-    if (mIsAborting) {
-      final EvalAbortException exception = new EvalAbortException();
-      throw new VisitorException(exception);
-    }
   }
 
 
@@ -178,14 +147,11 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     try {
       return visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
-      final Throwable cause = exception.getCause();
-      if (cause instanceof EvalException) {
-        throw (EvalException) cause;
-      } else {
-        throw new WatersRuntimeException(cause);
-      }
+      throwAsEvalException(exception);
+      return null;
     }
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -204,7 +170,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     final Map<NodeProxy,CompiledNode> nodeMap = new HashMap<>(nodes.size());
     int numSimpleNodes = 0;
     for (final NodeProxy node : nodes) {
-      checkAbort();
+      checkAbortInVisitor();
       final CompiledNode compiledNode = new CompiledNode(node);
       compiledNodes.add(compiledNode);
       nodeMap.put(node, compiledNode);
@@ -223,7 +189,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
 
     mUsingGuardActionBlocks = false;
     for (final EdgeProxy edge : graph.getEdges()) {
-      checkAbort();
+      checkAbortInVisitor();
       mUsingGuardActionBlocks |= edge.getGuardActionBlock() != null;
       final NodeProxy source = edge.getSource();
       final CompiledNode compiledSource = nodeMap.get(source);
@@ -278,7 +244,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     throws VisitorException
   {
-    checkAbort();
+    checkAbortInVisitor();
     final GraphProxy oldGraph = comp.getGraph();
     final GraphProxy newGraph = visitGraphProxy(oldGraph);
     if (newGraph != oldGraph) {
@@ -286,7 +252,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
         mFactory.createSimpleComponentProxy(comp.getIdentifier(),
                                             comp.getKind(), newGraph,
                                             comp.getAttributes());
-      mCompilationInfo.add(newComponent, comp);
+      linkCompilationInfo(newComponent, comp);
       mComponents.add(newComponent);
     } else {
       mComponents.add(comp);
@@ -352,8 +318,8 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
-      checkAbort();
-      mPropagator = new ConstraintPropagator(mFactory, mCompilationInfo,
+      checkAbortInVisitor();
+      mPropagator = new ConstraintPropagator(mFactory, getCompilationInfo(),
                                              mOperatorTable, mRootContext);
       mPrimedVar = null;
       final GuardActionBlockProxy ga = edge.getGuardActionBlock();
@@ -459,12 +425,7 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
         try {
           visitor.visitEdgeProxy(edge);
         } catch (final VisitorException exception) {
-          final Throwable cause = exception.getCause();
-          if (cause instanceof EvalException) {
-            final EvalException evalException = (EvalException) cause;
-            mCompilationInfo.raiseInVisitor(evalException);
-          }
-          throw exception;
+          recordCaughtExceptionInVisitor(exception);
         }
       }
     }
@@ -845,10 +806,8 @@ public class GroupNodeCompiler extends DefaultModuleProxyVisitor
   // These variables are utilities used by the compiler.
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final CompilationInfo mCompilationInfo;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleEqualityVisitor mEquality;
   private final PrimedVariableCollector mPrimedVariableFinder;
   private final ModuleProxyCloner mCloner;
-  private boolean mIsAborting;
 }

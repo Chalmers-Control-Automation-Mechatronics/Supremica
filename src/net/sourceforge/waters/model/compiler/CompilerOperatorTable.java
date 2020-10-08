@@ -350,7 +350,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     if (expr instanceof BinaryExpressionProxy) {
       final BinaryExpressionProxy binary = (BinaryExpressionProxy) expr;
       final BinaryOperator op = binary.getOperator();
-      return getAssigningOperator(op) != null;
+      return op == mAssignmentOperator || getAssigningOperator(op) != null;
     } else {
       return false;
     }

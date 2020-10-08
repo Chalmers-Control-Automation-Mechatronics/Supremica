@@ -39,7 +39,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -1219,7 +1218,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "instance", "instantiate_guard1");
-    compileError(module, ActionSyntaxException.class, "Assignment operator =");
+    compileError(module, InstantiationException.class, "Assignment operator =");
   }
 
   public void testCompile_instantiate_guard2()
@@ -1227,7 +1226,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "instance", "instantiate_guard2");
-    compileError(module, ActionSyntaxException.class, "Assignment operator =");
+    compileError(module, InstantiationException.class, "Assignment operator =");
   }
 
   public void testCompile_instantiate_twoinit()
@@ -1482,21 +1481,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   /**
-   * Asserts that the culprit is mentioned by at least one exception.
-   */
-  private void assertMentioned(final String[] culprit,
-                               final Collection<? extends WatersException> exceptions)
-  {
-    for (final WatersException exception : exceptions) {
-      if (mentionsAll(exception, culprit)) {
-        return;
-      }
-    }
-    fail("The culprit " + Arrays.toString(culprit) +
-         " is not mentioned in any of the exception messages!");
-  }
-
-  /**
    * Asserts that the exception mentions at least one culprit.
    */
   private void assertMentionsAny(final WatersException exception,
@@ -1576,16 +1560,39 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     if (multi && EvalException.class.isAssignableFrom(exclass)) {
       assertEquals("Not a MultiEvalException!",
                    MultiEvalException.class, exception.getClass());
-      final List<EvalException> exceptions = ((EvalException) exception).getAll();
+      final EvalException evalException = (EvalException) exception;
+      final List<EvalException> exceptions = evalException.getAll();
       assertTrue("Caught MultiEvalException as expected, " +
                  "but it does not contain any exceptions!",
                  exceptions.size() > 0);
+      boolean found = false;
       for (final EvalException ex : exceptions) {
-        checkException(module, ex, exclass, culprits);
+        final String msg = ex.getMessage();
+        assertNotNull("Caught " + ProxyTools.getShortClassName(ex) +
+                      " without any error message!", msg);
+        final Proxy location = ex.getLocation();
+        assertNotNull("Caught " + ProxyTools.getShortClassName(ex) +
+                      " <" + msg + "> provides no location!",
+                      location);
+        if (mCompiler.isSourceInfoEnabled()) {
+          assertTrue("Caught " + ProxyTools.getShortClassName(ex) + " <" +
+                     msg + "> in " + ProxyTools.getShortClassName(location) +
+                     " which is not in the module!",
+                     mDescendantCheckVisitor.isDescendant(location, module));
+        }
+        if (ex.getClass() == exclass) {
+          for (final String[] culprit : culprits) {
+            if (mentionsAll(ex, culprit)) {
+              found = true;
+              break;
+            }
+          }
+        }
       }
-      for (final String[] culprit : culprits) {
-        assertMentioned(culprit, exceptions);
-      }
+      assertTrue("Did not catch expected " + exclass.getSimpleName() +
+                 " that mentions the culprits: " +
+                 Arrays.deepToString(culprits) + "!",
+                 found);
     } else {
       checkException(module, exception, exclass, culprits[0]);
     }

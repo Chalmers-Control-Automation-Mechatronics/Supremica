@@ -33,22 +33,25 @@
 
 package net.sourceforge.waters.model.compiler.instance;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
+import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConditionalProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -56,20 +59,26 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * <P>A utility class to help with the conversion of conditional blocks
  * ({@link ConditionalProxy}) to guard/action blocks ({@link
- * GuardActionBlockProxy}).</P>
+ * GuardActionBlockProxy}) and vice versa.</P>
  *
- * <P>This converter identifies assignments within an expression and
- * replaces them with equalities involving the next operator, for example,
- * replacing <CODE>x&nbsp;+=&nbsp;1</CODE> by <CODE>x'&nbsp;==&nbsp;x+1</CODE>.
- * Additionally, it recognises the top level of an AND expression, where
- * assignments are detected and converted to actions of a guard/action
- * block.</P>
+ * <P>This converter scans the top-level conjunction of a condition
+ * and separates assignments from non-assignments. Non-assignments are
+ * recorded as guards, and additionally traversed to check for nested
+ * assignments, which are reported as errors. Assignments are recorded
+ * as actions, and additionally their left and right subterms are traversed
+ * to search for nested assignments.</P>
+ *
+ * <P>This class also performs validation of guard/action blocks.
+ * Guards are traversed to check for any nested assignments, which are
+ * reported as errors. Actions are reported as errors, unless they are
+ * assignments, and their left and right subterms are traversed
+ * to search for nested assignments.</P>
  *
  * @author Robi Malik
  */
 
 class ConditionToGuardActionBlockConverter
-  extends DefaultModuleProxyVisitor
+  extends MultiExceptionModuleProxyVisitor
 {
   //#########################################################################
   //# Constructor
@@ -77,9 +86,9 @@ class ConditionToGuardActionBlockConverter
                                        final CompilerOperatorTable optable,
                                        final CompilationInfo info)
   {
+    super(info);
     mFactory = factory;
     mOpTable = optable;
-    mCompilationInfo = info;
     mGuards = new LinkedList<>();
     mActions = new LinkedList<>();
   }
@@ -87,9 +96,9 @@ class ConditionToGuardActionBlockConverter
   ConditionToGuardActionBlockConverter
     (final ConditionToGuardActionBlockConverter converter)
   {
+    super(converter.getCompilationInfo());
     mFactory = converter.mFactory;
     mOpTable = converter.mOpTable;
-    mCompilationInfo = converter.mCompilationInfo;
     mGuards = new LinkedList<>(converter.mGuards);
     mActions = new LinkedList<>(converter.mActions);
   }
@@ -104,7 +113,12 @@ class ConditionToGuardActionBlockConverter
     throws VisitorException
   {
     mAtTopLevel = true;
-    cond.acceptVisitor(this);
+    mWhere = "subterm";
+    try {
+      cond.acceptVisitor(this);
+    } catch (final VisitorException exception) {
+      recordCaughtExceptionInVisitor(exception);
+    }
   }
 
   /**
@@ -113,12 +127,35 @@ class ConditionToGuardActionBlockConverter
    * @param  ga  The guard/action block to be included or <CODE>null</CODE>.
    */
   void addGuardActionBlock(final GuardActionBlockProxy ga)
+    throws VisitorException
   {
     if (ga != null) {
+      mWhere = "guard";
       final List<SimpleExpressionProxy> guards = ga.getGuards();
-      mGuards.addAll(guards);
+      for (final SimpleExpressionProxy guard : guards) {
+        try {
+          check(guard);
+          mGuards.add(guard);
+        } catch (final VisitorException exception) {
+          recordCaughtExceptionInVisitor(exception);
+        }
+      }
+      mWhere = "subterm";
       final List<BinaryExpressionProxy> actions = ga.getActions();
-      mActions.addAll(actions);
+      for (final BinaryExpressionProxy action : actions) {
+        if (!mOpTable.isAssignment(action)) {
+          final ActionSyntaxException exception =
+            new ActionSyntaxException(action);
+          raiseInVisitor(exception);
+        } else {
+          try {
+            checkAssignment(action);
+            mActions.add(action);
+          } catch (final VisitorException exception) {
+            recordCaughtExceptionInVisitor(exception);
+          }
+        }
+      }
     }
   }
 
@@ -128,26 +165,35 @@ class ConditionToGuardActionBlockConverter
    * addCondition()} and {@link #addGuardActionBlock(GuardActionBlockProxy)
    * addGuardActionBlock()}.
    * @return The created guard/action block, or <CODE>null</CODE> if no
-   *         guards and actions have been added.
+   *         guards or actions have been added.
    */
   GuardActionBlockProxy createGuardActionBlock()
   {
     if (mGuards.isEmpty() && mActions.isEmpty()) {
       return null;
     } else {
-      final BinaryOperator op = mOpTable.getAndOperator();
-      SimpleExpressionProxy conjuction = null;
-      for (final SimpleExpressionProxy guard : mGuards) {
-        if (conjuction == null) {
-          conjuction = guard;
-        } else {
-          conjuction =
-            mFactory.createBinaryExpressionProxy(op, conjuction, guard);
-        }
-      }
+      final SimpleExpressionProxy conjuction = addToConjunction(null, mGuards);
       final List<SimpleExpressionProxy> guards =
         conjuction == null ? null : Collections.singletonList(conjuction);
       return mFactory.createGuardActionBlockProxy(guards, mActions, null);
+    }
+  }
+
+  /**
+   * Creates a formula representing the conjunction of all formulas added by
+   * previous calls to {@link #addCondition(SimpleExpressionProxy)
+   * addCondition()} and {@link #addGuardActionBlock(GuardActionBlockProxy)
+   * addGuardActionBlock()}.
+   * @return The condition formula, or <CODE>null</CODE> if no
+   *         guards or actions have been added.
+   */
+  SimpleExpressionProxy createCondition()
+  {
+    if (mGuards.isEmpty() && mActions.isEmpty()) {
+      return null;
+    } else {
+      final SimpleExpressionProxy guard = addToConjunction(null, mGuards);
+      return addToConjunction(guard, mActions);
     }
   }
 
@@ -165,139 +211,171 @@ class ConditionToGuardActionBlockConverter
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  @Override
-  public BinaryExpressionProxy visitBinaryExpressionProxy
-    (final BinaryExpressionProxy expr)
+  //# Auxiliary Methods
+  private void checkAssignment(final BinaryExpressionProxy action)
     throws VisitorException
   {
-    final SimpleExpressionProxy lhs0 = expr.getLeft();
-    final SimpleExpressionProxy rhs0 = expr.getRight();
-    final BinaryOperator op = expr.getOperator();
-    if (mOpTable.isAssignment(expr)) {
-      if (mAtTopLevel) {
-        mActions.add(expr);
-        return null;
+    final SimpleExpressionProxy lhs = action.getLeft();
+    if (!(lhs instanceof IdentifierProxy)) {
+      final ActionSyntaxException exception =
+        new ActionSyntaxException(action, lhs);
+      throw wrap(exception);
+    } else {
+      check(lhs);
+      final SimpleExpressionProxy rhs = action.getRight();
+      check(rhs);
+    }
+  }
+
+  private void check(final SimpleExpressionProxy expr)
+    throws VisitorException
+  {
+    try {
+      mAtTopLevel = false;
+      expr.acceptVisitor(this);
+    } catch (final VisitorException exception) {
+      if (exception.getCause() instanceof EvalException) {
+        final EvalException cause = (EvalException) exception.getCause();
+        cause.provideLocation(expr);
+      }
+      throw exception;
+    }
+  }
+
+  private SimpleExpressionProxy addToConjunction
+    (SimpleExpressionProxy conjuction,
+     final List<? extends SimpleExpressionProxy> expressions)
+  {
+    final BinaryOperator op = mOpTable.getAndOperator();
+    for (final SimpleExpressionProxy expr : expressions) {
+      if (conjuction == null) {
+        conjuction = expr;
       } else {
-        final BinaryOperator modifier = mOpTable.getAssigningOperator(op);
-        final UnaryOperator prime = mOpTable.getNextOperator();
-        final UnaryExpressionProxy lhs1 =
-          mFactory.createUnaryExpressionProxy(prime, lhs0);
-        final SimpleExpressionProxy rhs1;
-        if (modifier == null) {
-          rhs1 = rhs0;
-        } else {
-          rhs1 = mFactory.createBinaryExpressionProxy(modifier, lhs0, rhs0);
-        }
-        final BinaryOperator eq = mOpTable.getEqualsOperator();
-        final BinaryExpressionProxy expr1 =
-          mFactory.createBinaryExpressionProxy(eq, lhs1, rhs1);
-        mCompilationInfo.add(expr1, expr);
-        return expr1;
+        conjuction =
+          mFactory.createBinaryExpressionProxy(op, conjuction, expr);
       }
     }
-    if (!mAtTopLevel) {
-      final SimpleExpressionProxy lhs1 =
-        (SimpleExpressionProxy) lhs0.acceptVisitor(this);
-      final SimpleExpressionProxy rhs1 =
-        (SimpleExpressionProxy) rhs0.acceptVisitor(this);
-      if (lhs0 == lhs1 && rhs0 == rhs1) {
-        return expr;
-      } else {
-        final BinaryExpressionProxy expr1 =
-          mFactory.createBinaryExpressionProxy(op, lhs1, rhs1);
-        mCompilationInfo.add(expr1, expr);
-        return expr1;
-      }
-    } else if (op == mOpTable.getAndOperator()) {
-      lhs0.acceptVisitor(this);
-      rhs0.acceptVisitor(this);
-      return null;
-    } else {
+    return conjuction;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
+  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+    throws VisitorException
+  {
+    if (mAtTopLevel) {
       try {
-        mAtTopLevel = false;
-        final SimpleExpressionProxy lhs1 =
-          (SimpleExpressionProxy) lhs0.acceptVisitor(this);
-        final SimpleExpressionProxy rhs1 =
-          (SimpleExpressionProxy) rhs0.acceptVisitor(this);
-        if (lhs0 == lhs1 && rhs0 == rhs1) {
-          mGuards.add(expr);
+        if (mOpTable.isAssignment(expr)) {
+          checkAssignment(expr);
+          mActions.add(expr);
+        } else if (expr.getOperator() == mOpTable.getAndOperator()) {
+          final SimpleExpressionProxy lhs = expr.getLeft();
+          lhs.acceptVisitor(this);
+          final SimpleExpressionProxy rhs = expr.getRight();
+          rhs.acceptVisitor(this);
         } else {
-          final BinaryExpressionProxy expr1 =
-            mFactory.createBinaryExpressionProxy(op, lhs1, rhs1);
-          mCompilationInfo.add(expr1, expr);
-          mGuards.add(expr1);
+          mAtTopLevel = false;
+          final SimpleExpressionProxy lhs = expr.getLeft();
+          lhs.acceptVisitor(this);
+          final SimpleExpressionProxy rhs = expr.getRight();
+          rhs.acceptVisitor(this);
+          mGuards.add(expr);
         }
       } finally {
         mAtTopLevel = true;
       }
-      return null;
+    } else {
+      if (mOpTable.isAssignment(expr)) {
+        final ActionSyntaxException exception =
+          new ActionSyntaxException(expr, mWhere);
+        throw wrap(exception);
+      } else {
+        final SimpleExpressionProxy lhs = expr.getLeft();
+        lhs.acceptVisitor(this);
+        final SimpleExpressionProxy rhs = expr.getRight();
+        rhs.acceptVisitor(this);
+      }
     }
+    return null;
   }
 
   @Override
-  public FunctionCallExpressionProxy visitFunctionCallExpressionProxy
+  public Object visitFunctionCallExpressionProxy
     (final FunctionCallExpressionProxy expr)
     throws VisitorException
   {
-    final List<SimpleExpressionProxy> args0 = expr.getArguments();
-    final List<SimpleExpressionProxy> args1 = new ArrayList<>(args0.size());
-    boolean change = false;
-    for (final SimpleExpressionProxy arg0 : args0) {
-      final SimpleExpressionProxy arg1 =
-        (SimpleExpressionProxy) arg0.acceptVisitor(this);
-      args1.add(arg0);
-      change |= arg0 != arg1;
-    }
-    final FunctionCallExpressionProxy expr1;
-    if (!change) {
-      expr1 = expr;
-    } else {
-      final String function = expr.getFunctionName();
-      expr1 = mFactory.createFunctionCallExpressionProxy(function, args1);
-      mCompilationInfo.add(expr1, expr);
-    }
-    if (mAtTopLevel) {
-      mGuards.add(expr1);
-      return null;
-    } else {
-      return expr1;
+    final boolean wasAtTopLevel = mAtTopLevel;
+    try {
+      mAtTopLevel = false;
+      final List<SimpleExpressionProxy> args = expr.getArguments();
+      for (final SimpleExpressionProxy arg : args) {
+        arg.acceptVisitor(this);
+      }
+      return visitSimpleExpressionProxy(expr);
+    } finally {
+      mAtTopLevel = wasAtTopLevel;
     }
   }
 
   @Override
-  public SimpleExpressionProxy visitSimpleExpressionProxy
-    (final SimpleExpressionProxy expr)
+  public Object visitIndexedIdentifierProxy
+    (final IndexedIdentifierProxy ident)
+    throws VisitorException
+  {
+    final boolean wasAtTopLevel = mAtTopLevel;
+    try {
+      mAtTopLevel = false;
+      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+      for (final SimpleExpressionProxy index : indexes) {
+        index.acceptVisitor(this);
+      }
+      return visitIdentifierProxy(ident);
+    } finally {
+      mAtTopLevel = wasAtTopLevel;
+    }
+  }
+
+  @Override
+  public Object visitQualifiedIdentifierProxy
+    (final QualifiedIdentifierProxy ident)
+    throws VisitorException
+  {
+    final boolean wasAtTopLevel = mAtTopLevel;
+    try {
+      mAtTopLevel = false;
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      base.acceptVisitor(this);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      comp.acceptVisitor(this);
+      return visitSimpleExpressionProxy(ident);
+    } finally {
+      mAtTopLevel = wasAtTopLevel;
+    }
+  }
+
+  @Override
+  public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
   {
     if (mAtTopLevel) {
       mGuards.add(expr);
-      return null;
-    } else {
-      return expr;
     }
+    return null;
   }
 
   @Override
-  public UnaryExpressionProxy visitUnaryExpressionProxy
-    (final UnaryExpressionProxy expr)
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
     throws VisitorException
   {
-    final SimpleExpressionProxy subTerm0 = expr.getSubTerm();
-    final SimpleExpressionProxy subTerm1 =
-      (SimpleExpressionProxy) subTerm0.acceptVisitor(this);
-    final UnaryExpressionProxy expr1;
-    if (subTerm0 == subTerm1) {
-      expr1 = expr;
-    } else {
-      final UnaryOperator op = expr.getOperator();
-      expr1 = mFactory.createUnaryExpressionProxy(op, subTerm1);
-      mCompilationInfo.add(expr1, expr);
-    }
-    if (mAtTopLevel) {
-      mGuards.add(expr1);
-      return null;
-    } else {
-      return expr1;
+    final boolean wasAtTopLevel = mAtTopLevel;
+    try {
+      mAtTopLevel = false;
+      final SimpleExpressionProxy subTerm = expr.getSubTerm();
+      subTerm.acceptVisitor(this);
+      return visitSimpleExpressionProxy(expr);
+    } finally {
+      mAtTopLevel = wasAtTopLevel;
     }
   }
 
@@ -306,11 +384,11 @@ class ConditionToGuardActionBlockConverter
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOpTable;
-  private final CompilationInfo mCompilationInfo;
 
   private final List<SimpleExpressionProxy> mGuards;
   private final List<BinaryExpressionProxy> mActions;
 
   private boolean mAtTopLevel;
+  private String mWhere;
 
 }
