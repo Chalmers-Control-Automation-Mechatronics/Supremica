@@ -325,8 +325,12 @@ class ConditionToGuardActionBlockConverter
     throws VisitorException
   {
     final boolean wasAtTopLevel = mAtTopLevel;
+    final IndexedIdentifierProxy oldIndexed = mIndexedIdentifier;
     try {
       mAtTopLevel = false;
+      if (mIndexedIdentifier == null) {
+        mIndexedIdentifier = ident;
+      }
       final List<SimpleExpressionProxy> indexes = ident.getIndexes();
       for (final SimpleExpressionProxy index : indexes) {
         index.acceptVisitor(this);
@@ -334,6 +338,7 @@ class ConditionToGuardActionBlockConverter
       return visitIdentifierProxy(ident);
     } finally {
       mAtTopLevel = wasAtTopLevel;
+      mIndexedIdentifier = oldIndexed;
     }
   }
 
@@ -369,13 +374,28 @@ class ConditionToGuardActionBlockConverter
     throws VisitorException
   {
     final boolean wasAtTopLevel = mAtTopLevel;
+    final UnaryExpressionProxy oldPrimed = mPrimedExpression;
     try {
+      if (expr.getOperator() == mOpTable.getNextOperator()) {
+        if (mPrimedExpression != null) {
+          final NestedNextException exception =
+            new NestedNextException(expr, mPrimedExpression);
+          throw wrap(exception);
+        } else if (mIndexedIdentifier != null) {
+          final NestedNextException exception =
+            new NestedNextException(expr, mIndexedIdentifier);
+          throw wrap(exception);
+        } else {
+          mPrimedExpression = expr;
+        }
+      }
       mAtTopLevel = false;
       final SimpleExpressionProxy subTerm = expr.getSubTerm();
       subTerm.acceptVisitor(this);
       return visitSimpleExpressionProxy(expr);
     } finally {
       mAtTopLevel = wasAtTopLevel;
+      mPrimedExpression = oldPrimed;
     }
   }
 
@@ -390,5 +410,7 @@ class ConditionToGuardActionBlockConverter
 
   private boolean mAtTopLevel;
   private String mWhere;
+  private UnaryExpressionProxy mPrimedExpression;
+  private IndexedIdentifierProxy mIndexedIdentifier;
 
 }

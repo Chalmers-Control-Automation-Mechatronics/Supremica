@@ -61,6 +61,7 @@ import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleExcepti
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.instance.EventKindException;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
+import net.sourceforge.waters.model.compiler.instance.NestedNextException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -1108,6 +1109,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, TypeMismatchException.class, "'2'");
   }
 
+  public void testCompile_error_double_prime()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "error_double_prime");
+    compileError(module, NestedNextException.class, "nested");
+  }
+
   public void testCompile_edge0()
     throws IOException, WatersException
   {
@@ -1122,11 +1131,19 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, UndefinedIdentifierException.class, "'finishLathe'");
   }
 
-  public void testCompile_min_array()
+  public void testCompile_error_min_array()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "error_min_array");
     compileError(module, UndefinedIdentifierException.class, "'id'");
+  }
+
+  public void testCompile_error_prime_in_index()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "error_prime_in_index");
+    compileError(module, NestedNextException.class, "array index");
   }
 
   public void testCompile_error1_small()
@@ -1511,44 +1528,9 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                                final WatersException caught,
                                final ExpectedException... expected)
   {
-    final boolean multi = mCompiler.isMultiExceptionsEnabled();
-    if (multi) {
-      assertEquals("Not a MultiEvalException!",
-                   MultiEvalException.class, caught.getClass());
-      final EvalException caughtEval = (EvalException) caught;
-      final List<EvalException> allCaught = caughtEval.getAll();
-      final Set<EvalException> covered = new THashSet<>(allCaught.size());
-      for (final ExpectedException expected1 : expected) {
-        checkException(module, caughtEval, expected1, covered);
-      }
-      if (covered.size() < allCaught.size()) {
-        for (final EvalException caught1 : allCaught) {
-          if (!covered.contains(caught1)) {
-            fail("The caught MultiEvalException contains an unexcepted " +
-                 ProxyTools.getShortClassName(caught1) + " <" +
-                 caught1.getMessage() + ">!");
-          }
-        }
-      }
-    } else {
-      final EvalException caughtEval = (EvalException) caught;
-      final List<EvalException> allCaught = caughtEval.getAll();
-      assertEquals("Multiple exceptions are diabled, " +
-                   "but did not produce exactly one exception!",
-                   1, allCaught.size());
-      final EvalException firstECaught = allCaught.get(0);
-      final ExpectedException firstExpected = expected[0];
-      checkException(module, firstECaught, firstExpected, null);
-    }
-  }
-
-  private void checkException(final ModuleProxy module,
-                              final EvalException caught,
-                              final ExpectedException expected,
-                              final Set<EvalException> covered)
-  {
-    boolean found = false;
-    for (final EvalException caught1 : caught.getAll()) {
+    final EvalException caughtEval = (EvalException) caught;
+    final List<EvalException> allCaught = caughtEval.getAll();
+    for (final EvalException caught1 : allCaught) {
       final String msg = caught1.getMessage();
       assertNotNull("Caught " + ProxyTools.getShortClassName(caught1) +
                     " without any error message!", msg);
@@ -1562,6 +1544,40 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                    " which is not in the module!",
                    mDescendantCheckVisitor.isDescendant(location, module));
       }
+    }
+    if (mCompiler.isMultiExceptionsEnabled()) {
+      assertTrue("Multiple exceptions are enabled, " +
+                 "but did not catch a MultiEvalException!",
+                 caught instanceof MultiEvalException);
+      final Set<EvalException> covered = new THashSet<>(allCaught.size());
+      for (final ExpectedException expected1 : expected) {
+        checkException(caughtEval, expected1, covered);
+      }
+      if (covered.size() < allCaught.size()) {
+        for (final EvalException caught1 : allCaught) {
+          if (!covered.contains(caught1)) {
+            fail("The caught MultiEvalException contains an unexcepted " +
+                 ProxyTools.getShortClassName(caught1) + " <" +
+                 caught1.getMessage() + ">!");
+          }
+        }
+      }
+    } else {
+      assertEquals("Multiple exceptions are diabled, " +
+                   "but did not produce exactly one exception!",
+                   1, allCaught.size());
+      final EvalException firstECaught = allCaught.get(0);
+      final ExpectedException firstExpected = expected[0];
+      checkException(firstECaught, firstExpected, null);
+    }
+  }
+
+  private void checkException(final EvalException caught,
+                              final ExpectedException expected,
+                              final Set<EvalException> covered)
+  {
+    boolean found = false;
+    for (final EvalException caught1 : caught.getAll()) {
       if (expected.matches(caught1)) {
         found = true;
         if (covered != null) {
