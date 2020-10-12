@@ -1138,6 +1138,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, UndefinedIdentifierException.class, "'id'");
   }
 
+  public void testCompile_error_prime_in_assignment()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "error_prime_in_assignment");
+    compileError(module, NestedNextException.class, "assignment");
+  }
+
   public void testCompile_error_prime_in_index()
     throws IOException, WatersException
   {

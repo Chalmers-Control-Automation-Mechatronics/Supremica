@@ -251,6 +251,28 @@ public class SimpleExpressionCompiler
     }
   }
 
+  public boolean isBooleanFalse(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof IntConstantProxy) {
+      final IntConstantProxy intconst = (IntConstantProxy) expr;
+      final int value = intconst.getValue();
+      return value == 0;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isBooleanTrue(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof IntConstantProxy) {
+      final IntConstantProxy intconst = (IntConstantProxy) expr;
+      final int value = intconst.getValue();
+      return value == 1;
+    } else {
+      return false;
+    }
+  }
+
   public int getIntValue(final SimpleExpressionProxy expr)
     throws TypeMismatchException
   {
@@ -319,6 +341,52 @@ public class SimpleExpressionCompiler
 
 
   //#########################################################################
+  //# Simple Access
+  ModuleProxyFactory getFactory()
+  {
+    return mFactory;
+  }
+
+  CompilerOperatorTable getOperatorTable()
+  {
+    return mOperatorTable;
+  }
+
+  ModuleEqualityVisitor getEquality()
+  {
+    return mEquality;
+  }
+
+  BindingContext getContext()
+  {
+    return mContext;
+  }
+
+  CompilationInfo getCompilationInfo()
+  {
+    return mCompilationInfo;
+  }
+
+  boolean isCloning()
+  {
+    return mIsCloning;
+  }
+
+  SimpleExpressionProxy getClone(final SimpleExpressionProxy expr,
+                                 final boolean alreadyCloned)
+  {
+    if (mIsCloning && !alreadyCloned) {
+      final SimpleExpressionProxy clone =
+        (SimpleExpressionProxy) mCloner.getClone(expr);
+      mCompilationInfo.add(clone, expr);
+      return clone;
+    } else {
+      return expr;
+    }
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private SimpleExpressionProxy simplify(final SimpleExpressionProxy expr)
     throws EvalException
@@ -345,19 +413,6 @@ public class SimpleExpressionCompiler
       throw new UndefinedIdentifierException(expr);
     } else {
       return getClone(expr, alreadyCloned);
-    }
-  }
-
-  private SimpleExpressionProxy getClone(final SimpleExpressionProxy expr,
-                                         final boolean alreadyCloned)
-  {
-    if (mIsCloning && !alreadyCloned) {
-      final SimpleExpressionProxy clone =
-        (SimpleExpressionProxy) mCloner.getClone(expr);
-      mCompilationInfo.add(clone, expr);
-      return clone;
-    } else {
-      return expr;
     }
   }
 

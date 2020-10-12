@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.compiler.instance;
 
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -51,29 +52,43 @@ public class NestedNextException extends EvalException
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new exception indicating that a further prime operator
-   * has been encountered within a primed expression.
-   * @param  inner   The primed expression found nested within another.
-   * @param  outer   The primed expression within which another was found.
+   * Constructs a new exception indicating that a primed subterm was
+   * encountered within the expression of a variable assignment.
+   * @param  primed      The offending primed expression.
+   * @param  assignment  The assignment within which the primed expression
+   *                     was found.
    */
-  public NestedNextException(final UnaryExpressionProxy inner,
-                             final UnaryExpressionProxy outer)
+  public NestedNextException(final UnaryExpressionProxy primed,
+                             final BinaryExpressionProxy assignment)
   {
-    super("Next-state (prime) operators cannot be nested.", inner);
+    super("Next-state (prime) operators cannot be used within assignments.",
+          assignment);
   }
 
   /**
    * Constructs a new exception indicating that a primed subterm was
    * encountered within an index of an indexed identifier.
-   * @param  primed  The offending primed expression.
-   * @param  ident   The indexed identifier within which the primed expression
-   *                 was found.
+   * @param  primed      The offending primed expression.
+   * @param  ident       The indexed identifier within which the primed
+   *                     expression was found.
    */
   public NestedNextException(final UnaryExpressionProxy primed,
                              final IndexedIdentifierProxy ident)
   {
     super("Next-state (prime) operators cannot be used within array indexes.",
           primed);
+  }
+
+  /**
+   * Constructs a new exception indicating that a further prime operator
+   * has been encountered within a primed expression.
+   * @param  inner       The primed expression found nested within another.
+   * @param  outer       The primed expression within which another was found.
+   */
+  public NestedNextException(final UnaryExpressionProxy inner,
+                             final UnaryExpressionProxy outer)
+  {
+    super("Next-state (prime) operators cannot be nested.", inner);
   }
 
 

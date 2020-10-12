@@ -38,23 +38,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.AbstractExpressionCompilerTest;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class ConstraintPropagatorTest extends TestCase
+public class ConstraintPropagatorTest extends AbstractExpressionCompilerTest
 {
 
   //#########################################################################
@@ -956,55 +952,21 @@ public class ConstraintPropagatorTest extends TestCase
     throws EvalException, ParseException
   {
     testPropagate_a();
+    resetContext();
     testPropagate_not_not_a();
+    resetContext();
     testPropagate_a_and_b();
+    resetContext();
     testPropagate_b_or_c_or_a();
+    resetContext();
     testPropagate_crc_1();
+    resetContext();
     testPropagate_intrange_3();
   }
 
 
   //#########################################################################
   //# Utilities
-  @SuppressWarnings("unused")
-  private void addAtom(final String name)
-    throws ParseException
-  {
-    final IdentifierProxy ident = mParser.parseIdentifier(name);
-    mContext.addAtom(ident);
-  }
-
-  private void addBooleanVariable(final String name)
-    throws ParseException
-  {
-    addVariable(name, BOOLEAN_RANGE);
-  }
-
-  private CompiledIntRange createIntRange(final int lower, final int upper)
-  {
-    return new CompiledIntRange(lower, upper);
-  }
-
-  private CompiledEnumRange createEnumRange(final String[] names)
-    throws ParseException
-  {
-    final List<SimpleIdentifierProxy> list =
-      new ArrayList<SimpleIdentifierProxy>(names.length);
-    for (final String name : names) {
-      final SimpleIdentifierProxy ident = mParser.parseSimpleIdentifier(name);
-      mContext.addAtom(ident);
-      list.add(ident);
-    }
-    return new CompiledEnumRange(list);
-  }
-
-  private void addVariable(final String name, final CompiledRange range)
-    throws ParseException
-  {
-    final SimpleExpressionProxy varname = mParser.parse(name);
-    mContext.addVariable(varname, range);
-  }
-
   private void testPropagate(final String[] inputs, final String[] outputs)
     throws EvalException, ParseException
   {
@@ -1039,7 +1001,8 @@ public class ConstraintPropagatorTest extends TestCase
     final ConstraintPropagator propagator2 =
       new ConstraintPropagator(mPropagator);
     if (recall != null) {
-      final SimpleExpressionProxy varname = mParser.parse(recall);
+      final ExpressionParser parser = getExpressionParser();
+      final SimpleExpressionProxy varname = parser.parse(recall);
       propagator2.recallBinding(varname);
     }
     propagator2.addConstraints(constraints2);
@@ -1054,12 +1017,13 @@ public class ConstraintPropagatorTest extends TestCase
     if (inputs == null) {
       return null;
     } else {
+      final ExpressionParser parser = getExpressionParser();
       final Comparator<SimpleExpressionProxy> comparator =
         mPropagator.getListComparator();
       final List<SimpleExpressionProxy> list =
         new ArrayList<SimpleExpressionProxy>(inputs.length);
       for (final String input : inputs) {
-        final SimpleExpressionProxy expr = mParser.parse(input);
+        final SimpleExpressionProxy expr = parser.parse(input);
         list.add(expr);
       }
       Collections.sort(list, comparator);
@@ -1073,32 +1037,23 @@ public class ConstraintPropagatorTest extends TestCase
   @Override
   protected void setUp()
   {
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mContext = new DummyContext();
-    mParser = new ExpressionParser(factory, optable);
-    mPropagator = new ConstraintPropagator(factory, optable, mContext);
+    super.setUp();
+    final ModuleProxyFactory factory = getFactory();
+    final CompilerOperatorTable optable = getOperatorTable();
+    final VariableContext context = getContext();
+    mPropagator = new ConstraintPropagator(factory, optable, context);
   }
 
   @Override
   protected void tearDown()
   {
-    mContext = null;
-    mParser = null;
+    super.tearDown();
     mPropagator = null;
   }
 
 
   //#########################################################################
   //# Data Members
-  private DummyContext mContext;
-  private ExpressionParser mParser;
   private ConstraintPropagator mPropagator;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final CompiledIntRange BOOLEAN_RANGE =
-    new CompiledIntRange(0, 1);
 
 }

@@ -42,6 +42,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.DummyContext;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;

@@ -31,26 +31,23 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler.constraint;
+package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
-import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
-class DummyContext implements VariableContext
+public class DummyContext implements VariableContext
 {
 
   //#########################################################################
   //# Constructor
-  DummyContext()
+  public DummyContext()
   {
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mAtoms = new ProxyAccessorHashSet<>(eq);
@@ -97,15 +94,21 @@ class DummyContext implements VariableContext
 
   //#########################################################################
   //# Assignments
-  void addAtom(final IdentifierProxy ident)
+  public void addAtom(final IdentifierProxy ident)
   {
     mAtoms.addProxy(ident);
   }
 
-  void addVariable(final SimpleExpressionProxy varname,
-                   final CompiledRange range)
+  public void addVariable(final SimpleExpressionProxy varname,
+                          final CompiledRange range)
   {
     mRangeMap.putByProxy(varname, range);
+  }
+
+  public void reset()
+  {
+    mAtoms.clear();
+    mRangeMap.clear();
   }
 
 

@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
@@ -222,8 +223,14 @@ class ConditionToGuardActionBlockConverter
       throw wrap(exception);
     } else {
       check(lhs);
-      final SimpleExpressionProxy rhs = action.getRight();
-      check(rhs);
+      try {
+        assert mPrimeLockOut == null;
+        mPrimeLockOut = action;
+        final SimpleExpressionProxy rhs = action.getRight();
+        check(rhs);
+      } finally {
+        mPrimeLockOut = null;
+      }
     }
   }
 
@@ -325,11 +332,11 @@ class ConditionToGuardActionBlockConverter
     throws VisitorException
   {
     final boolean wasAtTopLevel = mAtTopLevel;
-    final IndexedIdentifierProxy oldIndexed = mIndexedIdentifier;
+    final SimpleExpressionProxy oldLockOut = mPrimeLockOut;
     try {
       mAtTopLevel = false;
-      if (mIndexedIdentifier == null) {
-        mIndexedIdentifier = ident;
+      if (mPrimeLockOut == null) {
+        mPrimeLockOut = ident;
       }
       final List<SimpleExpressionProxy> indexes = ident.getIndexes();
       for (final SimpleExpressionProxy index : indexes) {
@@ -338,7 +345,7 @@ class ConditionToGuardActionBlockConverter
       return visitIdentifierProxy(ident);
     } finally {
       mAtTopLevel = wasAtTopLevel;
-      mIndexedIdentifier = oldIndexed;
+      mPrimeLockOut = oldLockOut;
     }
   }
 
@@ -374,19 +381,31 @@ class ConditionToGuardActionBlockConverter
     throws VisitorException
   {
     final boolean wasAtTopLevel = mAtTopLevel;
-    final UnaryExpressionProxy oldPrimed = mPrimedExpression;
+    final SimpleExpressionProxy oldLockOut = mPrimeLockOut;
     try {
       if (expr.getOperator() == mOpTable.getNextOperator()) {
-        if (mPrimedExpression != null) {
-          final NestedNextException exception =
-            new NestedNextException(expr, mPrimedExpression);
-          throw wrap(exception);
-        } else if (mIndexedIdentifier != null) {
-          final NestedNextException exception =
-            new NestedNextException(expr, mIndexedIdentifier);
+        if (mPrimeLockOut != null) {
+          final NestedNextException exception;
+          if (mPrimeLockOut instanceof BinaryExpressionProxy) {
+            final BinaryExpressionProxy assignment =
+              (BinaryExpressionProxy) mPrimeLockOut;
+            exception = new NestedNextException(expr, assignment);
+          } else if (mPrimeLockOut instanceof IndexedIdentifierProxy) {
+            final IndexedIdentifierProxy ident =
+              (IndexedIdentifierProxy) mPrimeLockOut;
+            exception = new NestedNextException(expr, ident);
+          } else if (mPrimeLockOut instanceof UnaryExpressionProxy) {
+            final UnaryExpressionProxy primed =
+              (UnaryExpressionProxy) mPrimeLockOut;
+            exception = new NestedNextException(expr, primed);
+          } else {
+            throw new IllegalStateException
+              ("Unknown prime lock-out class " +
+               ProxyTools.getShortClassName(mPrimeLockOut) + "!");
+          }
           throw wrap(exception);
         } else {
-          mPrimedExpression = expr;
+          mPrimeLockOut = expr;
         }
       }
       mAtTopLevel = false;
@@ -395,7 +414,7 @@ class ConditionToGuardActionBlockConverter
       return visitSimpleExpressionProxy(expr);
     } finally {
       mAtTopLevel = wasAtTopLevel;
-      mPrimedExpression = oldPrimed;
+      mPrimeLockOut = oldLockOut;
     }
   }
 
@@ -410,7 +429,6 @@ class ConditionToGuardActionBlockConverter
 
   private boolean mAtTopLevel;
   private String mWhere;
-  private UnaryExpressionProxy mPrimedExpression;
-  private IndexedIdentifierProxy mIndexedIdentifier;
+  private SimpleExpressionProxy mPrimeLockOut;
 
 }
