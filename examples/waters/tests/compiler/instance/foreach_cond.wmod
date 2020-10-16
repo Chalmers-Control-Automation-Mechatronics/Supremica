@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="foreach_cond">
+<B:Comment>A compiler test that involves a conditional block nested inside a foreach block in the component list, where the condition is sometimes true and sometimes false.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
+<ConditionalComponent>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="A">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="80" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="80" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ConditionalComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

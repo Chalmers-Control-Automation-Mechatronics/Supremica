@@ -240,7 +240,7 @@ public class SimpleExpressionCompiler
 
   //#########################################################################
   //# Type Checking
-  public boolean isBooleanValue(final SimpleExpressionProxy expr)
+  public static boolean isBooleanValue(final SimpleExpressionProxy expr)
   {
     if (expr instanceof IntConstantProxy) {
       final IntConstantProxy intconst = (IntConstantProxy) expr;
@@ -251,7 +251,7 @@ public class SimpleExpressionCompiler
     }
   }
 
-  public boolean isBooleanFalse(final SimpleExpressionProxy expr)
+  public static boolean isBooleanFalse(final SimpleExpressionProxy expr)
   {
     if (expr instanceof IntConstantProxy) {
       final IntConstantProxy intconst = (IntConstantProxy) expr;
@@ -262,7 +262,7 @@ public class SimpleExpressionCompiler
     }
   }
 
-  public boolean isBooleanTrue(final SimpleExpressionProxy expr)
+  public static boolean isBooleanTrue(final SimpleExpressionProxy expr)
   {
     if (expr instanceof IntConstantProxy) {
       final IntConstantProxy intconst = (IntConstantProxy) expr;
@@ -273,7 +273,7 @@ public class SimpleExpressionCompiler
     }
   }
 
-  public int getIntValue(final SimpleExpressionProxy expr)
+  public static int getIntValue(final SimpleExpressionProxy expr)
     throws TypeMismatchException
   {
     if (expr instanceof IntConstantProxy) {
@@ -284,7 +284,7 @@ public class SimpleExpressionCompiler
     }
   }
 
-  public boolean getBooleanValue(final SimpleExpressionProxy expr)
+  public static boolean getBooleanValue(final SimpleExpressionProxy expr)
     throws TypeMismatchException
   {
     if (expr instanceof IntConstantProxy) {

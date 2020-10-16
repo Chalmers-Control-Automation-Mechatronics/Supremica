@@ -372,7 +372,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
         mSimplifier.invokeSimplificationVisitor(expr);
       if (mSimplifier.isAtomicValue(simplified)) {
         try {
-          mSimplifier.getIntValue(simplified);
+          SimpleExpressionCompiler.getIntValue(simplified);
         } catch (final TypeMismatchException exception) {
           throw wrap(exception);
         }

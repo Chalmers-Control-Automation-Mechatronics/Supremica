@@ -237,7 +237,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
           new SingleBindingContext(varName, rangeValue, mRootContext);
         final SimpleExpressionProxy boolValue =
           mSimpleExpressionCompiler.eval(initStatePredicate, context);
-        if (mSimpleExpressionCompiler.getBooleanValue(boolValue)) {
+        if (SimpleExpressionCompiler.getBooleanValue(boolValue)) {
           initialValues.add(variableCounter);
         }
         variableCounter++;

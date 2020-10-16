@@ -95,29 +95,52 @@ public class CompilationInfo
     return mResultMap != null;
   }
 
+  public void setSourceInfoEnabled(final boolean enabled)
+  {
+    if (enabled) {
+      if (mResultMap == null) {
+        mResultMap = new HashMap<>();
+      }
+    } else {
+      mResultMap = null;
+    }
+  }
+
   public boolean isMultiExceptionsEnabled()
   {
     return mExceptions != null;
   }
 
-  public void setSourceInfoEnabled(final boolean enabled)
-  {
-    if (enabled) {
-      if (mResultMap == null)
-        mResultMap = new HashMap<Object,SourceInfo>();
-    }
-    else
-      mResultMap = null;
-  }
-
   public void setMultiExceptionsEnabled(final boolean enabled)
   {
     if (enabled) {
-      if (mExceptions == null)
+      if (mExceptions == null) {
         mExceptions = new MultiEvalException();
-    }
-    else
+      }
+    } else {
       mExceptions = null;
+    }
+  }
+
+  /**
+   * Returns whether exceptions are currently suppressed.
+   * @see #setSuppressingExceptions(boolean) setSuppressingExceptions()
+   */
+  public boolean isSuppressingExceptions()
+  {
+    return mSuppressingExceptions;
+  }
+
+  /**
+   * Sets whether exceptions are currently suppressed.
+   * If this is <CODE>true</CODE>, calls to {@link #raise(EvalException)
+   * raise()} or {@link #raiseInVisitor(EvalException) raiseInVisitor()}
+   * will not record or throw any exception. Initially and by default,
+   * exceptions are enabled.
+   */
+  public void setSuppressingExceptions(final boolean suppressing)
+  {
+    mSuppressingExceptions = suppressing;
   }
 
 
@@ -276,30 +299,33 @@ public class CompilationInfo
   //#########################################################################
   //# Exception Handling
   /**
-   * Signals that a compilation error occurred.
-   * <p>
-   * The exception's location is adjusted if source information is enabled.
-   * <p>
-   * If multiple exceptions are enabled, and the exception is not an abort
+   * <P>Signals that a compilation error occurred.<.P>
+   * <P>The exception's location is adjusted if source information is
+   * enabled.</P>
+   * <P>If multiple exceptions are enabled, and the exception is not an abort
    * exception, then the exception is logged and the method returns normally.
-   * Otherwise, the exception is thrown.
-   * <p>
-   * Calling this method with the <CODE>MultiEvalException</CODE> of this
-   * instance is permitted and has no effect.
+   * Otherwise, the exception is thrown.</P>
+   * <P>Calling this method with the <CODE>MultiEvalException</CODE> of this
+   * instance is permitted and has no effect.</P>
+   * <P>Calling this method while exceptions are suppressed (see {@link
+   * #setSuppressingExceptions(boolean) setSuppressingExceptions()} has no
+   * effect.</P>
    *
    * @param exception The compilation exception.
    * @throws EvalException if multiple exception are disabled.
    */
   public void raise(final EvalException exception) throws EvalException
   {
-    if (isSourceInfoEnabled()) {
-      adjustLocation(exception);
-    }
-    final boolean abort = exception instanceof EvalAbortException;
-    if (isMultiExceptionsEnabled() && !abort) {
-      mExceptions.add(exception);
-    } else {
-      throw exception;
+    if (!mSuppressingExceptions) {
+      if (isSourceInfoEnabled()) {
+        adjustLocation(exception);
+      }
+      final boolean abort = exception instanceof EvalAbortException;
+      if (isMultiExceptionsEnabled() && !abort) {
+        mExceptions.add(exception);
+      } else {
+        throw exception;
+      }
     }
   }
 
@@ -421,5 +447,11 @@ public class CompilationInfo
    * @see #pushParentSourceInfo(InstanceProxy,BindingContext) pushParentSourceInfo()
    */
   private SourceInfo mParentSourceInfo;
+
+  /**
+   * Whether exceptions are currently suppressed.
+   * @see #setSuppressingExceptions(boolean) setSuppressingExceptions()
+   */
+  private boolean mSuppressingExceptions;
 
 }

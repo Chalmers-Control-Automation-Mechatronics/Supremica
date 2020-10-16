@@ -176,22 +176,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_selfloop1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "graph", "selfloop1");
-    testCompile(module);
-  }
-
-  public void testCompile_selfloop2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "graph", "selfloop2");
-    testCompile(module);
-  }
-
   public void testCompile_empty_intrange() throws IOException,
     WatersException
   {
@@ -212,6 +196,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_foreach_cond() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "foreach_cond");
+    testCompile(module);
+  }
+
   public void testCompile_instantiate_duplicate_identifiers()
     throws IOException, WatersException
   {
@@ -219,7 +210,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                                           "instantiate_duplicate_identifiers");
     testCompile(module);
   }
-
 
   public void testCompile_instantiate_order()
     throws IOException, WatersException
@@ -249,7 +239,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       loadModule("tests", "compiler", "graph", "markus2");
     testCompile(module);
   }
-
 
   public void testCompile_notDiag2()
     throws IOException, WatersException
@@ -291,6 +280,22 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("handwritten", "small_factory_n");
+    testCompile(module);
+  }
+
+  public void testCompile_selfloop1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "graph", "selfloop1");
+    testCompile(module);
+  }
+
+  public void testCompile_selfloop2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "graph", "selfloop2");
     testCompile(module);
   }
 
@@ -343,6 +348,22 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     final ParameterBindingProxy binding = createBinding("N", 2);
     bindings.add(binding);
     testCompile(module, bindings, true);
+  }
+
+  public void testCompile_undef_event_guarded_1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "undef_event_guarded_1");
+    testCompile(module);
+  }
+
+  public void testCompile_undef_event_guarded_2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "undef_event_guarded_2");
+    testCompile(module);
   }
 
   public void testCompile_unused_event()
@@ -569,17 +590,19 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_DosingTankWithJelly1()
+  public void testCompile_DosingTankWithJellyEFA1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "DosingTankWithJellyEFA1");
+    final ModuleProxy module =
+      loadModule("handwritten", "DosingTankWithJellyEFA1");
     testCompile(module);
   }
 
-  public void testCompile_DosingTankWithJelly2()
+  public void testCompile_DosingTankWithJellyEFA2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "DosingTankWithJellyEFA2");
+    final ModuleProxy module =
+      loadModule("handwritten", "DosingTankWithJellyEFA2");
     testCompile(module);
   }
 

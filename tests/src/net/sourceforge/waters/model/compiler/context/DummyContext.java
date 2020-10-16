@@ -61,7 +61,11 @@ public class DummyContext implements VariableContext
   public SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
-    return null;
+    if (mRangeMap.containsProxyKey(ident)) {
+      return ident;
+    } else {
+      return null;
+    }
   }
 
   @Override

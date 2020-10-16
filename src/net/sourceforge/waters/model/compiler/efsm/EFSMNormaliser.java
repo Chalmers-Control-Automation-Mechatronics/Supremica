@@ -1523,8 +1523,11 @@ public class EFSMNormaliser extends AbortableCompiler
               final List<SimpleExpressionProxy> guards = gaBlock.getGuards();
               if (guards != null && !guards.isEmpty()) {
                 final SimpleExpressionProxy guard = guards.get(0);
-                if (occursChecker.occurs(varNamePrimed, guard)) {
-                  final Proxy location = mCompilationInfo.getErrorLocation(guard);
+                final SimpleExpressionProxy occurrence =
+                  occursChecker.find(varNamePrimed, guard);
+                if (occurrence != null) {
+                  final Proxy location =
+                    mCompilationInfo.getErrorLocation(occurrence);
                   final EFSMControllabilityException exception =
                     new EFSMControllabilityException(mComponent, var, eventIdent, location);
                   mCompilationInfo.raise(exception);

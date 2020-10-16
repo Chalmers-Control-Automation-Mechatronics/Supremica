@@ -1,36 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="EFA0" xmlns="http://waters.sourceforge.net/xsd/module">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="EFA0">
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="e1"/>
 <EventDecl Kind="CONTROLLABLE" Name="e2"/>
 </EventDeclList>
 <ComponentList>
-<SimpleComponent Kind="PLANT">
-<SimpleIdentifier Name="A"/>
-<Graph Deterministic="true">
+<SimpleComponent Kind="PLANT" Name="A">
+<Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <PointGeometry>
-<Point X="112" Y="240"/>
+<Point X="112" Y="208"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="5" Y="20"/>
+<Point X="-7" Y="12"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="s1">
 <PointGeometry>
-<Point X="208" Y="128"/>
+<Point X="208" Y="112"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="5" Y="20"/>
+<Point X="-5" Y="9"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="s2">
 <PointGeometry>
-<Point X="288" Y="320"/>
+<Point X="208" Y="304"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="5" Y="20"/>
+<Point X="-5" Y="11"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -39,28 +38,38 @@
 <LabelBlock>
 <SimpleIdentifier Name="e1"/>
 <LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
+<Point X="6" Y="8"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry Kind="INTERPOLATING">
-<Point X="160" Y="184"/>
+<SplineGeometry>
+<Point X="160" Y="160"/>
 </SplineGeometry>
 <GuardActionBlock>
-<Guards><IntConstant Value="1"/></Guards>
+<Guards>
+<IntConstant Value="1"/>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="9"/>
+</LabelGeometry>
 </GuardActionBlock>
 </Edge>
 <Edge Source="s0" Target="s2">
 <LabelBlock>
 <SimpleIdentifier Name="e2"/>
 <LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
+<Point X="6" Y="-23"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry Kind="INTERPOLATING">
-<Point X="200" Y="280"/>
+<SplineGeometry>
+<Point X="160" Y="256"/>
 </SplineGeometry>
 <GuardActionBlock>
-<Guards><IntConstant Value="0"/></Guards>
+<Guards>
+<IntConstant Value="0"/>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-22"/>
+</LabelGeometry>
 </GuardActionBlock>
 </Edge>
 </EdgeList>

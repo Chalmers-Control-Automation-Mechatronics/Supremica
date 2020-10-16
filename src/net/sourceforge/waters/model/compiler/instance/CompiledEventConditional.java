@@ -33,14 +33,19 @@
 
 package net.sourceforge.waters.model.compiler.instance;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConditionalProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -56,11 +61,37 @@ class CompiledEventConditional implements CompiledEvent
 
   //#########################################################################
   //# Constructor
-  CompiledEventConditional(final SimpleExpressionProxy condition,
+  CompiledEventConditional(final SimpleExpressionProxy cond,
                            final CompiledEventList body)
   {
-    mCondition = condition;
+    this(Collections.singletonList(cond), Collections.emptyList(), body);
+  }
+
+  CompiledEventConditional(final List<SimpleExpressionProxy> guards,
+                           final List<BinaryExpressionProxy> actions,
+                           final CompiledEventList body)
+  {
+    mGuards = guards;
+    mActions = actions;
     mBody = body;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  List<SimpleExpressionProxy> getGuards()
+  {
+    return mGuards;
+  }
+
+  List<BinaryExpressionProxy> getActions()
+  {
+    return mActions;
+  }
+
+  CompiledEventList getBody()
+  {
+    return mBody;
   }
 
 
@@ -116,21 +147,74 @@ class CompiledEventConditional implements CompiledEvent
 
 
   //#########################################################################
-  //# Simple Access
-  public SimpleExpressionProxy getCondition()
+  //# Compilation
+  boolean isBooleanTrue()
   {
-    return mCondition;
+    return mGuards.isEmpty() && mActions.isEmpty();
   }
 
-  public CompiledEventList getBody()
+  boolean isBooleanFalse()
   {
-    return mBody;
+    if (mGuards.isEmpty()) {
+      return false;
+    } else {
+      final SimpleExpressionProxy guard = mGuards.get(0);
+      return SimpleExpressionCompiler.isBooleanFalse(guard);
+    }
+  }
+
+  void push(final List<SimpleExpressionProxy> guards,
+            final List<BinaryExpressionProxy> actions)
+  {
+    guards.addAll(mGuards);
+    actions.addAll(mActions);
+  }
+
+  void pop(final List<SimpleExpressionProxy> guards,
+           final List<BinaryExpressionProxy> actions)
+  {
+    pop(guards, mGuards.size());
+    pop(actions, mActions.size());
+  }
+
+  List<SimpleExpressionProxy> getClonedGuardsAndActions
+    (final ModuleProxyCloner cloner)
+  {
+    final int size = mGuards.size() + mActions.size();
+    final List<SimpleExpressionProxy> result = new ArrayList<>(size);
+    for (final SimpleExpressionProxy guard : mGuards) {
+      final SimpleExpressionProxy clone =
+        (SimpleExpressionProxy) cloner.getClone(guard);
+      result.add(clone);
+    }
+    for (final BinaryExpressionProxy action : mActions) {
+      final SimpleExpressionProxy clone =
+        (SimpleExpressionProxy) cloner.getClone(action);
+      result.add(clone);
+    }
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static void pop(final List<? extends SimpleExpressionProxy> stack,
+                          final int count)
+  {
+    final int end = stack.size();
+    final ListIterator<? extends SimpleExpressionProxy> iter =
+      stack.listIterator(end);
+    for (int i = 0; i < count; i++) {
+      iter.previous();
+      iter.remove();
+    }
   }
 
 
   //#########################################################################
   //# Data Members
-  private final SimpleExpressionProxy mCondition;
+  private final List<SimpleExpressionProxy> mGuards;
+  private final List<BinaryExpressionProxy> mActions;
   private final CompiledEventList mBody;
 
 }

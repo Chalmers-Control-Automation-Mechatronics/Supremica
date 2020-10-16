@@ -33,31 +33,60 @@
 
 package net.sourceforge.waters.model.compiler.context;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
-public class PrimePreservingConditionCompilerTest
+public class GuardActionCompilerTest
   extends AbstractExpressionCompilerTest
 {
 
   //#########################################################################
   //# Test Cases
+  public void testSimplify_error_assign()
+    throws EvalException, ParseException
+  {
+    try {
+      final String input = "(a = 0) | (b = a)";
+      testSimplify(input, input);
+      fail("Expected ActionSyntaxException not caught!");
+    } catch (final ActionSyntaxException exception) {
+      // OK
+    }
+  }
+
+
   public void testSimplify_keep_alone()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
     final String input = "a' == a'";
+    final String[] guards = {input};
+    testGuardActionBlock(guards, null, input);
+  }
+
+  public void testSimplify_keep_assign()
+    throws EvalException, ParseException
+  {
+    final String input = "order.x += 1";
     testSimplify(input, input);
   }
 
   public void testSimplify_keep_left()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
     final String input = "a' == a' & b > 0";
     testSimplify(input, input);
   }
@@ -65,6 +94,8 @@ public class PrimePreservingConditionCompilerTest
   public void testSimplify_keep_nested_or()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
+    addBooleanVariable("b");
     final String input = "a' == a' | b' == b'";
     final String expected = "a' == a' & b' == b'";
     testSimplify(input, expected);
@@ -73,6 +104,8 @@ public class PrimePreservingConditionCompilerTest
   public void testSimplify_keep_right()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
+    addBooleanVariable("b");
     final String input = "b > 0 & a' == a'";
     testSimplify(input, input);
   }
@@ -86,9 +119,16 @@ public class PrimePreservingConditionCompilerTest
   }
 
 
+  public void testSimplify_null()
+    throws EvalException, ParseException
+  {
+    testSimplify(null, null);
+  }
+
   public void testSimplify_redundant_assign()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
     final String input = "(a = 0) & a' == a'";
     final String expected = "a = 0";
     testSimplify(input, expected);
@@ -97,6 +137,7 @@ public class PrimePreservingConditionCompilerTest
   public void testSimplify_redundant_dup()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
     final String input = "a' == a' & a' == a'";
     final String expected = "a' == a'";
     testSimplify(input, expected);
@@ -105,6 +146,8 @@ public class PrimePreservingConditionCompilerTest
   public void testSimplify_redundant_dup_assign()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
+    addBooleanVariable("b");
     final String input = "a' == a' & (b += a) & a' == a' & b' == b'";
     final String expected = "a' == a' & (b += a)";
     testSimplify(input, expected);
@@ -113,6 +156,7 @@ public class PrimePreservingConditionCompilerTest
   public void testSimplify_redundant_eq()
     throws EvalException, ParseException
   {
+    addBooleanVariable("a");
     final String input = "a' == 0 & a' == a'";
     final String expected = "a' == 0";
     testSimplify(input, expected);
@@ -123,6 +167,7 @@ public class PrimePreservingConditionCompilerTest
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(0, 10);
+    addVariable("x", range);
     addVariable("x'", range);
     final String input = "x' >= 0";
     final String expected = "x' == x'";
@@ -137,6 +182,14 @@ public class PrimePreservingConditionCompilerTest
     testSimplify(input, expected);
   }
 
+  public void testSimplify_rewrite_true()
+    throws EvalException, ParseException
+  {
+    final String input = "1 < 2";
+    final String expected = null;
+    testSimplify(input, expected);
+  }
+
 
   public void testSimplify_simplify_ga()
     throws EvalException, ParseException
@@ -147,17 +200,10 @@ public class PrimePreservingConditionCompilerTest
   }
 
 
-  public void testSimplify_unchanged_assign1()
+  public void testSimplify_unchanged_assign()
     throws EvalException, ParseException
   {
     final String input = "a = 0";
-    testSimplify(input, input);
-  }
-
-  public void testSimplify_unchanged_assign2()
-    throws EvalException, ParseException
-  {
-    final String input = "(a = 0) | (b = a)";
     testSimplify(input, input);
   }
 
@@ -172,7 +218,7 @@ public class PrimePreservingConditionCompilerTest
   public void testSimplify_var_boolean()
     throws EvalException, ParseException
   {
-    addBooleanVariable("a'");
+    addBooleanVariable("a");
     final String input = "a";
     testSimplify(input, input);
   }
@@ -226,19 +272,70 @@ public class PrimePreservingConditionCompilerTest
 
   //#########################################################################
   //# Utilities
+  private void testGuardActionBlock(final String[] guardInput,
+                                    final String[] actionInput,
+                                    final String expected)
+    throws EvalException, ParseException
+  {
+    final ExpressionParser parser = getExpressionParser();
+    final List<SimpleExpressionProxy> guards = new LinkedList<>();
+    if (guardInput != null) {
+      for (final String input : guardInput) {
+        final SimpleExpressionProxy expr = parser.parse(input);
+        guards.add(expr);
+      }
+    }
+    final List<BinaryExpressionProxy> actions = new LinkedList<>();
+    if (actionInput != null) {
+      for (final String input : actionInput) {
+        final SimpleExpressionProxy expr = parser.parse(input);
+        assertTrue("Bad type of action!", expr instanceof BinaryExpressionProxy);
+        final BinaryExpressionProxy binary = (BinaryExpressionProxy) expr;
+        actions.add(binary);
+      }
+    }
+    final ModuleProxyFactory factory = getFactory();
+    final GuardActionBlockProxy ga =
+      factory.createGuardActionBlockProxy(guards, actions, null);
+    final VariableContext context = getContext();
+    guards.clear();
+    actions.clear();
+    final GuardActionCompiler.Result result =
+      mCompiler.separateGuardActionBlock(ga, context);
+    checkResult(result, expected);
+  }
+
   private void testSimplify(final String input, final String expected)
     throws EvalException, ParseException
   {
     final ExpressionParser parser = getExpressionParser();
-    final SimpleExpressionProxy inExpr = parser.parse(input);
-    final SimpleExpressionProxy expectedExpr = parser.parse(expected);
-    final BindingContext context = getContext();
-    final SimpleExpressionProxy result = mCompiler.simplify(inExpr, context);
-    if (!mEquality.equals(result, expectedExpr)) {
-      final String msg =
-        "Wrong output from prime preserving condition compiler! " +
-        "Expected: " + expected + ", but was: " + result;
-      fail(msg);
+    final SimpleExpressionProxy inExpr =
+      input == null ? null : parser.parse(input);
+    final VariableContext context = getContext();
+    final GuardActionCompiler.Result result =
+      mCompiler.separateCondition(inExpr, context, true);
+    checkResult(result, expected);
+  }
+
+  private void checkResult(final GuardActionCompiler.Result result,
+                           final String expected)
+    throws ParseException
+  {
+    final List<SimpleExpressionProxy> guards = result.getGuards();
+    final List<BinaryExpressionProxy> actions = result.getActions();
+    final SimpleExpressionProxy combined =
+      mCompiler.createCondition(guards, actions);
+    final ExpressionParser parser = getExpressionParser();
+    final SimpleExpressionProxy expectedExpr =
+      expected == null ? null : parser.parse(expected);
+    if (!mEquality.equals(combined, expectedExpr)) {
+      final StringBuilder builder = new StringBuilder
+        ("Wrong output from guard/action compiler!");
+      builder.append("Expected: ");
+      builder.append(expected == null ? "null" : expected.toString());
+      builder.append(", but was: ");
+      builder.append(combined == null ? "null" : combined.toString());
+      fail(builder.toString());
     }
   }
 
@@ -252,8 +349,7 @@ public class PrimePreservingConditionCompilerTest
     final ModuleProxyFactory factory = getFactory();
     final CompilerOperatorTable optable = getOperatorTable();
     final CompilationInfo info = new CompilationInfo(false, false);
-    mCompiler =
-      new PrimePreservingConditionCompiler(factory, optable, info, false);
+    mCompiler = new GuardActionCompiler(factory, optable, info);
     mEquality = new ModuleEqualityVisitor(false);
   }
 
@@ -268,7 +364,7 @@ public class PrimePreservingConditionCompilerTest
 
   //#########################################################################
   //# Data Members
-  private PrimePreservingConditionCompiler mCompiler;
+  private GuardActionCompiler mCompiler;
   private ModuleEqualityVisitor mEquality;
 
 }

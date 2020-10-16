@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.GuardActionCompiler;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
@@ -76,7 +77,6 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
@@ -92,7 +92,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -114,7 +113,6 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -166,7 +164,7 @@ import org.xml.sax.SAXException;
  *   getInstance}();</CODE><BR>
  * <CODE>&nbsp;&nbsp;{@link ProxyUnmarshaller}&lt;{@link ModuleProxy}&gt; unmarshaller =
  *   new {@link SAXModuleMarshaller#SAXModuleMarshaller(ModuleProxyFactory,OperatorTable)
- *   JAXBModuleMarshaller}(factory, optable);</CODE><BR>
+ *   SAXModuleMarshaller}(factory, optable);</CODE><BR>
  * <CODE>&nbsp;&nbsp;{@link DocumentManager} manager =
  *   new {@link DocumentManager#DocumentManager() DocumentManager}();</CODE><BR>
  * <CODE>&nbsp;&nbsp;manager.{@link DocumentManager#registerUnmarshaller(ProxyUnmarshaller)
@@ -182,7 +180,7 @@ import org.xml.sax.SAXException;
  *   <CODE>instantiatedModule</CODE> ...<BR>
  * <CODE>} catch ({@link EvalException} exception) {</CODE><BR>
  * <CODE>&nbsp;&nbsp;// </CODE>module has errors ...<BR>
- * <CODE>} catch ({@link JAXBException} | {@link SAXException} exception) {</CODE><BR>
+ * <CODE>} catch ( {@link SAXException} | {@link ParserConfigurationException}) {</CODE><BR>
  * <CODE>&nbsp;&nbsp;// </CODE>error setting up XML parsers - should not happen ...<BR>
  * <CODE>}</CODE></P>
  *
@@ -232,13 +230,14 @@ public class ModuleInstanceCompiler
     super(compilationInfo);
     mDocumentManager = manager;
     mFactory = factory;
-    mCloner = new SourceInfoCloner(factory, compilationInfo);
+    mCloner = new SourceInfoCloner(factory, compilationInfo, false);
     mOperatorTable = CompilerOperatorTable.getInstance();
     mEquality = new ModuleEqualityVisitor(false);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, compilationInfo,
                                    mOperatorTable);
-    mPrimeSearcher = new PrimeSearcher();
+    mGuardActionCompiler =
+      new GuardActionCompiler(mFactory, mOperatorTable, compilationInfo);
     mNameCompiler = new NameCompiler();
     mIndexAdder = new IndexAdder();
     mNameSpaceVariablesContext = new NameSpaceVariablesContext();
@@ -404,32 +403,51 @@ public class ModuleInstanceCompiler
   public Object visitConditionalProxy(final ConditionalProxy cond)
     throws VisitorException
   {
+    final CompilationInfo info = getCompilationInfo();
     final CompiledEventList oldEventList = mCurrentEventList;
+    final boolean wasWithinFalseCondition = info.isSuppressingExceptions();
     try {
       final SimpleExpressionProxy guard = cond.getGuard();
-      final SimpleExpressionProxy compiledGuard =
-        mSimpleExpressionCompiler.simplify(guard, mContext);
-      if (mSimpleExpressionCompiler.isAtomicValue(compiledGuard, mContext)) {
-        final boolean boolValue =
-          mSimpleExpressionCompiler.getBooleanValue(compiledGuard);
-        if (boolValue) {
-          final List<Proxy> body = cond.getBody();
+      final List<Proxy> body = cond.getBody();
+      if (mCurrentEdge == null) {
+        boolean value;
+        try {
+          final SimpleExpressionProxy evaluated =
+            mSimpleExpressionCompiler.eval(guard, mNameSpaceVariablesContext);
+          value = SimpleExpressionCompiler.getBooleanValue(evaluated);
+        } catch (final EvalException exception) {
+          exception.provideLocation(cond);
+          throw wrap(exception);
+        }
+        if (value) {
           visitCollection(body);
         }
       } else {
-        final int mask = mCurrentEventList.getAllowedKindMask();
-        mCurrentEventList = new CompiledEventList(mask);
-        final List<Proxy> body = cond.getBody();
-        visitCollection(body);
-        final CompiledEventConditional conditional =
-          new CompiledEventConditional(compiledGuard, mCurrentEventList);
-        oldEventList.addEvent(conditional);
+        final GuardActionCompiler.Result result =
+          mGuardActionCompiler.separateCondition
+            (guard, mNameSpaceVariablesContext, mGeneratingConditionals);
+        if (result.isBooleanTrue()) {
+          visitCollection(body);
+        } else {
+          if (result.isBooleanFalse()) {
+            info.setSuppressingExceptions(true);
+          }
+          final int mask = mCurrentEventList.getAllowedKindMask();
+          mCurrentEventList = new CompiledEventList(mask);
+          visitCollection(body);
+          final List<SimpleExpressionProxy> guards = result.getGuards();
+          final List<BinaryExpressionProxy> actions = result.getActions();
+          final CompiledEventConditional event =
+            new CompiledEventConditional(guards, actions, mCurrentEventList);
+          oldEventList.addEvent(event);
+        }
       }
       return null;
     } catch (final EvalException exception) {
       throw wrap(exception);
     } finally {
       mCurrentEventList = oldEventList;
+      info.setSuppressingExceptions(wasWithinFalseCondition);
     }
   }
 
@@ -465,49 +483,44 @@ public class ModuleInstanceCompiler
   public Object visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
   {
+    final CompilationInfo info = getCompilationInfo();
     try {
       mCurrentEdge = edge;
-      final LabelBlockProxy labels0 = edge.getLabelBlock();
-      final CompiledEventList events = visitLabelBlockProxy
-        (labels0, EventKindMask.TYPEMASK_EVENT);
-      final GuardActionBlockProxy ga0 = edge.getGuardActionBlock();
-      GuardActionBlockProxy ga1 = null;
-      if (ga0 != null) {
-        ga1 = visitGuardActionBlockProxy(ga0);
-        final List<SimpleExpressionProxy> guards = ga1.getGuards();
-        final List<BinaryExpressionProxy> actions = ga1.getActions();
-        if (guards.isEmpty()) {
-          if (actions.isEmpty()) {
-            ga1 = null;
-          }
-        } else {
-          final Iterator<SimpleExpressionProxy> iter = guards.iterator();
-          final SimpleExpressionProxy guard = iter.next();
-          if (!iter.hasNext() &&
-              mSimpleExpressionCompiler.isAtomicValue(guard, mContext)) {
-            final boolean value =
-              mSimpleExpressionCompiler.getBooleanValue(guard);
-            if (!value) {
-              addAdditionalBlockedEvents(events);
-              return null;
-            } else if (actions.isEmpty()) {
-              ga1 = null;
-            }
-          }
+      final LabelBlockProxy labels = edge.getLabelBlock();
+      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+      final CompiledEventList list;
+      final CompiledEvent compiledBody;
+      if (ga == null) {
+        compiledBody = list =
+          visitLabelBlockProxy(labels, EventKindMask.TYPEMASK_EVENT);
+      } else {
+        final GuardActionCompiler.Result result =
+          mGuardActionCompiler.separateGuardActionBlock
+          (ga, mNameSpaceVariablesContext);
+        if (result.isBooleanFalse()) {
+          info.setSuppressingExceptions(true);
         }
-        mHasEFAElements |= ga1 != null;
+        list = visitLabelBlockProxy(labels, EventKindMask.TYPEMASK_EVENT);
+        if (result.isBooleanTrue()) {
+          compiledBody = list;
+        } else {
+          final List<SimpleExpressionProxy> guards = result.getGuards();
+          final List<BinaryExpressionProxy> actions = result.getActions();
+          compiledBody = new CompiledEventConditional(guards, actions, list);
+        }
       }
-      mHasEFAElements |= events.hasConditional();
-      final ConditionToGuardActionBlockConverter converter =
-        new ConditionToGuardActionBlockConverter(mFactory, mOperatorTable,
-                                                 getCompilationInfo());
-      converter.addGuardActionBlock(ga1);
-      createConditionalEdges(edge, converter, events);
+      final int size = list.size();
+      final List<SimpleExpressionProxy> guards = new LinkedList<>();
+      final List<BinaryExpressionProxy> actions = new LinkedList<>();
+      final EventOutput eventOuput = new EventOutput(size);
+      createConditionalEdges(compiledBody, guards, actions, eventOuput);
+      createOutputEdge(guards, actions, eventOuput);
       return null;
     } catch (final EvalException exception) {
       throw wrap(exception);
     } finally {
       mCurrentEdge = null;
+      info.setSuppressingExceptions(false);
     }
   }
 
@@ -657,8 +670,13 @@ public class ModuleInstanceCompiler
     try {
       final boolean deterministic = graph.isDeterministic();
       final LabelBlockProxy blocked0 = graph.getBlockedEvents();
-      if (blocked0 != null) {
-        mCurrentBlockedEvents = visitLabelBlockProxy(blocked0);
+      if (blocked0 == null) {
+        mCurrentBlockedEvents = new EventOutput();
+      } else {
+        final CompiledEventList list = visitLabelBlockProxy(blocked0);
+        final int size = list.size();
+        mCurrentBlockedEvents = new EventOutput(size);
+        createConditionalEdges(list, null, null, mCurrentBlockedEvents);
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
       final int numnodes = nodes.size();
@@ -671,9 +689,8 @@ public class ModuleInstanceCompiler
       final int numedges = edges.size();
       mCurrentEdges = new ArrayList<>(numedges);
       visitCollection(edges);
-      final LabelBlockProxy blocked1 =
-        mCurrentBlockedEvents == null ? null :
-        createLabelBlock(mCurrentBlockedEvents);
+      final LabelBlockProxy blocked1 = mCurrentBlockedEvents.isEmpty() ?
+        null : mCurrentBlockedEvents.createLabelBlock();
       final GraphProxy compiled = mFactory.createGraphProxy
         (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
       linkCompilationInfo(compiled, graph);
@@ -714,90 +731,6 @@ public class ModuleInstanceCompiler
     mCurrentNodes.add(compiled);
     linkCompilationInfo(compiled, group);
     return compiled;
-  }
-
-  @Override
-  public GuardActionBlockProxy visitGuardActionBlockProxy
-    (final GuardActionBlockProxy ga)
-    throws VisitorException
-  {
-    try {
-      final List<SimpleExpressionProxy> oldGuards = ga.getGuards();
-      final int numGuards = oldGuards.size();
-      final List<SimpleExpressionProxy> newGuards = new ArrayList<>(numGuards);
-      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-      final ProxyAccessorSet<IdentifierProxy> oldPrimed =
-        new ProxyAccessorHashSet<>(eq);
-      final ProxyAccessorSet<IdentifierProxy> newPrimed =
-        new ProxyAccessorHashSet<>(eq);
-      for (final SimpleExpressionProxy oldGuard : oldGuards) {
-        checkAbort();
-        mPrimeSearcher.collect(oldGuard, oldPrimed);
-        final SimpleExpressionProxy newGuard =
-          mSimpleExpressionCompiler.simplify(oldGuard,
-                                             mNameSpaceVariablesContext);
-        mPrimeSearcher.collect(newGuard, newPrimed);
-        if (!mSimpleExpressionCompiler.isAtomicValue(newGuard, mContext)) {
-          newGuards.add(newGuard);
-          linkCompilationInfo(newGuard, oldGuard);
-        } else if (mSimpleExpressionCompiler.getBooleanValue(newGuard)) {
-          // True guards are not added.
-        } else {
-          // If a guard is false, no need for any other guards.
-          newGuards.clear();
-          newGuards.add(newGuard);
-          linkCompilationInfo(newGuard, oldGuard);
-          newPrimed.clear();
-          oldPrimed.clear();
-          break;
-        }
-      }
-      if (newPrimed.size() < oldPrimed.size()) {
-        // If we have lost primed variables, add them back in ...
-        final List<IdentifierProxy> lost =
-          new ArrayList<>(oldPrimed.size() - newPrimed.size());
-        for (final IdentifierProxy ident : oldPrimed) {
-          if (!newPrimed.containsProxy(ident)) {
-            lost.add(ident);
-          }
-        }
-        Collections.sort(lost);
-        for (final IdentifierProxy ident : lost) {
-          final IdentifierProxy clone = ident.clone();
-          final UnaryExpressionProxy lhs = mFactory.createUnaryExpressionProxy
-            (mOperatorTable.getNextOperator(), clone);
-          final SimpleExpressionProxy rhs = lhs.clone();
-          final BinaryExpressionProxy eqn = mFactory.createBinaryExpressionProxy
-            (mOperatorTable.getEqualsOperator(), lhs, rhs);
-          newGuards.add(eqn);
-        }
-      }
-
-      final List<BinaryExpressionProxy> oldActions = ga.getActions();
-      final int numActions = oldActions.size();
-      final List<BinaryExpressionProxy> newActions = new ArrayList<>(numActions);
-      for (final BinaryExpressionProxy oldAction : oldActions) {
-        checkAbort();
-        final SimpleExpressionProxy newAction =
-          mSimpleExpressionCompiler.simplify(oldAction,
-                                             mNameSpaceVariablesContext);
-        if (newAction instanceof BinaryExpressionProxy) {
-          final BinaryExpressionProxy newBinary =
-            (BinaryExpressionProxy) newAction;
-          newActions.add(newBinary);
-          linkCompilationInfo(newBinary, oldAction);
-        } else {
-          throw new TypeMismatchException(oldAction, "ACTION");
-        }
-      }
-
-      final GuardActionBlockProxy newGA =
-        mFactory.createGuardActionBlockProxy(newGuards, newActions, null);
-      linkCompilationInfo(newGA, ga);
-      return newGA;
-    } catch (final EvalException exception) {
-      throw wrap(exception);
-    }
   }
 
   @Override
@@ -1203,57 +1136,81 @@ public class ModuleInstanceCompiler
     }
   }
 
-  private void createConditionalEdges(final EdgeProxy edge0,
-                                      final ConditionToGuardActionBlockConverter converter,
-                                      final CompiledEventList list0)
-    throws VisitorException
+  private void createConditionalEdges(final CompiledEvent input,
+                                      final List<SimpleExpressionProxy> guards,
+                                      final List<BinaryExpressionProxy> actions,
+                                      final EventOutput output)
   {
-    CompiledEventList list1;
-    if (list0.hasConditional()) {
-      list1 = new CompiledEventList();
-      final Iterator<CompiledEvent> iter = list0.getChildrenIterator();
+    if (input instanceof CompiledEventConditional) {
+      final CompiledEventConditional condEvent =
+        (CompiledEventConditional) input;
+      final CompiledEventList body = condEvent.getBody();
+      if (condEvent.isBooleanFalse() || output == mCurrentBlockedEvents) {
+        createConditionalEdges(body, guards, actions, mCurrentBlockedEvents);
+      } else if (mGeneratingConditionals) {
+        final List<SimpleExpressionProxy> condList =
+          condEvent.getClonedGuardsAndActions(mCloner);
+        final SimpleExpressionProxy condGuard =
+          mGuardActionCompiler.createSingleGuard(condList);
+        final EventOutput condOutput = new EventOutput(body.size());
+        createConditionalEdges(body, guards, actions, condOutput);
+        final List<Proxy> list = condOutput.getList();
+        final ConditionalProxy cond =
+          mFactory.createConditionalProxy(list, condGuard);
+        output.add(cond);
+      } else {
+        condEvent.push(guards, actions);
+        final EventOutput condOutput = new EventOutput(body.size());
+        createConditionalEdges(body, guards, actions, condOutput);
+        createOutputEdge(guards, actions, condOutput);
+        condEvent.pop(guards, actions);
+      }
+    } else if (input instanceof CompiledEventList) {
+      final CompiledEventList list = (CompiledEventList) input;
+      final Iterator<CompiledEvent> iter = list.getChildrenIterator();
       while (iter.hasNext()) {
         final CompiledEvent child = iter.next();
-        if (child instanceof CompiledEventConditional) {
-          final CompiledEventConditional conditional =
-            (CompiledEventConditional) child;
-          final SimpleExpressionProxy guard = conditional.getCondition();
-          final ConditionToGuardActionBlockConverter converter1 =
-            new ConditionToGuardActionBlockConverter(converter);
-          converter1.addCondition(guard);
-          final CompiledEventList body = conditional.getBody();
-          createConditionalEdges(edge0, converter1, body);
-        } else {
-          try {
-            list1.addEvent(child);
-          } catch (final EventKindException exception) {
-            // list0 has been compiled already---can't happen anymore
-            throw exception.getRuntimeException();
-          }
-        }
+        createConditionalEdges(child, guards, actions, output);
       }
     } else {
-      list1 = list0;
-    }
-    if (!list1.isEmpty()) {
-      final NodeProxy source0 = edge0.getSource();
-      final NodeProxy source1 = mNodeMap.get(source0);
-      final NodeProxy target0 = edge0.getTarget();
-      final NodeProxy target1 = mNodeMap.get(target0);
-      final LabelBlockProxy block1 = createLabelBlock(list1);
-      final GuardActionBlockProxy ga = converter.createGuardActionBlock();
-      final EdgeProxy edge1 = mFactory.createEdgeProxy
-        (source1, target1, block1, ga, null, null, null);
-      linkCompilationInfo(edge1, edge0);
-      mCurrentEdges.add(edge1);
+      output.add(input);
     }
   }
 
-  private LabelBlockProxy createLabelBlock(final CompiledEventList events)
+  private void createOutputEdge(final List<SimpleExpressionProxy> guards,
+                                final List<BinaryExpressionProxy> actions,
+                                final EventOutput events)
   {
-    final List<IdentifierProxy> elist = new LinkedList<IdentifierProxy>();
-    createEventList(events, elist);
-    return mFactory.createLabelBlockProxy(elist, null);
+    if (!events.isEmpty()) {
+      final NodeProxy source0 = mCurrentEdge.getSource();
+      final NodeProxy source1 = mNodeMap.get(source0);
+      final NodeProxy target0 = mCurrentEdge.getTarget();
+      final NodeProxy target1 = mNodeMap.get(target0);
+      final LabelBlockProxy block1 = events.createLabelBlock();
+      final GuardActionBlockProxy ga;
+      if (guards.isEmpty() && actions.isEmpty()) {
+        ga = null;
+      } else {
+        final List<SimpleExpressionProxy> guards1;
+        if (guards.isEmpty()) {
+          guards1 = null;
+        } else {
+          final List<SimpleExpressionProxy> guards0 =
+            mCloner.getClonedList(guards);
+          final SimpleExpressionProxy guard0 =
+            mGuardActionCompiler.createSingleGuard(guards0);
+          guards1 = Collections.singletonList(guard0);
+        }
+        final List<BinaryExpressionProxy> actions1 =
+          mCloner.getClonedList(actions);
+        ga = mFactory.createGuardActionBlockProxy(guards1, actions1, null);
+        mHasEFAElements = true;
+      }
+      final EdgeProxy edge = mFactory.createEdgeProxy
+        (source1, target1, block1, ga, null, null, null);
+      linkCompilationInfo(edge, mCurrentEdge);
+      mCurrentEdges.add(edge);
+    }
   }
 
   private PlainEventListProxy createPlainEventList
@@ -1317,15 +1274,6 @@ public class ModuleInstanceCompiler
     return decl;
   }
 
-  private void addAdditionalBlockedEvents(final CompiledEvent event)
-    throws EventKindException
-  {
-    if (mCurrentBlockedEvents == null) {
-      mCurrentBlockedEvents = new CompiledEventList();
-    }
-    mCurrentBlockedEvents.addEvent(event);
-  }
-
   private boolean isDisabledProposition(final CompiledEvent event)
   {
     if (mEnabledPropositionNames == null) {
@@ -1373,126 +1321,6 @@ public class ModuleInstanceCompiler
     return mFactory.createModuleProxy(name, comment, null, aliases,
                                       mCompiledEvents, null,
                                       mCompiledComponents);
-  }
-
-  //#########################################################################
-  //# Inner Class: PrimeSearcher
-  private class PrimeSearcher extends DefaultModuleProxyVisitor
-  {
-    //#######################################################################
-    //# Invocation
-    private void collect(final SimpleExpressionProxy expr,
-                         final ProxyAccessorSet<IdentifierProxy> primedIdentifiers)
-      throws VisitorException
-    {
-      try {
-        mPrimedIdentifiers = primedIdentifiers;
-        mNumPrimes = 0;
-        expr.acceptVisitor(this);
-      } finally {
-        mPrimedIdentifiers = null;
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    @Override
-    public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final SimpleExpressionProxy lhs = expr.getLeft();
-      lhs.acceptVisitor(this);
-      final SimpleExpressionProxy rhs = expr.getRight();
-      rhs.acceptVisitor(this);
-      return null;
-    }
-
-    @Override
-    public Boolean visitFunctionCallExpressionProxy
-      (final FunctionCallExpressionProxy expr)
-      throws VisitorException
-    {
-      for (final SimpleExpressionProxy arg : expr.getArguments()) {
-        arg.acceptVisitor(this);
-      }
-      return null;
-    }
-
-    @Override
-    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
-    {
-      if (mNumPrimes > 0) {
-        mPrimedIdentifiers.addProxy(ident);
-      }
-      return null;
-    }
-
-    @Override
-    public Boolean visitIndexedIdentifierProxy
-      (final IndexedIdentifierProxy ident)
-      throws VisitorException
-    {
-      visitIdentifierProxy(ident);
-      final int oldNumPrimes = mNumPrimes;
-      try {
-        mNumPrimes = 0;
-        final List<SimpleExpressionProxy> indices = ident.getIndexes();
-        for (final SimpleExpressionProxy index : indices) {
-          index.acceptVisitor(this);
-        }
-      } finally {
-        mNumPrimes = oldNumPrimes;
-      }
-      return null;
-    }
-
-    @Override
-    public Boolean visitQualifiedIdentifierProxy
-      (final QualifiedIdentifierProxy ident)
-      throws VisitorException
-    {
-      visitIdentifierProxy(ident);
-      final int oldNumPrimes = mNumPrimes;
-      try {
-        mNumPrimes = 0;
-        final IdentifierProxy base = ident.getBaseIdentifier();
-        base.acceptVisitor(this);
-        final IdentifierProxy comp = ident.getComponentIdentifier();
-        comp.acceptVisitor(this);
-      } finally {
-        mNumPrimes = oldNumPrimes;
-      }
-      return null;
-    }
-
-    @Override
-    public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
-    {
-      return null;
-    }
-
-    @Override
-    public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-      throws VisitorException
-    {
-      final int oldNumPrimes = mNumPrimes;
-      try {
-        final UnaryOperator op = expr.getOperator();
-        if (op == mOperatorTable.getNextOperator()) {
-          mNumPrimes++;
-        }
-        final SimpleExpressionProxy subterm = expr.getSubTerm();
-        subterm.acceptVisitor(this);
-      } finally {
-        mNumPrimes = oldNumPrimes;
-      }
-      return null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private ProxyAccessorSet<IdentifierProxy> mPrimedIdentifiers;
-    private int mNumPrimes;
   }
 
 
@@ -1738,6 +1566,66 @@ public class ModuleInstanceCompiler
 
 
   //#########################################################################
+  //# Inner Class EventOutput
+  private class EventOutput
+  {
+    //#######################################################################
+    //# Constructors
+    private EventOutput()
+    {
+      mList = new LinkedList<>();
+      mSet = new ProxyAccessorHashSet<>(mEquality);
+    }
+
+    private EventOutput(final int size)
+    {
+      mList = new ArrayList<>(size);
+      mSet = new ProxyAccessorHashSet<>(mEquality, size);
+    }
+
+    //#######################################################################
+    //# Access
+    private void add(final CompiledEvent event)
+    {
+      final Iterable<SingleEventOutput> outputs =
+        new EventOutputIterable(event, getCompilationInfo());
+      for (final SingleEventOutput output : outputs) {
+        final IdentifierProxy ident = getSingleEvent(output);
+        add(ident);
+      }
+    }
+
+    private void add(final Proxy proxy)
+    {
+      if (mSet.addProxy(proxy)) {
+        final Proxy clone = mCloner.getClone(proxy);
+        mList.add(clone);
+      }
+    }
+
+    private LabelBlockProxy createLabelBlock()
+    {
+      return mFactory.createLabelBlockProxy(mList, null);
+    }
+
+    private List<Proxy> getList()
+    {
+      return mList;
+    }
+
+    private boolean isEmpty()
+    {
+      return mList.isEmpty();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<Proxy> mList;
+    private final ProxyAccessorSet<Proxy> mSet;
+  }
+
+
+  //#########################################################################
   //# Data Members
 
   //  Utilities:
@@ -1747,7 +1635,7 @@ public class ModuleInstanceCompiler
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleEqualityVisitor mEquality;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private final PrimeSearcher mPrimeSearcher;
+  private final GuardActionCompiler mGuardActionCompiler;
   private final NameCompiler mNameCompiler;
   private final IndexAdder mIndexAdder;
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
@@ -1755,6 +1643,7 @@ public class ModuleInstanceCompiler
 
   //  Configurations:
   private boolean mIsOptimizationEnabled = true;
+  private final boolean mGeneratingConditionals = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
@@ -1772,7 +1661,7 @@ public class ModuleInstanceCompiler
 
   private SimpleComponentProxy mCurrentComponent;
   private ProxyAccessorSet<IdentifierProxy> mCurrentAlphabet;
-  private CompiledEventList mCurrentBlockedEvents;
+  private EventOutput mCurrentBlockedEvents;
   private List<NodeProxy> mCurrentNodes;
   private List<EdgeProxy> mCurrentEdges;
   private Map<NodeProxy,NodeProxy> mNodeMap;

@@ -1710,11 +1710,32 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
 
   ############################################################################
   # Write Constructor and Invocation
-    Java_GenerateSeparatorComment $stream $umap "Constructor"
+    Java_GenerateSeparatorComment $stream $umap "Constructors"
+    Java_WriteLn $stream $umap "  /**"
+    Java_WriteLn $stream $umap \
+        "   * Creates a new module proxy cloner that preserves geometry."
+    Java_WriteLn $stream $umap \
+        "   * @param  factory  The factory used to create cloned objects."
+    Java_WriteLn $stream $umap "   */"
     Java_WriteLn $stream $umap \
         "  public ${visitorname}(final ${prefix}ProxyFactory factory)"
     Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    this(factory, true);"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+    Java_WriteLn $stream $umap "  /**"
+    Java_WriteLn $stream $umap \
+        "   * Creates a new module proxy cloner that optionally preserves geometry."
+    Java_WriteLn $stream $umap \
+        "   * @param  factory  The factory used to create cloned objects."
+    Java_WriteLn $stream $umap \
+        "   * @param  geo      Whether cloned objects retain geometry information."
+    Java_WriteLn $stream $umap "   */"
+    Java_WriteLn $stream $umap \
+        "  public ${visitorname}(final ${prefix}ProxyFactory factory, boolean geo)"
+    Java_WriteLn $stream $umap "  \{"
     Java_WriteLn $stream $umap "    mFactory = factory;"
+    Java_WriteLn $stream $umap "    mCloningGeometry = geo;"
     Java_WriteLn $stream $umap "    mNodeMap = null;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
@@ -1892,6 +1913,8 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap \
         "  private final ${prefix}ProxyFactory mFactory;"
     Java_WriteLn $stream $umap \
+        "  private final boolean mCloningGeometry;"
+    Java_WriteLn $stream $umap \
         "  private Map<String,NodeProxy> mNodeMap;"
     Java_WriteLn $stream $umap ""
 
@@ -1962,16 +1985,39 @@ proc Java_GenerateCloningMethodBody {stream classMapName useMapName
     } else {
       set method "use"
     }
-    if {[string compare $method "use"] == 0} {
+    set eqstatus [Java_AttribGetEqualityStatus $attrib]
+    if {[string compare $eqstatus "geometry"] == 0} {
       Java_WriteLn $stream $umap \
-          "$ind    final $decltype $paramname = proxy.${gettername}();"
+          "$ind    final $decltype $paramname;"
+      Java_WriteLn $stream $umap \
+          "$ind    if (mCloningGeometry) \{"
+      if {[string compare $method "use"] == 0} {
+        Java_WriteLn $stream $umap \
+            "$ind      $paramname = proxy.${gettername}();"
+      } else {
+        set paramname0 "${paramname}0"
+        Java_WriteLn $stream $umap \
+            "$ind      final $decltype $paramname0 = proxy.${gettername}();"
+        Java_WriteLn $stream $umap \
+            "$ind      $paramname = ${method}($paramname0);"
+      }
+      Java_WriteLn $stream $umap \
+          "$ind    \} else \{"
+      Java_WriteLn $stream $umap \
+          "$ind      $paramname = null;"
+      Java_WriteLn $stream $umap \
+          "$ind    \}"      
     } else {
-      set eqstatus [Java_AttribGetEqualityStatus $attrib]
-      set paramname0 "${paramname}0"
-      Java_WriteLn $stream $umap \
-          "$ind    final $decltype $paramname0 = proxy.${gettername}();"
-      Java_WriteLn $stream $umap \
-          "$ind    final $decltype $paramname = ${method}($paramname0);"
+      if {[string compare $method "use"] == 0} {
+        Java_WriteLn $stream $umap \
+            "$ind    final $decltype $paramname = proxy.${gettername}();"
+      } else {
+        set paramname0 "${paramname}0"
+        Java_WriteLn $stream $umap \
+            "$ind    final $decltype $paramname0 = proxy.${gettername}();"
+        Java_WriteLn $stream $umap \
+            "$ind    final $decltype $paramname = ${method}($paramname0);"
+      }
     }
     lappend args $paramname
   }

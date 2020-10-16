@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="undef_event_guarded_1">
+<B:Comment>A compiler test with a guarded event expression that references an undefined event when the guard evaluates to false.
+In plant B[0], the guard i&gt;0 evaluates to false, and its referenced event e[0] is undefined.
+Normally events under false guards must be blocked, but errors under false guards are suppressed, simply suppressing the event.
+</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="B">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="112" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="112" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<IndexedIdentifier Name="e">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="i"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-16"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>

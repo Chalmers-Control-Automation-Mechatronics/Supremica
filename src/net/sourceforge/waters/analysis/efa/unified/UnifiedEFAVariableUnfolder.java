@@ -370,13 +370,13 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
       mUnfoldingContext.setCurrentValue(expr);
       final SimpleExpressionProxy initEval =
         mExpressionCompiler.eval(init, mUnfoldingContext);
-      if (mExpressionCompiler.getBooleanValue(initEval)) {
+      if (SimpleExpressionCompiler.getBooleanValue(initEval)) {
         rel.setInitial(value, true);
       }
       if (marked != null) {
         final SimpleExpressionProxy markedEval =
           mExpressionCompiler.eval(marked, mUnfoldingContext);
-        if (mExpressionCompiler.getBooleanValue(markedEval)) {
+        if (SimpleExpressionCompiler.getBooleanValue(markedEval)) {
           rel.setMarked(value, UnifiedEFAEventEncoding.OMEGA, true);
         }
       }

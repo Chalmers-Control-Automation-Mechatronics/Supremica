@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
@@ -103,6 +104,20 @@ public class MultiExceptionModuleProxyVisitor
       throw exception;
     } else {
       mCompilationInfo.raise(exception);
+    }
+  }
+
+  protected void recordCaughtException(final VisitorException exception,
+                                       final SimpleExpressionProxy location)
+    throws EvalException
+  {
+    final Throwable cause = exception.getCause();
+    if (cause instanceof EvalException) {
+      final EvalException evalCause = (EvalException) cause;
+      evalCause.provideLocation(location);
+      recordCaughtException(evalCause);
+    } else {
+      throw exception.getRuntimeException();
     }
   }
 

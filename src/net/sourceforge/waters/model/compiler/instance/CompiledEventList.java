@@ -163,6 +163,10 @@ class CompiledEventList implements CompiledEvent
     return mList.isEmpty();
   }
 
+  int size()
+  {
+    return mList.size();
+  }
 
   //#########################################################################
   //# Auxiliary Methods

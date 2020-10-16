@@ -47,13 +47,11 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <EventRefList>
 <EventRef Name="black[1][1]"/>
 <EventRef Name="black_win_d1"/>
-<EventRef Name="black_win_d2"/>
 <EventRef Name="black_win_x[1]"/>
 <EventRef Name="black_win_y[1]"/>
 <EventRef Name="draw"/>
 <EventRef Name="white[1][1]"/>
 <EventRef Name="white_win_d1"/>
-<EventRef Name="white_win_d2"/>
 <EventRef Name="white_win_x[1]"/>
 <EventRef Name="white_win_y[1]"/>
 </EventRefList>
@@ -73,12 +71,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_y[1]" Target="black"/>
 <Transition Source="black" Event="black_win_d1" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d2" Target="free"/>
-<Transition Source="free" Event="white_win_d2" Target="free"/>
-<Transition Source="white" Event="black_win_d2" Target="white"/>
-<Transition Source="white" Event="white_win_d2" Target="white"/>
-<Transition Source="black" Event="black_win_d2" Target="black"/>
-<Transition Source="black" Event="white_win_d2" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[1][2]">
@@ -90,10 +82,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <EventRef Name="white[1][2]"/>
 <EventRef Name="white_win_x[1]"/>
 <EventRef Name="white_win_y[2]"/>
-<EventRef Name="black_win_d1"/>
-<EventRef Name="black_win_d2"/>
-<EventRef Name="white_win_d1"/>
-<EventRef Name="white_win_d2"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="free"/>
@@ -109,30 +97,16 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_x[1]" Target="black"/>
 <Transition Source="black" Event="black_win_y[2]" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d1" Target="free"/>
-<Transition Source="free" Event="black_win_d2" Target="free"/>
-<Transition Source="free" Event="white_win_d1" Target="free"/>
-<Transition Source="free" Event="white_win_d2" Target="free"/>
-<Transition Source="white" Event="black_win_d1" Target="white"/>
-<Transition Source="white" Event="black_win_d2" Target="white"/>
-<Transition Source="white" Event="white_win_d1" Target="white"/>
-<Transition Source="white" Event="white_win_d2" Target="white"/>
-<Transition Source="black" Event="black_win_d1" Target="black"/>
-<Transition Source="black" Event="black_win_d2" Target="black"/>
-<Transition Source="black" Event="white_win_d1" Target="black"/>
-<Transition Source="black" Event="white_win_d2" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[1][3]">
 <EventRefList>
 <EventRef Name="black[1][3]"/>
-<EventRef Name="black_win_d1"/>
 <EventRef Name="black_win_d2"/>
 <EventRef Name="black_win_x[1]"/>
 <EventRef Name="black_win_y[3]"/>
 <EventRef Name="draw"/>
 <EventRef Name="white[1][3]"/>
-<EventRef Name="white_win_d1"/>
 <EventRef Name="white_win_d2"/>
 <EventRef Name="white_win_x[1]"/>
 <EventRef Name="white_win_y[3]"/>
@@ -153,12 +127,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_y[3]" Target="black"/>
 <Transition Source="black" Event="black_win_d2" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d1" Target="free"/>
-<Transition Source="free" Event="white_win_d1" Target="free"/>
-<Transition Source="white" Event="black_win_d1" Target="white"/>
-<Transition Source="white" Event="white_win_d1" Target="white"/>
-<Transition Source="black" Event="black_win_d1" Target="black"/>
-<Transition Source="black" Event="white_win_d1" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[2][1]">
@@ -170,10 +138,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <EventRef Name="white[2][1]"/>
 <EventRef Name="white_win_x[2]"/>
 <EventRef Name="white_win_y[1]"/>
-<EventRef Name="black_win_d1"/>
-<EventRef Name="black_win_d2"/>
-<EventRef Name="white_win_d1"/>
-<EventRef Name="white_win_d2"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="free"/>
@@ -189,18 +153,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_x[2]" Target="black"/>
 <Transition Source="black" Event="black_win_y[1]" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d1" Target="free"/>
-<Transition Source="free" Event="black_win_d2" Target="free"/>
-<Transition Source="free" Event="white_win_d1" Target="free"/>
-<Transition Source="free" Event="white_win_d2" Target="free"/>
-<Transition Source="white" Event="black_win_d1" Target="white"/>
-<Transition Source="white" Event="black_win_d2" Target="white"/>
-<Transition Source="white" Event="white_win_d1" Target="white"/>
-<Transition Source="white" Event="white_win_d2" Target="white"/>
-<Transition Source="black" Event="black_win_d1" Target="black"/>
-<Transition Source="black" Event="black_win_d2" Target="black"/>
-<Transition Source="black" Event="white_win_d1" Target="black"/>
-<Transition Source="black" Event="white_win_d2" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[2][2]">
@@ -246,10 +198,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <EventRef Name="white[2][3]"/>
 <EventRef Name="white_win_x[2]"/>
 <EventRef Name="white_win_y[3]"/>
-<EventRef Name="black_win_d1"/>
-<EventRef Name="black_win_d2"/>
-<EventRef Name="white_win_d1"/>
-<EventRef Name="white_win_d2"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="free"/>
@@ -265,30 +213,16 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_x[2]" Target="black"/>
 <Transition Source="black" Event="black_win_y[3]" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d1" Target="free"/>
-<Transition Source="free" Event="black_win_d2" Target="free"/>
-<Transition Source="free" Event="white_win_d1" Target="free"/>
-<Transition Source="free" Event="white_win_d2" Target="free"/>
-<Transition Source="white" Event="black_win_d1" Target="white"/>
-<Transition Source="white" Event="black_win_d2" Target="white"/>
-<Transition Source="white" Event="white_win_d1" Target="white"/>
-<Transition Source="white" Event="white_win_d2" Target="white"/>
-<Transition Source="black" Event="black_win_d1" Target="black"/>
-<Transition Source="black" Event="black_win_d2" Target="black"/>
-<Transition Source="black" Event="white_win_d1" Target="black"/>
-<Transition Source="black" Event="white_win_d2" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[3][1]">
 <EventRefList>
 <EventRef Name="black[3][1]"/>
-<EventRef Name="black_win_d1"/>
 <EventRef Name="black_win_d2"/>
 <EventRef Name="black_win_x[3]"/>
 <EventRef Name="black_win_y[1]"/>
 <EventRef Name="draw"/>
 <EventRef Name="white[3][1]"/>
-<EventRef Name="white_win_d1"/>
 <EventRef Name="white_win_d2"/>
 <EventRef Name="white_win_x[3]"/>
 <EventRef Name="white_win_y[1]"/>
@@ -309,12 +243,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_y[1]" Target="black"/>
 <Transition Source="black" Event="black_win_d2" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d1" Target="free"/>
-<Transition Source="free" Event="white_win_d1" Target="free"/>
-<Transition Source="white" Event="black_win_d1" Target="white"/>
-<Transition Source="white" Event="white_win_d1" Target="white"/>
-<Transition Source="black" Event="black_win_d1" Target="black"/>
-<Transition Source="black" Event="white_win_d1" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[3][2]">
@@ -326,10 +254,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <EventRef Name="white[3][2]"/>
 <EventRef Name="white_win_x[3]"/>
 <EventRef Name="white_win_y[2]"/>
-<EventRef Name="black_win_d1"/>
-<EventRef Name="black_win_d2"/>
-<EventRef Name="white_win_d1"/>
-<EventRef Name="white_win_d2"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="free"/>
@@ -345,31 +269,17 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_x[3]" Target="black"/>
 <Transition Source="black" Event="black_win_y[2]" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d1" Target="free"/>
-<Transition Source="free" Event="black_win_d2" Target="free"/>
-<Transition Source="free" Event="white_win_d1" Target="free"/>
-<Transition Source="free" Event="white_win_d2" Target="free"/>
-<Transition Source="white" Event="black_win_d1" Target="white"/>
-<Transition Source="white" Event="black_win_d2" Target="white"/>
-<Transition Source="white" Event="white_win_d1" Target="white"/>
-<Transition Source="white" Event="white_win_d2" Target="white"/>
-<Transition Source="black" Event="black_win_d1" Target="black"/>
-<Transition Source="black" Event="black_win_d2" Target="black"/>
-<Transition Source="black" Event="white_win_d1" Target="black"/>
-<Transition Source="black" Event="white_win_d2" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="square[3][3]">
 <EventRefList>
 <EventRef Name="black[3][3]"/>
 <EventRef Name="black_win_d1"/>
-<EventRef Name="black_win_d2"/>
 <EventRef Name="black_win_x[3]"/>
 <EventRef Name="black_win_y[3]"/>
 <EventRef Name="draw"/>
 <EventRef Name="white[3][3]"/>
 <EventRef Name="white_win_d1"/>
-<EventRef Name="white_win_d2"/>
 <EventRef Name="white_win_x[3]"/>
 <EventRef Name="white_win_y[3]"/>
 </EventRefList>
@@ -389,12 +299,6 @@ It has 6692 reachable states and the diameter is 66.</B:Comment>
 <Transition Source="black" Event="black_win_y[3]" Target="black"/>
 <Transition Source="black" Event="black_win_d1" Target="black"/>
 <Transition Source="black" Event="draw" Target="black"/>
-<Transition Source="free" Event="black_win_d2" Target="free"/>
-<Transition Source="free" Event="white_win_d2" Target="free"/>
-<Transition Source="white" Event="black_win_d2" Target="white"/>
-<Transition Source="white" Event="white_win_d2" Target="white"/>
-<Transition Source="black" Event="black_win_d2" Target="black"/>
-<Transition Source="black" Event="white_win_d2" Target="black"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="turn">

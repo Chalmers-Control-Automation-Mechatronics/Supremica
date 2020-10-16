@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="undef_event_guarded_2">
+<B:Comment>A compiler test with a guarded event expression that references an undefined event when the guard evaluates to false.
+In plant B[0], the guard i&gt;0 evaluates to false, and its referenced event e[0] is undefined.
+Normally events under false guards must be blocked, but errors under false guards are suppressed, simply suppressing the event.
+</B:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="e[1]"/>
+<Event Kind="CONTROLLABLE" Name="e[2]"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="B[0]">
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="B[1]">
+<EventRefList>
+<EventRef Name="e[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="e[1]" Target="S1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="B[2]">
+<EventRefList>
+<EventRef Name="e[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="e[2]" Target="S1"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

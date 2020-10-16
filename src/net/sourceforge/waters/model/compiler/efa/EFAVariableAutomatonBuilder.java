@@ -161,12 +161,12 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
       final SimpleExpressionProxy initval =
         mSimpleExpressionCompiler.eval(initpred, context);
       final boolean initial =
-        mSimpleExpressionCompiler.getBooleanValue(initval);
+        SimpleExpressionCompiler.getBooleanValue(initval);
       for (final VariableMarkingProxy marking : markings) {
         final SimpleExpressionProxy pred = marking.getPredicate();
         final SimpleExpressionProxy predval =
           mSimpleExpressionCompiler.eval(pred, context);
-        if (mSimpleExpressionCompiler.getBooleanValue(predval)) {
+        if (SimpleExpressionCompiler.getBooleanValue(predval)) {
           final IdentifierProxy prop = marking.getProposition();
           props.add(prop);
           blocked.remove(prop);

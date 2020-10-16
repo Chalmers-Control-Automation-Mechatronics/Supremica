@@ -33,26 +33,36 @@
 
 package net.sourceforge.waters.model.compiler.context;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
+import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
+import net.sourceforge.waters.model.compiler.instance.NestedNextException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -75,21 +85,16 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * @author Robi Malik
  */
 
-public class PrimePreservingConditionCompiler
+public class GuardActionCompiler
 {
   //#########################################################################
   //# Constructor
-  public PrimePreservingConditionCompiler(final ModuleProxyFactory factory,
-                                          final CompilerOperatorTable optable,
-                                          final CompilationInfo compilationInfo,
-                                          final boolean cloning)
+  public GuardActionCompiler(final ModuleProxyFactory factory,
+                             final CompilerOperatorTable optable,
+                             final CompilationInfo compilationInfo)
   {
     mInternalFactory = ModuleElementFactory.getInstance();
-    if (cloning || factory != mInternalFactory) {
-      mCloner = new SourceInfoCloner(factory, compilationInfo);
-    } else {
-      mCloner = null;
-    }
+    mOutputFactory = factory;
     mSimplifier = new SimpleExpressionCompiler
       (mInternalFactory, compilationInfo, optable, false);
   }
@@ -97,22 +102,132 @@ public class PrimePreservingConditionCompiler
 
   //#########################################################################
   //# Invocation
-  public SimpleExpressionProxy simplify
-    (final SimpleExpressionProxy expr,
+  public Result separateGuardActionBlock
+    (final GuardActionBlockProxy ga,
      final BindingContext context)
     throws EvalException
   {
-    mContext = context;
+    try {
+      mContext = context;
+      mResult = new Result();
+      final CompilationInfo compilationInfo = getCompilationInfo();
+      final GuardActionSeparator separator =
+        new GuardActionSeparator(compilationInfo);
+      separator.separateGuardActionBlock(ga);
+      simplify();
+      return mResult;
+    } finally {
+      mContext = null;
+      mResult = null;
+    }
+  }
+
+  public Result separateCondition
+    (final SimpleExpressionProxy cond,
+     final BindingContext context,
+     final boolean generatingConditionals)
+    throws EvalException
+  {
+    try {
+      mResult = new Result();
+      if (cond != null) {
+        mContext = context;
+        final CompilationInfo compilationInfo = getCompilationInfo();
+        final GuardActionSeparator separator =
+          new GuardActionSeparator(compilationInfo);
+        separator.separateCondition(cond);
+        if (generatingConditionals) {
+          mResult.clear();
+          final SimpleExpressionProxy guard = simplify(cond, null);
+          mResult.addGuard(guard);
+        } else {
+          simplify();
+        }
+      }
+      return mResult;
+    } finally {
+      mContext = null;
+      mResult = null;
+    }
+  }
+
+  public SimpleExpressionProxy createSingleGuard
+    (final List<SimpleExpressionProxy> guards)
+  {
+    return addToConjunction(mOutputFactory, null, guards);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void simplify()
+    throws EvalException
+  {
+    final List<BinaryExpressionProxy> actions = mResult.getActions();
+    final Collection<IdentifierProxy> assigned = new THashSet<>(actions.size());
+    final ListIterator<BinaryExpressionProxy> iter = actions.listIterator();
+    while (iter.hasNext()) {
+      try {
+        final BinaryExpressionProxy action = iter.next();
+        final BinaryExpressionProxy simplified =
+          (BinaryExpressionProxy) mSimplifier.simplify(action, mContext);
+        if (SimpleExpressionCompiler.isBooleanFalse(simplified)) {
+          mResult.clear();
+          mResult.addGuard(simplified);
+          return;
+        }
+        final IdentifierProxy ident = (IdentifierProxy) simplified.getLeft();
+        assigned.add(ident);
+        iter.set(simplified);
+      } catch (final EvalException exception) {
+        iter.remove();
+        final CompilationInfo compilationInfo = getCompilationInfo();
+        compilationInfo.raise(exception);
+      }
+    }
+    final List<SimpleExpressionProxy> guards = mResult.getGuards();
+    final SimpleExpressionProxy guard =
+      addToConjunction(mInternalFactory, null, guards);
+    guards.clear();
+    if (guard != null) {
+      try {
+        final SimpleExpressionProxy simplified = simplify(guard, assigned);
+        if (simplified != null) {
+          guards.add(simplified);
+          if (SimpleExpressionCompiler.isBooleanFalse(simplified)) {
+            actions.clear();
+          }
+        }
+      } catch (final EvalException exception) {
+        final CompilationInfo compilationInfo = getCompilationInfo();
+        compilationInfo.raise(exception);
+      }
+    }
+  }
+
+  private SimpleExpressionProxy simplify
+    (final SimpleExpressionProxy expr,
+     final Collection<IdentifierProxy> assigned)
+    throws EvalException
+  {
     final ModuleEqualityVisitor equality = getEquality();
     final ProxyAccessorSet<IdentifierProxy> before =
       new ProxyAccessorHashSet<>(equality);
     final Map<SimpleExpressionProxy,IdentifierProxy> map = new HashMap<>();
     SimpleExpressionProxy simplified =
       mSmartPrimeFinder.simplifyIndexesAndCollectPrimes(expr, before, map);
-    simplified = mSimplifier.simplify(simplified, context);
-    if (!before.isEmpty() && !mSimplifier.isBooleanFalse(simplified)) {
-      final ProxyAccessorSet<IdentifierProxy> after =
-        new ProxyAccessorHashSet<>(equality, before.size());
+    simplified = mSimplifier.simplify(simplified, mContext);
+    if (!before.isEmpty() &&
+        !SimpleExpressionCompiler.isBooleanFalse(simplified)) {
+      final ProxyAccessorSet<IdentifierProxy> after;
+      if (assigned == null) {
+        after = new ProxyAccessorHashSet<>(equality, before.size());
+      } else {
+        before.addAll(assigned);
+        after = new ProxyAccessorHashSet<>(equality,
+          before.size() + assigned.size());
+        after.addAll(assigned);
+      }
       mSmartPrimeFinder.collectPrimes(simplified, after);
       if (before.size() > after.size()) {
         boolean canImprove = false;
@@ -126,7 +241,7 @@ public class PrimePreservingConditionCompiler
           simplified = mSmartSimplifier.simplify(expr, after, map);
         }
         if (before.size() > after.size() &&
-            !mSimplifier.isBooleanFalse(simplified)) {
+            !SimpleExpressionCompiler.isBooleanFalse(simplified)) {
           final int size = before.size() - after.size();
           final List<IdentifierProxy> list = new ArrayList<>(size);
           for (final IdentifierProxy ident : before) {
@@ -144,7 +259,7 @@ public class PrimePreservingConditionCompiler
               createUnaryExpressionProxy(next, ident);
             final BinaryExpressionProxy eqn = mInternalFactory.
               createBinaryExpressionProxy(eq, nextIdent, nextIdent);
-            if (mSimplifier.isBooleanTrue(simplified)) {
+            if (SimpleExpressionCompiler.isBooleanTrue(simplified)) {
               simplified = eqn;
             } else {
               simplified = mInternalFactory.
@@ -155,10 +270,32 @@ public class PrimePreservingConditionCompiler
         }
       }
     }
-    if (mCloner != null) {
-      simplified = (SimpleExpressionProxy) mCloner.getClone(simplified);
+    if (SimpleExpressionCompiler.isBooleanTrue(simplified)) {
+      return null;
+    } else {
+      return simplified;
     }
-    return simplified;
+  }
+
+  private SimpleExpressionProxy addToConjunction
+    (final ModuleProxyFactory factory,
+     SimpleExpressionProxy conjunction,
+     final List<? extends SimpleExpressionProxy> expressions)
+  {
+    final BinaryOperator op = getOperatorTable().getAndOperator();
+    for (final SimpleExpressionProxy expr : expressions) {
+      if (SimpleExpressionCompiler.isBooleanFalse(expr)) {
+        return expr;
+      } else if (SimpleExpressionCompiler.isBooleanTrue(expr)) {
+        continue;
+      } else if (conjunction == null) {
+        conjunction = expr;
+      } else {
+        conjunction =
+          factory.createBinaryExpressionProxy(op, conjunction, expr);
+      }
+    }
+    return conjunction;
   }
 
 
@@ -177,6 +314,345 @@ public class PrimePreservingConditionCompiler
   private CompilationInfo getCompilationInfo()
   {
     return mSimplifier.getCompilationInfo();
+  }
+
+
+  //#########################################################################
+  //# Inner Class Result
+  public static class Result
+  {
+    //#######################################################################
+    //# Simple Access
+    public List<SimpleExpressionProxy> getGuards()
+    {
+      return mGuards;
+    }
+
+    public List<BinaryExpressionProxy> getActions()
+    {
+      return mActions;
+    }
+
+    public boolean isBooleanTrue()
+    {
+      return mGuards.isEmpty() && mActions.isEmpty();
+    }
+
+    public boolean isBooleanFalse()
+    {
+      if (mGuards.isEmpty()) {
+        return false;
+      } else {
+        final SimpleExpressionProxy guard = mGuards.get(0);
+        return SimpleExpressionCompiler.isBooleanFalse(guard);
+      }
+    }
+
+    //#######################################################################
+    //# Data Gathering
+    private void addAction(final BinaryExpressionProxy action)
+    {
+      assert action != null;
+      mActions.add(action);
+    }
+
+    private void addGuard(final SimpleExpressionProxy guard)
+    {
+      if (guard != null) {
+        mGuards.add(guard);
+      }
+    }
+
+    private void clear()
+    {
+      mGuards.clear();
+      mActions.clear();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<SimpleExpressionProxy> mGuards = new LinkedList<>();
+    private final List<BinaryExpressionProxy> mActions = new LinkedList<>();
+  }
+
+
+  //#########################################################################
+  //# Inner Class GuardActionSeparator
+  private class GuardActionSeparator
+    extends MultiExceptionModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Constructor
+    private GuardActionSeparator(final CompilationInfo compilationInfo)
+    {
+      super(compilationInfo);
+    }
+
+    //#######################################################################
+    //# Invocation
+    /**
+     * Checks and converts a condition to guards and actions.
+     * @param  cond   The condition to be separated
+     *                (typically from a {@link ConditionalProxy}).
+     * @throws EvalException to report failures about incorrect nesting
+     *                of primes or assignment operators.
+     */
+    void separateCondition(final SimpleExpressionProxy cond)
+      throws EvalException
+    {
+      mAtTopLevel = true;
+      mWhere = "nested subterm";
+      try {
+        final boolean stored = (Boolean) cond.acceptVisitor(this);
+        if (!stored) {
+          mResult.addGuard(cond);
+        }
+      } catch (final VisitorException exception) {
+        recordCaughtException(exception, cond);
+      }
+    }
+
+    /**
+     * Checks and adds the guards and actions from a guard/action block to the
+     * converter.
+     * @param  ga     The guard/action block to be included,
+     *                or <CODE>null</CODE>.
+     * @throws EvalException to report failures about incorrect nesting
+     *                of primes or assignment operators.
+     */
+    void separateGuardActionBlock(final GuardActionBlockProxy ga)
+      throws EvalException
+    {
+      if (ga != null) {
+        mWhere = "guard";
+        final List<SimpleExpressionProxy> guards = ga.getGuards();
+        for (final SimpleExpressionProxy guard : guards) {
+          try {
+            checkInner(guard);
+            mResult.addGuard(guard);
+          } catch (final VisitorException exception) {
+            recordCaughtException(exception, guard);
+          }
+        }
+        final CompilerOperatorTable optable = getOperatorTable();
+        mWhere = "another assignment";
+        final List<BinaryExpressionProxy> actions = ga.getActions();
+        for (final BinaryExpressionProxy action : actions) {
+          if (!optable.isAssignment(action)) {
+            final ActionSyntaxException exception =
+              new ActionSyntaxException(action);
+            recordCaughtException(exception);
+          } else {
+            try {
+              checkAssignment(action);
+              mResult.addAction(action);
+            } catch (final VisitorException exception) {
+              recordCaughtException(exception, action);
+            }
+          }
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void checkAssignment(final BinaryExpressionProxy action)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = action.getLeft();
+      if (!(lhs instanceof IdentifierProxy)) {
+        final ActionSyntaxException exception =
+          new ActionSyntaxException(action, lhs);
+        throw wrap(exception);
+      } else {
+        checkInner(lhs);
+        try {
+          assert mPrimeLockOut == null;
+          mPrimeLockOut = action;
+          final SimpleExpressionProxy rhs = action.getRight();
+          checkInner(rhs);
+        } finally {
+          mPrimeLockOut = null;
+        }
+      }
+    }
+
+    private void checkInner(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      final boolean wasAtTopLevel = mAtTopLevel;
+      try {
+        mAtTopLevel = false;
+        expr.acceptVisitor(this);
+      } finally {
+        mAtTopLevel = wasAtTopLevel;
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final CompilerOperatorTable optable = getOperatorTable();
+      if (mAtTopLevel) {
+        try {
+          if (optable.isAssignment(expr)) {
+            checkAssignment(expr);
+            mResult.addAction(expr);
+            return true;
+          } else if (expr.getOperator() == optable.getAndOperator()) {
+            final SimpleExpressionProxy lhs = expr.getLeft();
+            final boolean storedLHS = (Boolean) lhs.acceptVisitor(this);
+            final SimpleExpressionProxy rhs = expr.getRight();
+            final boolean storedRHS = (Boolean) rhs.acceptVisitor(this);
+            if (storedLHS || storedRHS) {
+              if (storedLHS && !storedRHS) {
+                mResult.addGuard(rhs);
+              } else if (!storedLHS && storedRHS) {
+                mResult.addGuard(lhs);
+              }
+              return true;
+            }
+          } else {
+            mAtTopLevel = false;
+            final SimpleExpressionProxy lhs = expr.getLeft();
+            lhs.acceptVisitor(this);
+            final SimpleExpressionProxy rhs = expr.getRight();
+            rhs.acceptVisitor(this);
+          }
+        } finally {
+          mAtTopLevel = true;
+        }
+      } else {
+        if (optable.isAssignment(expr)) {
+          final ActionSyntaxException exception =
+            new ActionSyntaxException(expr, mWhere);
+          throw wrap(exception);
+        } else {
+          final SimpleExpressionProxy lhs = expr.getLeft();
+          lhs.acceptVisitor(this);
+          final SimpleExpressionProxy rhs = expr.getRight();
+          rhs.acceptVisitor(this);
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public Object visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      final boolean wasAtTopLevel = mAtTopLevel;
+      try {
+        mAtTopLevel = false;
+        final List<SimpleExpressionProxy> args = expr.getArguments();
+        for (final SimpleExpressionProxy arg : args) {
+          arg.acceptVisitor(this);
+        }
+        return visitSimpleExpressionProxy(expr);
+      } finally {
+        mAtTopLevel = wasAtTopLevel;
+      }
+    }
+
+    @Override
+    public Object visitIndexedIdentifierProxy
+    (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final boolean wasAtTopLevel = mAtTopLevel;
+      final SimpleExpressionProxy oldLockOut = mPrimeLockOut;
+      try {
+        mAtTopLevel = false;
+        if (mPrimeLockOut == null) {
+          mPrimeLockOut = ident;
+        }
+        final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+        for (final SimpleExpressionProxy index : indexes) {
+          index.acceptVisitor(this);
+        }
+        return visitIdentifierProxy(ident);
+      } finally {
+        mAtTopLevel = wasAtTopLevel;
+        mPrimeLockOut = oldLockOut;
+      }
+    }
+
+    @Override
+    public Object visitQualifiedIdentifierProxy
+    (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final boolean wasAtTopLevel = mAtTopLevel;
+      try {
+        mAtTopLevel = false;
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        base.acceptVisitor(this);
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        comp.acceptVisitor(this);
+        return visitSimpleExpressionProxy(ident);
+      } finally {
+        mAtTopLevel = wasAtTopLevel;
+      }
+    }
+
+    @Override
+    public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return false;
+    }
+
+    @Override
+    public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final boolean wasAtTopLevel = mAtTopLevel;
+      final SimpleExpressionProxy oldLockOut = mPrimeLockOut;
+      try {
+        final CompilerOperatorTable optable = getOperatorTable();
+        if (expr.getOperator() == optable.getNextOperator()) {
+          if (mPrimeLockOut != null) {
+            final NestedNextException exception;
+            if (mPrimeLockOut instanceof BinaryExpressionProxy) {
+              final BinaryExpressionProxy assignment =
+                (BinaryExpressionProxy) mPrimeLockOut;
+              exception = new NestedNextException(expr, assignment);
+            } else if (mPrimeLockOut instanceof IndexedIdentifierProxy) {
+              final IndexedIdentifierProxy ident =
+                (IndexedIdentifierProxy) mPrimeLockOut;
+              exception = new NestedNextException(expr, ident);
+            } else if (mPrimeLockOut instanceof UnaryExpressionProxy) {
+              final UnaryExpressionProxy primed =
+                (UnaryExpressionProxy) mPrimeLockOut;
+              exception = new NestedNextException(expr, primed);
+            } else {
+              throw new IllegalStateException
+              ("Unknown prime lock-out class " +
+                ProxyTools.getShortClassName(mPrimeLockOut) + "!");
+            }
+            throw wrap(exception);
+          } else {
+            mPrimeLockOut = expr;
+          }
+        }
+        mAtTopLevel = false;
+        final SimpleExpressionProxy subTerm = expr.getSubTerm();
+        subTerm.acceptVisitor(this);
+        return visitSimpleExpressionProxy(expr);
+      } finally {
+        mAtTopLevel = wasAtTopLevel;
+        mPrimeLockOut = oldLockOut;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private boolean mAtTopLevel;
+    private String mWhere;
+    private SimpleExpressionProxy mPrimeLockOut;
   }
 
 
@@ -316,7 +792,7 @@ public class PrimePreservingConditionCompiler
     {
       if (mWithinPrime &&
           !mWithinQualification &&
-          mContext.getBoundExpression(ident) == null) {
+          isPossibleVariable(ident)) {
         mCollectedIdentifiers.addProxy(ident);
       }
       return ident;
@@ -350,7 +826,7 @@ public class PrimePreservingConditionCompiler
           ident = newIdent;
         }
       }
-      return visitIdentifierProxy(ident);
+      return ident;
     }
 
     @Override
@@ -414,6 +890,21 @@ public class PrimePreservingConditionCompiler
     }
 
     //#######################################################################
+    //# Auxiliary Methods
+    private boolean isPossibleVariable(final IdentifierProxy ident)
+    {
+      final SimpleExpressionProxy bound = mContext.getBoundExpression(ident);
+      if (bound == null) {
+        return true;
+      } else if (bound instanceof IdentifierProxy) {
+        final IdentifierProxy boundIdent = (IdentifierProxy) bound;
+        return !mContext.isEnumAtom(boundIdent);
+      } else {
+        return false;
+      }
+    }
+
+    //#######################################################################
     //# Data Members
     private ProxyAccessorSet<IdentifierProxy> mCollectedIdentifiers;
     private Map<SimpleExpressionProxy,IdentifierProxy> mNondeterminismMap;
@@ -466,7 +957,7 @@ public class PrimePreservingConditionCompiler
           final SimpleExpressionProxy left0 = expr.getLeft();
           final SimpleExpressionProxy left1 =
             (SimpleExpressionProxy) left0.acceptVisitor(this);
-          if (mSimplifier.isBooleanFalse(left1)) {
+          if (SimpleExpressionCompiler.isBooleanFalse(left1)) {
             return left1;
           }
           final SimpleExpressionProxy right0 = expr.getRight();
@@ -474,10 +965,10 @@ public class PrimePreservingConditionCompiler
             (SimpleExpressionProxy) right0.acceptVisitor(this);
           if (left1 == left0 && right1 == right0) {
             return expr;
-          } else if (mSimplifier.isBooleanTrue(left1) ||
-                     mSimplifier.isBooleanFalse(right1)) {
+          } else if (SimpleExpressionCompiler.isBooleanTrue(left1) ||
+                     SimpleExpressionCompiler.isBooleanFalse(right1)) {
             return right1;
-          } else if (mSimplifier.isBooleanTrue(right1)) {
+          } else if (SimpleExpressionCompiler.isBooleanTrue(right1)) {
             return left1;
           } else {
             final BinaryExpressionProxy newExpr =
@@ -525,11 +1016,12 @@ public class PrimePreservingConditionCompiler
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mInternalFactory;
-  private final ModuleProxyCloner mCloner;
+  private final ModuleProxyFactory mOutputFactory;
   private final SimpleExpressionCompiler mSimplifier;
   private final SmartPrimeFinder mSmartPrimeFinder = new SmartPrimeFinder();
   private final SmartSimplifier mSmartSimplifier = new SmartSimplifier();
 
   private BindingContext mContext;
+  private Result mResult;
 
 }

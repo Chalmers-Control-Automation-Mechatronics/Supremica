@@ -929,7 +929,7 @@ public class EFSMCompiler extends AbortableCompiler
       for (final SimpleExpressionProxy constraint : constraints.getConstraints()) {
         final SimpleExpressionProxy value =
           mSimpleExpressionCompiler.eval(constraint, this);
-        if (!mSimpleExpressionCompiler.getBooleanValue(value)) {
+        if (!SimpleExpressionCompiler.getBooleanValue(value)) {
           return false;
         }
       }
@@ -1480,7 +1480,7 @@ public class EFSMCompiler extends AbortableCompiler
         try {
           final SimpleExpressionProxy initVal =
             mSimpleExpressionCompiler.eval(initPred, context);
-          initial = mSimpleExpressionCompiler.getBooleanValue(initVal);
+          initial = SimpleExpressionCompiler.getBooleanValue(initVal);
         } catch (final EvalException exception) {
           mCompilationInfo.raiseInVisitor(exception);
         }
@@ -1489,7 +1489,7 @@ public class EFSMCompiler extends AbortableCompiler
             final SimpleExpressionProxy pred = marking.getPredicate();
             final SimpleExpressionProxy predVal =
               mSimpleExpressionCompiler.eval(pred, context);
-            if (mSimpleExpressionCompiler.getBooleanValue(predVal)) {
+            if (SimpleExpressionCompiler.getBooleanValue(predVal)) {
               final IdentifierProxy prop = marking.getProposition();
               props.add(prop);
               blocked.remove(prop);

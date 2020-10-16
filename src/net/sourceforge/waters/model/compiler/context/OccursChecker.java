@@ -89,7 +89,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     try {
       mSoughtExpression = sought;
       for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
-        if (occurs(expr)) {
+        if (find(expr) != null) {
           return true;
         }
       }
@@ -111,7 +111,24 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   {
     try {
       mSoughtExpression = sought;
-      return occurs(expr);
+      return find(expr) != null;
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    } finally {
+      mSoughtExpression = null;
+    }
+  }
+
+  /**
+   * Searches an expression for a subterm.
+   * @return The subterm found within the expression, or <CODE>null</CODE>.
+   */
+  public SimpleExpressionProxy find(final SimpleExpressionProxy sought,
+                                    final SimpleExpressionProxy expr)
+  {
+    try {
+      mSoughtExpression = sought;
+      return find(expr);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     } finally {
@@ -122,13 +139,13 @@ public class OccursChecker extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean occurs(final SimpleExpressionProxy expr)
+  private SimpleExpressionProxy find(final SimpleExpressionProxy expr)
     throws VisitorException
   {
     if (mEquality.equals(expr, mSoughtExpression)) {
-      return true;
+      return expr;
     } else {
-      return (Boolean) expr.acceptVisitor(this);
+      return (SimpleExpressionProxy) expr.acceptVisitor(this);
     }
   }
 
@@ -136,71 +153,78 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
-  public Boolean visitBinaryExpressionProxy
+  public SimpleExpressionProxy visitBinaryExpressionProxy
     (final BinaryExpressionProxy expr)
     throws VisitorException
   {
     final SimpleExpressionProxy lhs = expr.getLeft();
+    final SimpleExpressionProxy found = find(lhs);
+    if (found != null) {
+      return found;
+    }
     final SimpleExpressionProxy rhs = expr.getRight();
-    return occurs(lhs) || occurs(rhs);
+    return find(rhs);
   }
 
   @Override
-  public Boolean visitFunctionCallExpressionProxy
+  public SimpleExpressionProxy visitFunctionCallExpressionProxy
     (final FunctionCallExpressionProxy expr)
     throws VisitorException
   {
     final List<SimpleExpressionProxy> args = expr.getArguments();
     for (final SimpleExpressionProxy arg : args) {
-      if (occurs(arg)) {
-        return true;
+      final SimpleExpressionProxy found = find(arg);
+      if (found != null) {
+        return found;
       }
     }
-    return false;
+    return null;
   }
 
   @Override
-  public Boolean visitIndexedIdentifierProxy
+  public SimpleExpressionProxy visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy ident)
     throws VisitorException
   {
     final List<SimpleExpressionProxy> indexes = ident.getIndexes();
     for (final SimpleExpressionProxy index : indexes) {
-      if (occurs(index)) {
-        return true;
+      final SimpleExpressionProxy found = find(index);
+      if (found != null) {
+        return found;
       }
     }
-    return false;
+    return null;
   }
 
   @Override
-  public Boolean visitQualifiedIdentifierProxy
+  public SimpleExpressionProxy visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy ident)
     throws VisitorException
   {
     final IdentifierProxy base = ident.getBaseIdentifier();
-    final Boolean occbase = (Boolean) base.acceptVisitor(this);
-    if (occbase) {
-      return occbase;
+    final SimpleExpressionProxy found =
+      (SimpleExpressionProxy) base.acceptVisitor(this);
+    if (found != null) {
+      return found;
     }
     final IdentifierProxy comp = ident.getComponentIdentifier();
-    return (Boolean) comp.acceptVisitor(this);
+    return (SimpleExpressionProxy) comp.acceptVisitor(this);
   }
 
   @Override
-  public Boolean visitSimpleExpressionProxy
+  public SimpleExpressionProxy visitSimpleExpressionProxy
     (final SimpleExpressionProxy expr)
   {
-    return false;
+    return null;
   }
 
   @Override
-  public Boolean visitUnaryExpressionProxy
+  public SimpleExpressionProxy visitUnaryExpressionProxy
     (final UnaryExpressionProxy expr)
     throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
-    return occurs(subterm);
+    return find(subterm);
   }
 
 

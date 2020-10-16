@@ -482,7 +482,7 @@ class EFATransitionRelationBuilder extends AbortableCompiler
       for (final SimpleExpressionProxy literal : mOtherLiterals) {
         final SimpleExpressionProxy value =
           mSimpleExpressionCompiler.eval(literal, context);
-        if (!mSimpleExpressionCompiler.getBooleanValue(value)) {
+        if (!SimpleExpressionCompiler.getBooleanValue(value)) {
           return false;
         }
       }

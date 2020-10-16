@@ -71,10 +71,25 @@ public class ModuleProxyCloner
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
+  /**
+   * Creates a new module proxy cloner that preserves geometry.
+   * @param  factory  The factory used to create cloned objects.
+   */
   public ModuleProxyCloner(final ModuleProxyFactory factory)
   {
+    this(factory, true);
+  }
+
+  /**
+   * Creates a new module proxy cloner that optionally preserves geometry.
+   * @param  factory  The factory used to create cloned objects.
+   * @param  geo      Whether cloned objects retain geometry information.
+   */
+  public ModuleProxyCloner(final ModuleProxyFactory factory, boolean geo)
+  {
     mFactory = factory;
+    mCloningGeometry = geo;
     mNodeMap = null;
   }
 
@@ -166,7 +181,12 @@ public class ModuleProxyCloner
     (final BinaryExpressionProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final BinaryOperator operator = proxy.getOperator();
     final SimpleExpressionProxy left0 = proxy.getLeft();
     final SimpleExpressionProxy left =
@@ -245,15 +265,27 @@ public class ModuleProxyCloner
       proxy.getGuardActionBlock();
     final GuardActionBlockProxy guardActionBlock =
       (GuardActionBlockProxy) cloneProxy(guardActionBlock0);
-    final SplineGeometryProxy geometry0 = proxy.getGeometry();
-    final SplineGeometryProxy geometry =
-      (SplineGeometryProxy) cloneProxy(geometry0);
-    final PointGeometryProxy startPoint0 = proxy.getStartPoint();
-    final PointGeometryProxy startPoint =
-      (PointGeometryProxy) cloneProxy(startPoint0);
-    final PointGeometryProxy endPoint0 = proxy.getEndPoint();
-    final PointGeometryProxy endPoint =
-      (PointGeometryProxy) cloneProxy(endPoint0);
+    final SplineGeometryProxy geometry;
+    if (mCloningGeometry) {
+      final SplineGeometryProxy geometry0 = proxy.getGeometry();
+      geometry = (SplineGeometryProxy) cloneProxy(geometry0);
+    } else {
+      geometry = null;
+    }
+    final PointGeometryProxy startPoint;
+    if (mCloningGeometry) {
+      final PointGeometryProxy startPoint0 = proxy.getStartPoint();
+      startPoint = (PointGeometryProxy) cloneProxy(startPoint0);
+    } else {
+      startPoint = null;
+    }
+    final PointGeometryProxy endPoint;
+    if (mCloningGeometry) {
+      final PointGeometryProxy endPoint0 = proxy.getEndPoint();
+      endPoint = (PointGeometryProxy) cloneProxy(endPoint0);
+    } else {
+      endPoint = null;
+    }
     return mFactory.createEdgeProxy(source,
                                     target,
                                     labelBlock,
@@ -268,7 +300,12 @@ public class ModuleProxyCloner
     (final EnumSetExpressionProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final Collection<SimpleIdentifierProxy> items0 = proxy.getItems();
     final Collection<SimpleIdentifierProxy> items =
       cloneProxyCollection(items0);
@@ -305,9 +342,13 @@ public class ModuleProxyCloner
     final Collection<SimpleExpressionProxy> ranges0 = proxy.getRanges();
     final Collection<SimpleExpressionProxy> ranges =
       cloneProxyCollection(ranges0);
-    final ColorGeometryProxy colorGeometry0 = proxy.getColorGeometry();
-    final ColorGeometryProxy colorGeometry =
-      (ColorGeometryProxy) cloneProxy(colorGeometry0);
+    final ColorGeometryProxy colorGeometry;
+    if (mCloningGeometry) {
+      final ColorGeometryProxy colorGeometry0 = proxy.getColorGeometry();
+      colorGeometry = (ColorGeometryProxy) cloneProxy(colorGeometry0);
+    } else {
+      colorGeometry = null;
+    }
     final Map<String,String> attributes = proxy.getAttributes();
     return mFactory.createEventDeclProxy(identifier,
                                          kind,
@@ -339,7 +380,12 @@ public class ModuleProxyCloner
     (final FunctionCallExpressionProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final String functionName = proxy.getFunctionName();
     final Collection<SimpleExpressionProxy> arguments0 = proxy.getArguments();
     final Collection<SimpleExpressionProxy> arguments =
@@ -388,9 +434,13 @@ public class ModuleProxyCloner
       proxy.getImmediateChildNodes();
     final Collection<NodeProxy> immediateChildNodes =
       lookupNodeProxyCollection(immediateChildNodes0);
-    final BoxGeometryProxy geometry0 = proxy.getGeometry();
-    final BoxGeometryProxy geometry =
-      (BoxGeometryProxy) cloneProxy(geometry0);
+    final BoxGeometryProxy geometry;
+    if (mCloningGeometry) {
+      final BoxGeometryProxy geometry0 = proxy.getGeometry();
+      geometry = (BoxGeometryProxy) cloneProxy(geometry0);
+    } else {
+      geometry = null;
+    }
     return mFactory.createGroupNodeProxy(name,
                                          propositions,
                                          attributes,
@@ -409,9 +459,13 @@ public class ModuleProxyCloner
     final Collection<BinaryExpressionProxy> actions0 = proxy.getActions();
     final Collection<BinaryExpressionProxy> actions =
       cloneProxyCollection(actions0);
-    final LabelGeometryProxy geometry0 = proxy.getGeometry();
-    final LabelGeometryProxy geometry =
-      (LabelGeometryProxy) cloneProxy(geometry0);
+    final LabelGeometryProxy geometry;
+    if (mCloningGeometry) {
+      final LabelGeometryProxy geometry0 = proxy.getGeometry();
+      geometry = (LabelGeometryProxy) cloneProxy(geometry0);
+    } else {
+      geometry = null;
+    }
     return mFactory.createGuardActionBlockProxy(guards,
                                                 actions,
                                                 geometry);
@@ -422,7 +476,12 @@ public class ModuleProxyCloner
     (final IndexedIdentifierProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final String name = proxy.getName();
     final Collection<SimpleExpressionProxy> indexes0 = proxy.getIndexes();
     final Collection<SimpleExpressionProxy> indexes =
@@ -455,7 +514,12 @@ public class ModuleProxyCloner
     (final IntConstantProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final int value = proxy.getValue();
     return mFactory.createIntConstantProxy(plainText,
                                            value);
@@ -470,9 +534,13 @@ public class ModuleProxyCloner
       proxy.getEventIdentifierList();
     final Collection<Proxy> eventIdentifierList =
       cloneProxyCollection(eventIdentifierList0);
-    final LabelGeometryProxy geometry0 = proxy.getGeometry();
-    final LabelGeometryProxy geometry =
-      (LabelGeometryProxy) cloneProxy(geometry0);
+    final LabelGeometryProxy geometry;
+    if (mCloningGeometry) {
+      final LabelGeometryProxy geometry0 = proxy.getGeometry();
+      geometry = (LabelGeometryProxy) cloneProxy(geometry0);
+    } else {
+      geometry = null;
+    }
     return mFactory.createLabelBlockProxy(eventIdentifierList,
                                           geometry);
   }
@@ -572,7 +640,12 @@ public class ModuleProxyCloner
     (final QualifiedIdentifierProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final IdentifierProxy baseIdentifier0 = proxy.getBaseIdentifier();
     final IdentifierProxy baseIdentifier =
       (IdentifierProxy) cloneProxy(baseIdentifier0);
@@ -608,7 +681,12 @@ public class ModuleProxyCloner
     (final SimpleIdentifierProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final String name = proxy.getName();
     return mFactory.createSimpleIdentifierProxy(plainText,
                                                 name);
@@ -625,16 +703,29 @@ public class ModuleProxyCloner
       (PlainEventListProxy) cloneProxy(propositions0);
     final Map<String,String> attributes = proxy.getAttributes();
     final boolean initial = proxy.isInitial();
-    final PointGeometryProxy pointGeometry0 = proxy.getPointGeometry();
-    final PointGeometryProxy pointGeometry =
-      (PointGeometryProxy) cloneProxy(pointGeometry0);
-    final PointGeometryProxy initialArrowGeometry0 =
-      proxy.getInitialArrowGeometry();
-    final PointGeometryProxy initialArrowGeometry =
-      (PointGeometryProxy) cloneProxy(initialArrowGeometry0);
-    final LabelGeometryProxy labelGeometry0 = proxy.getLabelGeometry();
-    final LabelGeometryProxy labelGeometry =
-      (LabelGeometryProxy) cloneProxy(labelGeometry0);
+    final PointGeometryProxy pointGeometry;
+    if (mCloningGeometry) {
+      final PointGeometryProxy pointGeometry0 = proxy.getPointGeometry();
+      pointGeometry = (PointGeometryProxy) cloneProxy(pointGeometry0);
+    } else {
+      pointGeometry = null;
+    }
+    final PointGeometryProxy initialArrowGeometry;
+    if (mCloningGeometry) {
+      final PointGeometryProxy initialArrowGeometry0 =
+        proxy.getInitialArrowGeometry();
+      initialArrowGeometry =
+        (PointGeometryProxy) cloneProxy(initialArrowGeometry0);
+    } else {
+      initialArrowGeometry = null;
+    }
+    final LabelGeometryProxy labelGeometry;
+    if (mCloningGeometry) {
+      final LabelGeometryProxy labelGeometry0 = proxy.getLabelGeometry();
+      labelGeometry = (LabelGeometryProxy) cloneProxy(labelGeometry0);
+    } else {
+      labelGeometry = null;
+    }
     return mFactory.createSimpleNodeProxy(name,
                                           propositions,
                                           attributes,
@@ -660,7 +751,12 @@ public class ModuleProxyCloner
     (final UnaryExpressionProxy proxy)
     throws VisitorException
   {
-    final String plainText = proxy.getPlainText();
+    final String plainText;
+    if (mCloningGeometry) {
+      plainText = proxy.getPlainText();
+    } else {
+      plainText = null;
+    }
     final UnaryOperator operator = proxy.getOperator();
     final SimpleExpressionProxy subTerm0 = proxy.getSubTerm();
     final SimpleExpressionProxy subTerm =
@@ -773,6 +869,7 @@ public class ModuleProxyCloner
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
+  private final boolean mCloningGeometry;
   private Map<String,NodeProxy> mNodeMap;
 
 }

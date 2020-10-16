@@ -56,7 +56,14 @@ public class SourceInfoCloner extends ModuleProxyCloner
   public SourceInfoCloner(final ModuleProxyFactory factory,
                           final CompilationInfo compilationInfo)
   {
-    super(factory);
+    this(factory, compilationInfo, true);
+  }
+
+  public SourceInfoCloner(final ModuleProxyFactory factory,
+                          final CompilationInfo compilationInfo,
+                          final boolean geo)
+  {
+    super(factory, geo);
     mCompilationInfo = compilationInfo;
   }
 
