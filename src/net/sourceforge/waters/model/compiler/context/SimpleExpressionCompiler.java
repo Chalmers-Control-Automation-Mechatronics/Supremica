@@ -1331,7 +1331,11 @@ public class SimpleExpressionCompiler
     {
       final SumSimplifier simplifier =
         new SumSimplifier(mFactory, SimpleExpressionCompiler.this);
-      return simplifier.normaliseSum(expr);
+      final SimpleExpressionProxy result = simplifier.normaliseSum(expr);
+      if (result != expr) {
+        mCompilationInfo.add(result, expr);
+      }
+      return result;
     }
 
   }

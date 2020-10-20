@@ -526,6 +526,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_blocked_action()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "blocked_action");
+    testCompile(module);
+  }
+
   public void testCompile_blocked_efa()
     throws IOException, WatersException
   {
@@ -539,6 +547,18 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "blocked_event");
     testCompile(module);
+  }
+
+  public void testCompile_complex_prime_01()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "complex_prime_01");
+    if (isNormalisationEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, null, TypeMismatchException.class);
+    }
   }
 
   public void testCompile_conditional01()

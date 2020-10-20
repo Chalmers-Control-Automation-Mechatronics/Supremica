@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="blocked_action">
+<B:Comment>An EFSM compiler test with an event that becomes blocked by a false guard, which is found only after checking variable ranges.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="A">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="80" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="134" Y="62"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="80" Y="64"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="==">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="x"/>
+</UnaryExpression>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="3"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-3"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent Name="y">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="x">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

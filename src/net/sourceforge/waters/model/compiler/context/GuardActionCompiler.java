@@ -74,13 +74,27 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * <P>A utility to simplify expressions while preserving the presence of
  * primed variables.</P>
  *
- * <P>Based on {@link SimpleExpressionCompiler}, the prime-preserving
- * condition compiler simplifies Boolean expressions as much as possible
- * while ensuring that any primed variable that appears in the input is
+ * <P>Based on {@link SimpleExpressionCompiler}, the guard/action compiler
+ * checks and simplifies Boolean expressions as much as possible while
+ * ensuring that any primed variable that appears in the input is
  * still present in the output. This is achieved by adding equations of
  * the form <CODE>x'&nbsp;==&nbsp;x'</CODE> to the result if necessary.
  * Effort is made to re-use such equations if they are already present in
  * the input and only create them if necessary.</P>
+ *
+ * <P>Prior to simplification, structure checking is performed to ensure
+ * reasonable use of primes and assignments:</P>
+ * <UL>
+ * <LI>The next-state (prime) operator cannot be used within assignment
+ *     expressions, within array indexes, or nested within another prime.</LI>
+ * <LI>Assignments are only allowed as actions, not guards within a
+ *     guard/action block. They are allowed within conditionals, but
+ *     only at the topmost level or as immediate subterms of a conjunction at
+ *     the topmost level.</LI>
+ * </UL>
+ * <P>If an expression to be simplified fails to meet these requirements,
+ * simplification will fail and a {@link NestedNextException} or {@link
+ * ActionSyntaxException} will be produced.</P>
  *
  * @author Robi Malik
  */
@@ -155,6 +169,15 @@ public class GuardActionCompiler
     (final List<SimpleExpressionProxy> guards)
   {
     return addToConjunction(mOutputFactory, null, guards);
+  }
+
+  public SimpleExpressionProxy createCondition
+    (final List<SimpleExpressionProxy> guards,
+     final List<BinaryExpressionProxy> actions)
+  {
+    final SimpleExpressionProxy guard =
+      addToConjunction(mOutputFactory, null, guards);
+    return addToConjunction(mOutputFactory, guard, actions);
   }
 
 

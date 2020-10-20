@@ -120,6 +120,22 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   }
 
   /**
+   * Searches a constraint list for a subterm.
+   * @return The subterm found within the constraint list, or <CODE>null</CODE>.
+   */
+  public SimpleExpressionProxy find(final SimpleExpressionProxy sought,
+                                    final ConstraintList list)
+  {
+    for (final SimpleExpressionProxy expr : list.getConstraints()) {
+      final SimpleExpressionProxy occurrence = find(sought, expr);
+      if (occurrence != null) {
+        return occurrence;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Searches an expression for a subterm.
    * @return The subterm found within the expression, or <CODE>null</CODE>.
    */

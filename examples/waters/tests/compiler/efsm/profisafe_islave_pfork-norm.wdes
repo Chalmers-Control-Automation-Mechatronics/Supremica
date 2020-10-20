@@ -4,7 +4,7 @@
     <ns2:EventList>
         <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{in_cons_num}"/>
         <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{!in_cons_num}"/>
-        <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{in_CRC!=ok|in_cons_num!=0}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{in_cons_num|in_CRC!=ok}"/>
     </ns2:EventList>
     <ns2:AutomataList>
         <ns2:Automaton Kind="PLANT" Name="in_cons_num">
@@ -25,14 +25,14 @@
             <ns2:EventRefList>
                 <ns2:EventRef Name="resume.{!in_cons_num}"/>
                 <ns2:EventRef Name="resume.{in_cons_num}"/>
-                <ns2:EventRef Name="resume.{in_CRC!=ok|in_cons_num!=0}"/>
+                <ns2:EventRef Name="resume.{in_cons_num|in_CRC!=ok}"/>
             </ns2:EventRefList>
             <ns2:StateList>
                 <ns2:State Name="ok"/>
                 <ns2:State Initial="true" Name="nok"/>
             </ns2:StateList>
             <ns2:TransitionList>
-                <ns2:Transition Event="resume.{in_CRC!=ok|in_cons_num!=0}" Source="nok" Target="nok"/>
+                <ns2:Transition Event="resume.{in_cons_num|in_CRC!=ok}" Source="nok" Target="nok"/>
                 <ns2:Transition Event="resume.{!in_cons_num}" Source="ok" Target="ok"/>
                 <ns2:Transition Event="resume.{in_cons_num}" Source="ok" Target="ok"/>
             </ns2:TransitionList>
@@ -41,7 +41,7 @@
             <ns2:EventRefList>
                 <ns2:EventRef Name="resume.{!in_cons_num}"/>
                 <ns2:EventRef Name="resume.{in_cons_num}"/>
-                <ns2:EventRef Name="resume.{in_CRC!=ok|in_cons_num!=0}"/>
+                <ns2:EventRef Name="resume.{in_cons_num|in_CRC!=ok}"/>
             </ns2:EventRefList>
             <ns2:StateList>
                 <ns2:State Initial="true" Name="init"/>

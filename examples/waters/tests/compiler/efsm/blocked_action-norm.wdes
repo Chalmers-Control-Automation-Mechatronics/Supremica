@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="blocked_action">
+<B:Comment>An EFSM compiler test with an event that becomes blocked by a false guard, which is found only after checking variable ranges.</B:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="a"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="A">
+<EventRefList>
+<EventRef Name="a"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="x">
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="y">
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>

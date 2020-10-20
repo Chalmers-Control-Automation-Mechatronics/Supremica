@@ -71,15 +71,14 @@ import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.efa.EFAEventNameBuilder;
-import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.compiler.efa.EFAModuleContext;
 import net.sourceforge.waters.model.compiler.efa.EFAVariable;
 import net.sourceforge.waters.model.compiler.efa.EFAVariableCollector;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -166,7 +165,11 @@ public class EFSMNormaliser extends AbortableCompiler
       mInputModule.acceptVisitor(pass1);
 
       // Pass 2
-      mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
+      mUsingGuardActionBlocks = false;
+      mConditionCompiler =
+        new EFSMConditionCompiler(mFactory, mOperatorTable,
+                                  mCompilationInfo, mRootContext);
+      mConditionCache = new HashMap<>();
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final int size = mInputModule.getEventDeclList().size();
       mEventMap = new ProxyAccessorHashMap<>(eq,size);
@@ -208,7 +211,7 @@ public class EFSMNormaliser extends AbortableCompiler
 
     finally {
       mRootContext = null;
-      mGuardCompiler = null;
+      mConditionCompiler = null;
       mEventMap = null;
       mEventNameBuilder = null;
     }
@@ -309,34 +312,60 @@ public class EFSMNormaliser extends AbortableCompiler
    *         and has all the events with their unique updates as loops.
    */
   private SimpleComponentProxy createGuardAutomaton
-                                          (final List<EventDeclProxy> events)
+    (final List<EventDeclProxy> events)
   {
     if (!mCreatesGuardAutomaton) {
       return null;
     }
     final SimpleNodeProxy node =
       mFactory.createSimpleNodeProxy(":init", null, null, true, null, null, null);
-    final List<EdgeProxy> edges = new ArrayList<>(mEventUpdateMap.size());
-    for (final EventDeclProxy event : events) {
-      final IdentifierProxy ident = event.getIdentifier();
-      final ConstraintList update = mEventUpdateMap.getByProxy(ident);
-      if (update != null && !update.isTrue()) {
-        final SimpleExpressionProxy guard =
-          update.createExpression(mFactory, mOperatorTable.getAndOperator());
-        final List<SimpleExpressionProxy> guards =
-          Collections.singletonList(guard);
-        final GuardActionBlockProxy ga =
-          mFactory.createGuardActionBlockProxy(guards, null, null);
-        final List<IdentifierProxy> labels = Collections.singletonList(ident);
-        final LabelBlockProxy block =
-          mFactory.createLabelBlockProxy(labels, null);
-        final EdgeProxy edge =
-          mFactory.createEdgeProxy(node, node, block, ga, null, null, null);
-        edges.add(edge);
+    final List<EdgeProxy> edges;
+    if (mUsingGuardActionBlocks) {
+      edges = new ArrayList<>(mEventUpdateMap.size());
+      for (final EventDeclProxy event : events) {
+        final IdentifierProxy ident = event.getIdentifier();
+        final ConstraintList update = mEventUpdateMap.getByProxy(ident);
+        if (update != null && !update.isTrue()) {
+          final SimpleExpressionProxy guard =
+            update.createExpression(mFactory, mOperatorTable.getAndOperator());
+          final List<SimpleExpressionProxy> guards =
+            Collections.singletonList(guard);
+          final GuardActionBlockProxy ga =
+            mFactory.createGuardActionBlockProxy(guards, null, null);
+          final List<IdentifierProxy> labels = Collections.singletonList(ident);
+          final LabelBlockProxy block =
+            mFactory.createLabelBlockProxy(labels, null);
+          final EdgeProxy edge =
+            mFactory.createEdgeProxy(node, node, block, ga, null, null, null);
+          edges.add(edge);
+        }
       }
-    }
-    if (edges.isEmpty()) {
-      return null;
+      if (edges.isEmpty()) {
+        return null;
+      }
+    } else {
+      final List<ConditionalProxy> labels =
+        new ArrayList<>(mEventUpdateMap.size());
+      for (final EventDeclProxy event : events) {
+        final IdentifierProxy ident = event.getIdentifier();
+        final ConstraintList update = mEventUpdateMap.getByProxy(ident);
+        if (update != null && !update.isTrue()) {
+          final SimpleExpressionProxy guard =
+            update.createExpression(mFactory, mOperatorTable.getAndOperator());
+          final List<IdentifierProxy> body = Collections.singletonList(ident);
+          final ConditionalProxy cond =
+            mFactory.createConditionalProxy(body, guard);
+          labels.add(cond);
+        }
+      }
+      if (labels.isEmpty()) {
+        return null;
+      }
+      final LabelBlockProxy block =
+        mFactory.createLabelBlockProxy(labels, null);
+      final EdgeProxy edge =
+        mFactory.createEdgeProxy(node, node, block, null, null, null, null);
+      edges = Collections.singletonList(edge);
     }
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final GraphProxy graph =
@@ -467,22 +496,43 @@ public class EFSMNormaliser extends AbortableCompiler
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
+    public Object visitConditionalProxy(final ConditionalProxy cond)
+      throws VisitorException
+    {
+      final ConstraintPropagator oldPropagator = mCurrentPropagator;
+      final ConstraintList oldConstraints = mCurrentConstraints;
+      try {
+        final SimpleExpressionProxy guard = cond.getGuard();
+        final ConstraintList constraints =
+          mConditionCompiler.compileCondition(guard);
+        propagate(constraints, cond);
+        final List<Proxy> body = cond.getBody();
+        visitCollection(body);
+        return null;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      } finally {
+        mCurrentPropagator = oldPropagator;
+        mCurrentConstraints = oldConstraints;
+      }
+    }
+
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
       try {
-        mCurrentGABlock = edge.getGuardActionBlock();
-        if (mCurrentGABlock == null) {
-          mCurrentUpdate = ConstraintList.TRUE;
-        } else {
-          visitGuardActionBlockProxy(mCurrentGABlock);
+        mCurrentConstraints = ConstraintList.TRUE;
+        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+        if (ga != null) {
+          visitGuardActionBlockProxy(ga);
         }
         final LabelBlockProxy block = edge.getLabelBlock();
         visitLabelBlockProxy(block);
         return null;
       } finally {
-        mCurrentUpdate = null;
-        mCurrentGABlock = null;
+        mCurrentPropagator = null;
+        mCurrentConstraints = null;
       }
     }
 
@@ -521,8 +571,11 @@ public class EFSMNormaliser extends AbortableCompiler
     {
       try {
         checkAbortInVisitor();
-        mCurrentUpdate = mGuardCompiler.getCompiledGuard(ga);
-        return mCurrentUpdate;
+        mUsingGuardActionBlocks = true;
+        final ConstraintList constraints =
+          mConditionCompiler.compileGuardActionBlock(ga);
+        propagate(constraints, ga);
+        return null;
       } catch (final EvalException exception) {
         throw wrap(exception);
       }
@@ -535,10 +588,10 @@ public class EFSMNormaliser extends AbortableCompiler
       try {
         checkAbortInVisitor();
         final EFAEventInfo edecl = findEventInfo(ident);
-        if (mCurrentUpdate == null) {
+        if (mCurrentConstraints == null) {
           edecl.setBlocked(mCurrentComponent);
         } else {
-          edecl.addUpdate(mCurrentComponent, mCurrentUpdate, mCurrentGABlock);
+          edecl.addUpdate(mCurrentComponent, mCurrentConstraints);
         }
         return edecl;
       } catch (final UndefinedIdentifierException exception) {
@@ -586,12 +639,37 @@ public class EFSMNormaliser extends AbortableCompiler
       return null;
     }
 
+    //#######################################################################
+    //# Auxiliary Methods
+    private void propagate(final ConstraintList constraints,
+                           final Proxy key)
+      throws EvalException
+    {
+      if (mCurrentConstraints != null) {
+        if (mCurrentPropagator == null) {
+          mCurrentPropagator =
+            new ConstraintPropagator(mFactory, mCompilationInfo,
+                                     mOperatorTable, mRootContext);
+        } else {
+          mCurrentPropagator = new ConstraintPropagator(mCurrentPropagator);
+        }
+        mCurrentPropagator.addConstraints(constraints);
+        mCurrentPropagator.propagate();
+        if (mCurrentPropagator.isUnsatisfiable()) {
+          mCurrentPropagator = null;
+          mCurrentConstraints = null;
+        } else {
+          mCurrentConstraints = mCurrentPropagator.getAllConstraints();
+          mConditionCache.put(key, mCurrentConstraints);
+        }
+      }
+    }
 
     //#######################################################################
     //# Data Members
     private SimpleComponentProxy mCurrentComponent;
-    private GuardActionBlockProxy mCurrentGABlock;
-    private ConstraintList mCurrentUpdate;
+    private ConstraintPropagator mCurrentPropagator;
+    private ConstraintList mCurrentConstraints;
   }
 
 
@@ -615,6 +693,50 @@ public class EFSMNormaliser extends AbortableCompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitConditionalProxy(final ConditionalProxy cond)
+      throws VisitorException
+    {
+      final ConstraintList oldUpdate = mCurrentUpdate;
+      try {
+        mCurrentUpdate = mConditionCache.get(cond);
+        final List<Proxy> body = cond.getBody();
+        visitCollection(body);
+        return null;
+      } finally {
+        mCurrentUpdate = oldUpdate;
+      }
+    }
+
+    @Override
+    public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      try {
+        final NodeProxy source0 = edge.getSource();
+        final NodeProxy source1 = mNodeMap.get(source0);
+        final NodeProxy target0 = edge.getTarget();
+        final NodeProxy target1 = mNodeMap.get(target0);
+
+        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+        if (ga == null) {
+          mCurrentUpdate = ConstraintList.TRUE;
+        } else {
+          visitGuardActionBlockProxy(ga);
+        }
+        final LabelBlockProxy block0 = edge.getLabelBlock();
+        final LabelBlockProxy block1 = visitLabelBlockProxy(block0);
+        if (block1 != null) {
+          final EdgeProxy result = mFactory.createEdgeProxy
+            (source1, target1, block1, null, null, null, null);
+          mEdgeList.add(result);
+        }
+        return null;
+      } finally {
+        mCurrentUpdate = null;
+      }
+    }
+
     @Override
     public Object visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
@@ -641,34 +763,6 @@ public class EFSMNormaliser extends AbortableCompiler
     }
 
     @Override
-    public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
-      throws VisitorException
-    {
-      try {
-        final NodeProxy source0 = edge.getSource();
-        final NodeProxy source1 = mNodeMap.get(source0);
-        final NodeProxy target0 = edge.getTarget();
-        final NodeProxy target1 = mNodeMap.get(target0);
-
-        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-        if (ga == null)
-          mCurrentUpdate = ConstraintList.TRUE;
-        else
-          visitGuardActionBlockProxy(ga);
-
-        final LabelBlockProxy block0 = edge.getLabelBlock();
-        final LabelBlockProxy block1 = visitLabelBlockProxy(block0);
-
-        final EdgeProxy result = mFactory.createEdgeProxy
-                          (source1, target1, block1, null, null, null, null);
-        mEdgeList.add(result);
-        return result;
-      } finally {
-        mCurrentUpdate = null;
-      }
-    }
-
-    @Override
     public GraphProxy visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -687,18 +781,22 @@ public class EFSMNormaliser extends AbortableCompiler
         visitCollection(edges);
 
         final LabelBlockProxy blocked = graph.getBlockedEvents();
-        if (blocked != null)
+        if (blocked != null) {
           visitLabelBlockProxy(blocked);
-
+        }
         final List<EFAEventInfo> events = new ArrayList<>(mCurrentEvents);
         Collections.sort(events);
         final List<IdentifierProxy> blockedList = new LinkedList<>();
-        for (final EFAEventInfo event : events)
-          for (final EFAIdentifier ident : event.getEvents())
-            if (!mCurrentIdentifiers.contains(ident))
+        for (final EFAEventInfo event : events) {
+          for (final EFAIdentifier ident : event.getEvents()) {
+            if (!mCurrentIdentifiers.contains(ident)) {
               blockedList.add(ident.getIdentifier());
-        final LabelBlockProxy newBlocked =blockedList.isEmpty() ? null :
-                           mFactory.createLabelBlockProxy(blockedList, null);
+            }
+          }
+        }
+        final LabelBlockProxy newBlocked =
+          blockedList.isEmpty() ? null :
+          mFactory.createLabelBlockProxy(blockedList, null);
 
         final boolean deterministic = graph.isDeterministic();
         return mFactory.createGraphProxy
@@ -717,44 +815,35 @@ public class EFSMNormaliser extends AbortableCompiler
       (final GuardActionBlockProxy ga)
       throws VisitorException
     {
-      try {
-        checkAbortInVisitor();
-        mCurrentUpdate = mGuardCompiler.getCompiledGuard(ga);
-        return mCurrentUpdate;
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
+      mCurrentUpdate = mConditionCache.get(ga);
+      return mCurrentUpdate;
     }
 
     @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
-      try
-      {
+      try {
         checkAbortInVisitor();
-
         final EFAEventInfo info = findEventInfo(ident);
-        mCurrentEvents.add(info);
-        if (mCurrentUpdate != null)
-        {
+        if (!info.isBlocked() || info.isBlockedBy(mCurrentComponent)) {
+          mCurrentEvents.add(info);
+        }
+        if (mCurrentUpdate != null) {
           final List<EFAIdentifier> events =
-                           info.getEvents(mCurrentComponent, mCurrentUpdate);
-
-          for (final EFAIdentifier event : events)
-          {
+            info.getEvents(mCurrentComponent, mCurrentUpdate);
+          for (final EFAIdentifier event : events) {
             IdentifierProxy subIdent = event.getIdentifier();
             subIdent = (IdentifierProxy) mCloner.getClone(subIdent);
-            if (!identifierNotDeclared(subIdent))
+            if (!identifierNotDeclared(subIdent)) {
               mLabelList.add(subIdent);
+            }
             mCurrentIdentifiers.add(event);
             mCompilationInfo.add(subIdent, ident);
           }
         }
         return null;
-      }
-
-      catch(final UndefinedIdentifierException exception) {
+      } catch (final UndefinedIdentifierException exception) {
         throw wrap(exception);
       }
     }
@@ -764,10 +853,14 @@ public class EFSMNormaliser extends AbortableCompiler
       throws VisitorException
     {
       try {
-        mLabelList = new LinkedList<IdentifierProxy>();
+        mLabelList = new LinkedList<>();
         final List<Proxy> list = block.getEventIdentifierList();
         visitCollection(list);
-        return mFactory.createLabelBlockProxy(mLabelList, null);
+        if (mLabelList.isEmpty()) {
+          return null;
+        } else {
+          return mFactory.createLabelBlockProxy(mLabelList, null);
+        }
       } finally {
         mLabelList = null;
       }
@@ -943,37 +1036,41 @@ public class EFSMNormaliser extends AbortableCompiler
     private List<EFAIdentifier> getEvents(final SimpleComponentProxy comp,
                                           final ConstraintList update)
     {
-      if (isBlocked()) {
-        return Collections.emptyList();
-      }
-      final EFAUpdateInfo info = mMap.get(comp);
-      final List<EFAIdentifier> identifiers = info.getEvents(update);
-      if (identifiers == null) {
-        return Collections.emptyList();
+      if (mBlockingComponent == null) {
+        final EFAUpdateInfo info = mMap.get(comp);
+        final List<EFAIdentifier> identifiers = info.getEvents(update);
+        if (identifiers == null) {
+          return Collections.emptyList();
+        } else {
+          return identifiers;
+        }
+      } else if (mBlockingComponent == comp) {
+        return mEventList;
       } else {
-        return identifiers;
+        return Collections.emptyList();
       }
     }
 
     /**
-     * Returns whether this event is blocked. <p>
-     * Blocked events are events known to be always disabled by the plant. <p>
-     * These events are removed from the model entirely. <p>
+     * <P>Returns whether this event is blocked.</P>
+     * <P>Blocked events are events known to be always disabled by the plant.
+     * These events are placed on the blocked events list of the first plant
+     * component found to disable it and removed from all other components.</P>
      */
     private boolean isBlocked()
     {
-      return mList == null;
+      return mBlockingComponent != null;
     }
 
     /**
-     * Marks this event as blocked.
+     * Returns whether this event is blocked by the specified component.
+     * This method returns <CODE>true</CODE> if the given component
+     * <CODE>comp</CODE> is the first plant component found to disable
+     * this event.
      */
-    private void setBlocked()
+    public boolean isBlockedBy(final SimpleComponentProxy comp)
     {
-      mMap = null;
-      mList = null;
-      mConstraintMap = null;
-      mEventList = Collections.emptyList();
+      return mBlockingComponent == comp;
     }
 
     /**
@@ -983,8 +1080,7 @@ public class EFSMNormaliser extends AbortableCompiler
      * @param  update     The update associated with the transition.
      */
     private void addUpdate(final SimpleComponentProxy comp,
-                           final ConstraintList update,
-                           final GuardActionBlockProxy block)
+                           final ConstraintList update)
     {
       if (!isBlocked()) {
         EFAUpdateInfo info = mMap.get(comp);
@@ -993,37 +1089,46 @@ public class EFSMNormaliser extends AbortableCompiler
           mMap.put(comp, info);
           mList.add(info);
         }
-        info.addUpdate(update, block);
+        info.addUpdate(update);
       }
     }
 
     /**
-     * Records a blocked events list entry.
-     * <P>
-     * This method is to be called after all regular transitions have been
-     * added using {@link #addUpdate(SimpleComponentProxy, ConstraintList,
-     * GuardActionBlockProxy) addUpdate()}.
-     * <P>
-     * If this method is called with another update already recorded for
-     * the given automaton, it has no effect. Otherwise, the effect of
-     * blocked events depends on the component kind.
-     * <p>
-     * If an event only occurs in a blocked events list of a plant, then it
-     * is marked as blocked&nbsp;- effectively removing it from the model.
+     * <P>Records a blocked events list entry.</P>
+     *
+     * <P>This method is to be called after all regular transitions have been
+     * added using {@link #addUpdate(SimpleComponentProxy, ConstraintList)
+     * addUpdate()}.</P>
+     *
+     * <P>If this method is called for an event already marked as blocked or
+     * with another update already recorded for the given automaton, it has
+     * no effect. Otherwise, the effect of blocked events depends on the
+     * component kind.</P>
+     *
+     * <P>If an event only occurs in a blocked events list of a plant, then it
+     * is marked as blocked, removing it from all other components
+     * but keeping it in the blocked event list of the given component.
      * If an event occurs in a blocked events list of some other type of
      * component, an update associated with a true guard is recorded for
-     * the automaton.
+     * the automaton.</P>
      *
      * @param  comp       The automaton containing the blocked events list.
      */
     private void setBlocked(final SimpleComponentProxy comp)
     {
-      if (mMap != null && !mMap.containsKey(comp)) {
+      if (mBlockingComponent == null && !mMap.containsKey(comp)) {
         if (mEventDecl.getKind() != EventKind.PROPOSITION &&
             comp.getKind() == ComponentKind.PLANT) {
-          setBlocked();
+          mMap.clear();
+          mList.clear();
+          addUpdate(comp, ConstraintList.TRUE);
+          mConstraintMap = null;
+          final EFAIdentifier ident =
+            new EFAIdentifier(mEventDecl, ConstraintList.TRUE);
+          mEventList = Collections.singletonList(ident);
+          mBlockingComponent = comp;
         } else {
-          addUpdate(comp, ConstraintList.TRUE, null);
+          addUpdate(comp, ConstraintList.TRUE);
         }
       }
     }
@@ -1215,10 +1320,11 @@ public class EFSMNormaliser extends AbortableCompiler
     //#######################################################################
     //# Data Members
     private final EventDeclProxy mEventDecl;
-    private Map<SimpleComponentProxy,EFAUpdateInfo> mMap;
-    private List<EFAUpdateInfo> mList;
+    private final Map<SimpleComponentProxy,EFAUpdateInfo> mMap;
+    private final List<EFAUpdateInfo> mList;
     private Map<ConstraintList,EFAIdentifier> mConstraintMap;
     private List<EFAIdentifier> mEventList;
+    private SimpleComponentProxy mBlockingComponent;
   }
 
 
@@ -1238,17 +1344,15 @@ public class EFSMNormaliser extends AbortableCompiler
     {
       mComponent = comp;
       mUpdates = new ArrayList<>();
+      mUniqueUpdates = new THashSet<>();
       mUpdateMap = new HashMap<>();
-      mGABlockMap = new HashMap<>();
     }
 
     //#######################################################################
     //# Simple Access
-    private void addUpdate(final ConstraintList update,
-                           final GuardActionBlockProxy gaBlock)
+    private void addUpdate(final ConstraintList update)
     {
-      if (!mGABlockMap.containsKey(update)) {
-        mGABlockMap.put(update, gaBlock);
+      if (mUniqueUpdates.add(update)) {
         mUpdates.add(update);
       }
     }
@@ -1502,10 +1606,7 @@ public class EFSMNormaliser extends AbortableCompiler
       if (cKind == ComponentKind.PROPERTY || eKind == EventKind.UNCONTROLLABLE) {
         final EFAVariableCollector collector =
           new EFAVariableCollector(mOperatorTable, mRootContext);
-        for (final Map.Entry<ConstraintList, GuardActionBlockProxy> entry :
-             mGABlockMap.entrySet()) {
-          final ConstraintList update = entry.getKey();
-          final GuardActionBlockProxy gaBlock = entry.getValue();
+        for (final ConstraintList update : mUpdates) {
           final Set<EFAVariable> primedVariables = new THashSet<>();
           collector.collectPrimedVariables(update, primedVariables);
           if (!primedVariables.isEmpty()) {
@@ -1513,38 +1614,19 @@ public class EFSMNormaliser extends AbortableCompiler
             // EFSMControllabilityException. Let us raise one exception for
             // each primed variable ...
             final OccursChecker occursChecker = new OccursChecker();
-            final ModuleEqualityVisitor eq = occursChecker.getEquality();
             final UnaryOperator prime = mOperatorTable.getNextOperator();
             for (final EFAVariable var : primedVariables) {
               final SimpleExpressionProxy varName = var.getVariableName();
               // First check if the variable appears primed in the guard ...
               final UnaryExpressionProxy varNamePrimed =
                 mFactory.createUnaryExpressionProxy(prime, varName);
-              final List<SimpleExpressionProxy> guards = gaBlock.getGuards();
-              if (guards != null && !guards.isEmpty()) {
-                final SimpleExpressionProxy guard = guards.get(0);
-                final SimpleExpressionProxy occurrence =
-                  occursChecker.find(varNamePrimed, guard);
-                if (occurrence != null) {
-                  final Proxy location =
-                    mCompilationInfo.getErrorLocation(occurrence);
-                  final EFSMControllabilityException exception =
-                    new EFSMControllabilityException(mComponent, var, eventIdent, location);
-                  mCompilationInfo.raise(exception);
-                  continue;
-                }
-              }
-              // Not in the guard - search for an action assigning to it ...
-              for (final BinaryExpressionProxy action : gaBlock.getActions()) {
-                final SimpleExpressionProxy lhs = action.getLeft();
-                if (eq.equals(varName, lhs)) {
-                  final Proxy location = mCompilationInfo.getErrorLocation(action);
-                  final EFSMControllabilityException exception =
-                    new EFSMControllabilityException(mComponent, var, eventIdent, location);
-                  mCompilationInfo.raise(exception);
-                  break;
-                }
-              }
+              final SimpleExpressionProxy occurrence =
+                occursChecker.find(varNamePrimed, update);
+              assert occurrence != null;
+              final EFSMControllabilityException exception =
+                new EFSMControllabilityException(mComponent, var,
+                                                 eventIdent, occurrence);
+              mCompilationInfo.raise(exception);
             }
             return false;
           }
@@ -1568,15 +1650,15 @@ public class EFSMNormaliser extends AbortableCompiler
     private List<ConstraintList> mUpdates;
 
     /**
+     * A set containing the same updates as {@link #mUpdates},
+     * to avoid duplicates.
+     */
+    private final Set<ConstraintList> mUniqueUpdates;
+
+    /**
      * A map from the original updates to the new events.
      */
     private Map<ConstraintList,EFAEventList> mUpdateMap;
-
-    /**
-     * A map from each original update to the first guard action block from
-     * which the update originates.
-     */
-    private final Map<ConstraintList,GuardActionBlockProxy> mGABlockMap;
 
     /**
      * A list that contains the additional complementary guards which are not
@@ -1751,11 +1833,13 @@ public class EFSMNormaliser extends AbortableCompiler
   private final CompilationInfo mCompilationInfo;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private EFAModuleContext mRootContext;
-  private EFAGuardCompiler mGuardCompiler;
+  private EFSMConditionCompiler mConditionCompiler;
   private EFAEventNameBuilder mEventNameBuilder;
 
   // Module Information
   private final ModuleProxy mInputModule;
+
+  private Map<Proxy,ConstraintList> mConditionCache;
 
   /**
    * A map from a primitive event identifier ({@link IdentifierProxy}) to
@@ -1769,4 +1853,7 @@ public class EFSMNormaliser extends AbortableCompiler
    * associated update ({@link ConstraintList}).
    */
   private ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
+
+  private boolean mUsingGuardActionBlocks;
+
 }

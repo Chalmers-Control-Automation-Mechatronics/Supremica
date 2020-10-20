@@ -89,7 +89,7 @@ abstract class SimplificationRule {
     final MatchVisitor visitor = MatchVisitor.getInstance();
     final boolean result = visitor.match(constraint, this, propagator);
     mMatchedExpression = result ? constraint : null;
-    return result;      
+    return result;
   }
 
   abstract boolean isMakingReplacement();
@@ -105,7 +105,7 @@ abstract class SimplificationRule {
     return mTemplate;
   }
 
-  PlaceHolder getPlaceHolder(SimpleIdentifierProxy ident)
+  PlaceHolder getPlaceHolder(final SimpleIdentifierProxy ident)
   {
     return mPlaceHolders.get(ident);
   }
@@ -116,9 +116,6 @@ abstract class SimplificationRule {
     mPlaceHolders.put(ident, placeholder);
   }
 
-
-  //#########################################################################
-  //# Simple Access
   SimpleExpressionProxy getMatchedExpression()
   {
     return mMatchedExpression;
