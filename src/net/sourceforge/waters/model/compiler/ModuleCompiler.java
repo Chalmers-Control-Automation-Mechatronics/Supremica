@@ -413,6 +413,7 @@ public class ModuleCompiler extends AbortableCompiler
             new EFSMNormaliser(modFactory, mCompilationInfo, intermediate);
           normaliser.setUsesEventNameBuilder(true);
           normaliser.setCreatesGuardAutomaton(true);
+          normaliser.setOptimizationEnabled(mOptimizationEnabled);
           normaliser.setAutomatonVariablesEnabled(mAutomatonVariablesEnabled);
           mActiveAbortable = normaliser;
           intermediate = normaliser.compile();

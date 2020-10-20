@@ -1,41 +1,50 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<ns2:ProductDES Name="autvars07" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
-<Comment>A compiler test with automaton variables.
-The guards in specification 'select' refer to the state of the plant 'clock', which must be in state 's1' or 's2' for the transition to be enabled. In this case, the transition is blocked in the plant, so it remains blocked and the guard has no effect.</Comment>
-<ns2:EventList>
-<ns2:Event Kind="UNCONTROLLABLE" Name="tick"/>
-<ns2:Event Kind="UNCONTROLLABLE" Name="tock"/>
-<ns2:Event Kind="CONTROLLABLE" Name="toggle"/>
-</ns2:EventList>
-<ns2:AutomataList>
-<ns2:Automaton Kind="PLANT" Name="clock">
-<ns2:EventRefList>
-<ns2:EventRef Name="tick"/>
-<ns2:EventRef Name="tock"/>
-</ns2:EventRefList>
-<ns2:StateList>
-<ns2:State Initial="true" Name="s0"/>
-<ns2:State Name="s1"/>
-<ns2:State Name="s2"/>
-</ns2:StateList>
-<ns2:TransitionList>
-<ns2:Transition Source="s0" Event="tick" Target="s1"/>
-<ns2:Transition Source="s1" Event="tick" Target="s2"/>
-<ns2:Transition Source="s2" Event="tick" Target="s0"/>
-</ns2:TransitionList>
-</ns2:Automaton>
-<ns2:Automaton Kind="SPEC" Name="select">
-<ns2:EventRefList>
-<ns2:EventRef Name="toggle"/>
-</ns2:EventRefList>
-<ns2:StateList>
-<ns2:State Initial="true" Name="s0"/>
-<ns2:State Name="s1"/>
-</ns2:StateList>
-<ns2:TransitionList>
-<ns2:Transition Source="s0" Event="toggle" Target="s1"/>
-<ns2:Transition Source="s1" Event="toggle" Target="s0"/>
-</ns2:TransitionList>
-</ns2:Automaton>
-</ns2:AutomataList>
-</ns2:ProductDES>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="autvars07">
+<B:Comment>A compiler test with automaton variables.
+The guards in specification 'select' refer to the state of the plant 'clock', which must be in state 's1' or 's2' for the transition to be enabled. In this case, the transition is blocked in the plant, so it remains blocked and the guard has no effect.</B:Comment>
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="tick"/>
+<Event Kind="UNCONTROLLABLE" Name="tock.{clock==s0}"/>
+<Event Kind="UNCONTROLLABLE" Name="tock.{clock==s1}"/>
+<Event Kind="UNCONTROLLABLE" Name="tock.{clock==s2}"/>
+<Event Kind="CONTROLLABLE" Name="toggle"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="clock">
+<EventRefList>
+<EventRef Name="tick"/>
+<EventRef Name="tock.{clock==s0}"/>
+<EventRef Name="tock.{clock==s1}"/>
+<EventRef Name="tock.{clock==s2}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+<State Name="s2"/>
+</StateList>
+<TransitionList>
+<Transition Source="s0" Event="tick" Target="s1"/>
+<Transition Source="s1" Event="tick" Target="s2"/>
+<Transition Source="s2" Event="tick" Target="s0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="select">
+<EventRefList>
+<EventRef Name="tock.{clock==s0}"/>
+<EventRef Name="tock.{clock==s1}"/>
+<EventRef Name="tock.{clock==s2}"/>
+<EventRef Name="toggle"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+</StateList>
+<TransitionList>
+<Transition Source="s0" Event="toggle" Target="s1"/>
+<Transition Source="s1" Event="toggle" Target="s0"/>
+<Transition Source="s0" Event="tock.{clock==s1}" Target="s0"/>
+<Transition Source="s1" Event="tock.{clock==s2}" Target="s1"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

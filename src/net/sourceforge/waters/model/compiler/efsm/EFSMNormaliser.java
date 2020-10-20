@@ -219,6 +219,26 @@ public class EFSMNormaliser extends AbortableCompiler
 
   //#########################################################################
   //# Configuration
+  /**
+   * Returns whether compiler optimisation is enabled.
+   * @see #setOptimizationEnabled(boolean)
+   */
+  public boolean isOptimizationEnabled()
+  {
+    return mOptimizationEnabled;
+  }
+
+  /**
+   * Enables or disabled compiler optimisation.
+   * If enabled, the compiler may perform several optimisation steps to
+   * remove selfloops and unused events or automata from the output.
+   * This option is enabled by default.
+   */
+  public void setOptimizationEnabled(final boolean enabled)
+  {
+    mOptimizationEnabled = enabled;
+  }
+
   public boolean getCreatesGuardAutomaton()
   {
     return mCreatesGuardAutomaton;
@@ -1103,21 +1123,23 @@ public class EFSMNormaliser extends AbortableCompiler
      * <P>If this method is called for an event already marked as blocked or
      * with another update already recorded for the given automaton, it has
      * no effect. Otherwise, the effect of blocked events depends on the
-     * component kind.</P>
+     * optimisation status and component kind.</P>
      *
-     * <P>If an event only occurs in a blocked events list of a plant, then it
-     * is marked as blocked, removing it from all other components
-     * but keeping it in the blocked event list of the given component.
-     * If an event occurs in a blocked events list of some other type of
-     * component, an update associated with a true guard is recorded for
-     * the automaton.</P>
+     * <P>If optimisation is enabled and the event only occurs in a blocked
+     * events list of a plant, then it is marked as blocked, removing it
+     * from all other components but keeping it in the blocked event list
+     * of the given component.
+     * If optimisation is disabled or the event occurs in a blocked events
+     * list of some other type of component, an update associated with a
+     * true guard is recorded for the component.</P>
      *
      * @param  comp       The automaton containing the blocked events list.
      */
     private void setBlocked(final SimpleComponentProxy comp)
     {
       if (mBlockingComponent == null && !mMap.containsKey(comp)) {
-        if (mEventDecl.getKind() != EventKind.PROPOSITION &&
+        if (mOptimizationEnabled &&
+            mEventDecl.getKind() != EventKind.PROPOSITION &&
             comp.getKind() == ComponentKind.PLANT) {
           mMap.clear();
           mList.clear();
@@ -1821,7 +1843,8 @@ public class EFSMNormaliser extends AbortableCompiler
 
   //#########################################################################
   //# Data Members
-  // Flags
+  // Configuration
+  private boolean mOptimizationEnabled = true;
   private boolean mCreatesGuardAutomaton = false;
   private boolean mUsesEventNameBuilder = false;
   private boolean mAutomatonVariablesEnabled = false;

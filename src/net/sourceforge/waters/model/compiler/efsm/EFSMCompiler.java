@@ -203,6 +203,21 @@ public class EFSMCompiler extends AbortableCompiler
 
   //#########################################################################
   //# Configuration
+  /**
+   * Returns whether compiler optimisation is enabled.
+   * @see #setOptimizationEnabled(boolean)
+   */
+  public boolean isOptimizationEnabled()
+  {
+    return mOptimizationEnabled;
+  }
+
+  /**
+   * Enables or disabled compiler optimisation.
+   * If enabled, the compiler may perform several optimisation steps to
+   * remove selfloops and unused events or automata from the output.
+   * This option is enabled by default.
+   */
   public void setOptimizationEnabled(final boolean enabled)
   {
     mOptimizationEnabled = enabled;
@@ -805,6 +820,12 @@ public class EFSMCompiler extends AbortableCompiler
       final ComponentBindingContext context =
         new ComponentBindingContext(comp, source, target);
       return context.eval(constraints);
+    }
+
+    @Override
+    public boolean isOptimizationEnabled()
+    {
+      return EFSMCompiler.this.isOptimizationEnabled();
     }
 
     //#######################################################################

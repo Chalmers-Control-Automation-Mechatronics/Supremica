@@ -51,4 +51,6 @@ interface EFSMTransitionIteratorFactory
                                    ConstraintList constraints,
                                    long transition)
     throws EvalException;
+
+  public boolean isOptimizationEnabled();
 }

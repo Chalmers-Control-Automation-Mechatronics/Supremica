@@ -59,7 +59,6 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   {
     super.configure(compiler);
     compiler.setMultiExceptionsEnabled(true);
-    compiler.setOptimizationEnabled(false);
     compiler.setSourceInfoEnabled(true);
   }
 
@@ -68,6 +67,12 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   {
     final String[] array = {"-norm", ""};
     return array;
+  }
+
+  @Override
+  boolean isOptimizationEnabled()
+  {
+    return false;
   }
 
   @Override

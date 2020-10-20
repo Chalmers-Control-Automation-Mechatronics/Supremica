@@ -969,7 +969,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "autvars07");
-    testCompile(module);
+    if (isNormalisationEnabled() &&
+        !isAutomatonVariablesEnabled() &&
+        !isOptimizationEnabled()) {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    } else {
+      testCompile(module);
+    }
   }
 
   public void testCompile_autvars08()
@@ -1388,11 +1394,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   //# Customisation
   void configure(final ModuleCompiler compiler)
   {
+    compiler.setOptimizationEnabled(isOptimizationEnabled());
     compiler.setNormalizationEnabled(isNormalisationEnabled());
     compiler.setAutomatonVariablesEnabled(isAutomatonVariablesEnabled());
   }
 
   abstract String[] getTestSuffices();
+
+  abstract boolean isOptimizationEnabled();
 
   abstract boolean isNormalisationEnabled();
 

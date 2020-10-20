@@ -139,7 +139,11 @@ class EFSMSimpleComponent extends EFSMComponent
     final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
     final TransitionGroup master = mEventMap.get(decl);
     if (master != null && master.isEmpty()) {
-      return isConsideredControllable(decl) ? null : master;
+      if (isConsideredControllable(decl) && factory.isOptimizationEnabled()) {
+        return null;
+      } else {
+        return master;
+      }
     }
     final GroupKey key = new GroupKey(master, constraints);
     TransitionGroup group = getTransitionGroup(key);
@@ -166,7 +170,8 @@ class EFSMSimpleComponent extends EFSMComponent
       }
       group = addTransitionGroup(key, transitions);
     }
-    if (group.isEmpty() && isConsideredControllable(decl)) {
+    if (group.isEmpty() && isConsideredControllable(decl) &&
+        factory.isOptimizationEnabled()) {
       return null;
     } else {
       return group;

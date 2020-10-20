@@ -59,7 +59,6 @@ public class OldOptimisingCompilerTest extends AbstractCompilerTest
   void configure(final ModuleCompiler compiler)
   {
     super.configure(compiler);
-    compiler.setOptimizationEnabled(true);
     compiler.setSourceInfoEnabled(true);
     compiler.setMultiExceptionsEnabled(true);
   }
@@ -69,6 +68,12 @@ public class OldOptimisingCompilerTest extends AbstractCompilerTest
   {
     final String[] array = {"-opt", ""};
     return array;
+  }
+
+  @Override
+  boolean isOptimizationEnabled()
+  {
+    return true;
   }
 
   @Override

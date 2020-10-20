@@ -59,7 +59,6 @@ public class AutVarsOptimisingCompilerTest extends AbstractCompilerTest
   {
     super.configure(compiler);
     compiler.setMultiExceptionsEnabled(true);
-    compiler.setOptimizationEnabled(true);
     compiler.setSourceInfoEnabled(true);
   }
 
@@ -68,6 +67,12 @@ public class AutVarsOptimisingCompilerTest extends AbstractCompilerTest
   {
     final String[] array = {"-norm", "-opt"};
     return array;
+  }
+
+  @Override
+  boolean isOptimizationEnabled()
+  {
+    return true;
   }
 
   @Override
