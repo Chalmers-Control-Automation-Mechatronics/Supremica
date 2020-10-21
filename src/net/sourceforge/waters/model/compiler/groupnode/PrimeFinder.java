@@ -31,98 +31,56 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler.constraint;
+package net.sourceforge.waters.model.compiler.groupnode;
 
-import java.util.Collection;
-
-import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.VariableContext;
-import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * A utility class to collect all the primed EFSM variables in expressions.
+ * A utility class to search expressions for primed subterms or assignments.
  *
  * @author Robi Malik
  */
 
-public class PrimedVariableCollector
+public class PrimeFinder
   extends DescendingModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructor
   /**
-   * Creates a new primed variable collector.
-   * @param  optable     The operator table that defines the prime operator.
-   * @param  context     The context used to determine whether a symbol is a
-   *                     variable. If a non-<CODE>null</CODE> context is
-   *                     provided, only primed expression whose subterm
-   *                     is identified as a variable by the context are
-   *                     considered as primed variables. Otherwise, if the
-   *                     context is <CODE>null</CODE>, all primed subterms
-   *                     are assumed to be next-state variables.
+   * Creates a new prime finder.
+   * @param  optable     The operator table that defines the prime and
+   *                     assignment operators.
    */
-  public PrimedVariableCollector(final CompilerOperatorTable optable,
-                                 final VariableContext context)
+  public PrimeFinder(final CompilerOperatorTable optable)
   {
-    mNextOperator = optable.getNextOperator();
-    mContext = context;
+    mOperatorTable = optable;
   }
 
 
   //#########################################################################
   //# Invocation
   /**
-   * Collects all primed variables in the given expression.
+   * Checks whether the given expression contains a primed variable or
+   * assignment.
    * @param  expr        The expression to be searched.
-   * @param  vars        Found variables will be added in their primed form
-   *                     to this set.
+   * @return The first subterm found to be an assignment or primed
+   *         expression, or <CODE>null</CODE>.
    */
-  public void collectPrimedVariables
-    (final SimpleExpressionProxy expr,
-     final ProxyAccessorSet<UnaryExpressionProxy> vars)
-  {
-    try {
-      mPrimedVariables = vars;
-      collect(expr);
-    } finally {
-      mPrimedVariables = null;
-    }
-  }
-
-  /**
-   * Collects all primed variables in the given expressions.
-   * @param  exprs       A collection of expressions to be searched.
-   * @param  vars        Found variables will be added in their primed form
-   *                     to this set.
-   */
-  public void collectPrimedVariables
-    (final Collection<SimpleExpressionProxy> exprs,
-     final ProxyAccessorSet<UnaryExpressionProxy> vars)
-  {
-    try {
-      mPrimedVariables = vars;
-      for (final SimpleExpressionProxy expr : exprs) {
-        collect(expr);
-      }
-    } finally {
-      mPrimedVariables = null;
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void collect(final SimpleExpressionProxy expr)
+  public SimpleExpressionProxy containsPrimedVariable
+    (final SimpleExpressionProxy expr)
   {
     try {
       expr.acceptVisitor(this);
+      return null;
+    } catch (final PrimeFoundNotification notification) {
+      return notification.getExpression();
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     }
@@ -131,6 +89,17 @@ public class PrimedVariableCollector
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
+  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+    throws VisitorException
+  {
+    if (mOperatorTable.isAssignment(expr)) {
+      throw new PrimeFoundNotification(expr);
+    } else {
+      return super.visitBinaryExpressionProxy(expr);
+    }
+  }
+
   @Override
   public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
   {
@@ -141,23 +110,44 @@ public class PrimedVariableCollector
   public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
     throws VisitorException
   {
-    if (expr.getOperator() == mNextOperator) {
-      if (mContext == null || mContext.getVariableRange(expr) != null) {
-        mPrimedVariables.addProxy(expr);
-      }
+    if (expr.getOperator() == mOperatorTable.getNextOperator()) {
+      throw new PrimeFoundNotification(expr);
     } else {
-      final SimpleExpressionProxy subterm = expr.getSubTerm();
-      subterm.acceptVisitor(this);
+      return super.visitUnaryExpressionProxy(expr);
     }
-    return null;
+  }
+
+
+  //#########################################################################
+  //# Inner Class PrimeFoundNotification
+  private static class PrimeFoundNotification extends VisitorException
+  {
+    //#######################################################################
+    //# Constructor
+    private PrimeFoundNotification(final SimpleExpressionProxy expr)
+    {
+      mExpression = expr;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private SimpleExpressionProxy getExpression()
+    {
+      return mExpression;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final SimpleExpressionProxy mExpression;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 3511954770213121187L;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final UnaryOperator mNextOperator;
-  private final VariableContext mContext;
-
-  private ProxyAccessorSet<UnaryExpressionProxy> mPrimedVariables;
+  private final CompilerOperatorTable mOperatorTable;
 
 }

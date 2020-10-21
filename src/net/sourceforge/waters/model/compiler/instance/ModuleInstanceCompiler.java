@@ -277,7 +277,7 @@ public class ModuleInstanceCompiler
     throws EvalException
   {
     try {
-      mHasEFAElements = false;
+      mHasEFSMElements = false;
       mContext = mRootContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace(mEquality);
       mCompiledEvents = new TreeSet<>();
@@ -306,7 +306,7 @@ public class ModuleInstanceCompiler
    */
   public boolean getHasEFSMElements()
   {
-    return mHasEFAElements;
+    return mHasEFSMElements;
   }
 
 
@@ -327,9 +327,33 @@ public class ModuleInstanceCompiler
    * remove selfloops and unused events or automata from the output.
    * This option is enabled by default.
    */
-  public void setOptimizationEnabled(final boolean enable)
+  public void setOptimizationEnabled(final boolean enabled)
   {
-    mIsOptimizationEnabled = enable;
+    mIsOptimizationEnabled = enabled;
+  }
+
+  /**
+   * Returns whether guard/action blocks are translated to conditionals.
+   * @see #setGeneratingConditionals(boolean)
+   */
+  public boolean isGeneratingConditionals()
+  {
+    return mGeneratingConditionals;
+  }
+
+  /**
+   * Configures whether guard/action blocks are translated to conditionals
+   * or vice versa. If enabled, the instance compiler removes all
+   * guard/action blocks and replaces them by an equivalent conditional block
+   * that encompasses the label block of the edge. If disabled, all
+   * conditional blocks are removed and replaced by equivalent guard/action
+   * blocks. This may result in the creation of parallel edges in cases
+   * where a label block contains multiple conditionals.
+   * This option is disabled by default.
+   */
+  public void setGeneratingConditionals(final boolean generating)
+  {
+    mGeneratingConditionals = generating;
   }
 
   /**
@@ -1049,7 +1073,7 @@ public class ModuleInstanceCompiler
       if (m1stPass) {
         // Variables are compiled first so that their ranges are available
         // to simplify guard/action blocks
-        mHasEFAElements = true;
+        mHasEFSMElements = true;
         final IdentifierProxy fullName =
           mNameSpace.getPrefixedIdentifier(suffix, mFactory);
         linkCompilationInfo(fullName, ident);
@@ -1158,6 +1182,7 @@ public class ModuleInstanceCompiler
         final ConditionalProxy cond =
           mFactory.createConditionalProxy(list, condGuard);
         output.add(cond);
+        mHasEFSMElements = true;
       } else {
         condEvent.push(guards, actions);
         final EventOutput condOutput = new EventOutput(body.size());
@@ -1204,7 +1229,7 @@ public class ModuleInstanceCompiler
         final List<BinaryExpressionProxy> actions1 =
           mCloner.getClonedList(actions);
         ga = mFactory.createGuardActionBlockProxy(guards1, actions1, null);
-        mHasEFAElements = true;
+        mHasEFSMElements = true;
       }
       final EdgeProxy edge = mFactory.createEdgeProxy
         (source1, target1, block1, ga, null, null, null);
@@ -1643,13 +1668,13 @@ public class ModuleInstanceCompiler
 
   //  Configurations:
   private boolean mIsOptimizationEnabled = true;
-  private final boolean mGeneratingConditionals = false;
+  private boolean mGeneratingConditionals = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
   //  Module Information:
-  private boolean mHasEFAElements;
+  private boolean mHasEFSMElements;
   private boolean m1stPass; // Used in the method visitModuleProxy().
 
   private ModuleBindingContext mRootContext;

@@ -75,10 +75,10 @@ import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.compiler.efa.EFAEventNameBuilder;
-import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -245,8 +245,11 @@ public class EFSMCompiler extends AbortableCompiler
     //# Constructor
     private Pass1Processor()
     {
-      mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
-      mAutVarTransitionMap = mAutomatonVariablesEnabled ? new HashMap<>() : null;
+      mConditionCompiler =
+        new EFSMConditionCompiler(mFactory, mOperatorTable,
+                                  mCompilationInfo, mRootContext);
+      mAutVarTransitionMap =
+        mAutomatonVariablesEnabled ? new HashMap<>() : null;
     }
 
     //#######################################################################
@@ -260,6 +263,32 @@ public class EFSMCompiler extends AbortableCompiler
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
+    public Object visitConditionalProxy(final ConditionalProxy cond)
+      throws VisitorException
+    {
+      final ConstraintList oldGuard = mCurrentGuard;
+      try {
+        if (mCurrentGuard != null && mCurrentGuard.isTrue()) {
+          try {
+            checkAbortInVisitor();
+            final SimpleExpressionProxy guard = cond.getGuard();
+            mCurrentGuard = mConditionCompiler.compileCondition(guard);
+          } catch (final EvalException exception) {
+            mCompilationInfo.raiseInVisitor(exception);
+          }
+        } else {
+          final EvalException exception = new EFSMNormalisationException(cond);
+          mCompilationInfo.raiseInVisitor(exception);
+        }
+        final List<Proxy> body = cond.getBody();
+        visitCollection(body);
+        return null;
+      } finally {
+        mCurrentGuard = oldGuard;
+      }
+    }
+
+    @Override
     public Object visitConstantAliasProxy(final ConstantAliasProxy alias)
       throws VisitorException
     {
@@ -272,11 +301,15 @@ public class EFSMCompiler extends AbortableCompiler
       throws VisitorException
     {
       try {
+        mCurrentGuard = ConstraintList.TRUE;
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-        if (ga == null) {
-          mCurrentGuard = ConstraintList.TRUE;
-        } else {
-          mCurrentGuard = visitGuardActionBlockProxy(ga);
+        if (ga != null) {
+          try {
+            checkAbortInVisitor();
+            mCurrentGuard =  mConditionCompiler.compileGuardActionBlock(ga);
+          } catch (final EvalException exception) {
+            mCompilationInfo.raiseInVisitor(exception);
+          }
         }
         if (mCurrentComponent != null) {
           final NodeProxy source = edge.getSource();
@@ -325,20 +358,6 @@ public class EFSMCompiler extends AbortableCompiler
         mCompilationInfo.raiseInVisitor(exception);
       }
       return info;
-    }
-
-    @Override
-    public ConstraintList visitGuardActionBlockProxy
-      (final GuardActionBlockProxy ga)
-      throws VisitorException
-    {
-      try {
-        checkAbortInVisitor();
-        return mGuardCompiler.getCompiledGuard(ga);
-      } catch (final EvalException exception) {
-        mCompilationInfo.raiseInVisitor(exception);
-        return ConstraintList.TRUE;
-      }
     }
 
     @Override
@@ -500,7 +519,7 @@ public class EFSMCompiler extends AbortableCompiler
 
     //#######################################################################
     //# Data Members
-    private final EFAGuardCompiler mGuardCompiler;
+    private final EFSMConditionCompiler mConditionCompiler;
     private final Map<EFSMEventDeclaration,TLongArrayList> mAutVarTransitionMap;
     private List<SimpleIdentifierProxy> mCurrentRangeList;
     private TObjectIntMap<SimpleNodeProxy> mCurrentRangeMap;

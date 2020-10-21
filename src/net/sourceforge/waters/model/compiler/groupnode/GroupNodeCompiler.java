@@ -57,7 +57,6 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
-import net.sourceforge.waters.model.compiler.constraint.PrimedVariableCollector;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -85,7 +84,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
@@ -134,7 +132,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, compilationInfo, mOperatorTable);
     mEquality = new ModuleEqualityVisitor(false);
-    mPrimedVariableFinder = new PrimedVariableCollector(mOperatorTable, null);
+    mPrimedVariableFinder = new PrimeFinder(mOperatorTable);
     mInputModule = module;
     mCloner = new SourceInfoCloner(factory, compilationInfo);
   }
@@ -297,12 +295,16 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
       throws VisitorException
     {
       final ConstraintPropagator oldPropagator = mPropagator;
+      final SimpleExpressionProxy oldFoundPrime = mFoundPrime;
       final SimpleExpressionProxy guard = cond.getGuard();
       try {
         mPropagator = new ConstraintPropagator(mPropagator);
         mPropagator.addConstraint(guard);
         mPropagator.propagate();
         if (!mPropagator.isUnsatisfiable()) {
+          if (mFoundPrime == null) {
+            mFoundPrime = mPrimedVariableFinder.containsPrimedVariable(guard);
+          }
           visitCollection(cond.getBody());
         }
         return null;
@@ -311,6 +313,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
         throw wrap(exception);
       } finally {
         mPropagator = oldPropagator;
+        mFoundPrime = oldFoundPrime;
       }
     }
 
@@ -321,7 +324,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
       checkAbortInVisitor();
       mPropagator = new ConstraintPropagator(mFactory, getCompilationInfo(),
                                              mOperatorTable, mRootContext);
-      mPrimedVar = null;
+      mFoundPrime = null;
       final GuardActionBlockProxy ga = edge.getGuardActionBlock();
       if (ga != null) {
         final List<SimpleExpressionProxy> guards = ga.getGuards();
@@ -337,7 +340,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
           if (mPropagator.isUnsatisfiable()) {
             return null;
           }
-          mPrimedVar = mPrimedVariableFinder.containsPrimedVariable(guard);
+          mFoundPrime = mPrimedVariableFinder.containsPrimedVariable(guard);
         }
         mActions = ga.getActions();
       } else {
@@ -355,7 +358,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
     {
       try {
         final ConstraintList guard = mPropagator.getAllConstraints();
-        mSource.addGuard(ident, guard, mActions, mPrimedVar);
+        mSource.addGuard(ident, guard, mActions, mFoundPrime);
         mSource.createEdges(ident, mPropagator, mActions, mTarget);
         return null;
       } catch (final EvalException exception) {
@@ -370,7 +373,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
 
     private ConstraintPropagator mPropagator;
     private List<BinaryExpressionProxy> mActions;
-    private UnaryExpressionProxy mPrimedVar;
+    private SimpleExpressionProxy mFoundPrime;
     private SimpleNodeProxy mTarget;
   }
 
@@ -481,7 +484,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
     private void addGuard(final IdentifierProxy ident,
                           final ConstraintList guard,
                           final List<BinaryExpressionProxy> actions,
-                          final UnaryExpressionProxy primedVar)
+                          final SimpleExpressionProxy foundPrime)
     {
       final ProxyAccessor<IdentifierProxy> accessor =
         mGuards.createAccessor(ident);
@@ -491,7 +494,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
         mGuards.put(accessor, info);
       }
       info.addGuard(guard);
-      info.addAction(actions, primedVar);
+      info.addAction(actions, foundPrime);
     }
 
     private GuardInfo getGuards(final IdentifierProxy ident)
@@ -709,13 +712,13 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
     }
 
     private void addAction(final List<BinaryExpressionProxy> actions,
-                           final UnaryExpressionProxy primedVar)
+                           final SimpleExpressionProxy foundPrime)
     {
       if (mFirstAction == null) {
         if (!actions.isEmpty()) {
           mFirstAction = actions.iterator().next();
         } else {
-          mFirstAction = primedVar;
+          mFirstAction = foundPrime;
         }
       }
     }
@@ -808,6 +811,6 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleEqualityVisitor mEquality;
-  private final PrimedVariableCollector mPrimedVariableFinder;
+  private final PrimeFinder mPrimedVariableFinder;
   private final ModuleProxyCloner mCloner;
 }

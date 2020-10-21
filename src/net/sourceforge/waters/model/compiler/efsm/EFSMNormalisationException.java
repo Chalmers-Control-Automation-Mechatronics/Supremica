@@ -35,6 +35,7 @@ package net.sourceforge.waters.model.compiler.efsm;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.ConditionalProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -67,7 +68,16 @@ public class EFSMNormalisationException extends EvalException {
   {
     super("The event '" + ident +
           "' is associated with more than one guard/action block," +
-          " but it appears in a normalised EFSM system!", location);
+          " but it appears in a normalised EFSM system.", location);
+  }
+
+  /**
+   * Constructs a new exception indicating an unexpected {@link
+   * ConditionalProxy} encountered in a normalised module.
+   */
+  public EFSMNormalisationException(final ConditionalProxy cond)
+  {
+    super("Unexpected conditional block found in normalised module.", cond);
   }
 
 

@@ -388,6 +388,7 @@ public class ModuleCompiler extends AbortableCompiler
       ModuleInstanceCompiler instanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modFactory, mCompilationInfo, mInputModule);
       instanceCompiler.setOptimizationEnabled(mOptimizationEnabled);
+      instanceCompiler.setGeneratingConditionals(mNormalizationEnabled);
       instanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       instanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
       instanceCompiler.setHISCCompileMode(mHISCCompileMode);
