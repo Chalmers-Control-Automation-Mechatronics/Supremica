@@ -64,7 +64,7 @@ public class CompilationInfo
   public CompilationInfo()
   {
     mExceptions = new MultiEvalException();
-    mResultMap = new HashMap<Object,SourceInfo>();
+    mResultMap = new HashMap<>();
     mParentSourceInfo = null;
   }
 
@@ -72,7 +72,7 @@ public class CompilationInfo
                          final boolean multiExceptionEnabled)
   {
     mExceptions = multiExceptionEnabled ? new MultiEvalException() : null;
-    mResultMap = sourceInfoEnabled? new HashMap<Object,SourceInfo>() : null;
+    mResultMap = sourceInfoEnabled? new HashMap<>() : null;
     mParentSourceInfo = null;
   }
 
@@ -299,7 +299,7 @@ public class CompilationInfo
   //#########################################################################
   //# Exception Handling
   /**
-   * <P>Signals that a compilation error occurred.<.P>
+   * <P>Signals that a compilation error occurred.</P>
    * <P>The exception's location is adjusted if source information is
    * enabled.</P>
    * <P>If multiple exceptions are enabled, and the exception is not an abort

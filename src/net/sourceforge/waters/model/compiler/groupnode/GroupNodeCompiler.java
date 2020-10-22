@@ -784,8 +784,8 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
       final ModuleHashCodeVisitor hash = mEquality.getHashCodeVisitor();
       return
         mGuard.hashCode() +
-        5 * hash.getListHashCode(mActions) *
-        mTarget.hashCode();
+        5 * hash.getListHashCode(mActions) +
+        25 * mTarget.hashCode();
     }
 
     //#######################################################################

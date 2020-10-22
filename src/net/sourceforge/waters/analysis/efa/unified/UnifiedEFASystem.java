@@ -40,14 +40,14 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
 
 
 /**
- * A collection of transition relations and variables representing a
- * normalised EFSM system.
+ * <P>A collection of transition relations and variables representing a
+ * normalised EFSM system.</P>
  *
- * <I>Reference:</I><BR>
+ * <P><I>Reference:</I><BR>
  * Sahar Mohajerani, Robi Malik, Martin Fabian. An Algorithm for Compositional
  * Nonblocking Verification of Extended Finite-state Machines. Proc. 12th
- * International Workshop on Discrete Event Systems (WODES&nbsp;'14), 376-382,
- * Paris, France, 2014.
+ * International Workshop on Discrete Event Systems (WODES&nbsp;'14),
+ * 376&ndash;382, Paris, France, 2014.</P>
  *
  * @author Robi Malik, Sahar Mohajerani
  */

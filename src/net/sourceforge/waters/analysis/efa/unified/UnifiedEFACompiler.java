@@ -143,8 +143,8 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     if (mModuleInstanceCompiler != null) {
       mModuleInstanceCompiler.requestAbort();
     }
-    if (mEFANormaliser != null) {
-      mEFANormaliser.requestAbort();
+    if (mNormaliser != null) {
+      mNormaliser.requestAbort();
     }
   }
 
@@ -155,8 +155,8 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     if (mModuleInstanceCompiler != null) {
       mModuleInstanceCompiler.resetAbort();
     }
-    if (mEFANormaliser != null) {
-      mEFANormaliser.resetAbort();
+    if (mNormaliser != null) {
+      mNormaliser.resetAbort();
     }
   }
 
@@ -168,7 +168,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   {
     super.tearDown();
     mModuleInstanceCompiler = null;
-    mEFANormaliser = null;
+    mNormaliser = null;
     mSystemBuilder = null;
   }
 
@@ -202,6 +202,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mModuleInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      mModuleInstanceCompiler.setGeneratingConditionals(true);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mModuleInstanceCompiler.setEnabledPropositionNames(propositionNames);
       ModuleProxy instantiated =
@@ -215,13 +216,13 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mGroupNodeCompiler = null;
 
       //Normalisation
-      final ModuleProxy normalised;
-      final ProxyAccessorMap<IdentifierProxy, ConstraintList> map;
-      mEFANormaliser =
+      mNormaliser =
         new EFSMNormaliser(modfactory, mCompilationInfo, instantiated);
-      normalised = mEFANormaliser.compile();
-      map = mEFANormaliser.getEventUpdateMap();
-      mEFANormaliser = null;
+      mNormaliser.setCreatesGuardAutomaton(false);
+      final ModuleProxy normalised = mNormaliser.compile();
+      final ProxyAccessorMap<IdentifierProxy,ConstraintList> map =
+        mNormaliser.getEventUpdateMap();
+      mNormaliser = null;
 
       //Create UnifiedEFASystem
       mSystemBuilder = new UnifiedEFASystemBuilder
@@ -250,7 +251,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
   private GroupNodeCompiler mGroupNodeCompiler;
-  private EFSMNormaliser mEFANormaliser;
+  private EFSMNormaliser mNormaliser;
   private UnifiedEFASystemBuilder mSystemBuilder;
   private CompilationInfo mCompilationInfo;
 }
