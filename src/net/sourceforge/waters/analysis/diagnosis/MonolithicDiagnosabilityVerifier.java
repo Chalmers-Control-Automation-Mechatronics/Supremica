@@ -855,7 +855,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
    *
    * <P>Control stack entries are identified as integers representing an
    * index in an array list that holds the stack data. This is called the
-   * <I>stack index</I>, which refers to a block of three  consecutive
+   * <I>stack index</I>, which refers to a block of three consecutive
    * integers:</P>
    * <OL>
    * <LI>The stack index of the next entry below on the stack,
@@ -1007,12 +1007,13 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     }
 
     /**
-     * Retrieves the parent index of the top-most entry of the stack.
-     * @throws IndexOutOfBoundsException if the stack is empty.
+     * Sets the the parent index of the top-most entry of the stack.
+     * @param  index  The new parent index, including its {@link
+     *                MonolithicDiagnosabilityVerifier#MSB1 MSB1}.
      */
-    private void setTopIndex(final int entry)
+    private void setTopIndex(final int index)
     {
-      setStackIndex(mUsedTop, entry);
+      setStackIndex(mUsedTop, index);
     }
 
     //#######################################################################
@@ -1083,7 +1084,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     /**
      * Allocates a stack entry. This method either enlarges the stack or
      * updates and returns the next available entry from the list of free
-     * entry.
+     * entries.
      */
     private int allocateEntry()
     {

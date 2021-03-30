@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -40,8 +42,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-
-import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -61,7 +61,7 @@ import gnu.trove.list.array.TIntArrayList;
  * adding a second copy.</P>
  *
  * <P>The integer array buffer does not support deletion or modification of
- * array after they have been created.</P>
+ * arrays after they have been created.</P>
  *
  * @author Robi Malik
  */
@@ -223,7 +223,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
   }
 
   /**
-   * Gets the number of arrays currently stored in this integer set buffer.
+   * Gets the number of arrays currently stored in this integer array buffer.
    */
   public int size()
   {
