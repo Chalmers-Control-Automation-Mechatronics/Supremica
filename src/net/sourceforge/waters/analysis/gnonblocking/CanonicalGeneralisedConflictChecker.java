@@ -157,7 +157,6 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     } catch (final Throwable t) {
       t.printStackTrace();
     }
-    Runtime.getRuntime().traceMethodCalls(true);
     boolean result = false;
     final double checkerstates = 0;
 

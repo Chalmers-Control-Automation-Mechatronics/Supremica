@@ -326,6 +326,8 @@ Class-Path: ${manifest.pathlist}</echo>
           <classpath>
               <pathelement location="${waters.jniglue.jar}"/>
           </classpath>
+          <sysproperty key="java.library.path" value="${platform}/detect"/>
+          <arg file="${platform}/detect"/>
           <arg file="${platform}"/>
           <arg file="${arch.properties}"/>
         </java>

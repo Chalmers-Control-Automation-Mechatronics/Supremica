@@ -39,7 +39,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 /**
@@ -50,23 +52,27 @@ import java.lang.reflect.Field;
  * <P>USAGE:<BR>
  * &nbsp;&nbsp;<CODE>java
  *   net.sourceforge.waters.build.arch.ArchitectureDetector
- *   &lt;searchpath&gt; &lt;propfile&gt;</CODE><BR>
- * Examines each subdirectory &lt;subdir&gt of the given directory
- * &lt;searchpath&gt, recursively searching for dynamic libraries.
- * The name of the first subdirectory containing a library that can be
- * successfully loaded is placed as a property in the file &lt;propfile&gt,
- * which will contain a line like this:<BR>
- * &nbsp;&nbsp;<CODE>java.arch = &lt;subdir&gt;</CODE></P>
+ *   &lt;<I>library&nbsp;path</I>&gt; &lt;<I>search&nbsp;path</I>&gt;
+ *   &lt;<I>property&nbsp;file&gt;</I></CODE></P>
+ *
+ * <P>Examines each subdirectory of the given directory
+ * &lt;<I>search&nbsp;path</I>&gt; to see whether it contains a loadable
+ * library named <CODE>waters</CODE> for some operating system. If a
+ * candidate file is found, it is linked or copied (under a different name)
+ * to the directory identified as &lt;<I>library&nbsp;path</I>&gt;, which must
+ * be equal to the <CODE>java.library.path</CODE> property. Then it is
+ * attempted to load the file as a dynamic library into the VM.
+ * The name of the first subdirectory where this succeeds is placed as a
+ * property in the file &lt;<I>property file</I>&gt;, which will contain a
+ * line like this:<BR>
+ * &nbsp;&nbsp;<CODE>native.host.arch = &lt;subdir&gt;</CODE></P>
  *
  * <P><I>Notes.</I></P>
  * <UL>
  * <LI>The program attempts to load dynamic libraries matching the following
  * patterns: <CODE>*.dll</CODE>, <CODE>lib*.so</CODE>,
  * <CODE>*.dylib</CODE>.</LI>
- * <LI>It will not attempt to load more than one dynamic library per
- * subdirectory. As soon as one attempt fails, the next subdirectory will
- * be searched.</LI>
- * <LI>If no loadable library can be found, the <CODE>java.arch</CODE>
+ * <LI>If no loadable library can be found, the <CODE>native.host.arch</CODE>
  * variable will be defined to be empty.</LI>
  * </UL>
  *
@@ -79,31 +85,48 @@ public class ArchitectureDetector
   //# Main Method
   public static void main(final String[] args)
   {
+    if (args.length != 3) {
+      usage();
+    }
+
+    final File searchPath = new File(args[1]);
+    final File[] subDirs = searchPath.listFiles(DIRECTORY_FILTER);
+    if (subDirs == null) {
+      usage();
+    }
+
+    final String libPathName = args[0];
+    final File libPath = new File(libPathName);
+    if (!libPath.exists()) {
+      libPath.mkdir();
+    } else if (!libPath.isDirectory()) {
+      usage();
+    }
+
     try {
-      if (args.length != 2) {
-        usage();
-      }
-      final File searchPath = new File(args[0]);
-      final File[] subdirs = searchPath.listFiles(DIRECTORY_FILTER);
-      if (subdirs == null) {
-        usage();
-      }
       String arch = null;
-      for (final File subdir : subdirs) {
-        if (containsLoadableLibrary(subdir)) {
-          arch = subdir.getName();
+      for (final File subDir : subDirs) {
+        if (subDir.equals(libPath)) {
+          continue;
+        } else if (containsLoadableLibrary(subDir.getName(),
+                                           subDir, libPathName)) {
+          arch = subDir.getName();
           System.out.println("Found architecture: " + arch);
           break;
         }
       }
       if (arch == null) {
-        System.err.println("Could not find any loadable library.");
+        System.err.println("Could not find loadable library.");
       }
-      writePropertiesFile(args[1], arch);
-    } catch (final IOException exception) {
-      System.err.println("Error writing properties file: " + args[1]);
-      System.err.println(exception.getMessage());
-      System.exit(1);
+      writePropertiesFile(args[2], arch);
+
+    } catch (final Throwable exception) {
+      System.err.print("ERROR: ");
+      System.err.print(exception.getClass().getSimpleName());
+      System.err.println("caught in main.");
+      exception.printStackTrace();
+    } finally {
+      deleteDirectory(libPath);
     }
   }
 
@@ -112,70 +135,101 @@ public class ArchitectureDetector
   //# Auxiliary Methods
   private static void usage()
   {
-    System.err.println("USAGE: " + ArchitectureDetector.class.getName() +
-                       " <searchpath> <propfile>");
+    System.err.print("USAGE: java ");
+    System.err.print(ArchitectureDetector.class.getName());
+    System.err.println("<library path> <search path> <property file>");
     System.exit(1);
   }
 
-
-  private static boolean containsLoadableLibrary(final File subdir)
+  private static boolean containsLoadableLibrary(final String arch,
+                                                 final File subDir,
+                                                 final String libPathName)
+    throws IOException, SecurityException
   {
-    final File[] children = subdir.listFiles(LIBRARY_FILTER);
-    for (final File child : children) {
-      if (child.isDirectory()) {
-        if (containsLoadableLibrary(child)) {
-          return true;
-        }
-      } else {
-        final String name = child.getName();
-        if (name.equals("libBisimulationEquivalence.so")) {
-          continue;
-        }
-        final String libname = LIBRARY_FILTER.getLibraryName(name);
-        try {
-          System.setProperty("java.library.path", subdir.toString());
-          final Field fieldSysPath =
-            ClassLoader.class.getDeclaredField("sys_paths");
-          fieldSysPath.setAccessible(true);
-          fieldSysPath.set(null, null);
-          System.loadLibrary(libname);
-          return true;
-        } catch (final UnsatisfiedLinkError error) {
-          final String msg = error.getMessage();
-          if (!msg.contains("Can't find dependent libraries")) {
-            return false;
+    final File[] libFiles = subDir.listFiles(LIBRARY_FILTER);
+    if (libFiles != null) {
+      for (final File libFile : libFiles) {
+        if (libFile.isDirectory()) {
+          if (containsLoadableLibrary(arch, libFile, libPathName)) {
+            return true;
           }
-        } catch (final SecurityException exception) {
-          throw new RuntimeException(exception);
-        } catch (final NoSuchFieldException exception) {
-          throw new RuntimeException(exception);
-        } catch (final IllegalAccessException exception) {
-          throw new RuntimeException(exception);
+        } else {
+          final String libFileName = libFile.getName();
+          final int dotPos = libFileName.indexOf('.');
+          final String base = libFileName.substring(0, dotPos);
+          final String ext = libFileName.substring(dotPos);
+          final String libFileNameWithArch = base + '.' + arch + ext;
+          final Path libPathWithArch =
+            Paths.get(libPathName, libFileNameWithArch);
+          final Path libPath = libFile.toPath();
+          if (!Files.exists(libPathWithArch)) {
+            try {
+              Files.createLink(libPathWithArch, libPath);
+            } catch (IOException | SecurityException |
+                     UnsupportedOperationException exception) {
+              // never mind---try to copy
+            }
+          }
+          if (!Files.exists(libPathWithArch)) {
+            try {
+              Files.copy(libPath, libPathWithArch);
+            } catch (final IOException exception) {
+              System.err.println("Error copying library: " + libPath);
+              System.err.println(exception.getMessage());
+              throw exception;
+            }
+          }
+          try {
+            final String loadableName = LIBRARY_NAME + '.' + arch;
+            System.loadLibrary(loadableName);
+            return true;
+          } catch (final UnsatisfiedLinkError error) {
+            final String msg = error.getMessage();
+            if (msg.contains("Can't find dependent libraries")) {
+              return true;
+            }
+          }
         }
       }
     }
     return false;
   }
 
+  private static boolean deleteDirectory(final File directoryToBeDeleted)
+  {
+    final File[] allContents = directoryToBeDeleted.listFiles();
+    if (allContents != null) {
+      for (final File file : allContents) {
+        deleteDirectory(file);
+      }
+    }
+    return directoryToBeDeleted.delete();
+  }
 
-  private static void writePropertiesFile(final String propname,
+  private static void writePropertiesFile(final String propFileName,
                                           final String arch)
     throws IOException
   {
-    final File propfile = new File(propname);
-    final OutputStream stream = new FileOutputStream(propfile);
-    final PrintWriter writer = new PrintWriter(stream);
-    writer.println("##############################################################################");
-    writer.println("# Detected Architecture for build.xml");
-    writer.println("# Automatically generated --- do not edit");
-    writer.println("##############################################################################");
-    writer.println();
-    if (arch == null) {
-      writer.println("native.host.arch =");
-    } else {
-      writer.println("native.host.arch = " + arch);
+    try {
+      final File propFile = new File(propFileName);
+      final OutputStream stream = new FileOutputStream(propFile);
+      final PrintWriter writer = new PrintWriter(stream);
+      writer.println("##############################################################################");
+      writer.println("# Detected Architecture for build.xml");
+      writer.println("# Automatically generated --- do not edit");
+      writer.println("##############################################################################");
+      writer.println();
+      if (arch == null) {
+        writer.println("native.host.arch =");
+      } else {
+        writer.println("native.host.arch = " + arch);
+      }
+      writer.close();
+    } catch (final IOException exception) {
+      System.err.println("Error writing properties file: " + propFileName);
+      System.err.println(exception.getMessage());
+      throw exception;
     }
-    writer.close();
   }
 
 
@@ -183,14 +237,14 @@ public class ArchitectureDetector
   //# Inner Class DirectoryFilter
   private static class DirectoryFilter implements FilenameFilter
   {
-
+    //#######################################################################
+    //# Interface java.io.FilenameFilter
     @Override
     public boolean accept(final File dir, final String name)
     {
       final File subdir = new File(dir, name);
       return subdir.isDirectory();
     }
-
   }
 
 
@@ -198,40 +252,39 @@ public class ArchitectureDetector
   //# Inner Class LibraryFilter
   private static class LibraryFilter implements FilenameFilter
   {
-
+    //#######################################################################
+    //# Interface java.io.FilenameFilter
     @Override
     public boolean accept(final File dir, final String name)
     {
       final File file = new File(dir, name);
       if (file.isDirectory()) {
         return true;
-      } else {
-        return getLibraryName(name) != null;
       }
-    }
-
-    private String getLibraryName(final String name)
-    {
-      final int dotpos = name.lastIndexOf('.');
-      if (dotpos < 0) {
-        return null;
+      final int dotPos = name.lastIndexOf('.');
+      if (dotPos < 0) {
+        return false;
       }
-      final String ext = name.substring(dotpos + 1);
+      final String ext = name.substring(dotPos + 1);
       if (ext.equalsIgnoreCase("dll") || ext.equals("dylib")) {
-        return name.substring(0, dotpos);
+        final String base = name.substring(0, dotPos);
+        return base.equals(LIBRARY_NAME);
       } else if (ext.equals("so") && name.startsWith("lib")) {
-        return name.substring(3, dotpos);
+        final String base = name.substring(3, dotPos);
+        return base.equals(LIBRARY_NAME);
       } else {
-        return null;
+        return false;
       }
     }
-
   }
 
 
   //#########################################################################
-  //# Class DirectoryFilter
-  private static final FilenameFilter DIRECTORY_FILTER = new DirectoryFilter();
-  private static final LibraryFilter LIBRARY_FILTER = new LibraryFilter();
+  //# Class Constants
+  private static final String LIBRARY_NAME = "waters";
+  private static final FilenameFilter DIRECTORY_FILTER =
+    new DirectoryFilter();
+  private static final FilenameFilter LIBRARY_FILTER =
+    new LibraryFilter();
 
 }
