@@ -44,8 +44,8 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.HornerPolynomial;
@@ -1029,6 +1029,7 @@ public final class GeometryTools
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -1040,18 +1041,21 @@ public final class GeometryTools
       }
     }
 
+    @Override
     public Object visitGroupNodeProxy(final GroupNodeProxy group)
       throws VisitorException
     {
       return visitBoxGeometryProxy(group.getGeometry());
     }
 
+    @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
       return visitLabelGeometryProxy(block.getGeometry());
     }
 
+    @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy simple)
       throws VisitorException
     {
@@ -1081,6 +1085,7 @@ public final class GeometryTools
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitBoxGeometryProxy(final BoxGeometryProxy geo)
     {
       final BoxGeometrySubject subject = (BoxGeometrySubject) geo;
@@ -1094,6 +1099,26 @@ public final class GeometryTools
       return null;
     }
 
+    @Override
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      final SplineGeometryProxy splineGeo = edge.getGeometry();
+      if (splineGeo != null) {
+        visitSplineGeometryProxy(splineGeo);
+      }
+      final PointGeometryProxy startGeo = edge.getStartPoint();
+      if (startGeo != null) {
+        visitPointGeometryProxy(startGeo);
+      }
+      final PointGeometryProxy endGeo = edge.getEndPoint();
+      if (endGeo != null) {
+        visitPointGeometryProxy(endGeo);
+      }
+      return null;
+    }
+
+    @Override
     public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
     {
       final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
@@ -1105,6 +1130,7 @@ public final class GeometryTools
       return null;
     }
 
+    @Override
     public Object visitPointGeometryProxy(final PointGeometryProxy geo)
     {
       final PointGeometrySubject subject = (PointGeometrySubject) geo;
@@ -1116,6 +1142,7 @@ public final class GeometryTools
       return null;
     }
 
+    @Override
     public Object visitSplineGeometryProxy(final SplineGeometryProxy geo)
     {
       final SplineGeometrySubject subject = (SplineGeometrySubject) geo;
@@ -1157,6 +1184,7 @@ public final class GeometryTools
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Point2D visitBoxGeometryProxy(final BoxGeometryProxy geo)
     {
       final Rectangle2D rect = geo.getRectangle();
@@ -1165,6 +1193,7 @@ public final class GeometryTools
       return new Point2D.Double(x, y);
     }
 
+    @Override
     public Object visitPointGeometryProxy(final PointGeometryProxy geo)
     {
       return geo.getPoint();
@@ -1192,6 +1221,7 @@ public final class GeometryTools
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Point2D visitBoxGeometryProxy(final BoxGeometryProxy geo)
     {
       final Rectangle2D rect = geo.getRectangle();
@@ -1200,11 +1230,13 @@ public final class GeometryTools
       return new Point2D.Double(x, y);
     }
 
+    @Override
     public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
     {
       return geo.getOffset();
     }
 
+    @Override
     public Object visitPointGeometryProxy(final PointGeometryProxy geo)
     {
       return geo.getPoint();
@@ -1234,12 +1266,14 @@ public final class GeometryTools
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Point2D visitBoxGeometryProxy(final BoxGeometryProxy geo)
     {
       final Rectangle2D rect = geo.getRectangle();
       return findIntersection(rect, mTarget);
     }
 
+    @Override
     public Object visitPointGeometryProxy(final PointGeometryProxy geo)
     {
       return geo.getPoint();
