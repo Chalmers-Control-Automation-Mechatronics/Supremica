@@ -52,6 +52,7 @@ import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.analysis.tr.TarjanControlStack;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
@@ -181,7 +182,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           }
           mComponentStack.clear();
           mControlStack.clear();
-          mLinks.clear();
           mStateIndexMap.clear();
           mIndexStateMap.clear();
           mNumberOfTransitions = 0;
@@ -201,7 +201,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
             final int i = mControlStack.getTopIndex();
             if (!mControlStack.isTopExpanded()) {
               final int dfsIndex = mComponentStack.size() | MSB1;
-              setLink(i, dfsIndex);
+              mControlStack.setLink(i, dfsIndex);
               mControlStack.setTopIndex(dfsIndex);
               mComponentStack.add(i);
               expand(i, processor);
@@ -377,7 +377,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   private boolean close(final int dfsIndex, final int parentIndex)
   {
     final int index = mComponentStack.get(dfsIndex);
-    final int link = mLinks.get(index);
+    final int link = mControlStack.getLink(index);
     if ((link & ~MSB1) == dfsIndex) {
       final long pair = mIndexStateMap.get(index);
       final int a = (int) (pair >>> 32);
@@ -385,12 +385,14 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       mCurrentSCC.clear();
       int j = mComponentStack.removeAt(mComponentStack.size() - 1);
       mCurrentSCC.add(j);
-      setLink(j, -1);
+      final int index1 = j;
+      mControlStack.setLink(index1, -1);
       if (j != index) {
         do {
           j = mComponentStack.removeAt(mComponentStack.size() - 1);
           mCurrentSCC.add(j);
-          setLink(j, -1);
+          final int index2 = j;
+          mControlStack.setLink(index2, -1);
         } while (j != index);
         return (a & MSB1) == (b & MSB1);
       } else {
@@ -426,9 +428,9 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         }
       }
     } else {
-      final int parentLink = mLinks.get(parentIndex);
+      final int parentLink = mControlStack.getLink(parentIndex);
       if ((link & ~MSB1) < (parentLink & ~MSB1)) {
-        setLink(parentIndex, link);
+        mControlStack.setLink(parentIndex, link);
       }
     }
     return true;
@@ -437,19 +439,18 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   private CounterExampleProxy computeCounterExample()
     throws AnalysisException
   {
-    mControlStack.clear();
+    mControlStack.resetLinks();
     mComponentStack.clear();
     bfsQueue.clear();
     System.gc();
     int sccRoot = 0;
     final StateProcessor processor = new BFSStateProcessor();
     final BackStateProcessor backProcessor = new BackStateProcessor();
-    for (int i = 0; i < mLinks.size(); i++) {
-      setLink(i, -1);
-    }
     for (int i = 0; i <= lastVerInit; i++) {
       bfsQueue.add(i);
-      setLink(i, bfsIndex);
+      final int index = i;
+      final int value = bfsIndex;
+      mControlStack.setLink(index, value);
       bfsIndex++;
     }
     while (!bfsQueue.isEmpty()) {
@@ -588,11 +589,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   {
     final Map<String,String> attribs = event.getAttributes();
     return attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
-  }
-
-  private void setLink(final int index, final int value)
-  {
-    mLinks.set(index, value);
   }
 
   private void addVerifierStatistics()
@@ -737,13 +733,13 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           }
           mControlStack.push(index, parentIndex);
         } else {
-          final int link = mLinks.get(index);
+          final int link = mControlStack.getLink(index);
           if ((link & MSB1) == 0) {
             mControlStack.moveToTop(link, parentIndex);
           } else if (link != -1) {
-            final int parentLink = mLinks.get(parentIndex);
+            final int parentLink = mControlStack.getLink(parentIndex);
             if ((link & ~MSB1) < (parentLink & ~MSB1)) {
-              setLink(parentIndex, link);
+              mControlStack.setLink(parentIndex, link);
             }
           }
         }
@@ -776,17 +772,19 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
             bfsQueue.add(index);
             inSCC = true;
           }
-          if (mLinks.get(index) == -1) {
+          if (mControlStack.getLink(index) == -1) {
             bfsQueue.add(index);
-            setLink(index, bfsIndex);
+            final int value = bfsIndex;
+            mControlStack.setLink(index, value);
             bfsIndex++;
           }
         }
       } else {
         if (mCurrentSCC.contains(index)) {
-          if (mLinks.get(index) == -1) {
+          if (mControlStack.getLink(index) == -1) {
             bfsQueue.add(index);
-            setLink(index, bfsIndex);
+            final int value = bfsIndex;
+            mControlStack.setLink(index, value);
             bfsIndex++;
           }
         }
@@ -823,14 +821,15 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final boolean newInMap = mStateIndexMap.contains(next);
       final boolean newInSCC = mCurrentSCC.contains(index);
       if ((!inSCC && newInMap) || (inSCC && newInSCC)) {
-        if (mLinks.get(index) != -1) {
+        if (mControlStack.getLink(index) != -1) {
           if (predIndex == -1) {
             predIndex = index;
             predEvent = event;
             predA = a;
             predB = b;
           } else {
-            if (mLinks.get(index) < mLinks.get(predIndex)) {
+            if (mControlStack.getLink(index) <
+                mControlStack.getLink(predIndex)) {
               predIndex = index;
               predEvent = event;
               predA = a;
@@ -849,351 +848,18 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
 
 
   //#########################################################################
-  //# Inner Class ControlStack
-  /**
-   * <P>The control stack for the iterative version of Tarjan's algorithm.</P>
-   *
-   * <P>Control stack entries are identified as integers representing an
-   * index in an array list that holds the stack data. This is called the
-   * <I>stack index</I>, which refers to a block of three consecutive
-   * integers:</P>
-   * <OL>
-   * <LI>The stack index of the next entry below on the stack,
-   *     or -1 for the bottom-most entry.</LI>
-   * <LI>The state index, which for unexpanded state pairs is the true state
-   *     pair index, and for expanded state pairs its position on the component
-   *     stack. Expanded state pairs are tagged by setting the {@link
-   *     MonolithicDiagnosabilityVerifier#MSB1 MSB1} of the state index.
-   *     For unexpanded state pairs, the link entry in {@link
-   *     MonolithicDiagnosabilityVerifier#mLinks mLinks} contains the stack
-   *     index of the entry above their entry on the stack.</LI>
-   * <LI>The parent index, which is the true state pair index of the
-   *     state pair from where the current stack entry is being expanded.</LI>
-   * </OL>
-   * <P>The stack always contains a dummy top entry ({@link #mDummyTop}),
-   * with the entry below it ({@link #mUsedTop}) being the first entry
-   * to actually contain data. Unused stack entries are collected in a
-   * linked list of free entries ({@link #mNextFree}).</P>
-   */
-  private class ControlStack
-  {
-    //#######################################################################
-    //# Constructor
-    /**
-     * Creates an empty control stack.
-     */
-    private ControlStack()
-    {
-      mStack = new TIntArrayList();
-      clear();
-    }
-
-    //#######################################################################
-    //# Stack Access
-    /**
-     * Resets the control stack to be empty.
-     */
-    private void clear()
-    {
-      mStack.clear();
-      mStack.add(-1);
-      mStack.add(-1);
-      mStack.add(-1);
-      mDummyTop = 0;
-      mUsedTop = mNextFree = -1;
-    }
-
-    /**
-     * Adds a new entry to the top of the stack. Also adds a {@link
-     * MonolithicDiagnosabilityVerifier#mLinks mLinks} entry to point to
-     * the new dummy top index.
-     * @param  index  The state index to be stored in the new entry.
-     * @param  parent The parent index to be stored in the new entry.
-     */
-    private void push(final int index, final int parent)
-    {
-      final int newTop = allocateEntry();
-      setStackLink(newTop, mDummyTop);
-      setStackIndex(mDummyTop, index);
-      setStackParent(mDummyTop, parent);
-      mLinks.add(newTop);
-      mUsedTop = mDummyTop;
-      mDummyTop = newTop;
-    }
-
-    /**
-     * Removes the top-most entry from the stack.
-     */
-    private void pop()
-    {
-      final int newTop = getStackLink(mUsedTop);
-      setStackLink(mDummyTop, mNextFree);
-      mNextFree = mDummyTop;
-      mDummyTop = mUsedTop;
-      mUsedTop = newTop;
-    }
-
-    /**
-     * Changes the given stack entry to become the new top. This method
-     * rearranges the stack to the new order and also updates any {@link
-     * MonolithicDiagnosabilityVerifier#mLinks mLinks} entries to point to
-     * the new predecessors of stack entries affected by the move.
-     * @param  stackPosAbove  The stack index of a stack entry above
-     *                        the stack entry to become the new top.
-     * @param  newParent      A new parent index to be stored in the
-     *                        new top of the stack after the move.
-     */
-    private void moveToTop(final int stackPosAbove, final int newParent)
-    {
-      if (stackPosAbove != mDummyTop) {
-        final int pos = getStackLink(stackPosAbove);
-        final int stackPosBelow = getStackLink(pos);
-        setStackParent(pos, newParent);
-        setStackLink(stackPosAbove, stackPosBelow);
-        setStackLink(pos, mUsedTop);
-        setStackLink(mDummyTop, pos);
-        final int index = getStackIndex(pos);
-        setLink(index, mDummyTop);
-        final int indexBelow = getStackIndex(stackPosBelow);
-        if ((indexBelow & MSB1) == 0) {
-          setLink(indexBelow, stackPosAbove);
-        }
-        final int oldTopIndex = getStackIndex(mUsedTop);
-        if ((oldTopIndex & MSB1) == 0) {
-          setLink(oldTopIndex, pos);
-        }
-        mUsedTop = pos;
-      }
-    }
-
-    /**
-     * Returns whether the stack is empty.
-     */
-    private boolean isEmpty()
-    {
-      return mUsedTop < 0;
-    }
-
-    /**
-     * Returns whether the top-most entry of the stack is flagged as
-     * expanded.
-     * @return <CODE>true</CODE> if the {@link
-     *         MonolithicDiagnosabilityVerifier#MSB1 MSB1} of the state
-     *         index of the top entry is set.
-     * @throws IndexOutOfBoundsException if the stack is empty.
-     */
-    private boolean isTopExpanded()
-    {
-      return (getStackIndex(mUsedTop) & MSB1) != 0;
-    }
-
-    /**
-     * Retrieves the state index of the top-most entry of the stack,
-     * without the {@link MonolithicDiagnosabilityVerifier#MSB1 MSB1}.
-     * @throws IndexOutOfBoundsException if the stack is empty.
-     */
-    private int getTopIndex()
-    {
-      return getStackIndex(mUsedTop) & ~MSB1;
-    }
-
-    /**
-     * Retrieves the parent index of the top-most entry of the stack.
-     * @throws IndexOutOfBoundsException if the stack is empty.
-     */
-    private int getTopParent()
-    {
-      return getStackParent(mUsedTop);
-    }
-
-    /**
-     * Sets the the parent index of the top-most entry of the stack.
-     * @param  index  The new parent index, including its {@link
-     *                MonolithicDiagnosabilityVerifier#MSB1 MSB1}.
-     */
-    private void setTopIndex(final int index)
-    {
-      setStackIndex(mUsedTop, index);
-    }
-
-    //#######################################################################
-    //# Indexing
-    /**
-     * Retrieves the stack link, which refers to the next entry below the
-     * stack given stack entry.
-     * @param  pos    The stack index of the entry to be checked.
-     */
-    private int getStackLink(final int pos)
-    {
-      return mStack.get(pos);
-    }
-
-    /**
-     * Retrieves the state index of the stack given stack entry,
-     * including its {@link MonolithicDiagnosabilityVerifier#MSB1 MSB1}.
-     * @param  pos    The stack index of the entry to be checked.
-     */
-    private int getStackIndex(final int pos)
-    {
-      return mStack.get(pos + 1);
-    }
-
-    /**
-     * Retrieves the parent index of the stack given stack entry.
-     * @param  pos    The stack index of the entry to be checked.
-     */
-    private int getStackParent(final int pos)
-    {
-      return mStack.get(pos + 2);
-    }
-
-    /**
-     * Sets the stack link, which refers to the next entry below the
-     * stack given stack entry.
-     * @param  pos    The stack index of the entry to be updated.
-     * @param  value  The stack index of the new entry below.
-     */
-    private void setStackLink(final int pos, final int value)
-    {
-      mStack.set(pos, value);
-    }
-
-    /**
-     * Sets the state index of the stack given stack entry.
-     * @param  pos    The stack index of the entry to be updated.
-     * @param  index  The new state index, including its {@link
-     *                MonolithicDiagnosabilityVerifier#MSB1 MSB1}.
-     */
-    private void setStackIndex(final int pos, final int index)
-    {
-      mStack.set(pos + 1, index);
-    }
-
-    /**
-     * Sets the parent index of the stack given stack entry.
-     * @param  pos    The stack index of the entry to be updated.
-     * @param  parent The new parent index.
-     */
-    private void setStackParent(final int pos, final int parent)
-    {
-      mStack.set(pos + 2, parent);
-    }
-
-    //#######################################################################
-    //# Free Nodes
-    /**
-     * Allocates a stack entry. This method either enlarges the stack or
-     * updates and returns the next available entry from the list of free
-     * entries.
-     */
-    private int allocateEntry()
-    {
-      if (mNextFree >= 0) {
-        final int free = mNextFree;
-        mNextFree = getStackLink(free);
-        return free;
-      } else {
-        final int free = mStack.size();
-        mStack.add(-1);
-        mStack.add(-1);
-        mStack.add(-1);
-        return free;
-      }
-    }
-
-    //#######################################################################
-    //# Debugging
-    @Override
-    public String toString()
-    {
-      final StringBuilder builder = new StringBuilder();
-      boolean first = true;
-      for (int i = 0; i < mStack.size(); i+= 3) {
-        if (first) {
-          first = false;
-        } else {
-          builder.append('\n');
-        }
-        builder.append(i);
-        builder.append(": (");
-        final int value = mStack.get(i+1);
-        if (value == -1) {
-          builder.append(value);
-        } else {
-          builder.append(value & ~MSB1);
-          if ((value & MSB1) != 0) {
-            builder.append('*');
-          }
-        }
-        builder.append(',');
-        builder.append(mStack.get(i+2));
-        builder.append(") -> ");
-        builder.append(mStack.get(i));
-        if (i == mDummyTop) {
-          builder.append(" @dummy");
-        } else if (i == mUsedTop) {
-          builder.append(" @top");
-        } else if (i == mNextFree) {
-          builder.append(" @free");
-        }
-      }
-      return builder.toString();
-    }
-
-    @SuppressWarnings("unused")
-    private void checkIntegrity()
-    {
-      for (int i = 0; i < mLinks.size(); i++) {
-        final int link = mLinks.get(i);
-        if ((link & MSB1) == 0) {
-          final int stackPosAbove = link;
-          final int stackPos = getStackLink(stackPosAbove);
-          final int index = getStackIndex(stackPos);
-          assert index == i;
-        }
-      }
-    }
-
-    //#######################################################################
-    //# Instance Variables
-    /**
-     * Array list containing stack data.
-     */
-    private final TIntArrayList mStack;
-    /**
-     * A fake stack top entry. The dummy top is always defined and identifies
-     * the entry to be created by a following {@link #push(int, int) push()}
-     * operation. It can be used as the reference to the entry above any new
-     * item pushed on the stack (which needs to be stored in {@link
-     * MonolithicDiagnosabilityVerifier#mLinks mLinks}). The stack link
-     * of <CODE>mDummyTop</CODE> always points to {@link #mUsedTop}.
-     */
-    private int mDummyTop;
-    /**
-     * The top-most stack entry that holds data, or -1 if the stack is
-     * empty.
-     */
-    private int mUsedTop;
-    /**
-     * The next available unused stack entry, or -1 if all stack entries are
-     * in use. If a free entry is available, its stack link refers to the
-     * next available free entry.
-     */
-    private int mNextFree;
-  }
-
-
-  //#########################################################################
   //# Instance Variables
   private boolean[] mEventObservable;
   private boolean[] mFaultEvent;
   private int mNumberOfFaultClasses;
   private String mCurrentFaultClass;
   private TLongIntHashMap mStateIndexMap;
-  private final TLongArrayList mIndexStateMap = new TLongArrayList();
-  private final ControlStack mControlStack = new ControlStack();
-  private final TIntArrayList mComponentStack = new TIntArrayList();
-  private final TIntArrayList mLinks = new TIntArrayList();
+  private final TLongArrayList mIndexStateMap =
+    new TLongArrayList(INITIAL_STACK_SIZE);
+  private final TarjanControlStack mControlStack =
+    new TarjanControlStack(INITIAL_STACK_SIZE);
+  private final TIntArrayList mComponentStack =
+    new TIntArrayList(INITIAL_STACK_SIZE);
   private final TIntHashSet mCurrentSCC = new TIntHashSet();
   private final ArrayDeque<Integer> bfsQueue = new ArrayDeque<Integer>();
   private TRSynchronousProductBuilder mSynchronousProductBuilder;
@@ -1208,5 +874,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   //#########################################################################
   //# Class Constants
   private static final int MSB1 = 0x80000000;
+  private static final int INITIAL_STACK_SIZE = 1024;
 
 }
