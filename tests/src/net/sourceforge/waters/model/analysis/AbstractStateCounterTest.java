@@ -166,6 +166,13 @@ public abstract class AbstractStateCounterTest
     countStates(des, 12.0);
   }
 
+  public void testSmallFactory2s() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "small_factory_2s.wmod");
+    countStates(des, 12.0);
+  }
+
   public void testSmallFactory2u() throws Exception
   {
     final ProductDESProxy des =

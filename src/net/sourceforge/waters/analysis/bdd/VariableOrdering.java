@@ -62,7 +62,7 @@ public enum VariableOrdering
         new ArrayList<AutomatonProxy>(size);
       for (final AutomatonProxy aut : automata) {
         final ComponentKind kind = translator.getComponentKind(aut);
-        if (kind == ComponentKind.PLANT || kind == ComponentKind.SPEC) {
+        if (kind != null && kind != ComponentKind.PROPERTY) {
           reduced.add(aut);
         }
       }

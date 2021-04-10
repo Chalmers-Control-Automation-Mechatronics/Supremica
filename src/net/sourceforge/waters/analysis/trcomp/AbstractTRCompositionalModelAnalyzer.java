@@ -1241,12 +1241,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   {
     final KindTranslator translator = getKindTranslator();
     final ComponentKind kind = translator.getComponentKind(aut);
-    if (kind == null) {
-      return null;
-    }
-    switch (kind) {
-    case PLANT:
-    case SPEC:
+    if (kind != null && kind != ComponentKind.PROPERTY) {
       final TRAbstractionStepInput step;
       if (isPreservingEncodings() && aut instanceof TRAutomatonProxy) {
         final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
@@ -1270,7 +1265,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         addAbstractionStep(step, created);
       }
       return created;
-    default:
+    } else {
       return null;
     }
   }
