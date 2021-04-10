@@ -893,23 +893,48 @@ public class MonolithicSynthesizerNormality
   private abstract class AutomatonEventInfo implements
     Comparable<AutomatonEventInfo>
   {
+    //#######################################################################
+    //# Constructor
     public AutomatonEventInfo(final int aut, final double probability)
     {
-      mAut = aut;
+      mAutomaton = aut;
       mProbability = probability;
     }
 
-    protected int getAutomaton()
+    //#######################################################################
+    //# Simple Access
+    int getAutomaton()
     {
-      return mAut;
+      return mAutomaton;
     }
 
-    protected double getProbability()
+    double getProbability()
     {
       return mProbability;
     }
 
-    private final int mAut;
+    boolean isPlant()
+    {
+      return mAutomaton < mNumPlants;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparable<AutomatonEventInfo>
+    @Override
+    public int compareTo(final AutomatonEventInfo info)
+    {
+      if (mProbability < info.mProbability) {
+        return -1;
+      } else if (mProbability > info.mProbability) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mAutomaton;
     private final double mProbability;
   }
 
@@ -918,24 +943,26 @@ public class MonolithicSynthesizerNormality
   //# Inner Class UncontrollableAutomatonEventInfo
   private class UncontrollableAutomatonEventInfo extends AutomatonEventInfo
   {
+    //#######################################################################
+    //# Constructor
     public UncontrollableAutomatonEventInfo(final int aut,
                                             final double probability)
     {
       super(aut, probability);
     }
 
+    //#######################################################################
+    //# Interface java.util.Comparable<AutomatonEventInfo>
     @Override
     public int compareTo(final AutomatonEventInfo info)
     {
-      if (this.getAutomaton() < mNumPlants && this.getProbability() == 1.0f) {
-        return 1;
-      } else if (info.mAut < mNumPlants && info.mProbability == 1.0f) {
-        return -1;
-      } else if ((this.getAutomaton() < mNumPlants && info.mAut < mNumPlants)
-          || (this.getAutomaton() >= mNumPlants && info.mAut >= mNumPlants)) {
-        return (this.getProbability() < info.mProbability) ? -1 : 1;
+      assert info instanceof UncontrollableAutomatonEventInfo;
+      final boolean thisPlant = isPlant() && getProbability() < 1.0;
+      final boolean thatPlant = info.isPlant() && info.getProbability() < 1.0;
+      if (thisPlant != thatPlant) {
+        return thisPlant ? -1 : 1;
       } else {
-        return (this.getAutomaton() < mNumPlants) ? -1 : 1;
+        return super.compareTo(info);
       }
     }
   }
@@ -945,22 +972,12 @@ public class MonolithicSynthesizerNormality
   //# Inner Class ControllableAutomatonEventInfo
   private class ControllableAutomatonEventInfo extends AutomatonEventInfo
   {
+    //#######################################################################
+    //# Constructor
     public ControllableAutomatonEventInfo(final int aut,
                                           final double probability)
     {
       super(aut, probability);
-    }
-
-    @Override
-    public int compareTo(final AutomatonEventInfo info)
-    {
-      if (this.getProbability() < info.getProbability()) {
-        return -1;
-      } else if (this.getProbability() < info.getProbability()) {
-        return 1;
-      } else {
-        return 0;
-      }
     }
   }
 

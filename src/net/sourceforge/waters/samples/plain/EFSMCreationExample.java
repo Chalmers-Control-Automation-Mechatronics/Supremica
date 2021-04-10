@@ -117,7 +117,7 @@ public class EFSMCreationExample
     final EventDeclProxy eventU =
       factory.createEventDeclProxy(eventNameU, EventKind.UNCONTROLLABLE);
     events.add(eventU);
-    //Proposition :accepting (used for marking)
+    // Proposition :accepting (used for marking)
     final IdentifierProxy eventNameAccepting =
       factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
     final EventDeclProxy eventAccepting =

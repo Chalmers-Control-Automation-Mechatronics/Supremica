@@ -499,7 +499,6 @@ Class-Path: ${manifest.pathlist}</echo>
 		    <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
 		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicCliqueBasedSupervisorReductionTest.java"/>
 		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
-		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSynthesizerNormalityTest.java"/>
                     <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
                 </fileset>
             </batchtest>
