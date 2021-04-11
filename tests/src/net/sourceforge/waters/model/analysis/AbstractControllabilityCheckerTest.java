@@ -86,15 +86,16 @@ public abstract class AbstractControllabilityCheckerTest
     testSmallFactory2();
     testTransferline__1();
     testEmpty();
-    testTransferline__1();
+    testOverflowException();
     testSmallFactory2();
+    testTransferline__1();
   }
 
   public void testOverflowException()
     throws Exception
   {
+    final ModelVerifier verifier = getModelVerifier();
     try {
-      final ModelVerifier verifier = getModelVerifier();
       verifier.setNodeLimit(2);
       testTransferline__1();
       fail("Expected overflow not caught!");
@@ -102,13 +103,14 @@ public abstract class AbstractControllabilityCheckerTest
       final OverflowKind kind = exception.getOverflowKind();
       assertTrue("Unexpected overflow kind!",
                  kind == OverflowKind.STATE || kind == OverflowKind.NODE);
-      final ModelVerifier verifier = getModelVerifier();
       final AnalysisResult result = verifier.getAnalysisResult();
       assertNotNull("Got NULL analysis result after exception!", result);
       assertNotNull("No exception in analysis result after caught exception!",
                     result.getException());
       assertSame("Unexpected exception in analysis result!",
                  exception, result.getException());
+    } finally {
+      verifier.setNodeLimit(Integer.MAX_VALUE);
     }
   }
 
@@ -389,6 +391,13 @@ public abstract class AbstractControllabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- tests/nasty
+  public void testAlwaysEnabledUncontrollables() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "always_enabled_uncontrollables.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void test_AmpleCandidateTrue() throws Exception
   {
     final ProductDESProxy des =

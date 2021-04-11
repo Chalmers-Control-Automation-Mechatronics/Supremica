@@ -633,6 +633,16 @@ public abstract class AbstractSupervisorSynthesizerTest
 
 
   //#########################################################################
+  //# Test Cases --- Nasty
+  public void testAlwaysEnabledUncontrollables() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "always_enabled_uncontrollables.wmod");
+    runSynthesizer(des, false);
+  }
+
+
+  //#########################################################################
   //# Test Cases --- Nondeterministic
   public void testTwoInit2() throws Exception
   {

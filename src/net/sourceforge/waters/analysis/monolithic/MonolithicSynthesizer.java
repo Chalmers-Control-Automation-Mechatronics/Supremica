@@ -882,7 +882,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
       } else if (mProbability > info.mProbability) {
         return 1;
       } else {
-        return 0;
+        return mAutomaton - info.mAutomaton;
       }
     }
 

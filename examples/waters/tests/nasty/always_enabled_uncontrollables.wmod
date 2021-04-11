@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="always_enabled_uncontrollables">
+<B:Comment>A test case with a large number of uncontrollable events that are always enabled in several plants.
+This is a test for monolithic algorithms that optimise the ordering of plants using uncontrollable events based on whether they are always enabled.</B:Comment>
+<ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+<ConstantAliasExpression><IntConstant Value="30"/>
+</ConstantAliasExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="u">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="k">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="plant">
+<SimpleIdentifier Name="k"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="144" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<ForeachEvent Name="j">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+<EventList>
+<ConditionalEvent>
+<BinaryExpression Operator="!=" Text="j != k">
+<SimpleIdentifier Name="j"/>
+<SimpleIdentifier Name="k"/>
+</BinaryExpression>
+<EventList>
+<IndexedIdentifier Name="u">
+<SimpleIdentifier Name="j"/>
+</IndexedIdentifier>
+</EventList>
+</ConditionalEvent>
+</EventList>
+</ForeachEvent>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="136"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="spec">
+<SimpleIdentifier Name="k"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="240" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="192" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<IndexedIdentifier Name="u">
+<SimpleIdentifier Name="k"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S2">
+<LabelBlock>
+<IndexedIdentifier Name="u" Text="u[(k+1) % N]">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="k"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S2" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="u" Text="u[(k+2) % N]">
+<BinaryExpression Operator="%">
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="k"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-76" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
