@@ -434,20 +434,21 @@ public class TRControllabilityChecker
         final TRAbstractionStepInput step = info.createInputStep();
         trace.replaceInputAutomaton(aut, step);
         trace.setInputAutomaton(step);
-        if (info.getComponentKind() == ComponentKind.SPEC) {
-          final int s = trace.getState(step, end - 1);
-          final int t = trace.getState(step, end);
-          if (!info.hasTransition(s, event, t)) {
-            trace.setState(step, end, -1);
-            if (failedAut == null) {
-              failedAut = aut;
-              final SafetyDiagnostics diag = getDiagnostics();
-              if (diag != null) {
-                final StateProxy failedState = step.getState(s);
-                final String comment =
-                  diag.getTraceComment(des, event, failedAut, failedState);
-                trace.setComment(comment);
-              }
+        final int s = trace.getState(step, end - 1);
+        int t = trace.getState(step, end);
+        if (!info.hasTransition(s, event, t)) {
+          t = info.getAlternateTarget(s, event);
+          trace.setState(step, end, t);
+          if (info.getComponentKind() == ComponentKind.PLANT) {
+            assert t >= 0;
+          } else if (t < 0 && failedAut == null) {
+            failedAut = aut;
+            final SafetyDiagnostics diag = getDiagnostics();
+            if (diag != null) {
+              final StateProxy failedState = step.getState(s);
+              final String comment =
+                diag.getTraceComment(des, event, failedAut, failedState);
+              trace.setComment(comment);
             }
           }
         }
@@ -705,6 +706,38 @@ public class TRControllabilityChecker
         }
       }
       return false;
+    }
+
+    private int getAlternateTarget(final int s, final EventProxy event)
+    {
+      final EventEncoding enc = mPrimaryTRAutomaton.getEventEncoding();
+      final int e = enc.getEventCode(event);
+      if (e < 0) {
+        return s;
+      }
+      final ListBufferTransitionRelation rel =
+        mPrimaryTRAutomaton.getTransitionRelation();
+      final byte status = rel.getProperEventStatus(e);
+      if (!EventStatus.isUsedEvent(status)) {
+        return s;
+      }
+      final int config = rel.getConfiguration();
+      if ((config & ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0) {
+        final TransitionIterator iter =
+          rel.createSuccessorsReadOnlyIterator(s, e);
+        if (iter.advance()) {
+          return iter.getCurrentTargetState();
+        }
+      } else {
+        final TransitionIterator iter =
+          rel.createAllTransitionsReadOnlyIterator(e);
+        while (iter.advance()) {
+          if (iter.getCurrentSourceState() == s) {
+            return iter.getCurrentTargetState();
+          }
+        }
+      }
+      return -1;
     }
 
     //#######################################################################
