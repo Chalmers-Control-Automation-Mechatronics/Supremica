@@ -48,8 +48,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,18 +75,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
-import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
-import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.NonTypingTable;
-import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
-
-import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
-import org.supremica.automata.BDD.EFA.TimeInvariantAttributeFactory;
-import org.supremica.gui.ide.DefaultAttributeFactory;
-import org.supremica.properties.Config;
 
 
 /**
@@ -114,7 +104,7 @@ public class AttributesPanel extends JPanel
 
   AttributesPanel(final Class<? extends Proxy> clazz)
   {
-    mAttributeValues = getAttributeInfo(clazz);
+    mAttributeValues = AttributeFactoryManager.getGlobalAttributeInfo(clazz);
     final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
     mTable = new NonTypingTable(model);
     mTable.setTableHeader(null);
@@ -383,7 +373,6 @@ public class AttributesPanel extends JPanel
   //# Inner Class AddAttributeAction
   private class AddAttributeAction extends AbstractAction
   {
-
     //#######################################################################
     //# Constructor
     private AddAttributeAction()
@@ -406,8 +395,7 @@ public class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 2982516984147170498L;
   }
 
 
@@ -415,7 +403,6 @@ public class AttributesPanel extends JPanel
   //# Inner Class RemoveAttributesAction
   private class RemoveAttributesAction extends AbstractAction
   {
-
     //#######################################################################
     //# Constructor
     private RemoveAttributesAction()
@@ -438,8 +425,7 @@ public class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 8495941310956125660L;
   }
 
 
@@ -448,7 +434,6 @@ public class AttributesPanel extends JPanel
   private class AttributeEditor
     extends DefaultCellEditor
   {
-
     //#######################################################################
     //# Constructors
     private AttributeEditor()
@@ -520,64 +505,13 @@ public class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
-  }
-
-
-  //#########################################################################
-  //# Attribute Maps
-  private static class AttributeInfo extends TreeMap<String,List<String>>
-  {
-    private static final long serialVersionUID = 1L;
-  }
-
-  private static final List<AttributeFactory>
-    ATTRIBUTE_FACTORIES = new LinkedList<AttributeFactory>();
-  private static final Map<Class<? extends Proxy>,AttributeInfo>
-    ATTRIBUTE_INFO_MAP = new HashMap<Class<? extends Proxy>,AttributeInfo>();
-
-  static {
-    //=======================================================================
-    // Register Attribute Factories
-    //=======================================================================
-    // TODO Make responsive to configuration changes ...
-    ATTRIBUTE_FACTORIES.add(DefaultAttributeFactory.getInstance());
-    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.getValue()) {
-      ATTRIBUTE_FACTORIES.add(DiagnosabilityAttributeFactory.getInstance());
-    }
-    if (Config.GUI_ANALYZER_INCLUDE_HISC.getValue()) {
-      ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
-    }
-    // A condition could be added to check if the model contains any clocks
-    if (Config.INCLUDE_RAS_SUPPORT.getValue()) {
-      ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
-      ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
-    }
-    //=======================================================================
-  }
-
-  private static AttributeInfo getAttributeInfo
-    (final Class<? extends Proxy> iface)
-  {
-    AttributeInfo info = ATTRIBUTE_INFO_MAP.get(iface);
-    if (info == null) {
-      info = new AttributeInfo();
-      for (final AttributeFactory factory : ATTRIBUTE_FACTORIES) {
-        for (final String attrib : factory.getApplicableKeys(iface)) {
-          final List<String> values = factory.getApplicableValues(attrib);
-          info.put(attrib, values);
-        }
-      }
-      ATTRIBUTE_INFO_MAP.put(iface, info);
-    }
-    return info;
+    private static final long serialVersionUID = 3155575354358336693L;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final AttributeInfo mAttributeValues;
+  private final Map<String,List<String>> mAttributeValues;
   private final TableCellEditor mEditor;
   private final NonTypingTable mTable;
   private final JButton mAddButton;
@@ -587,11 +521,9 @@ public class AttributesPanel extends JPanel
   private final Action mRemoveAction;
 
 
-
-
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 6869389311747459446L;
 
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   public static final String LABEL_NAME = "Attributes:";
