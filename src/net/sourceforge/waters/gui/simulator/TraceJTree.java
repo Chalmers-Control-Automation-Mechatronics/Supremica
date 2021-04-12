@@ -61,6 +61,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -84,6 +85,7 @@ public class TraceJTree
     this.getSelectionModel().setSelectionMode
       (TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
+    setRowHeight(IconAndFontLoader.getWatersIconSize());
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
@@ -408,6 +410,5 @@ public class TraceJTree
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int noduleWidth = 30;
-  private static final int rowHeight = 20;
 
 }
