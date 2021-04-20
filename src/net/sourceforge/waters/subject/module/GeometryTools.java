@@ -1355,8 +1355,8 @@ public final class GeometryTools
 
   /**
    * The distance of the control point of a selfloop to the node,
-   * when the height and with of the selfloop are both equal to one and
-   * the selfloop has standard 45degrees (north-east) orientation.
+   * when the height and width of the selfloop are both equal to one and
+   * the selfloop has standard 45 degrees (north-east) orientation.
    */
   public static final double SELFLOOP_DISTANCE_UNIT =
     2.0 * (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2);

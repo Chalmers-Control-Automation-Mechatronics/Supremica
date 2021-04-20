@@ -152,7 +152,7 @@ public class IsomorphismChecker
    * Checks whether the two given automata are isomorphic.
    * @param  aut1   The first automaton to be compared.
    * @param  aut2   The second automaton to be compared.
-   * @throws AnalysisException if the input automata are not isomorphic.
+   * @throws IsomorphismException if the input automata are not isomorphic.
    */
   public void checkIsomorphism(final AutomatonProxy aut1,
                                final AutomatonProxy aut2)
@@ -190,7 +190,9 @@ public class IsomorphismChecker
    * @param  aut2   The second automaton to be compared.
    * @return <CODE>true</CODE> if the automata have been found to be
    *         bisimilar, <CODE>false</CODE> otherwise.
-   * @throws AnalysisException if the input automata are not isomorphic.
+   * @throws IsomorphismException if configured to throw an exception and
+   *         the input automata are not bisimilar.
+   * @see #setThrowingExceptions(boolean)
    */
   public boolean checkBisimulation(final AutomatonProxy aut1,
                                    final AutomatonProxy aut2)
@@ -657,6 +659,14 @@ public class IsomorphismChecker
   private Collection<EventProxy> mExtraProperties1;
   private Collection<EventProxy> mSelfloops2;
   private Collection<EventProxy> mExtraProperties2;
+
+  /**
+   * Map to determine which original automaton a state belongs to.
+   * When checking whether two automata are bisimilar or isomorphic, new
+   * {@link StateProxy} are created for both the automata. The split map
+   * maps states created for the first automaton to&nbsp;0 and states created
+   * for the second automaton to&nbsp;1.
+   */
   private TObjectIntHashMap<StateProxy> mSplitMap;
 
 }
