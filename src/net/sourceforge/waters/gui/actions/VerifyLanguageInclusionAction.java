@@ -56,6 +56,8 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -84,12 +86,15 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
       if (mNamedProxy instanceof SimpleComponentSubject) {
         final SimpleComponentSubject comp =
           (SimpleComponentSubject) mNamedProxy;
-        if (comp.getParent().getParent() instanceof ForeachProxy) {
+        if (SubjectTools.getAncestor(comp, ForeachSubject.class) != null) {
           suffix = "ies";
         }
       }
-      putValue(Action.NAME,
-               "Check propert" + suffix + ' ' + mNamedProxy.getName());
+      String name = mNamedProxy.getName();
+      if (name.length() > 32) {
+        name = name.substring(0, 30) + "...";
+      }
+      putValue(Action.NAME, "Check propert" + suffix + ' ' + name);
     }
   }
 
