@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -50,11 +51,13 @@ import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -803,6 +806,43 @@ public abstract class AbstractSupervisorSynthesizerTest
     } else {
       assertFalse("Synthesis failed, but the problem has a solution!",
                   expect);
+    }
+  }
+
+  /**
+   * Checks whether the computed supervisor is isomorphic
+   * (including markings) to the synchronous product of the expected result
+   * and the plants and specs in the test case. Can be called
+   * for monolithic synthesis in addition to {@link
+   * #checkResult(ProductDESProxy, ProductDESResult, boolean) checkResult()}
+   * to ensure that the result is exactly the expected automaton.
+   */
+  protected void checkMonolithicResult(final ProductDESProxy des,
+                                       final ProductDESResult result)
+    throws Exception
+  {
+    if (result.isSatisfied()) {
+      final Collection<? extends AutomatonProxy> computedSupervisors =
+        result.getComputedAutomata();
+      assertEquals("Monolithic synthesis did not return exactly one supervisor!",
+                   1, computedSupervisors.size());
+      final AutomatonProxy computedSupervisor =
+        computedSupervisors.iterator().next();
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final SynchronousProductBuilder builder =
+        new TRSynchronousProductBuilder(des);
+      builder.setOutputName(des.getName());
+      builder.setOutputKind(ComponentKind.SUPERVISOR);
+      builder.setRemovingSelfloops(true);
+      final EventProxy marking =
+        AbstractConflictChecker.findMarkingProposition(des);
+      final Collection<EventProxy> props = Collections.singletonList(marking);
+      builder.setPropositions(props);
+      assertTrue(builder.run());
+      final AutomatonProxy expectedSupervisor = builder.getComputedAutomaton();
+      final IsomorphismChecker checker =
+        new IsomorphismChecker(factory, false, true);
+      checker.checkIsomorphism(computedSupervisor, expectedSupervisor);
     }
   }
 
