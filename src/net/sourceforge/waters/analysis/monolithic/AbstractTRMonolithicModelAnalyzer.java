@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -317,7 +318,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     setUpDeadlockInfo();
     // Add transition information to event info ...
     final List<EventInfo> eventInfoList =
-      setUpTransitions(mTRAutomata, eventInfoMap);
+      setUpTransitions(mTRAutomata, eventInfoMap, supportsNondeterminism());
     // Sort event info and merge local events
     postProcessEventInfo(eventInfoList);
   }
@@ -509,8 +510,9 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
   protected List<EventInfo> setUpTransitions
     (final TRAutomatonProxy[] automata,
-     final Map<EventProxy,EventInfo> eventInfoMap)
-    throws OverflowException, AnalysisAbortException
+     final Map<EventProxy,EventInfo> eventInfoMap,
+     final boolean nondeterminismSupported)
+    throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
@@ -531,8 +533,9 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           final EventProxy event = enc.getProperEvent(local);
           if (event == null) {
             assert local == EventEncoding.TAU;
+            assert nondeterminismSupported;
             final AutomatonEventInfo autInfo =
-              new AutomatonEventInfo(a, aut, local, deadlockInfo, true);
+              new AutomatonEventInfo(a, aut, local, deadlockInfo, true, true);
             if (!autInfo.isBlocked()) {
               final EventInfo info = new EventInfo(null);
               info.addAutomatonEventInfo(autInfo);
@@ -549,7 +552,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
             if (info != null && !info.isBlocked()) {
               info.setOutputCode(global);
               final AutomatonEventInfo autInfo =
-                new AutomatonEventInfo(a, aut, local, deadlockInfo, true);
+                new AutomatonEventInfo(a, aut, local, deadlockInfo,
+                                       true, nondeterminismSupported);
               info.addAutomatonEventInfo(autInfo);
             }
           }
@@ -618,7 +622,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       eventInfoMap.put(event, info);
     }
     final List<EventInfo> eventInfoList =
-      setUpTransitions(reversedAutomata, eventInfoMap);
+      setUpTransitions(reversedAutomata, eventInfoMap, true);
     postProcessEventInfo(eventInfoList);
     return eventInfoList;
   }
@@ -884,7 +888,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   //#########################################################################
   //# Auxiliary Methods
   private void addMergedEventInfo(final List<EventInfo> group)
-    throws OverflowException
+    throws AnalysisException
   {
     switch (group.size()) {
     case 0:
@@ -898,14 +902,14 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       final TRAutomatonProxy aut = mTRAutomata[a];
       final DeadlockInfo deadlockInfo =
         mDeadlockInfo == null ? null : mDeadlockInfo[a];
-      final EventInfo merged = new EventInfo(group, aut, deadlockInfo);
+      final EventInfo merged = new EventInfo(group, aut, deadlockInfo, true);
       mEventInfo.add(merged);
       break;
     }
   }
 
   private void storeInitialStates()
-    throws OverflowException
+    throws AnalysisException
   {
     final TIntArrayList nondeterministicIndices = new TIntArrayList();
     for (int a = 0; a < mTRAutomata.length; a++) {
@@ -915,12 +919,15 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       final int numStates = rel.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
         if (rel.isInitial(s)) {
-          if (found) {
+          if (!found) {
+            mDecodedTarget[a] = s;
+            found = true;
+          } else if (supportsNondeterminism()) {
             nondeterministicIndices.add(a);
             break;
           } else {
-            mDecodedTarget[a] = s;
-            found = true;
+            final StateProxy state = aut.getState(s);
+            throw new NondeterministicDESException(aut, state);
           }
         }
       }
@@ -1382,8 +1389,9 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
     private EventInfo(final Collection<EventInfo> parts,
                       final TRAutomatonProxy aut,
-                      final DeadlockInfo deadlockInfo)
-      throws OverflowException
+                      final DeadlockInfo deadlockInfo,
+                      final boolean nondeterminismSupported)
+      throws AnalysisException
     {
       mEvent = null;
       mStatus = EventStatus.STATUS_NONE;
@@ -1397,7 +1405,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         autParts.add(autPart);
       }
       final AutomatonEventInfo merged =
-        new AutomatonEventInfo(autParts, aut, deadlockInfo);
+        new AutomatonEventInfo(autParts, aut,
+                               deadlockInfo, nondeterminismSupported);
       mDisablingAutomata = Collections.singletonList(merged);
       if (merged.isSelfloopOnly()) {
         mUpdatingAutomata = Collections.emptyList();
@@ -1653,19 +1662,22 @@ public abstract class AbstractTRMonolithicModelAnalyzer
                                final TRAutomatonProxy aut,
                                final int e,
                                final DeadlockInfo deadlockInfo,
-                               final boolean canBlock)
+                               final boolean canBlock,
+                               final boolean nondeterminismSupported)
+      throws NondeterministicDESException
     {
       mAutomatonIndex = autIndex;
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator.resetEvent(e);
-      countTransitions(rel, deadlockInfo, canBlock);
+      countTransitions(aut, deadlockInfo, canBlock, nondeterminismSupported);
     }
 
     private AutomatonEventInfo(final Collection<AutomatonEventInfo> parts,
                                final TRAutomatonProxy aut,
-                               final DeadlockInfo deadlockInfo)
-      throws OverflowException
+                               final DeadlockInfo deadlockInfo,
+                               final boolean nondeterminismSupported)
+      throws AnalysisException
     {
       assert !parts.isEmpty();
       final AutomatonEventInfo first = parts.iterator().next();
@@ -1687,16 +1699,19 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator = new StatusGroupTransitionIterator
         (iter, provider, EventStatus.STATUS_LOCAL);
-      countTransitions(rel, deadlockInfo, true);
+      countTransitions(aut, deadlockInfo, true, nondeterminismSupported);
     }
 
-    private void countTransitions(final ListBufferTransitionRelation rel,
+    private void countTransitions(final TRAutomatonProxy aut,
                                   final DeadlockInfo deadlockInfo,
-                                  final boolean canBlock)
+                                  final boolean canBlock,
+                                  final boolean nondeterminismSupported)
+      throws NondeterministicDESException
     {
       mDeterministic = true;
       mSelfloopOnly = true;
       mBlocked = canBlock;
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
       int numReachable = 0;
       int numEnabled = 0;
@@ -1714,7 +1729,16 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           if (count > 0) {
             numEnabled++;
             mBlocked = false;
-            mDeterministic &= (count == 1);
+            if (count > 1) {
+              if (nondeterminismSupported) {
+                mDeterministic = false;
+              } else {
+                final StateProxy source = aut.getState(s);
+                final int e = mTransitionIterator.getCurrentEvent();
+                final EventProxy event = aut.getEventEncoding().getProperEvent(e);
+                throw new NondeterministicDESException(aut, source, event);
+              }
+            }
           }
         }
       }
