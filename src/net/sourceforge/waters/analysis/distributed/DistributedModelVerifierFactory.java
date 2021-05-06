@@ -39,9 +39,7 @@ import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.StringOption;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -54,14 +52,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 public class DistributedModelVerifierFactory
   extends AbstractModelAnalyzerFactory
 {
-  //####################################################################
-  // The current implementation makes a cast to
-  // DistributedSafetyVerifier when processing command line arguments.
-  // An interface should be created for any distributed model verifiers
-  // that allow the host and port parameters to be specified.
-  //####################################################################
-
-
   //#########################################################################
   //# Constructors
   private DistributedModelVerifierFactory()
@@ -91,7 +81,7 @@ public class DistributedModelVerifierFactory
     db.add(new StringOption
              (OPTION_DistributedModelVerifierFactory_Host,
               null,
-              "Serer to submit job to",
+              "Server to submit job to",
               "-host", null));
     db.add(new PositiveIntOption
              (OPTION_DistributedModelVerifierFactory_Port,
@@ -125,14 +115,6 @@ public class DistributedModelVerifierFactory
               "-statedist", null));
   }
 
-  @Override
-  public void configure(final ModelAnalyzer analyzer)
-    throws AnalysisConfigurationException
-  {
-    super.configure(analyzer);
-    ((DistributedSafetyVerifier) analyzer).launchLocalServers();
-  }
-
 
   //#########################################################################
   //# Factory Instantiation
@@ -143,10 +125,6 @@ public class DistributedModelVerifierFactory
     }
     return theInstance;
   }
-
-
-  //#########################################################################
-  //# Data Members
 
 
   //#########################################################################
@@ -167,7 +145,5 @@ public class DistributedModelVerifierFactory
     "DistributedModelVerifierFactory.Walltime";
   public static final String OPTION_DistributedModelVerifierFactory_StateDistribution =
     "DistributedModelVerifierFactory.StateDistribution";
-
-
 
 }

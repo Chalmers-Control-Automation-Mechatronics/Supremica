@@ -38,6 +38,7 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.ChainOption;
 import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -52,7 +53,7 @@ public class ChainCommandLineArgument extends EnumCommandLineArgument<ModelAnaly
   //#######################################################################
   //# Constructors
   public ChainCommandLineArgument(final CommandLineOptionContext context,
-                                    final ChainOption option)
+                                  final ChainOption option)
   {
     super(context, option);
   }
@@ -72,6 +73,7 @@ public class ChainCommandLineArgument extends EnumCommandLineArgument<ModelAnaly
   public void parse(final CommandLineOptionContext context,
                     final Collection<Configurable> configurables,
                     final ListIterator<String> iter)
+    throws AnalysisException
   {
     for (final Configurable configurable : configurables) {
       if (configurable instanceof ModelAnalyzer) {
@@ -79,11 +81,12 @@ public class ChainCommandLineArgument extends EnumCommandLineArgument<ModelAnaly
         final ModelAnalyzerFactoryLoader loader = getValue();
         final String factoryName = loader.toString();
         try {
-          final ModelAnalyzerFactory secondaryFactory = loader.getModelAnalyzerFactory();
-          ((ChainOption)getOption()).setSecondaryFactory(secondaryFactory);
+          final ChainOption option = (ChainOption) getOption();
+          final ModelAnalyzerFactory secondaryFactory =
+            loader.getModelAnalyzerFactory();
+          option.setSecondaryFactory(secondaryFactory);
           final ModelAnalyzer secondaryAnalyzer =
-            ((ChainOption) getOption()).createSecondaryAnalyzer((ModelAnalyzer) configurable,
-                                                                true);
+            option.createSecondaryAnalyzer((ModelAnalyzer) configurable);
           context.getArgumentSources().pop();
           context.addArgumentSource(secondaryFactory);
           context.getConfigurables().pop();

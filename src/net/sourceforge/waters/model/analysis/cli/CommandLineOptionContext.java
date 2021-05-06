@@ -38,7 +38,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -67,6 +67,7 @@ import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -81,18 +82,20 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Constructors
-  public CommandLineOptionContext(final ProductDESProxy des) {
-    mDes = des;
+  public CommandLineOptionContext()
+  {
+    mDES = null;
     mArgumentSources = new Stack<ArgumentSource>();
     mConfigurables = new Stack<Configurable>();
   }
 
+
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.OptionContext
+  //# Interface net.sourceforge.waters.analysis.options.OptionContext
   @Override
   public ProductDESProxy getProductDES()
   {
-    return mDes;
+    return mDES;
   }
 
   @Override
@@ -138,9 +141,10 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<EventProxy> createPropositionEditor(final PropositionOption option)
+  public OptionEditor<EventProxy> createPropositionEditor
+    (final PropositionOption option)
   {
-    return null;
+    return new PropositionCommandLineArgument(this, option);
   }
 
   @Override
@@ -194,22 +198,29 @@ public class CommandLineOptionContext implements OptionContext
 
 
   //#########################################################################
-  //# Auxiliary Methods
+  //# Specific Access
+  public void setProductDES(final ProductDESProxy des)
+    throws AnalysisException
+  {
+    mDES = des;
+    for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
+      arg.updateContext(this);
+    }
+  }
+
   public void addArgument(final CommandLineArgument<?> argument)
   {
     for (final String name : argument.getNames()) {
       mArgumentMap.put(name, argument);
     }
-  }
-
-  protected void removeArgument(final String name)
-  {
-    mArgumentMap.remove(name);
+    mArgumentList.add(argument);
   }
 
   public void parse(final ListIterator<String> iter)
+    throws AnalysisException
   {
     mArgumentMap.clear();
+    mArgumentList.clear();
     final LeafOptionPage page = new SimpleLeafOptionPage(null, null) {
       @Override
       public List<Option<?>> getOptions()
@@ -237,16 +248,6 @@ public class CommandLineOptionContext implements OptionContext
     checkRequiredArguments();
   }
 
-  private void checkRequiredArguments()
-  {
-    for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
-      if (arg.isRequired() && !arg.isUsed()) {
-        final String msg ="Required argument " + arg.getName() + " not specified!";
-        CommandLineArgument.fail(msg);
-      }
-    }
-  }
-
   public void generateArgumentsFromOptions(final LeafOptionPage page,
                                            final Configurable source,
                                            final String... requiredOptions)
@@ -268,23 +269,28 @@ public class CommandLineOptionContext implements OptionContext
     }
   }
 
-  public Map<String, CommandLineArgument<?>> getArgumentMap() {
+  public Map<String, CommandLineArgument<?>> getArgumentMap()
+  {
     return mArgumentMap;
   }
 
-  public void addArgumentSource(final ArgumentSource source) {
+  public void addArgumentSource(final ArgumentSource source)
+  {
     mArgumentSources.push(source);
   }
 
-  public Stack<ArgumentSource> getArgumentSources() {
+  public Stack<ArgumentSource> getArgumentSources()
+  {
     return mArgumentSources;
   }
 
-  public void addConfigurable(final Configurable configurable) {
+  public void addConfigurable(final Configurable configurable)
+  {
     mConfigurables.push(configurable);
   }
 
-  public Stack<Configurable> getConfigurables() {
+  public Stack<Configurable> getConfigurables()
+  {
     return mConfigurables;
   }
 
@@ -300,8 +306,9 @@ public class CommandLineOptionContext implements OptionContext
     }
   }
 
-  public void configure(final Configurable configurable) {
-    for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
+  public void configure(final Configurable configurable)
+  {
+    for (final CommandLineArgument<?> arg : mArgumentList) {
       if (arg.isUsed()) {
         configurable.setOption(arg.getOption());
       }
@@ -310,14 +317,28 @@ public class CommandLineOptionContext implements OptionContext
 
 
   //#########################################################################
-  //# Data Members
-  private final ProductDESProxy mDes;
+  //# Auxiliary Methods
+  private void checkRequiredArguments()
+  {
+    for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
+      if (arg.isRequired() && !arg.isUsed()) {
+        final String msg ="Required argument " + arg.getName() + " not specified!";
+        CommandLineArgument.fail(msg);
+      }
+    }
+  }
 
+
+  //#########################################################################
+  //# Data Members
   private final Map<String, CommandLineArgument<?>> mArgumentMap =
-    new LinkedHashMap<String, CommandLineArgument<?>>(64);
+    new HashMap<>(64);
+  private final List<CommandLineArgument<?>> mArgumentList =
+    new ArrayList<>(64);
 
   private final Stack<ArgumentSource> mArgumentSources;
   private final Stack<Configurable> mConfigurables;
 
+  private ProductDESProxy mDES;
 
 }

@@ -40,6 +40,7 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 
 /**
@@ -71,6 +72,7 @@ public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
   public void parse(final CommandLineOptionContext context,
                     final Collection<Configurable> configurables,
                     final ListIterator<String> iter)
+    throws AnalysisException
   {
     iter.remove();
     if (iter.hasNext()) {

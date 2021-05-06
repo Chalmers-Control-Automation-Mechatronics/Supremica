@@ -35,9 +35,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -119,36 +117,6 @@ public interface ModelAnalyzerFactory extends ArgumentSource
   //#########################################################################
   //# Options
   public void registerOptions(OptionPage db);
-
-
-//  //#########################################################################
-//  //# Command Line Arguments
-//  public void parse(CommandLineOptionContext context,
-//                    ModelAnalyzer analyzer,
-//                    ListIterator<String> iter);
-
-  /**
-   * Configures the given model analyser according to any command line
-   * arguments passed to this factory. This method is called while parsing
-   * command line arguments, before loading of any models. Hence, the model
-   * analyser does not yet have its input model when this method is called.
-   */
-  public void configure(ModelAnalyzer analyzer)
-    throws AnalysisConfigurationException;
-
-  /**
-   * Configures the given compiler according to any command line arguments
-   * passed to this factory.
-   */
-  public void configure(ModuleCompiler compiler);
-
-  /**
-   * Configures the given model analyser after command line arguments parsing
-   * and compiling of models. This method is called just before running the
-   * model verifier to provide a second pass of configuration. When it is
-   * called, the model analyser's input model is available.
-   */
-  public void postConfigure(ModelAnalyzer analyzer) throws AnalysisException;
 
 
   //#########################################################################

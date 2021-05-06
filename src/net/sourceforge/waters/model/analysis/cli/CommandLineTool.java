@@ -147,7 +147,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
         usage();
       }
 
-      mContext = new CommandLineOptionContext(null);
+      mContext = new CommandLineOptionContext();
 
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
@@ -245,7 +245,6 @@ public class CommandLineTool implements Configurable, ArgumentSource
 
       mContext.parse(argIter);
       mContext.configure(this);
-      mContext.configure(mAnalyzer);
 
       if (mVerbosity != null) {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
@@ -279,7 +278,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
             compiler.setEnabledPropositionNames(empty);
           }
           compiler.setEnabledPropertyNames(empty);
-          factory.configure(compiler);
+          mContext.configure(compiler);
           watchdog.addAbortable(compiler);
           try {
             des = compiler.compile(bindings);
@@ -306,8 +305,9 @@ public class CommandLineTool implements Configurable, ArgumentSource
         }
 
         final long start = System.currentTimeMillis();
+        mContext.setProductDES(des);
+        mContext.configure(mAnalyzer);
         wrapper.setModel(des);
-        factory.postConfigure(mAnalyzer);
         boolean additions = false;
         try {
           wrapper.run();

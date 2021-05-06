@@ -36,7 +36,6 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -89,6 +88,83 @@ public class CommandLineToolTest
 
   //#########################################################################
   //# Test Cases
+  public void testConflictBadFactory()
+    throws Exception
+  {
+    final String name = "bad_factory";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("TRCompositional", "ConflictChecker", file);
+    testCommandLine(name, args, false, "counterexample:");
+  }
+
+  public void testConflictControlledPhilosophers()
+    throws Exception
+  {
+    final String name = "controlled_philosophers";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("BDD", "ConflictChecker", file,
+                                  "-marking", "eaten[0]");
+    testCommandLine(name, args, true);
+  }
+
+  public void testConflictDiningPhilosophers()
+    throws Exception
+  {
+    final String name = "dining_philosophers";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("BDD", "ConflictChecker", file,
+                                  "-marking", "eaten");
+    testCommandLine(name, args, "FATAL.*", ".*'eaten'.*");
+  }
+
+  public void testConflictG1()
+    throws Exception
+  {
+    final String name = "g1";
+    final File file = getInputWMOD("tests", "generalisedNonblocking", name);
+    final String[] args = getArgs("Native", "ConflictChecker", file,
+                                  "-premarking", ":alpha",
+                                  "-marking", ":accepting");
+    testCommandLine(name, args, true);
+  }
+
+  public void testConflictSmallFactory2()
+    throws Exception
+  {
+    final String name = "small_factory_2";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("Native", "ConflictChecker", file);
+    testCommandLine(name, args, true);
+  }
+
+  public void testControllabilitySmallFactory2()
+    throws Exception
+  {
+    final String name = "small_factory_2";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("Native", "ControllabilityChecker", file);
+    testCommandLine(name, args, true);
+  }
+
+  public void testControllabilitySmallFactory2u()
+    throws Exception
+  {
+    final String name = "small_factory_2u";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("Monolithic", "ControllabilityChecker", file);
+    testCommandLine(name, args, false, "counterexample:");
+  }
+
+  public void testDiagnosabilityNotDiag1()
+    throws Exception
+  {
+    final String name = "notDiag_1";
+    final File file = getInputWMOD("tests", "diagnosability", name);
+    final String[] args = getArgs("Monolithic", "DiagnosabilityChecker", file);
+    testCommandLine(name, args, false,
+                    "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
+  }
+
   public void testLanguageInclusionJustProperty()
     throws Exception
   {
@@ -122,26 +198,39 @@ public class CommandLineToolTest
 
   private void testCommandLine(final String name,
                                final String[] args,
-                               final boolean expectedResult,
                                final String... outputPatterns)
-    throws IOException
+    throws Exception
+  {
+    testCommandLine(name, args, null, outputPatterns);
+  }
+
+  private void testCommandLine(final String name,
+                               final String[] args,
+                               final Boolean expectedResult,
+                               final String... outputPatterns)
+    throws Exception
   {
     final PrintStream sysOut = System.out;
+    final PrintStream sysErr = System.err;
     final File dir = getOutputDirectory();
     final File file = new File(dir, name + ".log");
     final PrintStream output = new PrintStream(file);
     try {
       System.setOut(output);
+      System.setErr(output);
       CommandLineTool.main(args);
     } finally {
       System.setOut(sysOut);
+      System.setErr(sysErr);
       output.close();
     }
 
     final List<Pattern> patterns = new ArrayList<>(outputPatterns.length + 1);
-    final String resultRegex = String.format("%b \\(.*", expectedResult);
-    final Pattern resultPattern = Pattern.compile(resultRegex);
-    patterns.add(resultPattern);
+    if (expectedResult != null) {
+      final String resultRegex = String.format("%b \\(.*", expectedResult);
+      final Pattern resultPattern = Pattern.compile(resultRegex);
+      patterns.add(resultPattern);
+    }
     for (final String regex : outputPatterns) {
       final Pattern pattern = Pattern.compile(regex);
       patterns.add(pattern);

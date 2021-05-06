@@ -46,21 +46,14 @@ import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
 import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
-import net.sourceforge.waters.model.analysis.cli.CustomStringCommandLineArgument;
 import net.sourceforge.waters.model.analysis.cli.FlagCommandLineArgument;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -159,72 +152,22 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Command Line Arguments
-  // TODO Option context should be responsible, not factory?
-  @Override
-  public void configure(final ModelAnalyzer analyzer)
-    throws AnalysisConfigurationException
-  {
-    if (mCommandLineOptionContext != null) {
-      for (final CommandLineArgument<?> arg : mCommandLineOptionContext.getArgumentMap().values()) {
-        if (arg.isUsed()) {
-          mCommandLineOptionContext.configure(analyzer);
-        }
-      }
-    }
-  }
-
-  @Override
-  public void configure(final ModuleCompiler compiler)
-  {
-    mCommandLineOptionContext.configure(compiler);
-  }
-
-  @Override
-  public void postConfigure(final ModelAnalyzer analyzer)
-  throws AnalysisException
-  {
-    for (final CommandLineArgument<?> arg : mCommandLineOptionContext.getArgumentMap().values()) {
-      if (arg.isUsed()) {
-        arg.postConfigure(analyzer);
-      }
-    }
-  }
-
-  //#########################################################################
   //# Configuration
   @Override
   public void addArguments(final CommandLineOptionContext context,
-                              final Configurable configurable,
-                              final LeafOptionPage page)
+                           final Configurable configurable,
+                           final LeafOptionPage page)
   {
     if (configurable instanceof ModelAnalyzer) {
-      mCommandLineOptionContext = context;
       registerOptions(page);
       context.generateArgumentsFromOptions(page, configurable,
                                    DistributedModelVerifierFactory.
                                      OPTION_DistributedModelVerifierFactory_Host);
-
-      if (configurable instanceof ConflictChecker) {
-        @SuppressWarnings("unchecked")
-        final Option<EventProxy> markingOption = (Option<EventProxy>)
-          page.get(AbstractModelAnalyzerFactory.OPTION_ConflictChecker_ConfiguredDefaultMarking);
-        context.addArgument(new MarkingArgument(context, markingOption, AbstractModelAnalyzerFactory.
-                                                OPTION_ConflictChecker_ConfiguredDefaultMarkingString));
-        @SuppressWarnings("unchecked")
-        final Option<EventProxy> premarkingOption = (Option<EventProxy>)
-          page.get(AbstractModelAnalyzerFactory.OPTION_ConflictChecker_ConfiguredPreconditionMarking);
-        context.addArgument(new PreMarkingArgument(context, premarkingOption, AbstractModelAnalyzerFactory.
-                                                   OPTION_ConflictChecker_ConfiguredPreconditionMarkingString));
-      }
-
-
       context.addArgument(new EndArgument(context, new FlagOption
                                           (null, null,
                                            "Treat remaining arguments as file names", "--")));
     }
   }
-
 
   @Override
   public void registerOptions(final OptionPage db)
@@ -407,72 +350,6 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class MarkingArgument
-  public static class MarkingArgument
-    extends CustomStringCommandLineArgument<EventProxy>
-  {
-    //#######################################################################
-    //# Constructors
-    public MarkingArgument(final CommandLineOptionContext context,
-                            final Option<EventProxy> option,
-                            final String substituteID)
-    {
-      super(context, option, substituteID);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void postConfigure(final ModelAnalyzer analyzer)
-    throws EventNotFoundException
-    {
-      final ConflictChecker cchecker = (ConflictChecker) analyzer;
-      final ProductDESProxy model = cchecker.getModel();
-      final String markingname = getValue();
-      if (markingname != null) {
-        final EventProxy marking =
-          AbstractConflictChecker.findMarkingProposition(model, markingname);
-        cchecker.setConfiguredDefaultMarking(marking);
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class PreMarkingArgument
-  public static class PreMarkingArgument
-    extends CustomStringCommandLineArgument<EventProxy>
-  {
-    //#######################################################################
-    //# Constructors
-    public PreMarkingArgument(final CommandLineOptionContext context,
-                               final Option<EventProxy> option,
-                               final String substituteID)
-    {
-      super(context, option, substituteID);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void postConfigure(final ModelAnalyzer analyzer)
-    throws EventNotFoundException
-    {
-      final ConflictChecker cchecker = (ConflictChecker) analyzer;
-      final ProductDESProxy model = cchecker.getModel();
-      final String markingname = getValue();
-      if (markingname != null) {
-        final EventProxy marking =
-          AbstractConflictChecker.findMarkingProposition(model, markingname);
-        cchecker.setConfiguredPreconditionMarking(marking);
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class EndArgument
   public static class EndArgument extends FlagCommandLineArgument
   {
@@ -500,10 +377,6 @@ public abstract class AbstractModelAnalyzerFactory
 
   }
 
-
-  //#########################################################################
-  //# Data Members
-  private CommandLineOptionContext mCommandLineOptionContext;
 
   //#########################################################################
   //# Class Constants

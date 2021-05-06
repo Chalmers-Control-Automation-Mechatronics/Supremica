@@ -42,22 +42,24 @@ import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 /**
  *
  * @author Benjamin Wheeler
  */
-public abstract class CommandLineArgument<T> implements OptionEditor<T>,
-  Comparable<CommandLineArgument<?>>
+public abstract class CommandLineArgument<T>
+  implements OptionEditor<T>, Comparable<CommandLineArgument<?>>
 {
 
   //#########################################################################
   //# Constructors
-  public CommandLineArgument(final CommandLineOptionContext context, final Option<T> option) {
+  public CommandLineArgument(final CommandLineOptionContext context,
+                             final Option<T> option)
+  {
     mOption = option;
     mName = option.getCommandLineOption();
   }
+
 
   //#########################################################################
   //# Interface java.util.Comparable
@@ -66,6 +68,16 @@ public abstract class CommandLineArgument<T> implements OptionEditor<T>,
   {
     return mName.compareTo(arg.getName());
   }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.OptionEditor<T>
+  @Override
+  public Option<T> getOption()
+  {
+    return mOption;
+  }
+
 
   //#########################################################################
   //# Simple Access
@@ -81,20 +93,22 @@ public abstract class CommandLineArgument<T> implements OptionEditor<T>,
 
   public boolean isRequired()
   {
-    return mIsRequired;
+    return mRequired;
   }
 
-  public void setRequired(final boolean required) {
-    mIsRequired = required;
+  public void setRequired(final boolean required)
+  {
+    mRequired = required;
   }
 
   public boolean isUsed()
   {
-    return mIsUsed;
+    return mUsed;
   }
 
-  protected void setUsed(final boolean used) {
-    mIsUsed = used;
+  protected void setUsed(final boolean used)
+  {
+    mUsed = used;
   }
 
   protected String getArgumentTemplate()
@@ -102,30 +116,31 @@ public abstract class CommandLineArgument<T> implements OptionEditor<T>,
     return null;
   }
 
-  @Override
-  public Option<T> getOption()
+  public void setOption(final Configurable configurable)
   {
-    return mOption;
+    if (mUsed) {
+      configurable.setOption(getOption());
+    }
   }
 
-  public void setOption(final Configurable configurable) {
-    if (mIsUsed) configurable.setOption(getOption());
-  }
-
-  public T getValue() {
+  public T getValue()
+  {
     return getOption().getValue();
   }
+
 
   //#########################################################################
   //# Parsing
   public abstract void parse(final CommandLineOptionContext context,
                              final Collection<Configurable> configurables,
-                             ListIterator<String> iter);
+                             ListIterator<String> iter)
+    throws AnalysisException;
 
-  public void postConfigure(final ModelAnalyzer analyzer)
+  public void updateContext(final CommandLineOptionContext context)
     throws AnalysisException
   {
   }
+
 
   //#########################################################################
   //# Printing
@@ -198,8 +213,9 @@ public abstract class CommandLineArgument<T> implements OptionEditor<T>,
   //# Data Members
   private final Option<T> mOption;
   private final String mName;
-  private boolean mIsUsed;
-  private boolean mIsRequired;
+  private boolean mUsed;
+  private boolean mRequired;
+
 
   //#########################################################################
   //# Class Constants

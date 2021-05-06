@@ -128,7 +128,7 @@ public class UnifiedEFACommandLineTool
         usage();
       }
 
-      mContext = new CommandLineOptionContext(null);
+      mContext = new CommandLineOptionContext();
 
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();

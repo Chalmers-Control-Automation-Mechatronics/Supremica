@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2020 Robi Malik
+//# Copyright (C) 2004-2021 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,35 +33,79 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
+import java.util.Collection;
+import java.util.ListIterator;
+
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
 
 /**
- *
- * @author Benjamin Wheeler
+ * @author Robi Malik
  */
-public abstract class CustomStringCommandLineArgument<T> extends StringCommandLineArgument
+public class PropositionCommandLineArgument
+  extends CommandLineArgument<EventProxy>
 {
 
   //#######################################################################
   //# Constructors
-  public CustomStringCommandLineArgument(final CommandLineOptionContext context,
-                                         final Option<T> option,
-                                         final String substituteID)
+  public PropositionCommandLineArgument(final CommandLineOptionContext context,
+                                        final Option<EventProxy> option)
   {
-    super(context, new StringOption(substituteID,
-                                    option.getShortName(),
-                              option.getDescription(),
-                              option.getCommandLineOption(),
-                              null));
+    super(context, option);
   }
+
 
   //#######################################################################
   //# Simple Access
   @Override
   protected String getArgumentTemplate()
   {
-    return "<value>";
+    return "<name>";
   }
+
+
+  //#######################################################################
+  //# Parsing
+  @Override
+  public void parse(final CommandLineOptionContext context,
+                    final Collection<Configurable> configurables,
+                    final ListIterator<String> iter)
+    throws AnalysisException
+  {
+    iter.remove();
+    if (iter.hasNext()) {
+      mName = iter.next();
+      iter.remove();
+      setUsed(true);
+      updateContext(context);
+    } else {
+      failMissingValue();
+    }
+  }
+
+  @Override
+  public void updateContext(final CommandLineOptionContext context)
+    throws AnalysisException
+  {
+    if (isUsed()) {
+      final ProductDESProxy des = context.getProductDES();
+      if (des != null) {
+        final EventProxy marking =
+          AbstractConflictChecker.findMarkingProposition(des, mName);
+        final Option<EventProxy> option = getOption();
+        option.setValue(marking);
+      }
+    }
+  }
+
+
+  //#######################################################################
+  //# Data Members
+  private String mName;
 
 }

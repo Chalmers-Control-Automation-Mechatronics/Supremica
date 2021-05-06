@@ -93,12 +93,6 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
   //# Configuring the Secondary Verifier
   public ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer)
   {
-    return createSecondaryAnalyzer(analyzer, false);
-  }
-
-  public ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer,
-                                               final boolean referenceOnly)
-  {
     try {
       final ModelAnalyzerFactory secondaryFactory = getValue().getModelAnalyzerFactory();
       final ProductDESProxyFactory desFactory = analyzer.getFactory();
@@ -116,11 +110,8 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
         secondaryAnalyzer =
           secondaryFactory.createLanguageInclusionChecker(desFactory);
       } else {
-        if (!referenceOnly) failUnsupportedAnalyzerClass(analyzer);
+        failUnsupportedAnalyzerClass(analyzer);
         return null;
-      }
-      if (!referenceOnly) {
-        secondaryFactory.configure(secondaryAnalyzer);
       }
       return secondaryAnalyzer;
     } catch (final ClassNotFoundException exception) {
@@ -150,6 +141,6 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
 
   //#########################################################################
   //# Data Members
-  ModelAnalyzerFactory mSecondaryFactory;
+  private ModelAnalyzerFactory mSecondaryFactory;
 
 }
