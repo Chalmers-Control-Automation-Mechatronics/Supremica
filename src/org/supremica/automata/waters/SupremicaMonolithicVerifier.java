@@ -147,17 +147,6 @@ public  class SupremicaMonolithicVerifier
   }
 
   @Override
-  public void setShortCounterExampleRequested(final boolean req)
-  {
-  }
-
-  @Override
-  public boolean isShortCounterExampleRequested()
-  {
-    return false;
-  }
-
-  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();

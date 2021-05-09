@@ -91,28 +91,6 @@ public interface ModelVerifier extends ModelAnalyzer
 {
 
   //#########################################################################
-  //# Configuration
-  /**
-   * <P>Requests the computation of a short counterexample.
-   * With this setting the user can express the preference for a
-   * counterexample that is as short as possible. When this setting is
-   * disabled (the default), model verifiers will generally use the fastest
-   * possible means to compute a counterexample. When the setting is enabled,
-   * some model verifiers will use slower algorithms that give shorter or
-   * minimal counterexamples. It depends on the specific model verifier
-   * whether the request for a short counterexample is honoured, and whether
-   * or not minimality can be guaranteed.
-   */
-  public void setShortCounterExampleRequested(final boolean req);
-
-  /**
-   * Returns whether a short counterexample is requested.
-   * @see #setShortCounterExampleRequested(boolean) setEarlyDeadlockEnabled()
-   */
-  public boolean isShortCounterExampleRequested();
-
-
-  //#########################################################################
   //# More Specific Access to the Results
   /**
    * Gets the result of model checking.

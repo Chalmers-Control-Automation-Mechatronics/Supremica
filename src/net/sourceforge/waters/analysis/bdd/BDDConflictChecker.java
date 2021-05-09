@@ -154,6 +154,30 @@ public class BDDConflictChecker
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Requests the computation of a shortest counterexample.
+   * With this enabled, the BDD conflict checker performs a strict
+   * breadth-first search that ensures a shortest counterexample.
+   * This disables early termination when deadlock states are encountered
+   * and forces exploration of the full state space.
+   */
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  /**
+   * Returns whether a short counterexample is requested.
+   * @see #setShortCounterExampleRequested(boolean)
+   */
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
@@ -193,6 +217,11 @@ public class BDDConflictChecker
   public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
+    db.insertAfter(options,
+                   AbstractModelAnalyzerFactory.
+                   OPTION_ModelVerifier_ShortCounterExampleRequested,
+                   AbstractModelAnalyzerFactory.
+                   OPTION_ModelVerifier_DetailedOutputEnabled);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ConflictChecker_ConfiguredPreconditionMarking);
     db.prepend(options, AbstractModelAnalyzerFactory.
@@ -223,8 +252,8 @@ public class BDDConflictChecker
   public boolean run()
     throws AnalysisException
   {
-    LogManager.getLogger().debug("BDDConflictChecker.run(): " +
-                      getModel().getName() + " ...");
+    LogManager.getLogger().debug("BDDConflictChecker.run(): {} ...",
+                                 getModel().getName());
     try {
       setUp();
       createAutomatonBDDs();
@@ -291,8 +320,8 @@ public class BDDConflictChecker
       }
     } finally {
       tearDown();
-      LogManager.getLogger().debug("BDDConflictChecker.run(): " +
-                        getModel().getName() + " done.");
+      LogManager.getLogger().debug("BDDConflictChecker.run(): {} done",
+                                   getModel().getName());
     }
   }
 
@@ -440,7 +469,7 @@ public class BDDConflictChecker
   }
 
   private ConflictCounterExampleProxy computeCounterExample(final BDD bad,
-                                                   final int index)
+                                                            final int index)
     throws AnalysisAbortException, OverflowException
   {
     if (isDetailedOutputEnabled()) {
@@ -480,6 +509,7 @@ public class BDDConflictChecker
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
+  private boolean mShortCounterExampleRequested;
   private BDD mMarkingBDD;
   private BDD mPreconditionBDD;
   private ConflictKind mConflictKind = ConflictKind.CONFLICT;

@@ -95,10 +95,6 @@ public abstract class TRAbstractModelVerifier
                      OPTION_ModelVerifier_DetailedOutputEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setShortCounterExampleRequested(boolOption.getBooleanValue());
     } else {
       super.setOption(option);
     }
@@ -107,18 +103,6 @@ public abstract class TRAbstractModelVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
-  @Override
-  public void setShortCounterExampleRequested(final boolean req)
-  {
-    mShortCounterExampleRequested = req;
-  }
-
-  @Override
-  public boolean isShortCounterExampleRequested()
-  {
-    return mShortCounterExampleRequested;
-  }
-
   @Override
   public boolean isSatisfied()
   {
@@ -206,10 +190,5 @@ public abstract class TRAbstractModelVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mShortCounterExampleRequested;
 
 }

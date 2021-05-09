@@ -52,7 +52,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
@@ -268,18 +267,6 @@ public abstract class AbstractCompositionalModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
   @Override
-  public void setShortCounterExampleRequested(final boolean req)
-  {
-    mShortCounterExampleRequested = req;
-  }
-
-  @Override
-  public boolean isShortCounterExampleRequested()
-  {
-    return mShortCounterExampleRequested;
-  }
-
-  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -356,10 +343,6 @@ public abstract class AbstractCompositionalModelVerifier
                      OPTION_ModelVerifier_DetailedOutputEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setShortCounterExampleRequested(boolOption.getBooleanValue());
     } else if (option.hasID(CompositionalModelAnalyzerFactory.
                             OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
@@ -425,17 +408,6 @@ public abstract class AbstractCompositionalModelVerifier
   protected ModelVerifier getCurrentMonolithicAnalyzer()
   {
     return (ModelVerifier) super.getCurrentMonolithicAnalyzer();
-  }
-
-  @Override
-  protected void setupMonolithicAnalyzer()
-    throws EventNotFoundException
-  {
-    super.setupMonolithicAnalyzer();
-    final ModelVerifier mono = getCurrentMonolithicAnalyzer();
-    if (mono != null) {
-      mono.setShortCounterExampleRequested(mShortCounterExampleRequested);
-    }
   }
 
   @Override
@@ -684,7 +656,6 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Data Members
-  private boolean mShortCounterExampleRequested = false;
   private boolean mTraceCheckingEnabled = false;
 
   private List<AbstractionStep> mAbstractionSteps;

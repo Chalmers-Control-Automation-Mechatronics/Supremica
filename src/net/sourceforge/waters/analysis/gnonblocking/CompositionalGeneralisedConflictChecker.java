@@ -693,7 +693,6 @@ public class CompositionalGeneralisedConflictChecker
           .setConfiguredPreconditionMarking(getUsedPreconditionMarkingProposition());
       checker.setNodeLimit(mFinalStepNodeLimit);
       checker.setTransitionLimit(mFinalStepTransitionLimit);
-      checker.setShortCounterExampleRequested(isShortCounterExampleRequested());
       final boolean result = checker.run();
       mComposedModelNumberOfStates =
           checker.getAnalysisResult().getTotalNumberOfStates();

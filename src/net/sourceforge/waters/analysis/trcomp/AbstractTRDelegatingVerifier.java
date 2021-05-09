@@ -81,8 +81,6 @@ public abstract class AbstractTRDelegatingVerifier
     db.prepend(options, TRCompositionalModelAnalyzerFactory.
                         OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled);
     db.prepend(options, AbstractModelAnalyzerFactory.
-                        OPTION_ModelVerifier_ShortCounterExampleRequested);
-    db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_DetailedOutputEnabled);
     return options;
   }
@@ -94,10 +92,6 @@ public abstract class AbstractTRDelegatingVerifier
                      OPTION_ModelVerifier_DetailedOutputEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setShortCounterExampleRequested(boolOption.getBooleanValue());
     } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
                             OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
@@ -125,20 +119,6 @@ public abstract class AbstractTRDelegatingVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
-  @Override
-  public void setShortCounterExampleRequested(final boolean req)
-  {
-    final ModelVerifier delegate = (ModelVerifier) getDelegate();
-    delegate.setShortCounterExampleRequested(req);
-  }
-
-  @Override
-  public boolean isShortCounterExampleRequested()
-  {
-    final ModelVerifier delegate = (ModelVerifier) getDelegate();
-    return delegate.isShortCounterExampleRequested();
-  }
-
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {

@@ -37,6 +37,7 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
@@ -89,6 +90,21 @@ public abstract class OptionPage
     final Option<?> option = get(id);
     assert option != null;
     list.add(0, option);
+  }
+
+  public void insertAfter(final List<Option<?>> list,
+                          final String id,
+                          final String afterThis)
+  {
+    final Option<?> option = get(id);
+    assert option != null;
+    final ListIterator<Option<?>> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Option<?> next = iter.next();
+      if (next.hasID(afterThis)) {
+        iter.add(option);
+      }
+    }
   }
 
   public boolean remove(final List<Option<?>> list, final String id)

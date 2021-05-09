@@ -85,8 +85,6 @@ public abstract class AbstractModelVerifier
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelVerifier_DetailedOutputEnabled);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelVerifier_ShortCounterExampleRequested);
     return options;
   }
 
@@ -97,10 +95,6 @@ public abstract class AbstractModelVerifier
                      OPTION_ModelVerifier_DetailedOutputEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setShortCounterExampleRequested(boolOption.getBooleanValue());
     } else {
       super.setOption(option);
     }
@@ -109,18 +103,6 @@ public abstract class AbstractModelVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
-  @Override
-  public void setShortCounterExampleRequested(final boolean req)
-  {
-    mShortCounterExampleRequested = req;
-  }
-
-  @Override
-  public boolean isShortCounterExampleRequested()
-  {
-    return mShortCounterExampleRequested;
-  }
-
   @Override
   public boolean isSatisfied()
   {
@@ -195,10 +177,5 @@ public abstract class AbstractModelVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mShortCounterExampleRequested = false;
 
 }

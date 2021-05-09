@@ -95,18 +95,6 @@ public abstract class AbstractTRCompositionalModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
   @Override
-  public void setShortCounterExampleRequested(final boolean req)
-  {
-    mShortCounterExampleRequested = req;
-  }
-
-  @Override
-  public boolean isShortCounterExampleRequested()
-  {
-    return mShortCounterExampleRequested;
-  }
-
-  @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
     setDetailedOutputEnabled(enable);
@@ -156,10 +144,6 @@ public abstract class AbstractTRCompositionalModelVerifier
                      OPTION_ModelVerifier_DetailedOutputEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setShortCounterExampleRequested(boolOption.getBooleanValue());
     } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
                             OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
@@ -179,7 +163,6 @@ public abstract class AbstractTRCompositionalModelVerifier
     super.setUp();
     final ModelVerifier mono = getMonolithicVerifier();
     mono.setCounterExampleEnabled(isCounterExampleEnabled());
-    mono.setShortCounterExampleRequested(mShortCounterExampleRequested);
   }
 
 
@@ -237,10 +220,5 @@ public abstract class AbstractTRCompositionalModelVerifier
       return null;
     }
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mShortCounterExampleRequested = false;
 
 }
