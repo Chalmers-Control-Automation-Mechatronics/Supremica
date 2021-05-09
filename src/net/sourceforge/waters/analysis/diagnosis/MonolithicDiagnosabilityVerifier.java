@@ -49,6 +49,9 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -58,6 +61,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
@@ -129,6 +133,33 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   public boolean supportsNondeterminism()
   {
     return true;
+  }
+
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalTransitionLimit);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setTransitionLimit(intOption.getIntValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 
