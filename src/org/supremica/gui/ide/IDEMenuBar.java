@@ -51,9 +51,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import net.sourceforge.waters.analysis.options.AnalysisAlgorithmOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
@@ -65,11 +67,11 @@ import net.sourceforge.waters.gui.actions.AnalyzerSimplifierAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.AnalyzerWorkbenchAction;
-import net.sourceforge.waters.gui.actions.IDECloseAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.GraphSavePDFAction;
 import net.sourceforge.waters.gui.actions.IDEAboutAction;
+import net.sourceforge.waters.gui.actions.IDECloseAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -127,6 +129,7 @@ import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
@@ -371,8 +374,10 @@ public class IDEMenuBar
     final Action languageInclusion =
         actions.getAction(VerifyLanguageInclusionAction.class);
     menu.add(languageInclusion);
-    addOption(Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY);
-    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.getValue()) {
+    final AnalysisAlgorithmOption diagnosabilityOption =
+      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+    addOption(diagnosabilityOption);
+    if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       final Action diagnosability =
         actions.getAction(VerifyDiagnosabilityCheckAction.class);
       menu.add(diagnosability);

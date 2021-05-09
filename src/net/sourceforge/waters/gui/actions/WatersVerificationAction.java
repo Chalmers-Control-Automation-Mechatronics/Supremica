@@ -237,7 +237,6 @@ public abstract class WatersVerificationAction
 
   //#########################################################################
   //# Auxiliary Methods
-  @SuppressWarnings("unchecked")
   private EnumOption<ModelAnalyzerFactoryLoader> getSelectorOption()
   {
     if (mOperation == null) {
@@ -247,7 +246,7 @@ public abstract class WatersVerificationAction
         mOperation.getOptionPagePrefix();
       final AnalysisOptionPage page =
         (AnalysisOptionPage) OptionPage.getOptionPage(optionPagePrefix);
-      return (EnumOption<ModelAnalyzerFactoryLoader>) page.getTopSelectorOption();
+      return page.getTopSelectorOption();
     }
   }
 

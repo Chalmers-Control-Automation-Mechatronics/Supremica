@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2020 Robi Malik
+//# Copyright (C) 2004-2021 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,38 +31,36 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.analysis.des;
 
 /**
+ * An empty model analyser factory.
+ * This implementation can be used to configure analysis algorithms that
+ * can be disabled entirely.
  *
- * @author Benjamin Wheeler
+ * @author Robi Malik
  */
-public class LegacyEnumOption<E> extends EnumOption<E>
+
+public class DisabledModelAnalyzerFactory extends AbstractModelAnalyzerFactory
 {
 
-  public LegacyEnumOption(final String id, final String shortName, final String description,
-                          final String commandLineOption, final E[] enumConstants,
-                          final E defaultValue, final E trueValue, final E falseValue)
+  //#########################################################################
+  //# Singleton Implementation
+  public static DisabledModelAnalyzerFactory getInstance()
   {
-    super(id, shortName, description, commandLineOption, enumConstants,
-          defaultValue);
-    mTrueValue = trueValue;
-    mFalseValue = falseValue;
+    return SingletonHolder.theInstance;
   }
 
-  @Override
-  public void set(final String text)
-  {
-    if (mTrueValue != null && text.equalsIgnoreCase("true")) {
-      setValue(mTrueValue);
-    }
-    else if (mFalseValue != null && text.equalsIgnoreCase("false")) {
-      setValue(mFalseValue);
-    }
-    else super.set(text);
+  private static class SingletonHolder {
+    private static final DisabledModelAnalyzerFactory theInstance =
+      new DisabledModelAnalyzerFactory();
   }
 
-  private final E mTrueValue;
-  private final E mFalseValue;
+
+  //#########################################################################
+  //# Constructors
+  private DisabledModelAnalyzerFactory()
+  {
+  }
 
 }

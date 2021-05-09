@@ -96,37 +96,46 @@ public final class SupremicaProperties
   private static void updateProperties(final File propertyFile)
     throws FileNotFoundException, IOException
   {
-    LegacyOptions.init();
     final Properties propertiesFromFile = buildProperties(propertyFile);
-    for (final Enumeration<?> e = propertiesFromFile.keys(); e
-      .hasMoreElements();) {
-      final String newKeyLegacy = (String) e.nextElement();
-      final String newKey = LegacyOptions.get(newKeyLegacy);
-      final String newValue = propertiesFromFile.getProperty(newKeyLegacy);
-
+    for (final Enumeration<?> e = propertiesFromFile.keys();
+         e.hasMoreElements();) {
+      final String legacyKey = (String) e.nextElement();
+      final String legacyValue = propertiesFromFile.getProperty(legacyKey);
+      final LegacyOption legacyOption = LegacyOption.get(legacyKey);
+      final String key;
+      final String value;
+      if (legacyOption == null) {
+        key = legacyKey;
+        value = legacyValue;
+      } else {
+        value = legacyOption.getReplacementValue(legacyValue);
+        if (value == null) {
+          continue;
+        }
+        key = legacyOption.getReplacementName();
+      }
       int index = 0;
       while (index != -1) {
-        final String prefix = newKey.substring(0, index);
+        final String prefix = key.substring(0, index);
         final LeafOptionPage page = OptionPage.getOptionPage(prefix);
         if (page != null) {
-          final String suffix = newKey.substring(index + 1);
+          final String suffix = key.substring(index + 1);
           final Option<?> option = page.get(suffix);
           if (option != null) {
             try {
-              option.set(newValue);
+              option.set(value);
               break;
             } catch (final IllegalArgumentException ex) {
-              System.err.println("Invalid argument to key: " + newKey);
+              System.err.println("Invalid argument to property: " + key);
               break;
             }
           }
         }
-        index = newKey.indexOf('.', index + 1);
+        index = key.indexOf('.', index + 1);
       }
       if (index == -1) {
-        System.err.println("Unknown property: " + newKey);
+        System.err.println("Unknown property: " + key);
       }
-
     }
   }
 

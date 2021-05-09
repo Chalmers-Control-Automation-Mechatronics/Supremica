@@ -8,7 +8,6 @@ import net.sourceforge.waters.analysis.options.ColorOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.LegacyEnumOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.gui.logging.IDELogLevel;
@@ -84,24 +83,26 @@ public class Config
      "Default File Save Path", "Default file save path", null, System.getProperty("user.home"));
 
 
-  //GUI_COMPILER
+  //GENERAL
   public static final PositiveIntOption GUI_IDE_WIDTH = new PositiveIntOption
     ("ideFrameWidth",
      "IDE Width", "Width at which IDE opens", null, 1024, false);
   public static final PositiveIntOption GUI_IDE_HEIGHT = new PositiveIntOption
     ("ideFrameHeight",
-     "IDE Width", "Height at which IDE opens", null, 768, false);
+     "IDE Height", "Height at which IDE opens", null, 768, false);
   public static final PositiveIntOption GUI_IDE_XPOS = new PositiveIntOption
     ("ideFrameX",
-     "IDE Width", "X position at which IDE opens", null, 0, false);
+     "IDE X Position", "X position at which IDE opens", null, 0, false);
   public static final PositiveIntOption GUI_IDE_YPOS = new PositiveIntOption
     ("ideFrameY",
-     "IDE Width", "Y position at which IDE opens", null, 0, false);
+     "IDE Y Position", "Y position at which IDE opens", null, 0, false);
   public static final BooleanOption GUI_IDE_MAXIMIZED = new BooleanOption
     ("ideFrameMaximized",
      "Maximized Window", "Whether or not the IDE opens as a maximised window",
      null, false, false);
 
+
+  //GUI_COMPILER
   public static final BooleanOption INCLUDE_INSTANTIATION = new BooleanOption
     ("includeInstantiation",
      "Include Instantiation", "Enable instantiation and other advanced features", null, true);
@@ -114,7 +115,7 @@ public class Config
      null, false);
   public static final BooleanOption NORMALIZING_COMPILER = new BooleanOption
     ("normalizingCompiler",
-     "Normalizing Compiler", "Use normalising EFSM compiler", null, false);
+     "Normalizing Compiler", "Use normalising EFSM compiler", null, true);
   public static final BooleanOption AUTOMATON_VARIABLES_COMPILER = new BooleanOption
     ("automatonVariablesCompiler",
      "Automaton Variables Compiler", "Allow automaton names in EFSM guards", null, false);
@@ -135,10 +136,10 @@ public class Config
      "Open an empty module when launching Supremica without options", null, true);
   public static final BooleanOption GUI_EDITOR_SHOW_GRID = new BooleanOption
     ("showGrid",
-     "Show Grid", "Show grid", null, true);
+     "Show Grid", "Show grid in graph editor", null, true);
   public static final PositiveIntOption GUI_EDITOR_GRID_SIZE = new PositiveIntOption
     ("gridSize",
-     "Grid Size", "Grid size", null, 16, 4, 64);
+     "Grid Size", "Grid size in graph editor", null, 16, 4, 64);
   public static final BooleanOption GUI_EDITOR_NODES_SNAP_TO_GRID = new BooleanOption
     ("nodesSnapToGrid",
      "Nodes Snap to Grid", "Nodes snap to grid", null, true);
@@ -151,9 +152,9 @@ public class Config
   public static final BooleanOption GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE = new BooleanOption
     ("controlPointsMoveWithNode",
      "Control points move with node", "Control points move with node", null, true);
-  public static final EnumOption<EdgeArrowPosition> GUI_EDITOR_EDGEARROW_POSITION = new LegacyEnumOption<>
-  ("edgeArrowAtEnd", "Edge Arrow Position", "Edge arrow position",
-    null, EdgeArrowPosition.values(), EdgeArrowPosition.End, EdgeArrowPosition.End, EdgeArrowPosition.Middle);
+  public static final EnumOption<EdgeArrowPosition> GUI_EDITOR_EDGEARROW_POSITION = new EnumOption<>
+    ("edgeArrowAtEnd", "Edge Arrow Position", "Edge arrow position",
+     null, EdgeArrowPosition.values(), EdgeArrowPosition.End);
   public static final PositiveIntOption GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new PositiveIntOption
     ("springEmbedderTimeout", "Maximum Layout Time",
      "Maximum time (in milliseconds) before stopping automatic graph layout", null, 10000);
@@ -163,12 +164,9 @@ public class Config
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS = new BooleanOption
     ("includeSeamlessSynthesis", "Include Seamless Synthesis",
      "Include symbolic synthesis option in editor's Analyze menu", null, true);
-  public static final BooleanOption GUI_ANALYZER_INCLUDE_DIAGNOSABILIY = new BooleanOption
-    ("includeDiagnosability", "Include Diagnosability Check",
-     "Add diagnosability check in editor's Verify menu", null, false);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_HISC = new BooleanOption
     ("includeHISC", "Include HISC Checks",
-     "Add Hierachical Interface-Based Supervisory Coontrol (HOSC) property checks " +
+     "Add Hierachical Interface-Based Supervisory Coontrol (HISC) property checks " +
      "in editor's Verify menu", null, false);
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SD = new BooleanOption
     ("includeSD", "Include Sampled-Data Checks",

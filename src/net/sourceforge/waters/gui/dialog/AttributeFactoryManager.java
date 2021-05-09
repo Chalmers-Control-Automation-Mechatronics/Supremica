@@ -41,8 +41,11 @@ import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
+import net.sourceforge.waters.analysis.options.AnalysisAlgorithmOption;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 
@@ -145,7 +148,9 @@ public class AttributeFactoryManager implements OptionChangeListener
   //# Auxiliary Methods
   private void register()
   {
-    Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.addOptionChangeListener(this);
+    final AnalysisAlgorithmOption diagnosabilityOption =
+      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+    diagnosabilityOption.addOptionChangeListener(this);
     Config.GUI_ANALYZER_INCLUDE_HISC.addOptionChangeListener(this);
     Config.INCLUDE_RAS_SUPPORT.addOptionChangeListener(this);
   }
@@ -155,7 +160,9 @@ public class AttributeFactoryManager implements OptionChangeListener
     mAttributeFactories.clear();
     mAttributeInfoMap.clear();
     mAttributeFactories.add(DefaultAttributeFactory.getInstance());
-    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.getValue()) {
+    final AnalysisAlgorithmOption diagnosabilityOption =
+      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+    if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       mAttributeFactories.add(DiagnosabilityAttributeFactory.getInstance());
     }
     if (Config.GUI_ANALYZER_INCLUDE_HISC.getValue()) {

@@ -41,26 +41,23 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
  * <P>A collection of available options.</P>
  *
- * <P>An option map acts as a database that maps string identifiers to
+ * <P>An option page acts as a database that maps string identifiers to
  * {@link Option} objects. For persistent storage of options values,
  * the option map is first initialised with all available options,
  * typically at program start-up. The initialised option map is then
- * passed to {@link Configurable} objects, which select the options
+ * passed to {@link Configurable} objects, which select some of the options
  * stored in it.</P>
  *
  * @author Robi Malik, Benjamin Wheeler
  */
 public abstract class OptionPage
 {
-
-  //#########################################################################
-  //# Constructors
-
 
   //#########################################################################
   //# Simple Access
@@ -107,9 +104,11 @@ public abstract class OptionPage
     return false;
   }
 
-  public abstract OptionPageEditor<? extends OptionPage> createEditor(OptionContext context);
+  public abstract OptionPageEditor<? extends OptionPage>
+  createEditor(OptionContext context);
 
-  public static LeafOptionPage getOptionPage(final String prefix) {
+  public static LeafOptionPage getOptionPage(final String prefix)
+  {
     for (final LeafOptionPage map : OPTION_PAGES) {
       if (map.getPrefix().equals(prefix)) return map;
     }
@@ -129,9 +128,7 @@ public abstract class OptionPage
              SecurityException |
              IllegalArgumentException |
              IllegalAccessException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-      return null;
+      throw new WatersRuntimeException(exception);
     }
   }
 
@@ -140,23 +137,23 @@ public abstract class OptionPage
   //# Class Constants
   public static final List<LeafOptionPage> OPTION_PAGES = new LinkedList<>();
 
-  public static final SelectorLeafOptionPage ConflictCheck =
+  public static final AnalysisOptionPage ConflictCheck =
     new AnalysisOptionPage(AnalysisOperation.CONFLICT_CHECK);
-  public static final SelectorLeafOptionPage ControllabilityCheck =
+  public static final AnalysisOptionPage ControllabilityCheck =
     new AnalysisOptionPage(AnalysisOperation.CONTROLLABILITY_CHECK);
-  public static final SelectorLeafOptionPage ControlLoop =
+  public static final AnalysisOptionPage ControlLoop =
     new AnalysisOptionPage(AnalysisOperation.CONTROL_LOOP_CHECK);
-  public static final SelectorLeafOptionPage DeadlockCheck =
+  public static final AnalysisOptionPage DeadlockCheck =
     new AnalysisOptionPage(AnalysisOperation.DEADLOCK_CHECK);
-  public static final SelectorLeafOptionPage DiagnosabilityCheck =
-    new AnalysisOptionPage(AnalysisOperation.DIAGNOSABILITY_CHECK);
-  public static final SelectorLeafOptionPage LanguageInclusion =
+  public static final AnalysisOptionPage DiagnosabilityCheck =
+    new AnalysisOptionPage(AnalysisOperation.DIAGNOSABILITY_CHECK, true);
+  public static final AnalysisOptionPage LanguageInclusion =
     new AnalysisOptionPage(AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
-  public static final SelectorLeafOptionPage StateCounter =
+  public static final AnalysisOptionPage StateCounter =
     new AnalysisOptionPage(AnalysisOperation.STATE_COUNTER);
-  public static final SelectorLeafOptionPage SynchronousProduct =
+  public static final AnalysisOptionPage SynchronousProduct =
     new AnalysisOptionPage(AnalysisOperation.SYNCHRONOUS_PRODUCT);
-  public static final SelectorLeafOptionPage Synthesis =
+  public static final AnalysisOptionPage Synthesis =
     new AnalysisOptionPage(AnalysisOperation.SUPERVISOR_SYNTHESIZER);
 
   public static final SelectorLeafOptionPage Simplifier = new SimplifierOptionPage

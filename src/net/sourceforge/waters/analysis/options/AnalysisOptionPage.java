@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
@@ -51,52 +52,41 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 public class AnalysisOptionPage extends SelectorLeafOptionPage
 {
 
+  //#########################################################################
+  //# Constructor
   public AnalysisOptionPage(final AnalysisOperation operation)
   {
+    this(operation, false);
+  }
+
+  public AnalysisOptionPage(final AnalysisOperation operation,
+                            final boolean canBeDisabled)
+  {
     super(operation.getOptionPagePrefix(), operation.getAnalysisName());
+    mCanBeDisabled = canBeDisabled;
     final List<ModelAnalyzerFactoryLoader> loaders = getLoaders(operation);
-    mAlgorithmOption = new AnalysisAlgorithmOption
-      (operation.getOptionPagePrefix() + ".Algorithm", loaders);
+    final ModelAnalyzerFactoryLoader defaultValue =
+      canBeDisabled ? ModelAnalyzerFactoryLoader.Disabled :
+      ModelAnalyzerFactoryLoader.DEFAULT;
+    mAlgorithmOption =
+      new AnalysisAlgorithmOption("Algorithm", loaders, defaultValue);
     add(mAlgorithmOption);
     mOperation = operation;
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
   @Override
   public String getShortName()
   {
     return mOperation.getAnalysisName();
   }
 
-  public List<ModelAnalyzerFactoryLoader> getLoaders
-    (final AnalysisOperation operation)
-  {
-    final List<ModelAnalyzerFactoryLoader> loaders = new LinkedList<>();
 
-    for (final ModelAnalyzerFactoryLoader loader :
-      ModelAnalyzerFactoryLoader.values()) {
-      try {
-        final ModelAnalyzerFactory factory =
-          loader.getModelAnalyzerFactory();
-        final ProductDESProxyFactory desFactory =
-          ProductDESElementFactory.getInstance();
-        final ModelAnalyzer analyzer =
-          operation.createModelAnalyzer(factory, desFactory);
-
-        if (analyzer != null) {
-          loaders.add(loader);
-          factory.registerOptions(this);
-        }
-      } catch (ClassNotFoundException |
-               AnalysisConfigurationException |
-               UnsatisfiedLinkError |
-               NoClassDefFoundError exception) {
-        // skip this factory
-      }
-    }
-
-    return loaders;
-  }
-
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
   @Override
   public List<Option<?>> getOptionsForSelector
     (final SelectorOption<?> selectorOption, final Object key)
@@ -106,29 +96,8 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
     return options;
   }
 
-  public void addOptions(final List<Option<?>> options,
-                         final ModelAnalyzerFactoryLoader loader)
-  {
-    try {
-      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-      final ProductDESProxyFactory desFactory =
-        ProductDESElementFactory.getInstance();
-      final ModelAnalyzer analyzer =
-        mOperation.createModelAnalyzer(factory, desFactory);
-      for (final Option<?> option : analyzer.getOptions(this)) {
-        //Get the option instance known by this OptionPage
-        final Option<?> optionInstance = get(option.getID());
-        options.add(optionInstance);
-      }
-    } catch (AnalysisConfigurationException |
-             ClassNotFoundException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    }
-  }
-
   @Override
-  public SelectorOption<?> getTopSelectorOption()
+  public AnalysisAlgorithmOption getTopSelectorOption()
   {
     return mAlgorithmOption;
   }
@@ -140,7 +109,66 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
     return null;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private List<ModelAnalyzerFactoryLoader> getLoaders
+    (final AnalysisOperation operation)
+  {
+    final List<ModelAnalyzerFactoryLoader> loaders = new LinkedList<>();
+    for (final ModelAnalyzerFactoryLoader loader :
+         ModelAnalyzerFactoryLoader.values()) {
+      if (loader == ModelAnalyzerFactoryLoader.Disabled && mCanBeDisabled) {
+        loaders.add(loader);
+      } else {
+        try {
+          final ModelAnalyzerFactory factory =
+            loader.getModelAnalyzerFactory();
+          final ProductDESProxyFactory desFactory =
+            ProductDESElementFactory.getInstance();
+          final ModelAnalyzer analyzer =
+            operation.createModelAnalyzer(factory, desFactory);
+          if (analyzer != null) {
+            loaders.add(loader);
+            factory.registerOptions(this);
+          }
+        } catch (ClassNotFoundException |
+                 AnalysisConfigurationException |
+                 UnsatisfiedLinkError |
+                 NoClassDefFoundError exception) {
+          // skip this factory
+        }
+      }
+    }
+    return loaders;
+  }
+
+  private void addOptions(final List<Option<?>> options,
+                          final ModelAnalyzerFactoryLoader loader)
+  {
+    if (loader != ModelAnalyzerFactoryLoader.Disabled) {
+      try {
+        final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+        final ProductDESProxyFactory desFactory =
+          ProductDESElementFactory.getInstance();
+        final ModelAnalyzer analyzer =
+          mOperation.createModelAnalyzer(factory, desFactory);
+        for (final Option<?> option : analyzer.getOptions(this)) {
+          final Option<?> optionInstance = get(option.getID());
+          options.add(optionInstance);
+        }
+      } catch (AnalysisConfigurationException |
+               ClassNotFoundException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Data Members
   private final AnalysisAlgorithmOption mAlgorithmOption;
   private final AnalysisOperation mOperation;
+  private final boolean mCanBeDisabled;
 
 }

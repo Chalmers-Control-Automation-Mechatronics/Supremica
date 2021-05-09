@@ -48,6 +48,10 @@ import java.lang.reflect.Method;
 
 public enum ModelAnalyzerFactoryLoader
 {
+  Disabled("net.sourceforge.waters.model.analysis.des.DisabledModelAnalyzerFactory") {
+    @Override
+    public String toString() { return "(disabled)"; }
+  },
   BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
   Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory"),
   GNB("net.sourceforge.waters.analysis.gnonblocking.GNBModelVerifierFactory"),

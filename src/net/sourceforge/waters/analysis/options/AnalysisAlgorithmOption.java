@@ -45,11 +45,14 @@ public class AnalysisAlgorithmOption
   extends SelectorOption<ModelAnalyzerFactoryLoader>
 {
 
+  //#########################################################################
+  //# Constructors
   public AnalysisAlgorithmOption
     (final String id,
-     final List<ModelAnalyzerFactoryLoader> loaders)
+     final List<ModelAnalyzerFactoryLoader> loaders,
+     final ModelAnalyzerFactoryLoader defaultValue)
   {
-    super(id, "Algorithm", loaders, ModelAnalyzerFactoryLoader.DEFAULT);
+    super(id, "Algorithm", loaders, defaultValue);
   }
 
 }
