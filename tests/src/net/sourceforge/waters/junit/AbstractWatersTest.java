@@ -78,14 +78,19 @@ public abstract class AbstractWatersTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    final File dir = getOutputDirectory();
-    mConfigurationFactory = new WatersLogConfigurationFactory(dir);
-    ConfigurationFactory.setConfigurationFactory(mConfigurationFactory);
+    setUpLog4J();
   }
 
 
   //#########################################################################
   //# Simple Access
+  protected void setUpLog4J()
+  {
+    final File dir = getOutputDirectory();
+    mConfigurationFactory = new WatersLogConfigurationFactory(dir);
+    ConfigurationFactory.setConfigurationFactory(mConfigurationFactory);
+  }
+
   protected File getInputRoot()
   {
     return mInputRoot;
@@ -124,7 +129,11 @@ public abstract class AbstractWatersTest
 
   protected String getLogFileName()
   {
-    return mConfigurationFactory.getFileName();
+    if (mConfigurationFactory == null) {
+      return null;
+    } else {
+      return mConfigurationFactory.getFileName();
+    }
   }
 
   protected File getInputDirectory(final String[] path)

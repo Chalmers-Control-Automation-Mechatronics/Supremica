@@ -48,6 +48,8 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 
+import org.apache.logging.log4j.LogManager;
+
 
 /**
  * A test class for the command line tool (<CODE>wcheck</CODE>).
@@ -103,8 +105,9 @@ public class CommandLineToolTest
     final String name = "controlled_philosophers";
     final File file = getInputWMOD("handwritten", name);
     final String[] args = getArgs("BDD", "ConflictChecker", file,
-                                  "-marking", "eaten[0]");
-    testCommandLine(name, args, true);
+                                  "-marking", "eaten[0]", "-verbose");
+    testCommandLine(name, args,
+                    "DEBUG Depth .*", "DEBUG Coreachability .*");
   }
 
   public void testConflictDiningPhilosophers()
@@ -133,8 +136,8 @@ public class CommandLineToolTest
   {
     final String name = "small_factory_2";
     final File file = getInputWMOD("handwritten", name);
-    final String[] args = getArgs("Native", "ConflictChecker", file);
-    testCommandLine(name, args, true);
+    final String[] args = getArgs("BDD", "ConflictChecker", file, "-q");
+    testCommandLine(name, args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
   }
 
   public void testControllabilitySmallFactory2()
@@ -152,7 +155,7 @@ public class CommandLineToolTest
     final String name = "small_factory_2u";
     final File file = getInputWMOD("handwritten", name);
     final String[] args = getArgs("Monolithic", "ControllabilityChecker", file);
-    testCommandLine(name, args, false, "counterexample:");
+    testCommandLine(name, args, false, "counterexample:", "!Statistics");
   }
 
   public void testDiagnosabilityNotDiag1()
@@ -173,6 +176,15 @@ public class CommandLineToolTest
     final String[] args = getArgs("BDD", "LanguageInclusionChecker", file,
                                   "-property", "the_property", "-stats");
     testCommandLine(name, args, false, "counterexample:", "Statistics:");
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.junit.AbstractWatersTest
+  @Override
+  protected void setUpLog4J()
+  {
+    // Skip---command line tool handles log4j by itself.
   }
 
 
@@ -210,39 +222,68 @@ public class CommandLineToolTest
                                final String... outputPatterns)
     throws Exception
   {
+    final StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < 2; i++) {
+      if (i < args.length) {
+        final String arg = args[i];
+        if (arg.startsWith("-")) {
+          builder.append(arg.substring(1));
+        } else {
+          builder.append(arg);
+        }
+        builder.append('.');
+      }
+    }
+    builder.append(name);
+    builder.append(".log");
+    final String logName = builder.toString();
+
+    final File dir = getOutputDirectory();
+    final File logFile = new File(dir, logName);
+    final PrintStream output = new PrintStream(logFile);
     final PrintStream sysOut = System.out;
     final PrintStream sysErr = System.err;
-    final File dir = getOutputDirectory();
-    final File file = new File(dir, name + ".log");
-    final PrintStream output = new PrintStream(file);
     try {
       System.setOut(output);
       System.setErr(output);
       CommandLineTool.main(args);
     } finally {
+      LogManager.shutdown();
       System.setOut(sysOut);
       System.setErr(sysErr);
       output.close();
     }
 
     final List<Pattern> patterns = new ArrayList<>(outputPatterns.length + 1);
+    final List<Pattern> antiPatterns = new ArrayList<>(outputPatterns.length);
     if (expectedResult != null) {
       final String resultRegex = String.format("%b \\(.*", expectedResult);
       final Pattern resultPattern = Pattern.compile(resultRegex);
       patterns.add(resultPattern);
     }
     for (final String regex : outputPatterns) {
-      final Pattern pattern = Pattern.compile(regex);
-      patterns.add(pattern);
+      if (regex.startsWith("!")) {
+        final Pattern pattern = Pattern.compile(regex.substring(1));
+        antiPatterns.add(pattern);
+      } else {
+        final Pattern pattern = Pattern.compile(regex);
+        patterns.add(pattern);
+      }
     }
     final Iterator<Pattern> iter = patterns.iterator();
     Pattern pattern = iter.next();
 
-    final FileReader reader = new FileReader(file);
+    final FileReader reader = new FileReader(logFile);
     final BufferedReader buffered = new BufferedReader(reader);
     try {
       String line;
       while ((line = buffered.readLine()) != null) {
+        for (final Pattern anti : antiPatterns) {
+          final Matcher matcher = anti.matcher(line);
+          if (matcher.matches()) {
+            fail("Unexpected output " + pattern.toString() + "!");
+          }
+        }
         final Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
           if (iter.hasNext()) {
