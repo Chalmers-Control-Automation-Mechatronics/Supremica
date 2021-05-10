@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2020 Robi Malik
+//# Copyright (C) 2004-2021 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,97 +31,86 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
-import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
-import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import java.awt.event.ActionEvent;
+
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
+import net.sourceforge.waters.gui.analyzer.DiagnosabilityCheckDialog;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
+
 /**
- * The dialog to launch a deadlock check from the Waters analyser.
+ * The action to invoke the diagnosability dialog in the Waters analyser.
  *
- * @author Brandon Bassett
+ * @author Robi Malik
  */
-public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
+
+public class AnalyzerDiagnosabilityCheckAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
   //# Constructor
-  public DeadlockCheckDialog(final WatersAnalyzerPanel panel)
+  protected AnalyzerDiagnosabilityCheckAction(final IDE ide)
   {
-    super(panel);
-    setTitle(TITLE);
+    super(ide);
+    putValue(Action.NAME, "Diagnosability Check ...");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
+    updateEnabledStatus();
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  //# Interface java.awt.event.ActionListener
   @Override
-  protected AnalysisOptionPage getOptionPage()
+  public void actionPerformed(final ActionEvent arg0)
   {
-    return OptionPage.DeadlockCheck;
-  }
-
-  @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
-                                                    final ProductDESProxy des)
-  {
-    return new DeadlockCheckPopUpDialog(ide, des);
+    final IDE ide = getIDE();
+    if (ide != null) {
+      new DiagnosabilityCheckDialog(getAnalyzerPanel());
+    }
   }
 
 
   //#########################################################################
-  //# Inner Class DeadlockCheckPopUpDialog
-  private class DeadlockCheckPopUpDialog extends WatersVerificationDialog
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
   {
-    //#######################################################################
-    //# Constructor
-    public DeadlockCheckPopUpDialog(final IDE owner,
-                                    final ProductDESProxy des)
-    {
-      super(owner, des);
+    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
+      updateEnabledStatus();
     }
+  }
 
-    @Override
-    protected String getAnalysisName()
-    {
-      return TITLE;
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    final AutomataTable table = getAnalyzerTable();
+    if (table == null) {
+      setEnabled(false);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether automaton is diagnosable");
+    } else if (table.getSelectedRowCount() > 0) {
+      setEnabled(true);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether the selected automata are diagnosable");
+    } else {
+      setEnabled(table.getRowCount() > 0);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether all automata are diagnosable");
     }
-
-    @Override
-    protected String getFailureDescription()
-    {
-      return "has a deadlock";
-    }
-
-    @Override
-    protected String getSuccessDescription()
-    {
-      return "is deadlock-free";
-    }
-
-    @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
-    {
-      return getAnalyzer();
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 6159733639861131531L;
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Deadlock Check";
-
-  private static final long serialVersionUID = 7587116260533051091L;
+  private static final long serialVersionUID = 4203785461125403362L;
 
 }

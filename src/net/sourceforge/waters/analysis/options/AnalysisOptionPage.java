@@ -76,6 +76,14 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
 
 
   //#########################################################################
+  //# Simple Access
+  public AnalysisOperation getAnalysisOperation()
+  {
+    return mOperation;
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
   @Override
   public String getShortName()

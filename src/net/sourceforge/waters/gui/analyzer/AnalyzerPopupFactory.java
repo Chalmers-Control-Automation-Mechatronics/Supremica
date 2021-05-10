@@ -35,9 +35,12 @@ package net.sourceforge.waters.gui.analyzer;
 
 import javax.swing.JPopupMenu;
 
+import net.sourceforge.waters.analysis.options.AnalysisAlgorithmOption;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 
 class AnalyzerPopupFactory
@@ -79,6 +82,13 @@ class AnalyzerPopupFactory
     final IDEAction languageInclusion =
       master.getAnalyzerLanguageInclusionCheckAction();
     popup.add(languageInclusion);
+    final AnalysisAlgorithmOption diagnosabilityOption =
+      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+    if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
+      final IDEAction diagnosability =
+        master.getAnalyzerDiagnosabilityCheckAction();
+      popup.add(diagnosability);
+    }
     popup.addSeparator();
     final IDEAction hide = master.getAnalyzerHideAction();
     popup.add(hide);

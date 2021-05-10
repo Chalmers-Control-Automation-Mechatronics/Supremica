@@ -61,6 +61,7 @@ import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerCountStatesAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerDiagnosabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerHideAction;
 import net.sourceforge.waters.gui.actions.AnalyzerLanguageInclusionCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSimplifierAction;
@@ -567,6 +568,14 @@ public class IDEMenuBar
     final Action languageInclusion =
       actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
     menu.add(languageInclusion);
+    final AnalysisAlgorithmOption diagnosabilityOption =
+      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+    addOption(diagnosabilityOption);
+    if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
+      final Action diagnosability =
+        actions.getAction(AnalyzerDiagnosabilityCheckAction.class);
+      menu.add(diagnosability);
+    }
     menu.addSeparator();
     final Action hide =
       actions.getAction(AnalyzerHideAction.class);

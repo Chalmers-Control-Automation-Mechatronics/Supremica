@@ -35,22 +35,22 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 /**
+ * The dialog to launch a supervisor synthesiser from the Waters analyser.
+ *
  * @author Brandon Bassett, Robi Malik
  */
 public class SynthesisDialog extends ParametrisedAnalysisDialog
@@ -66,13 +66,11 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected SupervisorSynthesizer createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
+  protected AnalysisOptionPage getOptionPage()
   {
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return factory.createSupervisorSynthesizer(desFactory);
+    return OptionPage.Synthesis;
   }
 
   @Override
@@ -86,15 +84,6 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
                                                     final ProductDESProxy des)
   {
     return new SynthesisPopUpDialog(ide, des);
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected OptionPage getOptionPage()
-  {
-    return OptionPage.Synthesis;
   }
 
 

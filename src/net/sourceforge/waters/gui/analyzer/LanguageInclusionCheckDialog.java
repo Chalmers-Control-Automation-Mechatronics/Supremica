@@ -33,20 +33,19 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 /**
+ * The dialog to launch a language inclusion check from the Waters analyser.
+ *
  * @author Brandon Bassett
  */
 public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
@@ -60,14 +59,13 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
     setTitle(TITLE);
   }
 
+
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected LanguageInclusionChecker createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
+  protected AnalysisOptionPage getOptionPage()
   {
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return factory.createLanguageInclusionChecker(desFactory);
+    return OptionPage.LanguageInclusion;
   }
 
   @Override
@@ -75,20 +73,6 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
                                                     final ProductDESProxy des)
   {
     return new LanguageInclusionCheckPopUpDialog(ide, des);
-  }
-
-  @Override
-  protected LanguageInclusionChecker getAnalyzer()
-  {
-    return (LanguageInclusionChecker) super.getAnalyzer();
-  }
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected OptionPage getOptionPage()
-  {
-    return OptionPage.LanguageInclusion;
   }
 
 

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2020 Robi Malik
+//# Copyright (C) 2004-2021 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -43,17 +43,19 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 import org.supremica.gui.ide.IDE;
 
+
 /**
- * The dialog to launch a deadlock check from the Waters analyser.
+ * The dialog to launch a diagnosability check from the Waters analyser.
  *
- * @author Brandon Bassett
+ * @author Robi Malik
  */
-public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
+
+public class DiagnosabilityCheckDialog extends ParametrisedAnalysisDialog
 {
 
   //#########################################################################
   //# Constructor
-  public DeadlockCheckDialog(final WatersAnalyzerPanel panel)
+  public DiagnosabilityCheckDialog(final WatersAnalyzerPanel panel)
   {
     super(panel);
     setTitle(TITLE);
@@ -65,25 +67,25 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
   @Override
   protected AnalysisOptionPage getOptionPage()
   {
-    return OptionPage.DeadlockCheck;
+    return OptionPage.DiagnosabilityCheck;
   }
 
   @Override
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
   {
-    return new DeadlockCheckPopUpDialog(ide, des);
+    return new DiagnosabilityCheckPopUpDialog(ide, des);
   }
 
 
   //#########################################################################
-  //# Inner Class DeadlockCheckPopUpDialog
-  private class DeadlockCheckPopUpDialog extends WatersVerificationDialog
+  //# Inner Class DiagnosabilityCheckPopUpDialog
+  private class DiagnosabilityCheckPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
-    public DeadlockCheckPopUpDialog(final IDE owner,
-                                    final ProductDESProxy des)
+    public DiagnosabilityCheckPopUpDialog(final IDE owner,
+                                          final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -97,13 +99,13 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
     @Override
     protected String getFailureDescription()
     {
-      return "has a deadlock";
+      return "is not diagnosable";
     }
 
     @Override
     protected String getSuccessDescription()
     {
-      return "is deadlock-free";
+      return "is diagnosable";
     }
 
     @Override
@@ -114,14 +116,14 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 6159733639861131531L;
+    private static final long serialVersionUID = -3453813712277345474L;
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Deadlock Check";
+  private static final String TITLE = "Diagnosability Check";
 
-  private static final long serialVersionUID = 7587116260533051091L;
+  private static final long serialVersionUID = -872573554126822984L;
 
 }

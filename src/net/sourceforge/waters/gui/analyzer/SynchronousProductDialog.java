@@ -33,18 +33,16 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +51,10 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * @author George Hewlett, Carly Hona, Brandon Bassett
+ * The dialog to launch a synchronous product builder from the Waters
+ * analyser.
+ *
+ * @author George Hewlett, Brandon Bassett
  */
 public class SynchronousProductDialog extends ParametrisedAnalysisDialog
 {
@@ -66,14 +67,13 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
     setTitle(TITLE);
   }
 
+
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected SynchronousProductBuilder createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
+  protected AnalysisOptionPage getOptionPage()
   {
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return factory.createSynchronousProductBuilder(desFactory);
+    return OptionPage.SynchronousProduct;
   }
 
   @Override
@@ -89,23 +89,15 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
     return new SynchronousProductPopUpDialog(ide, des);
   }
 
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected OptionPage getOptionPage()
-  {
-    return OptionPage.SynchronousProduct;
-  }
 
   //#########################################################################
   //# Inner Class SynchronousProductPopUpDialog
   private class SynchronousProductPopUpDialog extends WatersAnalyzeDialog
   {
-
     //#######################################################################
     //# Constructor
     public SynchronousProductPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                         final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -170,6 +162,7 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
     //# Class Constants
     private static final long serialVersionUID = -4410961155882957875L;
   }
+
 
   //#########################################################################
   //# Class Constants

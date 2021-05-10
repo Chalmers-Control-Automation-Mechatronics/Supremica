@@ -434,6 +434,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerDeadlockCheckAction.class);
   }
 
+  public IDEAction getAnalyzerDiagnosabilityCheckAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerDiagnosabilityCheckAction.class);
+  }
+
   public IDEAction getAnalyzerLanguageInclusionCheckAction()
   {
     final WatersActionManager master = mIDE.getActions();

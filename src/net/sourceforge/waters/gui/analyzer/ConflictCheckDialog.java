@@ -33,20 +33,19 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 /**
+ * The dialog to launch a conflict check from the Waters analyser.
+ *
  * @author Brandon Bassett
  */
 public class ConflictCheckDialog extends ParametrisedAnalysisDialog
@@ -60,16 +59,9 @@ public class ConflictCheckDialog extends ParametrisedAnalysisDialog
     setTitle(TITLE);
   }
 
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
-  @Override
-  protected ConflictChecker createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
-  {
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return factory.createConflictChecker(desFactory);
-  }
 
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
@@ -78,18 +70,11 @@ public class ConflictCheckDialog extends ParametrisedAnalysisDialog
   }
 
   @Override
-  protected ConflictChecker getAnalyzer()
-  {
-    return (ConflictChecker) super.getAnalyzer();
-  }
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected OptionPage getOptionPage()
+  protected AnalysisOptionPage getOptionPage()
   {
     return OptionPage.ConflictCheck;
   }
+
 
   //#########################################################################
   //# Inner Class ConflictCheckPopUpDialog

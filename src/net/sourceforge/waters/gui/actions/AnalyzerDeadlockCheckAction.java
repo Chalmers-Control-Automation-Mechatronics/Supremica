@@ -46,7 +46,7 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the Conflict Check dialog in the Waters analyser.
+ * The action to invoke the deadlock check dialog in the Waters analyser.
  *
  * @author Brandon Bassett
  */
@@ -60,8 +60,6 @@ public class AnalyzerDeadlockCheckAction extends WatersAnalyzerAction
     super(ide);
     putValue(Action.NAME, "Deadlock Check ...");
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
-    //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
-    //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
     updateEnabledStatus();
   }
 
@@ -97,15 +95,15 @@ public class AnalyzerDeadlockCheckAction extends WatersAnalyzerAction
     if (table == null) {
       setEnabled(false);
       putValue(Action.SHORT_DESCRIPTION,
-               "Check whether automata is dead locking");
+               "Check whether automaton has a deadlock");
     } else if (table.getSelectedRowCount() > 0) {
       setEnabled(true);
       putValue(Action.SHORT_DESCRIPTION,
-               "Check whether the selected automata are dead locking");
+               "Check whether the selected automata have a dedlock");
     } else {
       setEnabled(table.getRowCount() > 0);
       putValue(Action.SHORT_DESCRIPTION,
-               "Check whether all automata are dead locking");
+               "Check whether all automata have a deadlock");
     }
   }
 

@@ -33,20 +33,19 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 /**
+ * The dialog to launch a loop check from the Waters analyser.
+ *
  * @author Brandon Bassett
  */
 public class ControlLoopDialog extends ParametrisedAnalysisDialog
@@ -60,14 +59,13 @@ public class ControlLoopDialog extends ParametrisedAnalysisDialog
     setTitle(TITLE);
   }
 
+
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected ControlLoopChecker createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
+  protected AnalysisOptionPage getOptionPage()
   {
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return factory.createControlLoopChecker(desFactory);
+    return OptionPage.ControlLoop;
   }
 
   @Override
@@ -75,20 +73,6 @@ public class ControlLoopDialog extends ParametrisedAnalysisDialog
                                                     final ProductDESProxy des)
   {
     return new ControlLoopPopUpDialog(ide, des);
-  }
-
-   @Override
-   protected ControlLoopChecker getAnalyzer()
-   {
-     return (ControlLoopChecker) super.getAnalyzer();
-   }
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected OptionPage getOptionPage()
-  {
-    return OptionPage.ControlLoop;
   }
 
 

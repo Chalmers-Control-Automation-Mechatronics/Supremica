@@ -44,8 +44,8 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -53,6 +53,7 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -146,30 +147,23 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     return mContext;
   }
 
-  protected ModelAnalyzer getAnalyzer()
-  {
-
-    return mCurrentModelAnalyzer;
-  }
-
   protected ProductDESProxyFactory getProductDESProxyFactory()
   {
     return mContext.getProductDESProxyFactory();
   }
 
-  protected abstract OptionPage getOptionPage();
-
 
   //#########################################################################
   //# Hooks
-  /**
-   * Class-specific way to generate a model analyser.
-   */
-  protected abstract ModelAnalyzer createAnalyzer(ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException;
+  protected abstract AnalysisOptionPage getOptionPage();
+
+  protected ModelAnalyzer getAnalyzer()
+  {
+    return mCurrentModelAnalyzer;
+  }
 
   /**
-   * Generates the pop up dialog that shows the result of using the analyser.
+   * Generates the pop-up dialog that shows the result of using the analyser.
    */
   protected abstract WatersAnalyzeDialog createAnalyzeDialog(IDE ide,
                                                              ProductDESProxy des);
@@ -177,6 +171,15 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
 
   //#########################################################################
   //# Auxiliary Methods
+  private ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
+  {
+    final AnalysisOptionPage page = getOptionPage();
+    final AnalysisOperation operation = page.getAnalysisOperation();
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return operation.createModelAnalyzer(factory, desFactory);
+  }
+
   private void commitDialog()
   {
     final IDE ide = mContext.getIDE();

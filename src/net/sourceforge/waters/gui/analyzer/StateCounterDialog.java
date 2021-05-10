@@ -33,16 +33,13 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +48,8 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
+ * The dialog to launch a state counter from the Waters analyser.
+ *
  * @author Brandon Bassett
  */
 public class StateCounterDialog extends ParametrisedAnalysisDialog
@@ -65,19 +64,11 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
   }
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected StateCounter createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
+  protected AnalysisOptionPage getOptionPage()
   {
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return factory.createStateCounter(desFactory);
-  }
-
-  @Override
-  protected StateCounter getAnalyzer()
-  {
-    return (StateCounter) super.getAnalyzer();
+    return OptionPage.StateCounter;
   }
 
   @Override
@@ -87,13 +78,6 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
     return new StateCounterPopUpDialog(ide, des);
   }
 
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected OptionPage getOptionPage()
-  {
-    return OptionPage.StateCounter;
-  }
 
   //#########################################################################
   //# Inner Class StateCounterPopUpDialog
@@ -102,7 +86,7 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
     //#######################################################################
     //# Constructor
     public StateCounterPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                   final ProductDESProxy des)
     {
       super(owner, des);
     }
