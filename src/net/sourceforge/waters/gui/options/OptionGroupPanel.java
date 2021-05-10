@@ -40,7 +40,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +58,7 @@ import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.analysis.options.SelectorOption;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 /**
  *
@@ -137,7 +137,9 @@ public class OptionGroupPanel extends JPanel
 
     while (selectorOption != null) {
       final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
-
+      if (context.getWatersAnalyzerPanel() != null) {
+        comboBox.removeItem(ModelAnalyzerFactoryLoader.Disabled);
+      }
       c.gridx = 0;
       c.insets.right = 10;
       c.weightx = 0.0;
@@ -174,11 +176,7 @@ public class OptionGroupPanel extends JPanel
       final JTextPane descriptionTextPane = new JTextPane();
       descriptionTextPane.setContentType("text/html");
       descriptionTextPane.setBackground(getBackground());
-      //Prevent selection
-      for (final MouseListener l : descriptionTextPane
-        .getListeners(MouseListener.class)) {
-        descriptionTextPane.removeMouseListener(l);
-      }
+      descriptionTextPane.setEditable(false);
 
       final JScrollPane scrollDescription =
         new JScrollPane(descriptionTextPane) {
@@ -200,7 +198,6 @@ public class OptionGroupPanel extends JPanel
       builder.append("</BODY></HTML>");
       final String text = builder.toString();
       descriptionTextPane.setText(text);
-      descriptionTextPane.setCaretPosition(0);
       c.gridx = 0;
       c.gridwidth = 2;
       c.weightx = 1.0;

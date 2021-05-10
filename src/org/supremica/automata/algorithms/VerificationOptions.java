@@ -133,6 +133,7 @@ public final class VerificationOptions
         return algorithmType;
     }
 
+    // modular controllability check only
     public void setExclusionStateLimit(final int limit)
     {
         exclusionStateLimit = limit;
@@ -143,6 +144,7 @@ public final class VerificationOptions
         return exclusionStateLimit;
     }
 
+    // modular controllability check only
     public void setReachabilityStateLimit(final int limit)
     {
         reachabilityStateLimit = limit;
@@ -153,6 +155,7 @@ public final class VerificationOptions
         return reachabilityStateLimit;
     }
 
+    // modular controllability check only
     public void setOneEventAtATime(final boolean bool)
     {
         oneEventAtATime = bool;
@@ -163,6 +166,7 @@ public final class VerificationOptions
         return oneEventAtATime;
     }
 
+    // modular controllability check only
     public void setSkipUncontrollabilityCheck(final boolean bool)
     {
         skipUncontrollabilityCheck = bool;
@@ -173,6 +177,7 @@ public final class VerificationOptions
         return skipUncontrollabilityCheck;
     }
 
+    // modular controllability check only
     public void setNbrOfAttempts(final int nbr)
     {
         nbrOfAttempts = nbr;
