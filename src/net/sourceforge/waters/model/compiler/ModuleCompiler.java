@@ -311,12 +311,12 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
   public void registerOptions(final OptionPage page) {
-    page.add(new FlagOption
+    page.register(new FlagOption
            (AbstractModelAnalyzerFactory.
              OPTION_AbstractModelAnalyzerFactory_NoOptimisation, null,
             "Disable compiler optimisation",
             "-noopt"));
-    page.add(new FlagOption
+    page.register(new FlagOption
            (AbstractModelAnalyzerFactory.
              OPTION_AbstractModelAnalyzerFactory_HISCModule, null,
             "Compile as HISC module, "

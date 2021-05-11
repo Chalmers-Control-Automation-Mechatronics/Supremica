@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
@@ -195,11 +196,14 @@ public abstract class Option<T> implements Cloneable
    */
   public boolean setValue(final T value)
   {
-    final String oldValue = getAsString();
-    mValue = value;
-    final String newValue = getAsString();
-    firePropertyChanged(oldValue);
-    return oldValue.equals(newValue);
+    if (ProxyTools.equals(value, mValue)) {
+      return false;
+    } else {
+      final String oldValue = getAsString();
+      mValue = value;
+      firePropertyChanged(oldValue);
+      return true;
+    }
   }
 
   /**
@@ -207,9 +211,7 @@ public abstract class Option<T> implements Cloneable
    */
   public void restoreDefaultValue()
   {
-    final String oldValue = getAsString();
-    mValue = mDefaultValue;
-    firePropertyChanged(oldValue);
+    setValue(mDefaultValue);
   }
 
   public abstract void set(String text);
@@ -240,10 +242,10 @@ public abstract class Option<T> implements Cloneable
     }
   }
 
-  public void firePropertyChanged(final String oldValue) {
+  public void firePropertyChanged(final String oldValue)
+  {
     if (mListeners != null) {
       final String newValue = getAsString();
-      if (oldValue.equals(newValue)) return;
       final OptionChangeEvent event =
         new OptionChangeEvent(this, oldValue, newValue);
       final List<OptionChangeListener> copy =

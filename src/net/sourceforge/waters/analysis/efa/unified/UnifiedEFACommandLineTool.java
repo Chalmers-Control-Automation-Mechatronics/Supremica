@@ -356,22 +356,22 @@ public class UnifiedEFACommandLineTool
   }
 
   public void registerOptions(final OptionPage page) {
-    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
+    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
                             "Verbose output",
                             "-verbose", "-v"));
-    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
+    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
                             "Quiet output",
                             "-quiet", "-q"));
-    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
+    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
                             "Output statistics",
                             "-stats"));
-    page.add(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
+    page.register(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
                             "Output statistics",
                             "-timeout"));
-    page.add(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
+    page.register(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
                             "CSV output file location",
                             "-csv"));
-    page.add(new FlagOption(OPTION_UnifiedEFACommandLineTool_Help, null,
+    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Help, null,
                             "Print this message", "-help"));
   }
 

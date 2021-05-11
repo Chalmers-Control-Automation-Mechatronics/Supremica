@@ -41,7 +41,7 @@ import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
-import net.sourceforge.waters.analysis.options.AnalysisAlgorithmOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.analysis.options.OptionPage;
@@ -148,7 +148,7 @@ public class AttributeFactoryManager implements OptionChangeListener
   //# Auxiliary Methods
   private void register()
   {
-    final AnalysisAlgorithmOption diagnosabilityOption =
+    final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       OptionPage.DiagnosabilityCheck.getTopSelectorOption();
     diagnosabilityOption.addOptionChangeListener(this);
     Config.GUI_ANALYZER_INCLUDE_HISC.addOptionChangeListener(this);
@@ -160,7 +160,7 @@ public class AttributeFactoryManager implements OptionChangeListener
     mAttributeFactories.clear();
     mAttributeInfoMap.clear();
     mAttributeFactories.add(DefaultAttributeFactory.getInstance());
-    final AnalysisAlgorithmOption diagnosabilityOption =
+    final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       OptionPage.DiagnosabilityCheck.getTopSelectorOption();
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       mAttributeFactories.add(DiagnosabilityAttributeFactory.getInstance());

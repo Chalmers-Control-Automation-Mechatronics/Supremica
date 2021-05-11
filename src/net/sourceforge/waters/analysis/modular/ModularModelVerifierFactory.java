@@ -100,7 +100,7 @@ public class ModularModelVerifierFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new EnumOption<ModularHeuristicFactory.Method>
+    db.register(new EnumOption<ModularHeuristicFactory.Method>
              (OPTION_AbstractModularSafetyVerifier_HeuristicMethod,
               "Heuristic Method",
               "Strategy to select additional components when a subsystem " +
@@ -108,7 +108,7 @@ public class ModularModelVerifierFactory
               "-heuristic",
               ModularHeuristicFactory.Method.values(),
               ModularHeuristicFactory.Method.MaxCommonEvents));
-    db.add(new EnumOption<ModularHeuristicFactory.Preference>
+    db.register(new EnumOption<ModularHeuristicFactory.Preference>
              (OPTION_AbstractModularSafetyVerifier_HeuristicPreference,
               "Heuristic Preference",
               "What kind of plants are selected preferentially by the heuristic.",
@@ -116,13 +116,13 @@ public class ModularModelVerifierFactory
               ModularHeuristicFactory.Preference.values(),
               ModularHeuristicFactory.Preference.NOPREF));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ModularControllabilityChecker_CollectsFailedSpecs,
               "Collect failed specifications",
               "Continue checking if a specification is found not controllable.",
               "-collect",
               false));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ModularControllabilityChecker_StartsWithSmallestSpec,
               "Start with smallest spefication",
               "Sort the specifications by number of states, and start " +
@@ -130,7 +130,7 @@ public class ModularModelVerifierFactory
               "-so",
               true));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis,
               "Locally nonblocking supervisors",
               "Attempt to synthesise nonblocking supervisors each time a subsystem " +
@@ -138,7 +138,7 @@ public class ModularModelVerifierFactory
               "blocking states, it does not ensure a globally nonblocking supervisor.",
               "-nb",
               false));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors,
               "Remove unnecessary supervisors",
               "Check whether new superivsors impose additional constraints over " +
@@ -146,7 +146,7 @@ public class ModularModelVerifierFactory
               "-remove",
               true));
 
-    db.add(new EnumOption<AutomataGroup.MergeVersion>
+    db.register(new EnumOption<AutomataGroup.MergeVersion>
              (OPTION_ModularControlLoopChecker_MergeVersion,
               "Selection heuristic",
               "The heuristic to determine which components to include in " +
@@ -155,7 +155,7 @@ public class ModularModelVerifierFactory
               "-merge",
               AutomataGroup.MergeVersion.values(),
               AutomataGroup.MergeVersion.MaxCommonEvents));
-    db.add(new EnumOption<AutomataGroup.SelectVersion>
+    db.register(new EnumOption<AutomataGroup.SelectVersion>
            (OPTION_ModularControlLoopChecker_SelectVersion,
             "Select Version",
             "Method used to select the primary automaton for merging",
@@ -163,7 +163,7 @@ public class ModularModelVerifierFactory
             AutomataGroup.SelectVersion.values(),
             AutomataGroup.SelectVersion.Naive));
 
-    db.add(new ChainOption
+    db.register(new ChainOption
              (OPTION_ModelAnalyzer_SecondaryFactory,
               "Monolithic model analyzer",
               "Algorithm used to analyze the subsystems during modular " +

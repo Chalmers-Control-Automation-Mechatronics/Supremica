@@ -51,7 +51,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import net.sourceforge.waters.analysis.options.AnalysisAlgorithmOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
@@ -375,7 +375,7 @@ public class IDEMenuBar
     final Action languageInclusion =
         actions.getAction(VerifyLanguageInclusionAction.class);
     menu.add(languageInclusion);
-    final AnalysisAlgorithmOption diagnosabilityOption =
+    final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       OptionPage.DiagnosabilityCheck.getTopSelectorOption();
     addOption(diagnosabilityOption);
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
@@ -568,7 +568,7 @@ public class IDEMenuBar
     final Action languageInclusion =
       actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
     menu.add(languageInclusion);
-    final AnalysisAlgorithmOption diagnosabilityOption =
+    final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       OptionPage.DiagnosabilityCheck.getTopSelectorOption();
     addOption(diagnosabilityOption);
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {

@@ -82,7 +82,7 @@ public class AggregatorOptionPage extends OptionPage
   }
 
   @Override
-  public void add(final Option<?> param)
+  public void register(final Option<?> param)
   {
     throw new RuntimeException("Invalid operation!");
   }

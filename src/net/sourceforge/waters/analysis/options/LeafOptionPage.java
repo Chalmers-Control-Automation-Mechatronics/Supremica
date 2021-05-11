@@ -64,7 +64,7 @@ public abstract class LeafOptionPage extends OptionPage
   }
 
   @Override
-  public void add(final Option<?> param)
+  public void register(final Option<?> param)
   {
     final String id = param.getID();
     mMap.put(id, param);

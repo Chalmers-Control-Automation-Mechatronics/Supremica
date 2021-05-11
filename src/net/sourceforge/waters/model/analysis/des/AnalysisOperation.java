@@ -164,7 +164,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation STATE_COUNTER =
-    new AnalysisOperation("waters.analysis.statecount", "State Counter",
+    new AnalysisOperation("waters.analysis.statecount", "State Count",
                           null, null)
   {
     @Override
@@ -177,7 +177,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation SYNCHRONOUS_PRODUCT =
-    new AnalysisOperation("waters.analysis.syncprod", "Synchronize",
+    new AnalysisOperation("waters.analysis.syncprod", "Synchronization",
                           null, null)
   {
     @Override
@@ -190,7 +190,7 @@ public abstract class AnalysisOperation
   };
 
   public static final AnalysisOperation SUPERVISOR_SYNTHESIZER =
-    new AnalysisOperation("waters.analysis.synthesis", "Synthesize",
+    new AnalysisOperation("waters.analysis.synthesis", "Synthesis",
                           null, null)
   {
     @Override

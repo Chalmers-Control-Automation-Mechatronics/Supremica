@@ -64,7 +64,7 @@ public abstract class OptionPage
   //# Simple Access
   public abstract Option<?> get(final String id);
 
-  public abstract void add(final Option<?> param);
+  public abstract void register(final Option<?> param);
 
   public abstract String getPrefix();
 
@@ -77,19 +77,17 @@ public abstract class OptionPage
   public void append(final List<Option<?>> list, final String id)
   {
     final Option<?> option = get(id);
-    if (option == null) {
-      System.err.println(id);
-      return;
+    if (option != null) {
+      list.add(option);
     }
-    assert option != null;
-    list.add(option);
   }
 
   public void prepend(final List<Option<?>> list, final String id)
   {
     final Option<?> option = get(id);
-    assert option != null;
-    list.add(0, option);
+    if (option != null) {
+      list.add(0, option);
+    }
   }
 
   public void insertAfter(final List<Option<?>> list,
@@ -97,12 +95,14 @@ public abstract class OptionPage
                           final String afterThis)
   {
     final Option<?> option = get(id);
-    assert option != null;
-    final ListIterator<Option<?>> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Option<?> next = iter.next();
-      if (next.hasID(afterThis)) {
-        iter.add(option);
+    if (option != null) {
+      final ListIterator<Option<?>> iter = list.listIterator();
+      while (iter.hasNext()) {
+        final Option<?> next = iter.next();
+        if (next.hasID(afterThis)) {
+          iter.add(option);
+          return;
+        }
       }
     }
   }

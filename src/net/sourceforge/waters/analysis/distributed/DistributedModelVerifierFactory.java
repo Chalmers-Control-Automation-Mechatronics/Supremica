@@ -78,37 +78,37 @@ public class DistributedModelVerifierFactory
   @Override
   public void registerOptions(final OptionPage db)
   {
-    db.add(new StringOption
+    db.register(new StringOption
              (OPTION_DistributedModelVerifierFactory_Host,
               null,
               "Server to submit job to",
               "-host", null));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_DistributedModelVerifierFactory_Port,
               null,
               "Port to connect to the server with",
               "-port", DistributedServer.DEFAULT_PORT));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_DistributedModelVerifierFactory_NodeCount,
               null,
               "Preferred number of nodes for the job",
               "-nodes"));
-    db.add(new FileOption
+    db.register(new FileOption
              (OPTION_DistributedModelVerifierFactory_ResultsDump,
               null,
               "File to dump job result into",
               "-resultsdump"));
-    db.add(new FlagOption
+    db.register(new FlagOption
              (OPTION_DistributedModelVerifierFactory_Shutdown,
               null,
               "Shut down the distributed checker after verification",
               "-shutdown"));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_DistributedModelVerifierFactory_Walltime,
               null,
               "Sets the time limit for the job",
               "-walltime"));
-    db.add(new StringOption
+    db.register(new StringOption
              (OPTION_DistributedModelVerifierFactory_StateDistribution,
               null,
               "State distribution method to use",

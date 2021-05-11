@@ -120,21 +120,21 @@ public class NativeModelVerifierFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_NativeModelAnalyzer_EventTreeEnabled,
               "Use branching program",
               "Compile the event enablement condition into a branching program " +
               "to speed up synchronous product computation.",
               "-et",
               true));
-    db.add(new EnumOption<ConflictCheckMode>
+    db.register(new EnumOption<ConflictCheckMode>
              (OPTION_NativeConflictChecker_ConflictCheckMode,
               "Conflict check mode",
               "The strategy used to store or explore the reverse transition relation",
               "-mode",
               ConflictCheckMode.values(),
               ConflictCheckMode.NO_BACKWARDS_TRANSITIONS));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
            (OPTION_NativeConflictChecker_DumpStateAware,
             "Dump State Aware",
             "Enable or disable stopping in local deadlock states",

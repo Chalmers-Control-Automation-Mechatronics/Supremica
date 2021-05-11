@@ -68,9 +68,9 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
     final ModelAnalyzerFactoryLoader defaultValue =
       canBeDisabled ? ModelAnalyzerFactoryLoader.Disabled :
       ModelAnalyzerFactoryLoader.DEFAULT;
-    mAlgorithmOption =
-      new AnalysisAlgorithmOption("Algorithm", loaders, defaultValue);
-    add(mAlgorithmOption);
+    mAlgorithmOption = new EnumOption<ModelAnalyzerFactoryLoader>
+      ("Algorithm", "Algorithm", loaders, defaultValue);
+    register(mAlgorithmOption);
     mOperation = operation;
   }
 
@@ -97,7 +97,7 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
   //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
   @Override
   public List<Option<?>> getOptionsForSelector
-    (final SelectorOption<?> selectorOption, final Object key)
+    (final EnumOption<?> selectorOption, final Object key)
   {
     final List<Option<?>> options = new LinkedList<>();
     addOptions(options, (ModelAnalyzerFactoryLoader) key);
@@ -105,14 +105,14 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
   }
 
   @Override
-  public AnalysisAlgorithmOption getTopSelectorOption()
+  public EnumOption<ModelAnalyzerFactoryLoader> getTopSelectorOption()
   {
     return mAlgorithmOption;
   }
 
   @Override
-  public SelectorOption<?> getSubSelector
-    (final SelectorOption<?> selectorOption, final Object key)
+  public EnumOption<?> getSubSelector
+    (final EnumOption<?> selectorOption, final Object key)
   {
     return null;
   }
@@ -175,7 +175,7 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
 
   //#########################################################################
   //# Data Members
-  private final AnalysisAlgorithmOption mAlgorithmOption;
+  private final EnumOption<ModelAnalyzerFactoryLoader> mAlgorithmOption;
   private final AnalysisOperation mOperation;
   private final boolean mCanBeDisabled;
 

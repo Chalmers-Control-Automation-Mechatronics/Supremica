@@ -118,44 +118,44 @@ public class BDDModelVerifierFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new EnumOption<BDDPackage>
+    db.register(new EnumOption<BDDPackage>
              (OPTION_BDDModelAnalyzer_BDDPackage,
               "BDD package",
               "The BDD implementation used to manipulate BDDs.",
               "-pack",
               BDDPackage.values()));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_BDDModelAnalyzer_InitialSize,
               "Initial BDD table size",
               "The initial number of BDD nodes to be supported by the BDD package.",
                "-size",
                50000));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_BDDModelAnalyzer_NodeLimit,
               "BDD Node limit",
               "Maximum number of BDD nodes allowed before aborting.",
                "-limit"));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_BDDModelAnalyzer_PartitionSizeLimit,
               "Partition size limit",
               "The maximum number of BDD nodes allowed in a transition relation " +
               "BDD before it is split when partitioning.",
               "-plimit",
               10000));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_BDDModelAnalyzer_ReorderingEnabled,
               "Dynamic variable reordering",
               "Try to improve the BDD variable ordering between iterations.",
               "-dynamic",
               false));
-    db.add(new EnumOption<TransitionPartitioningStrategy>
+    db.register(new EnumOption<TransitionPartitioningStrategy>
              (OPTION_BDDModelAnalyzer_TransitionPartitioningStrategy,
               "Transition partitioning strategy",
               "The method used to split the transition relation BDD into " +
               "disjunctive components.",
               "-part",
               TransitionPartitioningStrategy.values()));
-    db.add(new EnumOption<VariableOrdering>
+    db.register(new EnumOption<VariableOrdering>
              (OPTION_BDDModelAnalyzer_VariableOrdering,
               "Initial variable ordering",
               "The strategy to determine the initial ordering of the BDD variables.",

@@ -172,55 +172,55 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public void registerOptions(final OptionPage db)
   {
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_ModelAnalyzer_FinalStateLimit,
               "Monolithic state limit",
               "Maximum number of states in final synchronous product before aborting.",
               "-fslimit"));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_ModelAnalyzer_FinalTransitionLimit,
               "Monolithic transition limit",
               "Maximum number of transitions in final synchronous product before aborting.",
               "-ftlimit"));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_ModelAnalyzer_InternalStateLimit,
               "Internal state limit",
               "Maximum number of states in intermediate abstraction steps.",
               "-islimit"));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_ModelAnalyzer_InternalTransitionLimit,
               "Internal transition limit",
               "Maximum number of transitions in intermediate abstraction steps.",
               "-itlimit"));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ModelVerifier_DetailedOutputEnabled,
               "Compute counterexample",
               "Computate a counterexample if model checking gives a failed result.",
               "-out",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ModelVerifier_ShortCounterExampleRequested,
               "Short counterexample",
               "Try to compute a counterexample that is as short as possible.",
               "-mince",
               false));
 
-    db.add(new PropositionOption
+    db.register(new PropositionOption
              (OPTION_ConflictChecker_ConfiguredDefaultMarking,
               "Marking proposition",
               "The model is considered nonblocking, if it possible to reach a state " +
               "marked by this proposition from every reachable state.",
               "-marking",
               PropositionOption.DefaultKind.PREVENT_NULL));
-    db.add(new PropositionOption
+    db.register(new PropositionOption
              (OPTION_ConflictChecker_ConfiguredPreconditionMarking,
               "Precondition marking",
               "Precondition marking used for generalised conflict check.",
               "-premarking",
               PropositionOption.DefaultKind.DEFAULT_NULL));
 
-    db.add(new EventSetOption
+    db.register(new EventSetOption
              (OPTION_ControlLoopChecker_LoopEvents,
               "Loop events",
               "Check whether the system permits a loop using the selected events.",
@@ -229,90 +229,90 @@ public abstract class AbstractModelAnalyzerFactory
               "Loop Events",
               "Non-Loop Events"));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupervisorSynthesizer_DetailedOutputEnabled,
               "Create supervisor automata",
               "Disable this to suppress the creation of supervisor automata, " +
               "and only determine whether a supervisor exists.",
               "-out",
               true));
-    db.add(new PropositionOption
+    db.register(new PropositionOption
              (OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking,
               "Marking proposition",
               "If synthesising a nonblocking supervisor, it will be " +
               "nonblocking with respect to this proposition.",
               "-marking",
               PropositionOption.DefaultKind.ALLOW_NULL));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupervisorSynthesizer_ControllableSynthesis,
               "Controllable supervisor",
               "Synthesise a controllable supervisor.",
               "-cont",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupervisorSynthesizer_NonblockingSynthesis,
               "Nonblocking supervisor",
               "Synthesise a nonblocking supervisor.",
               "-nbl",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupervisorSynthesizer_NormalSynthesis,
               "Normal supervisor",
               "Synthesise a normal supervisor.",
               "-norm",
               false));
-    db.add(new StringOption
+    db.register(new StringOption
              (OPTION_SupervisorSynthesizer_OutputName,
               "Supervisor name prefix",
               "Name or name prefix for synthesised supervisors.",
               "-name",
               "sup"));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled,
               "Localize supervisors",
               "If using supervisor reduction, create separate supervisors " +
               "for each controllable event that needs to be disabled.",
               "-loc",
               false));
-    db.add(new EnumOption<SupervisorReductionMainMethod>
+    db.register(new EnumOption<SupervisorReductionMainMethod>
              (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
               "Supervisor reduction method",
               "Core algorithm to reduce the size of computed supervisors.",
               "-red",
               SupervisorReductionMainMethod.values()));
-    db.add(new EnumOption<SupervisorReductionProjectionMethod>
+    db.register(new EnumOption<SupervisorReductionProjectionMethod>
              (OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod,
               "Supervisor reduction projection",
               "Method to reduce the number of events before supervisor reduction.",
               "-redproj",
               SupervisorReductionProjectionMethod.values()));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SynchronousProductBuilder_DetailedOutputEnabled,
               "Build automaton model",
               "Disable this to suppress the creation of a synchronous product " +
               "automaton, and only run for statistics.",
               "-out",
               true));
-    db.add(new StringOption
+    db.register(new StringOption
              (OPTION_SynchronousProductBuilder_OutputName,
               "Output name",
               "Name for the generated synchronous product automaton",
               "-name",
               "sync"));
-    db.add(new ComponentKindOption
+    db.register(new ComponentKindOption
              (OPTION_SynchronousProductBuilder_OutputKind,
               "Output kind",
               "Type of the generated synchronous product automaton.",
               "-kind"));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SynchronousProductBuilder_PruningDeadlocks,
               "Prune deadlocks",
               "Stop synchronous product construction when encountering " +
               "states that are a deadlock in one of the components.",
               "-prune",
               false));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SynchronousProductBuilder_RemovingSelfloops,
               "Remove Selfloops",
               "Remove events that appear only as selfloop on every state," +
@@ -320,7 +320,7 @@ public abstract class AbstractModelAnalyzerFactory
               "-out",
               true));
 
-    db.add(new StringListOption
+    db.register(new StringListOption
              (OPTION_LanguageInclusionChecker_Property, null,
               "Name of a property to be checked " +
               "(can be used more than once)",

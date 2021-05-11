@@ -63,7 +63,7 @@ public abstract class AutomatonSimplifierFactory
   //# Options
   public void registerOptions(final OptionPage db)
   {
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AutomatonSimplifierFactory_KeepOriginal,
               "Keep Original",
               "Do not remove the input automaton from the analyzer " +

@@ -98,14 +98,14 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new EnumOption<PreselectingHeuristicFactory>
+    db.register(new EnumOption<PreselectingHeuristicFactory>
              (OPTION_CompositionalGeneralisedConflictChecker_PreselectingHeuristic,
               "Preselection method",
               "Preselection heuristic to generate groups of automata to consider " +
               "for composition.",
               "-presel",
               PreselectingHeuristicFactory.getInstance()));
-    db.add(new EnumOption<SelectingHeuristicFactory>
+    db.register(new EnumOption<SelectingHeuristicFactory>
              (OPTION_CompositionalGeneralisedConflictChecker_SelectingHeuristic,
               "Selection method",
               "Heuristic to choose the group of automata to compose and simplify " +

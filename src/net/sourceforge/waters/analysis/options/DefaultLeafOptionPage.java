@@ -43,7 +43,7 @@ public abstract class DefaultLeafOptionPage extends SimpleLeafOptionPage
   public DefaultLeafOptionPage(final String prefix, final String title)
   {
     super(prefix, title);
-    for (final Option<?> option : getOptions()) add(option);
+    for (final Option<?> option : getOptions()) register(option);
   }
 
 }

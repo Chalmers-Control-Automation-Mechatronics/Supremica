@@ -145,7 +145,7 @@ public class MonolithicModelAnalyzerFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_MonolithicSynchronousProductBuilder_PruningDeadlocks,
               "Prune deadlocks",
               "Stop synchronous product construction when encountering " +

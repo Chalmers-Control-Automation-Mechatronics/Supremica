@@ -54,7 +54,7 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
 
   //#########################################################################
   //# Constructors
-  protected ListedEnumFactory()
+  public ListedEnumFactory()
   {
     mRegisteredElements = new LinkedList<E>();
   }
@@ -62,7 +62,7 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
 
   //#########################################################################
   //# Initialisation
-  protected void register(final E item, final boolean isDefault)
+  public void register(final E item, final boolean isDefault)
   {
     register(item);
     if (isDefault) {
@@ -70,7 +70,7 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
     }
   }
 
-  protected void register(final E item)
+  public void register(final E item)
   {
     mRegisteredElements.add(item);
   }

@@ -38,54 +38,71 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * An option page that can display different options depending on one or
+ * more selectors. This is used to allow the user to switch between
+ * different algorithms and see only the relevant options.
  *
  * @author Benjamin Wheeler
  */
 public abstract class SelectorLeafOptionPage extends LeafOptionPage
 {
 
+  //#########################################################################
+  //# Constructor
   public SelectorLeafOptionPage(final String prefix, final String title)
   {
     super(prefix, title);
   }
 
-  public abstract SelectorOption<?> getTopSelectorOption();
 
-  public abstract SelectorOption<?> getSubSelector
-    (final SelectorOption<?> selectorOption, final Object key);
+  //#########################################################################
+  //# Hooks
+  public abstract EnumOption<?> getTopSelectorOption();
+
+  public abstract EnumOption<?> getSubSelector
+    (final EnumOption<?> selectorOption, final Object key);
 
   public abstract List<Option<?>> getOptionsForSelector
-    (final SelectorOption<?> selectorOption, final Object key);
+    (final EnumOption<?> selectorOption, final Object key);
 
-  @Override
-  public List<Option<?>> getOptions() {
-    final List<Option<?>> options = new LinkedList<>();
-    final SelectorOption<?> selectorOption = getTopSelectorOption();
-    addOptions(options, selectorOption);
-    return options.stream().distinct().collect(Collectors.toList());
-  }
 
-  private void addOptions(final List<Option<?>> options,
-                          final SelectorOption<?> selectorOption)
-  {
-    options.add(selectorOption);
-    for (final Object key : selectorOption.getEnumConstants()) {
-      final SelectorOption<?> subSelectorOption =
-        getSubSelector(selectorOption, key);
-      if (subSelectorOption != null) {
-        addOptions(options, subSelectorOption);
-      }
-      else {
-        options.addAll(getOptionsForSelector(selectorOption, key));
-      }
-    }
-  }
-
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
   @Override
   public OptionPageEditor<SelectorLeafOptionPage> createEditor
     (final OptionContext context)
   {
     return context.createSelectorLeafOptionPageEditor(this);
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+  @Override
+  public List<Option<?>> getOptions()
+  {
+    final List<Option<?>> options = new LinkedList<>();
+    final EnumOption<?> selectorOption = getTopSelectorOption();
+    addOptions(options, selectorOption);
+    return options.stream().distinct().collect(Collectors.toList());
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void addOptions(final List<Option<?>> options,
+                          final EnumOption<?> selectorOption)
+  {
+    options.add(selectorOption);
+    for (final Object key : selectorOption.getEnumConstants()) {
+      final EnumOption<?> subSelectorOption =
+        getSubSelector(selectorOption, key);
+      if (subSelectorOption != null) {
+        addOptions(options, subSelectorOption);
+      } else {
+        options.addAll(getOptionsForSelector(selectorOption, key));
+      }
+    }
   }
 
 }

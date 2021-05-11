@@ -54,9 +54,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
-import net.sourceforge.waters.analysis.options.SelectorOption;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
@@ -131,8 +131,8 @@ public class OptionGroupPanel extends JPanel
     c.gridy = 0;
     c.fill = GridBagConstraints.HORIZONTAL;
 
-    SelectorOption<?> selectorOption = page.getTopSelectorOption();
-    SelectorOption<?> finalSelectorOption = null;
+    EnumOption<?> selectorOption = page.getTopSelectorOption();
+    EnumOption<?> finalSelectorOption = null;
     Object selectedItem = null;
 
     while (selectorOption != null) {
@@ -216,13 +216,13 @@ public class OptionGroupPanel extends JPanel
   }
 
   private OptionListPanel getOptionListPanel
-    (final SelectorOption<?> selectorOption, final Object key)
+    (final EnumOption<?> selectorOption, final Object key)
   {
     final Map<Object, OptionListPanel> map = mOptionPanes.get(selectorOption);
     return map.get(key);
   }
 
-  private void addOptionListPanel(final SelectorOption<?> selectorOption,
+  private void addOptionListPanel(final EnumOption<?> selectorOption,
                                   final Object key,
                                   final OptionListPanel panel)
   {
@@ -238,7 +238,7 @@ public class OptionGroupPanel extends JPanel
   public void generateComponents(final GUIOptionContext context,
                                  final SelectorLeafOptionPage map,
                                  final Map<String, OptionPanel<?>> optionPanels,
-                                 final SelectorOption<?> selectorOption)
+                                 final EnumOption<?> selectorOption)
   {
     final Object[] values = selectorOption.getEnumConstants().toArray();
     final JComboBox<Object> comboBox = new JComboBox<>(values);
@@ -251,7 +251,7 @@ public class OptionGroupPanel extends JPanel
     }
 
     for (final Object key : selectorOption.getEnumConstants()) {
-      final SelectorOption<?> subSelectorOption = map.getSubSelector(selectorOption, key);
+      final EnumOption<?> subSelectorOption = map.getSubSelector(selectorOption, key);
       if (subSelectorOption != null) {
         //Has subselectors
         generateComponents(context, map, optionPanels, subSelectorOption);
@@ -271,10 +271,10 @@ public class OptionGroupPanel extends JPanel
   @Override
   public void commitOptions()
   {
-    for (final Entry<SelectorOption<?>, JComboBox<Object>> entry
+    for (final Entry<EnumOption<?>, JComboBox<Object>> entry
         : mComboBoxes.entrySet()) {
       final Object selected = entry.getValue().getSelectedItem();
-      ((SelectorOption<Object>)entry.getKey()).setValue(selected);
+      ((EnumOption<Object>)entry.getKey()).setValue(selected);
     }
     for (final Map<Object, OptionListPanel> map : mOptionPanes.values()) {
       for (final OptionListPanel pane : map.values()) {
@@ -289,7 +289,7 @@ public class OptionGroupPanel extends JPanel
     search(query, mPage.getTopSelectorOption());
   }
 
-  private boolean hasSubselectors(final SelectorOption<?> selectorOption)
+  private boolean hasSubselectors(final EnumOption<?> selectorOption)
   {
     for (final Object key : selectorOption.getEnumConstants()) {
       if (mPage.getSubSelector(selectorOption, key) != null) return true;
@@ -297,14 +297,14 @@ public class OptionGroupPanel extends JPanel
     return false;
   }
 
-  public void search(final SearchQuery query, final SelectorOption<?> selectorOption)
+  public void search(final SearchQuery query, final EnumOption<?> selectorOption)
   {
     final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
     final Object selectedKey = comboBox.getSelectedItem();
     if (hasSubselectors(selectorOption)) {
       search(query, mPage.getSubSelector(selectorOption, selectedKey));
       for (final Object key : selectorOption.getEnumConstants()) {
-        final SelectorOption<?> subSelector = mPage.getSubSelector(selectorOption, key);
+        final EnumOption<?> subSelector = mPage.getSubSelector(selectorOption, key);
         search(query, subSelector);
       }
     } else {
@@ -324,7 +324,7 @@ public class OptionGroupPanel extends JPanel
   }
 
   public boolean selectOption(final OptionPanel<?> panel,
-                              final SelectorOption<?> selectorOption)
+                              final EnumOption<?> selectorOption)
   {
     final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
     final Object selectedKey = comboBox.getSelectedItem();
@@ -358,7 +358,7 @@ public class OptionGroupPanel extends JPanel
   }
 
   public Object getSelectedValue() {
-    SelectorOption<?> selectorOption = mPage.getTopSelectorOption();
+    EnumOption<?> selectorOption = mPage.getTopSelectorOption();
     while (true) {
       final JComboBox<?> comboBox = mComboBoxes.get(selectorOption);
       final Object key = comboBox.getSelectedItem();
@@ -368,11 +368,11 @@ public class OptionGroupPanel extends JPanel
   }
 
   public List<Option<?>> getSelectedOptions() {
-    SelectorOption<?> selectorOption = mPage.getTopSelectorOption();
+    EnumOption<?> selectorOption = mPage.getTopSelectorOption();
     while (true) {
       final JComboBox<?> comboBox = mComboBoxes.get(selectorOption);
       final Object key = comboBox.getSelectedItem();
-      final SelectorOption<?> subSelectorOption =
+      final EnumOption<?> subSelectorOption =
         mPage.getSubSelector(selectorOption, key);
       if (subSelectorOption == null) {
         return mPage.getOptionsForSelector(selectorOption, key);
@@ -397,7 +397,7 @@ public class OptionGroupPanel extends JPanel
   private class ComboboxToolTipRenderer extends DefaultListCellRenderer
   {
 
-    public ComboboxToolTipRenderer(final SelectorOption<?> selectorOption, final int toolTipWidth)
+    public ComboboxToolTipRenderer(final EnumOption<?> selectorOption, final int toolTipWidth)
     {
       super();
       mSelectorOption = selectorOption;
@@ -428,7 +428,7 @@ public class OptionGroupPanel extends JPanel
     }
 
     private final int mToolTipWidth;
-    private final SelectorOption<?> mSelectorOption;
+    private final EnumOption<?> mSelectorOption;
 
     private static final long serialVersionUID = -3041815919444247332L;
   }
@@ -439,8 +439,8 @@ public class OptionGroupPanel extends JPanel
   }
 
   private final SelectorLeafOptionPage mPage;
-  private final Map<SelectorOption<?>, Map<Object, OptionListPanel>> mOptionPanes;
-  private final Map<SelectorOption<?>, JComboBox<Object>> mComboBoxes;
+  private final Map<EnumOption<?>, Map<Object, OptionListPanel>> mOptionPanes;
+  private final Map<EnumOption<?>, JComboBox<Object>> mComboBoxes;
   private SelectionChangedListener mSelectionChangedListener;
 
   private static final long serialVersionUID = -6276738004584574667L;

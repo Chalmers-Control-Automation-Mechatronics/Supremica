@@ -462,23 +462,21 @@ public class CommandLineTool implements Configurable, ArgumentSource
   //# Auxiliary Methods
   private void registerOptions(final OptionPage page)
   {
-    page.add(new FlagOption(OPTION_CommandLineTool_Quiet, null,
-                            "Suppress all log output",
-                            "-quiet", "-q"));
-    page.add(new FlagOption(OPTION_CommandLineTool_Verbose, null,
-                            "Verbose output",
-                            "-verbose", "-v"));
-    page.add(new FlagOption(OPTION_CommandLineTool_Stats, null,
-                            "Output statistics",
-                            "-stats"));
-    page.add(new FileOption(OPTION_CommandLineTool_Csv, null,
-                            "CSV output file name",
-                            "-csv"));
-    page.add(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
-                                   "Maximum allowed runtime in seconds",
-                                   "-timeout"));
-    page.add(new FlagOption(OPTION_CommandLineTool_Help, null,
-                            "Print this message", "-help"));
+    page.register(new FlagOption(OPTION_CommandLineTool_Quiet, null,
+                                 "Suppress all log output",
+                                 "-quiet", "-q"));
+    page.register(new FlagOption(OPTION_CommandLineTool_Verbose, null,
+                                 "Verbose output",
+                                 "-verbose", "-v"));
+    page.register(new FlagOption(OPTION_CommandLineTool_Stats, null,
+                                 "Output statistics", "-stats"));
+    page.register(new FileOption(OPTION_CommandLineTool_Csv, null,
+                                 "CSV output file name", "-csv"));
+    page.register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
+                                        "Maximum allowed runtime in seconds",
+                                        "-timeout"));
+    page.register(new FlagOption(OPTION_CommandLineTool_Help, null,
+                                 "Print this message", "-help"));
   }
 
   private void writeCSV(final String fullName, final AnalysisResult result)

@@ -109,7 +109,7 @@ public class TRCompositionalModelAnalyzerFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled,
               "Use always enabled events",
               "Detect events that are enabled in all states outside of the " +
@@ -117,33 +117,33 @@ public class TRCompositionalModelAnalyzerFactory
               "with minimisation.",
               "-ae",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled,
               "Use blocked events",
               "Detect and remove events known to be globablly disabled.",
               "-be",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled,
               "Use failing events",
               "Detect events that only lead to blocking states and " +
               "simplify automata based on this information.",
               "-fe",
               true));
-    db.add(new FileOption
+    db.register(new FileOption
              (OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile,
               "Dump file name",
               "If set, any abstracted model will be written to this file " +
               "before being sent for monolithic analysis.",
               "-dump"));
-    db.add(new EnumOption<TRPreselectionHeuristic>
+    db.register(new EnumOption<TRPreselectionHeuristic>
              (OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
               "Preselection method",
               "Preselection heuristic to generate groups of automata to consider " +
               "for composition.",
               "-presel",
               AbstractTRCompositionalModelAnalyzer.getPreselectionHeuristicFactoryStatic()));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled,
               "Use selfloop-only events",
               "Detect events that are appear only as selfloop outside of the " +
@@ -151,14 +151,14 @@ public class TRCompositionalModelAnalyzerFactory
               "with minimisation.",
               "-se",
               true));
-    db.add(new EnumOption<SelectionHeuristic<TRCandidate>>
+    db.register(new EnumOption<SelectionHeuristic<TRCandidate>>
              (OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
               "Selection method",
               "Heuristic to choose the group of automata to compose and simplify " +
               "from the options produced by the preselection method.",
               "-sel",
               AbstractTRCompositionalModelAnalyzer.getSelectionHeuristicFactoryStatic()));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
               "Use weak observation equivalence",
               "Use weak observation equivalence rather than ordinary " +
@@ -166,7 +166,7 @@ public class TRCompositionalModelAnalyzerFactory
               "-woeq",
               false));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled,
               "Counterexample debugging",
               "When computing counterexamples, perform debug checks to ensure " +
@@ -174,35 +174,35 @@ public class TRCompositionalModelAnalyzerFactory
               "-tc",
               false));
 
-    db.add(new EnumOption<TRPreselectionHeuristic>
+    db.register(new EnumOption<TRPreselectionHeuristic>
              (OPTION_TRCompositionalConflictChecker_PreselectionHeuristic,
               "Preselection method",
               "Preselection heuristic to generate groups of automata to consider " +
               "for composition.",
               "-presel",
               TRCompositionalConflictChecker.getPreselectionHeuristicFactoryStatic()));
-    db.add(new EnumOption<SelectionHeuristic<TRCandidate>>
+    db.register(new EnumOption<SelectionHeuristic<TRCandidate>>
              (OPTION_TRCompositionalConflictChecker_SelectionHeuristic,
               "Selection method",
               "Heuristic to choose the group of automata to compose and simplify " +
               "from the options produced by the preselection method.",
               "-sel",
               TRCompositionalConflictChecker.getSelectionHeuristicFactoryStatic()));
-    db.add(new EnumOption<TRToolCreator<TransitionRelationSimplifier>>
+    db.register(new EnumOption<TRToolCreator<TransitionRelationSimplifier>>
              (OPTION_TRCompositionalConflictChecker_SimplifierCreator,
               "Abstraction procedure",
               "Abstraction procedure to simplify automata during compositional " +
               "minimisation.",
               "-method",
               TRCompositionalConflictChecker.getTRSimplifierFactoryStatic()));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts,
               "Use limited certain conflicts",
               "Include the Limited Certain Conflicts Rule in the " +
               "abstraction procedure.",
               "-lcc",
               true));
-    db.add(new ChainOption
+    db.register(new ChainOption
              (OPTION_ModelAnalyzer_SecondaryFactory,
               "Monolithic model analyzer",
               "Algorithm used to analyze the results of abstraction.",

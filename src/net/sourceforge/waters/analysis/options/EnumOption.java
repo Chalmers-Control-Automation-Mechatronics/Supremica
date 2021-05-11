@@ -57,9 +57,18 @@ public class EnumOption<E> extends Option<E>
                     final String commandLineOption,
                     final EnumFactory<? extends E> factory)
   {
-   super(id, shortName, description, commandLineOption,
-         factory.getDefaultValue());
-   mEnumConstants = factory.getEnumConstants();
+    super(id, shortName, description, commandLineOption,
+          factory.getDefaultValue());
+    mEnumConstants = factory.getEnumConstants();
+  }
+
+  public EnumOption(final String id,
+                    final String name,
+                    final List<E> enumConstants,
+                    final E defaultValue)
+  {
+    super(id, name, null, null, defaultValue);
+    mEnumConstants = enumConstants;
   }
 
   public EnumOption(final String id,
@@ -68,8 +77,8 @@ public class EnumOption<E> extends Option<E>
                     final String commandLineOption,
                     final E[] enumConstants)
   {
-   this(id, shortName, description, commandLineOption,
-        enumConstants, enumConstants[0]);
+    this(id, shortName, description, commandLineOption,
+         enumConstants, enumConstants[0]);
   }
 
   public EnumOption(final String id,
@@ -79,8 +88,8 @@ public class EnumOption<E> extends Option<E>
                     final E[] enumConstants,
                     final E defaultValue)
   {
-   super(id, shortName, description, commandLineOption, defaultValue);
-   mEnumConstants = Arrays.asList(enumConstants);
+    super(id, shortName, description, commandLineOption, defaultValue);
+    mEnumConstants = Arrays.asList(enumConstants);
   }
 
 
@@ -89,6 +98,11 @@ public class EnumOption<E> extends Option<E>
   public List<? extends E> getEnumConstants()
   {
     return mEnumConstants;
+  }
+
+  public String getDescription(final Object selectedItem)
+  {
+    return null;
   }
 
 

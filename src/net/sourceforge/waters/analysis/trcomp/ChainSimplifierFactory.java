@@ -88,14 +88,14 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ChainSimplifierFactory_WeakObservationEquivalence,
               "Use Weak Observation Equivalence",
               "Use weak observation equivalence rather than ordinary " +
               "observation equivalence.",
               "-woeq",
               false));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ChainSimplifierFactory_LimitedCertainConflicts,
               "Use Limited Certain Conflicts",
               "Include the Limited Certain Conflict Rule " +
@@ -105,14 +105,14 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
 
 
     //TODO Descriptions and command line options
-    db.add(new EnumOption<OPSearchAutomatonSimplifier.Mode>
+    db.register(new EnumOption<OPSearchAutomatonSimplifier.Mode>
            (OPTION_OPSearchAutomatonSimplifier_OperationMode,
             "Operation Mode",
             "",
             "",
             OPSearchAutomatonSimplifier.Mode.values(),
             OPSearchAutomatonSimplifier.Mode.MINIMIZE));
-    db.add(new EventSetOption
+    db.register(new EventSetOption
            (OPTION_OPSearchAutomatonSimplifier_HiddenEvents,
             "Hidden Events",
             "",
@@ -120,7 +120,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
             DefaultKind.PROPER_EVENT,
             "Selected Events",
             "Unselected Events"));
-    db.add(new EventSetOption
+    db.register(new EventSetOption
            (OPTION_OPSearchAutomatonSimplifier_Propositions,
             "Propositions",
             "",
@@ -135,7 +135,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
 //            "",
 //            "",
 //            ...));
-    db.add(new FileOption
+    db.register(new FileOption
            (OPTION_OPSearchAutomatonSimplifier_LogFile,
             "Log File",
             "",

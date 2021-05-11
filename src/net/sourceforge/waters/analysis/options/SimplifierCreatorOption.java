@@ -41,7 +41,7 @@ import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
  *
  * @author Benjamin Wheeler
  */
-public class SimplifierCreatorOption extends SelectorOption<AutomatonSimplifierCreator>
+public class SimplifierCreatorOption extends EnumOption<AutomatonSimplifierCreator>
 {
   public SimplifierCreatorOption
     (final String id,

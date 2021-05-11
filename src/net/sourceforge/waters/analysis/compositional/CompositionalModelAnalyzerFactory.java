@@ -101,33 +101,33 @@ public class CompositionalModelAnalyzerFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractCompositionalModelAnalyzer_BlockedEventsEnabled,
               "Use blocked events",
               "Detect and remove events known to be globablly disabled.",
               "-be",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractCompositionalModelAnalyzer_FailingEventsEnabled,
               "Use failing events",
               "Detect events that only lead to blocking states and " +
               "simplify automata based on this information.",
               "-fe",
               true));
-    db.add(new FileOption
+    db.register(new FileOption
              (OPTION_AbstractCompositionalModelAnalyzer_MonolithicDumpFile,
               "Dump file name",
               "If set, any abstracted model will be written to this file " +
               "before being sent for monolithic analysis.",
               "-dump"));
-    db.add(new EnumOption<PreselectingMethod>
+    db.register(new EnumOption<PreselectingMethod>
              (OPTION_AbstractCompositionalModelAnalyzer_PreselectingMethod,
               "Preselection method",
               "Preselection heuristic to generate groups of automata to consider " +
               "for composition.",
               "-presel",
               AbstractCompositionalModelAnalyzer.getPreselectingMethodFactoryStatic()));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled,
               "Use selfloop-only events",
               "Detect events that are appear only as selfloop outside of the " +
@@ -135,14 +135,14 @@ public class CompositionalModelAnalyzerFactory
               "with minimisation.",
               "-se",
               true));
-    db.add(new EnumOption<SelectionHeuristicCreator>
+    db.register(new EnumOption<SelectionHeuristicCreator>
              (OPTION_AbstractCompositionalModelAnalyzer_SelectingMethod,
               "Selection method",
               "Heuristic to choose the group of automata to compose and simplify " +
               "from the options produced by the preselection method.",
               "-sel",
               CompositionalSelectionHeuristicFactory.getInstance()));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractCompositionalModelAnalyzer_SubumptionEnabled,
               "Use subumption test",
               "Suppress candidate groups of automata that are supersets of " +
@@ -150,19 +150,19 @@ public class CompositionalModelAnalyzerFactory
               "-sub",
               true));
 
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
            (OPTION_AbstractCompositionalModelVerifier_LowerInternalStateLimit,
             null,
             "Initial maximum number of states for abstraction attempts",
             "-lslimit",
             10000));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
            (OPTION_AbstractCompositionalModelVerifier_UpperInternalStateLimit,
             "Use blocked events",
             "Detect and remove events known to be globablly disabled.",
             "-uslimit",
             10000));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
            (OPTION_AbstractCompositionalModelVerifier_SpecialEvents,
             null,
             "Enable or disable blocked, failing, and selfloop-only events",
@@ -170,7 +170,7 @@ public class CompositionalModelAnalyzerFactory
             true));
 
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled,
               "Counterexample debugging",
               "When computing counterexamples, perform debug checks to ensure " +
@@ -178,7 +178,7 @@ public class CompositionalModelAnalyzerFactory
               "-tc",
               false));
 
-    db.add(new EnumOption<AbstractionProcedureCreator>
+    db.register(new EnumOption<AbstractionProcedureCreator>
              (OPTION_CompositionalAutomataSynthesizer_AbstractionProcedureCreator,
               "Abstraction procedure",
               "Abstraction procedure to simplify automata during compositional " +
@@ -186,21 +186,21 @@ public class CompositionalModelAnalyzerFactory
               "-method",
               AutomataSynthesisAbstractionProcedureFactory.getInstance()));
 
-    db.add(new EnumOption<AbstractionProcedureCreator>
+    db.register(new EnumOption<AbstractionProcedureCreator>
              (OPTION_CompositionalConflictChecker_AbstractionProcedureCreator,
               "Abstraction procedure",
               "Abstraction procedure to simplify automata during compositional " +
               "minimisation.",
               "-method",
               ConflictAbstractionProcedureFactory.getInstance()));
-    db.add(new EnumOption<PreselectingMethod>
+    db.register(new EnumOption<PreselectingMethod>
              (OPTION_CompositionalConflictChecker_PreselectingMethod,
               "Preselection method",
               "Preselection heuristic to generate groups of automata to consider " +
               "for composition.",
               "-presel",
               CompositionalConflictChecker.getPreselectingMethodFactoryStatic()));
-    db.add(new EnumOption<SelectionHeuristicCreator>
+    db.register(new EnumOption<SelectionHeuristicCreator>
              (OPTION_CompositionalConflictChecker_SelectingMethod,
               "Selection method",
               "Heuristic to choose the group of automata to compose and simplify " +

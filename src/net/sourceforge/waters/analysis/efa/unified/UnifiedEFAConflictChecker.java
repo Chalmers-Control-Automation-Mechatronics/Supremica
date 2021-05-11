@@ -325,19 +325,19 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   @Override
   public void registerOptions(final OptionPage page)
   {
-    page.add(new BooleanOption(UnifiedEFACommandLineTool.
+    page.register(new BooleanOption(UnifiedEFACommandLineTool.
                                OPTION_UnifiedEFACommandLineTool_PreferLocal, null,
                                "Enable or disable preference for local variables",
                                "-loc", false));
-    page.add(new EnumOption<UnifiedEFASimplifierFactory>(UnifiedEFACommandLineTool.
+    page.register(new EnumOption<UnifiedEFASimplifierFactory>(UnifiedEFACommandLineTool.
       OPTION_UnifiedEFACommandLineTool_SimplifierFactory, null,
                                "Abstraction sequence used for simplification",
                                "-method", UnifiedEFASimplifierFactory.values()));
-    page.add(new PositiveIntOption(UnifiedEFACommandLineTool.
+    page.register(new PositiveIntOption(UnifiedEFACommandLineTool.
                                    OPTION_UnifiedEFACommandLineTool_InternalStateLimit, null,
                                "Maximum number of states constructed in abstraction attempts",
                                "-islimit"));
-    page.add(new PositiveIntOption(UnifiedEFACommandLineTool.
+    page.register(new PositiveIntOption(UnifiedEFACommandLineTool.
                                    OPTION_UnifiedEFACommandLineTool_InternalTransitionLimit, null,
                                "Maximum number of transitions constructed in abstraction attempts",
                                "-itlimit"));

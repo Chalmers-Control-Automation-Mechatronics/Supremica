@@ -81,10 +81,8 @@ public abstract class TRAbstractModelVerifier
   public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelVerifier_DetailedOutputEnabled);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelVerifier_ShortCounterExampleRequested);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ModelVerifier_DetailedOutputEnabled);
     return options;
   }
 

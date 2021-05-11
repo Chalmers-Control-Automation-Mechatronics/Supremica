@@ -66,20 +66,20 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_Abstract_StateLimit,
               "State Limit",
               "The maximum number of states that can be constructed " +
               "before aborting.",
               "-slimit"));
-    db.add(new PositiveIntOption
+    db.register(new PositiveIntOption
              (OPTION_Abstract_TransitionLimit,
               "Transition Limit",
               "The maximum number of transitions that can be constructed " +
               "before aborting.",
               "-tlimit"));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_TransitionRelationSimplifier_DumpStateAware,
               "Dump-state aware",
               "Do not explore beyond dump states, and ignore dump states " +
@@ -88,40 +88,40 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
               "-dp",
               false));
 
-    db.add(new PropositionOption
+    db.register(new PropositionOption
              (OPTION_AbstractMarking_DefaultMarkingID,
               "Marking proposition",
               "Default marking used for nonblocking verification or synthesis.",
               "-marking",
               PropositionOption.DefaultKind.PREVENT_NULL));
-    db.add(new PropositionOption
+    db.register(new PropositionOption
              (OPTION_AbstractMarking_PreconditionMarkingID,
               "Precondition marking",
               "Precondition marking used for generalised conflict check.",
               "-premarking",
               PropositionOption.DefaultKind.DEFAULT_NULL));
 
-    db.add(new EnumOption<ObservationEquivalenceTRSimplifier.Equivalence>
+    db.register(new EnumOption<ObservationEquivalenceTRSimplifier.Equivalence>
              (OPTION_ObservationEquivalence_Equivalence,
               "Equivalence",
               "The equivalence relation that defines which states can be merged.",
               "-equiv",
               ObservationEquivalenceTRSimplifier.Equivalence.values()));
-    db.add(new EnumOption<ObservationEquivalenceTRSimplifier.TransitionRemoval>
+    db.register(new EnumOption<ObservationEquivalenceTRSimplifier.TransitionRemoval>
              (OPTION_ObservationEquivalence_TransitionRemovalMode,
               "Transition Removal Mode",
               "The times at which to remove redundant transitions based " +
               "on observation equicvalence.",
               "-trm",
               ObservationEquivalenceTRSimplifier.TransitionRemoval.values()));
-    db.add(new EnumOption<ObservationEquivalenceTRSimplifier.MarkingMode>
+    db.register(new EnumOption<ObservationEquivalenceTRSimplifier.MarkingMode>
              (OPTION_ObservationEquivalence_MarkingMode,
               "Marking Mode",
               "How markings are handled when minimising for " +
               "observation equivalence.",
               "-mm",
               ObservationEquivalenceTRSimplifier.MarkingMode.values()));
-    db.add(new EventSetOption
+    db.register(new EventSetOption
              (OPTION_ObservationEquivalence_PropositionMask,
               "Propositions",
               "Propositions to be preserved by the equivalence.",
@@ -129,14 +129,14 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
               EventSetOption.DefaultKind.PROPOSITION,
               "Selected Propositions",
               "Unselected Propositions"));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ObservationEquivalence_InfoEnabled,
               "Use Info Data Structure",
               "Use the data structures proposed by Fernandez " +
               "that ensure an O(n log n) runtime but require more memory.",
               "-eqinfo",
               false));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_ObservationEquivalence_UsingLocalEvents,
               "Use Local Events",
               "Consider all local events as silent in observation equivalence " +
@@ -144,7 +144,7 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
               "-eqlocal",
               false));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SilentIncoming_RestrictsToUnreachableStates,
               "Ensure reduction with Silent Incoming Rule",
               "Apply the Silent Incoming Rule only to &tau;-transitions " +
@@ -153,7 +153,7 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
               "-rtus",
               true));
 
-    db.add(new EnumOption<SuWonhamSupervisorReductionTRSimplifier.PairOrdering>
+    db.register(new EnumOption<SuWonhamSupervisorReductionTRSimplifier.PairOrdering>
              (OPTION_SuWonhamSupervisorReduction_PairOrdering,
                "Pair ordering",
                "The strategy to determine which pairs are merged first " +
@@ -161,14 +161,14 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
                "-por",
                SuWonhamSupervisorReductionTRSimplifier.PairOrdering.values()));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
               "Failing events as selfloops",
               "Enable this to create selfloops for failing events, " +
               "disable to create transitions to the dump state instead.",
               "-fesl",
               false));
-    db.add(new DoubleOption
+    db.register(new DoubleOption
              (OPTION_SubsetConstruction_MaxIncrease,
               "Maximum Increase",
               "The maximum factor by which the number of states may increase " +
@@ -176,7 +176,7 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
               "-maxinc",
               Double.POSITIVE_INFINITY, 1.0, Double.POSITIVE_INFINITY));
 
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence,
               "Weak Synthesis Observation Equivalence",
               "Use weak synthesis observation equivalence rather than " +

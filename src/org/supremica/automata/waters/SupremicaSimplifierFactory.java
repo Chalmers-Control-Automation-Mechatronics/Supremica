@@ -80,14 +80,14 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   public void registerOptions(final OptionPage db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupremicaAutomatonBuilder_AlsoTransitions,
               "Minimise number of transitions",
               "Minimise the number of transitions in addition to the number " +
               "of states when simplifying for observation equivalence.",
               "-oeqt",
               true));
-    db.add(new BooleanOption
+    db.register(new BooleanOption
              (OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal,
               "Treat unobservable events as local",
               "Consider the unobservable events of the automaton as local " +
@@ -95,7 +95,7 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
               "have no significance with this option.",
               "-unobs",
               false));
-    db.add(new PropositionOption
+    db.register(new PropositionOption
              (OPTION_SupremicaAutomatonBuilder_DefaultMarkingID,
               "Marking proposition",
               "Default marking used for nonblocking verification or synthesis.",

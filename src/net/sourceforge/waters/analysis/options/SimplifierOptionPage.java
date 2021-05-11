@@ -60,9 +60,9 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
     mCreatorOptions = new LinkedList<>();
     final List<AutomatonSimplifierFactory> factories =
       getFamilies(classNames);
-    mFamilyOption = new SimplifierFamilyOption(prefix+".FamilySelector",
-                                               factories, null);//TODO
-    add(mFamilyOption);
+    mFamilyOption = new EnumOption<AutomatonSimplifierFactory>
+      (prefix + ".FamilySelector", "Family", factories, null); //TODO
+    register(mFamilyOption);
     for (final AutomatonSimplifierFactory factory : factories) {
       final List<AutomatonSimplifierCreator> creators =
         factory.getSimplifierCreators();
@@ -127,12 +127,12 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
   {
     mCreatorOptionMap.put(factory, creatorOption);
     mCreatorOptions.add(creatorOption);
-    add(creatorOption);
+    register(creatorOption);
   }
 
   @Override
   public List<Option<?>> getOptionsForSelector
-    (final SelectorOption<?> selectorOption, final Object key)
+    (final EnumOption<?> selectorOption, final Object key)
   {
     final List<Option<?>> options = new LinkedList<>();
     addOptions(options, (AutomatonSimplifierCreator) key);
@@ -143,21 +143,21 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
 
 
   @Override
-  public SelectorOption<?> getTopSelectorOption()
+  public EnumOption<?> getTopSelectorOption()
   {
     return mFamilyOption;
   }
 
-  public List<SelectorOption<?>> getSubSelectors
-    (final SelectorOption<?> selectorOption)
+  public List<EnumOption<?>> getSubSelectors
+    (final EnumOption<?> selectorOption)
   {
     if (selectorOption == mFamilyOption) return mCreatorOptions;
     else return null;
   }
 
   @Override
-  public SelectorOption<?> getSubSelector
-    (final SelectorOption<?> selectorOption, final Object key)
+  public EnumOption<?> getSubSelector
+    (final EnumOption<?> selectorOption, final Object key)
   {
     if (selectorOption == mFamilyOption
       && key instanceof AutomatonSimplifierFactory) {
@@ -166,9 +166,9 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
     else return null;
   }
 
-  private final SimplifierFamilyOption mFamilyOption;
+  private final EnumOption<AutomatonSimplifierFactory> mFamilyOption;
   private final Map<AutomatonSimplifierFactory, SimplifierCreatorOption>
     mCreatorOptionMap;
-  private final List<SelectorOption<?>> mCreatorOptions;
+  private final List<EnumOption<?>> mCreatorOptions;
 
 }

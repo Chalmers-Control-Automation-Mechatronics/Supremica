@@ -33,44 +33,100 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of
- * <CODE>ComponentKind</CODE> type.
- *
- * @author Brandon Bassett
+ * @author Robi Malik
  */
 
-public class ComponentKindOption extends EnumOption<ComponentKind>
+public class ChainedAnalyzerFactory
 {
 
   //#########################################################################
   //# Constructor
-  public ComponentKindOption(final String id,
-                             final String shortName,
-                             final String description,
-                             final String commandLineOption)
+  ChainedAnalyzerFactory(final AnalysisOperation operation,
+                         final ModelAnalyzerFactoryLoader loader)
   {
-    super(id, shortName, description, commandLineOption,
-          ComponentKind.values());
+    mOperation = operation;
+    mLoader = loader;
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
-  @Override
-  public OptionEditor<ComponentKind> createEditor(final OptionContext context)
+  //# Simple Access
+  String getName()
   {
-    return context.createComponentKindEditor(this);
+    return mLoader.name();
+  }
+
+  AnalysisOperation getAnalysisOperation()
+  {
+    return mOperation;
+  }
+
+  ModelAnalyzerFactory getModelAnalyzerFactory()
+    throws ClassNotFoundException
+  {
+    return mLoader.getModelAnalyzerFactory();
+  }
+
+  OptionPage getOptionPage()
+  {
+    return mOptionPage;
+  }
+
+  void setOptionPage(final OptionPage page)
+  {
+    mOptionPage = page;
+  }
+
+
+  //#########################################################################
+  //# Analyser Configuration
+  public ModelAnalyzer configureModelAnalyzer
+    (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException, ClassNotFoundException
+  {
+    final ModelAnalyzerFactory factory = getModelAnalyzerFactory();
+    final ModelAnalyzer analyzer =
+      mOperation.createModelAnalyzer(factory, desFactory);
+    for (final Option<?> option : analyzer.getOptions(mOptionPage)) {
+      analyzer.setOption(option);
+    }
+    return analyzer;
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  @Override
+  public boolean equals(final Object other)
+  {
+    if (other.getClass() == getClass()) {
+      final ChainedAnalyzerFactory factory = (ChainedAnalyzerFactory) other;
+      return mOperation == factory.mOperation && mLoader == factory.mLoader;
+    } else {
+      return false;
+    }
   }
 
   @Override
-  public boolean isPersistent()
+  public int hashCode()
   {
-    return false;
+    return mOperation.hashCode() + 5 * mLoader.hashCode();
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final AnalysisOperation mOperation;
+  private final ModelAnalyzerFactoryLoader mLoader;
+  private OptionPage mOptionPage;
 
 }
