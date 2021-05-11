@@ -146,8 +146,9 @@ public class TarjanControlStack
    * the move.
    * @param  stackPosAbove  The stack index of a stack entry above
    *                        the stack entry to become the new top.
-   * @param  newParent      A new parent index to be stored in the
-   *                        new top of the stack after the move.
+   * @param  newParent      The true state index of the new parent state,
+   *                        i.e., the parent from where the moved state is
+   *                        considered to be expanded from after the move.
    */
   public void moveToTop(final int stackPosAbove, final int newParent)
   {
