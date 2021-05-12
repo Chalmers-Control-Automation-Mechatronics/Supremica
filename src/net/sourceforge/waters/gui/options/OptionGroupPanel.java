@@ -34,7 +34,6 @@
 package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -43,16 +42,19 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
@@ -60,350 +62,373 @@ import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
+
 /**
+ * <P>A panel to edit an option page with selectors.</P>
+ *
+ * <P>The option group panel displays one or more combo boxes to select
+ * option sets and, for the selected option set, its description
+ * (if available) followed by the scrollable list of option panels.</P>
+ *
+ * <P>The option group panel initialises all needed combo boxes and
+ * sub-panels when it is first created, and afterwards switches between
+ * the components as needed. This is done to facilitate operations like
+ * search that depend on all option panels being available.</P>
  *
  * @author Benjamin Wheeler
  */
-public class OptionGroupPanel extends JPanel
-  implements OptionContainer<SelectorLeafOptionPage>
+
+public class OptionGroupPanel<S>
+  extends JPanel
+  implements OptionContainer<SelectorLeafOptionPage<S>>
 {
 
+  //#########################################################################
+  //# Constructors
   public OptionGroupPanel(final GUIOptionContext context,
-                          final SelectorLeafOptionPage page)
+                          final SelectorLeafOptionPage<S> page)
   {
-    this(context, page, new HashMap<>());
+    mContext = context;
+    mPage = page;
+    mComboBoxMap = new HashMap<>();
+    mPanelMap = new HashMap<>();
+    final EnumOption<?> top = page.getTopSelectorOption();
+    final Map<String,OptionPanel<?>> sharedPanels = new HashMap<>();
+    initializeMaps(top, sharedPanels);
+    setLayout(new GridBagLayout());
+    createComponents();
   }
 
-  public OptionGroupPanel(final GUIOptionContext context,
-                          final SelectorLeafOptionPage page,
-                          final Map<String, OptionPanel<?>> optionPanels)
+
+  //#########################################################################
+  //# Set Up
+  private void initializeMaps(final EnumOption<?> selectorOption,
+                              final Map<String,OptionPanel<?>> sharedPanels)
   {
-    mPage = page;
-    mOptionPanes = new HashMap<>();
-    mComboBoxes = new HashMap<>();
+    final ComboBoxHandler<?> handler = new ComboBoxHandler<>(selectorOption);
+    mComboBoxMap.put(selectorOption, handler);
+    for (final Object key : selectorOption.getEnumConstants()) {
+      final EnumOption<?> subSelectorOption =
+        mPage.getSubSelectorOption(selectorOption, key);
+      if (subSelectorOption != null) {
+        // has subselectors
+        initializeMaps(subSelectorOption, sharedPanels);
+      } else {
+        // has options
+        @SuppressWarnings("unchecked")
+        final S typedKey = (S) key;
+        final List<Option<?>> options = mPage.getOptions(typedKey);
+        final OptionListPanel panel =
+          new OptionListPanel(mContext, mPage, sharedPanels, options);
+        mPanelMap.put(typedKey, panel);
+      }
+    }
+  }
 
-    generateComponents(context, page, optionPanels,
-                       page.getTopSelectorOption());
-
-    final GridBagLayout layout = new GridBagLayout();
-    setLayout(layout);
+  /**
+   * Initialises combo boxes and options panel for the first time.
+   */
+  private void createComponents()
+  {
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
-    constraints.anchor = GridBagConstraints.CENTER;
+    constraints.gridy = GridBagConstraints.RELATIVE;;
     constraints.weightx = 1.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weighty = 0.0;
-
-    final ActionListener handler = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e)
-      {
-        populateOptions(context, page);
-      }
-    };
-
-    for (final JComboBox<Object> comboBox : mComboBoxes.values()) {
-      comboBox.addActionListener(handler);
+    constraints.anchor = GridBagConstraints.CENTER;
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.insets = new Insets(4, 4, 4, 4);
+    final JComponent selectorPanel = createSelectorPanel();
+    add(selectorPanel, constraints);
+    final S key = getSelectedValue();
+    final JComponent descriptionPanel = createDescriptionPanel(key);
+    if (descriptionPanel != null) {
+      add(descriptionPanel, constraints);
     }
-
-    populateOptions(context, page);
+    final OptionListPanel panel = mPanelMap.get(key);
+    final List<Option<?>> options = mPage.getOptions(key);
+    panel.populateOptions(mContext, mPage, options);
+    constraints.weighty = 1.0;
+    add(panel, constraints);
   }
 
-  public void populateOptions(final GUIOptionContext context,
-                              final SelectorLeafOptionPage page)
+  /**
+   * Re-initialises combo boxes and options panel.
+   */
+  private void recreateComponents()
   {
     removeAll();
+    createComponents();
+    revalidate();
+  }
 
+  private JComponent createSelectorPanel()
+  {
+    final JPanel selectorPanel = new JPanel();
+    selectorPanel.setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
-    constraints.anchor = GridBagConstraints.CENTER;
-    constraints.weightx = 1.0;
-
     constraints.gridy = 0;
-    constraints.weighty = 0.0;
+    constraints.weighty = 1.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.insets = new Insets(4, 4, 4, 4);
-    final JPanel selectionPanel = new JPanel();
-    selectionPanel.setLayout(new GridBagLayout());
-    add(selectionPanel, constraints);
-
-    final GridBagConstraints c = new GridBagConstraints();
-    c.gridy = 0;
-    c.fill = GridBagConstraints.HORIZONTAL;
-
-    EnumOption<?> selectorOption = page.getTopSelectorOption();
-    EnumOption<?> finalSelectorOption = null;
+    EnumOption<?> selectorOption = mPage.getTopSelectorOption();
     Object selectedItem = null;
-
     while (selectorOption != null) {
-      final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
-      if (context.getWatersAnalyzerPanel() != null) {
-        comboBox.removeItem(ModelAnalyzerFactoryLoader.Disabled);
-      }
-      c.gridx = 0;
-      c.insets.right = 10;
-      c.weightx = 0.0;
-      c.weighty = 0.0;
+      final ComboBoxHandler<?> handler = mComboBoxMap.get(selectorOption);
+      final JComboBox<?> comboBox = handler.getComboBox();
       final String labelText = selectorOption.getShortName();
       if (labelText != null) {
         final JLabel label = new JLabel();
         label.setText(labelText);
         label.setBorder(BorderFactory.createLineBorder(getBackground()));
-        selectionPanel.add(label, c);
+        constraints.gridx = 0;
+        constraints.weightx = 0.0;
+        constraints.insets.right = 10;
+        selectorPanel.add(label, constraints);
       }
-      c.gridx = 1;
-      c.insets.right = 0;
-      c.weightx = 1.0;
-      selectionPanel.add(comboBox, c);
-      c.gridy++;
-
-      finalSelectorOption = selectorOption;
+      constraints.gridx = 1;
+      constraints.weightx = 1.0;
+      constraints.insets.right = 4;
+      selectorPanel.add(comboBox, constraints);
+      constraints.gridy++;
       selectedItem = comboBox.getSelectedItem();
-
-      selectorOption = page.getSubSelector(selectorOption, selectedItem);
+      selectorOption = mPage.getSubSelectorOption(selectorOption, selectedItem);
     }
+    return selectorPanel;
+  }
 
-    final OptionListPanel pane = getOptionListPanel(finalSelectorOption, selectedItem);
-    final List<Option<?>> options = page.getOptionsForSelector(finalSelectorOption, selectedItem);
-    pane.populateOptions(context, page, options);
-    constraints.gridy = 1;
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    add(pane, constraints);
-
-    final String description = finalSelectorOption.getDescription(selectedItem);
-    if (description != null) {
-      final JTextPane descriptionTextPane = new JTextPane();
-      descriptionTextPane.setContentType("text/html");
-      descriptionTextPane.setBackground(getBackground());
-      descriptionTextPane.setEditable(false);
-
-      final JScrollPane scrollDescription =
-        new JScrollPane(descriptionTextPane) {
+  private JComponent createDescriptionPanel(final S key)
+  {
+    final String description = mPage.getDescription(key);
+    if (description != null && description.length() > 0) {
+      final int width;
+      if (mDescriptionTextPane == null) {
+        width = Math.round(PREFERRED_WIDTH *
+                           IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+      } else {
+        final Insets insets = mDescriptionTextPane.getInsets();
+        width = mDescriptionTextPane.getWidth() - insets.left - insets.right;
+      }
+      final String htmlText = getHTMLText(description, width, false);
+      mDescriptionTextPane = new JTextPane();
+      mDescriptionTextPane.setContentType("text/html");
+      mDescriptionTextPane.setBackground(getBackground());
+      mDescriptionTextPane.setEditable(false);
+      mDescriptionTextPane.setText(htmlText);
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public Dimension getPreferredSize()
+        public void run()
         {
-          final Dimension d = super.getPreferredSize();
-          d.width = 0;
-          return d;
+          final String altText = getHTMLText(description, -1, false);
+          mDescriptionTextPane.setText(altText);
         }
-        private static final long serialVersionUID = -7065386236668370127L;
-      };
-
-      final StringBuilder builder = new StringBuilder();
-      builder.append("<HTML><BODY STYLE=\"font-size: ");
-      builder.append(IconAndFontLoader.HTML_FONT_SIZE);
-      builder.append("px; font-family: serif; text-align: justify;\">");
-      builder.append(description);
-      builder.append("</BODY></HTML>");
-      final String text = builder.toString();
-      descriptionTextPane.setText(text);
-      c.gridx = 0;
-      c.gridwidth = 2;
-      c.weightx = 1.0;
-      c.weighty = 1.0;
-      c.fill = GridBagConstraints.BOTH;
-      c.insets.top = 4;
-      selectionPanel.add(scrollDescription, c);
-      c.insets.top = 0;
-      c.gridwidth = 1;
-    }
-
-    revalidate();
-    if (mSelectionChangedListener != null) {
-      mSelectionChangedListener.selectionChanged();
+      });
+      final Border border =
+        BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+      mDescriptionTextPane.setBorder(border);
+      return mDescriptionTextPane;
+    } else {
+      return null;
     }
   }
 
-  private OptionListPanel getOptionListPanel
-    (final EnumOption<?> selectorOption, final Object key)
+  private String getHTMLText(final String description,
+                             final int width,
+                             final boolean toolTip)
   {
-    final Map<Object, OptionListPanel> map = mOptionPanes.get(selectorOption);
-    return map.get(key);
-  }
-
-  private void addOptionListPanel(final EnumOption<?> selectorOption,
-                                  final Object key,
-                                  final OptionListPanel panel)
-  {
-    Map<Object, OptionListPanel> map = mOptionPanes.get(selectorOption);
-    if (map == null) {
-      map = new HashMap<>();
-      mOptionPanes.put(selectorOption, map);
+    final StringBuilder builder = new StringBuilder();
+    builder.append("<HTML><BODY STYLE=\"");
+    if (width > 0) {
+      builder.append("width: ");
+      builder.append(width);
+      builder.append("; ");
     }
-    map.put(key, panel);
-  }
-
-
-  public void generateComponents(final GUIOptionContext context,
-                                 final SelectorLeafOptionPage map,
-                                 final Map<String, OptionPanel<?>> optionPanels,
-                                 final EnumOption<?> selectorOption)
-  {
-    final Object[] values = selectorOption.getEnumConstants().toArray();
-    final JComboBox<Object> comboBox = new JComboBox<>(values);
-    comboBox.setRenderer(new ComboboxToolTipRenderer(selectorOption, 300));
-    mComboBoxes.put(selectorOption, comboBox);
-
-    final Object selectedkey = selectorOption.getValue();
-    if (selectedkey != null) {
-      comboBox.setSelectedItem(selectedkey);
+    builder.append("font-size: ");
+    builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+    builder.append("px;");
+    if (!toolTip) {
+      builder.append(" margin-left: ");
+      final int margin =
+        Math.round(3 * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+      builder.append(margin);
+      builder.append("px; text-align: justify;");
     }
-
-    for (final Object key : selectorOption.getEnumConstants()) {
-      final EnumOption<?> subSelectorOption = map.getSubSelector(selectorOption, key);
-      if (subSelectorOption != null) {
-        //Has subselectors
-        generateComponents(context, map, optionPanels, subSelectorOption);
-      }
-      else {
-        //Has options
-        final List<Option<?>> options = map.getOptionsForSelector(selectorOption, key);
-        final OptionListPanel pane = new OptionListPanel(context, map, optionPanels, options);
-        addOptionListPanel(selectorOption, key, pane);
-      }
-    }
-
+    builder.append("\">");
+    builder.append(description);
+    builder.append("</BODY></HTML>");
+    return builder.toString();
   }
 
 
-  @SuppressWarnings("unchecked")
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.gui.options.OptionContainer<SelectorLeafOptionPage<S>>
   @Override
   public void commitOptions()
   {
-    for (final Entry<EnumOption<?>, JComboBox<Object>> entry
-        : mComboBoxes.entrySet()) {
-      final Object selected = entry.getValue().getSelectedItem();
-      ((EnumOption<Object>)entry.getKey()).setValue(selected);
+    // This commits all options. Should we commit only the selected?
+    for (final ComboBoxHandler<?> handler : mComboBoxMap.values()) {
+      handler.commit();
     }
-    for (final Map<Object, OptionListPanel> map : mOptionPanes.values()) {
-      for (final OptionListPanel pane : map.values()) {
-        pane.commitOptions();
-      }
+    for (final OptionListPanel panel : mPanelMap.values()) {
+      panel.commitOptions();
     }
   }
 
   @Override
   public void search(final SearchQuery query)
   {
-    search(query, mPage.getTopSelectorOption());
+    final EnumOption<?> top = mPage.getTopSelectorOption();
+    search(query, top);
   }
 
-  private boolean hasSubselectors(final EnumOption<?> selectorOption)
+  @Override
+  public boolean selectOption(final OptionPanel<?> option)
   {
+    final EnumOption<?> top = mPage.getTopSelectorOption();
+    return selectOption(option, top);
+  }
+
+  @SuppressWarnings("unchecked")
+  public S getSelectedValue()
+  {
+    EnumOption<?> selectorOption = mPage.getTopSelectorOption();
+    while (true) {
+      final ComboBoxHandler<?> handler = mComboBoxMap.get(selectorOption);
+      final Object key = handler.getSelectedItem();
+      selectorOption = mPage.getSubSelectorOption(selectorOption, key);
+      if (selectorOption == null) {
+        return (S) key;
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void search(final SearchQuery query,
+                      final EnumOption<?> selectorOption)
+  {
+    final ComboBoxHandler<?> handler = mComboBoxMap.get(selectorOption);
+    final Object selectedKey = handler.getSelectedItem();
+    search(query, selectorOption, selectedKey);
     for (final Object key : selectorOption.getEnumConstants()) {
-      if (mPage.getSubSelector(selectorOption, key) != null) return true;
+      if (key != selectedKey) {
+        search(query, selectorOption, key);
+      }
+    }
+  }
+
+  private void search(final SearchQuery query,
+                      final EnumOption<?> selectorOption,
+                      final Object key)
+  {
+    final EnumOption<?> subSelectorOption =
+      mPage.getSubSelectorOption(selectorOption, key);
+    if (subSelectorOption == null) {
+      final OptionListPanel panel = mPanelMap.get(key);
+      panel.search(query);
+    } else {
+      search(query, subSelectorOption);
+    }
+  }
+
+  private boolean selectOption(final OptionPanel<?> option,
+                               final EnumOption<?> selectorOption)
+  {
+    final ComboBoxHandler<?> handler = mComboBoxMap.get(selectorOption);
+    final Object selectedKey = handler.getSelectedItem();
+    if (selectOption(option, selectorOption, selectedKey)) {
+      return true;
+    }
+    for (final Object key : selectorOption.getEnumConstants()) {
+      if (key != selectedKey) {
+        if (selectOption(option, selectorOption, key)) {
+          handler.setSelectedItem(key);
+          return true;
+        }
+      }
     }
     return false;
   }
 
-  public void search(final SearchQuery query, final EnumOption<?> selectorOption)
+  private boolean selectOption(final OptionPanel<?> option,
+                               final EnumOption<?> selectorOption,
+                               final Object key)
   {
-    final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
-    final Object selectedKey = comboBox.getSelectedItem();
-    if (hasSubselectors(selectorOption)) {
-      search(query, mPage.getSubSelector(selectorOption, selectedKey));
-      for (final Object key : selectorOption.getEnumConstants()) {
-        final EnumOption<?> subSelector = mPage.getSubSelector(selectorOption, key);
-        search(query, subSelector);
-      }
-    } else {
-      final OptionListPanel selectedPane = getOptionListPanel(selectorOption, selectedKey);
-      selectedPane.search(query);
-      for (final Object key : selectorOption.getEnumConstants()) {
-        final OptionListPanel pane = getOptionListPanel(selectorOption, key);
-        pane.search(query);
-      }
-    }
-  }
-
-  @Override
-  public boolean selectOption(final OptionPanel<?> panel)
-  {
-    return selectOption(panel, mPage.getTopSelectorOption());
-  }
-
-  public boolean selectOption(final OptionPanel<?> panel,
-                              final EnumOption<?> selectorOption)
-  {
-    final JComboBox<Object> comboBox = mComboBoxes.get(selectorOption);
-    final Object selectedKey = comboBox.getSelectedItem();
-    if (hasSubselectors(selectorOption)) {
-      if (selectOption(panel, mPage.getSubSelector(selectorOption, selectedKey))) {
-        comboBox.setSelectedItem(selectedKey);
+    final EnumOption<?> subSelectorOption =
+      mPage.getSubSelectorOption(selectorOption, key);
+    if (subSelectorOption == null) {
+      final OptionListPanel panel = mPanelMap.get(key);
+      if (panel.selectOption(option)) {
         return true;
       }
-      for (final Object key : selectorOption.getEnumConstants()) {
-        if (selectOption(panel, mPage.getSubSelector(selectorOption, key))) {
-          comboBox.setSelectedItem(key);
-          return true;
-        }
-      }
     } else {
-      final OptionListPanel selectedPane = getOptionListPanel(selectorOption, selectedKey);
-      if (selectedPane.selectOption(panel)) {
-        comboBox.setSelectedItem(selectedKey);
+      if (selectOption(option, subSelectorOption)) {
         return true;
       }
-      for (final Object key : selectorOption.getEnumConstants()) {
-        final OptionListPanel pane = getOptionListPanel(selectorOption, key);
-        if (pane.selectOption(panel)) {
-          comboBox.setSelectedItem(key);
-          return true;
-        }
-      }
-
     }
     return false;
   }
 
-  public Object getSelectedValue() {
-    EnumOption<?> selectorOption = mPage.getTopSelectorOption();
-    while (true) {
-      final JComboBox<?> comboBox = mComboBoxes.get(selectorOption);
-      final Object key = comboBox.getSelectedItem();
-      selectorOption = mPage.getSubSelector(selectorOption, key);
-      if (selectorOption == null) return key;
-    }
-  }
 
-  public List<Option<?>> getSelectedOptions() {
-    EnumOption<?> selectorOption = mPage.getTopSelectorOption();
-    while (true) {
-      final JComboBox<?> comboBox = mComboBoxes.get(selectorOption);
-      final Object key = comboBox.getSelectedItem();
-      final EnumOption<?> subSelectorOption =
-        mPage.getSubSelector(selectorOption, key);
-      if (subSelectorOption == null) {
-        return mPage.getOptionsForSelector(selectorOption, key);
-      }
-      else selectorOption = mPage.getSubSelector(selectorOption, key);
-    }
-  }
-
-  @Override
-  public void revalidate()
+  //#########################################################################
+  //# Inner Class ComboBoxHandler
+  private class ComboBoxHandler<T>
+    extends DefaultListCellRenderer
+    implements ActionListener
   {
-    super.revalidate();
-    final Component parent = getParent();
-    if (parent != null) parent.revalidate();
-  }
-
-  public void setSelectionChangedListener(final SelectionChangedListener listener) {
-    mSelectionChangedListener = listener;
-  }
-
-
-  private class ComboboxToolTipRenderer extends DefaultListCellRenderer
-  {
-
-    public ComboboxToolTipRenderer(final EnumOption<?> selectorOption, final int toolTipWidth)
+    //#######################################################################
+    //# Constructor
+    private ComboBoxHandler(final EnumOption<T> option)
     {
-      super();
-      mSelectorOption = selectorOption;
-      mToolTipWidth = toolTipWidth;
+      mOption = option;
+      final Vector<T> values = new Vector<>(option.getEnumConstants());
+      if (mContext.getWatersAnalyzerPanel() != null) {
+        values.remove(ModelAnalyzerFactoryLoader.Disabled);
+      }
+      mComboBox = new JComboBox<>(values);
+      final T value = option.getValue();
+      mComboBox.setSelectedItem(value);
+      mComboBox.setRenderer(this);
+      mComboBox.addActionListener(this);
     }
 
+    //#######################################################################
+    //# Access
+    private JComboBox<T> getComboBox()
+    {
+      return mComboBox;
+    }
+
+    private void commit()
+    {
+      final T value = getSelectedItem();
+      mOption.setValue(value);
+    }
+
+    private T getSelectedItem()
+    {
+      final int index = mComboBox.getSelectedIndex();
+      return mComboBox.getItemAt(index);
+    }
+
+    private void setSelectedItem(final Object key)
+    {
+      mComboBox.setSelectedItem(key);
+    }
+
+    //#######################################################################
+    //# Interface java.awt.ActionListener
+    @Override
+    public void actionPerformed(final ActionEvent e)
+    {
+      recreateComponents();
+    }
+
+    //#######################################################################
+    //# Overrides for javax.swing.DefaultListCellRenderer
     @Override
     public Component getListCellRendererComponent(final JList<?> list,
                                                   final Object value,
@@ -412,37 +437,44 @@ public class OptionGroupPanel extends JPanel
                                                   final boolean cellHasFocus)
     {
       if (value != null) {
-
-        final String text = mSelectorOption.getDescription(value);
-
-        if (text != null && text.length() != 0) {
-          final String htmlText = "<html><p width=" + mToolTipWidth + ">"
-            + text + "</p></html>";
-
+        final String description = mPage.getDescription(value);
+        if (description != null && description.length() > 0) {
+          final int width = Math.round
+            (0.75f * PREFERRED_WIDTH * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+          final String htmlText = getHTMLText(description, width, true);
           list.setToolTipText(htmlText);
+        } else {
+          list.setToolTipText(null);
         }
-        else list.setToolTipText(null);
       }
       return super.getListCellRendererComponent(list, value, index,
                                                 isSelected, cellHasFocus);
     }
 
-    private final int mToolTipWidth;
-    private final EnumOption<?> mSelectorOption;
+    //#######################################################################
+    //# Data Members
+    private final EnumOption<T> mOption;
+    private final JComboBox<T> mComboBox;
 
+    //#######################################################################
+    //# Class Constants
     private static final long serialVersionUID = -3041815919444247332L;
   }
 
-  public interface SelectionChangedListener
-  {
-    public void selectionChanged();
-  }
 
-  private final SelectorLeafOptionPage mPage;
-  private final Map<EnumOption<?>, Map<Object, OptionListPanel>> mOptionPanes;
-  private final Map<EnumOption<?>, JComboBox<Object>> mComboBoxes;
-  private SelectionChangedListener mSelectionChangedListener;
+  //#########################################################################
+  //# Data Members
+  private final GUIOptionContext mContext;
+  private final SelectorLeafOptionPage<S> mPage;
+  private final Map<EnumOption<?>,ComboBoxHandler<?>> mComboBoxMap;
+  private final Map<S,OptionListPanel> mPanelMap;
+  private JTextPane mDescriptionTextPane;
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -6276738004584574667L;
+
+  private static final int PREFERRED_WIDTH = 480;
 
 }

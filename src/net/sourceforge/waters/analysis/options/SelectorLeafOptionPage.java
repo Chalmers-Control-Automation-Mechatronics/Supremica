@@ -33,18 +33,40 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
- * An option page that can display different options depending on one or
- * more selectors. This is used to allow the user to switch between
- * different algorithms and see only the relevant options.
+ * <P>An option page that can display different options depending on one or
+ * more selectors.</P>
+ *
+ * <P>The selector leaf option page contains a pool of registered options.
+ * One or more of these options may be classified as selectors and used
+ * to select a subset of the options to be displayed. The selector leaf
+ * option page makes it possible to identify a subset of relevant options
+ * depending on the values of the selectors. It is left to option page
+ * editors to query and display the correct subsets.</P>
+ *
+ * <P>The selector options are structured to form a tree of choices,
+ * whose root is the top selector option ({@link #getTopSelectorOption()}).
+ * Associated with each possible value of a selector option is either
+ * a sub-selector option ({@link #getSubSelectorOption(EnumOption, Object)
+ * getSubSelectorOption()})---another selector option with more choices,
+ * or a subset of options to be displayed ({@link #collectOptions(Collection,
+ * EnumOption) collectOptions()}).</P>
+ *
+ * <P>The type parameter S is the type of the values of the last options
+ * in the sequence of selectors, which is used to select to option
+ * subsets.</P>
  *
  * @author Benjamin Wheeler
  */
-public abstract class SelectorLeafOptionPage extends LeafOptionPage
+
+public abstract class SelectorLeafOptionPage<S> extends LeafOptionPage
 {
 
   //#########################################################################
@@ -59,17 +81,25 @@ public abstract class SelectorLeafOptionPage extends LeafOptionPage
   //# Hooks
   public abstract EnumOption<?> getTopSelectorOption();
 
-  public abstract EnumOption<?> getSubSelector
-    (final EnumOption<?> selectorOption, final Object key);
+  public EnumOption<?> getSubSelectorOption(final EnumOption<?> parent,
+                                            final Object value)
+  {
+    return null;
+  }
 
-  public abstract List<Option<?>> getOptionsForSelector
-    (final EnumOption<?> selectorOption, final Object key);
+  public String getDescription(final Object key)
+  {
+    return null;
+  }
+
+  public abstract void collectOptions(final Collection<Option<?>> options,
+                                      S key);
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
   @Override
-  public OptionPageEditor<SelectorLeafOptionPage> createEditor
+  public OptionPageEditor<SelectorLeafOptionPage<S>> createEditor
     (final OptionContext context)
   {
     return context.createSelectorLeafOptionPageEditor(this);
@@ -81,27 +111,56 @@ public abstract class SelectorLeafOptionPage extends LeafOptionPage
   @Override
   public List<Option<?>> getOptions()
   {
-    final List<Option<?>> options = new LinkedList<>();
-    final EnumOption<?> selectorOption = getTopSelectorOption();
-    addOptions(options, selectorOption);
-    return options.stream().distinct().collect(Collectors.toList());
+    final Collection<Option<?>> options = new LinkedHashSet<>();
+    final EnumOption<?> top = getTopSelectorOption();
+    collectOptions(options, top);
+    return new ArrayList<>(options);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void addOptions(final List<Option<?>> options,
-                          final EnumOption<?> selectorOption)
+  public List<Option<?>> getCurrentOptions()
   {
-    options.add(selectorOption);
-    for (final Object key : selectorOption.getEnumConstants()) {
-      final EnumOption<?> subSelectorOption =
-        getSubSelector(selectorOption, key);
-      if (subSelectorOption != null) {
-        addOptions(options, subSelectorOption);
+    final EnumOption<S> selector = getCurrentPageSelectorOption();
+    final S key = selector.getValue();
+    return getOptions(key);
+  }
+
+  public List<Option<?>> getOptions(final S key)
+  {
+    final List<Option<?>> options = new LinkedList<>();
+    collectOptions(options, key);
+    return options;
+  }
+
+  public void collectOptions(final Collection<Option<?>> options,
+                             final EnumOption<?> selector)
+  {
+    options.add(selector);
+    for (final Object key : selector.getEnumConstants()) {
+      final EnumOption<?> subSelector = getSubSelectorOption(selector, key);
+      if (subSelector != null) {
+        collectOptions(options, subSelector);
       } else {
-        options.addAll(getOptionsForSelector(selectorOption, key));
+        @SuppressWarnings("unchecked")
+        final S typedKey = (S) key;
+        collectOptions(options, typedKey);
       }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public EnumOption<S> getCurrentPageSelectorOption()
+  {
+    EnumOption<?> parent = getTopSelectorOption();
+    while (true) {
+      final Object value = parent.getValue();
+      final EnumOption<?> next = getSubSelectorOption(parent, value);
+      if (next == null) {
+        return (EnumOption<S>) parent;
+      }
+      parent = next;
     }
   }
 

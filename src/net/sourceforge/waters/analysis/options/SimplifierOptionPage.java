@@ -35,51 +35,115 @@ package net.sourceforge.waters.analysis.options;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+
 /**
+ * <P>An option page to configure a transition relation simplifier.</P>
+ *
+ * <P>The simplifier option page has two selector option to select a family
+ * of simplifiers and then a specific {@link TransitionRelationSimplifier}.
+ * Each choice leads to the set of options to configure the corresponding
+ * {@link TransitionRelationSimplifier}.</P>
  *
  * @author Benjamin Wheeler
  */
-public class SimplifierOptionPage extends SelectorLeafOptionPage
+
+public class SimplifierOptionPage
+  extends SelectorLeafOptionPage<AutomatonSimplifierCreator>
 {
 
-  protected SimplifierOptionPage(final String prefix, final String title,
-                                 final String...classNames)
+  //#########################################################################
+  //# Constructor
+  protected SimplifierOptionPage(final String prefix,
+                                 final String title,
+                                 final String... classNames)
   {
     super(prefix, title);
     mCreatorOptionMap = new HashMap<>();
-    mCreatorOptions = new LinkedList<>();
     final List<AutomatonSimplifierFactory> factories =
       getFamilies(classNames);
     mFamilyOption = new EnumOption<AutomatonSimplifierFactory>
-      (prefix + ".FamilySelector", "Family", factories, null); //TODO
+      (prefix + ".FamilySelector", "Family", factories);
     register(mFamilyOption);
     for (final AutomatonSimplifierFactory factory : factories) {
       final List<AutomatonSimplifierCreator> creators =
         factory.getSimplifierCreators();
-      final SimplifierCreatorOption creatorOption =
-        new SimplifierCreatorOption(prefix+".SimplifierSelector."+factory,
-                                    creators, null);//TODO
-      addCreatorOption(creatorOption, factory);
+      final EnumOption<AutomatonSimplifierCreator> creatorOption =
+        new EnumOption<AutomatonSimplifierCreator>
+          (prefix + ".SimplifierSelector." + factory, "Simplifier", creators);
+      mCreatorOptionMap.put(factory, creatorOption);
+      register(creatorOption);
     }
   }
 
 
-  private List<AutomatonSimplifierFactory>
-    getFamilies(final String... classNames)
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
+  @Override
+  public EnumOption<AutomatonSimplifierFactory> getTopSelectorOption()
   {
+    return mFamilyOption;
+  }
 
-    final List<AutomatonSimplifierFactory> families = new LinkedList<>();
+  @Override
+  public EnumOption<AutomatonSimplifierCreator>
+  getSubSelectorOption(final EnumOption<?> parent, final Object value)
+  {
+    if (parent == mFamilyOption) {
+      return mCreatorOptionMap.get(value);
+    } else {
+      return null;
+    }
+  }
 
+  @Override
+  public void collectOptions(final Collection<Option<?>> options,
+                             final AutomatonSimplifierCreator creator)
+  {
+    for (final Option<?> option : creator.getOptions(this)) {
+      options.add(option);
+    }
+    final AutomatonBuilder builder = creator.createBuilder
+      (ProductDESElementFactory.getInstance());
+    for (final Option<?> option : builder.getOptions(this)) {
+      options.add(option);
+    }
+    options.add(get(AutomatonSimplifierFactory.
+                    OPTION_AutomatonSimplifierFactory_KeepOriginal));
+  }
+
+  @Override
+  public String getDescription(final Object key)
+  {
+    if (key instanceof AutomatonSimplifierCreator) {
+      final AutomatonSimplifierCreator creator =
+        (AutomatonSimplifierCreator) key;
+      return creator.getDescription();
+    } else {
+      return null;
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private List<AutomatonSimplifierFactory> getFamilies
+    (final String... classNames)
+  {
+    final List<AutomatonSimplifierFactory> families =
+      new ArrayList<>(classNames.length);
     for (final String className : classNames) {
       try {
         final ClassLoader loader = getClass().getClassLoader();
@@ -100,75 +164,14 @@ public class SimplifierOptionPage extends SelectorLeafOptionPage
         // skip this factory
       }
     }
-
     return families;
-
-  }
-
-  private void addOptions(final List<Option<?>> options,
-                          final AutomatonSimplifierCreator creator)
-  {
-    for (final Option<?> option : creator.getOptions(this)) {
-      //Get the option instance known by this OptionPage
-      final Option<?> optionInstance = get(option.getID());
-      options.add(optionInstance);
-    }
-    final AutomatonBuilder builder = creator.createBuilder
-      (ProductDESElementFactory.getInstance());
-    for (final Option<?> option : builder.getOptions(this)) {
-      //Get the option instance known by this OptionPage
-      final Option<?> optionInstance = get(option.getID());
-      options.add(optionInstance);
-    }
-  }
-
-  private void addCreatorOption(final SimplifierCreatorOption creatorOption,
-                                final AutomatonSimplifierFactory factory)
-  {
-    mCreatorOptionMap.put(factory, creatorOption);
-    mCreatorOptions.add(creatorOption);
-    register(creatorOption);
-  }
-
-  @Override
-  public List<Option<?>> getOptionsForSelector
-    (final EnumOption<?> selectorOption, final Object key)
-  {
-    final List<Option<?>> options = new LinkedList<>();
-    addOptions(options, (AutomatonSimplifierCreator) key);
-    options.add(get(AutomatonSimplifierFactory.
-                    OPTION_AutomatonSimplifierFactory_KeepOriginal));
-    return options;
   }
 
 
-  @Override
-  public EnumOption<?> getTopSelectorOption()
-  {
-    return mFamilyOption;
-  }
-
-  public List<EnumOption<?>> getSubSelectors
-    (final EnumOption<?> selectorOption)
-  {
-    if (selectorOption == mFamilyOption) return mCreatorOptions;
-    else return null;
-  }
-
-  @Override
-  public EnumOption<?> getSubSelector
-    (final EnumOption<?> selectorOption, final Object key)
-  {
-    if (selectorOption == mFamilyOption
-      && key instanceof AutomatonSimplifierFactory) {
-      return mCreatorOptionMap.get(key);
-    }
-    else return null;
-  }
-
+  //#########################################################################
+  //# Data Members
   private final EnumOption<AutomatonSimplifierFactory> mFamilyOption;
-  private final Map<AutomatonSimplifierFactory, SimplifierCreatorOption>
+  private final Map<AutomatonSimplifierFactory,EnumOption<AutomatonSimplifierCreator>>
     mCreatorOptionMap;
-  private final List<EnumOption<?>> mCreatorOptions;
 
 }

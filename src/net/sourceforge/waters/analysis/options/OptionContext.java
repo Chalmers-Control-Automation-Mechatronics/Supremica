@@ -152,8 +152,8 @@ public interface OptionContext
   /**
    * Creates an option editor for a selector leaf option page.
    */
-  public OptionPageEditor<SelectorLeafOptionPage>
-  createSelectorLeafOptionPageEditor(SelectorLeafOptionPage page);
+  public <S> OptionPageEditor<SelectorLeafOptionPage<S>>
+  createSelectorLeafOptionPageEditor(SelectorLeafOptionPage<S> page);
 
   /**
    * Creates an option editor for a string aggregator option page.

@@ -172,13 +172,12 @@ public abstract class OptionPage
   public static final AnalysisOptionPage Synthesis =
     new AnalysisOptionPage(AnalysisOperation.SUPERVISOR_SYNTHESIZER);
 
-  public static final SelectorLeafOptionPage Simplifier = new SimplifierOptionPage
+  public static final SimplifierOptionPage Simplifier = new SimplifierOptionPage
     ("waters.analysis.simplification",
      "Simplifiers",
      StepSimplifierFactory.class.getName(),
      "org.supremica.automata.waters.SupremicaSimplifierFactory",
      ChainSimplifierFactory.class.getName());
-
 
 
   private static final AggregatorOptionPage[] TOP_LEVEL_AGGREGATORS =

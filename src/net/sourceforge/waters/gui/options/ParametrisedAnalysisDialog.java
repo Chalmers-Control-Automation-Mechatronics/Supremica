@@ -91,17 +91,9 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mGroupPanel = (OptionGroupPanel) getOptionPage().createEditor(mContext);
+    mGroupPanel = (OptionGroupPanel<ModelAnalyzerFactoryLoader>)
+      getOptionPage().createEditor(mContext);
     add(mGroupPanel, constraints);
-    mGroupPanel.setSelectionChangedListener
-      (new OptionGroupPanel.SelectionChangedListener() {
-      @Override
-      public void selectionChanged()
-      {
-        updateModelAnalyzer();
-        pack();
-      }
-    });
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -171,22 +163,14 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
 
   //#########################################################################
   //# Auxiliary Methods
-  private ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
-  {
-    final AnalysisOptionPage page = getOptionPage();
-    final AnalysisOperation operation = page.getAnalysisOperation();
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return operation.createModelAnalyzer(factory, desFactory);
-  }
-
   private void commitDialog()
   {
     final IDE ide = mContext.getIDE();
     final FocusTracker tracker = ide.getFocusTracker();
     if (tracker.shouldYieldFocus(this)) {
       mGroupPanel.commitOptions();
-      for (final Option<?> option : mGroupPanel.getSelectedOptions()) {
+      updateModelAnalyzer();
+      for (final Option<?> option : getOptionPage().getCurrentOptions()) {
         mCurrentModelAnalyzer.setOption(option);
       }
       final ProductDESProxy des = mContext.getProductDES();
@@ -202,7 +186,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
   {
     try {
       final ModelAnalyzerFactoryLoader loader =
-        (ModelAnalyzerFactoryLoader) mGroupPanel.getSelectedValue();
+        mGroupPanel.getSelectedValue();
       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
       mCurrentModelAnalyzer = createAnalyzer(factory);
     } catch (ClassNotFoundException |
@@ -211,11 +195,20 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     }
   }
 
+  private ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
+  {
+    final AnalysisOptionPage page = getOptionPage();
+    final AnalysisOperation operation = page.getAnalysisOperation();
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return operation.createModelAnalyzer(factory, desFactory);
+  }
+
 
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final OptionGroupPanel mGroupPanel;
+  private final OptionGroupPanel<ModelAnalyzerFactoryLoader> mGroupPanel;
   private ModelAnalyzer mCurrentModelAnalyzer;
 
 

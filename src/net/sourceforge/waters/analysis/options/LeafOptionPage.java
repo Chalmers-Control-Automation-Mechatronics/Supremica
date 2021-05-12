@@ -84,12 +84,16 @@ public abstract class LeafOptionPage extends OptionPage
 
 
   //#########################################################################
-  //# Specific Access
+  //# Hooks
   public String getShortName()
   {
     return null;
   }
 
+  /**
+   * Gets a list of all registered options in this option page, in an order
+   * suitable for writing to a properties file.
+   */
   public abstract List<Option<?>> getOptions();
 
 

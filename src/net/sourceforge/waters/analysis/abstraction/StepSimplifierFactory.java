@@ -56,7 +56,6 @@ public class StepSimplifierFactory extends TRSimplifierFactory
   //# Constructor
   private StepSimplifierFactory()
   {
-    super();
   }
 
   @Override
@@ -64,6 +63,7 @@ public class StepSimplifierFactory extends TRSimplifierFactory
   {
     return "Waters Simplifier Steps";
   }
+
 
   //#########################################################################
   //# Options
@@ -143,17 +143,11 @@ public class StepSimplifierFactory extends TRSimplifierFactory
       super(name, description);
     }
 
-    /**
-     * Creates a tool to be used by the given model analyser.
-     */
     @Override
     public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory) {
       return new TRAutomatonBuilder(factory, createTRSimplifier());
     }
 
-    /**
-     * Creates a tool to be used by the given model analyser.
-     */
     protected abstract TransitionRelationSimplifier createTRSimplifier();
 
   }

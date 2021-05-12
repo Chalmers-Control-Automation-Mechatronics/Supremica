@@ -185,7 +185,8 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionPageEditor<SelectorLeafOptionPage> createSelectorLeafOptionPageEditor(final SelectorLeafOptionPage page)
+  public <S> OptionPageEditor<SelectorLeafOptionPage<S>>
+  createSelectorLeafOptionPageEditor(final SelectorLeafOptionPage<S> page)
   {
     return null;
   }

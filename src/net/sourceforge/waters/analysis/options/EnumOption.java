@@ -64,10 +64,18 @@ public class EnumOption<E> extends Option<E>
 
   public EnumOption(final String id,
                     final String name,
+                    final List<E> enumConstants)
+  {
+    this(id, name, enumConstants, enumConstants.get(0));
+  }
+
+  public EnumOption(final String id,
+                    final String name,
                     final List<E> enumConstants,
                     final E defaultValue)
   {
     super(id, name, null, null, defaultValue);
+    assert enumConstants.contains(defaultValue);
     mEnumConstants = enumConstants;
   }
 
@@ -98,11 +106,6 @@ public class EnumOption<E> extends Option<E>
   public List<? extends E> getEnumConstants()
   {
     return mEnumConstants;
-  }
-
-  public String getDescription(final Object selectedItem)
-  {
-    return null;
   }
 
 

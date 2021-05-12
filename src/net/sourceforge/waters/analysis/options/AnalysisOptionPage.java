@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,15 +46,25 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+
 /**
+ * <P>An option page to configure an analysis algorithm.</P>
+ *
+ * <P>The analysis option page is associated with a given analysis task,
+ * e.g., conflict check. It consists of a single selector option to
+ * choose a {@link ModelAnalyzerFactory}, which each choice leading
+ * to the set of options to configure the algorithm provided by the
+ * corresponding factory.</P>
  *
  * @author Benjamin Wheeler
  */
-public class AnalysisOptionPage extends SelectorLeafOptionPage
+
+public class AnalysisOptionPage
+  extends SelectorLeafOptionPage<ModelAnalyzerFactoryLoader>
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public AnalysisOptionPage(final AnalysisOperation operation)
   {
     this(operation, false);
@@ -84,26 +95,8 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
-  @Override
-  public String getShortName()
-  {
-    return mOperation.getAnalysisName();
-  }
-
-
-  //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
-  @Override
-  public List<Option<?>> getOptionsForSelector
-    (final EnumOption<?> selectorOption, final Object key)
-  {
-    final List<Option<?>> options = new LinkedList<>();
-    addOptions(options, (ModelAnalyzerFactoryLoader) key);
-    return options;
-  }
-
   @Override
   public EnumOption<ModelAnalyzerFactoryLoader> getTopSelectorOption()
   {
@@ -111,10 +104,32 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
   }
 
   @Override
-  public EnumOption<?> getSubSelector
-    (final EnumOption<?> selectorOption, final Object key)
+  public void collectOptions(final Collection<Option<?>> options,
+                             final ModelAnalyzerFactoryLoader loader)
   {
-    return null;
+    if (loader != ModelAnalyzerFactoryLoader.Disabled) {
+      try {
+        final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+        final ProductDESProxyFactory desFactory =
+          ProductDESElementFactory.getInstance();
+        final ModelAnalyzer analyzer =
+          mOperation.createModelAnalyzer(factory, desFactory);
+        final List<Option<?>> analyzerOptions = analyzer.getOptions(this);
+        options.addAll(analyzerOptions);
+      } catch (AnalysisConfigurationException |
+               ClassNotFoundException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+  @Override
+  public String getShortName()
+  {
+    return mOperation.getAnalysisName();
   }
 
 
@@ -149,27 +164,6 @@ public class AnalysisOptionPage extends SelectorLeafOptionPage
       }
     }
     return loaders;
-  }
-
-  private void addOptions(final List<Option<?>> options,
-                          final ModelAnalyzerFactoryLoader loader)
-  {
-    if (loader != ModelAnalyzerFactoryLoader.Disabled) {
-      try {
-        final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-        final ProductDESProxyFactory desFactory =
-          ProductDESElementFactory.getInstance();
-        final ModelAnalyzer analyzer =
-          mOperation.createModelAnalyzer(factory, desFactory);
-        for (final Option<?> option : analyzer.getOptions(this)) {
-          final Option<?> optionInstance = get(option.getID());
-          options.add(optionInstance);
-        }
-      } catch (AnalysisConfigurationException |
-               ClassNotFoundException exception) {
-        throw new WatersRuntimeException(exception);
-      }
-    }
   }
 
 

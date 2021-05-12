@@ -51,7 +51,7 @@ import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
+import net.sourceforge.waters.analysis.options.SimplifierOptionPage;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -98,16 +98,9 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mGroupPanel = (OptionGroupPanel) OptionPage.Simplifier.createEditor(mContext);
+    mGroupPanel = (OptionGroupPanel<AutomatonSimplifierCreator>)
+      OptionPage.Simplifier.createEditor(mContext);
     add(mGroupPanel, constraints);
-    mGroupPanel.setSelectionChangedListener
-      (new OptionGroupPanel.SelectionChangedListener() {
-      @Override
-      public void selectionChanged()
-      {
-        pack();
-      }
-    });
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -181,13 +174,12 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
       final ProductDESProxyFactory factory =
         mContext.getProductDESProxyFactory();
-      final AutomatonSimplifierCreator creator =
-        (AutomatonSimplifierCreator) mGroupPanel.getSelectedValue();
 
       final FocusTracker tracker = ide.getFocusTracker();
       if (tracker.shouldYieldFocus(this)) {
         mGroupPanel.commitOptions();
-
+        final AutomatonSimplifierCreator creator =
+          mGroupPanel.getSelectedValue();
         final AutomatonBuilder builder = creator.createBuilder(factory);
         builder.setModel(aut);
 
@@ -202,7 +194,8 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
           builder.setOutputName(aut.getName());
         }
 
-        for (final Option<?> option : mGroupPanel.getSelectedOptions()) {
+        for (final Option<?> option :
+             OptionPage.Simplifier.getCurrentOptions()) {
           builder.setOption(option);
         }
         builder.run();
@@ -231,8 +224,8 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final OptionGroupPanel mGroupPanel;
-  private final SelectorLeafOptionPage mPage;
+  private final OptionGroupPanel<AutomatonSimplifierCreator> mGroupPanel;
+  private final SimplifierOptionPage mPage;
 
 
   //#########################################################################
