@@ -651,10 +651,12 @@ public class AutomataTable extends JTable implements SelectionOwner
       final JLabel cell =
         (JLabel) super.getTableCellRendererComponent(table, value, selected,
                                                      false, row, column);
-      final ComponentKind kind = (ComponentKind) value;
-      final Icon icon = ModuleContext.getComponentKindIcon(kind);
-      cell.setIcon(icon);
-      cell.setText(null);
+      if (value != null) {
+        final ComponentKind kind = (ComponentKind) value;
+        final Icon icon = ModuleContext.getComponentKindIcon(kind);
+        cell.setIcon(icon);
+        cell.setText(null);
+      }
       return cell;
     }
 
