@@ -33,12 +33,7 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -48,7 +43,6 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
@@ -57,141 +51,120 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  * @author Robi Malik
  */
 
-public class ChainedAnalyzerOption extends EnumOption<ChainedAnalyzerFactory>
+public class ChainedAnalyzerOption
+  extends EnumOption<ModelAnalyzerFactoryLoader>
 {
 
   //#########################################################################
-  //# Constructor
-  public ChainedAnalyzerOption(final String id,
-                               final String shortName,
-                               final String description,
-                               final String commandLineOption,
-                               final AnalysisOptionPage parentPage,
-                               final ModelAnalyzerFactoryLoader parentLoader,
-                               final Collection<String> overridden)
+  //# Constructors
+  public ChainedAnalyzerOption
+    (final String id,
+     final String shortName,
+     final String description,
+     final AnalysisOptionPage parentPage,
+     final ModelAnalyzerFactoryLoader parentLoader,
+     final Collection<String> overridden)
   {
-    super(id, shortName, description, commandLineOption,
+    super(id, shortName, description, "-chain",
           createEnumFactory(parentPage, parentLoader));
-    mOverriddenIDs = new THashSet<>(overridden);
-    for (final ChainedAnalyzerFactory value : getEnumConstants()) {
-      final OptionPage page = createChainedOptionPage(parentPage, value);
-      value.setOptionPage(page);
-    }
+    mOptionPage = new ChainedAnalyzerOptionPage(parentPage, this, overridden);
+    mParentLoader = parentLoader;
+  }
+
+  private ChainedAnalyzerOption(final ChainedAnalyzerOption template,
+                                final ChainedAnalyzerOptionPage parentPage)
+  {
+    super(template, createEnumFactory(parentPage, template.mParentLoader));
+    mOptionPage =
+      new ChainedAnalyzerOptionPage(parentPage, this, template.mOptionPage);
+    mParentLoader = template.mParentLoader;
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  public ChainedAnalyzerOption clone()
+  {
+    throw new IllegalStateException
+      ("ChainedAnalyzerOption cannot be cloned directly.");
+    // Use clone(ChainedAnalyzerOptionPage) instead
+  }
+
+  @Override
+  public ChainedAnalyzerOption clone(final ChainedAnalyzerOptionPage newParent)
+  {
+    return new ChainedAnalyzerOption(this, newParent);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public ChainedAnalyzerOptionPage getOptionPage()
+  {
+    return mOptionPage;
   }
 
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.options.Option<ModelAnalyzer>
+  //# net.sourceforge.waters.analysis.options.Option<ModelAnalyzerFactoryLoader>
   @Override
-  public OptionEditor<ChainedAnalyzerFactory>
+  public OptionEditor<ModelAnalyzerFactoryLoader>
   createEditor(final OptionContext context)
   {
-    // TODO Auto-generated method stub
-    return null;
+    return context.createChainedAnalyzerEditor(this);
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  public ModelAnalyzer createAndConfigureModelAnalyzer
+    (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
+  {
+    final ModelAnalyzerFactoryLoader loader = getValue();
+    try {
+      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+      final AnalysisOperation operation = mOptionPage.getAnalysisOperation();
+      final ModelAnalyzer analyzer =
+        operation.createModelAnalyzer(factory, desFactory);
+      for (final Option<?> option : analyzer.getOptions(mOptionPage)) {
+        analyzer.setOption(option);
+      }
+      return analyzer;
+    } catch (final ClassNotFoundException exception) {
+      throw new AnalysisConfigurationException
+        ("Could not create chained analyzer for " + loader.toString() +
+         " factory.", exception);
+    }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private static EnumFactory<ChainedAnalyzerFactory>
-  createEnumFactory(final AnalysisOptionPage parentPage,
+  private static EnumFactory<ModelAnalyzerFactoryLoader>
+  createEnumFactory(final SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> parentPage,
                     final ModelAnalyzerFactoryLoader parentLoader)
   {
-    final AnalysisOperation operation = parentPage.getAnalysisOperation();
     final EnumOption<ModelAnalyzerFactoryLoader> selector =
-      parentPage.getTopSelectorOption();
-    final ListedEnumFactory<ChainedAnalyzerFactory> result =
+      parentPage.getCurrentPageSelectorOption();
+    final ListedEnumFactory<ModelAnalyzerFactoryLoader> result =
       new ListedEnumFactory<>();
-    boolean first = true;
-    for (final ModelAnalyzerFactoryLoader loader : selector.getEnumConstants()) {
+    for (final ModelAnalyzerFactoryLoader loader :
+         selector.getEnumConstants()) {
       if (loader != ModelAnalyzerFactoryLoader.Disabled &&
           loader != parentLoader) {
-        final ChainedAnalyzerFactory enumConstant =
-          new ChainedAnalyzerFactory(operation, loader);
-        final boolean isDefault =
-          first || loader == ModelAnalyzerFactoryLoader.DEFAULT;
-        result.register(enumConstant, isDefault);
-        first = false;
+        result.register(loader, loader == ModelAnalyzerFactoryLoader.DEFAULT);
       }
     }
     return result;
   }
 
-  private OptionPage createChainedOptionPage
-    (final OptionPage parent,
-     final ChainedAnalyzerFactory value)
-  {
-    final String name = value.getName();
-    final String prefix = parent.getPrefix() + "." + name;
-    return new ChainedOptionPage(prefix, name);
-  }
-
-
-  //#########################################################################
-  //# Inner Class ChainedOptionPage
-  private class ChainedOptionPage extends LeafOptionPage
-  {
-    //#######################################################################
-    //# Constructor
-    public ChainedOptionPage(final String prefix, final String name)
-    {
-      super(prefix, name);
-      try {
-        final ChainedAnalyzerFactory cFactory = getValue();
-        final ModelAnalyzerFactory aFactory =
-          cFactory.getModelAnalyzerFactory();
-        aFactory.registerOptions(this);
-      } catch (final ClassNotFoundException exception) {
-        // OK, no options then ...
-      }
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
-    @Override
-    public void register(final Option<?> option)
-    {
-      final String id = option.getID();
-      if (!mOverriddenIDs.contains(id)) {
-        super.register(option);
-      }
-    }
-
-    @Override
-    public OptionPageEditor<ChainedOptionPage>
-    createEditor(final OptionContext context)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      try {
-        final ChainedAnalyzerFactory cFactory = getValue();
-        final ModelAnalyzerFactory aFactory =
-          cFactory.getModelAnalyzerFactory();
-        final AnalysisOperation operation = cFactory.getAnalysisOperation();
-        final ProductDESProxyFactory desFactory =
-          ProductDESElementFactory.getInstance();
-        final ModelAnalyzer analyzer =
-          operation.createModelAnalyzer(aFactory, desFactory);
-        assert analyzer != null;
-        return analyzer.getOptions(this);
-      } catch (AnalysisConfigurationException |
-               ClassNotFoundException exception) {
-        return Collections.emptyList();
-      }
-    }
-  }
-
 
   //#########################################################################
   //# Data Members
-  private final Set<String> mOverriddenIDs;
+  private final ChainedAnalyzerOptionPage mOptionPage;
+  private final ModelAnalyzerFactoryLoader mParentLoader;
 
 }

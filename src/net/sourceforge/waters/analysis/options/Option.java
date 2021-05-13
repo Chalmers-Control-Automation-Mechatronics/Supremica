@@ -82,18 +82,34 @@ public abstract class Option<T> implements Cloneable
     mDefaultValue = mValue = defaultValue;
   }
 
+  protected Option(final Option<T> template, final T defaultValue)
+  {
+    mID = template.mID;
+    mShortName = template.mShortName;
+    mDescription = template.mDescription;
+    mCommandLineOption = template.mCommandLineOption;
+    mDefaultValue = mValue = defaultValue;
+  }
+
 
   //#########################################################################
   //# Interface java.lang.Cloneable
   @Override
-  @SuppressWarnings("unchecked")
   public Option<T> clone()
   {
     try {
-      return (Option<T>) super.clone();
+      @SuppressWarnings("unchecked")
+      final Option<T> cloned = (Option<T>) super.clone();
+      cloned.mListeners = null;
+      return cloned;
     } catch (final CloneNotSupportedException exception) {
       throw new WatersRuntimeException(exception);
     }
+  }
+
+  public Option<T> clone(final ChainedAnalyzerOptionPage newParent)
+  {
+    return clone();
   }
 
 
@@ -156,15 +172,18 @@ public abstract class Option<T> implements Cloneable
     return mCommandLineOption;
   }
 
-  public boolean isPersistent() {
+  public boolean isPersistent()
+  {
     return true;
   }
 
-  public boolean isEditable() {
+  public boolean isEditable()
+  {
     return mEditable;
   }
 
-  public void setEditable(final boolean editable) {
+  public void setEditable(final boolean editable)
+  {
     mEditable = editable;
   }
 
@@ -224,6 +243,9 @@ public abstract class Option<T> implements Cloneable
     return ""+mDefaultValue;
   }
 
+
+  //#########################################################################
+  //# Event Handling
   public void addOptionChangeListener(final OptionChangeListener listener)
   {
     if (mListeners == null) {
@@ -257,7 +279,10 @@ public abstract class Option<T> implements Cloneable
     saveLater();
   }
 
-  private static Method loadSaveMethod() {
+  //#########################################################################
+  //# Loading and Saving
+  private static Method loadSaveMethod()
+  {
     final String className = "org.supremica.properties.SupremicaProperties";
     final String methodName = "savePropertiesLater";
     try {
@@ -273,7 +298,8 @@ public abstract class Option<T> implements Cloneable
     }
   }
 
-  private static void saveLater() {
+  private static void saveLater()
+  {
     try {
       saveMethod.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException

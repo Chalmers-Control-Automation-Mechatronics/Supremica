@@ -76,7 +76,7 @@ public class AnalysisException extends WatersException
    * Constructs a new exception with the specified message and cause.
    */
   public AnalysisException(final String message,
-			   final Throwable cause)
+                           final Throwable cause)
   {
     super(message, cause);
   }

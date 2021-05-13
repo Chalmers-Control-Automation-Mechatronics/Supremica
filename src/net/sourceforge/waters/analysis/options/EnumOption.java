@@ -100,6 +100,13 @@ public class EnumOption<E> extends Option<E>
     mEnumConstants = Arrays.asList(enumConstants);
   }
 
+  public EnumOption(final EnumOption<E> template,
+                    final EnumFactory<? extends E> factory)
+  {
+    super(template, factory.getDefaultValue());
+    mEnumConstants = factory.getEnumConstants();
+  }
+
 
   //#########################################################################
   //# Type-specific Access

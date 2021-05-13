@@ -47,7 +47,7 @@ import java.util.Stack;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.ColorOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.Configurable;
@@ -101,6 +101,19 @@ public class CommandLineOptionContext implements OptionContext
   public OptionEditor<Boolean> createBooleanEditor(final BooleanOption option)
   {
     return new BooleanCommandLineArgument(option);
+  }
+
+  @Override
+  public OptionEditor<ModelAnalyzerFactoryLoader>
+  createChainedAnalyzerEditor(final ChainedAnalyzerOption option)
+  {
+    return createEnumEditor(option);
+  }
+
+  @Override
+  public OptionEditor<Color> createColorEditor(final ColorOption option)
+  {
+    return null;
   }
 
   @Override
@@ -160,18 +173,6 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<Color> createColorEditor(final ColorOption option)
-  {
-    return null;
-  }
-
-  @Override
-  public OptionEditor<ModelAnalyzerFactoryLoader> createChainEditor(final ChainOption option)
-  {
-    return new ChainCommandLineArgument(this, option);
-  }
-
-  @Override
   public OptionPageEditor<SimpleLeafOptionPage> createSimpleLeafOptionPageEditor(final SimpleLeafOptionPage page)
   {
     return null;
@@ -197,7 +198,7 @@ public class CommandLineOptionContext implements OptionContext
     throws AnalysisException
   {
     mDES = des;
-    for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
+    for (final CommandLineArgument<?> arg : mArgumentList) {
       arg.updateContext(this);
     }
   }

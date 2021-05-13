@@ -188,7 +188,7 @@ public class CommandLineToolTest
                     ".*supports the following command line options:",
                     "-fslimit <n>.*",
                     "-opt\\|-nopt.*",
-                    "!1:-quiet\\|-q.*");
+                    "=-quiet\\|-q.*");
   }
 
   public void testUnsupportedOption()
@@ -291,45 +291,46 @@ public class CommandLineToolTest
       output.close();
     }
 
-    final List<Pattern> patterns = new ArrayList<>(outputPatterns.length + 1);
-    final List<AntiPattern> antiPatterns = new ArrayList<>(outputPatterns.length);
+    final List<PatternHandler> patterns =
+      new ArrayList<>(outputPatterns.length + 1);
+    final List<PatternHandler> antiPatterns =
+      new ArrayList<>(outputPatterns.length);
     if (expectedResult != null) {
       final String resultRegex = String.format("%b \\(.*", expectedResult);
-      final Pattern resultPattern = Pattern.compile(resultRegex);
+      final PatternHandler resultPattern = new PatternHandler(resultRegex);
       patterns.add(resultPattern);
     }
     for (final String regex : outputPatterns) {
-      if (regex.startsWith("!")) {
-        final AntiPattern pattern = new AntiPattern(regex);
+      final PatternHandler pattern = new PatternHandler(regex);
+      if (pattern.isAntiPattern()) {
         antiPatterns.add(pattern);
       } else {
-        final Pattern pattern = Pattern.compile(regex);
         patterns.add(pattern);
       }
     }
-    final Iterator<Pattern> iter = patterns.iterator();
-    Pattern pattern = iter.next();
+    final Iterator<PatternHandler> iter = patterns.iterator();
+    PatternHandler pattern = iter.next();
 
     final FileReader reader = new FileReader(logFile);
     final BufferedReader buffered = new BufferedReader(reader);
     try {
       String line;
       while ((line = buffered.readLine()) != null) {
-        for (final AntiPattern anti : antiPatterns) {
+        for (final PatternHandler anti : antiPatterns) {
           if (anti.matches(line)) {
             fail("Unexpected output: " + anti.toString() + "!");
           }
         }
-        if (pattern != null) {
-          final Matcher matcher = pattern.matcher(line);
-          if (matcher.matches()) {
-            if (iter.hasNext()) {
-              pattern = iter.next();
-            } else {
-              pattern = null;
-              if (antiPatterns.isEmpty()) {
-                break;
-              }
+        if (pattern != null && pattern.matches(line)) {
+          if (pattern.isAntiPattern()) {
+            antiPatterns.add(pattern);
+          }
+          if (iter.hasNext()) {
+            pattern = iter.next();
+          } else {
+            pattern = null;
+            if (antiPatterns.isEmpty()) {
+              break;
             }
           }
         }
@@ -344,28 +345,30 @@ public class CommandLineToolTest
 
 
   //#########################################################################
-  //# Inner Class AntiPattern
-  private static class AntiPattern
+  //# Inner Class PatternHandler
+  private static class PatternHandler
   {
     //#######################################################################
     //# Constructor
-    private AntiPattern(final String regex)
+    private PatternHandler(final String regex)
     {
-      assert regex.charAt(0) == '!';
-      int start = 1;
-      while (start < regex.length() &&
-             Character.isDigit(regex.charAt(start))) {
-        start++;
+      final String tail;
+      switch (regex.charAt(0)) {
+      case '>':
+        tail = regex.substring(1);
+        break;
+      case '=':
+        tail = regex.substring(1);
+        mOneOff = true;
+        break;
+      case '!':
+        tail = regex.substring(1);
+        mAnti = true;
+        break;
+      default:
+        tail = regex;
+        break;
       }
-      if (start == 1) {
-        mAllowedMatches = 0;
-      } else {
-        assert regex.charAt(start) == ':';
-        final String digits = regex.substring(1, start);
-        mAllowedMatches = Integer.parseInt(digits);
-        start++;
-      }
-      final String tail = regex.substring(start);
       mPattern = Pattern.compile(tail);
     }
 
@@ -379,23 +382,27 @@ public class CommandLineToolTest
 
     //#######################################################################
     //# Matching
-    boolean matches(final String line)
+    private boolean matches(final String line)
     {
       final Matcher matcher = mPattern.matcher(line);
-      if (!matcher.matches()) {
-        return false;
-      } else if (mAllowedMatches == 0) {
+      if (matcher.matches()) {
+        mAnti |= mOneOff;
         return true;
       } else {
-        mAllowedMatches--;
         return false;
       }
+    }
+
+    private boolean isAntiPattern()
+    {
+      return mAnti;
     }
 
     //#######################################################################
     //# Data Members
     private final Pattern mPattern;
-    private int mAllowedMatches;
+    private boolean mOneOff;
+    private boolean mAnti;
   }
 
 

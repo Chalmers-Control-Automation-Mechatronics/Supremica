@@ -72,6 +72,18 @@ public interface OptionContext
   createBooleanEditor(BooleanOption option);
 
   /**
+   * Creates an option editor for a chained analyser option.
+   */
+  public OptionEditor<ModelAnalyzerFactoryLoader>
+  createChainedAnalyzerEditor(ChainedAnalyzerOption option);
+
+  /**
+   * Creates an option editor for a colour option.
+   */
+  public OptionEditor<Color>
+  createColorEditor(ColorOption option);
+
+  /**
    * Creates an option editor for a component kind option.
    */
   public OptionEditor<ComponentKind>
@@ -124,18 +136,6 @@ public interface OptionContext
    */
   public OptionEditor<List<String>>
   createStringListEditor(StringListOption option);
-
-  /**
-   * Creates an option editor for a color option.
-   */
-  public OptionEditor<Color>
-  createColorEditor(ColorOption option);
-
-  /**
-   * Creates an option editor for a chain option.
-   */
-  public OptionEditor<ModelAnalyzerFactoryLoader>
-  createChainEditor(ChainOption option);
 
   /**
    * Creates an option editor for a simple leaf option page.

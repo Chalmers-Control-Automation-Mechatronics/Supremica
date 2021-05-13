@@ -33,12 +33,13 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.EnumFactory;
-import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -49,44 +50,51 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
- * <P>An option page to configure an analysis algorithm.</P>
+ * <P>An option page to configure a chained model analyser.</P>
  *
- * <P>The analysis option page is associated with a given analysis task,
- * e.g., conflict check. It consists of a single selector option to
- * choose a {@link ModelAnalyzerFactory}, which each choice leading
- * to the set of options to configure the algorithm provided by the
- * corresponding factory.</P>
- *
- * @author Benjamin Wheeler
+ * @author Robi Malik
  */
 
-public class AnalysisOptionPage
+public class ChainedAnalyzerOptionPage
   extends SelectorLeafOptionPage<ModelAnalyzerFactoryLoader>
 {
 
   //#########################################################################
   //# Constructors
-  public AnalysisOptionPage(final AnalysisOperation operation)
+  public ChainedAnalyzerOptionPage
+    (final AnalysisOptionPage parent,
+     final EnumOption<ModelAnalyzerFactoryLoader> selector,
+     final Collection<String> overridden)
   {
-    this(operation, false);
+    super(parent.getPrefix() + "." + selector.getID(),
+          selector.getShortName());
+    mParent = parent;
+    mOperation = parent.getAnalysisOperation();
+    mAlgorithmOption = selector;
+    mOverriddenIDs = new THashSet<>(overridden);
   }
 
-  public AnalysisOptionPage(final AnalysisOperation operation,
-                            final boolean canBeDisabled)
+  public ChainedAnalyzerOptionPage
+    (final ChainedAnalyzerOptionPage parent,
+     final EnumOption<ModelAnalyzerFactoryLoader> selector,
+     final ChainedAnalyzerOptionPage template)
   {
-    super(operation.getOptionPagePrefix(), operation.getAnalysisName());
-    mOperation = operation;
-    mCanBeDisabled = canBeDisabled;
-    final EnumFactory<ModelAnalyzerFactoryLoader> enumFactory =
-      createEnumFactory(operation);
-    mAlgorithmOption = new EnumOption<ModelAnalyzerFactoryLoader>
-      ("Algorithm", "Algorithm", null, null, enumFactory);
-    register(mAlgorithmOption);
+    super(parent.getPrefix() + "." + selector.getID(),
+          selector.getShortName());
+    mParent = parent;
+    mOperation = parent.getAnalysisOperation();
+    mAlgorithmOption = selector;
+    mOverriddenIDs = template.mOverriddenIDs;
   }
 
 
   //#########################################################################
   //# Simple Access
+  public SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> getParent()
+  {
+    return mParent;
+  }
+
   public AnalysisOperation getAnalysisOperation()
   {
     return mOperation;
@@ -106,19 +114,18 @@ public class AnalysisOptionPage
   public void collectOptions(final Collection<Option<?>> options,
                              final ModelAnalyzerFactoryLoader loader)
   {
-    if (loader != ModelAnalyzerFactoryLoader.Disabled) {
-      try {
-        final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-        final ProductDESProxyFactory desFactory =
-          ProductDESElementFactory.getInstance();
-        final ModelAnalyzer analyzer =
-          mOperation.createModelAnalyzer(factory, desFactory);
-        final List<Option<?>> analyzerOptions = analyzer.getOptions(this);
-        options.addAll(analyzerOptions);
-      } catch (AnalysisConfigurationException |
-               ClassNotFoundException exception) {
-        throw new WatersRuntimeException(exception);
-      }
+    try {
+      final AnalysisOperation operation = getAnalysisOperation();
+      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      final ModelAnalyzer analyzer =
+        operation.createModelAnalyzer(factory, desFactory);
+      final List<Option<?>> analyzerOptions = analyzer.getOptions(this);
+      options.addAll(analyzerOptions);
+    } catch (AnalysisConfigurationException |
+             ClassNotFoundException exception) {
+      throw new WatersRuntimeException(exception);
     }
   }
 
@@ -128,55 +135,34 @@ public class AnalysisOptionPage
   @Override
   public String getShortName()
   {
-    return mOperation.getAnalysisName();
+    final AnalysisOperation operation = getAnalysisOperation();
+    return operation.getAnalysisName();
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
-    (final AnalysisOperation operation)
+  @Override
+  public Option<?> get(final String id)
   {
-    final ProductDESProxyFactory desFactory =
-      ProductDESElementFactory.getInstance();
-    final ListedEnumFactory<ModelAnalyzerFactoryLoader> enumFactory =
-      new ListedEnumFactory<>();
-    boolean hasDefault = false;
-    for (final ModelAnalyzerFactoryLoader loader :
-         ModelAnalyzerFactoryLoader.values()) {
-      if (loader == ModelAnalyzerFactoryLoader.Disabled && mCanBeDisabled) {
-        enumFactory.register(loader, true);
-        hasDefault = true;
-      } else {
-        try {
-          final ModelAnalyzerFactory factory =
-            loader.getModelAnalyzerFactory();
-          final ModelAnalyzer analyzer =
-            operation.createModelAnalyzer(factory, desFactory);
-          if (analyzer != null) {
-            enumFactory.register(loader);
-            if (!hasDefault && loader == ModelAnalyzerFactoryLoader.DEFAULT) {
-              enumFactory.setDefaultValue(loader);
-              hasDefault = true;
-            }
-            factory.registerOptions(this);
-          }
-        } catch (ClassNotFoundException |
-                 AnalysisConfigurationException |
-                 UnsatisfiedLinkError |
-                 NoClassDefFoundError exception) {
-          // skip this factory
-        }
-      }
+    final Option<?> option = super.get(id);
+    if (option != null) {
+      return option;
+    } else if (mOverriddenIDs.contains(id)) {
+      return null;
     }
-    return enumFactory;
+    final Option<?> template = mParent.get(id);
+    if (template == null) {
+      return null;
+    }
+    final Option<?> cloned = template.clone(this);
+    register(cloned);
+    return cloned;
   }
 
 
   //#########################################################################
   //# Data Members
+  private final SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> mParent;
   private final AnalysisOperation mOperation;
   private final EnumOption<ModelAnalyzerFactoryLoader> mAlgorithmOption;
-  private final boolean mCanBeDisabled;
+  private final Set<String> mOverriddenIDs;
 
 }

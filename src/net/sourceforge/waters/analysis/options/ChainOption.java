@@ -85,7 +85,7 @@ public class ChainOption extends EnumOption<ModelAnalyzerFactoryLoader>
   @Override
   public OptionEditor<ModelAnalyzerFactoryLoader> createEditor(final OptionContext context)
   {
-    return context.createChainEditor(this);
+    return null;
   }
 
 

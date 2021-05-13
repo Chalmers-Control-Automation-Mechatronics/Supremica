@@ -44,7 +44,7 @@ import javax.swing.Icon;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.ColorOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
@@ -164,6 +164,20 @@ public class GUIOptionContext implements OptionContext
   }
 
   @Override
+  public OptionEditor<ModelAnalyzerFactoryLoader>
+  createChainedAnalyzerEditor(final ChainedAnalyzerOption option)
+  {
+    return createEnumEditor(option);
+  }
+
+  @Override
+  public OptionEditor<Color>
+  createColorEditor(final ColorOption option)
+  {
+    return new ColorOptionPanel(this, option);
+  }
+
+  @Override
   public OptionEditor<ComponentKind>
   createComponentKindEditor(final ComponentKindOption option)
   {
@@ -224,20 +238,6 @@ public class GUIOptionContext implements OptionContext
   createStringListEditor(final StringListOption option)
   {
     return null;
-  }
-
-  @Override
-  public OptionEditor<Color>
-  createColorEditor(final ColorOption option)
-  {
-    return new ColorOptionPanel(this, option);
-  }
-
-  @Override
-  public OptionEditor<ModelAnalyzerFactoryLoader>
-  createChainEditor(final ChainOption option)
-  {
-    return createEnumEditor(option);
   }
 
   @Override

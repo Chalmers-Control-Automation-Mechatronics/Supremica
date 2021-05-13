@@ -46,11 +46,21 @@ public class AnalysisConfigurationException extends AnalysisException {
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new overflow exception with a given message.
+   * Constructs a analysis configuration exception with a given message.
    */
   public AnalysisConfigurationException(final String msg)
   {
     super(msg);
+  }
+
+  /**
+   * Constructs a analysis configuration exception with a given message
+   * and cause.
+   */
+  public AnalysisConfigurationException(final String msg,
+                                        final Throwable cause)
+  {
+    super(msg, cause);
   }
 
 
