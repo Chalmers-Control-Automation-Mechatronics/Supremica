@@ -82,7 +82,7 @@ public class DistributedModelVerifierFactory
              (OPTION_DistributedModelVerifierFactory_Host,
               null,
               "Server to submit job to",
-              "-host", null));
+              "-host", "localhost"));
     db.register(new PositiveIntOption
              (OPTION_DistributedModelVerifierFactory_Port,
               null,

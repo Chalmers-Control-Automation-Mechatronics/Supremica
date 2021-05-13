@@ -239,12 +239,10 @@ public class CommandLineOptionContext implements OptionContext
         System.exit(1);
       }
     }
-    checkRequiredArguments();
   }
 
   public void generateArgumentsFromOptions(final LeafOptionPage page,
-                                           final Configurable source,
-                                           final String... requiredOptions)
+                                           final Configurable source)
   {
     final List<Option<?>> options = source.getOptions(page);
     for (final Option<?> option : options) {
@@ -252,12 +250,6 @@ public class CommandLineOptionContext implements OptionContext
         (CommandLineArgument<?>) option.createEditor(this);
       if (arg == null) {
         continue;
-      }
-      for (final String id : requiredOptions) {
-        if (option.getID().equals(id)) {
-          arg.setRequired(true);
-          break;
-        }
       }
       addArgument(arg);
     }
@@ -305,19 +297,6 @@ public class CommandLineOptionContext implements OptionContext
     for (final CommandLineArgument<?> arg : mArgumentList) {
       if (arg.isUsed()) {
         configurable.setOption(arg.getOption());
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void checkRequiredArguments()
-  {
-    for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
-      if (arg.isRequired() && !arg.isUsed()) {
-        final String msg ="Required argument " + arg.getCommandLineCode() + " not specified!";
-        CommandLineArgument.fail(msg);
       }
     }
   }

@@ -98,16 +98,6 @@ public abstract class CommandLineArgument<T>
     return primary.equals(key);
   }
 
-  public boolean isRequired()
-  {
-    return mRequired;
-  }
-
-  public void setRequired(final boolean required)
-  {
-    mRequired = required;
-  }
-
   public boolean isUsed()
   {
     return mUsed;
@@ -226,7 +216,6 @@ public abstract class CommandLineArgument<T>
   //# Data Members
   private final Option<T> mOption;
   private boolean mUsed;
-  private boolean mRequired;
 
 
   //#########################################################################

@@ -38,7 +38,6 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
-import net.sourceforge.waters.analysis.distributed.DistributedModelVerifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.Configurable;
@@ -159,9 +158,7 @@ public abstract class AbstractModelAnalyzerFactory
   {
     if (configurable instanceof ModelAnalyzer) {
       registerOptions(page);
-      context.generateArgumentsFromOptions(page, configurable,
-                                   DistributedModelVerifierFactory.
-                                     OPTION_DistributedModelVerifierFactory_Host);
+      context.generateArgumentsFromOptions(page, configurable);
       context.addArgument(new EndArgument(context, new BooleanOption
                                           (null, null,
                                            "Treat remaining arguments as file names", "+-", false)));
