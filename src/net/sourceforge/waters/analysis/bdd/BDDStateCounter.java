@@ -33,10 +33,16 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import java.util.List;
+
 import net.sf.javabdd.BDD;
+
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -83,6 +89,18 @@ public class BDDStateCounter
                          final ProductDESProxyFactory factory)
   {
     super(model, IdenticalKindTranslator.getInstance(), factory);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.remove(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelVerifier_DetailedOutputEnabled);
+    return options;
   }
 
 

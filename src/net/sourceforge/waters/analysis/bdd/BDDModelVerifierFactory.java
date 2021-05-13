@@ -160,7 +160,8 @@ public class BDDModelVerifierFactory
               "Initial variable ordering",
               "The strategy to determine the initial ordering of the BDD variables.",
               "-order",
-              VariableOrdering.values()));
+              VariableOrdering.values(),
+              VariableOrdering.FORCE));
   }
 
 
