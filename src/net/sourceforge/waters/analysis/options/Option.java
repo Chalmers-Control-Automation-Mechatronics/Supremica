@@ -151,7 +151,7 @@ public abstract class Option<T> implements Cloneable
    *         (&quot;<CODE>-</CODE>&quot;), which can be used to set
    *         the option through a command line.
    */
-  public String getCommandLineOption()
+  public String getCommandLineCode()
   {
     return mCommandLineOption;
   }

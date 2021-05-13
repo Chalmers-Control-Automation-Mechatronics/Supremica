@@ -45,11 +45,11 @@ public class StringListCommandLineArgument extends CommandLineArgument<List<Stri
 
   //#######################################################################
   //# Constructor
-  public StringListCommandLineArgument(final CommandLineOptionContext context,
-                                       final Option<List<String>> option)
+  public StringListCommandLineArgument(final Option<List<String>> option)
   {
-    super(context, option);
+    super(option);
   }
+
 
   //#######################################################################
   //# Simple Access
@@ -58,6 +58,7 @@ public class StringListCommandLineArgument extends CommandLineArgument<List<Stri
   {
     return "<name>";
   }
+
 
   //#######################################################################
   //# Parsing

@@ -46,8 +46,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
@@ -261,9 +261,9 @@ public class ModuleCompiler extends AbortableCompiler
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, AbstractModelAnalyzerFactory.
-                OPTION_AbstractModelAnalyzerFactory_NoOptimisation);
+                         OPTION_ModuleCompiler_Optimisation);
     page.append(options, AbstractModelAnalyzerFactory.
-                OPTION_AbstractModelAnalyzerFactory_HISCModule);
+                         OPTION_ModuleCompiler_HISCModule);
     return options;
   }
 
@@ -271,12 +271,16 @@ public class ModuleCompiler extends AbortableCompiler
   public void setOption(final Option<?> option)
   {
     if (option.hasID(AbstractModelAnalyzerFactory.
-                     OPTION_AbstractModelAnalyzerFactory_NoOptimisation)) {
-      setOptimizationEnabled(false);
+                     OPTION_ModuleCompiler_Optimisation)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setOptimizationEnabled(boolOption.getBooleanValue());
     } else if (option.hasID(AbstractModelAnalyzerFactory.
-                     OPTION_AbstractModelAnalyzerFactory_HISCModule)) {
-      setHISCCompileMode(HISCCompileMode.HISC_HIGH);
-      setEnabledPropertyNames(null);
+                            OPTION_ModuleCompiler_HISCModule)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      if (boolOption.getBooleanValue()) {
+        setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+        setEnabledPropertyNames(null);
+      }
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_LanguageInclusionChecker_Property)) {
       final StringListOption opt = (StringListOption) option;
@@ -310,18 +314,17 @@ public class ModuleCompiler extends AbortableCompiler
     }
   }
 
+  // TODO Use the regular compiler option page
   public void registerOptions(final OptionPage page) {
-    page.register(new FlagOption
-           (AbstractModelAnalyzerFactory.
-             OPTION_AbstractModelAnalyzerFactory_NoOptimisation, null,
-            "Disable compiler optimisation",
-            "-noopt"));
-    page.register(new FlagOption
-           (AbstractModelAnalyzerFactory.
-             OPTION_AbstractModelAnalyzerFactory_HISCModule, null,
-            "Compile as HISC module, "
-             + "only including interfaces of low levels",
-            "-hisc"));
+    page.register(new BooleanOption
+      (AbstractModelAnalyzerFactory.OPTION_ModuleCompiler_Optimisation, null,
+       "Enable or disable compiler optimisation",
+       "-opt", true));
+    page.register(new BooleanOption
+      (AbstractModelAnalyzerFactory.OPTION_ModuleCompiler_HISCModule, null,
+       "Enable or disable compilation as HISC module, "+
+       "only including interfaces of low levels",
+       "-hisc", false));
   }
 
   @Override

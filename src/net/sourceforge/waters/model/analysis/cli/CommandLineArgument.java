@@ -52,21 +52,21 @@ public abstract class CommandLineArgument<T>
 {
 
   //#########################################################################
-  //# Constructors
-  public CommandLineArgument(final CommandLineOptionContext context,
-                             final Option<T> option)
+  //# Constructor
+  public CommandLineArgument(final Option<T> option)
   {
     mOption = option;
-    mName = option.getCommandLineOption();
   }
 
 
   //#########################################################################
-  //# Interface java.util.Comparable
+  //# Interface java.util.Comparable<CommandLineArgument<?>>
   @Override
   public int compareTo(final CommandLineArgument<?> arg)
   {
-    return mName.compareTo(arg.getName());
+    final String code = getCommandLineCode();
+    final String argCode = arg.getCommandLineCode();
+    return code.compareTo(argCode);
   }
 
 
@@ -81,14 +81,21 @@ public abstract class CommandLineArgument<T>
 
   //#########################################################################
   //# Simple Access
-  public String getName()
+  public String getCommandLineCode()
   {
-    return mName;
+    return mOption.getCommandLineCode();
   }
 
-  public Collection<String> getNames()
+  public Collection<String> getKeys()
   {
-    return Collections.singletonList(mName);
+    final String code = getCommandLineCode();
+    return Collections.singletonList(code);
+  }
+
+  public boolean isPrimaryKey(final String key)
+  {
+    final String primary = getKeys().iterator().next();
+    return primary.equals(key);
   }
 
   public boolean isRequired()
@@ -125,7 +132,7 @@ public abstract class CommandLineArgument<T>
 
   public T getValue()
   {
-    return getOption().getValue();
+    return mOption.getValue();
   }
 
 
@@ -144,9 +151,15 @@ public abstract class CommandLineArgument<T>
 
   //#########################################################################
   //# Printing
+  @Override
+  public String toString()
+  {
+    return getCommandLineCode();
+  }
+
   public void dump(final PrintStream stream)
   {
-    final String name = getName();
+    final String name = getCommandLineCode();
     final String template = getArgumentTemplate();
     stream.print(name);
     int len = name.length();
@@ -204,15 +217,14 @@ public abstract class CommandLineArgument<T>
 
   protected void failMissingValue()
   {
-    fail("No value specified for command line argument "
-      + mName + "!");
+    fail("No value specified for command line argument " +
+         getCommandLineCode() + "!");
   }
 
 
   //#########################################################################
   //# Data Members
   private final Option<T> mOption;
-  private final String mName;
   private boolean mUsed;
   private boolean mRequired;
 

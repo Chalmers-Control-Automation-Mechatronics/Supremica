@@ -132,12 +132,6 @@ public interface OptionContext
   createColorEditor(ColorOption option);
 
   /**
-   * Creates an option editor for a flag option.
-   */
-  public OptionEditor<Boolean>
-  createFlagEditor(FlagOption option);
-
-  /**
    * Creates an option editor for a chain option.
    */
   public OptionEditor<ModelAnalyzerFactoryLoader>

@@ -34,8 +34,8 @@
 package net.sourceforge.waters.analysis.distributed;
 
 import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.StringOption;
@@ -98,11 +98,11 @@ public class DistributedModelVerifierFactory
               null,
               "File to dump job result into",
               "-resultsdump"));
-    db.register(new FlagOption
+    db.register(new BooleanOption
              (OPTION_DistributedModelVerifierFactory_Shutdown,
               null,
               "Shut down the distributed checker after verification",
-              "-shutdown"));
+              "-shutdown", false));
     db.register(new PositiveIntOption
              (OPTION_DistributedModelVerifierFactory_Walltime,
               null,

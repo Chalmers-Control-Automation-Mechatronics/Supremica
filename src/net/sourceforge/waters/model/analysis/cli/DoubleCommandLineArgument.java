@@ -48,10 +48,9 @@ public class DoubleCommandLineArgument extends CommandLineArgument<Double>
 
 //#######################################################################
   //# Constructors
-  public DoubleCommandLineArgument(final CommandLineOptionContext context,
-                                    final Option<Double> option)
+  public DoubleCommandLineArgument(final Option<Double> option)
   {
-    super(context, option);
+    super(option);
   }
 
   //#######################################################################
@@ -79,7 +78,5 @@ public class DoubleCommandLineArgument extends CommandLineArgument<Double>
       failMissingValue();
     }
   }
-
-
 
 }

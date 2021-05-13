@@ -55,7 +55,7 @@ public class ChainCommandLineArgument extends EnumCommandLineArgument<ModelAnaly
   public ChainCommandLineArgument(final CommandLineOptionContext context,
                                   final ChainOption option)
   {
-    super(context, option);
+    super(option);
   }
 
   //#######################################################################

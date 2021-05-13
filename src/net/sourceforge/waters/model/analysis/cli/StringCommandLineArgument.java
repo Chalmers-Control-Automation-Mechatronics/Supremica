@@ -42,11 +42,13 @@ import net.sourceforge.waters.analysis.options.Option;
 public class StringCommandLineArgument extends CommandLineArgument<String>
 {
 
-  public StringCommandLineArgument(final CommandLineOptionContext context,
-                                    final Option<String> option)
+  //#######################################################################
+  //# Constructor
+  public StringCommandLineArgument(final Option<String> option)
   {
-    super(context, option);
+    super(option);
   }
+
 
   //#######################################################################
   //# Simple Access
@@ -55,6 +57,7 @@ public class StringCommandLineArgument extends CommandLineArgument<String>
   {
     return "<name>";
   }
+
 
   //#######################################################################
   //# Parsing
@@ -73,7 +76,5 @@ public class StringCommandLineArgument extends CommandLineArgument<String>
       failMissingValue();
     }
   }
-
-
 
 }

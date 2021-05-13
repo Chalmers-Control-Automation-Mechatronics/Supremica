@@ -47,10 +47,11 @@ import net.sourceforge.waters.analysis.options.Option;
 public class FileCommandLineArgument extends CommandLineArgument<File>
 {
 
-  public FileCommandLineArgument(final CommandLineOptionContext context,
-                                    final Option<File> option)
+  //#######################################################################
+  //# Constructor
+  public FileCommandLineArgument(final Option<File> option)
   {
-    super(context, option);
+    super(option);
   }
 
   //#######################################################################
@@ -78,7 +79,5 @@ public class FileCommandLineArgument extends CommandLineArgument<File>
       failMissingValue();
     }
   }
-
-
 
 }

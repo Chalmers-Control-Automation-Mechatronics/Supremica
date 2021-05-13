@@ -2102,7 +2102,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
        final HeuristicOption<T> option,
        final EnumFactory<SelectionHeuristic<T>> factory)
     {
-      super(context, option);
+      super(option);
       mFactory = factory;
     }
 
@@ -2131,7 +2131,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         if (parts.length == 1) {
           final SelectionHeuristic<T> heuristic = mFactory.getEnumValue(name);
           if (heuristic == null) {
-            System.err.println("Bad value for " + getName() + " option!");
+            System.err.println("Bad value for " + getCommandLineCode() + " option!");
             mFactory.dumpEnumeration(System.err, 0);
             System.exit(1);
           }
@@ -2143,7 +2143,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
           for (int i = 0; i < parts.length; i++) {
             heuristics[i] = mFactory.getEnumValue(parts[i]);
             if (heuristics[i]  == null) {
-              System.err.println("Bad value for " + getName() + " option!");
+              System.err.println("Bad value for " + getCommandLineCode() + " option!");
               mFactory.dumpEnumeration(System.err, 0);
               System.exit(1);
             }

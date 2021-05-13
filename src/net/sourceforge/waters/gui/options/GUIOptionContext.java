@@ -51,7 +51,6 @@ import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.OptionContext;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionPageEditor;
@@ -232,12 +231,6 @@ public class GUIOptionContext implements OptionContext
   createColorEditor(final ColorOption option)
   {
     return new ColorOptionPanel(this, option);
-  }
-
-  @Override
-  public OptionEditor<Boolean> createFlagEditor(final FlagOption option)
-  {
-    return null;
   }
 
   @Override

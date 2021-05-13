@@ -37,6 +37,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -178,9 +179,45 @@ public class CommandLineToolTest
     testCommandLine(name, args, false, "counterexample:", "Statistics:");
   }
 
+  public void testHelpOption()
+    throws Exception
+  {
+    final String[] args =
+      new String[] {"Monolithic", "DiagnosabilityChecker", "-help"};
+    testCommandLine("help", args,
+                    ".*supports the following command line options:",
+                    "-fslimit <n>.*",
+                    "-opt\\|-nopt.*",
+                    "!1:-quiet\\|-q.*");
+  }
+
+  public void testUnsupportedOption()
+    throws Exception
+  {
+    final String name = "controlled_philosophers";
+    final File file = getInputWMOD("handwritten", name);
+    final String[] args = getArgs("Monolithic", "DiagnosabilityChecker",
+                                  file, "-verose");
+    testCommandLine(name, args, "Unsupported option -verose.*");
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.junit.AbstractWatersTest
+  @Override
+  protected void setUp() throws Exception
+  {
+    super.setUp();
+    System.setSecurityManager(new NoExitSecurityManager());
+  }
+
+  @Override
+  protected void tearDown() throws Exception
+  {
+    System.setSecurityManager(null); // or save and restore original
+    super.tearDown();
+  }
+
   @Override
   protected void setUpLog4J()
   {
@@ -255,7 +292,7 @@ public class CommandLineToolTest
     }
 
     final List<Pattern> patterns = new ArrayList<>(outputPatterns.length + 1);
-    final List<Pattern> antiPatterns = new ArrayList<>(outputPatterns.length);
+    final List<AntiPattern> antiPatterns = new ArrayList<>(outputPatterns.length);
     if (expectedResult != null) {
       final String resultRegex = String.format("%b \\(.*", expectedResult);
       final Pattern resultPattern = Pattern.compile(resultRegex);
@@ -263,7 +300,7 @@ public class CommandLineToolTest
     }
     for (final String regex : outputPatterns) {
       if (regex.startsWith("!")) {
-        final Pattern pattern = Pattern.compile(regex.substring(1));
+        final AntiPattern pattern = new AntiPattern(regex);
         antiPatterns.add(pattern);
       } else {
         final Pattern pattern = Pattern.compile(regex);
@@ -278,28 +315,131 @@ public class CommandLineToolTest
     try {
       String line;
       while ((line = buffered.readLine()) != null) {
-        for (final Pattern anti : antiPatterns) {
-          final Matcher matcher = anti.matcher(line);
-          if (matcher.matches()) {
-            fail("Unexpected output " + pattern.toString() + "!");
+        for (final AntiPattern anti : antiPatterns) {
+          if (anti.matches(line)) {
+            fail("Unexpected output: " + anti.toString() + "!");
           }
         }
-        final Matcher matcher = pattern.matcher(line);
-        if (matcher.matches()) {
-          if (iter.hasNext()) {
-            pattern = iter.next();
-          } else {
-            pattern = null;
-            break;
+        if (pattern != null) {
+          final Matcher matcher = pattern.matcher(line);
+          if (matcher.matches()) {
+            if (iter.hasNext()) {
+              pattern = iter.next();
+            } else {
+              pattern = null;
+              if (antiPatterns.isEmpty()) {
+                break;
+              }
+            }
           }
         }
       }
       if (pattern != null) {
-        fail("Missing output " + pattern.toString() + "!");
+        fail("Missing output: " + pattern.toString() + "!");
       }
     } finally {
       buffered.close();
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class AntiPattern
+  private static class AntiPattern
+  {
+    //#######################################################################
+    //# Constructor
+    private AntiPattern(final String regex)
+    {
+      assert regex.charAt(0) == '!';
+      int start = 1;
+      while (start < regex.length() &&
+             Character.isDigit(regex.charAt(start))) {
+        start++;
+      }
+      if (start == 1) {
+        mAllowedMatches = 0;
+      } else {
+        assert regex.charAt(start) == ':';
+        final String digits = regex.substring(1, start);
+        mAllowedMatches = Integer.parseInt(digits);
+        start++;
+      }
+      final String tail = regex.substring(start);
+      mPattern = Pattern.compile(tail);
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public String toString()
+    {
+      return mPattern.toString();
+    }
+
+    //#######################################################################
+    //# Matching
+    boolean matches(final String line)
+    {
+      final Matcher matcher = mPattern.matcher(line);
+      if (!matcher.matches()) {
+        return false;
+      } else if (mAllowedMatches == 0) {
+        return true;
+      } else {
+        mAllowedMatches--;
+        return false;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Pattern mPattern;
+    private int mAllowedMatches;
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoExitSecurityManager
+  private static class NoExitSecurityManager extends SecurityManager
+  {
+    //#######################################################################
+    //# Overrides for java.lang.SecurityManager
+    @Override
+    public void checkPermission(final Permission perm)
+    {
+      // allow anything.
+    }
+
+    @Override
+    public void checkPermission(final Permission perm, final Object context)
+    {
+      // allow anything.
+    }
+
+    @Override
+    public void checkExit(final int status)
+    {
+      super.checkExit(status);
+      throw new ExitException();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class ExitException
+  private static class ExitException extends SecurityException
+  {
+    //#######################################################################
+    //# Constructor
+    private ExitException()
+    {
+      super("Terminated by System.exit()");
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = -840490238005753878L;
   }
 
 }

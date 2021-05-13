@@ -42,10 +42,11 @@ import net.sourceforge.waters.analysis.options.Option;
 public class PositiveIntCommandLineArgument extends CommandLineArgument<Integer>
 {
 
-  public PositiveIntCommandLineArgument(final CommandLineOptionContext context,
-                                    final Option<Integer> option)
+  //#######################################################################
+  //# Constructor
+  public PositiveIntCommandLineArgument(final Option<Integer> option)
   {
-    super(context, option);
+    super(option);
   }
 
   //#######################################################################
@@ -73,7 +74,5 @@ public class PositiveIntCommandLineArgument extends CommandLineArgument<Integer>
       failMissingValue();
     }
   }
-
-
 
 }

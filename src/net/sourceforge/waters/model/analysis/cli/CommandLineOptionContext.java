@@ -55,7 +55,6 @@ import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionContext;
@@ -101,7 +100,7 @@ public class CommandLineOptionContext implements OptionContext
   @Override
   public OptionEditor<Boolean> createBooleanEditor(final BooleanOption option)
   {
-    return new BooleanCommandLineArgument(this, option);
+    return new BooleanCommandLineArgument(option);
   }
 
   @Override
@@ -113,7 +112,7 @@ public class CommandLineOptionContext implements OptionContext
   @Override
   public <E> OptionEditor<E> createEnumEditor(final EnumOption<E> option)
   {
-    return new EnumCommandLineArgument<E>(this, option);
+    return new EnumCommandLineArgument<E>(option);
   }
 
   @Override
@@ -125,51 +124,45 @@ public class CommandLineOptionContext implements OptionContext
   @Override
   public OptionEditor<File> createFileEditor(final FileOption option)
   {
-    return new FileCommandLineArgument(this, option);
+    return new FileCommandLineArgument(option);
   }
 
   @Override
   public OptionEditor<Integer> createPositiveIntEditor(final PositiveIntOption option)
   {
-    return new PositiveIntCommandLineArgument(this, option);
+    return new PositiveIntCommandLineArgument(option);
   }
 
   @Override
   public OptionEditor<Double> createDoubleEditor(final DoubleOption option)
   {
-    return new DoubleCommandLineArgument(this, option);
+    return new DoubleCommandLineArgument(option);
   }
 
   @Override
   public OptionEditor<EventProxy> createPropositionEditor
     (final PropositionOption option)
   {
-    return new PropositionCommandLineArgument(this, option);
+    return new PropositionCommandLineArgument(option);
   }
 
   @Override
   public OptionEditor<String> createStringEditor(final StringOption option)
   {
-    return new StringCommandLineArgument(this, option);
+    return new StringCommandLineArgument(option);
   }
 
   @Override
   public OptionEditor<List<String>>
   createStringListEditor(final StringListOption option)
   {
-    return new StringListCommandLineArgument(this, option);
+    return new StringListCommandLineArgument(option);
   }
 
   @Override
   public OptionEditor<Color> createColorEditor(final ColorOption option)
   {
     return null;
-  }
-
-  @Override
-  public OptionEditor<Boolean> createFlagEditor(final FlagOption option)
-  {
-    return new FlagCommandLineArgument(this, option);
   }
 
   @Override
@@ -211,7 +204,7 @@ public class CommandLineOptionContext implements OptionContext
 
   public void addArgument(final CommandLineArgument<?> argument)
   {
-    for (final String name : argument.getNames()) {
+    for (final String name : argument.getKeys()) {
       mArgumentMap.put(name, argument);
     }
     mArgumentList.add(argument);
@@ -236,7 +229,6 @@ public class CommandLineOptionContext implements OptionContext
     }
     while (iter.hasNext()) {
       final String name = iter.next();
-
       final CommandLineArgument<?> arg = mArgumentMap.get(name);
       if (arg != null) {
         arg.parse(this, mConfigurables, iter);
@@ -301,7 +293,7 @@ public class CommandLineOptionContext implements OptionContext
     Collections.sort(keys);
     for (final String key : keys) {
       final CommandLineArgument<?> arg = mArgumentMap.get(key);
-      if (arg.getName().startsWith(key)) {
+      if (arg.isPrimaryKey(key)) {
         arg.dump(stream);
       }
     }
@@ -323,7 +315,7 @@ public class CommandLineOptionContext implements OptionContext
   {
     for (final CommandLineArgument<?> arg : mArgumentMap.values()) {
       if (arg.isRequired() && !arg.isUsed()) {
-        final String msg ="Required argument " + arg.getName() + " not specified!";
+        final String msg ="Required argument " + arg.getCommandLineCode() + " not specified!";
         CommandLineArgument.fail(msg);
       }
     }

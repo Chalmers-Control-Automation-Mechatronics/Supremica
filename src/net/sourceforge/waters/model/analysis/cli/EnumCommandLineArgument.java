@@ -50,12 +50,14 @@ import net.sourceforge.waters.model.analysis.EnumFactory;
 public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
 {
 
-  public EnumCommandLineArgument(final CommandLineOptionContext context,
-                                    final EnumOption<E> option)
+  //#######################################################################
+  //# Constructor
+  public EnumCommandLineArgument(final EnumOption<E> option)
   {
-    super(context, option);
+    super(option);
     mEnumFactory = new JavaEnumFactory<E>(option);
   }
+
 
   //#######################################################################
   //# Simple Access
@@ -109,8 +111,9 @@ public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
 
   protected String getErrorMessage()
   {
-    return "Bad value for " + getName() + " option!";
+    return "Bad value for " + getCommandLineCode() + " option!";
   }
+
 
   //#########################################################################
   //# Static Enum Parsing
@@ -122,7 +125,7 @@ public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
     final EnumOption<E> option =
       new EnumOption<E>(null, null, null, null, eclass.getEnumConstants());
     final EnumCommandLineArgument<E> parser =
-      new EnumCommandLineArgument<E>(context, option) {
+      new EnumCommandLineArgument<E>(option) {
       @Override
       protected String getErrorMessage()
       {
@@ -140,7 +143,7 @@ public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
     extends EnumFactory<E>
   {
     //#######################################################################
-    //# Constructors
+    //# Constructor
     private JavaEnumFactory(final EnumOption<E> enumOption)
     {
       mEnumOption = enumOption;
@@ -163,8 +166,8 @@ public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
     //#######################################################################
     //# Data Members
     private final EnumOption<E> mEnumOption;
-
   }
+
 
   //#########################################################################
   //# Data Members

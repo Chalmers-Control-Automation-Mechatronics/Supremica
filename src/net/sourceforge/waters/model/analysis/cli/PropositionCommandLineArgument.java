@@ -52,11 +52,10 @@ public class PropositionCommandLineArgument
 {
 
   //#######################################################################
-  //# Constructors
-  public PropositionCommandLineArgument(final CommandLineOptionContext context,
-                                        final Option<EventProxy> option)
+  //# Constructor
+  public PropositionCommandLineArgument(final Option<EventProxy> option)
   {
-    super(context, option);
+    super(option);
   }
 
 

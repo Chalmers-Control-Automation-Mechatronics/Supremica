@@ -44,9 +44,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
@@ -355,24 +355,23 @@ public class UnifiedEFACommandLineTool
     }
   }
 
-  public void registerOptions(final OptionPage page) {
-    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
-                            "Verbose output",
-                            "-verbose", "-v"));
-    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
-                            "Quiet output",
-                            "-quiet", "-q"));
-    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
-                            "Output statistics",
-                            "-stats"));
-    page.register(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
-                            "Output statistics",
-                            "-timeout"));
+  public void registerOptions(final OptionPage page)
+  {
+    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
+                                    "Suppress all output except answer",
+                                    "+quiet|+q", false));
+    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
+                                    "Verbose output",
+                                    "+verbose|+v", false));
+    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
+                                    "Print statistics", "+stats", false));
     page.register(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
-                            "CSV output file location",
-                            "-csv"));
-    page.register(new FlagOption(OPTION_UnifiedEFACommandLineTool_Help, null,
-                            "Print this message", "-help"));
+                                 "CSV output file name", "-csv"));
+    page.register(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
+                                        "Maximum allowed runtime in seconds",
+                                        "-timeout"));
+    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Help, null,
+                                    "Print this message", "+help", false));
   }
 
   @Override

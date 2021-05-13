@@ -44,7 +44,6 @@ import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
@@ -52,8 +51,8 @@ import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.cli.BooleanCommandLineArgument;
 import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
-import net.sourceforge.waters.model.analysis.cli.FlagCommandLineArgument;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -163,9 +162,9 @@ public abstract class AbstractModelAnalyzerFactory
       context.generateArgumentsFromOptions(page, configurable,
                                    DistributedModelVerifierFactory.
                                      OPTION_DistributedModelVerifierFactory_Host);
-      context.addArgument(new EndArgument(context, new FlagOption
+      context.addArgument(new EndArgument(context, new BooleanOption
                                           (null, null,
-                                           "Treat remaining arguments as file names", "--")));
+                                           "Treat remaining arguments as file names", "+-", false)));
     }
   }
 
@@ -196,7 +195,7 @@ public abstract class AbstractModelAnalyzerFactory
     db.register(new BooleanOption
              (OPTION_ModelVerifier_DetailedOutputEnabled,
               "Compute counterexample",
-              "Computate a counterexample if model checking gives a failed result.",
+              "Compute a counterexample if model checking gives a failed result.",
               "-out",
               true));
     db.register(new BooleanOption
@@ -351,14 +350,14 @@ public abstract class AbstractModelAnalyzerFactory
 
   //#########################################################################
   //# Inner Class EndArgument
-  public static class EndArgument extends FlagCommandLineArgument
+  public static class EndArgument extends BooleanCommandLineArgument
   {
     //#######################################################################
     //# Constructors
     public EndArgument(final CommandLineOptionContext context,
-                        final FlagOption option)
+                       final BooleanOption option)
     {
-      super(context, option);
+      super(option);
     }
 
     //#######################################################################
@@ -374,7 +373,6 @@ public abstract class AbstractModelAnalyzerFactory
         iter.next();
       }
     }
-
   }
 
 
@@ -438,10 +436,12 @@ public abstract class AbstractModelAnalyzerFactory
   public static final String OPTION_SynchronousProductBuilder_RemovingSelfloops =
     "SynchronousProductBuilder.RemovingSelfloops";
 
-  public static final String OPTION_AbstractModelAnalyzerFactory_NoOptimisation =
-    "AbstractModelAnalyzerFactory.NoOptimisation";
-  public static final String OPTION_AbstractModelAnalyzerFactory_HISCModule =
-    "AbstractModelAnalyzerFactory.HISCModule";
+  public static final String OPTION_ModuleCompiler_Optimisation =
+    "ModuleCompiler.Optimisation";
+    // "AbstractModelAnalyzerFactory.NoOptimisation";
+  public static final String OPTION_ModuleCompiler_HISCModule =
+    "ModuleCompiler.HISCModule";
+    // "AbstractModelAnalyzerFactory.HISCModule";
 
   public static final String OPTION_ConflictChecker_ConfiguredDefaultMarkingString =
     "ConflictChecker.ConfiguredDefaultMarkingString";

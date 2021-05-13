@@ -50,9 +50,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.FlagOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
@@ -462,21 +462,21 @@ public class CommandLineTool implements Configurable, ArgumentSource
   //# Auxiliary Methods
   private void registerOptions(final OptionPage page)
   {
-    page.register(new FlagOption(OPTION_CommandLineTool_Quiet, null,
-                                 "Suppress all log output",
-                                 "-quiet", "-q"));
-    page.register(new FlagOption(OPTION_CommandLineTool_Verbose, null,
-                                 "Verbose output",
-                                 "-verbose", "-v"));
-    page.register(new FlagOption(OPTION_CommandLineTool_Stats, null,
-                                 "Output statistics", "-stats"));
+    page.register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
+                                    "Suppress all output except answer",
+                                    "+quiet|+q", false));
+    page.register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
+                                    "Verbose output",
+                                    "+verbose|+v", false));
+    page.register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
+                                    "Print statistics", "+stats", false));
     page.register(new FileOption(OPTION_CommandLineTool_Csv, null,
                                  "CSV output file name", "-csv"));
     page.register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
                                         "Maximum allowed runtime in seconds",
                                         "-timeout"));
-    page.register(new FlagOption(OPTION_CommandLineTool_Help, null,
-                                 "Print this message", "-help"));
+    page.register(new BooleanOption(OPTION_CommandLineTool_Help, null,
+                                    "Print this message", "+help", false));
   }
 
   private void writeCSV(final String fullName, final AnalysisResult result)

@@ -33,55 +33,116 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.ListIterator;
+import java.util.Map;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 
+
 /**
+ * <P>A command line argument to configure a Boolean option.</P>
+ *
+ * <P>Unlike multi-valued arguments, which typicalled are configured by
+ * specifying <CODE>-<I>key</I>&nbsp;&lt;<I>value</I>&gt;</CODE>,
+ * Boolean command options can be configured with different keys to
+ * set a value of <CODE>true</CODE> or <CODE>false</CODE>. This is
+ * implement by parsing and interpreting the option's command line
+ * code ({@link Option#getCommandLineCode()}) in a special way.</P>
+ *
+ * <P>The option string is split into a sequence of keys separated by
+ * vertical bar '<CODE>|</CODE>' characters. Each key starts with a
+ * '<CODE>+</CODE>' or'<CODE>-</CODE>'. Keys of the form
+ * <CODE>+<I>key</I></CODE> provide the means to set the option to
+ * <CODE>true</CODE> by specifying <CODE>-<I>key</I></CODE> on the command
+ * line. Keys of the form <CODE>-<I>key</I></CODE> provide the means to set
+ * the option to <CODE>true</CODE> by specifying <CODE>-<I>key</I></CODE>,
+ * and the means to set the option to <CODE>false</CODE> by specifying
+ * <CODE>-n<I>key</I></CODE>.</P>
+ *
+ * <P>For example, the command line code &quot;+v|+verbose&quot; creates
+ * keys <CODE>-v</CODE> and <CODE>+verbose</CODE> both setting an option to
+ * <CODE>true</CODE>. And the command line code &quot;-opt&quot; creates
+ * keys <CODE>-opt</CODE> setting an option to <CODE>true</CODE> and
+ * <CODE>-nopt</CODE> setting it to <CODE>false</CODE>.</P>
  *
  * @author Benjamin Wheeler
  */
+
 public class BooleanCommandLineArgument extends CommandLineArgument<Boolean>
 {
 
   //#######################################################################
-  //# Constructors
-  public BooleanCommandLineArgument(final CommandLineOptionContext context,
-                                    final Option<Boolean> option)
+  //# Constructor
+  /**
+   * Creates a Boolean command line argument.
+   * @param  option  The option to be configured by this command line
+   *                 argument. It command line code ({@link
+   *                 Option#getCommandLineCode()}) is interpreted to
+   *                 generate one or more keys as explained in the
+   *                 class documentation.
+   * @see BooleanCommandLineArgument
+   */
+  public BooleanCommandLineArgument(final BooleanOption option)
   {
-    super(context, option);
+    super(option);
+    final String commandLineCode = option.getCommandLineCode();
+    if (commandLineCode.indexOf('|') > 0) {
+      final String[] codes = commandLineCode.split("\\|");
+      mKeyMap = new LinkedHashMap<>(2 * codes.length);
+      for (final String code : codes) {
+        register(code);
+      }
+    } else if (commandLineCode.startsWith("+")) {
+      final String key = "-" + commandLineCode.substring(1);
+      mKeyMap = Collections.singletonMap(key, true);
+    } else {
+      mKeyMap = new LinkedHashMap<>(2);
+      register(commandLineCode);
+    }
   }
+
+  private void register(final String code)
+  {
+    if (code.startsWith("+")) {
+      final String key = "-" + code.substring(1);
+      mKeyMap.put(key, true);
+    } else {
+      mKeyMap.put(code, true);
+      final String key = "-n" + code.substring(1);
+      mKeyMap.put(key, false);
+    }
+  }
+
 
   //#######################################################################
-  //# Parsing
+  //# Simple Access
   @Override
-  public String getName()
+  public String getCommandLineCode()
   {
-    return getOnName() + "|" + getOffName();
+    final StringBuilder builder = new StringBuilder();
+    boolean first = true;
+    for (final String key : getKeys()) {
+      if (first) {
+        first = false;
+      } else {
+        builder.append('|');
+      }
+      builder.append(key);
+    }
+    return builder.toString();
   }
 
   @Override
-  public Collection<String> getNames()
+  public Collection<String> getKeys()
   {
-    final Collection<String> names = new ArrayList<>(2);
-    names.add(getOnName());
-    names.add(getOffName());
-    return names;
+    return mKeyMap.keySet();
   }
 
-  protected String getOnName()
-  {
-    return super.getName();
-  }
-
-  protected String getOffName()
-  {
-    final String onName = getOnName();
-    return "-n" + onName.substring(1);
-  }
 
   //#######################################################################
   //# Parsing
@@ -91,11 +152,15 @@ public class BooleanCommandLineArgument extends CommandLineArgument<Boolean>
                     final ListIterator<String> iter)
   {
     final String parsed = iter.previous();
-    final String onName = getOnName();
-    final boolean value = parsed.equals(onName);
+    final boolean value = mKeyMap.get(parsed);
     getOption().setValue(value);
     iter.remove();
     setUsed(true);
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private final Map<String,Boolean> mKeyMap;
 
 }
