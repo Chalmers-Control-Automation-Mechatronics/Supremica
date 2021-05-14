@@ -33,17 +33,14 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import java.util.Collection;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
-import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
@@ -151,20 +148,6 @@ public abstract class AbstractModelAnalyzerFactory
 
   //#########################################################################
   //# Configuration
-  @Override
-  public void addArguments(final CommandLineOptionContext context,
-                           final Configurable configurable,
-                           final LeafOptionPage page)
-  {
-    if (configurable instanceof ModelAnalyzer) {
-      registerOptions(page);
-      context.generateArgumentsFromOptions(page, configurable);
-      context.addArgument(new EndArgument(context, new BooleanOption
-                                          (null, null,
-                                           "Treat remaining arguments as file names", "+-", false)));
-    }
-  }
-
   @Override
   public void registerOptions(final OptionPage db)
   {
@@ -362,7 +345,6 @@ public abstract class AbstractModelAnalyzerFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
     public void parse(final CommandLineOptionContext context,
-                      final Collection<Configurable> configurables,
                       final ListIterator<String> iter)
     {
       iter.remove();

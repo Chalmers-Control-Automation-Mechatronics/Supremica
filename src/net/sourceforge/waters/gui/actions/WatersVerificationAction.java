@@ -223,9 +223,9 @@ public abstract class WatersVerificationAction
       return null;
     }
     final String prefix = mOperation.getOptionPagePrefix();
-    final OptionPage map = OptionPage.getOptionPage(prefix);
-    if (map != null) {
-      for (final Option<?> option : verifier.getOptions(map)) {
+    final OptionPage page = OptionPage.getOptionPage(prefix);
+    if (page != null) {
+      for (final Option<?> option : verifier.getOptions(page)) {
         if (option.isPersistent()) {
           verifier.setOption(option);
         }

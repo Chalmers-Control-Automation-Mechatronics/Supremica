@@ -104,21 +104,21 @@ public class Config
 
   //GUI_COMPILER
   public static final BooleanOption INCLUDE_INSTANTIATION = new BooleanOption
-    ("includeInstantiation",
-     "Include Instantiation", "Enable instantiation and other advanced features", null, true);
+    ("includeInstantiation", "Include Instantiation",
+     "Enable instantiation and other advanced features", null, true);
   public static final BooleanOption BACKGROUND_COMPILER = new BooleanOption
-    ("backgroundCompiler",
-     "Background Compiler", "Compile automatically while editing", null, true);
+    ("backgroundCompiler", "Background Compiler",
+     "Compile automatically while editing", null, true);
   public static final BooleanOption OPTIMIZING_COMPILER = new BooleanOption
-    ("optimizingCompiler",
-     "Optimizing Compiler", "Remove redundant events, transitions, and components when compiling",
-     null, false);
+    ("optimizingCompiler", "Optimizing Compiler",
+     "Remove redundant events, transitions, and components when compiling",
+     null, true);
   public static final BooleanOption NORMALIZING_COMPILER = new BooleanOption
-    ("normalizingCompiler",
-     "Normalizing Compiler", "Use normalising EFSM compiler", null, true);
+    ("normalizingCompiler", "Normalizing Compiler",
+     "Use normalising EFSM compiler", null, true);
   public static final BooleanOption AUTOMATON_VARIABLES_COMPILER = new BooleanOption
-    ("automatonVariablesCompiler",
-     "Automaton Variables Compiler", "Allow automaton names in EFSM guards", null, false);
+    ("automatonVariablesCompiler", "Automaton Variables Compiler",
+     "Allow automaton names in EFSM guards", null, false);
 
 
   //GUI_EDITOR

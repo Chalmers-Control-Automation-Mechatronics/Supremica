@@ -33,11 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 
 public class StringListCommandLineArgument extends CommandLineArgument<List<String>>
@@ -64,7 +62,6 @@ public class StringListCommandLineArgument extends CommandLineArgument<List<Stri
   //# Parsing
   @Override
   public void parse(final CommandLineOptionContext context,
-                    final Collection<Configurable> configurables,
                     final ListIterator<String> iter)
   {
     iter.remove();

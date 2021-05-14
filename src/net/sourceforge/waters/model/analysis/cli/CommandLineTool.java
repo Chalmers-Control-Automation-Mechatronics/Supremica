@@ -41,7 +41,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -50,6 +49,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.FileOption;
@@ -57,6 +57,7 @@ import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -65,6 +66,7 @@ import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.Watchdog;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -106,7 +108,7 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
  * @author Robi Malik
  */
 
-public class CommandLineTool implements Configurable, ArgumentSource
+public class CommandLineTool implements Configurable
 {
 
   //#########################################################################
@@ -207,21 +209,19 @@ public class CommandLineTool implements Configurable, ArgumentSource
       final ModelAnalyzerFactoryLoader factoryLoader =
         EnumCommandLineArgument.parse(mContext, ModelAnalyzerFactoryLoader.class,
                                       "model analyser factory", factoryName);
+      final AnalysisOperation operation =
+        EnumCommandLineArgument.parse(mContext, AnalysisOperation.class,
+                                      "operation", checkName);
       final ModelAnalyzerFactory factory =
         factoryLoader.getModelAnalyzerFactory();
-      final Class<? extends ModelAnalyzerFactory> fclazz = factory.getClass();
-      final String createname = "create" + checkName;
-      final Method getcheck =
-        fclazz.getMethod(createname, ProductDESProxyFactory.class);
-      mAnalyzer =
-        (ModelAnalyzer) getcheck.invoke(factory, desFactory);
+      mAnalyzer = operation.createModelAnalyzer(factory, desFactory);
       final ModelAnalyzer wrapper;
       final boolean keepPropositions;
       if (wrapperName == null) {
         wrapper = mAnalyzer;
         keepPropositions = mAnalyzer instanceof ConflictChecker ||
                            mAnalyzer instanceof SupervisorSynthesizer;
-      } else {
+      } else { // TODO wrappers no longer work ...
         @SuppressWarnings("unchecked")
         final Class<ModelVerifier> clazz =
           (Class<ModelVerifier>) loader.loadClass(wrapperName);
@@ -233,23 +233,28 @@ public class CommandLineTool implements Configurable, ArgumentSource
         wrapper = constructor.newInstance(mAnalyzer, desFactory);
         keepPropositions = true;
       }
+
+      final LeafOptionPage toolPage = new CommandLineToolOptionPage();
+      mContext.registerArguments(toolPage, this);
+      /* TODO set up compiler option page
+      final LeafOptionPage compilerPage =
+      final ModuleCompiler dummyCompiler =
+        new ModuleCompiler(null, null, null);
+      mContext.registerArguments(toolPage, dummyCompiler);
+      */
+      final AnalysisOptionPage analyserPage = operation.getOptionPage();
+      mContext.registerArguments(analyserPage, mAnalyzer);
+
       final Collection<String> empty = Collections.emptyList();
       final ListIterator<String> argIter = argList.listIterator();
-      mContext.addArgumentSource(this);
-      mContext.addConfigurable(this);
-      final ModuleCompiler dummyCompiler = new ModuleCompiler(null, null, null);
-      mContext.addArgumentSource(dummyCompiler);
-      mContext.addConfigurable(dummyCompiler);
-      mContext.addArgumentSource(factory);
-      mContext.addConfigurable(mAnalyzer);
-
       mContext.parse(argIter);
       mContext.configure(this);
 
       if (mVerbosity != null) {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         final Configuration config = ctx.getConfiguration();
-        final LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+        final LoggerConfig loggerConfig =
+          config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
         loggerConfig.setLevel(mVerbosity);
         ctx.updateLoggers();
       }
@@ -419,66 +424,44 @@ public class CommandLineTool implements Configurable, ArgumentSource
   public void setOption(final Option<?> option)
   {
     if (option.hasID(OPTION_CommandLineTool_Quiet)) {
-      mVerbosity = Level.OFF;
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mVerbosity = Level.OFF;
+      }
     } else if (option.hasID(OPTION_CommandLineTool_Verbose)) {
-      mVerbosity = Level.ALL;
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mVerbosity = Level.ALL;
+      }
     } else if (option.hasID(OPTION_CommandLineTool_Stats)) {
-      mStats = true;
+      final BooleanOption flag = (BooleanOption) option;
+      mStats = flag.getBooleanValue();
     } else if (option.hasID(OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
-      try {
-        final OutputStream stream = new FileOutputStream(opt.getValue(), true);
-        mCsv = new PrintWriter(stream);
-      } catch (final FileNotFoundException exception) {
-        throw new WatersRuntimeException(exception);
+      final File file = opt.getValue();
+      if (file != null) {
+        try {
+          final OutputStream stream = new FileOutputStream(file, true);
+          mCsv = new PrintWriter(stream);
+        } catch (final FileNotFoundException exception) {
+          throw new WatersRuntimeException(exception);
+        }
       }
     } else if (option.hasID(OPTION_CommandLineTool_Timeout)) {
       final PositiveIntOption opt = (PositiveIntOption) option;
       mTimeout = opt.getIntValue();
     } else if (option.hasID(OPTION_CommandLineTool_Help)) {
-      System.err.print(ProxyTools.getShortClassName(mAnalyzer));
-      System.err.println(" supports the following command line options:");
-      mContext.showHelpMessage(System.err);
-      System.exit(0);
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.cli.ArgumentSource
-  @Override
-  public void addArguments(final CommandLineOptionContext context,
-                           final Configurable configurable,
-                           final LeafOptionPage page)
-  {
-    if (configurable == this) {
-      registerOptions(page);
-      context.generateArgumentsFromOptions(page, this);
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mContext.showHelpMessage(System.err);
+        System.exit(0);
+      }
     }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void registerOptions(final OptionPage page)
-  {
-    page.register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
-                                    "Suppress all output except answer",
-                                    "+quiet|+q", false));
-    page.register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
-                                    "Verbose output",
-                                    "+verbose|+v", false));
-    page.register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
-                                    "Print statistics", "+stats", false));
-    page.register(new FileOption(OPTION_CommandLineTool_Csv, null,
-                                 "CSV output file name", "-csv"));
-    page.register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
-                                        "Maximum allowed runtime in seconds",
-                                        "-timeout"));
-    page.register(new BooleanOption(OPTION_CommandLineTool_Help, null,
-                                    "Print this message", "+help", false));
-  }
-
   private void writeCSV(final String fullName, final AnalysisResult result)
   {
     if (mCsv != null) {
@@ -521,6 +504,43 @@ public class CommandLineTool implements Configurable, ArgumentSource
 
 
   //#########################################################################
+  //# Inner Class CommandLineToolOptionPage
+  private class CommandLineToolOptionPage
+    extends SimpleLeafOptionPage
+  {
+    //#######################################################################
+    //# Constructor
+    public CommandLineToolOptionPage()
+    {
+      super("cli", "Command Line Tool");
+      register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
+                                 "Suppress all output except answer",
+                                 "+quiet|+q", false));
+      register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
+                                 "Verbose output",
+                                 "+verbose|+v", false));
+      register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
+                                 "Print statistics", "+stats", false));
+      register(new FileOption(OPTION_CommandLineTool_Csv, null,
+                              "CSV output file name", "-csv"));
+      register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
+                                     "Maximum allowed runtime in seconds",
+                                     "-timeout"));
+      register(new BooleanOption(OPTION_CommandLineTool_Help, null,
+                                 "Print this message", "+help", false));
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+    @Override
+    public List<Option<?>> getOptions()
+    {
+      return CommandLineTool.this.getOptions(this);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private Level mVerbosity = Level.DEBUG;
   private boolean mStats = false;
@@ -549,5 +569,7 @@ public class CommandLineTool implements Configurable, ArgumentSource
     "CommandLineTool.Csv";
   public static final String OPTION_CommandLineTool_Help =
     "CommandLineTool.Help";
+  public static final String OPTION_CommandLineTool_End =
+    "CommandLineTool.End";
 
 }

@@ -33,10 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
-import java.util.Collection;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 
 public class PositiveIntCommandLineArgument extends CommandLineArgument<Integer>
@@ -61,7 +59,6 @@ public class PositiveIntCommandLineArgument extends CommandLineArgument<Integer>
   //# Parsing
   @Override
   public void parse(final CommandLineOptionContext context,
-                    final Collection<Configurable> configurables,
                     final ListIterator<String> iter)
   {
     iter.remove();

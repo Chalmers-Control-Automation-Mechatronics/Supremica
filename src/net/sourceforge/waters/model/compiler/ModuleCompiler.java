@@ -48,14 +48,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.Abortable;
-import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
-import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -166,7 +163,7 @@ import org.xml.sax.SAXException;
  * @author Robi Malik
  */
 public class ModuleCompiler extends AbortableCompiler
-  implements Configurable, ArgumentSource
+  implements Configurable
 {
 
   //#########################################################################
@@ -325,16 +322,6 @@ public class ModuleCompiler extends AbortableCompiler
        "Enable or disable compilation as HISC module, "+
        "only including interfaces of low levels",
        "-hisc", false));
-  }
-
-  @Override
-  public void addArguments(final CommandLineOptionContext context,
-                           final Configurable configurable, final LeafOptionPage page)
-  {
-    if (configurable == this) {
-      registerOptions(page);
-      context.generateArgumentsFromOptions(page, configurable);
-    }
   }
 
 

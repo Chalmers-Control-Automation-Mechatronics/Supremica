@@ -35,7 +35,6 @@ package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -45,7 +44,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public interface ModelAnalyzerFactory extends ArgumentSource
+public interface ModelAnalyzerFactory
 {
 
   //#########################################################################

@@ -44,13 +44,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -58,7 +61,6 @@ import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.Watchdog;
-import net.sourceforge.waters.model.analysis.cli.ArgumentSource;
 import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
 import net.sourceforge.waters.model.analysis.cli.VerboseLogConfigurationFactory;
 import net.sourceforge.waters.model.base.Proxy;
@@ -92,7 +94,7 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
  */
 
 public class UnifiedEFACommandLineTool
-  implements ArgumentSource, Configurable
+  implements Configurable
 {
 
   //#########################################################################
@@ -173,18 +175,18 @@ public class UnifiedEFACommandLineTool
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);
 
-      checker = new UnifiedEFAConflictChecker(moduleFactory);
-      checker.setDocumentManager(docManager);
-      checker.setBindings(bindings);
+      mChecker = new UnifiedEFAConflictChecker(moduleFactory);
+      mChecker.setDocumentManager(docManager);
+      mChecker.setBindings(bindings);
 
+      final LeafOptionPage toolPage = new CommandLineToolOptionPage();
+      mContext.registerArguments(toolPage, this);
+      final LeafOptionPage analyserPage = new UnifiedEFAConflictCheckerOptionPage();
+      mContext.registerArguments(analyserPage, mChecker);
       final ListIterator<String> argIter = argList.listIterator();
-      mContext.addArgumentSource(this);
-      mContext.addConfigurable(this);
-      mContext.addArgumentSource(checker);
-      mContext.addConfigurable(checker);
       mContext.parse(argIter);
       mContext.configure(this);
-      mContext.configure(checker);
+      mContext.configure(mChecker);
 
       if (mVerbosity != null) {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
@@ -194,7 +196,7 @@ public class UnifiedEFACommandLineTool
         ctx.updateLoggers();
       }
       if (mTimeout > 0) {
-        final Watchdog watchdog = new Watchdog(checker, mTimeout);
+        final Watchdog watchdog = new Watchdog(mChecker, mTimeout);
         watchdog.start();
       }
 
@@ -211,11 +213,11 @@ public class UnifiedEFACommandLineTool
           System.out.flush();
         }
         final long start = System.currentTimeMillis();
-        checker.setModel(module);
+        mChecker.setModel(module);
         boolean additions = false;
         try {
-          checker.run();
-          final AnalysisResult result = checker.getAnalysisResult();
+          mChecker.run();
+          final AnalysisResult result = mChecker.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
           final double numstates = result.getTotalNumberOfStates();
@@ -248,7 +250,7 @@ public class UnifiedEFACommandLineTool
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("OUT OF MEMORY (%.3f s)\n", difftime);
-          final AnalysisResult result = checker.getAnalysisResult();
+          final AnalysisResult result = mChecker.getAnalysisResult();
           if (result != null) {
             final OverflowException overflow = new OverflowException(error);
             result.setException(overflow);
@@ -262,7 +264,7 @@ public class UnifiedEFACommandLineTool
           final float difftime = 0.001f * (stop - start);
           formatter.format("TIMEOUT (%.3f s)\n", difftime);
         }
-        final AnalysisResult result = checker.getAnalysisResult();
+        final AnalysisResult result = mChecker.getAnalysisResult();
         if (result != null) {
           if (mStats) {
             System.out.println(SEPARATOR);
@@ -348,40 +350,10 @@ public class UnifiedEFACommandLineTool
         throw new RuntimeException(exception);
       }
     } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Help)) {
-      System.err.print(ProxyTools.getShortClassName(checker));
+      System.err.print(ProxyTools.getShortClassName(mChecker));
       System.err.println(" supports the following command line options:");
       mContext.showHelpMessage(System.err);
       System.exit(0);
-    }
-  }
-
-  public void registerOptions(final OptionPage page)
-  {
-    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
-                                    "Suppress all output except answer",
-                                    "+quiet|+q", false));
-    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
-                                    "Verbose output",
-                                    "+verbose|+v", false));
-    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
-                                    "Print statistics", "+stats", false));
-    page.register(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
-                                 "CSV output file name", "-csv"));
-    page.register(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
-                                        "Maximum allowed runtime in seconds",
-                                        "-timeout"));
-    page.register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Help, null,
-                                    "Print this message", "+help", false));
-  }
-
-  @Override
-  public void addArguments(final CommandLineOptionContext context,
-                           final Configurable configurable,
-                           final LeafOptionPage page)
-  {
-    if (configurable == this) {
-      registerOptions(page);
-      context.generateArgumentsFromOptions(page, this);
     }
   }
 
@@ -408,6 +380,97 @@ public class UnifiedEFACommandLineTool
 
 
   //#########################################################################
+  //# Inner Class CommandLineToolOptionPage
+  private class CommandLineToolOptionPage
+    extends SimpleLeafOptionPage
+  {
+    //#######################################################################
+    //# Constructor
+    public CommandLineToolOptionPage()
+    {
+      super("UnifiedEFACommandLineTool", "Command Line Tool");
+      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
+                                 "Suppress all output except answer",
+                                 "+quiet|+q", false));
+      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
+                                 "Verbose output",
+                                 "+verbose|+v", false));
+      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
+                                 "Print statistics", "+stats", false));
+      register(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
+                              "CSV output file name", "-csv"));
+      register(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
+                                     "Maximum allowed runtime in seconds",
+                                     "-timeout"));
+      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Help, null,
+                                 "Print this message", "+help", false));
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+    @Override
+    public List<Option<?>> getOptions()
+    {
+      return UnifiedEFACommandLineTool.this.getOptions(this);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class UnifiedEFAConflictCheckerOptionPage
+  private class UnifiedEFAConflictCheckerOptionPage
+    extends SimpleLeafOptionPage
+  {
+    //#######################################################################
+    //# Constructor
+    public UnifiedEFAConflictCheckerOptionPage()
+    {
+      super("UnifiedEFAConflictChecker", "EFSM Conflict Checker");
+      register(new BooleanOption
+                 (UnifiedEFACommandLineTool.
+                  OPTION_UnifiedEFACommandLineTool_PreferLocal, null,
+                  "Enable or disable preference for local variables",
+                  "-loc", false));
+      register(new EnumOption<UnifiedEFASimplifierFactory>
+                 (UnifiedEFACommandLineTool.
+                  OPTION_UnifiedEFACommandLineTool_SimplifierFactory, null,
+                  "Abstraction sequence used for simplification",
+                  "-method", UnifiedEFASimplifierFactory.values()));
+      register(new PositiveIntOption
+                 (UnifiedEFACommandLineTool.
+                  OPTION_UnifiedEFACommandLineTool_InternalStateLimit, null,
+                  "Maximum number of states constructed in abstraction attempts",
+                  "-islimit"));
+      register(new PositiveIntOption
+                 (UnifiedEFACommandLineTool.
+                  OPTION_UnifiedEFACommandLineTool_InternalTransitionLimit, null,
+                  "Maximum number of transitions constructed in abstraction attempts",
+                  "-itlimit"));
+      register(new EnumOption<SelectionHeuristic<UnifiedEFACandidate>>
+                 (UnifiedEFACommandLineTool.
+                  OPTION_UnifiedEFACommandLineTool_CompositionSelectionHeuristic,
+                  null,
+                  "Composition selection heuristic", "-compsel",
+                  mChecker.getCompositionSelectionHeuristicFactory()));
+      register(new EnumOption<SelectionHeuristic<UnifiedEFAVariable>>
+                 (UnifiedEFACommandLineTool.
+                  OPTION_UnifiedEFACommandLineTool_VariableSelectionHeuristic,
+                  null,
+                  "Variable selection heuristic", "-varsel",
+                  mChecker.getVariableSelectionHeuristicFactory()));
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+    @Override
+    public List<Option<?>> getOptions()
+    {
+      return mChecker.getOptions(this);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private Level mVerbosity = Level.DEBUG;
   private boolean mStats = false;
@@ -415,7 +478,8 @@ public class UnifiedEFACommandLineTool
   private PrintWriter mCsv = null;
 
   private CommandLineOptionContext mContext;
-  private UnifiedEFAConflictChecker checker;
+  private UnifiedEFAConflictChecker mChecker;
+
 
   //#########################################################################
   //# Class Constants

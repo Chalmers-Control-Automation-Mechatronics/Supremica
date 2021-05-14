@@ -40,7 +40,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 
 
@@ -148,7 +147,6 @@ public class BooleanCommandLineArgument extends CommandLineArgument<Boolean>
   //# Parsing
   @Override
   public void parse(final CommandLineOptionContext context,
-                    final Collection<Configurable> configurables,
                     final ListIterator<String> iter)
   {
     final String parsed = iter.previous();

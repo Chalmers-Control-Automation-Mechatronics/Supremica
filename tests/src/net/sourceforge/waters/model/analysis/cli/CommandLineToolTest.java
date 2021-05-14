@@ -47,7 +47,9 @@ import java.util.regex.Pattern;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -185,9 +187,11 @@ public class CommandLineToolTest
     final String[] args =
       new String[] {"Monolithic", "DiagnosabilityChecker", "-help"};
     testCommandLine("help", args,
-                    ".*supports the following command line options:",
-                    "-fslimit <n>.*",
-                    "-opt\\|-nopt.*",
+                    "=MonolithicDiagnosabilityVerifier supports the following options:",
+                    "=-fslimit <n>.*",
+                    "=ModuleCompiler supports the following options:",
+                    "=-opt\\|-nopt.*",
+                    "=CommandLineTool supports the following options:",
                     "=-quiet\\|-q.*");
   }
 
@@ -209,6 +213,10 @@ public class CommandLineToolTest
   {
     super.setUp();
     System.setSecurityManager(new NoExitSecurityManager());
+    for (final AnalysisOperation operation : AnalysisOperation.values()) {
+      final AnalysisOptionPage page = operation.getOptionPage();
+      page.restoreDefaultValues();
+    }
   }
 
   @Override

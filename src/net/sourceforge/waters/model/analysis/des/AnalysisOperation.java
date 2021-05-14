@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -40,23 +42,165 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  *
  * @author Benjamin Wheeler
  */
-public abstract class AnalysisOperation
+public enum AnalysisOperation
 {
+  //#########################################################################
+  //# Enumeration
+  CONFLICT_CHECK("waters.analysis.conflict", "Conflict",
+                 "is blocking", "is nonblocking")
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createConflictChecker(desFactory);
+    }
+  },
 
+  CONTROLLABILITY_CHECK("waters.analysis.controllability", "Controllability",
+                        "is not controllable", "is controllable")
+  {
+    @Override
+    public final ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createControllabilityChecker(desFactory);
+    }
+  },
+
+  CONTROL_LOOP_CHECK("ControlLoopChecker",
+                     "waters.analysis.loop", "Control Loop",
+                     "has a control loop", "is control-loop free")
+  {
+    @Override
+    public final ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createControlLoopChecker(desFactory);
+    }
+  },
+
+  DEADLOCK_CHECK("waters.analysis.deadlock", "Deadlock",
+                 "has a deadlock", "is deadlock free")
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createDeadlockChecker(desFactory);
+    }
+  },
+
+  DIAGNOSABILITY_CHECK("waters.analysis.diagnosability", "Diagnosability",
+                       "is not diagnosable", "is diagnosable")
+  {
+    @Override
+    public DiagnosabilityChecker createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createDiagnosabilityChecker(desFactory);
+    }
+  },
+
+  LANGUAGE_INCLUSION_CHECK("LanguageInclusionChecker",
+                           "waters.analysis.languageinclusion",
+                           "Language Inclusion",
+                           "does not satisfy language inclusion",
+                           "satisfies language inclusion")
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createLanguageInclusionChecker(desFactory);
+    }
+  },
+
+  STATE_COUNTER("StateCounter", "waters.analysis.statecount", "State Count",
+                null, null)
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createStateCounter(desFactory);
+    }
+  },
+
+  SYNCHRONOUS_PRODUCT("SynchronousProductBuilder",
+                      "waters.analysis.syncprod", "Synchronization",
+                      null, null)
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createSynchronousProductBuilder(desFactory);
+    }
+  },
+
+  SUPERVISOR_SYNTHESIZER("SupervisorSynthesizer",
+                         "waters.analysis.synthesis", "Synthesis",
+                         null, null)
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createSupervisorSynthesizer(desFactory);
+    }
+  };
+
+
+  //#########################################################################
+  //# Constructor
   private AnalysisOperation(final String optionPagePrefix,
                             final String analysisName,
                             final String failureDescription,
                             final String successDescription)
   {
+    this(analysisName + "Checker", optionPagePrefix, analysisName,
+         failureDescription, successDescription);
+  }
+
+  private AnalysisOperation(final String key,
+                            final String optionPagePrefix,
+                            final String analysisName,
+                            final String failureDescription,
+                            final String successDescription)
+  {
+    mKey = key;
     mOptionPagePrefix = optionPagePrefix;
     mAnalysisName = analysisName;
     mFailureDescription = failureDescription;
     mSuccessDescription = successDescription;
   }
 
+
+  //#########################################################################
+  //# Simple Access
+  public String getKey()
+  {
+    return mKey;
+  }
+
   public String getOptionPagePrefix()
   {
     return mOptionPagePrefix;
+  }
+
+  public AnalysisOptionPage getOptionPage()
+  {
+    return (AnalysisOptionPage) OptionPage.getOptionPage(mOptionPagePrefix);
   }
 
   public String getAnalysisName()
@@ -78,128 +222,22 @@ public abstract class AnalysisOperation
     (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
       throws AnalysisConfigurationException;
 
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  @Override
+  public String toString()
+  {
+    return mKey;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final String mKey;
   private final String mOptionPagePrefix;
   private final String mAnalysisName;
   private final String mFailureDescription;
   private final String mSuccessDescription;
-
-  public static final AnalysisOperation CONFLICT_CHECK =
-    new AnalysisOperation("waters.analysis.conflict", "Conflict",
-                          "is blocking", "is nonblocking")
-  {
-    @Override
-    public ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createConflictChecker(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation CONTROLLABILITY_CHECK =
-    new AnalysisOperation("waters.analysis.controllability", "Controllability",
-                          "is not controllable", "is controllable")
-  {
-    @Override
-    public final ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createControllabilityChecker(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation CONTROL_LOOP_CHECK =
-    new AnalysisOperation("waters.analysis.loop", "Control Loop",
-                          "has a control loop", "is control-loop free")
-  {
-    @Override
-    public final ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createControlLoopChecker(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation DEADLOCK_CHECK =
-    new AnalysisOperation("waters.analysis.deadlock", "Deadlock",
-                          "has a deadlock", "is deadlock free")
-  {
-    @Override
-    public ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createDeadlockChecker(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation DIAGNOSABILITY_CHECK =
-    new AnalysisOperation("waters.analysis.diagnosability", "Diagnosability",
-                          "is not diagnosable", "is diagnosable")
-  {
-    @Override
-    public DiagnosabilityChecker createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createDiagnosabilityChecker(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation LANGUAGE_INCLUSION_CHECK =
-    new AnalysisOperation("waters.analysis.languageinclusion",
-                          "Language Inclusion",
-                          "does not satisfy language inclusion",
-                          "satisfies language inclusion")
-  {
-    @Override
-    public ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createLanguageInclusionChecker(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation STATE_COUNTER =
-    new AnalysisOperation("waters.analysis.statecount", "State Count",
-                          null, null)
-  {
-    @Override
-    public ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createStateCounter(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation SYNCHRONOUS_PRODUCT =
-    new AnalysisOperation("waters.analysis.syncprod", "Synchronization",
-                          null, null)
-  {
-    @Override
-    public ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createSynchronousProductBuilder(desFactory);
-    }
-  };
-
-  public static final AnalysisOperation SUPERVISOR_SYNTHESIZER =
-    new AnalysisOperation("waters.analysis.synthesis", "Synthesis",
-                          null, null)
-  {
-    @Override
-    public ModelAnalyzer createModelAnalyzer
-      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
-        throws AnalysisConfigurationException
-    {
-      return factory.createSupervisorSynthesizer(desFactory);
-    }
-  };
 
 }

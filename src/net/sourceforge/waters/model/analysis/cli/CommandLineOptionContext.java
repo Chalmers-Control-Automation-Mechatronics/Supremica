@@ -39,11 +39,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
@@ -69,13 +69,16 @@ import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+
 
 /**
  *
  * @author Benjamin Wheeler
  */
+
 public class CommandLineOptionContext implements OptionContext
 {
 
@@ -84,8 +87,8 @@ public class CommandLineOptionContext implements OptionContext
   public CommandLineOptionContext()
   {
     mDES = null;
-    mArgumentSources = new Stack<ArgumentSource>();
-    mConfigurables = new Stack<Configurable>();
+    mArgumentMap = new HashMap<>(64);
+    mArgumentSources = new LinkedList<>();
   }
 
 
@@ -117,7 +120,8 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<ComponentKind> createComponentKindEditor(final ComponentKindOption option)
+  public OptionEditor<ComponentKind>
+  createComponentKindEditor(final ComponentKindOption option)
   {
     return null;
   }
@@ -129,7 +133,8 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<Set<EventProxy>> createEventSetEditor(final EventSetOption option)
+  public OptionEditor<Set<EventProxy>>
+  createEventSetEditor(final EventSetOption option)
   {
     return null;
   }
@@ -141,7 +146,8 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<Integer> createPositiveIntEditor(final PositiveIntOption option)
+  public OptionEditor<Integer>
+  createPositiveIntEditor(final PositiveIntOption option)
   {
     return new PositiveIntCommandLineArgument(option);
   }
@@ -173,7 +179,8 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionPageEditor<SimpleLeafOptionPage> createSimpleLeafOptionPageEditor(final SimpleLeafOptionPage page)
+  public OptionPageEditor<SimpleLeafOptionPage>
+  createSimpleLeafOptionPageEditor(final SimpleLeafOptionPage page)
   {
     return null;
   }
@@ -186,7 +193,8 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
-  public OptionPageEditor<AggregatorOptionPage> createAggregatorOptionPageEditor(final AggregatorOptionPage page)
+  public OptionPageEditor<AggregatorOptionPage>
+  createAggregatorOptionPageEditor(final AggregatorOptionPage page)
   {
     return null;
   }
@@ -194,45 +202,21 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Specific Access
-  public void setProductDES(final ProductDESProxy des)
-    throws AnalysisException
+  public void registerArguments(final LeafOptionPage page,
+                                final Configurable configurable)
   {
-    mDES = des;
-    for (final CommandLineArgument<?> arg : mArgumentList) {
-      arg.updateContext(this);
-    }
-  }
-
-  public void addArgument(final CommandLineArgument<?> argument)
-  {
-    for (final String name : argument.getKeys()) {
-      mArgumentMap.put(name, argument);
-    }
-    mArgumentList.add(argument);
+    final ArgumentSource source = new ArgumentSource(page, configurable);
+    mArgumentSources.add(0, source);
   }
 
   public void parse(final ListIterator<String> iter)
     throws AnalysisException
   {
-    mArgumentMap.clear();
-    mArgumentList.clear();
-    final LeafOptionPage page = new SimpleLeafOptionPage(null, null) {
-      @Override
-      public List<Option<?>> getOptions()
-      {
-        return null;
-      }
-    };
-    for (final ArgumentSource argumentSource : mArgumentSources) {
-      for (final Configurable configurable : mConfigurables) {
-        argumentSource.addArguments(this, configurable, page);
-      }
-    }
     while (iter.hasNext()) {
       final String name = iter.next();
       final CommandLineArgument<?> arg = mArgumentMap.get(name);
       if (arg != null) {
-        arg.parse(this, mConfigurables, iter);
+        arg.parse(this, iter);
       } else if (name.startsWith("-")) {
         System.err.println("Unsupported option " + name +
                            ". Try -help to see available options.");
@@ -241,77 +225,109 @@ public class CommandLineOptionContext implements OptionContext
     }
   }
 
-  public void generateArgumentsFromOptions(final LeafOptionPage page,
-                                           final Configurable source)
+  public void setProductDES(final ProductDESProxy des)
+    throws AnalysisException
   {
-    final List<Option<?>> options = source.getOptions(page);
-    for (final Option<?> option : options) {
-      final CommandLineArgument<?> arg =
-        (CommandLineArgument<?>) option.createEditor(this);
-      if (arg == null) {
-        continue;
-      }
-      addArgument(arg);
-    }
-  }
-
-  public Map<String, CommandLineArgument<?>> getArgumentMap()
-  {
-    return mArgumentMap;
-  }
-
-  public void addArgumentSource(final ArgumentSource source)
-  {
-    mArgumentSources.push(source);
-  }
-
-  public Stack<ArgumentSource> getArgumentSources()
-  {
-    return mArgumentSources;
-  }
-
-  public void addConfigurable(final Configurable configurable)
-  {
-    mConfigurables.push(configurable);
-  }
-
-  public Stack<Configurable> getConfigurables()
-  {
-    return mConfigurables;
-  }
-
-  public void showHelpMessage(final PrintStream stream)
-  {
-    final List<String> keys = new ArrayList<>(mArgumentMap.keySet());
-    Collections.sort(keys);
-    for (final String key : keys) {
-      final CommandLineArgument<?> arg = mArgumentMap.get(key);
-      if (arg.isPrimaryKey(key)) {
-        arg.dump(stream);
-      }
+    mDES = des;
+    for (final ArgumentSource source : mArgumentSources) {
+      source.updateContext();
     }
   }
 
   public void configure(final Configurable configurable)
+    throws AnalysisException
   {
-    for (final CommandLineArgument<?> arg : mArgumentList) {
-      if (arg.isUsed()) {
-        configurable.setOption(arg.getOption());
-      }
+    for (final ArgumentSource source : mArgumentSources) {
+      source.configure(configurable);
+    }
+  }
+
+  public void showHelpMessage(final PrintStream stream)
+  {
+    for (final ArgumentSource source : mArgumentSources) {
+      source.showHelpMessage(stream);
     }
   }
 
 
   //#########################################################################
-  //# Data Members
-  private final Map<String, CommandLineArgument<?>> mArgumentMap =
-    new HashMap<>(64);
-  private final List<CommandLineArgument<?>> mArgumentList =
-    new ArrayList<>(64);
+  //# Auxiliary Methods
+  private <T> CommandLineArgument<T> registerOption(final Option<T> option)
+  {
+    final CommandLineArgument<T> arg =
+      (CommandLineArgument<T>) option.createEditor(this);
+    if (arg != null) {
+      for (final String key : arg.getKeys()) {
+        mArgumentMap.put(key, arg);
+      }
+    }
+    return arg;
+  }
 
-  private final Stack<ArgumentSource> mArgumentSources;
-  private final Stack<Configurable> mConfigurables;
+
+  //#########################################################################
+  //# Inner Class ArgumentSource
+  private class ArgumentSource
+  {
+    //#######################################################################
+    //# Constructor
+    private ArgumentSource(final LeafOptionPage page,
+                           final Configurable configurable)
+    {
+      mConfigurable = configurable;
+      final List<Option<?>> options = configurable.getOptions(page);
+      mArguments = new ArrayList<>(options.size());
+      for (final Option<?> option : options) {
+        final CommandLineArgument<?> arg = registerOption(option);
+        if (arg != null) {
+          mArguments.add(arg);
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private void showHelpMessage(final PrintStream stream)
+    {
+      stream.print(ProxyTools.getShortClassName(mConfigurable));
+      stream.println(" supports the following options:");
+      final List<CommandLineArgument<?>> args = new ArrayList<>(mArguments);
+      Collections.sort(args);
+      for (final CommandLineArgument<?> arg : args) {
+        arg.dump(stream);
+      }
+    }
+
+    private void updateContext()
+      throws AnalysisException
+    {
+      for (final CommandLineArgument<?> arg : mArguments) {
+        arg.updateContext(CommandLineOptionContext.this);
+      }
+    }
+
+    private void configure(final Configurable configurable)
+      throws AnalysisException
+    {
+      for (final CommandLineArgument<?> arg : mArguments) {
+        final Option<?> option = arg.getOption();
+        configurable.setOption(option);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Configurable mConfigurable;
+    private final List<CommandLineArgument<?>> mArguments;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final Map<String,CommandLineArgument<?>> mArgumentMap;
+  private final List<ArgumentSource> mArgumentSources;
 
   private ProductDESProxy mDES;
+
 
 }

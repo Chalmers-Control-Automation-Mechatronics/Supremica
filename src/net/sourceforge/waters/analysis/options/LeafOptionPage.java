@@ -98,6 +98,16 @@ public abstract class LeafOptionPage extends OptionPage
 
 
   //#########################################################################
+  //# Access
+  public void restoreDefaultValues()
+  {
+    for (final Option<?> option : mMap.values()) {
+      option.restoreDefaultValue();
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final String mTitle;
   private final String mPrefix;

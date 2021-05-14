@@ -235,12 +235,22 @@ public abstract class Option<T> implements Cloneable
 
   public abstract void set(String text);
 
-  public String getAsString() {
-    return ""+mValue;
+  public String getAsString()
+  {
+    if (mValue == null) {
+      return "";
+    } else {
+      return mValue.toString();
+    }
   }
 
-  public String getDefaultAsString() {
-    return ""+mDefaultValue;
+  public String getDefaultAsString()
+  {
+    if (mDefaultValue == null) {
+      return "";
+    } else {
+      return mDefaultValue.toString();
+    }
   }
 
 

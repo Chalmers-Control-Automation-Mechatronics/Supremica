@@ -33,10 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
-import java.util.Collection;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -72,7 +70,6 @@ public class PropositionCommandLineArgument
   //# Parsing
   @Override
   public void parse(final CommandLineOptionContext context,
-                    final Collection<Configurable> configurables,
                     final ListIterator<String> iter)
     throws AnalysisException
   {

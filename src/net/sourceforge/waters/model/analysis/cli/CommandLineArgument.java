@@ -128,8 +128,7 @@ public abstract class CommandLineArgument<T>
 
   //#########################################################################
   //# Parsing
-  public abstract void parse(final CommandLineOptionContext context,
-                             final Collection<Configurable> configurables,
+  public abstract void parse(CommandLineOptionContext context,
                              ListIterator<String> iter)
     throws AnalysisException;
 
