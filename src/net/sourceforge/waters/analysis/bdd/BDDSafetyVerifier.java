@@ -149,7 +149,7 @@ public class BDDSafetyVerifier
     throws AnalysisException
   {
     LogManager.getLogger().debug("BDDSafetyVerifier.run(): " +
-                      getModel().getName() + " ...");
+                                 getModel().getName() + " ...");
     try {
       setUp();
       createAutomatonBDDs();
@@ -169,8 +169,10 @@ public class BDDSafetyVerifier
       if (reachable != null) {
         reachable.free();
         setSatisfiedResult();
-      } else {
+      } else if (isDetailedOutputEnabled()) {
         computeCounterExample();
+      } else {
+        setBooleanResult(false);
       }
       return isSatisfied();
     } catch (final AnalysisException exception) {
@@ -189,7 +191,7 @@ public class BDDSafetyVerifier
     } finally {
       tearDown();
       LogManager.getLogger().debug("BDDSafetyVerifier.run(): " +
-                        getModel().getName() + " done.");
+                                   getModel().getName() + " done.");
     }
   }
 
