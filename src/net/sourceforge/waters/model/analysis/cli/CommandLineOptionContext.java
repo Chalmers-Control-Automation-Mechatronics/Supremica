@@ -73,7 +73,6 @@ import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -236,7 +235,7 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   public void parse(final ListIterator<String> iter)
-    throws AnalysisException, ParseException
+    throws AnalysisException
   {
     while (iter.hasNext()) {
       final String name = iter.next();

@@ -73,14 +73,28 @@ public class ParameterBindingListCommandLineArgument
   @Override
   public void parse(final CommandLineOptionContext context,
                     final ListIterator<String> iter)
-    throws ParseException
   {
     iter.remove();
     if (iter.hasNext()) {
-      final String value = iter.next();
-      getOption().set(value);
-      iter.remove();
-      setUsed(true);
+      final String text = iter.next();
+      try {
+        getOption().set(text);
+        iter.remove();
+        setUsed(true);
+      } catch (final ParseException exception) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Option ");
+        builder.append(getCommandLineCode());
+        builder.append(' ');
+        builder.append(text);
+        builder.append(" does not specify a valid parameter binding.");
+        final String msg = exception.getMessage();
+        if (msg != null) {
+          builder.append('\n');
+          builder.append(msg);
+        }
+        fail(builder.toString());
+      }
     } else {
       failMissingValue();
     }

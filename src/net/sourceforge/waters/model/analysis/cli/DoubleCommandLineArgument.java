@@ -65,14 +65,18 @@ public class DoubleCommandLineArgument extends OptionCommandLineArgument<Double>
   @Override
   public void parse(final CommandLineOptionContext context,
                     final ListIterator<String> iter)
-    throws ParseException
   {
     iter.remove();
     if (iter.hasNext()) {
       final String text = iter.next();
-      getOption().set(text);
-      iter.remove();
-      setUsed(true);
+      try {
+        getOption().set(text);
+        iter.remove();
+        setUsed(true);
+      } catch (final ParseException exception) {
+        fail("Option " + getCommandLineCode() + " " + text +
+             " does not specify a number.");
+      }
     } else {
       failMissingValue();
     }

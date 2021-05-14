@@ -248,7 +248,6 @@ public class TRControllabilityChecker
   {
     try {
       setUp();
-
       final VerificationResult result = getAnalysisResult();
       if (result.isFinished()) {
         return result.isSatisfied();
@@ -269,11 +268,15 @@ public class TRControllabilityChecker
         delegate.run();
         final VerificationResult subResult = delegate.getAnalysisResult();
         result.merge(subResult);
-         if (!subResult.isSatisfied()) {
-          final TRTraceProxy trace =
-            (TRTraceProxy) delegate.getCounterExample();
-          convertCounterExample(trace, event);
-          return setFailedResult(trace);
+        if (!subResult.isSatisfied()) {
+          if (isDetailedOutputEnabled()) {
+            final TRTraceProxy trace =
+              (TRTraceProxy) delegate.getCounterExample();
+            convertCounterExample(trace, event);
+            return setFailedResult(trace);
+          } else {
+            return setBooleanResult(false);
+          }
         }
       }
       return setSatisfiedResult();

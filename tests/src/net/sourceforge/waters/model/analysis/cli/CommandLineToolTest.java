@@ -162,6 +162,19 @@ public class CommandLineToolTest
                     "counterexample:", "Statistics:");
   }
 
+  public void testAnalyzer_TRCompControllability()
+    throws Exception
+  {
+    final File file1 = getInputWmod("handwritten", "small_factory_2");
+    final File file2 = getInputWmod("handwritten", "small_factory_2u");
+    final String[] args = new String[]
+      {"TRCompositional", "ControllabilityChecker",
+       file1.toString(), file2.toString(), "-q", "-nout"};
+    testCommandLine("trcomp-cont", args,
+                    "small_factory_2 ... true \\(.*",
+                    "small_factory_2u ... false \\(.*");
+  }
+
   public void testAnalyzer_TRCompConflict()
     throws Exception
   {
@@ -203,6 +216,27 @@ public class CommandLineToolTest
                     "FATAL ERROR \\(BadFileTypeException\\)");
   }
 
+  public void testOption_FslimitBad()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "small_factory_2");
+    final String[] args =
+      new String[] {"Monolithic", "ControllabilityChecker",
+                    "-fslimit", "xxx", file.toString()};
+    testCommandLine("fslimit-bad", args,
+                    "Option -fslimit xxx does not specify an integer\\.");
+  }
+
+  public void testOption_FslimitOverflow()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "small_factory_2");
+    final String[] args =
+      new String[] {"Monolithic", "ControllabilityChecker",
+                    "-fslimit", "3", file.toString()};
+    testCommandLine("fslimit-overflow", args, "!true.*", "OVERFLOW \\(.*");
+  }
+
   public void testOption_Help()
     throws Exception
   {
@@ -235,12 +269,21 @@ public class CommandLineToolTest
     testCommandLine("quiet", args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
   }
 
+  public void testOption_Timeout()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "incremental_suite", "agv");
+    final String[] args = new String[]
+      {"Native", "ConflictChecker", "-timeout", "1", file.toString()};
+    testCommandLine("timeout", args, "!true.*", "TIMEOUT \\(.*");
+  }
+
   public void testOption_Unsupported()
     throws Exception
   {
     final String[] args = new String[]
       {"Monolithic", "DiagnosabilityChecker", "-verose"};
-    testCommandLine("unsopported", args, "Unsupported option -verose.*");
+    testCommandLine("unsupported", args, "Unsupported option -verose.*");
   }
 
   public void testOption_Verbose()

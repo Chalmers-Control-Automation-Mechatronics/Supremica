@@ -40,7 +40,6 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.expr.ParseException;
 
 /**
  *
@@ -99,7 +98,7 @@ public abstract class CommandLineArgument
   //# Parsing
   public abstract void parse(CommandLineOptionContext context,
                              ListIterator<String> iter)
-    throws AnalysisException, ParseException;
+    throws AnalysisException;
 
   public void updateContext(final CommandLineOptionContext context)
     throws AnalysisException
@@ -175,7 +174,7 @@ public abstract class CommandLineArgument
   protected void failMissingValue()
   {
     fail("No value specified for command line argument " +
-         getCommandLineCode() + "!");
+         getCommandLineCode() + ".");
   }
 
 
