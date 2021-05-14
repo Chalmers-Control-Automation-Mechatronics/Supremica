@@ -98,6 +98,7 @@ import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.EventKind;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -116,7 +117,6 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.Config;
 
 
 /**
@@ -225,7 +225,7 @@ public class EventDeclEditorDialog
     if (mNamePanel == null) {
       // Initialising for the first time. Everything needs to be done.
       // Name panel, basic part ...
-      final boolean advanced = Config.INCLUDE_INSTANTIATION.getValue();
+      final boolean advanced = CompilerOptions.INCLUDE_INSTANTIATION.getValue();
       mNamePanel = new RaisedDialogPanel();
       mNameLabel = new JLabel("Name:");
       final EventNameInputHandler handler = new EventNameInputHandler();

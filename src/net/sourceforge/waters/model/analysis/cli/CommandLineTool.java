@@ -78,6 +78,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -236,12 +237,9 @@ public class CommandLineTool implements Configurable
 
       final LeafOptionPage toolPage = new CommandLineToolOptionPage();
       mContext.registerArguments(toolPage, this);
-      /* TODO set up compiler option page
-      final LeafOptionPage compilerPage =
       final ModuleCompiler dummyCompiler =
         new ModuleCompiler(null, null, null);
-      mContext.registerArguments(toolPage, dummyCompiler);
-      */
+      mContext.registerArguments(CompilerOptions.PAGE, dummyCompiler);
       final AnalysisOptionPage analyserPage = operation.getOptionPage();
       mContext.registerArguments(analyserPage, mAnalyzer);
 
@@ -522,7 +520,7 @@ public class CommandLineTool implements Configurable
       register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
                                  "Print statistics", "+stats", false));
       register(new FileOption(OPTION_CommandLineTool_Csv, null,
-                              "CSV output file name", "-csv"));
+                              "Save statistics in CSV file", "-csv"));
       register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
                                      "Maximum allowed runtime in seconds",
                                      "-timeout"));

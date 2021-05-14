@@ -408,7 +408,7 @@ public class MainMenuBar
             }
         });
 
-        if (Config.INCLUDE_USER_INTERFACE.getValue())
+        // if (Config.INCLUDE_USER_INTERFACE.getValue()) "Include SwiXML Analyzer Tools"
         {
 
             // Project.UserInterface

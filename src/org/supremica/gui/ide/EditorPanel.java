@@ -69,11 +69,10 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-
-import org.supremica.properties.Config;
 
 
 /**
@@ -109,7 +108,7 @@ public class EditorPanel
     final AliasesPanel aliasesPanel =
       new AliasesPanel(mModuleContainer, manager);
     mAliasesTab = new Tab("Definitions", aliasesPanel);
-    if (Config.INCLUDE_INSTANTIATION.getValue()) {
+    if (CompilerOptions.INCLUDE_INSTANTIATION.getValue()) {
       mAliasesTab.addToTabbedPane();
     }
     mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
@@ -129,7 +128,7 @@ public class EditorPanel
 
     mCommentPanel = new CommentPanel(moduleContainer);
     setRightComponent(mCommentPanel);
-    Config.INCLUDE_INSTANTIATION.addOptionChangeListener(this);
+    CompilerOptions.INCLUDE_INSTANTIATION.addOptionChangeListener(this);
   }
 
 
@@ -331,7 +330,7 @@ public class EditorPanel
   @Override
   public void optionChanged(final OptionChangeEvent event)
   {
-    if (Config.INCLUDE_INSTANTIATION.getValue()) {
+    if (CompilerOptions.INCLUDE_INSTANTIATION.getValue()) {
       mAliasesTab.addToTabbedPane(0);
     } else {
       mAliasesTab.removeFromTabbedPane();

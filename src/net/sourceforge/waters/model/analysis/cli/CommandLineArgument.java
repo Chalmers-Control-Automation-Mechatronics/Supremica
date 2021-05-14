@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -92,12 +91,6 @@ public abstract class CommandLineArgument<T>
     return Collections.singletonList(code);
   }
 
-  public boolean isPrimaryKey(final String key)
-  {
-    final String primary = getKeys().iterator().next();
-    return primary.equals(key);
-  }
-
   public boolean isUsed()
   {
     return mUsed;
@@ -111,13 +104,6 @@ public abstract class CommandLineArgument<T>
   protected String getArgumentTemplate()
   {
     return null;
-  }
-
-  public void setOption(final Configurable configurable)
-  {
-    if (mUsed) {
-      configurable.setOption(getOption());
-    }
   }
 
   public T getValue()

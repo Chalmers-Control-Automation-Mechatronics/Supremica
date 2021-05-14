@@ -38,20 +38,20 @@ import net.sourceforge.waters.analysis.options.OptionChangeListener;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.Config;
 
 
 /**
  * An abstract insertion action for instantiation-related features.
  *
  * This action supports smarter action enablement by registering a
- * listener on the option {@link Config#INCLUDE_INSTANTIATION} and to
- * selection changes. The action is enabled if {@link
- * Config#INCLUDE_INSTANTIATION} is selected. Additionally, it is possible
- * to implement a type-dependent check to determine whether the currently
- * active panel can accept an insertion.
+ * listener on the option {@link CompilerOptions#INCLUDE_INSTANTIATION} and
+ * to selection changes. The action is enabled if {@link
+ * CompilerOptions#INCLUDE_INSTANTIATION} is selected. Additionally, it is
+ * possible to implement a type-dependent check to determine whether the
+ * currently active panel can accept an insertion.
  *
  * @author Robi Malik
  */
@@ -66,7 +66,7 @@ public abstract class AbstractInsertAction
   AbstractInsertAction(final IDE ide)
   {
     super(ide);
-    Config.INCLUDE_INSTANTIATION.addOptionChangeListener(this);
+    CompilerOptions.INCLUDE_INSTANTIATION.addOptionChangeListener(this);
   }
 
 
@@ -108,7 +108,7 @@ public abstract class AbstractInsertAction
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    if (Config.INCLUDE_INSTANTIATION.getValue()) {
+    if (CompilerOptions.INCLUDE_INSTANTIATION.getValue()) {
       final FocusTracker tracker = getFocusTracker();
       final SelectionOwner panel = tracker.getWatersSelectionOwner();
       if (panel != null) {

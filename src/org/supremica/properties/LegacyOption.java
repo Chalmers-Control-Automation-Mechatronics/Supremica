@@ -125,6 +125,8 @@ public class LegacyOption
     createSimpleReplacement("gui.optimizingCompiler", "gui.compiler.optimizingCompiler");
     createSimpleReplacement("gui.normalizingCompiler", "gui.compiler.normalizingCompiler");
     createSimpleReplacement("gui.automatonVariablesCompiler", "gui.compiler.automatonVariablesCompiler");
+    // algorithms.hmi->gui.compiler
+    createSimpleReplacement("algorithms.hmi.expandEFA", "gui.compiler.efsmCompiler");
     // gui->misc
     createSimpleReplacement("gui.includeRASSupport", "misc.includeRASSupport");
     // gui.analyzer.includeDiagnosability ->

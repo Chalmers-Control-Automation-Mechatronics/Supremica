@@ -35,12 +35,16 @@ package net.sourceforge.waters.gui.compiler;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Timer;
 
+import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -59,7 +63,6 @@ import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
 
 /**
  * <P>The unit that controls background compilation in the IDE.</P>
@@ -111,33 +114,31 @@ public class BackgroundCompiler
     mWorker = new CompilationWorker(this, mCompiler, container.getName());
     container.getModule().addModelObserver(this);
 
-    mEnablementPropertyChangeListener =
-    new OptionChangeListener() {
+    mEnablementPropertyChangeListener = new OptionChangeListener() {
       @Override
       public void optionChanged(final OptionChangeEvent event)
       {
-        setTimerEnabled(Config.BACKGROUND_COMPILER.getValue());
+        setTimerEnabled(CompilerOptions.BACKGROUND_COMPILER.getValue());
       }
     };
     mEnablementPropertyChangeListener.optionChanged(null);
-    mCompilerPropertyChangeListener =
-    new OptionChangeListener() {
+    CompilerOptions.BACKGROUND_COMPILER.
+    addOptionChangeListener(mEnablementPropertyChangeListener);
+    mCompilerPropertyChangeListener = new OptionChangeListener() {
       @Override
       public void optionChanged(final OptionChangeEvent event)
       {
         setModuleChanged();
       }
     };
-    Config.BACKGROUND_COMPILER
-    .addOptionChangeListener(mEnablementPropertyChangeListener);
-    Config.OPTIMIZING_COMPILER
-    .addOptionChangeListener(mCompilerPropertyChangeListener);
-    Config.EXPAND_EXTENDED_AUTOMATA
-    .addOptionChangeListener(mCompilerPropertyChangeListener);
-    Config.NORMALIZING_COMPILER
-    .addOptionChangeListener(mCompilerPropertyChangeListener);
-    Config.AUTOMATON_VARIABLES_COMPILER
-    .addOptionChangeListener(mCompilerPropertyChangeListener);
+    final List<Option<?>> options = mCompiler.getOptions(CompilerOptions.PAGE);
+    mOptions = new ArrayList<>(options.size());
+    for (final Option<?> option : options) {
+      if (option.isEditable()) {
+        mOptions.add(option);
+        option.addOptionChangeListener(mCompilerPropertyChangeListener);
+      }
+    }
     mAbortButtonAction = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e)
@@ -147,7 +148,7 @@ public class BackgroundCompiler
       }
     };
     mModuleChanged = true;
-    if (Config.BACKGROUND_COMPILER.getValue()) {
+    if (CompilerOptions.BACKGROUND_COMPILER.getValue()) {
       compile(null);
     }
   }
@@ -199,14 +200,9 @@ public class BackgroundCompiler
     if (mModuleChanged && !mRunning) {
       mModuleChanged = false;
       mRunning = true;
-      mCompiler.setOptimizationEnabled
-        (Config.OPTIMIZING_COMPILER.getValue());
-      mCompiler.setExpandingEFATransitions
-        (Config.EXPAND_EXTENDED_AUTOMATA.getValue());
-      mCompiler.setNormalizationEnabled
-        (Config.NORMALIZING_COMPILER.getValue());
-      mCompiler.setAutomatonVariablesEnabled
-        (Config.AUTOMATON_VARIABLES_COMPILER.getValue());
+      for (final Option<?> option : mOptions) {
+        mCompiler.setOption(option);
+      }
       mCompiler.setInputModule(mModuleContainer.getModule(), true);
       mWorker.compile();
     } else if (mModuleChanged && mRunning) {
@@ -234,19 +230,15 @@ public class BackgroundCompiler
   /**
    * Terminates the background compiler. This method is called for cleanup
    * when the {@link ModuleContainer} is closed in the IDE. It cancels any
-   * running compilation and stops all threads.
+   * running compilation, stops all threads, and unregisters all option
+   * listeners.
    */
   public void terminate()
   {
-    Config.OPTIMIZING_COMPILER.removeOptionChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.EXPAND_EXTENDED_AUTOMATA.removeOptionChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.NORMALIZING_COMPILER.removeOptionChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.AUTOMATON_VARIABLES_COMPILER.removeOptionChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.BACKGROUND_COMPILER.removeOptionChangeListener
+    for (final Option<?> option : mOptions) {
+      option.removeOptionChangeListener(mCompilerPropertyChangeListener);
+    }
+    CompilerOptions.BACKGROUND_COMPILER.removeOptionChangeListener
       (mEnablementPropertyChangeListener);
     setTimerEnabled(false);
     mWorker.terminate();
@@ -413,6 +405,7 @@ public class BackgroundCompiler
   //# Data Members
   private final ModuleContainer mModuleContainer;
   private final ModuleCompiler mCompiler;
+  private final List<Option<?>> mOptions;
   private final CompilationWorker mWorker;
   private final OptionChangeListener mEnablementPropertyChangeListener;
   private final OptionChangeListener mCompilerPropertyChangeListener;

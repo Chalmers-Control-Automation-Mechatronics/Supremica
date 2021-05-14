@@ -92,7 +92,10 @@ public abstract class EnumFactory<E>
     int column = 0;
     boolean first = true;
     for (final E item : getEnumConstants()) {
-      final String label = getConsoleName(item);
+      String label = getConsoleName(item);
+      if (item == getDefaultValue()) {
+        label += " (default)";
+      }
       final int len = label.length();
       if (first) {
         first = false;

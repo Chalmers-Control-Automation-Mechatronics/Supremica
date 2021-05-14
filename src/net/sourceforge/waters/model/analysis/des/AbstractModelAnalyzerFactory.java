@@ -415,13 +415,6 @@ public abstract class AbstractModelAnalyzerFactory
   public static final String OPTION_SynchronousProductBuilder_RemovingSelfloops =
     "SynchronousProductBuilder.RemovingSelfloops";
 
-  public static final String OPTION_ModuleCompiler_Optimisation =
-    "ModuleCompiler.Optimisation";
-    // "AbstractModelAnalyzerFactory.NoOptimisation";
-  public static final String OPTION_ModuleCompiler_HISCModule =
-    "ModuleCompiler.HISCModule";
-    // "AbstractModelAnalyzerFactory.HISCModule";
-
   public static final String OPTION_ConflictChecker_ConfiguredDefaultMarkingString =
     "ConflictChecker.ConfiguredDefaultMarkingString";
   public static final String OPTION_ConflictChecker_ConfiguredPreconditionMarkingString =

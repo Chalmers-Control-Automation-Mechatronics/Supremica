@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.util.List;
-
 /**
  *
  * @author Benjamin Wheeler
@@ -42,19 +40,21 @@ import java.util.List;
 public abstract class SimpleLeafOptionPage extends LeafOptionPage
 {
 
+  //#########################################################################
+  //# Constructor
   public SimpleLeafOptionPage(final String prefix, final String title)
   {
     super(prefix, title);
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.analysis.options.LeafOptionPage
   @Override
-  public OptionPageEditor<SimpleLeafOptionPage> createEditor(final OptionContext context)
+  public OptionPageEditor<SimpleLeafOptionPage>
+  createEditor(final OptionContext context)
   {
     return context.createSimpleLeafOptionPageEditor(this);
   }
-
-  @Override
-  public abstract List<Option<?>> getOptions();
-
 
 }

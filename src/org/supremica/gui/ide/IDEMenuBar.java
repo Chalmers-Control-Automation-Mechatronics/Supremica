@@ -133,6 +133,7 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
@@ -331,8 +332,8 @@ public class IDEMenuBar
     menu.add(insComp);
     final Action insVar = actions.getAction(InsertVariableAction.class);
     menu.add(insVar);
-    addOption(Config.INCLUDE_INSTANTIATION);
-    if (Config.INCLUDE_INSTANTIATION.getBooleanValue()) {
+    addOption(CompilerOptions.INCLUDE_INSTANTIATION);
+    if (CompilerOptions.INCLUDE_INSTANTIATION.getBooleanValue()) {
       final Action insConditional =
         actions.getAction(InsertConditionalAction.class);
       menu.add(insConditional);
@@ -473,8 +474,8 @@ public class IDEMenuBar
     menu.setMnemonic(KeyEvent.VK_T);
     final Action layout = actions.getAction(GraphLayoutAction.class);
     menu.add(layout);
-    addOption(Config.INCLUDE_INSTANTIATION);
-    if (Config.INCLUDE_INSTANTIATION.getBooleanValue()) {
+    addOption(CompilerOptions.INCLUDE_INSTANTIATION);
+    if (CompilerOptions.INCLUDE_INSTANTIATION.getBooleanValue()) {
       final Action instantiation =
         actions.getAction(InstantiateModuleAction.class);
       menu.add(instantiation);

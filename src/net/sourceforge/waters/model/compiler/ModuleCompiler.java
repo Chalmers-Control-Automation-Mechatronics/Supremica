@@ -257,26 +257,45 @@ public class ModuleCompiler extends AbortableCompiler
   public List<Option<?>> getOptions(final OptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
-    page.append(options, AbstractModelAnalyzerFactory.
-                         OPTION_ModuleCompiler_Optimisation);
-    page.append(options, AbstractModelAnalyzerFactory.
-                         OPTION_ModuleCompiler_HISCModule);
+    page.append(options, CompilerOptions.
+                         OPTION_ModuleCompiler_OptimizingCompiler);
+    page.append(options, CompilerOptions.
+                         OPTION_ModuleCompiler_EFSMCompiler);
+    page.append(options, CompilerOptions.
+                         OPTION_ModuleCompiler_NormalizingCompiler);
+    page.append(options, CompilerOptions.
+                         OPTION_ModuleCompiler_AutomatonVariablesCompiler);
+    page.append(options, CompilerOptions.
+                         OPTION_ModuleCompiler_HISCCompiler);
     return options;
   }
 
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(AbstractModelAnalyzerFactory.
-                     OPTION_ModuleCompiler_Optimisation)) {
+    if (option.hasID(CompilerOptions.
+                     OPTION_ModuleCompiler_OptimizingCompiler)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setOptimizationEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModuleCompiler_HISCModule)) {
+    } else if (option.hasID(CompilerOptions.
+                            OPTION_ModuleCompiler_EFSMCompiler)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setExpandingEFATransitions(boolOption.getBooleanValue());
+    } else if (option.hasID(CompilerOptions.
+                            OPTION_ModuleCompiler_NormalizingCompiler)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setNormalizationEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(CompilerOptions.
+                            OPTION_ModuleCompiler_AutomatonVariablesCompiler)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setAutomatonVariablesEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(CompilerOptions.
+                            OPTION_ModuleCompiler_HISCCompiler)) {
       final BooleanOption boolOption = (BooleanOption) option;
       if (boolOption.getBooleanValue()) {
         setHISCCompileMode(HISCCompileMode.HISC_HIGH);
-        setEnabledPropertyNames(null);
+      } else {
+        setHISCCompileMode(HISCCompileMode.NOT_HISC);
       }
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_LanguageInclusionChecker_Property)) {
@@ -309,19 +328,6 @@ public class ModuleCompiler extends AbortableCompiler
         setEnabledPropositionNames(props);
       }
     }
-  }
-
-  // TODO Use the regular compiler option page
-  public void registerOptions(final OptionPage page) {
-    page.register(new BooleanOption
-      (AbstractModelAnalyzerFactory.OPTION_ModuleCompiler_Optimisation, null,
-       "Enable or disable compiler optimisation",
-       "-opt", true));
-    page.register(new BooleanOption
-      (AbstractModelAnalyzerFactory.OPTION_ModuleCompiler_HISCModule, null,
-       "Enable or disable compilation as HISC module, "+
-       "only including interfaces of low levels",
-       "-hisc", false));
   }
 
 

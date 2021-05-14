@@ -2,13 +2,13 @@ package org.supremica.properties;
 
 import static org.supremica.properties.Config.*;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
 import net.sourceforge.waters.analysis.options.DefaultLeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 public class ConfigPages
 {
@@ -45,16 +45,8 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage GUI_COMPILER = new DefaultLeafOptionPage("gui.compiler", "Compiler") {
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      return createOptionList
-        (INCLUDE_INSTANTIATION, BACKGROUND_COMPILER,
-         OPTIMIZING_COMPILER, NORMALIZING_COMPILER,
-         AUTOMATON_VARIABLES_COMPILER);
-    }
-  };
+  public static final SimpleLeafOptionPage GUI_COMPILER =
+    CompilerOptions.PAGE;
 
   public static final SimpleLeafOptionPage GUI_EDITOR = new DefaultLeafOptionPage("gui.editor", "Editor") {
     @Override
@@ -184,16 +176,6 @@ public class ConfigPages
     }
   };
 
-  public static final SimpleLeafOptionPage ALGORITHMS_HMI =
-    new DefaultLeafOptionPage("algorithms.hmi", "HMI") {
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      return createOptionList(INCLUDE_USER_INTERFACE,
-                              EXPAND_EXTENDED_AUTOMATA);
-    }
-  };
-
   public static final SimpleLeafOptionPage MISC =
     new DefaultLeafOptionPage("misc", "Misc") {
     @Override
@@ -213,14 +195,6 @@ public class ConfigPages
     new AggregatorOptionPage("Supremica Analyzer", ConfigPages.ALGORITHMS_SYNCHRONIZATION,
                              ConfigPages.ALGORITHMS_VERIFICATION, ConfigPages.ALGORITHMS_SYNTHESIS,
                              ConfigPages.ALGORITHMS_MINIMIZATION,
-                             ConfigPages.ALGORITHMS_BDD, ConfigPages.ALGORITHMS_HMI, ConfigPages.GUI_DOT);
-
-  public static List<Option<?>> createOptionList(final Option<?>...options) {
-    final List<Option<?>> list = new LinkedList<>();
-    for (final Option<?> option : options) {
-      list.add(option);
-    }
-    return list;
-  }
+                             ConfigPages.ALGORITHMS_BDD, ConfigPages.GUI_DOT);
 
 }

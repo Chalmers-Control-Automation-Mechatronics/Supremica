@@ -67,6 +67,7 @@ import net.sourceforge.waters.model.analysis.kindtranslator.PropertySuppressionK
 import net.sourceforge.waters.model.analysis.kindtranslator.SynthesisKindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -93,7 +94,6 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.ProjectFactory;
 import org.supremica.automata.State;
-import org.supremica.properties.Config;
 
 
 /**
@@ -288,10 +288,10 @@ public class ProjectBuildFromWaters
     }
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
-    final boolean optimize = Config.OPTIMIZING_COMPILER.getValue();
-    final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.getValue();
-    final boolean normalize = Config.NORMALIZING_COMPILER.getValue();
-    final boolean autVars = Config.AUTOMATON_VARIABLES_COMPILER.getValue();
+    final boolean optimize = CompilerOptions.OPTIMIZING_COMPILER.getValue();
+    final boolean expand = CompilerOptions.EFSM_COMPILER.getValue();
+    final boolean normalize = CompilerOptions.NORMALIZING_COMPILER.getValue();
+    final boolean autVars = CompilerOptions.AUTOMATON_VARIABLES_COMPILER.getValue();
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, factory, module);
     compiler.setOptimizationEnabled(optimize);

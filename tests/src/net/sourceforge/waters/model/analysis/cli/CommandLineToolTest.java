@@ -50,6 +50,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -97,7 +98,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "bad_factory";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("TRCompositional", "ConflictChecker", file);
     testCommandLine(name, args, false, "counterexample:");
   }
@@ -106,7 +107,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "controlled_philosophers";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("BDD", "ConflictChecker", file,
                                   "-marking", "eaten[0]", "-verbose");
     testCommandLine(name, args,
@@ -117,7 +118,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "dining_philosophers";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("BDD", "ConflictChecker", file,
                                   "-marking", "eaten");
     testCommandLine(name, args, "FATAL.*", ".*'eaten'.*");
@@ -127,7 +128,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "g1";
-    final File file = getInputWMOD("tests", "generalisedNonblocking", name);
+    final File file = getInputWmod("tests", "generalisedNonblocking", name);
     final String[] args = getArgs("Native", "ConflictChecker", file,
                                   "-premarking", ":alpha",
                                   "-marking", ":accepting");
@@ -138,16 +139,25 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "small_factory_2";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("BDD", "ConflictChecker", file, "-q");
     testCommandLine(name, args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
   }
 
-  public void testControllabilitySmallFactory2()
+  public void testControllabilitySmallFactory2Wdes()
     throws Exception
   {
     final String name = "small_factory_2";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWdes("handwritten", name);
+    final String[] args = getArgs("Modular", "ControllabilityChecker", file);
+    testCommandLine(name, args, true);
+  }
+
+  public void testControllabilitySmallFactory2Wmod()
+    throws Exception
+  {
+    final String name = "small_factory_2";
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("Native", "ControllabilityChecker", file);
     testCommandLine(name, args, true);
   }
@@ -156,7 +166,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "small_factory_2u";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("Monolithic", "ControllabilityChecker", file);
     testCommandLine(name, args, false, "counterexample:", "!Statistics");
   }
@@ -165,18 +175,28 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "notDiag_1";
-    final File file = getInputWMOD("tests", "diagnosability", name);
+    final File file = getInputWmod("tests", "diagnosability", name);
     final String[] args = getArgs("Monolithic", "DiagnosabilityChecker", file);
     testCommandLine(name, args, false,
                     "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
   }
 
-  public void testLanguageInclusionJustProperty()
+  public void testLanguageInclusionJustPropertyNout()
     throws Exception
   {
     final String name = "just_property";
-    final File file = getInputWMOD("tests", "nasty", name);
+    final File file = getInputWmod("tests", "nasty", name);
     final String[] args = getArgs("BDD", "LanguageInclusionChecker", file,
+                                  "-property", "the_property", "-nout");
+    testCommandLine(name, args, false, "!counterexample:", "!Statistics:");
+  }
+
+  public void testLanguageInclusionJustPropertyStats()
+    throws Exception
+  {
+    final String name = "just_property";
+    final File file = getInputWmod("tests", "nasty", name);
+    final String[] args = getArgs("Native", "LanguageInclusionChecker", file,
                                   "-property", "the_property", "-stats");
     testCommandLine(name, args, false, "counterexample:", "Statistics:");
   }
@@ -199,7 +219,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String name = "controlled_philosophers";
-    final File file = getInputWMOD("handwritten", name);
+    final File file = getInputWmod("handwritten", name);
     final String[] args = getArgs("Monolithic", "DiagnosabilityChecker",
                                   file, "-verose");
     testCommandLine(name, args, "Unsupported option -verose.*");
@@ -217,6 +237,7 @@ public class CommandLineToolTest
       final AnalysisOptionPage page = operation.getOptionPage();
       page.restoreDefaultValues();
     }
+    CompilerOptions.PAGE.restoreDefaultValues();
   }
 
   @Override
@@ -235,9 +256,14 @@ public class CommandLineToolTest
 
   //#########################################################################
   //# Auxiliary Methods
-  private File getInputWMOD(final String... path)
+  private File getInputWmod(final String... path)
   {
     return getInputFile(path, ".wmod");
+  }
+
+  private File getInputWdes(final String... path)
+  {
+    return getInputFile(path, ".wdes");
   }
 
   private String[] getArgs(final String factory,

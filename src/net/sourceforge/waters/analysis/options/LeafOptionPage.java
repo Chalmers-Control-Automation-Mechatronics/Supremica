@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +105,15 @@ public abstract class LeafOptionPage extends OptionPage
     for (final Option<?> option : mMap.values()) {
       option.restoreDefaultValue();
     }
+  }
+
+  public static List<Option<?>> createOptionList(final Option<?>...options)
+  {
+    final List<Option<?>> list = new ArrayList<>(options.length);
+    for (final Option<?> option : options) {
+      list.add(option);
+    }
+    return list;
   }
 
 

@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -154,6 +155,25 @@ public class BooleanCommandLineArgument extends CommandLineArgument<Boolean>
     getOption().setValue(value);
     iter.remove();
     setUsed(true);
+  }
+
+
+  //#######################################################################
+  //# Printing
+  @Override
+  public void dump(final PrintStream stream)
+  {
+    super.dump(stream);
+    if (mKeyMap.containsValue(false)) {
+      doIndent(stream, INDENT);
+      stream.print("(enable or disable, ");
+      if (getOption().getDefaultValue()) {
+        stream.print("en");
+      } else {
+        stream.print("dis");
+      }
+      stream.println("abled by default)");
+    }
   }
 
 

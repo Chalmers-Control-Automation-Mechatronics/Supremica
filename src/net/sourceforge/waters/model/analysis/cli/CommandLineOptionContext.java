@@ -286,18 +286,7 @@ public class CommandLineOptionContext implements OptionContext
     }
 
     //#######################################################################
-    //# Data Members
-    private void showHelpMessage(final PrintStream stream)
-    {
-      stream.print(ProxyTools.getShortClassName(mConfigurable));
-      stream.println(" supports the following options:");
-      final List<CommandLineArgument<?>> args = new ArrayList<>(mArguments);
-      Collections.sort(args);
-      for (final CommandLineArgument<?> arg : args) {
-        arg.dump(stream);
-      }
-    }
-
+    //# Auxiliary Methods
     private void updateContext()
       throws AnalysisException
     {
@@ -314,6 +303,18 @@ public class CommandLineOptionContext implements OptionContext
         configurable.setOption(option);
       }
     }
+
+    private void showHelpMessage(final PrintStream stream)
+    {
+      stream.print(ProxyTools.getShortClassName(mConfigurable));
+      stream.println(" supports the following options:");
+      final List<CommandLineArgument<?>> args = new ArrayList<>(mArguments);
+      Collections.sort(args);
+      for (final CommandLineArgument<?> arg : args) {
+        arg.dump(stream);
+      }
+    }
+
 
     //#######################################################################
     //# Data Members
