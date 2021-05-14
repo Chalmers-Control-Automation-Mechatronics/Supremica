@@ -93,156 +93,117 @@ public class CommandLineToolTest
 
 
   //#########################################################################
-  //# Test Cases
-  public void testConflictBadFactory()
+  //# Test Cases - specific combinations of factory/algorithm
+  public void testAnalyzer_BDDLanguageInclusion()
     throws Exception
   {
-    final String name = "bad_factory";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"TRCompositional", "ConflictChecker", file.toString()};
-    testCommandLine(name, args, false, "counterexample:");
-  }
-
-  public void testConflictControlledPhilosophers()
-    throws Exception
-  {
-    final String name = "controlled_philosophers";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"BDD", "ConflictChecker", file.toString(),
-       "-marking", "eaten[0]", "-verbose"};
-    testCommandLine(name, args,
-                    "DEBUG Depth .*", "DEBUG Coreachability .*");
-  }
-
-  public void testConflictDiningPhilosophers()
-    throws Exception
-  {
-    final String name = "dining_philosophers";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"BDD", "ConflictChecker", file.toString(), "-marking", "eaten"};
-    testCommandLine(name, args, "FATAL.*", ".*'eaten'.*");
-  }
-
-  public void testConflictG1()
-    throws Exception
-  {
-    final String name = "g1";
-    final File file = getInputWmod("tests", "generalisedNonblocking", name);
-    final String[] args = new String[]
-      {"Native", "ConflictChecker", file.toString(),
-       "-premarking", ":alpha", "-marking", ":accepting"};
-    testCommandLine(name, args, true);
-  }
-
-  public void testConflictSmallFactory2()
-    throws Exception
-  {
-    final String name = "small_factory_2";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"BDD", "ConflictChecker", file.toString(), "-q"};
-    testCommandLine(name, args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
-  }
-
-  public void testControllabilitySmallFactory2Wdes()
-    throws Exception
-  {
-    final String name = "small_factory_2";
-    final File file = getInputWdes("handwritten", name);
-    final String[] args = new String[]
-      {"Modular", "ControllabilityChecker", file.toString()};
-    testCommandLine(name, args, true);
-  }
-
-  public void testControllabilitySmallFactory2Wmod()
-    throws Exception
-  {
-    final String name = "small_factory_2";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"Native", "ControllabilityChecker", file.toString()};
-    testCommandLine(name, args, true);
-  }
-
-  public void testControllabilitySmallFactory2u()
-    throws Exception
-  {
-    final String name = "small_factory_2u";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"Monolithic", "ControllabilityChecker", file.toString()};
-    testCommandLine(name, args, false, "counterexample:", "!Statistics");
-  }
-
-  public void testCountTransferLine2()
-    throws Exception
-  {
-    final String name = "transferline";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"Native", "StateCounter", "-D", "N=2", "-stats", file.toString()};
-    testCommandLine(name, args, true, "Total number of states: 410");
-  }
-
-  public void testDiagnosabilityNotDiag1()
-    throws Exception
-  {
-    final String name = "notDiag_1";
-    final File file = getInputWmod("tests", "diagnosability", name);
-    final String[] args = new String[]
-      {"Monolithic", "DiagnosabilityChecker", file.toString()};
-    testCommandLine(name, args, false,
-                    "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
-  }
-
-  public void testLanguageInclusionJustPropertyNout()
-    throws Exception
-  {
-    final String name = "just_property";
-    final File file = getInputWmod("tests", "nasty", name);
+    final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
       {"BDD", "LanguageInclusionChecker", file.toString(),
        "-property", "the_property", "-nout"};
-    testCommandLine(name, args, false, "!counterexample:", "!Statistics:");
+    testCommandLine("bdd-lang", args, false, "!counterexample:", "!Statistics:");
   }
 
-  public void testLanguageInclusionJustPropertyStats()
+  public void testAnalyzer_ModularControllability()
     throws Exception
   {
-    final String name = "just_property";
-    final File file = getInputWmod("tests", "nasty", name);
+    final File file = getInputWdes("handwritten", "small_factory_2");
+    final String[] args = new String[]
+      {"Modular", "ControllabilityChecker", file.toString()};
+    testCommandLine("mod-cont", args, true);
+  }
+
+  public void testAnalyzer_MonolithicControllability()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "small_factory_2u");
+    final String[] args = new String[]
+      {"Monolithic", "ControllabilityChecker", file.toString()};
+    testCommandLine("mono-cont", args, false, "counterexample:", "!Statistics");
+  }
+
+  public void testAnalyzer_MonolithicDiagnosability()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "diagnosability", "notDiag_1");
+    final String[] args = new String[]
+      {"Monolithic", "DiagnosabilityChecker", file.toString()};
+    testCommandLine("mono-diag", args, false,
+                    "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
+  }
+
+  public void testAnalyzer_NativeControllability()
+    throws Exception
+  {
+    final File file = getInputWdes("handwritten", "small_factory_2");
+    final String[] args = new String[]
+      {"Native", "ControllabilityChecker", file.toString()};
+    testCommandLine("native-cont", args, true);
+  }
+
+  public void testAnalyzer_NativeGNonblocking()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "generalisedNonblocking", "g1");
+    final String[] args = new String[]
+      {"Native", "ConflictChecker", file.toString(),
+       "-premarking", ":alpha", "-marking", ":accepting"};
+    testCommandLine("native-gnonblocking", args, true);
+  }
+
+  public void testAnalyzer_NativeLanguageInclusion()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
       {"Native", "LanguageInclusionChecker", file.toString(),
        "-property", "the_property", "-stats"};
-    testCommandLine(name, args, false, "counterexample:", "Statistics:");
+    testCommandLine("native-lang", args, false,
+                    "counterexample:", "Statistics:");
   }
 
-  public void testEndOptionFail()
+  public void testAnalyzer_TRCompConflict()
     throws Exception
   {
-    final String name = "just_property";
-    final File file = getInputWmod("tests", "nasty", name);
+    final File file = getInputWmod("handwritten", "bad_factory");
+    final String[] args = new String[]
+      {"TRCompositional", "ConflictChecker", file.toString()};
+    testCommandLine("trcomp-conf", args, false, "counterexample:");
+  }
+
+
+  //#########################################################################
+  //# Test Cases - specific combinations of options
+  public void testOption_D()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "transferline");
+    final String[] args = new String[]
+      {"Native", "StateCounter", "-D", "N=2", "-stats", file.toString()};
+    testCommandLine("binding", args, true, "Total number of states: 410");
+  }
+
+  public void testOption_End()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "small_factory_2u");
+    final String[] args = new String[]
+      {"Modular", "ControllabilityChecker", "--", file.toString()};
+    testCommandLine("end", args, false);
+  }
+
+  public void testOption_EndBad()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args =
       new String[] {"Monolithic", "ControllabilityChecker",
                     "--", "-opt", file.toString()};
-    testCommandLine("end", args,
+    testCommandLine("end-bad", args,
                     "FATAL ERROR \\(BadFileTypeException\\)");
   }
 
-  public void testEndOptionSuccess()
-    throws Exception
-  {
-    final String name = "small_factory_2u";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = new String[]
-      {"Modular", "ControllabilityChecker", "--", file.toString()};
-    testCommandLine(name, args, false);
-  }
-
-  public void testHelpOption()
+  public void testOption_Help()
     throws Exception
   {
     final String[] args =
@@ -256,12 +217,41 @@ public class CommandLineToolTest
                     "=-quiet\\|-q.*");
   }
 
-  public void testUnsupportedOption()
+  public void testOption_MarkingBad()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "dining_philosophers");
+    final String[] args = new String[]
+      {"BDD", "ConflictChecker", file.toString(), "-marking", "eaten"};
+    testCommandLine("marking-bad", args, "FATAL.*", ".*'eaten'.*");
+  }
+
+  public void testOption_Quiet()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "small_factory_2");
+    final String[] args = new String[]
+      {"BDD", "ConflictChecker", file.toString(), "-q"};
+    testCommandLine("quiet", args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
+  }
+
+  public void testOption_Unsupported()
     throws Exception
   {
     final String[] args = new String[]
       {"Monolithic", "DiagnosabilityChecker", "-verose"};
-    testCommandLine("verose", args, "Unsupported option -verose.*");
+    testCommandLine("unsopported", args, "Unsupported option -verose.*");
+  }
+
+  public void testOption_Verbose()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "controlled_philosophers");
+    final String[] args = new String[]
+      {"BDD", "ConflictChecker", file.toString(),
+       "-marking", "eaten[0]", "-verbose"};
+    testCommandLine("verbose", args,
+                    "DEBUG Depth .*", "DEBUG Coreachability .*");
   }
 
 
@@ -319,23 +309,8 @@ public class CommandLineToolTest
                                final String... outputPatterns)
     throws Exception
   {
-    final StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < 2; i++) {
-      if (i < args.length) {
-        final String arg = args[i];
-        if (arg.startsWith("-")) {
-          builder.append(arg.substring(1));
-        } else {
-          builder.append(arg);
-        }
-        builder.append('.');
-      }
-    }
-    builder.append(name);
-    builder.append(".log");
-    final String logName = builder.toString();
-
     final File dir = getOutputDirectory();
+    final String logName = name + ".log";
     final File logFile = new File(dir, logName);
     final PrintStream output = new PrintStream(logFile);
     final PrintStream sysOut = System.out;
@@ -488,25 +463,8 @@ public class CommandLineToolTest
     public void checkExit(final int status)
     {
       super.checkExit(status);
-      throw new ExitException();
+      throw new ExitException(status);
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class ExitException
-  private static class ExitException extends SecurityException
-  {
-    //#######################################################################
-    //# Constructor
-    private ExitException()
-    {
-      super("Terminated by System.exit()");
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = -840490238005753878L;
   }
 
 }

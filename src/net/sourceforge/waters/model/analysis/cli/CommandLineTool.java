@@ -362,6 +362,8 @@ public class CommandLineTool implements Configurable
     } catch (final InvocationTargetException exception) {
       final Throwable cause = exception.getCause();
       showSupportedException(cause);
+    } catch (final ExitException exception) {
+      System.out.println(exception.getMessage());
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.print(ProxyTools.getShortClassName(exception));
