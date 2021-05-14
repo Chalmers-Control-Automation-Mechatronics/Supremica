@@ -38,7 +38,7 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.Option;
 
-public class StringListCommandLineArgument extends CommandLineArgument<List<String>>
+public class StringListCommandLineArgument extends OptionCommandLineArgument<List<String>>
 {
 
   //#######################################################################

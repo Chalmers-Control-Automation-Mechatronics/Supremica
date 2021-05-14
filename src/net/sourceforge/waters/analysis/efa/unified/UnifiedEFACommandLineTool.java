@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
 import net.sourceforge.waters.model.analysis.cli.VerboseLogConfigurationFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -179,9 +180,11 @@ public class UnifiedEFACommandLineTool
       mChecker.setDocumentManager(docManager);
       mChecker.setBindings(bindings);
 
-      final LeafOptionPage toolPage = new CommandLineToolOptionPage();
-      mContext.registerArguments(toolPage, this);
-      final LeafOptionPage analyserPage = new UnifiedEFAConflictCheckerOptionPage();
+      final LeafOptionPage toolPage =
+        mContext.createCommandLineToolOptionPage(this);
+      mContext.registerArguments(toolPage, this, true);
+      final LeafOptionPage analyserPage =
+        new UnifiedEFAConflictCheckerOptionPage();
       mContext.registerArguments(analyserPage, mChecker);
       final ListIterator<String> argIter = argList.listIterator();
       mContext.parse(argIter);
@@ -319,41 +322,54 @@ public class UnifiedEFACommandLineTool
   public List<Option<?>> getOptions(final OptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
-    page.append(options, OPTION_UnifiedEFACommandLineTool_Verbose);
-    page.append(options, OPTION_UnifiedEFACommandLineTool_Quiet);
-    page.append(options, OPTION_UnifiedEFACommandLineTool_Stats);
-    page.append(options, OPTION_UnifiedEFACommandLineTool_Timeout);
-    page.append(options, OPTION_UnifiedEFACommandLineTool_Csv);
-    page.append(options, OPTION_UnifiedEFACommandLineTool_Help);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Verbose);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Quiet);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Stats);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Timeout);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Csv);
     return options;
   }
 
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(OPTION_UnifiedEFACommandLineTool_Verbose)) {
-      mVerbosity = Level.ALL;
-    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Quiet)) {
-      mVerbosity = Level.OFF;
-    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Stats)) {
-      mStats = true;
-    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Timeout)) {
+    if (option.hasID(CommandLineOptionContext.
+                     OPTION_CommandLineTool_Verbose)) {
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mVerbosity = Level.ALL;
+      }
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Quiet)) {
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mVerbosity = Level.OFF;
+      }
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Stats)) {
+      final BooleanOption flag = (BooleanOption) option;
+      mStats = flag.getBooleanValue();
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Timeout)) {
       final PositiveIntOption opt = (PositiveIntOption) option;
       mTimeout = opt.getIntValue();
-    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Csv)) {
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
-      OutputStream csvstream;
-      try {
-        csvstream = new FileOutputStream(opt.getValue(), true);
-        mCsv = new PrintWriter(csvstream);
-      } catch (final FileNotFoundException exception) {
-        throw new RuntimeException(exception);
+      final File file = opt.getValue();
+      if (file != null) {
+        try {
+          final OutputStream stream = new FileOutputStream(file, true);
+          mCsv = new PrintWriter(stream);
+        } catch (final FileNotFoundException exception) {
+          throw new WatersRuntimeException(exception);
+        }
       }
-    } else if (option.hasID(OPTION_UnifiedEFACommandLineTool_Help)) {
-      System.err.print(ProxyTools.getShortClassName(mChecker));
-      System.err.println(" supports the following command line options:");
-      mContext.showHelpMessage(System.err);
-      System.exit(0);
     }
   }
 
@@ -375,43 +391,6 @@ public class UnifiedEFACommandLineTool
     final String msg = exception.getMessage();
     if (msg != null) {
       System.err.println(exception.getMessage());
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineToolOptionPage
-  private class CommandLineToolOptionPage
-    extends SimpleLeafOptionPage
-  {
-    //#######################################################################
-    //# Constructor
-    public CommandLineToolOptionPage()
-    {
-      super("UnifiedEFACommandLineTool", "Command Line Tool");
-      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Quiet, null,
-                                 "Suppress all output except answer",
-                                 "+quiet|+q", false));
-      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Verbose, null,
-                                 "Verbose output",
-                                 "+verbose|+v", false));
-      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Stats, null,
-                                 "Print statistics", "+stats", false));
-      register(new FileOption(OPTION_UnifiedEFACommandLineTool_Csv, null,
-                              "CSV output file name", "-csv"));
-      register(new PositiveIntOption(OPTION_UnifiedEFACommandLineTool_Timeout, null,
-                                     "Maximum allowed runtime in seconds",
-                                     "-timeout"));
-      register(new BooleanOption(OPTION_UnifiedEFACommandLineTool_Help, null,
-                                 "Print this message", "+help", false));
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      return UnifiedEFACommandLineTool.this.getOptions(this);
     }
   }
 
@@ -486,20 +465,6 @@ public class UnifiedEFACommandLineTool
 
   private static final String SEPARATOR =
     "------------------------------------------------------------";
-
-  public static final String OPTION_UnifiedEFACommandLineTool_Verbose =
-    "UnifiedEFACommandLineTool.Verbose";
-  public static final String OPTION_UnifiedEFACommandLineTool_Quiet =
-    "UnifiedEFACommandLineTool.Quiet";
-  public static final String OPTION_UnifiedEFACommandLineTool_Stats =
-    "UnifiedEFACommandLineTool.Stats";
-  public static final String OPTION_UnifiedEFACommandLineTool_Timeout =
-    "UnifiedEFACommandLineTool.Timeout";
-  public static final String OPTION_UnifiedEFACommandLineTool_Csv =
-    "UnifiedEFACommandLineTool.Csv";
-
-  public static final String OPTION_UnifiedEFACommandLineTool_Help =
-    "UnifiedEFACommandLineTool.Help";
 
   public static final String OPTION_UnifiedEFACommandLineTool_PreferLocal =
     "UnifiedEFACommandLineTool.PreferLocal";

@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
+import net.sourceforge.waters.model.analysis.cli.OptionCommandLineArgument;
 
 
 /**
@@ -104,7 +104,7 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
   {
     super.dumpEnumeration(stream, indent);
     if (mDefaultValue != null) {
-      CommandLineArgument.doIndent(stream, indent);
+      OptionCommandLineArgument.doIndent(stream, indent);
       stream.print("Default is: ");
       stream.println(mDefaultValue);
     }

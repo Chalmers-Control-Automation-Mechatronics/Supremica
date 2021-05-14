@@ -99,7 +99,8 @@ public class CommandLineToolTest
   {
     final String name = "bad_factory";
     final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("TRCompositional", "ConflictChecker", file);
+    final String[] args = new String[]
+      {"TRCompositional", "ConflictChecker", file.toString()};
     testCommandLine(name, args, false, "counterexample:");
   }
 
@@ -108,8 +109,9 @@ public class CommandLineToolTest
   {
     final String name = "controlled_philosophers";
     final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("BDD", "ConflictChecker", file,
-                                  "-marking", "eaten[0]", "-verbose");
+    final String[] args = new String[]
+      {"BDD", "ConflictChecker", file.toString(),
+       "-marking", "eaten[0]", "-verbose"};
     testCommandLine(name, args,
                     "DEBUG Depth .*", "DEBUG Coreachability .*");
   }
@@ -119,8 +121,8 @@ public class CommandLineToolTest
   {
     final String name = "dining_philosophers";
     final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("BDD", "ConflictChecker", file,
-                                  "-marking", "eaten");
+    final String[] args = new String[]
+      {"BDD", "ConflictChecker", file.toString(), "-marking", "eaten"};
     testCommandLine(name, args, "FATAL.*", ".*'eaten'.*");
   }
 
@@ -129,9 +131,9 @@ public class CommandLineToolTest
   {
     final String name = "g1";
     final File file = getInputWmod("tests", "generalisedNonblocking", name);
-    final String[] args = getArgs("Native", "ConflictChecker", file,
-                                  "-premarking", ":alpha",
-                                  "-marking", ":accepting");
+    final String[] args = new String[]
+      {"Native", "ConflictChecker", file.toString(),
+       "-premarking", ":alpha", "-marking", ":accepting"};
     testCommandLine(name, args, true);
   }
 
@@ -140,7 +142,8 @@ public class CommandLineToolTest
   {
     final String name = "small_factory_2";
     final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("BDD", "ConflictChecker", file, "-q");
+    final String[] args = new String[]
+      {"BDD", "ConflictChecker", file.toString(), "-q"};
     testCommandLine(name, args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
   }
 
@@ -149,7 +152,8 @@ public class CommandLineToolTest
   {
     final String name = "small_factory_2";
     final File file = getInputWdes("handwritten", name);
-    final String[] args = getArgs("Modular", "ControllabilityChecker", file);
+    final String[] args = new String[]
+      {"Modular", "ControllabilityChecker", file.toString()};
     testCommandLine(name, args, true);
   }
 
@@ -158,7 +162,8 @@ public class CommandLineToolTest
   {
     final String name = "small_factory_2";
     final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("Native", "ControllabilityChecker", file);
+    final String[] args = new String[]
+      {"Native", "ControllabilityChecker", file.toString()};
     testCommandLine(name, args, true);
   }
 
@@ -167,7 +172,8 @@ public class CommandLineToolTest
   {
     final String name = "small_factory_2u";
     final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("Monolithic", "ControllabilityChecker", file);
+    final String[] args = new String[]
+      {"Monolithic", "ControllabilityChecker", file.toString()};
     testCommandLine(name, args, false, "counterexample:", "!Statistics");
   }
 
@@ -176,7 +182,8 @@ public class CommandLineToolTest
   {
     final String name = "notDiag_1";
     final File file = getInputWmod("tests", "diagnosability", name);
-    final String[] args = getArgs("Monolithic", "DiagnosabilityChecker", file);
+    final String[] args = new String[]
+      {"Monolithic", "DiagnosabilityChecker", file.toString()};
     testCommandLine(name, args, false,
                     "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
   }
@@ -186,8 +193,9 @@ public class CommandLineToolTest
   {
     final String name = "just_property";
     final File file = getInputWmod("tests", "nasty", name);
-    final String[] args = getArgs("BDD", "LanguageInclusionChecker", file,
-                                  "-property", "the_property", "-nout");
+    final String[] args = new String[]
+      {"BDD", "LanguageInclusionChecker", file.toString(),
+       "-property", "the_property", "-nout"};
     testCommandLine(name, args, false, "!counterexample:", "!Statistics:");
   }
 
@@ -196,9 +204,32 @@ public class CommandLineToolTest
   {
     final String name = "just_property";
     final File file = getInputWmod("tests", "nasty", name);
-    final String[] args = getArgs("Native", "LanguageInclusionChecker", file,
-                                  "-property", "the_property", "-stats");
+    final String[] args = new String[]
+      {"Native", "LanguageInclusionChecker", file.toString(),
+       "-property", "the_property", "-stats"};
     testCommandLine(name, args, false, "counterexample:", "Statistics:");
+  }
+
+  public void testEndOptionFail()
+    throws Exception
+  {
+    final String name = "just_property";
+    final File file = getInputWmod("tests", "nasty", name);
+    final String[] args =
+      new String[] {"Monolithic", "ControllabilityChecker",
+                    "--", "-opt", file.toString()};
+    testCommandLine("end", args,
+                    "FATAL ERROR \\(BadFileTypeException\\)");
+  }
+
+  public void testEndOptionSuccess()
+    throws Exception
+  {
+    final String name = "small_factory_2u";
+    final File file = getInputWmod("handwritten", name);
+    final String[] args = new String[]
+      {"Modular", "ControllabilityChecker", "--", file.toString()};
+    testCommandLine(name, args, false);
   }
 
   public void testHelpOption()
@@ -218,11 +249,9 @@ public class CommandLineToolTest
   public void testUnsupportedOption()
     throws Exception
   {
-    final String name = "controlled_philosophers";
-    final File file = getInputWmod("handwritten", name);
-    final String[] args = getArgs("Monolithic", "DiagnosabilityChecker",
-                                  file, "-verose");
-    testCommandLine(name, args, "Unsupported option -verose.*");
+    final String[] args = new String[]
+      {"Monolithic", "DiagnosabilityChecker", "-verose"};
+    testCommandLine("verose", args, "Unsupported option -verose.*");
   }
 
 
@@ -264,19 +293,6 @@ public class CommandLineToolTest
   private File getInputWdes(final String... path)
   {
     return getInputFile(path, ".wdes");
-  }
-
-  private String[] getArgs(final String factory,
-                           final String check,
-                           final File file,
-                           final String... extras)
-  {
-    final String[] args = new String[extras.length + 3];
-    args[0] = factory;
-    args[1] = check;
-    args[2] = file.toString();
-    System.arraycopy(extras, 0, args, 3, extras.length);
-    return args;
   }
 
   private void testCommandLine(final String name,

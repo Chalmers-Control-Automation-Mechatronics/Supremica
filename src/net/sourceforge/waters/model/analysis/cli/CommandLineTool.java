@@ -57,7 +57,6 @@ import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -235,8 +234,9 @@ public class CommandLineTool implements Configurable
         keepPropositions = true;
       }
 
-      final LeafOptionPage toolPage = new CommandLineToolOptionPage();
-      mContext.registerArguments(toolPage, this);
+      final LeafOptionPage toolPage =
+        mContext.createCommandLineToolOptionPage(this);
+      mContext.registerArguments(toolPage, this, true);
       final ModuleCompiler dummyCompiler =
         new ModuleCompiler(null, null, null);
       mContext.registerArguments(CompilerOptions.PAGE, dummyCompiler);
@@ -409,32 +409,44 @@ public class CommandLineTool implements Configurable
   public List<Option<?>> getOptions(final OptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
-    page.append(options, OPTION_CommandLineTool_Quiet);
-    page.append(options, OPTION_CommandLineTool_Verbose);
-    page.append(options, OPTION_CommandLineTool_Stats);
-    page.append(options, OPTION_CommandLineTool_Csv);
-    page.append(options, OPTION_CommandLineTool_Timeout);
-    page.append(options, OPTION_CommandLineTool_Help);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Verbose);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Quiet);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Stats);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Timeout);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Csv);
     return options;
   }
 
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(OPTION_CommandLineTool_Quiet)) {
-      final BooleanOption flag = (BooleanOption) option;
-      if (flag.getBooleanValue()) {
-        mVerbosity = Level.OFF;
-      }
-    } else if (option.hasID(OPTION_CommandLineTool_Verbose)) {
+    if (option.hasID(CommandLineOptionContext.
+                     OPTION_CommandLineTool_Verbose)) {
       final BooleanOption flag = (BooleanOption) option;
       if (flag.getBooleanValue()) {
         mVerbosity = Level.ALL;
       }
-    } else if (option.hasID(OPTION_CommandLineTool_Stats)) {
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Quiet)) {
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mVerbosity = Level.OFF;
+      }
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Stats)) {
       final BooleanOption flag = (BooleanOption) option;
       mStats = flag.getBooleanValue();
-    } else if (option.hasID(OPTION_CommandLineTool_Csv)) {
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Timeout)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      mTimeout = opt.getIntValue();
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
       final File file = opt.getValue();
       if (file != null) {
@@ -444,15 +456,6 @@ public class CommandLineTool implements Configurable
         } catch (final FileNotFoundException exception) {
           throw new WatersRuntimeException(exception);
         }
-      }
-    } else if (option.hasID(OPTION_CommandLineTool_Timeout)) {
-      final PositiveIntOption opt = (PositiveIntOption) option;
-      mTimeout = opt.getIntValue();
-    } else if (option.hasID(OPTION_CommandLineTool_Help)) {
-      final BooleanOption flag = (BooleanOption) option;
-      if (flag.getBooleanValue()) {
-        mContext.showHelpMessage(System.err);
-        System.exit(0);
       }
     }
   }
@@ -502,43 +505,6 @@ public class CommandLineTool implements Configurable
 
 
   //#########################################################################
-  //# Inner Class CommandLineToolOptionPage
-  private class CommandLineToolOptionPage
-    extends SimpleLeafOptionPage
-  {
-    //#######################################################################
-    //# Constructor
-    public CommandLineToolOptionPage()
-    {
-      super("cli", "Command Line Tool");
-      register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
-                                 "Suppress all output except answer",
-                                 "+quiet|+q", false));
-      register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
-                                 "Verbose output",
-                                 "+verbose|+v", false));
-      register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
-                                 "Print statistics", "+stats", false));
-      register(new FileOption(OPTION_CommandLineTool_Csv, null,
-                              "Save statistics in CSV file", "-csv"));
-      register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
-                                     "Maximum allowed runtime in seconds",
-                                     "-timeout"));
-      register(new BooleanOption(OPTION_CommandLineTool_Help, null,
-                                 "Print this message", "+help", false));
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      return CommandLineTool.this.getOptions(this);
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
   private Level mVerbosity = Level.DEBUG;
   private boolean mStats = false;
@@ -554,20 +520,5 @@ public class CommandLineTool implements Configurable
   //# Class Constants
   private static final String SEPARATOR =
     "------------------------------------------------------------";
-
-  public static final String OPTION_CommandLineTool_Verbose =
-    "CommandLineTool.Verbose";
-  public static final String OPTION_CommandLineTool_Quiet =
-    "CommandLineTool.Quiet";
-  public static final String OPTION_CommandLineTool_Stats =
-    "CommandLineTool.Stats";
-  public static final String OPTION_CommandLineTool_Timeout =
-    "CommandLineTool.Timeout";
-  public static final String OPTION_CommandLineTool_Csv =
-    "CommandLineTool.Csv";
-  public static final String OPTION_CommandLineTool_Help =
-    "CommandLineTool.Help";
-  public static final String OPTION_CommandLineTool_End =
-    "CommandLineTool.End";
 
 }

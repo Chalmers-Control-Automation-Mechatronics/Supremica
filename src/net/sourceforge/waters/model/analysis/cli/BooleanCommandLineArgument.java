@@ -73,7 +73,7 @@ import net.sourceforge.waters.analysis.options.Option;
  * @author Benjamin Wheeler
  */
 
-public class BooleanCommandLineArgument extends CommandLineArgument<Boolean>
+public class BooleanCommandLineArgument extends OptionCommandLineArgument<Boolean>
 {
 
   //#######################################################################

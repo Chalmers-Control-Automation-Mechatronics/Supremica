@@ -33,75 +33,70 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
-import java.util.ListIterator;
-
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.analysis.options.OptionEditor;
 
 
 /**
- * @author Robi Malik
+ *
+ * @author Benjamin Wheeler
  */
-public class PropositionCommandLineArgument
-  extends OptionCommandLineArgument<EventProxy>
+
+public abstract class OptionCommandLineArgument<T>
+  extends CommandLineArgument
+  implements OptionEditor<T>
 {
 
-  //#######################################################################
+  //#########################################################################
   //# Constructor
-  public PropositionCommandLineArgument(final Option<EventProxy> option)
+  public OptionCommandLineArgument(final Option<T> option)
   {
-    super(option);
+    mOption = option;
   }
 
 
-  //#######################################################################
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.OptionEditor<T>
+  @Override
+  public Option<T> getOption()
+  {
+    return mOption;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.cli.CommandLineArgument
+  @Override
+  public String getCommandLineCode()
+  {
+    return mOption.getCommandLineCode();
+  }
+
+  @Override
+  public String getDescription()
+  {
+    return mOption.getDescription();
+  }
+
+  @Override
+  public void configure(final Configurable configurable)
+  {
+    configurable.setOption(mOption);
+  }
+
+
+  //#########################################################################
   //# Simple Access
-  @Override
-  protected String getArgumentTemplate()
+  public T getValue()
   {
-    return "<name>";
+    return mOption.getValue();
   }
 
 
-  //#######################################################################
-  //# Parsing
-  @Override
-  public void parse(final CommandLineOptionContext context,
-                    final ListIterator<String> iter)
-    throws AnalysisException
-  {
-    iter.remove();
-    if (iter.hasNext()) {
-      mName = iter.next();
-      iter.remove();
-      setUsed(true);
-      updateContext(context);
-    } else {
-      failMissingValue();
-    }
-  }
-
-  @Override
-  public void updateContext(final CommandLineOptionContext context)
-    throws AnalysisException
-  {
-    if (isUsed()) {
-      final ProductDESProxy des = context.getProductDES();
-      if (des != null) {
-        final EventProxy marking =
-          AbstractConflictChecker.findMarkingProposition(des, mName);
-        final Option<EventProxy> option = getOption();
-        option.setValue(marking);
-      }
-    }
-  }
-
-
-  //#######################################################################
+  //#########################################################################
   //# Data Members
-  private String mName;
+  private final Option<T> mOption;
 
 }

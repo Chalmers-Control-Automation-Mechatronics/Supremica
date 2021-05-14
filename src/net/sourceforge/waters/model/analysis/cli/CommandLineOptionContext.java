@@ -202,11 +202,27 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Specific Access
+  public LeafOptionPage createCommandLineToolOptionPage(final Configurable tool)
+  {
+    return new CommandLineToolOptionPage(tool);
+  }
+
   public void registerArguments(final LeafOptionPage page,
                                 final Configurable configurable)
   {
+    registerArguments(page, configurable, false);
+  }
+
+  public void registerArguments(final LeafOptionPage page,
+                                final Configurable configurable,
+                                final boolean includeSpecials)
+  {
     final ArgumentSource source = new ArgumentSource(page, configurable);
     mArgumentSources.add(0, source);
+    if (includeSpecials) {
+      source.addSpecialArgument(new EndArgument());
+      source.addSpecialArgument(new HelpArgument());
+    }
   }
 
   public void parse(final ListIterator<String> iter)
@@ -214,7 +230,7 @@ public class CommandLineOptionContext implements OptionContext
   {
     while (iter.hasNext()) {
       final String name = iter.next();
-      final CommandLineArgument<?> arg = mArgumentMap.get(name);
+      final CommandLineArgument arg = mArgumentMap.get(name);
       if (arg != null) {
         arg.parse(this, iter);
       } else if (name.startsWith("-")) {
@@ -252,16 +268,22 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Auxiliary Methods
-  private <T> CommandLineArgument<T> registerOption(final Option<T> option)
+  private <T> OptionCommandLineArgument<T>
+  registerOption(final Option<T> option)
   {
-    final CommandLineArgument<T> arg =
-      (CommandLineArgument<T>) option.createEditor(this);
+    final OptionCommandLineArgument<T> arg =
+      (OptionCommandLineArgument<T>) option.createEditor(this);
     if (arg != null) {
-      for (final String key : arg.getKeys()) {
-        mArgumentMap.put(key, arg);
-      }
+      registerArgument(arg);
     }
     return arg;
+  }
+
+  private void registerArgument(final CommandLineArgument arg)
+  {
+    for (final String key : arg.getKeys()) {
+      mArgumentMap.put(key, arg);
+    }
   }
 
 
@@ -278,7 +300,7 @@ public class CommandLineOptionContext implements OptionContext
       final List<Option<?>> options = configurable.getOptions(page);
       mArguments = new ArrayList<>(options.size());
       for (final Option<?> option : options) {
-        final CommandLineArgument<?> arg = registerOption(option);
+        final OptionCommandLineArgument<?> arg = registerOption(option);
         if (arg != null) {
           mArguments.add(arg);
         }
@@ -290,7 +312,7 @@ public class CommandLineOptionContext implements OptionContext
     private void updateContext()
       throws AnalysisException
     {
-      for (final CommandLineArgument<?> arg : mArguments) {
+      for (final CommandLineArgument arg : mArguments) {
         arg.updateContext(CommandLineOptionContext.this);
       }
     }
@@ -298,9 +320,8 @@ public class CommandLineOptionContext implements OptionContext
     private void configure(final Configurable configurable)
       throws AnalysisException
     {
-      for (final CommandLineArgument<?> arg : mArguments) {
-        final Option<?> option = arg.getOption();
-        configurable.setOption(option);
+      for (final CommandLineArgument arg : mArguments) {
+        arg.configure(configurable);
       }
     }
 
@@ -308,27 +329,146 @@ public class CommandLineOptionContext implements OptionContext
     {
       stream.print(ProxyTools.getShortClassName(mConfigurable));
       stream.println(" supports the following options:");
-      final List<CommandLineArgument<?>> args = new ArrayList<>(mArguments);
+      final List<CommandLineArgument> args = new ArrayList<>(mArguments);
       Collections.sort(args);
-      for (final CommandLineArgument<?> arg : args) {
+      for (final CommandLineArgument arg : args) {
         arg.dump(stream);
       }
     }
 
+    private void addSpecialArgument(final CommandLineArgument arg)
+    {
+      mArguments.add(arg);
+      registerArgument(arg);
+    }
 
     //#######################################################################
     //# Data Members
     private final Configurable mConfigurable;
-    private final List<CommandLineArgument<?>> mArguments;
+    private final List<CommandLineArgument> mArguments;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EndArgument
+  private class EndArgument extends CommandLineArgument
+  {
+    //#########################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.cli.CommandLineArgument
+    @Override
+    public String getCommandLineCode()
+    {
+      return "--";
+    }
+
+    @Override
+    public String getDescription()
+    {
+      return "Treat remaining arguments as file names";
+    }
+
+    @Override
+    public void parse(final CommandLineOptionContext context,
+                      final ListIterator<String> iter)
+    {
+      iter.remove();
+      while (iter.hasNext()) {
+        iter.next();
+      }
+      setUsed(true);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class HelpArgument
+  private class HelpArgument extends CommandLineArgument
+  {
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.cli.CommandLineArgument
+    @Override
+    public String getCommandLineCode()
+    {
+      return "-help";
+    }
+
+    @Override
+    public String getDescription()
+    {
+      return "Print this message";
+    }
+
+    @Override
+    public void parse(final CommandLineOptionContext context,
+                      final ListIterator<String> iter)
+    {
+      showHelpMessage(System.out);
+      System.exit(0);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineToolOptionPage
+  private class CommandLineToolOptionPage
+    extends SimpleLeafOptionPage
+  {
+    //#######################################################################
+    //# Constructor
+    public CommandLineToolOptionPage(final Configurable tool)
+    {
+      super("cli", "Command Line Tool");
+      mTool = tool;
+      register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
+                                 "Verbose logging output",
+                                 "+verbose|+v", false));
+      register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
+                                 "Suppress all logging output",
+                                 "+quiet|+q", false));
+      register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
+                                 "Print statistics", "+stats", false));
+      register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
+                                     "Maximum allowed runtime in seconds",
+                                     "-timeout"));
+      register(new FileOption(OPTION_CommandLineTool_Csv, null,
+                              "Save statistics in CSV file", "-csv"));
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+    @Override
+    public List<Option<?>> getOptions()
+    {
+      return mTool.getOptions(this);
+    }
+
+    //#########################################################################
+    //# Data Members
+    private final Configurable mTool;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map<String,CommandLineArgument<?>> mArgumentMap;
+  private final Map<String,CommandLineArgument> mArgumentMap;
   private final List<ArgumentSource> mArgumentSources;
 
   private ProductDESProxy mDES;
 
+
+  //#########################################################################
+  //# Class Constants
+  public static final String OPTION_CommandLineTool_Verbose =
+    "CommandLineTool.Verbose";
+  public static final String OPTION_CommandLineTool_Quiet =
+    "CommandLineTool.Quiet";
+  public static final String OPTION_CommandLineTool_Stats =
+    "CommandLineTool.Stats";
+  public static final String OPTION_CommandLineTool_Timeout =
+    "CommandLineTool.Timeout";
+  public static final String OPTION_CommandLineTool_Csv =
+    "CommandLineTool.Csv";
 
 }

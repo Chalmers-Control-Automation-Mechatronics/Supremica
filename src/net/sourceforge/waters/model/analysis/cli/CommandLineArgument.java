@@ -38,30 +38,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  *
  * @author Benjamin Wheeler
  */
-public abstract class CommandLineArgument<T>
-  implements OptionEditor<T>, Comparable<CommandLineArgument<?>>
+public abstract class CommandLineArgument
+  implements Comparable<CommandLineArgument>
 {
-
-  //#########################################################################
-  //# Constructor
-  public CommandLineArgument(final Option<T> option)
-  {
-    mOption = option;
-  }
-
 
   //#########################################################################
   //# Interface java.util.Comparable<CommandLineArgument<?>>
   @Override
-  public int compareTo(final CommandLineArgument<?> arg)
+  public int compareTo(final CommandLineArgument arg)
   {
     final String code = getCommandLineCode();
     final String argCode = arg.getCommandLineCode();
@@ -70,27 +61,7 @@ public abstract class CommandLineArgument<T>
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor<T>
-  @Override
-  public Option<T> getOption()
-  {
-    return mOption;
-  }
-
-
-  //#########################################################################
   //# Simple Access
-  public String getCommandLineCode()
-  {
-    return mOption.getCommandLineCode();
-  }
-
-  public Collection<String> getKeys()
-  {
-    final String code = getCommandLineCode();
-    return Collections.singletonList(code);
-  }
-
   public boolean isUsed()
   {
     return mUsed;
@@ -101,14 +72,25 @@ public abstract class CommandLineArgument<T>
     mUsed = used;
   }
 
+  //#########################################################################
+  //# Hooks
+  public abstract String getCommandLineCode();
+
+  public Collection<String> getKeys()
+  {
+    final String code = getCommandLineCode();
+    return Collections.singletonList(code);
+  }
+
+  public abstract String getDescription();
+
   protected String getArgumentTemplate()
   {
     return null;
   }
 
-  public T getValue()
+  public void configure(final Configurable configurable)
   {
-    return mOption.getValue();
   }
 
 
@@ -144,8 +126,7 @@ public abstract class CommandLineArgument<T>
       len += template.length() + 1;
     }
 
-    final Option<T> option = getOption();
-    final String description = option.getDescription();
+    final String description = getDescription();
     doIndent(stream, INDENT - len);
     int column = INDENT;
     boolean first = true;
@@ -199,7 +180,6 @@ public abstract class CommandLineArgument<T>
 
   //#########################################################################
   //# Data Members
-  private final Option<T> mOption;
   private boolean mUsed;
 
 

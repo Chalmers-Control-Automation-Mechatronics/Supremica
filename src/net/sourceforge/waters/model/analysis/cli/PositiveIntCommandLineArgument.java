@@ -37,7 +37,7 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.Option;
 
-public class PositiveIntCommandLineArgument extends CommandLineArgument<Integer>
+public class PositiveIntCommandLineArgument extends OptionCommandLineArgument<Integer>
 {
 
   //#######################################################################

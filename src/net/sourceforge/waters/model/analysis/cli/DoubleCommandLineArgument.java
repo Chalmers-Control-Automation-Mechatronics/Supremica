@@ -41,7 +41,7 @@ import net.sourceforge.waters.analysis.options.Option;
  *
  * @author Benjamin Wheeler
  */
-public class DoubleCommandLineArgument extends CommandLineArgument<Double>
+public class DoubleCommandLineArgument extends OptionCommandLineArgument<Double>
 {
 
 //#######################################################################

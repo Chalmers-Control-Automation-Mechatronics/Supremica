@@ -42,7 +42,7 @@ import net.sourceforge.waters.analysis.options.Option;
  *
  * @author Benjamin Wheeler
  */
-public class FileCommandLineArgument extends CommandLineArgument<File>
+public class FileCommandLineArgument extends OptionCommandLineArgument<File>
 {
 
   //#######################################################################

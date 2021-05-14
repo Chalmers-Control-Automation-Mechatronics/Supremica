@@ -45,7 +45,7 @@ import net.sourceforge.waters.model.analysis.EnumFactory;
  *
  * @author Benjamin Wheeler
  */
-public class EnumCommandLineArgument<E> extends CommandLineArgument<E>
+public class EnumCommandLineArgument<E> extends OptionCommandLineArgument<E>
 {
 
   //#######################################################################

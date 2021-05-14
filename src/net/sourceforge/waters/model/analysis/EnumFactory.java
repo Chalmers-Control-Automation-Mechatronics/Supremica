@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.analysis;
 import java.io.PrintStream;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.cli.CommandLineArgument;
+import net.sourceforge.waters.model.analysis.cli.OptionCommandLineArgument;
 
 /**
  * An enumeration interface to support enumerated command line arguments.
@@ -87,7 +87,7 @@ public abstract class EnumFactory<E>
    */
   public void dumpEnumeration(final PrintStream stream, final int indent)
   {
-    CommandLineArgument.doIndent(stream, indent);
+    OptionCommandLineArgument.doIndent(stream, indent);
     stream.println("Possible values are:");
     int column = 0;
     boolean first = true;
@@ -111,7 +111,7 @@ public abstract class EnumFactory<E>
         }
       }
       if (column == 0) {
-        CommandLineArgument.doIndent(stream, indent);
+        OptionCommandLineArgument.doIndent(stream, indent);
         column = indent;
       }
       stream.print(label);
