@@ -1541,7 +1541,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     mCompiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     configure(mCompiler);
-    return mCompiler.compile(bindings);
+    mCompiler.setParameterBindings(bindings);
+    return mCompiler.compile();
   }
 
   private String save(final ModuleProxy module,

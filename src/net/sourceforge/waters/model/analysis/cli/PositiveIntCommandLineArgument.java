@@ -36,6 +36,7 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.expr.ParseException;
 
 public class PositiveIntCommandLineArgument extends OptionCommandLineArgument<Integer>
 {
@@ -60,6 +61,7 @@ public class PositiveIntCommandLineArgument extends OptionCommandLineArgument<In
   @Override
   public void parse(final CommandLineOptionContext context,
                     final ListIterator<String> iter)
+    throws ParseException
   {
     iter.remove();
     if (iter.hasNext()) {

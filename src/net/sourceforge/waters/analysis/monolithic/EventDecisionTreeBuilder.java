@@ -157,7 +157,8 @@ public class EventDecisionTreeBuilder
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
           compiler.setEnabledPropositionNames(empty);
-          des = compiler.compile(bindings);
+          compiler.setParameterBindings(bindings);
+          des = compiler.compile();
         }
         final long start = System.currentTimeMillis();
         final EventDecisionTreeBuilder builder =

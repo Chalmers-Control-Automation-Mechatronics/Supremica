@@ -336,7 +336,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     try {
       setUp();
       final ModuleProxy module = getModel();
-      final List<ParameterBindingProxy> binding = getBindings();
+      final List<ParameterBindingProxy> binding = getParameterBindings();
       final EFSMCompiler compiler =
         new EFSMCompiler(mDocumentManager, module);
       compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());

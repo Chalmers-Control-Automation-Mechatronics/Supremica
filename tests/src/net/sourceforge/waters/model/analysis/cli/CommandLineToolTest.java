@@ -177,6 +177,16 @@ public class CommandLineToolTest
     testCommandLine(name, args, false, "counterexample:", "!Statistics");
   }
 
+  public void testCountTransferLine2()
+    throws Exception
+  {
+    final String name = "transferline";
+    final File file = getInputWmod("handwritten", name);
+    final String[] args = new String[]
+      {"Native", "StateCounter", "-D", "N=2", "-stats", file.toString()};
+    testCommandLine(name, args, true, "Total number of states: 410");
+  }
+
   public void testDiagnosabilityNotDiag1()
     throws Exception
   {

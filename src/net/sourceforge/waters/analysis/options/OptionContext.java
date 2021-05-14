@@ -42,6 +42,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 /**
  * <P>A context for editing options.</P>
@@ -105,7 +106,13 @@ public interface OptionContext
    * Creates an option editor for a file option.
    */
   public OptionEditor<File>
-  createFileEditor(FileOption fileOption);
+  createFileEditor(FileOption option);
+
+  /**
+   * Creates an option editor for a parameter binding list option.
+   */
+  public OptionEditor<List<ParameterBindingProxy>>
+  createParameterBindingListEditor(ParameterBindingListOption option);
 
   /**
    * Creates an option editor for a integer option.

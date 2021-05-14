@@ -372,7 +372,8 @@ public class EFSMConflictCheckerExperiments
       compiler.setEnabledPropertyNames(none);
       mWatchdog.addAbortable(compiler);
       final long start = System.currentTimeMillis();
-      final ProductDESProxy des = compiler.compile(bindings);
+      compiler.setParameterBindings(bindings);
+      final ProductDESProxy des = compiler.compile();
       final long finish = System.currentTimeMillis()-start;
       System.out.println("events:"+des.getEvents().size());
       System.out.println("flatten time:"+ finish);
@@ -509,7 +510,7 @@ public class EFSMConflictCheckerExperiments
         checker.setCompositionSelectionHeuristic(mCompositionSelectionHeuristic);
       }
       // Configuration end
-      checker.setBindings(bindings);
+      checker.setParameterBindings(bindings);
       mWatchdog.addAbortable(checker);
       checker.run();
       mWatchdog.removeAbortable(checker);

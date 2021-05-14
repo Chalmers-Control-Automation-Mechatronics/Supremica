@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.options;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.expr.ParseException;
 
 
 /**
@@ -135,7 +136,7 @@ public class PositiveIntOption extends Option<Integer>
   }
 
   @Override
-  public void set(final String text)
+  public void set(final String text) throws ParseException
   {
     try {
       final int value = Integer.parseUnsignedInt(text);
@@ -143,12 +144,13 @@ public class PositiveIntOption extends Option<Integer>
         setValue(value);
       }
       else {
-        final String error = "Value "+value
-          +" is out of range; must be between "+mMinValue+" and "+mMaxValue;
-        throw new IllegalArgumentException(error);
+        final String error = "Value "+ value +
+          " is out of range; must be between " + mMinValue + " and " +
+          mMaxValue;
+        throw new ParseException(error, 0);
       }
-    } catch(final NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+    } catch(final NumberFormatException exception) {
+      throw new ParseException(exception, 0);
     }
   }
 

@@ -75,6 +75,7 @@ import java.util.Properties;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.expr.ParseException;
 
 
 public final class SupremicaProperties
@@ -125,7 +126,7 @@ public final class SupremicaProperties
             try {
               option.set(value);
               break;
-            } catch (final IllegalArgumentException ex) {
+            } catch (final ParseException exception) {
               System.err.println("Invalid argument to property: " + key);
               break;
             }

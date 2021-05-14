@@ -83,7 +83,6 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
@@ -92,7 +91,6 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -140,8 +138,6 @@ public class CommandLineTool implements Configurable
     final ConfigurationFactory cfactory =
       new VerboseLogConfigurationFactory(mVerbosity);
     ConfigurationFactory.setConfigurationFactory(cfactory);
-
-    boolean noargs = false;
     final Formatter formatter = new Formatter(System.out);
 
     try {
@@ -156,38 +152,13 @@ public class CommandLineTool implements Configurable
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final ExpressionParser parser =
-        new ExpressionParser(moduleFactory, optable);
-      List<ParameterBindingProxy> bindings = null;
       final String wrapperName = null;
 
       final String factoryName = args[0];
       final List<String> argList = new LinkedList<String>();
       for (int i = 1; i < args.length; i++) {
         final String arg = args[i];
-        if (noargs) {
-          argList.add(arg);
-        } else if (arg.startsWith("-D")) {
-          final int eqpos = arg.indexOf('=', 2);
-          if (eqpos > 2) {
-            final String name = arg.substring(2, eqpos);
-            final String text = arg.substring(eqpos + 1);
-            final SimpleExpressionProxy expr = parser.parse(text);
-            final ParameterBindingProxy binding =
-              moduleFactory.createParameterBindingProxy(name, expr);
-            if (bindings == null) {
-              bindings = new LinkedList<ParameterBindingProxy>();
-            }
-            bindings.add(binding);
-          } else {
-            argList.add(arg);
-          }
-        } else if (arg.equals("--")) {
-          noargs = true;
-          argList.add(arg);
-        } else {
-          argList.add(arg);
-        }
+        argList.add(arg);
       }
 
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
@@ -258,7 +229,7 @@ public class CommandLineTool implements Configurable
       }
 
       final Watchdog watchdog = new Watchdog(wrapper, mTimeout);
-      if (mTimeout > 0) {
+      if (mTimeout > 0 && mTimeout < Integer.MAX_VALUE) {
         watchdog.start();
       }
 
@@ -274,6 +245,8 @@ public class CommandLineTool implements Configurable
         } else {
           final long start = System.currentTimeMillis();
           final ModuleProxy module = (ModuleProxy) doc;
+          final List<ParameterBindingProxy> bindings =
+            CompilerOptions.PARAMETER_BINDINGS.getValue();
           fullName = ModuleCompiler.getParametrizedName(module, bindings);
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
@@ -284,7 +257,7 @@ public class CommandLineTool implements Configurable
           mContext.configure(compiler);
           watchdog.addAbortable(compiler);
           try {
-            des = compiler.compile(bindings);
+            des = compiler.compile();
             final long stop = System.currentTimeMillis();
             compileTime = stop - start;
           } catch (final EvalAbortException exception) {

@@ -60,6 +60,7 @@ import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionContext;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionPageEditor;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
@@ -72,6 +73,8 @@ import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
 /**
@@ -127,6 +130,12 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
+  public OptionEditor<Double> createDoubleEditor(final DoubleOption option)
+  {
+    return new DoubleCommandLineArgument(option);
+  }
+
+  @Override
   public <E> OptionEditor<E> createEnumEditor(final EnumOption<E> option)
   {
     return new EnumCommandLineArgument<E>(option);
@@ -146,16 +155,17 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   @Override
+  public OptionEditor<List<ParameterBindingProxy>>
+  createParameterBindingListEditor(final ParameterBindingListOption option)
+  {
+    return new ParameterBindingListCommandLineArgument(option);
+  }
+
+  @Override
   public OptionEditor<Integer>
   createPositiveIntEditor(final PositiveIntOption option)
   {
     return new PositiveIntCommandLineArgument(option);
-  }
-
-  @Override
-  public OptionEditor<Double> createDoubleEditor(final DoubleOption option)
-  {
-    return new DoubleCommandLineArgument(option);
   }
 
   @Override
@@ -226,7 +236,7 @@ public class CommandLineOptionContext implements OptionContext
   }
 
   public void parse(final ListIterator<String> iter)
-    throws AnalysisException
+    throws AnalysisException, ParseException
   {
     while (iter.hasNext()) {
       final String name = iter.next();

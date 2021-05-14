@@ -566,7 +566,7 @@ public class EFSMConflictCheckerTest
     final EFSMConflictChecker conflictChecker =
       new EFSMConflictChecker(module, factory);
     configure(conflictChecker);
-    conflictChecker.setBindings(bindings);
+    conflictChecker.setParameterBindings(bindings);
     final boolean result = conflictChecker.run();
     assertEquals("Unexpected result from conflict check!", expected, result);
     return result;

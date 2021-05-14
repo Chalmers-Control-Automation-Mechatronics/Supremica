@@ -195,7 +195,8 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
       configure(compiler);
-      final ProductDESProxy des = compiler.compile(bindings);
+      compiler.setParameterBindings(bindings);
+      final ProductDESProxy des = compiler.compile();
       mProductDESIsDeterministic = AutomatonTools.isDeterministic(des);
       return des;
     } else {

@@ -357,7 +357,8 @@ abstract class AbstractAssessor
         new ModuleCompiler(mDocumentManager, mDESFactory, module);
       final Collection<String> empty = Collections.emptyList();
       compiler.setEnabledPropertyNames(empty);
-      des = compiler.compile(bindings);
+      compiler.setParameterBindings(bindings);
+      des = compiler.compile();
     }
 
     synchronized (this) {

@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import java.util.ListIterator;
-
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.options.BooleanOption;
@@ -47,8 +45,6 @@ import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.cli.BooleanCommandLineArgument;
-import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -325,33 +321,6 @@ public abstract class AbstractModelAnalyzerFactory
     final String msg =
       clsname.substring(dotpos + 1) + " does not support " + opname + "!";
     return new AnalysisConfigurationException(msg);
-  }
-
-
-  //#########################################################################
-  //# Inner Class EndArgument
-  public static class EndArgument extends BooleanCommandLineArgument
-  {
-    //#######################################################################
-    //# Constructors
-    public EndArgument(final CommandLineOptionContext context,
-                       final BooleanOption option)
-    {
-      super(option);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void parse(final CommandLineOptionContext context,
-                      final ListIterator<String> iter)
-    {
-      iter.remove();
-      while (iter.hasNext()) {
-        iter.next();
-      }
-    }
   }
 
 

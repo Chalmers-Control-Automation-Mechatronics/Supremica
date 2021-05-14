@@ -31,61 +31,59 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.analysis.cli;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
-
-/**
- * A configurable parameter of a {@link ModelAnalyzer} of a
- * {@link List} of {@link String} type.
- *
- * @author Benjamin Wheeler
- */
-
-public class StringListOption extends Option<List<String>>
+public class ParameterBindingListCommandLineArgument
+  extends OptionCommandLineArgument<List<ParameterBindingProxy>>
 {
-  //#########################################################################
-  //# Constructors
-  public StringListOption(final String id,
-                          final String shortName,
-                          final String description,
-                          final String commandLineOption)
+
+  //#######################################################################
+  //# Constructor
+  public ParameterBindingListCommandLineArgument
+    (final ParameterBindingListOption option)
   {
-    super(id, shortName, description, commandLineOption,
-          Collections.emptyList(), new LinkedList<>());
-    setEditable(false);
+    super(option);
   }
 
 
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //#######################################################################
+  //# Simple Access
   @Override
-  public OptionEditor<List<String>> createEditor(final OptionContext context)
+  public String getDescription()
   {
-    return context.createStringListEditor(this);
+    return super.getDescription() + " (can be specified more than once)";
   }
 
   @Override
-  public void set(final String text)
+  protected String getArgumentTemplate()
   {
-    getValue().add(text);
+    return "<name>=<value>";
   }
 
-  @Override
-  public void restoreDefaultValue()
-  {
-    getValue().clear();
-  }
 
+  //#######################################################################
+  //# Parsing
   @Override
-  public boolean isPersistent()
+  public void parse(final CommandLineOptionContext context,
+                    final ListIterator<String> iter)
+    throws ParseException
   {
-    return false;
+    iter.remove();
+    if (iter.hasNext()) {
+      final String value = iter.next();
+      getOption().set(value);
+      iter.remove();
+      setUsed(true);
+    } else {
+      failMissingValue();
+    }
   }
 
 }

@@ -50,6 +50,7 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -75,7 +76,6 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
-import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -100,9 +100,9 @@ import org.xml.sax.SAXException;
  *
  * <P>To use a module compiler, the user first creates an instance of this
  * class, and configures it as needed. Then compilation is started
- * using the {@link #compile()} or {@link #compile(List)} method, which
- * returns the resultant product DES. The following code is used to
- * compile a given <CODE>module</CODE>.</P>
+ * using the {@link #compile()} method, which returns the resultant
+ * product DES. The following code is used to compile a given
+ * <CODE>module</CODE>.</P>
  *
  * <P>
  * <CODE>try {</CODE><BR>
@@ -258,6 +258,8 @@ public class ModuleCompiler extends AbortableCompiler
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, CompilerOptions.
+                         OPTION_ModuleCompiler_ParameterBindings);
+    page.append(options, CompilerOptions.
                          OPTION_ModuleCompiler_OptimizingCompiler);
     page.append(options, CompilerOptions.
                          OPTION_ModuleCompiler_EFSMCompiler);
@@ -274,6 +276,11 @@ public class ModuleCompiler extends AbortableCompiler
   public void setOption(final Option<?> option)
   {
     if (option.hasID(CompilerOptions.
+                     OPTION_ModuleCompiler_ParameterBindings)) {
+      final ParameterBindingListOption paramOption =
+        (ParameterBindingListOption) option;
+      setParameterBindings(paramOption.getValue());
+    } else if (option.hasID(CompilerOptions.
                      OPTION_ModuleCompiler_OptimizingCompiler)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setOptimizationEnabled(boolOption.getBooleanValue());
@@ -348,30 +355,6 @@ public class ModuleCompiler extends AbortableCompiler
   public ProductDESProxy compile()
     throws EvalException
   {
-    return compile(null);
-  }
-
-  /**
-   * Compiles the input module using the given parameter bindings.
-   * @param  bindings  List of parameter bindings to supply values for
-   *                   parameters specified in the module. A module's
-   *                   event declarations ({@link EventDeclProxy}) and
-   *                   constant alias declarations ({@link ConstantAliasProxy})
-   *                   may be declared as parameters, in which case the
-   *                   bindings can be used to supply values to replace these
-   *                   parameters.
-   * @return The product DES resulting from compilation.
-   * @throws EvalException to indicate any syntactical or semantical
-   *         errors encountered during compilation.
-   *         Using the {@link #setMultiExceptionsEnabled(boolean)
-   *         setMultiExceptionsEnabled()} method, the compiler may be
-   *         configured to collect multiple error messages in a single
-   *         exception ({@link MultiEvalException}), or to stop with an
-   *         exception when the first error is encountered.
-   */
-  public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
-    throws EvalException
-  {
     try
     {
       if (mCompilationInfoIsDirty) {
@@ -390,7 +373,7 @@ public class ModuleCompiler extends AbortableCompiler
       instanceCompiler.setHISCCompileMode(mHISCCompileMode);
       checkAbort();
       mActiveAbortable = instanceCompiler;
-      ModuleProxy intermediate = instanceCompiler.compile(bindings);
+      ModuleProxy intermediate = instanceCompiler.compile(mParameterBindings);
       final boolean efsm = instanceCompiler.getHasEFSMElements();
       mActiveAbortable = instanceCompiler = null;
       checkAbort();
@@ -512,6 +495,25 @@ public class ModuleCompiler extends AbortableCompiler
 
   //#########################################################################
   //# Configuration
+  /**
+   * Gets the list of parameter bindings applied to the input module.
+   */
+  public List<ParameterBindingProxy> getParameterBindings()
+  {
+    return mParameterBindings;
+  }
+
+  /**
+   * Sets the parameter bindings to be applied to the input module.
+   * @param  bindings  List of parameter bindings. The name of each
+   *                   binding should match a parameter in the constant
+   *                   alias list of the input module.
+   */
+  public void setParameterBindings(final List<ParameterBindingProxy> bindings)
+  {
+    mParameterBindings = bindings;
+  }
+
   /**
    * Returns whether compiler optimisation is enabled.
    * @see #setOptimizationEnabled(boolean)
@@ -772,6 +774,7 @@ public class ModuleCompiler extends AbortableCompiler
   private final ProductDESProxyFactory mFactory;
 
   private ModuleProxy mInputModule;
+  private List<ParameterBindingProxy> mParameterBindings;
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
   private Abortable mActiveAbortable;

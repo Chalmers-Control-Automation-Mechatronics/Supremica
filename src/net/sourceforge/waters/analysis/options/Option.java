@@ -42,6 +42,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.ParseException;
 
 
 /**
@@ -75,11 +76,23 @@ public abstract class Option<T> implements Cloneable
                    final String commandLineOption,
                    final T defaultValue)
   {
+    this(id, shortName, description, commandLineOption,
+         defaultValue, defaultValue);
+  }
+
+  protected Option(final String id,
+                   final String shortName,
+                   final String description,
+                   final String commandLineOption,
+                   final T defaultValue,
+                   final T value)
+  {
     mID = id;
     mShortName = shortName;
     mDescription = description;
     mCommandLineOption = commandLineOption;
-    mDefaultValue = mValue = defaultValue;
+    mDefaultValue = defaultValue;
+    mValue = value;
   }
 
   protected Option(final Option<T> template, final T defaultValue)
@@ -187,6 +200,7 @@ public abstract class Option<T> implements Cloneable
     mEditable = editable;
   }
 
+
   //#########################################################################
   //# Value Access
   /**
@@ -233,7 +247,7 @@ public abstract class Option<T> implements Cloneable
     setValue(mDefaultValue);
   }
 
-  public abstract void set(String text);
+  public abstract void set(String text) throws ParseException;
 
   public String getAsString()
   {

@@ -593,7 +593,8 @@ public class CompareLessConflicting
       final ModuleProxy module = (ModuleProxy) doc;
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
-      return compiler.compile(bindings);
+      compiler.setParameterBindings(bindings);
+      return compiler.compile();
     } else {
       return null;
     }

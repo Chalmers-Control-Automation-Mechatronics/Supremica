@@ -106,14 +106,23 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
     clearAnalysisResult();
   }
 
-  public List<ParameterBindingProxy> getBindings()
+  /**
+   * Gets the list of parameter bindings applied to the input module.
+   */
+  public List<ParameterBindingProxy> getParameterBindings()
   {
-    return mBindings;
+    return mParameterBindings;
   }
 
-  public void setBindings(final List<ParameterBindingProxy> binding)
+  /**
+   * Sets the parameter bindings to be applied to the input module.
+   * @param  bindings  List of parameter bindings. The name of each
+   *                   binding should match a parameter in the constant
+   *                   alias list of the input module.
+   */
+  public void setParameterBindings(final List<ParameterBindingProxy> bindings)
   {
-    mBindings = binding;
+    mParameterBindings = bindings;
   }
 
   public void setKindTranslator(final KindTranslator translator)
@@ -336,6 +345,6 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   private int mTransitionLimit;
   private long mStartTime;
   private boolean mIsAborting;
-  List<ParameterBindingProxy> mBindings;
+  List<ParameterBindingProxy> mParameterBindings;
 
 }

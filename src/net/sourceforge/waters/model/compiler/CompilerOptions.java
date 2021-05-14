@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 
 
@@ -55,6 +56,7 @@ public class CompilerOptions extends SimpleLeafOptionPage
   private CompilerOptions()
   {
     super("gui.compiler", "Compiler");
+    register(PARAMETER_BINDINGS);
     register(INCLUDE_INSTANTIATION);
     register(BACKGROUND_COMPILER);
     register(OPTIMIZING_COMPILER);
@@ -71,14 +73,16 @@ public class CompilerOptions extends SimpleLeafOptionPage
   public List<Option<?>> getOptions()
   {
     return createOptionList
-      (INCLUDE_INSTANTIATION, BACKGROUND_COMPILER, OPTIMIZING_COMPILER,
-       EFSM_COMPILER, NORMALIZING_COMPILER, AUTOMATON_VARIABLES_COMPILER,
-       HISC_COMPILER);
+      (PARAMETER_BINDINGS, INCLUDE_INSTANTIATION, BACKGROUND_COMPILER,
+       OPTIMIZING_COMPILER, EFSM_COMPILER, NORMALIZING_COMPILER,
+       AUTOMATON_VARIABLES_COMPILER, HISC_COMPILER);
   }
 
 
   //#########################################################################
   //# Option Names
+  public static final String OPTION_ModuleCompiler_ParameterBindings =
+    "parameterBindings";
   public static final String OPTION_ModuleCompiler_IncludeInstantiation =
     "includeInstantiation";
   public static final String OPTION_ModuleCompiler_BackgroundCompiler =
@@ -97,6 +101,10 @@ public class CompilerOptions extends SimpleLeafOptionPage
 
   //#########################################################################
   //# Options
+  public static final ParameterBindingListOption PARAMETER_BINDINGS =
+  new ParameterBindingListOption
+    (OPTION_ModuleCompiler_ParameterBindings, "Parameter bindings",
+     "Set binding for a module parameter", "-D");
   public static final BooleanOption INCLUDE_INSTANTIATION = new BooleanOption
     (OPTION_ModuleCompiler_IncludeInstantiation, "Include Instantiation",
      "Enable instantiation and other advanced features", "-inst", true);
@@ -114,8 +122,10 @@ public class CompilerOptions extends SimpleLeafOptionPage
   public static final BooleanOption NORMALIZING_COMPILER = new BooleanOption
     (OPTION_ModuleCompiler_NormalizingCompiler, "Normalizing Compiler",
      "Use normalising EFSM compiler", "-norm", true);
-  public static final BooleanOption AUTOMATON_VARIABLES_COMPILER = new BooleanOption
-    (OPTION_ModuleCompiler_AutomatonVariablesCompiler, "Automaton Variables Compiler",
+  public static final BooleanOption AUTOMATON_VARIABLES_COMPILER =
+  new BooleanOption
+    (OPTION_ModuleCompiler_AutomatonVariablesCompiler,
+     "Automaton Variables Compiler",
      "Allow automaton names in EFSM guards", "-autvars", false);
   public static final BooleanOption HISC_COMPILER = new BooleanOption
     (OPTION_ModuleCompiler_HISCCompiler, "HISC high-level only",

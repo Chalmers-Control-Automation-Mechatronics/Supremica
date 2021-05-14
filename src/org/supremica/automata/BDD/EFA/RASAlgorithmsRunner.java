@@ -6,6 +6,7 @@ import java.io.File;
 import net.sf.javabdd.BDD;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.model.expr.ParseException;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.FlowerEFABuilder;
@@ -39,9 +40,14 @@ public class RASAlgorithmsRunner
     final ExtendedAutomata exAutomata = fbuilder.getEFAforRAS();
 
     Config.BDD2_BDD_LIBRARY.setValue(BDDPackage.BUDDY);
-    Config.BDD2_INITIAL_NODE_TABLE_SIZE.set(args[2]);
-    Config.BDD2_CACHE_SIZE.set(args[3]);
-    Config.BDD2_CACHE_RATIO.set(args[4]);
+    try {
+      Config.BDD2_INITIAL_NODE_TABLE_SIZE.set(args[2]);
+      Config.BDD2_CACHE_SIZE.set(args[3]);
+      Config.BDD2_CACHE_RATIO.set(args[4]);
+    } catch (final ParseException exception) {
+      System.err.println(exception.getMessage());
+      System.exit(1);
+    }
 
     final BDDExtendedSynthesizer synthesizer =
       new BDDExtendedSynthesizer(exAutomata, options);

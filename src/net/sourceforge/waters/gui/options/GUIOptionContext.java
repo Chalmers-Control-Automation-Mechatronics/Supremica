@@ -54,6 +54,7 @@ import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.OptionContext;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionPageEditor;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
@@ -75,6 +76,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -203,6 +205,13 @@ public class GUIOptionContext implements OptionContext
   createFileEditor(final FileOption option)
   {
     return new FileOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionEditor<List<ParameterBindingProxy>>
+  createParameterBindingListEditor(final ParameterBindingListOption option)
+  {
+    return null;
   }
 
   @Override

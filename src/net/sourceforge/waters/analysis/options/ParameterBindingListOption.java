@@ -33,109 +33,81 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} representing a
- * double. This parameter is represented as a <CODE>double</CODE>
- * value.
+ * A configurable parameter of a {@link ModelAnalyzer}, which can hold a
+ * {@link List} of {@link ParameterBindingProxy} objects.
  *
- * @author Brandon Bassett, Robi Malik, Benjamin Wheeler
+ * @author Robi Malik
  */
 
-public class DoubleOption extends Option<Double>
+public class ParameterBindingListOption
+  extends Option<List<ParameterBindingProxy>>
 {
   //#########################################################################
   //# Constructors
-  /**
-   * Creates a double parameter with {@link Double#POSITIVE_INFINITY}
-   * as its default.
-   */
-  public DoubleOption(final String id,
-                      final String shortName,
-                      final String description,
-                      final String commandLineOption)
+  public ParameterBindingListOption(final String id,
+                                    final String shortName,
+                                    final String description,
+                                    final String commandLineOption)
   {
-    this(id, shortName, description, commandLineOption,
-         Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Creates a double parameter with a specified default.
-   */
-  public DoubleOption(final String id,
-                      final String shortName,
-                      final String description,
-                      final String commandLineOption,
-                      final double defaultValue)
-  {
-    this(id, shortName, description, commandLineOption,
-         Double.POSITIVE_INFINITY,
-         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Creates a double parameter with a specified default and range.
-   */
-  public DoubleOption(final String id,
-                      final String shortName,
-                      final String description,
-                      final String commandLineOption,
-                      final double defaultValue,
-                      final double minValue,
-                      final double maxValue)
-  {
-    super(id, shortName, description, commandLineOption, defaultValue);
-    mMinValue = minValue;
-    mMaxValue = maxValue;
-  }
-
-
-  //#########################################################################
-  //# Type-specific Access
-  public double getDoubleValue()
-  {
-    return getValue().doubleValue();
-  }
-
-  public double getMin()
-  {
-    return mMinValue;
-  }
-
-  public double getMax()
-  {
-    return mMaxValue;
-  }
-
-  @Override
-  public void set(final String text)
-    throws ParseException
-  {
-    try {
-      final double value = Double.parseDouble(text);
-      this.setValue(value);
-    } catch(final NumberFormatException exception) {
-      throw new ParseException(exception, 0);
-    }
+    super(id, shortName, description, commandLineOption,
+          Collections.emptyList(), new LinkedList<>());
+    setEditable(false);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Option
   @Override
-  public OptionEditor<Double> createEditor(final OptionContext context)
+  public OptionEditor<List<ParameterBindingProxy>>
+  createEditor(final OptionContext context)
   {
-    return context.createDoubleEditor(this);
+    return context.createParameterBindingListEditor(this);
   }
 
+  @Override
+  public void set(final String text)
+    throws ParseException
+  {
+    final String[] parts = text.split("=");
+    if (parts.length != 2) {
+      throw new ParseException("Can't convert '" + text +
+                               "' to a parameter binding.", 0);
+    }
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    final ExpressionParser parser = new ExpressionParser(factory, optable);
+    final SimpleExpressionProxy expr = parser.parse(parts[1]);
+    final ParameterBindingProxy binding =
+      factory.createParameterBindingProxy(parts[0], expr);
+    getValue().add(binding);
+  }
 
-  //#########################################################################
-  //# Data Members
-  private final double mMinValue;
-  private final double mMaxValue;
+  @Override
+  public void restoreDefaultValue()
+  {
+    getValue().clear();
+  }
 
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
 
 }

@@ -52,6 +52,7 @@ import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
@@ -69,7 +70,6 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
@@ -77,7 +77,6 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.apache.logging.log4j.Level;
@@ -122,8 +121,6 @@ public class UnifiedEFACommandLineTool
     final ConfigurationFactory cfactory =
       new VerboseLogConfigurationFactory(mVerbosity);
     ConfigurationFactory.setConfigurationFactory(cfactory);
-
-    boolean noargs = false;
     final Formatter formatter = new Formatter(System.out);
 
     try {
@@ -131,41 +128,13 @@ public class UnifiedEFACommandLineTool
         usage();
       }
 
-      mContext = new CommandLineOptionContext();
-
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final ExpressionParser parser =
-        new ExpressionParser(moduleFactory, optable);
-      List<ParameterBindingProxy> bindings = null;
-
       final List<String> argList = new LinkedList<String>();
       for (int i = 0; i < args.length; i++) {
         final String arg = args[i];
-        if (noargs) {
-          argList.add(arg);
-        } else if (arg.startsWith("-D")) {
-          final int eqpos = arg.indexOf('=', 2);
-          if (eqpos > 2) {
-            final String name = arg.substring(2, eqpos);
-            final String text = arg.substring(eqpos + 1);
-            final SimpleExpressionProxy expr = parser.parse(text);
-            final ParameterBindingProxy binding =
-              moduleFactory.createParameterBindingProxy(name, expr);
-            if (bindings == null) {
-              bindings = new LinkedList<ParameterBindingProxy>();
-            }
-            bindings.add(binding);
-          } else {
-            argList.add(arg);
-          }
-        } else if (arg.equals("--")) {
-          noargs = true;
-          argList.add(arg);
-        } else {
-          argList.add(arg);
-        }
+        argList.add(arg);
       }
 
       final ValidUnmarshaller importer =
@@ -175,11 +144,10 @@ public class UnifiedEFACommandLineTool
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);
-
       mChecker = new UnifiedEFAConflictChecker(moduleFactory);
       mChecker.setDocumentManager(docManager);
-      mChecker.setBindings(bindings);
 
+      mContext = new CommandLineOptionContext();
       final LeafOptionPage toolPage =
         mContext.createCommandLineToolOptionPage(this);
       mContext.registerArguments(toolPage, this, true);
@@ -207,6 +175,8 @@ public class UnifiedEFACommandLineTool
       for (final String name : argList) {
         final File filename = new File(name);
         final ModuleProxy module = (ModuleProxy) docManager.load(filename);
+        final List<ParameterBindingProxy> bindings =
+          mChecker.getParameterBindings();
         final String fullName =
           ModuleCompiler.getParametrizedName(module, bindings);
         System.out.print(fullName + " ... ");
@@ -405,6 +375,10 @@ public class UnifiedEFACommandLineTool
     public UnifiedEFAConflictCheckerOptionPage()
     {
       super("UnifiedEFAConflictChecker", "EFSM Conflict Checker");
+      register(new ParameterBindingListOption
+                 (OPTION_UnifiedEFACommandLineTool_ParameterBindings,
+                  "Parameter bindings",
+                  "Set binding for a module parameter", "-D"));
       register(new BooleanOption
                  (UnifiedEFACommandLineTool.
                   OPTION_UnifiedEFACommandLineTool_PreferLocal, null,
@@ -466,6 +440,8 @@ public class UnifiedEFACommandLineTool
   private static final String SEPARATOR =
     "------------------------------------------------------------";
 
+  public static final String OPTION_UnifiedEFACommandLineTool_ParameterBindings =
+    "UnifiedEFACommandLineTool.ParameterBindings";
   public static final String OPTION_UnifiedEFACommandLineTool_PreferLocal =
     "UnifiedEFACommandLineTool.PreferLocal";
   public static final String OPTION_UnifiedEFACommandLineTool_SimplifierFactory =

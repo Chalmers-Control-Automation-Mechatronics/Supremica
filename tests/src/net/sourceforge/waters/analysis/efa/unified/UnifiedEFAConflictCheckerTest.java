@@ -762,7 +762,7 @@ public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
     final UnifiedEFAConflictChecker conflictChecker =
       new UnifiedEFAConflictChecker(module, factory);
     configure(conflictChecker);
-    conflictChecker.setBindings(bindings);
+    conflictChecker.setParameterBindings(bindings);
     final boolean result = conflictChecker.run();
     assertEquals("Unexpected result from conflict check!", expected, result);
     return result;

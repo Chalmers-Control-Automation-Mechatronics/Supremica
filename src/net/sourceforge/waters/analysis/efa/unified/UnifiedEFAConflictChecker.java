@@ -56,6 +56,7 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -69,6 +70,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
@@ -307,6 +309,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   {
     final List<Option<?>> options = super.getOptions(page);
     page.append(options, UnifiedEFACommandLineTool.
+                OPTION_UnifiedEFACommandLineTool_ParameterBindings);
+    page.append(options, UnifiedEFACommandLineTool.
                 OPTION_UnifiedEFACommandLineTool_PreferLocal);
     page.append(options, UnifiedEFACommandLineTool.
                 OPTION_UnifiedEFACommandLineTool_SimplifierFactory);
@@ -324,7 +328,12 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(UnifiedEFACommandLineTool.
+    if (option.hasID(CompilerOptions.
+                     OPTION_ModuleCompiler_ParameterBindings)) {
+      final ParameterBindingListOption paramOption =
+        (ParameterBindingListOption) option;
+      setParameterBindings(paramOption.getValue());
+    } else if (option.hasID(UnifiedEFACommandLineTool.
                      OPTION_UnifiedEFACommandLineTool_PreferLocal)) {
       final BooleanOption opt = (BooleanOption) option;
       setUsesLocalVariable(opt.getValue());
@@ -375,7 +384,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mDocumentManager = new DocumentManager();
     }
     final ModuleProxy module = getModel();
-    final List<ParameterBindingProxy> bindings = getBindings();
+    final List<ParameterBindingProxy> bindings = getParameterBindings();
     final UnifiedEFACompiler compiler =
       new UnifiedEFACompiler(mDocumentManager, module);
     compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());

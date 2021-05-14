@@ -36,9 +36,11 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.Option;
 
-public class StringListCommandLineArgument extends OptionCommandLineArgument<List<String>>
+public class StringListCommandLineArgument
+  extends OptionCommandLineArgument<List<String>>
 {
 
   //#######################################################################
@@ -51,6 +53,12 @@ public class StringListCommandLineArgument extends OptionCommandLineArgument<Lis
 
   //#######################################################################
   //# Simple Access
+  @Override
+  public String getDescription()
+  {
+    return super.getDescription() + " (can be specified more than once)";
+  }
+
   @Override
   protected String getArgumentTemplate()
   {
@@ -72,6 +80,14 @@ public class StringListCommandLineArgument extends OptionCommandLineArgument<Lis
       setUsed(true);
     } else {
       failMissingValue();
+    }
+  }
+
+  @Override
+  public void configure(final Configurable configurable)
+  {
+    if (isUsed()) {
+      super.configure(configurable);
     }
   }
 

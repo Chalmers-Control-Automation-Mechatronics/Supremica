@@ -37,6 +37,7 @@ import java.io.File;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.expr.ParseException;
 
 /**
  *
@@ -65,6 +66,7 @@ public class FileCommandLineArgument extends OptionCommandLineArgument<File>
   @Override
   public void parse(final CommandLineOptionContext context,
                     final ListIterator<String> iter)
+    throws ParseException
   {
     iter.remove();
     if (iter.hasNext()) {

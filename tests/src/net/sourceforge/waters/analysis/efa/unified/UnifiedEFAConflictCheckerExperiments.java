@@ -334,7 +334,7 @@ public class UnifiedEFAConflictCheckerExperiments
       final List<String> none = Collections.emptyList();
       compiler.setEnabledPropertyNames(none);
       mWatchdog.addAbortable(compiler);
-      final ProductDESProxy des = compiler.compile(bindings);
+      final ProductDESProxy des = compiler.compile();
       mWatchdog.removeAbortable(compiler);
       return des;
     } catch (final OutOfMemoryError error) {
@@ -552,7 +552,7 @@ public class UnifiedEFAConflictCheckerExperiments
       // Configuration of UnifiedEFAConflictChecker ...
       checker.setUsesLocalVariable(true);
       // Configuration end
-      checker.setBindings(bindings);
+      checker.setParameterBindings(bindings);
       mWatchdog.addAbortable(checker);
       checker.run();
       mWatchdog.removeAbortable(checker);
