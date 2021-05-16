@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -95,7 +95,7 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
 
 
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
     db.register(new EnumOption<PreselectingHeuristicFactory>

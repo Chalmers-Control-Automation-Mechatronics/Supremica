@@ -64,14 +64,17 @@ public class ChainedAnalyzerOptionPage
   public ChainedAnalyzerOptionPage
     (final AnalysisOptionPage parent,
      final EnumOption<ModelAnalyzerFactoryLoader> selector,
-     final Collection<String> overridden)
+     final String... overridden)
   {
     super(parent.getPrefix() + "." + selector.getID(),
           selector.getShortName());
     mParent = parent;
     mOperation = parent.getAnalysisOperation();
     mAlgorithmOption = selector;
-    mOverriddenIDs = new THashSet<>(overridden);
+    mOverriddenIDs = new THashSet<>(overridden.length);
+    for (final String id : overridden) {
+      mOverriddenIDs.add(id);
+    }
   }
 
   public ChainedAnalyzerOptionPage

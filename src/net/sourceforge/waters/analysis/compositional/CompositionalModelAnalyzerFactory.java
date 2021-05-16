@@ -34,12 +34,14 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -98,7 +100,7 @@ public class CompositionalModelAnalyzerFactory
 
 
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
     db.register(new BooleanOption
@@ -169,7 +171,6 @@ public class CompositionalModelAnalyzerFactory
             "-sp",
             true));
 
-
     db.register(new BooleanOption
              (OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled,
               "Counterexample debugging",
@@ -179,34 +180,53 @@ public class CompositionalModelAnalyzerFactory
               false));
 
     db.register(new EnumOption<AbstractionProcedureCreator>
-             (OPTION_CompositionalAutomataSynthesizer_AbstractionProcedureCreator,
-              "Abstraction procedure",
-              "Abstraction procedure to simplify automata during compositional " +
-              "minimisation.",
-              "-method",
-              AutomataSynthesisAbstractionProcedureFactory.getInstance()));
+      (OPTION_CompositionalAutomataSynthesizer_AbstractionProcedureCreator,
+        "Abstraction procedure",
+        "Abstraction procedure to simplify automata during compositional " +
+        "minimisation.",
+        "-method",
+        AutomataSynthesisAbstractionProcedureFactory.getInstance()));
+    db.register(new ChainedAnalyzerOption
+      (OPTION_CompositionalAutomataSynthesizer_Chain,
+       "Monolithic synthesise",
+       "Algorithm used to synthesize supervisors for the subsystems " +
+       "resulting from compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.Compositional, CHAIN_SUPPRESSIONS));
 
     db.register(new EnumOption<AbstractionProcedureCreator>
-             (OPTION_CompositionalConflictChecker_AbstractionProcedureCreator,
-              "Abstraction procedure",
-              "Abstraction procedure to simplify automata during compositional " +
-              "minimisation.",
-              "-method",
-              ConflictAbstractionProcedureFactory.getInstance()));
+      (OPTION_CompositionalConflictChecker_AbstractionProcedureCreator,
+       "Abstraction procedure",
+       "Abstraction procedure to simplify automata during compositional " +
+       "minimisation.",
+       "-method",
+       ConflictAbstractionProcedureFactory.getInstance()));
+    db.register(new ChainedAnalyzerOption
+      (OPTION_CompositionalConflictChecker_Chain,
+       "Monolithic conflict checker",
+       "Algorithm used to analyze the subsystems resulting from " +
+       "compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.Compositional, CHAIN_SUPPRESSIONS));
     db.register(new EnumOption<PreselectingMethod>
-             (OPTION_CompositionalConflictChecker_PreselectingMethod,
-              "Preselection method",
-              "Preselection heuristic to generate groups of automata to consider " +
-              "for composition.",
-              "-presel",
-              CompositionalConflictChecker.getPreselectingMethodFactoryStatic()));
+      (OPTION_CompositionalConflictChecker_PreselectingMethod,
+       "Preselection method",
+       "Preselection heuristic to generate groups of automata to consider " +
+       "for composition.",
+       "-presel",
+       CompositionalConflictChecker.getPreselectingMethodFactoryStatic()));
     db.register(new EnumOption<SelectionHeuristicCreator>
-             (OPTION_CompositionalConflictChecker_SelectingMethod,
-              "Selection method",
-              "Heuristic to choose the group of automata to compose and simplify " +
-              "from the options produced by the preselection method.",
-              "-sel",
-              ConflictSelectionHeuristicFactory.getInstance()));
+      (OPTION_CompositionalConflictChecker_SelectingMethod,
+        "Selection method",
+        "Heuristic to choose the group of automata to compose and simplify " +
+        "from the options produced by the preselection method.",
+        "-sel",
+        ConflictSelectionHeuristicFactory.getInstance()));
+
+    db.register(new ChainedAnalyzerOption
+      (OPTION_CompositionalLanguageInclusionChecker_Chain,
+       "Monolithic language inclusion checker",
+       "Algorithm used to analyze the subsystems resulting from " +
+       "compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.Compositional, CHAIN_SUPPRESSIONS));
   }
 
 
@@ -250,10 +270,16 @@ public class CompositionalModelAnalyzerFactory
   public static final String
     OPTION_CompositionalAutomataSynthesizer_AbstractionProcedureCreator =
     "CompositionalAutomataSynthesizer.AbstractionProcedureCreator";
+  public static final String
+    OPTION_CompositionalAutomataSynthesizer_Chain =
+    "CompositionalAutomataSynthesizer.chain";
 
   public static final String
     OPTION_CompositionalConflictChecker_AbstractionProcedureCreator =
     "CompositionalConflictChecker.AbstractionProcedureCreator";
+  public static final String
+    OPTION_CompositionalConflictChecker_Chain =
+    "CompositionalConflictChecker.chain";
   public static final String
     OPTION_CompositionalConflictChecker_PreselectingMethod =
     "CompositionalConflictChecker.PreselectingMethod";
@@ -261,5 +287,8 @@ public class CompositionalModelAnalyzerFactory
     OPTION_CompositionalConflictChecker_SelectingMethod =
     "CompositionalConflictChecker.SelectionHeuristic";
 
+  public static final String
+    OPTION_CompositionalLanguageInclusionChecker_Chain =
+    "CompositionalLanguageInclusionChecker.chain";
 
 }

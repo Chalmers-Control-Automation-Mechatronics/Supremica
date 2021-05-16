@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -115,7 +115,7 @@ public interface ModelAnalyzerFactory
 
   //#########################################################################
   //# Options
-  public void registerOptions(OptionPage db);
+  public void registerOptions(AnalysisOptionPage db);
 
 
   //#########################################################################

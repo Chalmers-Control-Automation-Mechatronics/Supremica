@@ -34,8 +34,8 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
@@ -142,7 +142,7 @@ public class MonolithicModelAnalyzerFactory
 
 
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
     db.register(new BooleanOption

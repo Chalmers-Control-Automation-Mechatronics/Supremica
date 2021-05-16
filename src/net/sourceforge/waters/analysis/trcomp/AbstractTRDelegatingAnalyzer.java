@@ -38,15 +38,10 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -88,85 +83,13 @@ public abstract class AbstractTRDelegatingAnalyzer
   @Override
   public List<Option<?>> getOptions(final OptionPage db)
   {
-    final List<Option<?>> options = super.getOptions(db);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelAnalyzer_InternalStateLimit);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelAnalyzer_InternalTransitionLimit);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelAnalyzer_FinalStateLimit);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelAnalyzer_FinalTransitionLimit);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled);
-    db.append(options, TRCompositionalModelAnalyzerFactory.
-                       OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile);
-    return options;
+    return mDelegate.getOptions(db);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                     OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic)) {
-      final EnumOption<TRPreselectionHeuristic> enumOption =
-        (EnumOption<TRPreselectionHeuristic>) option;
-      setPreselectionHeuristic(enumOption.getValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic)) {
-      final EnumOption<SelectionHeuristic<TRCandidate>> enumOption =
-        (EnumOption<SelectionHeuristic<TRCandidate>>) option;
-      setSelectionHeuristic(enumOption.getValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_InternalStateLimit)) {
-      final PositiveIntOption intOption = (PositiveIntOption) option;
-      setInternalStateLimit(intOption.getIntValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_InternalTransitionLimit)) {
-      final PositiveIntOption intOption = (PositiveIntOption) option;
-      setInternalTransitionLimit(intOption.getIntValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_FinalStateLimit)) {
-      final PositiveIntOption intOption = (PositiveIntOption) option;
-      setMonolithicStateLimit(intOption.getIntValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
-      final PositiveIntOption intOption = (PositiveIntOption) option;
-      setMonolithicTransitionLimit(intOption.getIntValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setBlockedEventsEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setFailingEventsEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setSelfloopOnlyEventsEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setAlwaysEnabledEventsEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
-                            OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile)) {
-      final FileOption fileOption = (FileOption) option;
-      setMonolithicDumpFile(fileOption.getValue());
-    } else {
-      super.setOption(option);
-    }
+    mDelegate.setOption(option);
   }
 
 

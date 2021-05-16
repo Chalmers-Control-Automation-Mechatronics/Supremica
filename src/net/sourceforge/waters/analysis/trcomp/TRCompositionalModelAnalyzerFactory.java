@@ -35,12 +35,13 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -106,7 +107,7 @@ public class TRCompositionalModelAnalyzerFactory
 
 
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
     db.register(new BooleanOption
@@ -174,6 +175,19 @@ public class TRCompositionalModelAnalyzerFactory
               "-tc",
               false));
 
+    db.register(new ChainedAnalyzerOption
+      (OPTION_TRControllabilityChecker_Chain,
+       "Monolithic controllability checker",
+       "Algorithm used to analyze the subsystems resulting from " +
+       "compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.TRCompositional, CHAIN_SUPPRESSIONS));
+
+    db.register(new ChainedAnalyzerOption
+      (OPTION_TRCompositionalConflictChecker_Chain,
+       "Monolithic conflict checker",
+       "Algorithm used to analyze the subsystems resulting from " +
+       "compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.TRCompositional, CHAIN_SUPPRESSIONS));
     db.register(new EnumOption<TRPreselectionHeuristic>
              (OPTION_TRCompositionalConflictChecker_PreselectionHeuristic,
               "Preselection method",
@@ -202,11 +216,20 @@ public class TRCompositionalModelAnalyzerFactory
               "abstraction procedure.",
               "-lcc",
               true));
-    db.register(new ChainOption
-             (OPTION_ModelAnalyzer_SecondaryFactory,
-              "Monolithic model analyzer",
-              "Algorithm used to analyze the results of abstraction.",
-              "-chain"));
+
+    db.register(new ChainedAnalyzerOption
+      (OPTION_TRCompositionalStateCounter_Chain,
+       "Monolithic state counter",
+       "Algorithm used to count states in the subsystems resulting from " +
+       "compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.TRCompositional, CHAIN_SUPPRESSIONS));
+
+    db.register(new ChainedAnalyzerOption
+      (OPTION_TRLanguageInclusionChecker_Chain,
+       "Monolithic language inclusion checker",
+       "Algorithm used to analyze the subsystems resulting from " +
+       "compositional minimisation.",
+       db, ModelAnalyzerFactoryLoader.TRCompositional, CHAIN_SUPPRESSIONS));
   }
 
 
@@ -246,6 +269,13 @@ public class TRCompositionalModelAnalyzerFactory
     "AbstractTRCompositionalModelVerifier.TraceCheckingEnabled";
 
   public static final String
+    OPTION_TRControllabilityChecker_Chain =
+    "TRControllabilityChecker.chain";
+
+  public static final String
+    OPTION_TRCompositionalConflictChecker_Chain =
+    "TRCompositionalConflictChecker.chain";
+  public static final String
     OPTION_TRCompositionalConflictChecker_SimplifierCreator =
     "TRCompositionalConflictChecker.SimplifierCreator";
   public static final String
@@ -256,6 +286,15 @@ public class TRCompositionalModelAnalyzerFactory
     "TRCompositionalConflictChecker.SelectionHeuristic";
   public static final String
     OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts =
-    "TRCompositionalConflictChecker.LimtedCertainConflicts";
+    "TRCompositionalConflictChecker.LimitedCertainConflicts";
+
+  public static final String
+    OPTION_TRCompositionalStateCounter_Chain =
+    "TRCompositionalStateCounter.chain";
+
+  public static final String
+    OPTION_TRLanguageInclusionChecker_Chain =
+    "TRLanguageInclusionChecker.chain";
+
 
 }

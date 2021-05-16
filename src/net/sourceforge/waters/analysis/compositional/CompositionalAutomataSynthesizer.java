@@ -323,6 +323,8 @@ public class CompositionalAutomataSynthesizer
         break;
       }
     }
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_CompositionalAutomataSynthesizer_Chain);
     return options;
   }
 

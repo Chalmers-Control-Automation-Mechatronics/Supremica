@@ -52,7 +52,6 @@ public abstract class LeafOptionPage extends OptionPage
     mPrefix = prefix;
     mTitle = title;
     mMap = new HashMap<>();
-    OptionPage.OPTION_PAGES.add(this);
   }
 
 

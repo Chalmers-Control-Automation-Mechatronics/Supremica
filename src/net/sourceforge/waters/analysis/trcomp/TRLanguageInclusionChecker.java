@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -105,6 +107,18 @@ public class TRLanguageInclusionChecker
      final SafetyDiagnostics diag)
   {
     super(model, translator, diag);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_TRLanguageInclusionChecker_Chain);
+    return options;
   }
 
 

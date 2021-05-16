@@ -35,11 +35,11 @@ package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
@@ -145,7 +145,7 @@ public abstract class AbstractModelAnalyzerFactory
   //#########################################################################
   //# Configuration
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     db.register(new PositiveIntOption
              (OPTION_ModelAnalyzer_FinalStateLimit,
@@ -335,9 +335,6 @@ public abstract class AbstractModelAnalyzerFactory
   public static final String OPTION_ModelAnalyzer_InternalTransitionLimit =
     "ModelAnalyzer.InternalTransitionLimit";
 
-  public static final String OPTION_ModelAnalyzer_SecondaryFactory =
-    "AbstractModelAnalyzerFactory.SecondaryFactory";
-
   public static final String OPTION_ModelVerifier_DetailedOutputEnabled =
     "ModelVerifier.DetailedOutputEnabled";
   public static final String OPTION_ModelVerifier_ShortCounterExampleRequested =
@@ -353,6 +350,17 @@ public abstract class AbstractModelAnalyzerFactory
 
   public static final String OPTION_LanguageInclusionChecker_Property =
     "LanguageInclusionChecker.Property";
+
+  public static final String[] CHAIN_SUPPRESSIONS = {
+    OPTION_ModelAnalyzer_FinalStateLimit,
+    OPTION_ModelAnalyzer_FinalTransitionLimit,
+    OPTION_ModelVerifier_DetailedOutputEnabled,
+    OPTION_ModelVerifier_ShortCounterExampleRequested,
+    OPTION_ConflictChecker_ConfiguredDefaultMarking,
+    OPTION_ConflictChecker_ConfiguredPreconditionMarking,
+    OPTION_ControlLoopChecker_LoopEvents,
+    OPTION_LanguageInclusionChecker_Property
+  };
 
   public static final String OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking =
     "SupervisorSynthesizer.ConfiguredDefaultMarking";

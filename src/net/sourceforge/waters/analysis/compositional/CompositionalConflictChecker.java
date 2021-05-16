@@ -406,6 +406,8 @@ public class CompositionalConflictChecker
     }
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ConflictChecker_ConfiguredDefaultMarking);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_CompositionalConflictChecker_Chain);
     return options;
   }
 

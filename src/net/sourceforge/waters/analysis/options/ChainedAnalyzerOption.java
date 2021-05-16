@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.util.Collection;
-
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
@@ -61,13 +59,13 @@ public class ChainedAnalyzerOption
     (final String id,
      final String shortName,
      final String description,
-     final AnalysisOptionPage parentPage,
+     final AnalysisOptionPage db,
      final ModelAnalyzerFactoryLoader parentLoader,
-     final Collection<String> overridden)
+     final String... chainSuppressions)
   {
     super(id, shortName, description, "-chain",
-          createEnumFactory(parentPage, parentLoader));
-    mOptionPage = new ChainedAnalyzerOptionPage(parentPage, this, overridden);
+          createEnumFactory(db, parentLoader));
+    mOptionPage = new ChainedAnalyzerOptionPage(db, this, chainSuppressions);
     mParentLoader = parentLoader;
   }
 

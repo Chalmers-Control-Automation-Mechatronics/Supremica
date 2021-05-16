@@ -44,6 +44,7 @@ public abstract class DefaultLeafOptionPage extends SimpleLeafOptionPage
   {
     super(prefix, title);
     for (final Option<?> option : getOptions()) register(option);
+    OptionPage.OPTION_PAGES.add(this);
   }
 
 }

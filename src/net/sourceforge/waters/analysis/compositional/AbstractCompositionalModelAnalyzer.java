@@ -55,6 +55,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.Option;
@@ -64,6 +65,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -80,6 +82,7 @@ import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -720,6 +723,21 @@ public abstract class AbstractCompositionalModelAnalyzer
                             OPTION_AbstractCompositionalModelAnalyzer_MonolithicDumpFile)) {
       final FileOption fileOption = (FileOption) option;
       setMonolithicDumpFile(fileOption.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_CompositionalAutomataSynthesizer_Chain) ||
+               option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_CompositionalConflictChecker_Chain) ||
+               option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_CompositionalLanguageInclusionChecker_Chain)) {
+      try {
+        final ChainedAnalyzerOption chain = (ChainedAnalyzerOption) option;
+        final ProductDESProxyFactory factory = getFactory();
+        final ModelAnalyzer secondaryAnalyzer =
+          chain.createAndConfigureModelAnalyzer(factory);
+        setMonolithicAnalyzer(secondaryAnalyzer);
+      } catch (final AnalysisConfigurationException exception) {
+        throw new WatersRuntimeException(exception);
+      }
     } else {
       super.setOption(option);
     }

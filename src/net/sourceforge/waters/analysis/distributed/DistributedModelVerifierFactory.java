@@ -34,9 +34,9 @@
 package net.sourceforge.waters.analysis.distributed;
 
 import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -76,7 +76,7 @@ public class DistributedModelVerifierFactory
   }
 
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     db.register(new StringOption
              (OPTION_DistributedModelVerifierFactory_Host,

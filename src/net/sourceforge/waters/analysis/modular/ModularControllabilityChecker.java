@@ -55,6 +55,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -101,8 +102,10 @@ public class ModularControllabilityChecker
                                        final ProductDESProxyFactory factory,
                                        final SafetyVerifier secondary)
   {
-    super(model, factory, secondary);
-    setKindTranslator(ControllabilityKindTranslator.getInstance());
+    super(model,
+          ControllabilityKindTranslator.getInstance(),
+          ControllabilityDiagnostics.getInstance(),
+          factory, secondary);
   }
 
 
@@ -128,6 +131,7 @@ public class ModularControllabilityChecker
     return mStartsWithSmallestSpec;
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
@@ -138,6 +142,8 @@ public class ModularControllabilityChecker
                         OPTION_ModularControllabilityChecker_CollectsFailedSpecs);
     db.prepend(options, ModularModelVerifierFactory.
                         OPTION_ModularControllabilityChecker_StartsWithSmallestSpec);
+    db.append(options, ModularModelVerifierFactory.
+                       OPTION_ModularControllabilityChecker_Chain);
     return options;
   }
 

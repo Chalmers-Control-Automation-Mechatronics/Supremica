@@ -43,6 +43,8 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -89,7 +91,19 @@ public class TRCompositionalStateCounter
 
 
   //#########################################################################
-  // Overriding Methods
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_TRCompositionalStateCounter_Chain);
+    return options;
+  }
+
+
+  //#########################################################################
+  //# Overriding Methods
   @Override
   protected boolean analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
     throws AnalysisException

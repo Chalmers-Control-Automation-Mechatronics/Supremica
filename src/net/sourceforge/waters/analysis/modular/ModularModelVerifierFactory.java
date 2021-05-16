@@ -33,13 +33,14 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -97,7 +98,7 @@ public class ModularModelVerifierFactory
 
 
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
     db.register(new EnumOption<ModularHeuristicFactory.Method>
@@ -116,6 +117,12 @@ public class ModularModelVerifierFactory
               ModularHeuristicFactory.Preference.values(),
               ModularHeuristicFactory.Preference.NOPREF));
 
+    db.register(new ChainedAnalyzerOption
+      (OPTION_ModularControllabilityChecker_Chain,
+       "Monolithic controllability checker",
+       "Algorithm used to analyze the subsystems during modular " +
+       "or incremental processing.",
+       db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
     db.register(new BooleanOption
              (OPTION_ModularControllabilityChecker_CollectsFailedSpecs,
               "Collect failed specifications",
@@ -163,12 +170,12 @@ public class ModularModelVerifierFactory
             AutomataGroup.SelectVersion.values(),
             AutomataGroup.SelectVersion.Naive));
 
-    db.register(new ChainOption
-             (OPTION_ModelAnalyzer_SecondaryFactory,
-              "Monolithic model analyzer",
-              "Algorithm used to analyze the subsystems during modular " +
-              "or incremental processing.",
-              "-chain"));
+    db.register(new ChainedAnalyzerOption
+      (OPTION_ModularLanguageInclusionChecker_Chain,
+       "Monolithic language inclusion checker",
+       "Algorithm used to analyze the subsystems during modular " +
+       "or incremental processing.",
+       db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
   }
 
 
@@ -203,6 +210,9 @@ public class ModularModelVerifierFactory
   public static final String
     OPTION_ModularControllabilityChecker_StartsWithSmallestSpec =
     "ModularControllabilityChecker.StartsWithSmallestSpec";
+  public static final String
+    OPTION_ModularControllabilityChecker_Chain =
+    "ModularControllabilityChecker.chain";
 
   public static final String
     OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis =
@@ -217,5 +227,9 @@ public class ModularModelVerifierFactory
   public static final String
     OPTION_ModularControlLoopChecker_SelectVersion =
     "ModularControlLoopChecker.SelectVersion";
+
+  public static final String
+    OPTION_ModularLanguageInclusionChecker_Chain =
+    "ModularLanguageInclusionChecker.chain";
 
 }

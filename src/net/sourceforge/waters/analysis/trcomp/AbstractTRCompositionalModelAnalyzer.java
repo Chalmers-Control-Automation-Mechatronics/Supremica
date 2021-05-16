@@ -61,7 +61,7 @@ import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBu
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.Option;
@@ -84,6 +84,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.kindtranslator.EventOnlyKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -422,8 +423,6 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence);
     db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelAnalyzer_SecondaryFactory);
-    db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_InternalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_InternalTransitionLimit);
@@ -458,12 +457,6 @@ public abstract class AbstractTRCompositionalModelAnalyzer
       final EnumOption<SelectionHeuristic<TRCandidate>> enumOption =
         (EnumOption<SelectionHeuristic<TRCandidate>>) option;
       setSelectionHeuristic(enumOption.getValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_SecondaryFactory)) {
-      final ChainOption opt = (ChainOption) option;
-      final ModelAnalyzer secondaryAnalyzer =
-        opt.createSecondaryAnalyzer(this);
-      setMonolithicAnalyzer(secondaryAnalyzer);
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_ModelAnalyzer_InternalStateLimit)) {
       final PositiveIntOption intOption = (PositiveIntOption) option;
@@ -504,6 +497,21 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                             OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setUsingWeakObservationEquivalence(boolOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.OPTION_TRControllabilityChecker_Chain) ||
+               option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_TRCompositionalConflictChecker_Chain) ||
+               option.hasID(TRCompositionalModelAnalyzerFactory.OPTION_TRLanguageInclusionChecker_Chain) ||
+               option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_TRCompositionalStateCounter_Chain)) {
+      try {
+        final ChainedAnalyzerOption chain = (ChainedAnalyzerOption) option;
+        final ProductDESProxyFactory factory = getFactory();
+        final ModelAnalyzer secondaryAnalyzer =
+          chain.createAndConfigureModelAnalyzer(factory);
+        setMonolithicAnalyzer(secondaryAnalyzer);
+      } catch (final AnalysisConfigurationException exception) {
+        throw new WatersRuntimeException(exception);
+      }
     } else {
       super.setOption(option);
     }

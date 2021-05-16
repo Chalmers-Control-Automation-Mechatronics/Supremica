@@ -35,15 +35,16 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.ChainOption;
+import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -142,8 +143,6 @@ abstract class AbstractModularSafetyVerifier
   public List<Option<?>> getOptions(final OptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.prepend(options, AbstractModelAnalyzerFactory.
-                        OPTION_ModelAnalyzer_SecondaryFactory);
     db.prepend(options, ModularModelVerifierFactory.
                         OPTION_AbstractModularSafetyVerifier_HeuristicPreference);
     db.prepend(options, ModularModelVerifierFactory.
@@ -165,12 +164,19 @@ abstract class AbstractModularSafetyVerifier
       final EnumOption<ModularHeuristicFactory.Method> enumOption =
         (EnumOption<ModularHeuristicFactory.Method>) option;
       setHeuristicMethod(enumOption.getValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelAnalyzer_SecondaryFactory)) {
-      final ChainOption opt = (ChainOption) option;
-      final SafetyVerifier secondaryAnalyzer =
-        (SafetyVerifier) opt.createSecondaryAnalyzer(this);
-      setMonolithicVerifier(secondaryAnalyzer);
+    } else if (option.hasID(ModularModelVerifierFactory.
+                            OPTION_ModularControllabilityChecker_Chain) ||
+               option.hasID(ModularModelVerifierFactory.
+                            OPTION_ModularLanguageInclusionChecker_Chain)) {
+      try {
+        final ChainedAnalyzerOption chain = (ChainedAnalyzerOption) option;
+        final ProductDESProxyFactory factory = getFactory();
+        final SafetyVerifier secondaryAnalyzer =
+          (SafetyVerifier) chain.createAndConfigureModelAnalyzer(factory);
+        setMonolithicVerifier(secondaryAnalyzer);
+      } catch (final AnalysisConfigurationException exception) {
+        throw new WatersRuntimeException(exception);
+      }
     } else {
       super.setOption(option);
     }

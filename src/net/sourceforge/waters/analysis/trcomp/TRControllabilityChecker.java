@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -121,6 +123,18 @@ public class TRControllabilityChecker
      final SafetyDiagnostics diag)
   {
     super(model, translator, diag);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_TRControllabilityChecker_Chain);
+    return options;
   }
 
 

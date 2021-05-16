@@ -305,7 +305,7 @@ public class CommandLineOptionContext implements OptionContext
     private ArgumentSource(final LeafOptionPage page,
                            final Configurable configurable)
     {
-      mConfigurable = configurable;
+      mConfigurableClass = configurable.getClass();
       final List<Option<?>> options = configurable.getOptions(page);
       mArguments = new ArrayList<>(options.size());
       for (final Option<?> option : options) {
@@ -336,7 +336,7 @@ public class CommandLineOptionContext implements OptionContext
 
     private void showHelpMessage(final PrintStream stream)
     {
-      stream.print(ProxyTools.getShortClassName(mConfigurable));
+      stream.print(ProxyTools.getShortClassName(mConfigurableClass));
       stream.println(" supports the following options:");
       final List<CommandLineArgument> args = new ArrayList<>(mArguments);
       Collections.sort(args);
@@ -353,7 +353,7 @@ public class CommandLineOptionContext implements OptionContext
 
     //#######################################################################
     //# Data Members
-    private final Configurable mConfigurable;
+    private final Class<? extends Configurable> mConfigurableClass;
     private final List<CommandLineArgument> mArguments;
   }
 

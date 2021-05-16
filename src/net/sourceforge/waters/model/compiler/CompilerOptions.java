@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 
@@ -64,6 +65,7 @@ public class CompilerOptions extends SimpleLeafOptionPage
     register(NORMALIZING_COMPILER);
     register(AUTOMATON_VARIABLES_COMPILER);
     register(HISC_COMPILER);
+    OptionPage.OPTION_PAGES.add(this);
   }
 
 

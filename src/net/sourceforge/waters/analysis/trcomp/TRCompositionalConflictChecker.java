@@ -300,6 +300,8 @@ public class TRCompositionalConflictChecker
                         OPTION_ConflictChecker_ConfiguredDefaultMarking);
     db.append(options,  AbstractModelAnalyzerFactory.
                         OPTION_SynchronousProductBuilder_PruningDeadlocks);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_TRCompositionalConflictChecker_Chain);
     return options;
   }
 

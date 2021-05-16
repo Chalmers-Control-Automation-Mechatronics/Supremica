@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
@@ -68,6 +72,18 @@ public class CompositionalLanguageInclusionChecker
           factory,
           LanguageInclusionKindTranslator.getInstance(),
           LanguageInclusionDiagnostics.getInstance());
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Option<?>> getOptions(final OptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_CompositionalLanguageInclusionChecker_Chain);
+    return options;
   }
 
 }

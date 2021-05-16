@@ -82,6 +82,8 @@ public class AnalysisOptionPage
     mAlgorithmOption = new EnumOption<ModelAnalyzerFactoryLoader>
       ("Algorithm", "Algorithm", null, null, enumFactory);
     register(mAlgorithmOption);
+    registerAnalyzerFactoryOptions();
+    OptionPage.OPTION_PAGES.add(this);
   }
 
 
@@ -159,7 +161,6 @@ public class AnalysisOptionPage
               enumFactory.setDefaultValue(loader);
               hasDefault = true;
             }
-            factory.registerOptions(this);
           }
         } catch (ClassNotFoundException |
                  AnalysisConfigurationException |
@@ -170,6 +171,22 @@ public class AnalysisOptionPage
       }
     }
     return enumFactory;
+  }
+
+  private void registerAnalyzerFactoryOptions()
+  {
+    for (final ModelAnalyzerFactoryLoader loader :
+         mAlgorithmOption.getEnumConstants()) {
+      try {
+        final ModelAnalyzerFactory factory =
+          loader.getModelAnalyzerFactory();
+        factory.registerOptions(this);
+      } catch (ClassNotFoundException |
+               UnsatisfiedLinkError |
+               NoClassDefFoundError exception) {
+        // caught already - should not happen
+      }
+    }
   }
 
 
