@@ -211,9 +211,9 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Specific Access
-  public LeafOptionPage createCommandLineToolOptionPage(final Configurable tool)
+  public LeafOptionPage createCommandLineToolOptionPage()
   {
-    return new CommandLineToolOptionPage(tool);
+    return new CommandLineToolOptionPage();
   }
 
   public void registerArguments(final LeafOptionPage page,
@@ -426,10 +426,9 @@ public class CommandLineOptionContext implements OptionContext
   {
     //#######################################################################
     //# Constructor
-    public CommandLineToolOptionPage(final Configurable tool)
+    public CommandLineToolOptionPage()
     {
       super("cli", "Command Line Tool");
-      mTool = tool;
       register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
                                  "Verbose logging output",
                                  "+verbose|+v", false));
@@ -444,18 +443,6 @@ public class CommandLineOptionContext implements OptionContext
       register(new FileOption(OPTION_CommandLineTool_Csv, null,
                               "Save statistics in CSV file", "-csv"));
     }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      return mTool.getOptions(this);
-    }
-
-    //#########################################################################
-    //# Data Members
-    private final Configurable mTool;
   }
 
 

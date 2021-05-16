@@ -86,7 +86,6 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.ProcessCommandLineArguments;
 
 import org.xml.sax.SAXException;
@@ -319,11 +318,8 @@ public class IDE
       final Container contentPane = getContentPane();
       final int width = contentPane.getWidth();
       final int height = contentPane.getHeight();
-      final boolean changedWidth = Config.GUI_IDE_WIDTH.setValue(width);
-      final boolean changedHeight = Config.GUI_IDE_HEIGHT.setValue(height);
-      if (changedWidth || changedHeight) {
-        SupremicaProperties.savePropertiesLater();
-      }
+      Config.GUI_IDE_WIDTH.setValue(width);
+      Config.GUI_IDE_HEIGHT.setValue(height);
     }
   }
 
@@ -331,11 +327,8 @@ public class IDE
   public void componentMoved(final ComponentEvent event)
   {
     if (getExtendedState() == Frame.NORMAL) {
-      final boolean changedX = Config.GUI_IDE_XPOS.setValue(getX());
-      final boolean changedY = Config.GUI_IDE_YPOS.setValue(getY());
-      if (changedX || changedY) {
-        SupremicaProperties.savePropertiesLater();
-      }
+      Config.GUI_IDE_XPOS.setValue(getX());
+      Config.GUI_IDE_YPOS.setValue(getY());
     }
   }
 
@@ -356,11 +349,7 @@ public class IDE
   public void windowStateChanged(final WindowEvent event)
   {
     final int state = event.getNewState();
-    final boolean changed =
-      Config.GUI_IDE_MAXIMIZED.setValue(state == Frame.MAXIMIZED_BOTH);
-    if (changed) {
-      SupremicaProperties.savePropertiesLater();
-    }
+    Config.GUI_IDE_MAXIMIZED.setValue(state == Frame.MAXIMIZED_BOTH);
   }
 
 

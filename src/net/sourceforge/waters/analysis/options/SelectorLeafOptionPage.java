@@ -33,7 +33,8 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -105,16 +106,18 @@ public abstract class SelectorLeafOptionPage<S> extends LeafOptionPage
     return context.createSelectorLeafOptionPageEditor(this);
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
   @Override
-  public List<Option<?>> getOptions()
+  public void saveProperties(final Writer writer, final boolean saveAll)
+    throws IOException
   {
     final Collection<Option<?>> options = new LinkedHashSet<>();
     final EnumOption<?> top = getTopSelectorOption();
     collectOptions(options, top);
-    return new ArrayList<>(options);
+    for (final Option<?> option : options) {
+      if (option.isPersistent()) {
+        option.save(writer, this, saveAll);
+      }
+    }
   }
 
 

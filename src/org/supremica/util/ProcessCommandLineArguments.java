@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.analysis.options.OptionFileManager;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -52,7 +53,6 @@ import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
-import org.supremica.properties.SupremicaProperties;
 
 import org.xml.sax.SAXException;
 
@@ -95,8 +95,7 @@ public class ProcessCommandLineArguments
                                  + propFile.getAbsolutePath());
               propFile.createNewFile();
             }
-
-            SupremicaProperties.loadProperties(propFile);
+            OptionFileManager.loadProperties(propFile);
           } catch (final Exception e) {
             System.err.println("Error reading properties file: "
                                + propFile.getAbsolutePath());

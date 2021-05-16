@@ -149,7 +149,7 @@ public class UnifiedEFACommandLineTool
 
       mContext = new CommandLineOptionContext();
       final LeafOptionPage toolPage =
-        mContext.createCommandLineToolOptionPage(this);
+        mContext.createCommandLineToolOptionPage();
       mContext.registerArguments(toolPage, this, true);
       final LeafOptionPage analyserPage =
         new UnifiedEFAConflictCheckerOptionPage();
@@ -411,14 +411,6 @@ public class UnifiedEFACommandLineTool
                   null,
                   "Variable selection heuristic", "-varsel",
                   mChecker.getVariableSelectionHeuristicFactory()));
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
-    @Override
-    public List<Option<?>> getOptions()
-    {
-      return mChecker.getOptions(this);
     }
   }
 

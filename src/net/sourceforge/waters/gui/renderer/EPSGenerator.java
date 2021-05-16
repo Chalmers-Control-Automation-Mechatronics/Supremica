@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.options.OptionFileManager;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -64,7 +65,6 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
-import org.supremica.properties.SupremicaProperties;
 
 import org.xml.sax.SAXException;
 
@@ -108,7 +108,7 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
           // Load properties
           if (++i < args.length) {
             final File propFile = new File(args[i]);
-            SupremicaProperties.loadProperties(propFile);
+            OptionFileManager.loadProperties(propFile);
           } else {
             usage();
           }

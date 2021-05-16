@@ -31,12 +31,10 @@
 //# exception.
 //###########################################################################
 
-package org.supremica.properties;
+package net.sourceforge.waters.analysis.options;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
 
 /**
  * Helper class to map legacy options from old file formats to up-to-date
@@ -135,9 +133,7 @@ public class LegacyOption
                              "waters.analysis.diagnosability.Algorithm",
                              "(disabled)", "Monolithic");
     // gui.editor.edgeArrowAtEnd
-    createBooleanExtension("gui.editor.edgeArrowAtEnd",
-                           EdgeArrowPosition.End.toString(),
-                           EdgeArrowPosition.Middle.toString());
+    createBooleanExtension("gui.editor.edgeArrowAtEnd", "End", "Middle");
   }
 
 

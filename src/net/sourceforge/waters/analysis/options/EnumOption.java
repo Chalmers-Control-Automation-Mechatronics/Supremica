@@ -117,7 +117,7 @@ public class EnumOption<E> extends Option<E>
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Overrides for net.sourceforge.waters.analysis.options.Option<E>
   @Override
   public OptionEditor<E> createEditor(final OptionContext context)
   {

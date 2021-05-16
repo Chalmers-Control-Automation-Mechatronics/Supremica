@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
@@ -112,6 +115,16 @@ public class ChainedAnalyzerOption
   createEditor(final OptionContext context)
   {
     return context.createChainedAnalyzerEditor(this);
+  }
+
+  @Override
+  public void save(final Writer writer,
+                   final LeafOptionPage page,
+                   final boolean saveAll)
+    throws IOException
+  {
+    super.save(writer, page, saveAll);
+    mOptionPage.saveProperties(writer, saveAll);
   }
 
 

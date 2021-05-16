@@ -34,8 +34,8 @@
 package net.sourceforge.waters.analysis.options;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -300,36 +300,36 @@ public abstract class Option<T> implements Cloneable
         listener.optionChanged(event);
       }
     }
-    saveLater();
+    OptionFileManager.savePropertiesLater();
   }
+
 
   //#########################################################################
   //# Loading and Saving
-  private static Method loadSaveMethod()
+  public void save(final Writer writer,
+                   final LeafOptionPage page,
+                   final boolean saveAll)
+    throws IOException
   {
-    final String className = "org.supremica.properties.SupremicaProperties";
-    final String methodName = "savePropertiesLater";
-    try {
-      return Option.class.getClassLoader()
-        .loadClass(className)
-        .getMethod(methodName);
-    } catch (ClassNotFoundException
-      | NoSuchMethodException
-      | SecurityException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-      return null;
-    }
-  }
-
-  private static void saveLater()
-  {
-    try {
-      saveMethod.invoke(null);
-    } catch (IllegalAccessException | IllegalArgumentException
-      | InvocationTargetException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
+    final String value = getAsString();
+    final String defaultValue = getDefaultAsString();
+    if (saveAll || !value.equals(defaultValue)) {
+      writer.append("# ");
+      final String pageComment = page.getShortName();
+      if (pageComment != null) {
+        writer.append(pageComment);
+        writer.append(": ");
+      }
+      writer.append(getShortName());
+      writer.append('\n');
+      writer.append(page.getPrefix());
+      writer.append('.');
+      final String escapedKey = OptionFileManager.getEscapedString(getID());
+      writer.append(escapedKey);
+      writer.append(" ");
+      final String escapedValue = OptionFileManager.getEscapedString(value);
+      writer.append(escapedValue);
+      writer.append("\n\n");
     }
   }
 
@@ -357,7 +357,5 @@ public abstract class Option<T> implements Cloneable
   private T mValue;
   private boolean mEditable = true;
   private List<OptionChangeListener> mListeners;
-
-  private static Method saveMethod = loadSaveMethod();
 
 }

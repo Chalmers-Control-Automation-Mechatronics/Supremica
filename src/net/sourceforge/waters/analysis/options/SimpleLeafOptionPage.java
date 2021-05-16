@@ -37,14 +37,20 @@ package net.sourceforge.waters.analysis.options;
  *
  * @author Benjamin Wheeler
  */
-public abstract class SimpleLeafOptionPage extends LeafOptionPage
+public class SimpleLeafOptionPage extends LeafOptionPage
 {
 
   //#########################################################################
   //# Constructor
-  public SimpleLeafOptionPage(final String prefix, final String title)
+  public SimpleLeafOptionPage(final String prefix,
+                              final String title,
+                              final Option<?>... options)
   {
     super(prefix, title);
+    for (final Option<?> option : options) {
+      register(option);
+    }
+    OptionPage.OPTION_PAGES.add(this);
   }
 
 

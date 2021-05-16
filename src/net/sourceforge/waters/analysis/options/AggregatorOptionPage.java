@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +45,10 @@ import java.util.List;
 public class AggregatorOptionPage extends OptionPage
 {
 
-  public AggregatorOptionPage(final String title, final OptionPage... pages) {
+  //#########################################################################
+  //# Constructor
+  public AggregatorOptionPage(final String title, final OptionPage... pages)
+  {
     mTitle = title;
     mPages = new LinkedList<OptionPage>();
     for (final OptionPage page : pages) {
@@ -51,12 +56,51 @@ public class AggregatorOptionPage extends OptionPage
     }
   }
 
-  public void addPage(final OptionPage page) {
+
+  //#########################################################################
+  //# Simple Access
+  public void addPage(final OptionPage page)
+  {
     mPages.add(page);
   }
 
+  public List<OptionPage> getPages()
+  {
+    return mPages;
+  }
+
+
   //#########################################################################
-  //# Manipulating Option Lists
+  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
+  @Override
+  public String getPrefix()
+  {
+    throw new RuntimeException("Invalid operation!");
+  }
+
+  @Override
+  public String getTitle()
+  {
+    return mTitle;
+  }
+
+  @Override
+  public void saveProperties(final Writer writer, final boolean saveAll)
+    throws IOException
+  {
+    for (final OptionPage page : mPages) {
+      page.saveProperties(writer, saveAll);
+    }
+  }
+
+  @Override
+  public OptionPageEditor<? extends OptionPage>
+  createEditor(final OptionContext context)
+  {
+    return context.createAggregatorOptionPageEditor(this);
+  }
+
+
   @Override
   public void append(final List<Option<?>> list, final String id)
   {
@@ -87,43 +131,9 @@ public class AggregatorOptionPage extends OptionPage
     throw new RuntimeException("Invalid operation!");
   }
 
-  @Override
-  public String getPrefix()
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
 
-  @Override
-  public String getTitle()
-  {
-    return mTitle;
-  }
-
-//  @Override
-//  public List<Option<?>> getSelectedOptions()
-//  {
-//    throw new RuntimeException("Invalid operation!");
-//  }
-
-//  @Override
-//  public Set<String> getOptionNames()
-//  {
-//    final Set<String> optionNames = new HashSet<String>();
-//    for (final OptionPage page : mPages) {
-//      optionNames.addAll(page.getOptionNames());
-//    }
-//    return optionNames;
-//  }
-
-  public List<OptionPage> getPages() {
-    return mPages;
-  }
-
-  @Override
-  public OptionPageEditor<? extends OptionPage> createEditor(final OptionContext context) {
-    return context.createAggregatorOptionPageEditor(this);
-  }
-
+  //#########################################################################
+  //# Data Members
   private final String mTitle;
   private final List<OptionPage> mPages;
 

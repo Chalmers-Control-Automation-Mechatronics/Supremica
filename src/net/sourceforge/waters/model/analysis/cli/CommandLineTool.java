@@ -206,7 +206,7 @@ public class CommandLineTool implements Configurable
       }
 
       final LeafOptionPage toolPage =
-        mContext.createCommandLineToolOptionPage(this);
+        mContext.createCommandLineToolOptionPage();
       mContext.registerArguments(toolPage, this, true);
       final ModuleCompiler dummyCompiler =
         new ModuleCompiler(null, null, null);

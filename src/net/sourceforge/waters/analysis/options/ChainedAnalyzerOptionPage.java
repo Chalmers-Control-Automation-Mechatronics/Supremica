@@ -35,7 +35,10 @@ package net.sourceforge.waters.analysis.options;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -158,6 +161,23 @@ public class ChainedAnalyzerOptionPage
     final Option<?> cloned = template.clone(this);
     register(cloned);
     return cloned;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
+  @Override
+  public void saveProperties(final Writer writer, final boolean saveAll)
+    throws IOException
+  {
+    final Collection<Option<?>> options = new LinkedHashSet<>();
+    final ModelAnalyzerFactoryLoader loader = mAlgorithmOption.getValue();
+    collectOptions(options, loader);
+    for (final Option<?> option : options) {
+      if (option.isPersistent()) {
+        option.save(writer, this, saveAll);
+      }
+    }
   }
 
 

@@ -33,9 +33,10 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -51,7 +52,7 @@ public abstract class LeafOptionPage extends OptionPage
   {
     mPrefix = prefix;
     mTitle = title;
-    mMap = new HashMap<>();
+    mMap = new LinkedHashMap<>();
   }
 
 
@@ -82,6 +83,17 @@ public abstract class LeafOptionPage extends OptionPage
     return mTitle;
   }
 
+  @Override
+  public void saveProperties(final Writer writer, final boolean saveAll)
+    throws IOException
+  {
+    for (final Option<?> option : mMap.values()) {
+      if (option.isPersistent()) {
+        option.save(writer, this, saveAll);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Hooks
@@ -90,29 +102,19 @@ public abstract class LeafOptionPage extends OptionPage
     return null;
   }
 
-  /**
-   * Gets a list of all registered options in this option page, in an order
-   * suitable for writing to a properties file.
-   */
-  public abstract List<Option<?>> getOptions();
-
 
   //#########################################################################
   //# Access
+  public Collection<Option<?>> getRegisteredOptions()
+  {
+    return mMap.values();
+  }
+
   public void restoreDefaultValues()
   {
     for (final Option<?> option : mMap.values()) {
       option.restoreDefaultValue();
     }
-  }
-
-  public static List<Option<?>> createOptionList(final Option<?>...options)
-  {
-    final List<Option<?>> list = new ArrayList<>(options.length);
-    for (final Option<?> option : options) {
-      list.add(option);
-    }
-    return list;
   }
 
 

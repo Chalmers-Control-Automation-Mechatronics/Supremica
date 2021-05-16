@@ -38,6 +38,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,14 +60,16 @@ import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 public class OptionListPanel extends JScrollPane implements OptionContainer<SimpleLeafOptionPage> {
 
   public OptionListPanel(final GUIOptionContext context,
-                         final SimpleLeafOptionPage page) {
-    this(context, page, null, page.getOptions());
+                         final SimpleLeafOptionPage page)
+  {
+    this(context, page, null, page.getRegisteredOptions());
   }
 
   public OptionListPanel(final GUIOptionContext context,
-                    final LeafOptionPage map,
-                    final Map<String, OptionPanel<?>> optionPanels,
-                    final List<Option<?>> options) {
+                         final LeafOptionPage map,
+                         final Map<String, OptionPanel<?>> optionPanels,
+                         final Collection<Option<?>> options)
+  {
     mSharedOptionPanels = optionPanels != null ? optionPanels
       : new HashMap<>();
     mOptionPanels = new LinkedList<>();
@@ -75,7 +78,7 @@ public class OptionListPanel extends JScrollPane implements OptionContainer<Simp
 
   public void populateOptions(final GUIOptionContext context,
                               final LeafOptionPage map,
-                              final List<Option<?>> options)
+                              final Collection<Option<?>> options)
   {
     final JPanel internalPane = new JPanel();
     setViewportView(internalPane);

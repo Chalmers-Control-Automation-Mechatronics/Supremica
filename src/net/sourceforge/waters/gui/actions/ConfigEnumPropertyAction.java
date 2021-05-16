@@ -40,7 +40,6 @@ import javax.swing.Action;
 import net.sourceforge.waters.analysis.options.EnumOption;
 
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.SupremicaProperties;
 
 
 /**
@@ -92,9 +91,7 @@ public class ConfigEnumPropertyAction<E extends Enum<E>>
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    if (mOption.setValue(mValue)) {
-      SupremicaProperties.savePropertiesLater();
-    }
+    mOption.setValue(mValue);
   }
 
 

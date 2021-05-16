@@ -40,7 +40,6 @@ import javax.swing.Action;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.SupremicaProperties;
 
 
 /**
@@ -90,7 +89,6 @@ public class ConfigBooleanPropertyAction
   public void actionPerformed(final ActionEvent event)
   {
     mOption.setValue(!mOption.getValue());
-    SupremicaProperties.savePropertiesLater();
   }
 
 

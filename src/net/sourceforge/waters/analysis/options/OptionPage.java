@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -69,6 +71,10 @@ public abstract class OptionPage
   public abstract String getPrefix();
 
   public abstract String getTitle();
+
+  public abstract void saveProperties(Writer writer,
+                                      boolean saveAll)
+    throws IOException;
 
 
   //#########################################################################

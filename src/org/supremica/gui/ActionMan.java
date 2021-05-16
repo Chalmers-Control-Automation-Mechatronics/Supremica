@@ -47,6 +47,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.analysis.options.OptionFileManager;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -119,7 +120,6 @@ import org.supremica.gui.useractions.SaveAction;
 import org.supremica.gui.useractions.SaveAsAction;
 import org.supremica.gui.useractions.SynthesizeAction;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaProperties;
 
 import org.swixml.SwingEngine;
 
@@ -1849,13 +1849,7 @@ public class ActionMan
     // File.Close action performed
     public static void fileClose(final Gui gui)
     {
-        try
-        {
-          SupremicaProperties.saveProperties();
-        }
-        catch(final Exception e)
-        {
-        }
+        OptionFileManager.savePropertiesOnExit();
         gui.close();
     }
 

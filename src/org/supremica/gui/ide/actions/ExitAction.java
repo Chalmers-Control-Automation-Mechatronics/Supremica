@@ -41,6 +41,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import net.sourceforge.waters.analysis.options.OptionFileManager;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
@@ -73,6 +74,7 @@ public class ExitAction extends net.sourceforge.waters.gui.actions.IDEAction
     final DocumentContainerManager manager =
       ide.getDocumentContainerManager();
     if (manager.closeAllContainers()) {
+      OptionFileManager.savePropertiesOnExit();
       System.exit(0);
     }
   }
