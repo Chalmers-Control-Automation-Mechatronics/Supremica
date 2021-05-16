@@ -46,8 +46,8 @@ import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -85,7 +85,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   //#########################################################################
   //# Options
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final LeafOptionPage db)
   {
     super.registerOptions(db);
     db.register(new BooleanOption
@@ -305,7 +305,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
     }
 
     @Override
-    public List<Option<?>> getOptions(final OptionPage db)
+    public List<Option<?>> getOptions(final LeafOptionPage db)
     {
       final List<Option<?>> options = super.getOptions(db);
       db.append(options, OPTION_ChainSimplifierFactory_WeakObservationEquivalence);
@@ -353,7 +353,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
     }
 
     @Override
-    public List<Option<?>> getOptions(final OptionPage db)
+    public List<Option<?>> getOptions(final LeafOptionPage db)
     {
       final List<Option<?>> options = super.getOptions(db);
       db.append(options, OPTION_ChainSimplifierFactory_LimitedCertainConflicts);

@@ -61,8 +61,8 @@ import java.util.List;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -371,7 +371,7 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage page)
+  public List<Option<?>> getOptions(final LeafOptionPage page)
   {
     final List<Option<?>> options = super.getOptions(page);
     page.append(options, ChainSimplifierFactory.

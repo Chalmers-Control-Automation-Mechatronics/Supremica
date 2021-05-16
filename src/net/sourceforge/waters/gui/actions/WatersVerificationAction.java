@@ -39,6 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
@@ -223,7 +224,7 @@ public abstract class WatersVerificationAction
       return null;
     }
     final String prefix = mOperation.getOptionPagePrefix();
-    final OptionPage page = OptionPage.getOptionPage(prefix);
+    final LeafOptionPage page = OptionPage.getLeafOptionPage(prefix);
     if (page != null) {
       for (final Option<?> option : verifier.getOptions(page)) {
         if (option.isPersistent()) {
@@ -245,7 +246,7 @@ public abstract class WatersVerificationAction
       final String optionPagePrefix =
         mOperation.getOptionPagePrefix();
       final AnalysisOptionPage page =
-        (AnalysisOptionPage) OptionPage.getOptionPage(optionPagePrefix);
+        (AnalysisOptionPage) OptionPage.getLeafOptionPage(optionPagePrefix);
       return page.getTopSelectorOption();
     }
   }

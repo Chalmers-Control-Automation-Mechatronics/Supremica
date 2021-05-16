@@ -49,8 +49,8 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -136,7 +136,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   }
 
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, AbstractModelAnalyzerFactory.

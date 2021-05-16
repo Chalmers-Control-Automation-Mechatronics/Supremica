@@ -200,7 +200,7 @@ public enum AnalysisOperation
 
   public AnalysisOptionPage getOptionPage()
   {
-    return (AnalysisOptionPage) OptionPage.getOptionPage(mOptionPagePrefix);
+    return (AnalysisOptionPage) OptionPage.getLeafOptionPage(mOptionPagePrefix);
   }
 
   public String getAnalysisName()

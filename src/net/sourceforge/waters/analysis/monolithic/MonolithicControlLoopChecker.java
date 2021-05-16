@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -161,7 +161,7 @@ public class MonolithicControlLoopChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.prepend(options, AbstractModelAnalyzerFactory.

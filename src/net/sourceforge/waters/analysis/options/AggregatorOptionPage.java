@@ -101,37 +101,6 @@ public class AggregatorOptionPage extends OptionPage
   }
 
 
-  @Override
-  public void append(final List<Option<?>> list, final String id)
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
-
-  @Override
-  public void prepend(final List<Option<?>> list, final String id)
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
-
-  @Override
-  public boolean remove(final List<Option<?>> list, final String id)
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
-
-  @Override
-  public Option<?> get(final String id)
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
-
-  @Override
-  public void register(final Option<?> param)
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
-
-
   //#########################################################################
   //# Data Members
   private final String mTitle;

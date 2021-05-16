@@ -40,8 +40,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -103,7 +103,7 @@ public abstract class AbstractModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage page)
+  public List<Option<?>> getOptions(final LeafOptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
     if (this instanceof LanguageInclusionChecker) {

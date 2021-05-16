@@ -41,8 +41,8 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringOption;
@@ -157,7 +157,7 @@ public abstract class AbstractSupervisorSynthesizer
   }
 
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.prepend(options, AbstractModelAnalyzerFactory.

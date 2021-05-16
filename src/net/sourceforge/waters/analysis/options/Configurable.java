@@ -41,7 +41,7 @@ import java.util.List;
  * through the options interface of Waters.</P>
  *
  * <P>After obtaining a configurable object, the code can call its
- * {@link #getOptions(OptionPage) getOptions()} method to obtain the
+ * {@link #getOptions(LeafOptionPage) getOptions()} method to obtain the
  * list of all supported options. Then after editing their values,
  * e.g., through their respective option editors ({@link OptionEditor}),
  * the values are sent to the configurable using {@link #setOption(Option)
@@ -60,7 +60,7 @@ public interface Configurable
    *         by the configurable. The list should be ordered to support
    *         reasonable presentation to the user.
    */
-  public List<Option<?>> getOptions(OptionPage db);
+  public List<Option<?>> getOptions(LeafOptionPage db);
 
   /**
    * Configures the configurable using the given option. This method
@@ -68,7 +68,7 @@ public interface Configurable
    * the configurable.
    * @param  option  The option to be used, which should be an element
    *                 of the list returned by a previous call to
-   *                 {@link #getOptions(OptionPage) getOptions()}.
+   *                 {@link #getOptions(LeafOptionPage) getOptions()}.
    */
   public void setOption(Option<?> option);
 

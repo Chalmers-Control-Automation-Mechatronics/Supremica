@@ -48,8 +48,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.StringListOption;
 import net.sourceforge.waters.analysis.options.StringOption;
@@ -254,7 +254,7 @@ public class ModuleCompiler extends AbortableCompiler
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage page)
+  public List<Option<?>> getOptions(final LeafOptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, CompilerOptions.

@@ -39,7 +39,7 @@ import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -77,7 +77,7 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   //#########################################################################
   //# Options
   @Override
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final LeafOptionPage db)
   {
     super.registerOptions(db);
     db.register(new BooleanOption

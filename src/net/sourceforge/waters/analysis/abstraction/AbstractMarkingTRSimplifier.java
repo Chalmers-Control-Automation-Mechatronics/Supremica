@@ -35,8 +35,8 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 
@@ -154,7 +154,7 @@ public abstract class AbstractMarkingTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, StepSimplifierFactory.

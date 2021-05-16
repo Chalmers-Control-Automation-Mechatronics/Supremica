@@ -54,8 +54,8 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -305,7 +305,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage page)
+  public List<Option<?>> getOptions(final LeafOptionPage page)
   {
     final List<Option<?>> options = super.getOptions(page);
     page.append(options, UnifiedEFACommandLineTool.

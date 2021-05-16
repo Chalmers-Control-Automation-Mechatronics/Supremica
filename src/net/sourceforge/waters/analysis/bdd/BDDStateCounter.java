@@ -37,8 +37,8 @@ import java.util.List;
 
 import net.sf.javabdd.BDD;
 
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -95,7 +95,7 @@ public class BDDStateCounter
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.remove(options, AbstractModelAnalyzerFactory.

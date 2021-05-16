@@ -36,10 +36,8 @@ package net.sourceforge.waters.analysis.options;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
@@ -64,13 +62,12 @@ public abstract class OptionPage
 
   //#########################################################################
   //# Simple Access
-  public abstract Option<?> get(final String id);
-
-  public abstract void register(final Option<?> param);
-
   public abstract String getPrefix();
 
   public abstract String getTitle();
+
+  public abstract OptionPageEditor<? extends OptionPage>
+  createEditor(OptionContext context);
 
   public abstract void saveProperties(Writer writer,
                                       boolean saveAll)
@@ -78,58 +75,8 @@ public abstract class OptionPage
 
 
   //#########################################################################
-  //# Manipulating Option Lists
-  //TODO Move to LeafOptionPage?
-  public void append(final List<Option<?>> list, final String id)
-  {
-    final Option<?> option = get(id);
-    if (option != null) {
-      list.add(option);
-    }
-  }
-
-  public void prepend(final List<Option<?>> list, final String id)
-  {
-    final Option<?> option = get(id);
-    if (option != null) {
-      list.add(0, option);
-    }
-  }
-
-  public void insertAfter(final List<Option<?>> list,
-                          final String id,
-                          final String afterThis)
-  {
-    final Option<?> option = get(id);
-    if (option != null) {
-      final ListIterator<Option<?>> iter = list.listIterator();
-      while (iter.hasNext()) {
-        final Option<?> next = iter.next();
-        if (next.hasID(afterThis)) {
-          iter.add(option);
-          return;
-        }
-      }
-    }
-  }
-
-  public boolean remove(final List<Option<?>> list, final String id)
-  {
-    final Iterator<Option<?>> iter = list.iterator();
-    while (iter.hasNext()) {
-      final Option<?> option = iter.next();
-      if (option.hasID(id)) {
-        iter.remove();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public abstract OptionPageEditor<? extends OptionPage>
-  createEditor(OptionContext context);
-
-  public static LeafOptionPage getOptionPage(final String prefix)
+  //# Auxiliary Static Methods
+  public static LeafOptionPage getLeafOptionPage(final String prefix)
   {
     for (final LeafOptionPage map : OPTION_PAGES) {
       if (map.getPrefix().equals(prefix)) return map;
@@ -137,8 +84,8 @@ public abstract class OptionPage
     return null;
   }
 
-  public static OptionPage loadOptionPage(final String className,
-                                          final String fieldName)
+  private static OptionPage loadOptionPage(final String className,
+                                           final String fieldName)
   {
     try {
       final Class<?>cls = OptionPage.class.getClassLoader().loadClass(className);
@@ -157,6 +104,7 @@ public abstract class OptionPage
 
   //#########################################################################
   //# Class Constants
+  //TODO Remove this
   public static final List<LeafOptionPage> OPTION_PAGES = new LinkedList<>();
 
   public static final AnalysisOptionPage ConflictCheck =

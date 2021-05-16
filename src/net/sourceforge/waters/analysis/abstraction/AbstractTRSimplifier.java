@@ -36,8 +36,8 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -321,7 +321,7 @@ public abstract class AbstractTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = new LinkedList<Option<?>>();
     db.append(options, StepSimplifierFactory.

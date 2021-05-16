@@ -36,7 +36,10 @@ package net.sourceforge.waters.analysis.options;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 /**
@@ -58,19 +61,6 @@ public abstract class LeafOptionPage extends OptionPage
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
-  @Override
-  public Option<?> get(final String id)
-  {
-    return mMap.get(id);
-  }
-
-  @Override
-  public void register(final Option<?> param)
-  {
-    final String id = param.getID();
-    mMap.put(id, param);
-  }
-
   @Override
   public String getPrefix()
   {
@@ -96,7 +86,23 @@ public abstract class LeafOptionPage extends OptionPage
 
 
   //#########################################################################
-  //# Hooks
+  //# Access
+  public Option<?> get(final String id)
+  {
+    return mMap.get(id);
+  }
+
+  public void register(final Option<?> param)
+  {
+    final String id = param.getID();
+    mMap.put(id, param);
+  }
+
+  public Collection<Option<?>> getRegisteredOptions()
+  {
+    return mMap.values();
+  }
+
   public String getShortName()
   {
     return null;
@@ -104,17 +110,58 @@ public abstract class LeafOptionPage extends OptionPage
 
 
   //#########################################################################
-  //# Access
-  public Collection<Option<?>> getRegisteredOptions()
-  {
-    return mMap.values();
-  }
-
+  //# Manipulating Option Lists
   public void restoreDefaultValues()
   {
     for (final Option<?> option : mMap.values()) {
       option.restoreDefaultValue();
     }
+  }
+
+  public void append(final List<Option<?>> list, final String id)
+  {
+    final Option<?> option = get(id);
+    if (option != null) {
+      list.add(option);
+    }
+  }
+
+  public void prepend(final List<Option<?>> list, final String id)
+  {
+    final Option<?> option = get(id);
+    if (option != null) {
+      list.add(0, option);
+    }
+  }
+
+  public void insertAfter(final List<Option<?>> list,
+                          final String id,
+                          final String afterThis)
+  {
+    final Option<?> option = get(id);
+    if (option != null) {
+      final ListIterator<Option<?>> iter = list.listIterator();
+      while (iter.hasNext()) {
+        final Option<?> next = iter.next();
+        if (next.hasID(afterThis)) {
+          iter.add(option);
+          return;
+        }
+      }
+    }
+  }
+
+  public boolean remove(final List<Option<?>> list, final String id)
+  {
+    final Iterator<Option<?>> iter = list.iterator();
+    while (iter.hasNext()) {
+      final Option<?> option = iter.next();
+      if (option.hasID(id)) {
+        iter.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
 

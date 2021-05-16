@@ -55,7 +55,6 @@ import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -381,7 +380,7 @@ public class CommandLineTool implements Configurable
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.Configurable
   @Override
-  public List<Option<?>> getOptions(final OptionPage page)
+  public List<Option<?>> getOptions(final LeafOptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, CommandLineOptionContext.

@@ -51,7 +51,6 @@ import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
@@ -289,7 +288,7 @@ public class UnifiedEFACommandLineTool
   //#########################################################################
   //# Configuration
   @Override
-  public List<Option<?>> getOptions(final OptionPage page)
+  public List<Option<?>> getOptions(final LeafOptionPage page)
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, CommandLineOptionContext.

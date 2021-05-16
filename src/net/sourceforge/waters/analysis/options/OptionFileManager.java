@@ -100,7 +100,7 @@ public final class OptionFileManager
         int index = 0;
         while (index != -1) {
           final String prefix = key.substring(0, index);
-          final LeafOptionPage page = OptionPage.getOptionPage(prefix);
+          final LeafOptionPage page = OptionPage.getLeafOptionPage(prefix);
           if (page != null) {
             final String suffix = key.substring(index + 1);
             final Option<?> option = page.get(suffix);

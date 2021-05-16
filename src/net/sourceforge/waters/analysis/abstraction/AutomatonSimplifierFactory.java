@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 
 
 /**
@@ -61,7 +61,7 @@ public abstract class AutomatonSimplifierFactory
 
   //#########################################################################
   //# Options
-  public void registerOptions(final OptionPage db)
+  public void registerOptions(final LeafOptionPage db)
   {
     db.register(new BooleanOption
              (OPTION_AutomatonSimplifierFactory_KeepOriginal,

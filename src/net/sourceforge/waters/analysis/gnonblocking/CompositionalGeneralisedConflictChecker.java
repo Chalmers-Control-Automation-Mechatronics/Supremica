@@ -57,8 +57,8 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -439,7 +439,7 @@ public class CompositionalGeneralisedConflictChecker
   }
 
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, GNBModelVerifierFactory.

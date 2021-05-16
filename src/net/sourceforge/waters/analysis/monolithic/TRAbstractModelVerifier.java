@@ -36,8 +36,8 @@ package net.sourceforge.waters.analysis.monolithic;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
@@ -78,7 +78,7 @@ public abstract class TRAbstractModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.prepend(options, AbstractModelAnalyzerFactory.

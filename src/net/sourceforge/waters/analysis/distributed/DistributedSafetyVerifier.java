@@ -52,8 +52,8 @@ import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerificationJob;
 import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -107,7 +107,7 @@ public class DistributedSafetyVerifier
   }
 
   @Override
-  public List<Option<?>> getOptions(final OptionPage db)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, DistributedModelVerifierFactory.
