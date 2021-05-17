@@ -45,6 +45,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
@@ -154,9 +155,22 @@ public class ChainedAnalyzerOption
       }
       return analyzer;
     } catch (final ClassNotFoundException exception) {
-      throw new AnalysisConfigurationException
-        ("Could not create chained analyzer for " + loader.toString() +
-         " factory.", exception);
+      throw createAnalysisConfigurationException(loader, exception);
+    }
+  }
+
+  public ModelAnalyzer createUnconfiguredAnalyzer()
+    throws AnalysisConfigurationException
+  {
+    final ModelAnalyzerFactoryLoader loader = getValue();
+    try {
+      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+      final AnalysisOperation operation = mOptionPage.getAnalysisOperation();
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      return operation.createModelAnalyzer(factory, desFactory);
+    } catch (final ClassNotFoundException exception) {
+      throw createAnalysisConfigurationException(loader, exception);
     }
   }
 
@@ -179,6 +193,15 @@ public class ChainedAnalyzerOption
       }
     }
     return result;
+  }
+
+  private static AnalysisConfigurationException
+  createAnalysisConfigurationException(final ModelAnalyzerFactoryLoader loader,
+                                       final ClassNotFoundException exception)
+  {
+    return new AnalysisConfigurationException
+      ("Could not create chained analyzer for " + loader.toString() +
+       " factory.", exception);
   }
 
 

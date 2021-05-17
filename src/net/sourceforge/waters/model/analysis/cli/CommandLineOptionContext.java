@@ -112,7 +112,7 @@ public class CommandLineOptionContext implements OptionContext
   public OptionEditor<ModelAnalyzerFactoryLoader>
   createChainedAnalyzerEditor(final ChainedAnalyzerOption option)
   {
-    return createEnumEditor(option);
+    return new ChainedAnalyzerCommandLineArgument(option);
   }
 
   @Override

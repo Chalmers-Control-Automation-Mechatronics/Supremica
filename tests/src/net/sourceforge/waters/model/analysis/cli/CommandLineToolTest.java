@@ -113,6 +113,29 @@ public class CommandLineToolTest
     testCommandLine("mod-cont", args, true);
   }
 
+  public void testAnalyzer_ModularBDDControllability()
+    throws Exception
+  {
+    final File file = getInputWdes("handwritten", "small_factory_2");
+    final String[] args = new String[]
+      {"Modular", "ControllabilityChecker", file.toString(),
+       "-chain", "BDD", "-v", "-dynamic"};
+    testCommandLine("mod-bdd-cont", args, "DEBUG Depth .*", "true \\(.*");
+  }
+
+  public void testAnalyzer_ModularTRCompositionalBDDControllability()
+    throws Exception
+  {
+    final File file = getInputWdes("handwritten", "small_factory_2");
+    final String[] args = new String[]
+      {"Modular", "ControllabilityChecker", file.toString(), "-stats",
+        "-chain", "TRCompositional", "-islimit", "100",
+        "-chain", "BDD", "-v", "-pack", "buddy"};
+    testCommandLine("mod-trcomp-bdd-cont", args,
+                    "DEBUG SpecialEventsFinder .*", "DEBUG Depth .*",
+                    "true \\(.*");
+  }
+
   public void testAnalyzer_MonolithicControllability()
     throws Exception
   {
@@ -245,6 +268,23 @@ public class CommandLineToolTest
     testCommandLine("help", args,
                     "=MonolithicDiagnosabilityVerifier supports the following options:",
                     "=-fslimit <n>.*",
+                    "=ModuleCompiler supports the following options:",
+                    "=-opt\\|-nopt.*",
+                    "=CommandLineTool supports the following options:",
+                    "=-quiet\\|-q.*");
+  }
+
+  public void testOption_HelpChain()
+    throws Exception
+  {
+    final String[] args =
+      new String[] {"TRCompositional", "ConflictChecker",
+                    "-chain", "Native", "-help"};
+    testCommandLine("help-chain", args,
+                    "=NativeConflictChecker supports the following options:",
+                    "-mode <value>.*",
+                    "=TRCompositionalConflictChecker supports the following options:",
+                    ".*NB0, NB1.*",
                     "=ModuleCompiler supports the following options:",
                     "=-opt\\|-nopt.*",
                     "=CommandLineTool supports the following options:",
