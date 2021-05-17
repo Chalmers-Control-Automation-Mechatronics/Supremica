@@ -36,8 +36,7 @@ package net.sourceforge.waters.analysis.options;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Properties;
 
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
@@ -66,31 +65,26 @@ public abstract class OptionPage
 
   public abstract String getTitle();
 
+  public abstract LeafOptionPage getLeafOptionPage(String prefix);
+
   public abstract OptionPageEditor<? extends OptionPage>
   createEditor(OptionContext context);
 
-  public abstract void saveProperties(Writer writer,
-                                      boolean saveAll)
+  public abstract void loadProperties(Properties properties);
+
+  public abstract void saveProperties(Writer writer, boolean saveAll)
     throws IOException;
 
 
   //#########################################################################
   //# Auxiliary Static Methods
-  public static LeafOptionPage getLeafOptionPage(final String prefix)
-  {
-    for (final LeafOptionPage map : OPTION_PAGES) {
-      if (map.getPrefix().equals(prefix)) return map;
-    }
-    return null;
-  }
-
-  private static OptionPage loadOptionPage(final String className,
-                                           final String fieldName)
+  private static AggregatorOptionPage loadOptionPage(final String className,
+                                                     final String fieldName)
   {
     try {
       final Class<?>cls = OptionPage.class.getClassLoader().loadClass(className);
       final Field f = cls.getField(fieldName);
-      final OptionPage page = (OptionPage) f.get(null);
+      final AggregatorOptionPage page = (AggregatorOptionPage) f.get(null);
       return page;
     } catch (ClassNotFoundException |
              NoSuchFieldException |
@@ -104,9 +98,6 @@ public abstract class OptionPage
 
   //#########################################################################
   //# Class Constants
-  //TODO Remove this
-  public static final List<LeafOptionPage> OPTION_PAGES = new LinkedList<>();
-
   public static final AnalysisOptionPage ConflictCheck =
     new AnalysisOptionPage(AnalysisOperation.CONFLICT_CHECK);
   public static final AnalysisOptionPage ControllabilityCheck =
@@ -136,22 +127,16 @@ public abstract class OptionPage
 
   private static final AggregatorOptionPage[] TOP_LEVEL_AGGREGATORS =
   new AggregatorOptionPage[] {
-    (AggregatorOptionPage)
     loadOptionPage("org.supremica.properties.ConfigPages",
                    "IDE_AGGREGATOR_OPTION_PAGE"),
-
-    (AggregatorOptionPage)
     loadOptionPage("org.supremica.properties.ConfigPages",
                    "GUI_AGGREGATOR_OPTION_PAGE"),
-
     new AggregatorOptionPage("Analysis", ConflictCheck,
                              ControllabilityCheck, ControlLoop,
                              DeadlockCheck, DiagnosabilityCheck,
                              LanguageInclusion, StateCounter,
                              SynchronousProduct, Synthesis,
                              Simplifier),
-
-    (AggregatorOptionPage)
     loadOptionPage("org.supremica.properties.ConfigPages",
                    "ANALYZER_AGGREGATOR_OPTION_PAGE")
   };

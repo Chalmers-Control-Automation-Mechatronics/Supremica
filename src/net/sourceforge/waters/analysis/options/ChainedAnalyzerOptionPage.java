@@ -38,7 +38,6 @@ import gnu.trove.set.hash.THashSet;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -139,7 +138,7 @@ public class ChainedAnalyzerOptionPage
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
   @Override
-  public String getShortName()
+  public String getShortDescription()
   {
     final AnalysisOperation operation = getAnalysisOperation();
     return operation.getAnalysisName();
@@ -170,10 +169,7 @@ public class ChainedAnalyzerOptionPage
   public void saveProperties(final Writer writer, final boolean saveAll)
     throws IOException
   {
-    final Collection<Option<?>> options = new LinkedHashSet<>();
-    final ModelAnalyzerFactoryLoader loader = mAlgorithmOption.getValue();
-    collectOptions(options, loader);
-    for (final Option<?> option : options) {
+    for (final Option<?> option : getCurrentOptions()) {
       if (option.isPersistent()) {
         option.save(writer, this, saveAll);
       }

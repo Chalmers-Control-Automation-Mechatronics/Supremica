@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.options;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Properties;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -115,6 +116,14 @@ public class ChainedAnalyzerOption
   createEditor(final OptionContext context)
   {
     return context.createChainedAnalyzerEditor(this);
+  }
+
+  @Override
+  public void load(final Properties properties, final String prefix)
+  {
+    super.load(properties, prefix);
+    mOptionPage.getCurrentOptions();
+    mOptionPage.loadProperties(properties);
   }
 
   @Override

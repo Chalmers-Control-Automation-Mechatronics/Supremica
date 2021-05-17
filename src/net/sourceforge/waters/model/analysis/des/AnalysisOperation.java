@@ -200,7 +200,8 @@ public enum AnalysisOperation
 
   public AnalysisOptionPage getOptionPage()
   {
-    return (AnalysisOptionPage) OptionPage.getLeafOptionPage(mOptionPagePrefix);
+    return (AnalysisOptionPage)
+      OptionPage.TOP_LEVEL_AGGREGATOR.getLeafOptionPage(mOptionPagePrefix);
   }
 
   public String getAnalysisName()

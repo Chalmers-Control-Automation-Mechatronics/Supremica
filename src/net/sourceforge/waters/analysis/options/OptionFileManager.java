@@ -41,14 +41,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
-
-import net.sourceforge.waters.model.expr.ParseException;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -61,6 +60,7 @@ public final class OptionFileManager
   private OptionFileManager()
   {
   }
+
 
   //#########################################################################
   //# Loading
@@ -77,67 +77,38 @@ public final class OptionFileManager
   private static void updateProperties(final File propertyFile)
     throws IOException
   {
-    final Properties propertiesFromFile = buildProperties(propertyFile);
+    final FileInputStream stream = new FileInputStream(propertyFile);
     try {
+      final Properties properties = new Properties();
+      properties.load(new BufferedInputStream(stream));
+      LegacyOption.transformProperties(properties);
       mReadingPropertyFile = true;
-      for (final Enumeration<?> e = propertiesFromFile.keys();
-        e.hasMoreElements();) {
-        final String legacyKey = (String) e.nextElement();
-        final String legacyValue = propertiesFromFile.getProperty(legacyKey);
-        final LegacyOption legacyOption = LegacyOption.get(legacyKey);
-        final String key;
-        final String value;
-        if (legacyOption == null) {
-          key = legacyKey;
-          value = legacyValue;
-        } else {
-          value = legacyOption.getReplacementValue(legacyValue);
-          if (value == null) {
-            continue;
-          }
-          key = legacyOption.getReplacementName();
-        }
-        int index = 0;
-        while (index != -1) {
-          final String prefix = key.substring(0, index);
-          final LeafOptionPage page = OptionPage.getLeafOptionPage(prefix);
-          if (page != null) {
-            final String suffix = key.substring(index + 1);
-            final Option<?> option = page.get(suffix);
-            if (option != null) {
-              try {
-                option.set(value);
-                break;
-              } catch (final ParseException exception) {
-                System.err.println("Invalid argument to property: " + key);
-                break;
-              }
-            }
-          }
-          index = key.indexOf('.', index + 1);
-        }
-        if (index == -1) {
-          System.err.println("Unknown property: " + key);
-        }
-      }
+      OptionPage.TOP_LEVEL_AGGREGATOR.loadProperties(properties);
+      warnAboutUnused(properties);
     } finally {
+      stream.close();
       mReadingPropertyFile = false;
     }
   }
 
-  private static Properties buildProperties(final File theFile)
-    throws FileNotFoundException, IOException
+  private static void warnAboutUnused(final Properties properties)
   {
-    final FileInputStream theStream = new FileInputStream(theFile);
-    return buildProperties(new BufferedInputStream(theStream));
-  }
-
-  private static Properties buildProperties(final InputStream inStream)
-    throws IOException
-  {
-    final Properties newProperties = new Properties();
-    newProperties.load(inStream);
-    return newProperties;
+    final int size = properties.size();
+    if (size == 0) {
+      return;
+    } else if (size < 5) {
+      final List<String> names = new ArrayList<>(size);
+      for (final Object key : properties.keySet()) {
+        final String name = (String) key;
+        names.add(name);
+      }
+      Collections.sort(names);
+      for (final String name : names) {
+        LogManager.getLogger().warn("Unkown property {} ignored.", name);
+      }
+    } else {
+      LogManager.getLogger().warn("{} unknown properties ignored.", size);
+    }
   }
 
 

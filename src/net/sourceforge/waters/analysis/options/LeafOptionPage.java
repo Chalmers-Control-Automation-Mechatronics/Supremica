@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  *
@@ -74,6 +75,26 @@ public abstract class LeafOptionPage extends OptionPage
   }
 
   @Override
+  public LeafOptionPage getLeafOptionPage(final String prefix)
+  {
+    if (mPrefix.equals(prefix)) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public void loadProperties(final Properties properties)
+  {
+    for (final Option<?> option : mMap.values()) {
+      if (option.isPersistent()) {
+        option.load(properties, mPrefix);
+      }
+    }
+  }
+
+  @Override
   public void saveProperties(final Writer writer, final boolean saveAll)
     throws IOException
   {
@@ -103,7 +124,7 @@ public abstract class LeafOptionPage extends OptionPage
     return mMap.values();
   }
 
-  public String getShortName()
+  public String getShortDescription()
   {
     return null;
   }

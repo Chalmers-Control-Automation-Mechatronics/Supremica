@@ -50,7 +50,6 @@ public class SimpleLeafOptionPage extends LeafOptionPage
     for (final Option<?> option : options) {
       register(option);
     }
-    OptionPage.OPTION_PAGES.add(this);
   }
 
 

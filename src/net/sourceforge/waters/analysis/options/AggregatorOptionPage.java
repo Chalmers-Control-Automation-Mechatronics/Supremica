@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -85,12 +86,15 @@ public class AggregatorOptionPage extends OptionPage
   }
 
   @Override
-  public void saveProperties(final Writer writer, final boolean saveAll)
-    throws IOException
+  public LeafOptionPage getLeafOptionPage(final String prefix)
   {
     for (final OptionPage page : mPages) {
-      page.saveProperties(writer, saveAll);
+      final LeafOptionPage found = page.getLeafOptionPage(prefix);
+      if (found != null) {
+        return found;
+      }
     }
+    return null;
   }
 
   @Override
@@ -98,6 +102,23 @@ public class AggregatorOptionPage extends OptionPage
   createEditor(final OptionContext context)
   {
     return context.createAggregatorOptionPageEditor(this);
+  }
+
+  @Override
+  public void loadProperties(final Properties properties)
+  {
+    for (final OptionPage page : mPages) {
+      page.loadProperties(properties);
+    }
+  }
+
+  @Override
+  public void saveProperties(final Writer writer, final boolean saveAll)
+    throws IOException
+  {
+    for (final OptionPage page : mPages) {
+      page.saveProperties(writer, saveAll);
+    }
   }
 
 

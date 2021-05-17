@@ -39,10 +39,13 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ParseException;
+
+import org.apache.logging.log4j.LogManager;
 
 
 /**
@@ -306,6 +309,20 @@ public abstract class Option<T> implements Cloneable
 
   //#########################################################################
   //# Loading and Saving
+  public void load(final Properties properties, final String prefix)
+  {
+    final String key = prefix + "." + mID;
+    final String value = properties.getProperty(key);
+    if (value != null) {
+      properties.remove(key);
+      try {
+        set(value);
+      } catch (final ParseException exception) {
+        LogManager.getLogger().warn(exception.getMessage());
+      }
+    }
+  }
+
   public void save(final Writer writer,
                    final LeafOptionPage page,
                    final boolean saveAll)
@@ -315,7 +332,7 @@ public abstract class Option<T> implements Cloneable
     final String defaultValue = getDefaultAsString();
     if (saveAll || !value.equals(defaultValue)) {
       writer.append("# ");
-      final String pageComment = page.getShortName();
+      final String pageComment = page.getShortDescription();
       if (pageComment != null) {
         writer.append(pageComment);
         writer.append(": ");

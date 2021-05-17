@@ -83,7 +83,6 @@ public class AnalysisOptionPage
       ("Algorithm", "Algorithm", null, null, enumFactory);
     register(mAlgorithmOption);
     registerAnalyzerFactoryOptions();
-    OptionPage.OPTION_PAGES.add(this);
   }
 
 
@@ -128,7 +127,7 @@ public class AnalysisOptionPage
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
   @Override
-  public String getShortName()
+  public String getShortDescription()
   {
     return mOperation.getAnalysisName();
   }

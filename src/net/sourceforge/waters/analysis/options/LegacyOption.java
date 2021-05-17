@@ -35,6 +35,9 @@ package net.sourceforge.waters.analysis.options;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Helper class to map legacy options from old file formats to up-to-date
@@ -48,6 +51,13 @@ public class LegacyOption
 
   //#########################################################################
   //# Static Access
+  public static void transformProperties(final Properties properties)
+  {
+    for (final LegacyOption option : mLegacyMap.values()) {
+      option.transform(properties);
+    }
+  }
+
   public static LegacyOption get(final String legacyKey)
   {
     return mLegacyMap.get(legacyKey);
@@ -104,6 +114,22 @@ public class LegacyOption
       return legacyValue;
     }
     return replacement;
+  }
+
+  void transform(final Properties properties)
+  {
+    final String value = properties.getProperty(mLegacyName);
+    if (value == null) {
+      return;
+    }
+    properties.remove(mLegacyName);
+    final String replacementValue = getReplacementValue(value);
+    if (replacementValue == null) {
+      LogManager.getLogger().warn("Unsupported value {} for option {}.",
+                                  value, mLegacyName);
+      return;
+    }
+    properties.put(mReplacementName, replacementValue);
   }
 
 

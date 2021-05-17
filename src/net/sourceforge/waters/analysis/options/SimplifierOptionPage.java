@@ -85,7 +85,6 @@ public class SimplifierOptionPage
       mCreatorOptionMap.put(factory, creatorOption);
       register(creatorOption);
     }
-    OptionPage.OPTION_PAGES.add(this);
   }
 
 
