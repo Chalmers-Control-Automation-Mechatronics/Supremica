@@ -196,11 +196,8 @@ public abstract class WatersVerificationAction
       if (vFactory == null) {
         return null;
       } else {
-        final ModelVerifier verifier =
-          (ModelVerifier) mOperation.createModelAnalyzer(vFactory, desFactory);
-        // TODO Remove this configureFromOptions()
-        vFactory.configureFromOptions(verifier);
-        return verifier;
+        return (ModelVerifier) mOperation.createModelAnalyzer(vFactory,
+                                                              desFactory);
       }
     } catch (final ClassNotFoundException |
                    AnalysisConfigurationException exception) {

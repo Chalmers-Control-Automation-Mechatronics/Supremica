@@ -121,7 +121,6 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.ConfigBridge;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -912,7 +911,7 @@ public class GraphEditorPanel
       return 1.0;
     } else {
       final int x = (int) Math.floor(area.getX());
-      final int grid = ConfigBridge.getGridSize();
+      final int grid = getGridSize();
       final int x0 = Math.floorDiv(x - LOWER_MARGIN, grid) * grid;
       final double width = area.getWidth() + 2.0 * (area.getX() - x0);
       final int y = (int) Math.floor(area.getY());
@@ -974,7 +973,7 @@ public class GraphEditorPanel
     final Rectangle2D area2D = getShapeProducer().getMinimumBoundingRectangle();
     final Rectangle bounds = area2D.getBounds();
     if (!bounds.isEmpty()) {
-      final int grid = ConfigBridge.getGridSize();
+      final int grid = getGridSize();
       final double gz = grid * mAdjustedZoomFactor;
       final int x0 = (int) (gz *
         Math.floorDiv(bounds.x - LOWER_MARGIN, grid));
@@ -1023,6 +1022,15 @@ public class GraphEditorPanel
     }
     clearTransform();
     mCurrentBounds = bounds;
+  }
+
+  private static int getGridSize()
+  {
+    if (Config.GUI_EDITOR_SHOW_GRID.getValue()) {
+      return Config.GUI_EDITOR_GRID_SIZE.getValue();
+    } else {
+      return 1;
+    }
   }
 
 
@@ -4030,7 +4038,7 @@ public class GraphEditorPanel
       final double dx = Math.abs(p2.getX() - p1.getX());
       final double dy = Math.abs(p2.getY() - p1.getY());
       final double perp = Math.pow(dx*dx + dy*dy, 0.5);
-      final int gridSize = ConfigBridge.getGridSize();
+      final int gridSize = getGridSize();
       double newX = (dy / perp) * gridSize;
       double newY = (dx / perp) * gridSize;
 

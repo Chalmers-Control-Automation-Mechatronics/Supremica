@@ -63,12 +63,6 @@ public abstract class LeafOptionPage extends OptionPage
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
   @Override
-  public String getPrefix()
-  {
-    return mPrefix;
-  }
-
-  @Override
   public String getTitle()
   {
     return mTitle;
@@ -108,6 +102,11 @@ public abstract class LeafOptionPage extends OptionPage
 
   //#########################################################################
   //# Access
+  public String getPrefix()
+  {
+    return mPrefix;
+  }
+
   public Option<?> get(final String id)
   {
     return mMap.get(id);

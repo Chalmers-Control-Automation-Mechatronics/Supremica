@@ -62,8 +62,6 @@ public abstract class OptionPage
 
   //#########################################################################
   //# Simple Access
-  public abstract String getPrefix();
-
   public abstract String getTitle();
 
   public abstract LeafOptionPage getLeafOptionPage(String prefix);

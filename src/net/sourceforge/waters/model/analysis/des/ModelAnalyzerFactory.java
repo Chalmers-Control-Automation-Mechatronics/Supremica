@@ -117,13 +117,4 @@ public interface ModelAnalyzerFactory
   //# Options
   public void registerOptions(AnalysisOptionPage db);
 
-
-  //#########################################################################
-  //# Supremica Options
-  /**
-   * Configures a BDD model verifier from Supremica options, if these
-   * are available.
-   */
-  public void configureFromOptions(ModelAnalyzer analyzer);
-
 }

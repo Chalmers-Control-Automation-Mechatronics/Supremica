@@ -74,12 +74,6 @@ public class AggregatorOptionPage extends OptionPage
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
   @Override
-  public String getPrefix()
-  {
-    throw new RuntimeException("Invalid operation!");
-  }
-
-  @Override
   public String getTitle()
   {
     return mTitle;
