@@ -57,6 +57,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
@@ -132,6 +133,8 @@ public class TRControllabilityChecker
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
+    db.remove(options, AbstractModelAnalyzerFactory.
+                       OPTION_LanguageInclusionChecker_Property);
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_TRControllabilityChecker_Chain);
     return options;

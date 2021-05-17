@@ -297,8 +297,7 @@ public abstract class AbstractModelAnalyzerFactory
 
     db.register(new StringListOption
              (OPTION_LanguageInclusionChecker_Property, null,
-              "Name of a property to be checked " +
-              "(can be used more than once)",
+              "Name of a property to be checked",
               "-property"));
   }
 

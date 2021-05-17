@@ -123,7 +123,7 @@ public class CommandLineToolTest
     testCommandLine("mod-bdd-cont", args, "DEBUG Depth .*", "true \\(.*");
   }
 
-  public void testAnalyzer_ModularTRCompositionalBDDControllability()
+  public void testAnalyzer_ModularTRCompBDDControllability()
     throws Exception
   {
     final File file = getInputWdes("handwritten", "small_factory_2");
@@ -196,6 +196,16 @@ public class CommandLineToolTest
     testCommandLine("trcomp-cont", args,
                     "small_factory_2 ... true \\(.*",
                     "small_factory_2u ... false \\(.*");
+  }
+
+  public void testAnalyzer_TRCompLanguageInclusion()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "five_properties");
+    final String[] args = new String[]
+      {"TRCompositional", "LanguageInclusionChecker",
+       file.toString(), "-property", "prop[3]"};
+    testCommandLine("trcomp-lang", args, true);
   }
 
   public void testAnalyzer_TRCompConflict()

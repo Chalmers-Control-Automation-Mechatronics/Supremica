@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="five_properties">
+<B:Comment>A language inclusion checker test where only one out of five properties (prop[3]) succeeds.
+Used to check whether the interface to select a specific property works correctly.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e">
+<RangeList>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+</RangeList>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="plant">
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="e">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="51" Y="42"/>
+</LabelGeometry>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="128" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="e">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="e">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="e">
+<IntConstant Value="4"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="e">
+<IntConstant Value="5"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="172" Y="95"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="i">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+<ComponentList>
+<SimpleComponent Kind="PROPERTY">
+<IndexedIdentifier Name="prop">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="e">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="125" Y="62"/>
+</LabelGeometry>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
