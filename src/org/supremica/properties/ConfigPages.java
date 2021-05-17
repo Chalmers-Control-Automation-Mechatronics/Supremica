@@ -3,8 +3,8 @@ package org.supremica.properties;
 import static org.supremica.properties.Config.*;
 
 import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
-import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 public class ConfigPages
 {
@@ -30,9 +30,6 @@ public class ConfigPages
   public static final SimpleLeafOptionPage GENERAL_FILE =
     new SimpleLeafOptionPage("general.file", "File",
                              FILE_OPEN_PATH, FILE_SAVE_PATH);
-
-  public static final SimpleLeafOptionPage GUI_COMPILER =
-    CompilerOptions.PAGE;
 
   public static final SimpleLeafOptionPage GUI_EDITOR =
     new SimpleLeafOptionPage("gui.editor", "Editor",
@@ -145,7 +142,8 @@ public class ConfigPages
     new AggregatorOptionPage("IDE", ConfigPages.GENERAL, ConfigPages.GENERAL_FILE, ConfigPages.GENERAL_LOG, ConfigPages.MISC);
 
   public static final AggregatorOptionPage GUI_AGGREGATOR_OPTION_PAGE =
-    new AggregatorOptionPage("GUI", ConfigPages.GUI_EDITOR, ConfigPages.GUI_SIMULATOR, ConfigPages.GUI_ANALYZER, ConfigPages.GUI_COMPILER);
+    new AggregatorOptionPage("GUI", ConfigPages.GUI_EDITOR, ConfigPages.GUI_SIMULATOR,
+                             ConfigPages.GUI_ANALYZER, OptionPage.GUI_COMPILER);
 
   public static final AggregatorOptionPage ANALYZER_AGGREGATOR_OPTION_PAGE =
     new AggregatorOptionPage("Supremica Analyzer", ConfigPages.ALGORITHMS_SYNCHRONIZATION,

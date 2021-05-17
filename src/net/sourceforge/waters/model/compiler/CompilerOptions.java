@@ -36,7 +36,6 @@ package net.sourceforge.waters.model.compiler;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
-import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
 
 
 /**
@@ -45,22 +44,13 @@ import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
  * @author Robi Malik
  */
 
-public class CompilerOptions extends SimpleLeafOptionPage
+public class CompilerOptions
 {
 
   //#########################################################################
   //# Dummy Constructor
   private CompilerOptions()
   {
-    super("gui.compiler", "Compiler");
-    register(PARAMETER_BINDINGS);
-    register(INCLUDE_INSTANTIATION);
-    register(BACKGROUND_COMPILER);
-    register(OPTIMIZING_COMPILER);
-    register(EFSM_COMPILER);
-    register(NORMALIZING_COMPILER);
-    register(AUTOMATON_VARIABLES_COMPILER);
-    register(HISC_COMPILER);
   }
 
 
@@ -116,10 +106,5 @@ public class CompilerOptions extends SimpleLeafOptionPage
     (OPTION_ModuleCompiler_HISCCompiler, "HISC high-level only",
      "Compile as HISC module, only including interfaces of low levels",
      "-hisc", false, false);
-
-
-  //#########################################################################
-  //# Option Page
-  public static final SimpleLeafOptionPage PAGE = new CompilerOptions();
 
 }

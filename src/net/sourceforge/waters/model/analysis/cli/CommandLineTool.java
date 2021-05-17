@@ -55,6 +55,7 @@ import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.analysis.options.FileOption;
 import net.sourceforge.waters.analysis.options.LeafOptionPage;
 import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -209,7 +210,7 @@ public class CommandLineTool implements Configurable
       mContext.registerArguments(toolPage, this, true);
       final ModuleCompiler dummyCompiler =
         new ModuleCompiler(null, null, null);
-      mContext.registerArguments(CompilerOptions.PAGE, dummyCompiler);
+      mContext.registerArguments(OptionPage.GUI_COMPILER, dummyCompiler);
       final AnalysisOptionPage analyserPage = operation.getOptionPage();
       mContext.registerArguments(analyserPage, mAnalyzer);
 

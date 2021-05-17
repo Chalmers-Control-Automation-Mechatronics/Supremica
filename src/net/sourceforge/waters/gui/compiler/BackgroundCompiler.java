@@ -44,6 +44,7 @@ import javax.swing.Timer;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionChangeEvent;
 import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -131,7 +132,8 @@ public class BackgroundCompiler
         setModuleChanged();
       }
     };
-    final List<Option<?>> options = mCompiler.getOptions(CompilerOptions.PAGE);
+    final List<Option<?>> options =
+      mCompiler.getOptions(OptionPage.GUI_COMPILER);
     mOptions = new ArrayList<>(options.size());
     for (final Option<?> option : options) {
       if (option.isEditable()) {

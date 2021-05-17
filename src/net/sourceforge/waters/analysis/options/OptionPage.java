@@ -42,6 +42,7 @@ import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 
 /**
@@ -124,6 +125,16 @@ public abstract class OptionPage
      "org.supremica.automata.waters.SupremicaSimplifierFactory",
      ChainSimplifierFactory.class.getName());
 
+  public static final SimpleLeafOptionPage GUI_COMPILER =
+    new SimpleLeafOptionPage("gui.compiler", "Compiler",
+                             CompilerOptions.PARAMETER_BINDINGS,
+                             CompilerOptions.INCLUDE_INSTANTIATION,
+                             CompilerOptions.BACKGROUND_COMPILER,
+                             CompilerOptions.OPTIMIZING_COMPILER,
+                             CompilerOptions.EFSM_COMPILER,
+                             CompilerOptions.NORMALIZING_COMPILER,
+                             CompilerOptions.AUTOMATON_VARIABLES_COMPILER,
+                             CompilerOptions.HISC_COMPILER);
 
   private static final AggregatorOptionPage[] TOP_LEVEL_AGGREGATORS =
   new AggregatorOptionPage[] {
