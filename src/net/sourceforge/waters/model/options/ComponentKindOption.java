@@ -31,54 +31,46 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
-
-import java.io.File;
+package net.sourceforge.waters.model.options;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.base.ComponentKind;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of <CODE>file</CODE> type.
+ * A configurable parameter of a {@link ModelAnalyzer} of
+ * <CODE>ComponentKind</CODE> type.
  *
  * @author Brandon Bassett
  */
 
-public class FileOption extends Option<File>
+public class ComponentKindOption extends EnumOption<ComponentKind>
 {
-  //#########################################################################
-  //# Constructors
-  public FileOption(final String id,
-                    final String shortName,
-                    final String description,
-                    final String commandLineOption)
-  {
-    this(id, shortName, description, commandLineOption, null);
-  }
 
-  public FileOption(final String id,
-                    final String shortName,
-                    final String description,
-                    final String commandLineOption,
-                    final File defaultValue)
+  //#########################################################################
+  //# Constructor
+  public ComponentKindOption(final String id,
+                             final String shortName,
+                             final String description,
+                             final String commandLineOption)
   {
-    super(id, shortName, description, commandLineOption, defaultValue);
+    super(id, shortName, description, commandLineOption,
+          ComponentKind.values());
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Overrides for net.sourceforge.waters.model.options.Option
   @Override
-  public OptionEditor<File> createEditor(final OptionContext context)
+  public OptionEditor<ComponentKind> createEditor(final OptionContext context)
   {
-    return context.createFileEditor(this);
+    return context.createComponentKindEditor(this);
   }
 
   @Override
-  public void set(final String text)
+  public boolean isPersistent()
   {
-    final File value = new File(text);
-    setValue(value);
+    return false;
   }
 
 }

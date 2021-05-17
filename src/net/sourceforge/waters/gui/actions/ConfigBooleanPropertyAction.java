@@ -37,7 +37,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.model.options.BooleanOption;
 
 import org.supremica.gui.ide.IDE;
 

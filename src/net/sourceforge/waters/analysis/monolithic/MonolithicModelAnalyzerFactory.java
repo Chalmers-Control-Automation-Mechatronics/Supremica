@@ -34,13 +34,13 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 
 /**

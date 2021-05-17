@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -98,7 +98,7 @@ public abstract class SelectorLeafOptionPage<S> extends LeafOptionPage
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
+  //# Overrides for net.sourceforge.waters.model.options.OptionPage
   @Override
   public OptionPageEditor<SelectorLeafOptionPage<S>> createEditor
     (final OptionContext context)

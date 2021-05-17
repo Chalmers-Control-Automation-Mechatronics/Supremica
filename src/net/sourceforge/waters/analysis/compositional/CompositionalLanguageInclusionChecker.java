@@ -35,8 +35,8 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;

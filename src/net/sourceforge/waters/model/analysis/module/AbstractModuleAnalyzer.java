@@ -36,9 +36,9 @@ package net.sourceforge.waters.model.analysis.module;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;

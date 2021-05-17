@@ -37,11 +37,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -54,6 +53,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.IDE;

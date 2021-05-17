@@ -51,11 +51,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
@@ -134,6 +133,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
@@ -377,7 +377,7 @@ public class IDEMenuBar
         actions.getAction(VerifyLanguageInclusionAction.class);
     menu.add(languageInclusion);
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
-      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+      WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     addOption(diagnosabilityOption);
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       final Action diagnosability =
@@ -570,7 +570,7 @@ public class IDEMenuBar
       actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
     menu.add(languageInclusion);
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
-      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+      WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     addOption(diagnosabilityOption);
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       final Action diagnosability =

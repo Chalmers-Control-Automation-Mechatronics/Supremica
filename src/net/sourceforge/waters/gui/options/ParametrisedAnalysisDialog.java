@@ -44,8 +44,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -60,6 +59,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 import org.supremica.gui.ide.IDE;
 

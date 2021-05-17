@@ -56,10 +56,10 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;

@@ -47,9 +47,9 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.WatersIntHeap;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;

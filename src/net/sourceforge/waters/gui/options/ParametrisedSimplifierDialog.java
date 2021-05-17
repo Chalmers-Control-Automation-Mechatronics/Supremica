@@ -48,10 +48,8 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.SimplifierOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -63,6 +61,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.SimplifierOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,7 +87,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     super(panel.getModuleContainer().getIDE());
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
-    mPage = OptionPage.Simplifier;
+    mPage = WatersOptionPages.SIMPLIFICATION;
 
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
@@ -99,7 +99,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     constraints.weighty = 1.0;
 
     mGroupPanel = (OptionGroupPanel<AutomatonSimplifierCreator>)
-      OptionPage.Simplifier.createEditor(mContext);
+      mPage.createEditor(mContext);
     add(mGroupPanel, constraints);
 
     // Error label
@@ -194,8 +194,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
           builder.setOutputName(aut.getName());
         }
 
-        for (final Option<?> option :
-             OptionPage.Simplifier.getCurrentOptions()) {
+        for (final Option<?> option : mPage.getCurrentOptions()) {
           builder.setOption(option);
         }
         builder.run();

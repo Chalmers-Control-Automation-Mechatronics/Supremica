@@ -31,14 +31,12 @@
 //# exception.
 //###########################################################################
 
-
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,6 +50,12 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 
 
+/**
+ * Static methods to read and write options to/from property files.
+ *
+ * @author Robi Malik
+ */
+
 public final class OptionFileManager
 {
 
@@ -64,17 +68,20 @@ public final class OptionFileManager
 
   //#########################################################################
   //# Loading
-  public static void loadProperties(final File theFile)
+  public static void loadProperties(final OptionPage root,
+                                    final File theFile)
     throws IOException
   {
+    mRoot = root;
     mPropertyFile = theFile; // this is the file we load properties from, it should also be the one to save to
-    updateProperties(mPropertyFile);
+    updateProperties(mRoot, mPropertyFile);
   }
 
   /**
    * Load properties from file.
    */
-  private static void updateProperties(final File propertyFile)
+  public static void updateProperties(final OptionPage root,
+                                      final File propertyFile)
     throws IOException
   {
     final FileInputStream stream = new FileInputStream(propertyFile);
@@ -83,7 +90,7 @@ public final class OptionFileManager
       properties.load(new BufferedInputStream(stream));
       LegacyOption.transformProperties(properties);
       mReadingPropertyFile = true;
-      OptionPage.TOP_LEVEL_AGGREGATOR.loadProperties(properties);
+      root.loadProperties(properties);
       warnAboutUnused(properties);
     } finally {
       stream.close();
@@ -160,10 +167,11 @@ public final class OptionFileManager
     saveProperties(false);
   }
 
-  public static void saveProperties(final boolean saveAll) throws IOException
+  public static void saveProperties(final boolean saveAll)
+    throws IOException
   {
     if (mPropertyFile != null) {
-      saveProperties(mPropertyFile, saveAll);
+      saveProperties(mRoot, mPropertyFile, saveAll);
     } else {
       LogManager.getLogger().error
         ("No configuration file to write to, was not specified (by -p) on startup");
@@ -171,26 +179,28 @@ public final class OptionFileManager
   }
 
   /**
-   * Save the property list to the configuration file.
-   *
-   * @param propertyFile
-   *          is the name of the config file
-   * @param saveAll
-   *          if this is true all mutable properties are saved to file
-   *          otherwise only those properties that values different from the
-   *          default value is saved.
+   * Save options to a configuration file.
+   * @param  root    The option page containing all options to be saved.
+   * @param  propertyFile  The name of the properties file to be written.
+   * @param  saveAll If this is <CODE>true</CODE> all persistent properties
+   *                 are saved, otherwise only properties with values
+   *                 different from the default are saved.
    */
-  private static void saveProperties(final File propertyFile,
-                                     final boolean saveAll)
-    throws FileNotFoundException, IOException
+  public static void saveProperties(final OptionPage root,
+                                    final File propertyFile,
+                                    final boolean saveAll)
+    throws IOException
   {
-    try (final OutputStream os = new FileOutputStream(propertyFile)) {
+    final OutputStream stream = new FileOutputStream(propertyFile);
+    try {
       final BufferedWriter writer =
-        new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
+        new BufferedWriter(new OutputStreamWriter(stream, "8859_1"));
       writer.write("# Waters configuration file\n");
       writer.write("# Created: " + new Date().toString() + "\n\n");
-      OptionPage.TOP_LEVEL_AGGREGATOR.saveProperties(writer, saveAll);
+      root.saveProperties(writer, saveAll);
       writer.flush();
+    } finally {
+      stream.close();
     }
   }
 
@@ -219,7 +229,7 @@ public final class OptionFileManager
     public void run()
     {
       long current = System.currentTimeMillis();
-      while (current < mSaveTime) {
+      while (current < mSaveTime && !isInterrupted()) {
         try {
           Thread.sleep(mSaveTime - current);
           current = System.currentTimeMillis();
@@ -302,7 +312,8 @@ public final class OptionFileManager
 
   //#########################################################################
   //# Static Variables
-  private static File mPropertyFile = null; // Set by loadProperties
+  private static OptionPage mRoot = null;   // Set by loadProperties()
+  private static File mPropertyFile = null; // Set by loadProperties()
   private static boolean mReadingPropertyFile = false;
   private static SaverThread mSaverThread = null;
 

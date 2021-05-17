@@ -36,9 +36,9 @@ package net.sourceforge.waters.model.analysis.des;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;

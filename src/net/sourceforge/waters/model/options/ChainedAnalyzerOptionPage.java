@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import gnu.trove.set.hash.THashSet;
 
@@ -108,7 +108,7 @@ public class ChainedAnalyzerOptionPage
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
+  //# net.sourceforge.waters.model.options.SelectorLeafOptionPage
   @Override
   public EnumOption<ModelAnalyzerFactoryLoader> getTopSelectorOption()
   {
@@ -136,7 +136,7 @@ public class ChainedAnalyzerOptionPage
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+  //# Overrides for net.sourceforge.waters.model.options.LeafOptionPage
   @Override
   public String getShortDescription()
   {
@@ -164,7 +164,7 @@ public class ChainedAnalyzerOptionPage
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
+  //# Overrides for net.sourceforge.waters.model.options.OptionPage
   @Override
   public void saveProperties(final Writer writer, final boolean saveAll)
     throws IOException

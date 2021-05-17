@@ -31,13 +31,14 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
+
 
 /**
  * Helper class to map legacy options from old file formats to up-to-date
@@ -46,6 +47,7 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author Robi Malik, Benjamin Wheeler
  */
+
 public class LegacyOption
 {
 

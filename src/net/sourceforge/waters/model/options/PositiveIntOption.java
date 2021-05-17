@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -128,7 +128,7 @@ public class PositiveIntOption extends Option<Integer>
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Overrides for net.sourceforge.waters.model.options.Option
   @Override
   public OptionEditor<Integer> createEditor(final OptionContext context)
   {

@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.module;
 
-import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;

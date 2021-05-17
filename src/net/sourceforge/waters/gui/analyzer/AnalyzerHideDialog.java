@@ -52,8 +52,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;

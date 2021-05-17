@@ -31,46 +31,35 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
-
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.base.ComponentKind;
-
+package net.sourceforge.waters.model.options;
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of
- * <CODE>ComponentKind</CODE> type.
  *
- * @author Brandon Bassett
+ * @author Benjamin Wheeler
  */
-
-public class ComponentKindOption extends EnumOption<ComponentKind>
+public class SimpleLeafOptionPage extends LeafOptionPage
 {
 
   //#########################################################################
   //# Constructor
-  public ComponentKindOption(final String id,
-                             final String shortName,
-                             final String description,
-                             final String commandLineOption)
+  public SimpleLeafOptionPage(final String prefix,
+                              final String title,
+                              final Option<?>... options)
   {
-    super(id, shortName, description, commandLineOption,
-          ComponentKind.values());
+    super(prefix, title);
+    for (final Option<?> option : options) {
+      register(option);
+    }
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Overrides for net.sourceforge.model.options.LeafOptionPage
   @Override
-  public OptionEditor<ComponentKind> createEditor(final OptionContext context)
+  public OptionPageEditor<SimpleLeafOptionPage>
+  createEditor(final OptionContext context)
   {
-    return context.createComponentKindEditor(this);
-  }
-
-  @Override
-  public boolean isPersistent()
-  {
-    return false;
+    return context.createSimpleLeafOptionPageEditor(this);
   }
 
 }

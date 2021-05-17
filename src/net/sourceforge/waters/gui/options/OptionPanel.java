@@ -39,8 +39,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionEditor;
 
 
 public abstract class OptionPanel<T> implements OptionEditor<T>
@@ -60,7 +60,7 @@ public abstract class OptionPanel<T> implements OptionEditor<T>
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.OptionEditor
+  //# Overrides for net.sourceforge.waters.model.options.OptionEditor
   @Override
   public Option<T> getOption()
   {

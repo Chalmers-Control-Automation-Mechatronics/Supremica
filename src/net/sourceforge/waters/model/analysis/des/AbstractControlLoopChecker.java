@@ -36,9 +36,9 @@ package net.sourceforge.waters.model.analysis.des;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;

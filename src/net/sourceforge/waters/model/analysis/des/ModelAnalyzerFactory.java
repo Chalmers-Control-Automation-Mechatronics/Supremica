@@ -33,9 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 
 /**

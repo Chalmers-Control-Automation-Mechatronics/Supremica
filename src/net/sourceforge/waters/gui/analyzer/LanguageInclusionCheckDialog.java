@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.gui.ide.IDE;
 
@@ -65,7 +65,7 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
   @Override
   protected AnalysisOptionPage getOptionPage()
   {
-    return OptionPage.LanguageInclusion;
+    return WatersOptionPages.LANGUAGE_INCLUSION;
   }
 
   @Override

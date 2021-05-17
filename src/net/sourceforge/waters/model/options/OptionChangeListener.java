@@ -31,61 +31,16 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+package net.sourceforge.waters.model.options;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of a
- * {@link List} of {@link String} type.
  *
  * @author Benjamin Wheeler
  */
-
-public class StringListOption extends Option<List<String>>
+public interface OptionChangeListener
 {
-  //#########################################################################
-  //# Constructors
-  public StringListOption(final String id,
-                          final String shortName,
-                          final String description,
-                          final String commandLineOption)
-  {
-    super(id, shortName, description, commandLineOption,
-          Collections.emptyList(), new LinkedList<>());
-    setEditable(false);
-  }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
-  @Override
-  public OptionEditor<List<String>> createEditor(final OptionContext context)
-  {
-    return context.createStringListEditor(this);
-  }
-
-  @Override
-  public void set(final String text)
-  {
-    getValue().add(text);
-  }
-
-  @Override
-  public void restoreDefaultValue()
-  {
-    getValue().clear();
-  }
-
-  @Override
-  public boolean isPersistent()
-  {
-    return false;
-  }
+  public void optionChanged(OptionChangeEvent event);
 
 }

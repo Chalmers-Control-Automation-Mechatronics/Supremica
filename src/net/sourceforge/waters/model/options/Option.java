@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 
 import java.io.IOException;

@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
+
 
 /**
  *
@@ -61,7 +62,7 @@ public abstract class LeafOptionPage extends OptionPage
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.OptionPage
+  //# Overrides for net.sourceforge.waters.model.options.OptionPage
   @Override
   public String getTitle()
   {

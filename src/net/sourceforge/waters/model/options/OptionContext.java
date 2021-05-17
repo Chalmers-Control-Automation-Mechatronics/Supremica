@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.awt.Color;
 import java.io.File;
@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
 
 /**
  * <P>A context for editing options.</P>
@@ -59,6 +60,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
  *
  * @author Robi Malik
  */
+
 public interface OptionContext
 {
   /**

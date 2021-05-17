@@ -45,28 +45,27 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.analysis.options.ColorOption;
-import net.sourceforge.waters.analysis.options.ComponentKindOption;
-import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.DoubleOption;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionContext;
-import net.sourceforge.waters.analysis.options.OptionEditor;
-import net.sourceforge.waters.analysis.options.OptionPageEditor;
-import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.analysis.options.PropositionOption;
-import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
-import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
-import net.sourceforge.waters.analysis.options.StringListOption;
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.options.AggregatorOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.ColorOption;
+import net.sourceforge.waters.model.options.ComponentKindOption;
+import net.sourceforge.waters.model.options.Configurable;
+import net.sourceforge.waters.model.options.DoubleOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionEditor;
+import net.sourceforge.waters.model.options.OptionPageEditor;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.PropositionOption;
+import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
+import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.model.options.StringListOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -74,6 +73,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.options.OptionContext;
 
 
 /**
@@ -95,7 +95,7 @@ public class CommandLineOptionContext implements OptionContext
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionContext
+  //# Interface net.sourceforge.waters.model.options.OptionContext
   @Override
   public ProductDESProxy getProductDES()
   {

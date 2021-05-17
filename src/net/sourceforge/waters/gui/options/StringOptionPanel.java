@@ -35,7 +35,7 @@ package net.sourceforge.waters.gui.options;
 
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.options.StringOption;
 
 
 class StringOptionPanel
@@ -60,7 +60,7 @@ class StringOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public StringOption getOption()
   {

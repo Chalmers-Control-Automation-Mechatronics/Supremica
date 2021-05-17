@@ -50,7 +50,7 @@
 
 package org.supremica.automata.algorithms;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.model.options.BooleanOption;
 
 
 public enum EquivalenceRelation

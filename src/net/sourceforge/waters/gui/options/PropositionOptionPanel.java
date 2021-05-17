@@ -42,7 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -64,7 +64,7 @@ class PropositionOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public PropositionOption getOption()
   {

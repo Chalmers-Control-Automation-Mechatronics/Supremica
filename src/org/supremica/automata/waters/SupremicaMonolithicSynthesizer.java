@@ -55,12 +55,12 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.analysis.options.PropositionOption;
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.PropositionOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;

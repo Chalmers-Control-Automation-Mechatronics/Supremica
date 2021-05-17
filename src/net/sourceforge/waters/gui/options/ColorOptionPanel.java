@@ -42,7 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.border.Border;
 
-import net.sourceforge.waters.analysis.options.ColorOption;
+import net.sourceforge.waters.model.options.ColorOption;
 
 /**
  *
@@ -82,7 +82,7 @@ class ColorOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public ColorOption getOption()
   {

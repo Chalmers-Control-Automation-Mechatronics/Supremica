@@ -49,8 +49,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;

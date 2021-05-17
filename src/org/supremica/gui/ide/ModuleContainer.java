@@ -48,8 +48,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.command.Command;

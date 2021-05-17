@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 /**
  *
@@ -122,7 +122,7 @@ public enum AnalysisOperation
     }
   },
 
-  STATE_COUNTER("StateCounter", "waters.analysis.statecount", "State Count",
+  STATE_COUNT("StateCounter", "waters.analysis.statecount", "State Count",
                 null, null)
   {
     @Override
@@ -147,7 +147,7 @@ public enum AnalysisOperation
     }
   },
 
-  SUPERVISOR_SYNTHESIZER("SupervisorSynthesizer",
+  SYNTHESIS("SupervisorSynthesizer",
                          "waters.analysis.synthesis", "Synthesis",
                          null, null)
   {
@@ -201,7 +201,7 @@ public enum AnalysisOperation
   public AnalysisOptionPage getOptionPage()
   {
     return (AnalysisOptionPage)
-      OptionPage.TOP_LEVEL_AGGREGATOR.getLeafOptionPage(mOptionPagePrefix);
+      WatersOptionPages.ANALYSIS.getLeafOptionPage(mOptionPagePrefix);
   }
 
   public String getAnalysisName()

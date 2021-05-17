@@ -35,9 +35,9 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -78,7 +78,7 @@ public abstract class AbstractModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {

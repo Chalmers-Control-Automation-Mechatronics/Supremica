@@ -31,15 +31,44 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
+
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+
 
 /**
- * 
- * @author Benjamin Wheeler
+ * A configurable parameter of a {@link ModelAnalyzer} of
+ * {@link String} type.
+ *
+ * @author Brandon Bassett
  */
-public interface OptionChangeListener
-{
 
-  public void optionChanged(OptionChangeEvent event);
+public class StringOption extends Option<String>
+{
+  //#########################################################################
+  //# Constructors
+  public StringOption(final String id,
+                      final String shortName,
+                      final String description,
+                      final String commandLineOption,
+                      final String defaultValue)
+  {
+    super(id, shortName, description, commandLineOption, defaultValue);
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.options.Option
+  @Override
+  public OptionEditor<String> createEditor(final OptionContext context)
+  {
+    return context.createStringEditor(this);
+  }
+
+  @Override
+  public void set(final String text)
+  {
+    setValue(text);
+  }
 
 }

@@ -40,11 +40,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 public class ChainTRSimplifier
@@ -111,7 +111,7 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {

@@ -56,7 +56,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.gui.options.GUIOptionContext;

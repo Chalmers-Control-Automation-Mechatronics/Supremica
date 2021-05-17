@@ -35,14 +35,14 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 
 /**

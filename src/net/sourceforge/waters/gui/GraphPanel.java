@@ -48,8 +48,8 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.PrintRenderingContext;

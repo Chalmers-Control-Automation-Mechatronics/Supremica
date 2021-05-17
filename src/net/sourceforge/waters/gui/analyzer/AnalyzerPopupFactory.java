@@ -35,12 +35,12 @@ package net.sourceforge.waters.gui.analyzer;
 
 import javax.swing.JPopupMenu;
 
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 
 class AnalyzerPopupFactory
@@ -83,7 +83,7 @@ class AnalyzerPopupFactory
       master.getAnalyzerLanguageInclusionCheckAction();
     popup.add(languageInclusion);
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
-      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+      WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       final IDEAction diagnosability =
         master.getAnalyzerDiagnosabilityCheckAction();

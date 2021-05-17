@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.options;
 
-import net.sourceforge.waters.analysis.options.DoubleOption;
+import net.sourceforge.waters.model.options.DoubleOption;
 import net.sourceforge.waters.gui.dialog.DoubleInputCell;
 
 
@@ -58,7 +58,7 @@ class DoubleOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public DoubleOption getOption()
   {

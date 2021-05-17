@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.util.Set;
 
@@ -83,7 +83,7 @@ public class EventSetOption extends Option<Set<EventProxy>>
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Overrides for net.sourceforge.waters.model.options.Option
   @Override
   public OptionEditor<Set<EventProxy>> createEditor(final OptionContext context)
   {

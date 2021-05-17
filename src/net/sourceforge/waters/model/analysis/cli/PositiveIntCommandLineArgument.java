@@ -35,7 +35,7 @@ package net.sourceforge.waters.model.analysis.cli;
 
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.expr.ParseException;
 
 public class PositiveIntCommandLineArgument extends OptionCommandLineArgument<Integer>

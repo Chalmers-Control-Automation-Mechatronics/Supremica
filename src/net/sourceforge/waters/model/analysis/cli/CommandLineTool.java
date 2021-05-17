@@ -49,14 +49,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.Configurable;
+import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -91,6 +89,8 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -210,7 +210,7 @@ public class CommandLineTool implements Configurable
       mContext.registerArguments(toolPage, this, true);
       final ModuleCompiler dummyCompiler =
         new ModuleCompiler(null, null, null);
-      mContext.registerArguments(OptionPage.GUI_COMPILER, dummyCompiler);
+      mContext.registerArguments(WatersOptionPages.COMPILER, dummyCompiler);
       final AnalysisOptionPage analyserPage = operation.getOptionPage();
       mContext.registerArguments(analyserPage, mAnalyzer);
 
@@ -379,7 +379,7 @@ public class CommandLineTool implements Configurable
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage page)
   {

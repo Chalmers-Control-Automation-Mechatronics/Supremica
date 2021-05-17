@@ -31,35 +31,40 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Properties;
+
 
 /**
+ * <P>A collection of available options.</P>
  *
- * @author Benjamin Wheeler
+ * <P>An option page acts as a database that maps string identifiers to
+ * {@link Option} objects. For persistent storage of options values,
+ * the option map is first initialised with all available options,
+ * typically at program start-up. The initialised option map is then
+ * passed to {@link Configurable} objects, which select some of the options
+ * stored in it.</P>
+ *
+ * @author Robi Malik, Benjamin Wheeler
  */
-public class SimpleLeafOptionPage extends LeafOptionPage
+public abstract class OptionPage
 {
 
   //#########################################################################
-  //# Constructor
-  public SimpleLeafOptionPage(final String prefix,
-                              final String title,
-                              final Option<?>... options)
-  {
-    super(prefix, title);
-    for (final Option<?> option : options) {
-      register(option);
-    }
-  }
+  //# Simple Access
+  public abstract String getTitle();
 
+  public abstract LeafOptionPage getLeafOptionPage(String prefix);
 
-  //#########################################################################
-  //# Overrides for net.sourceforge.analysis.options.LeafOptionPage
-  @Override
-  public OptionPageEditor<SimpleLeafOptionPage>
-  createEditor(final OptionContext context)
-  {
-    return context.createSimpleLeafOptionPageEditor(this);
-  }
+  public abstract OptionPageEditor<? extends OptionPage>
+  createEditor(OptionContext context);
+
+  public abstract void loadProperties(Properties properties);
+
+  public abstract void saveProperties(Writer writer, boolean saveAll)
+    throws IOException;
 
 }

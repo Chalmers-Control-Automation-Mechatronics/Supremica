@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.gui.options;
 
-import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.OptionPageEditor;
+import net.sourceforge.waters.model.options.OptionPage;
+import net.sourceforge.waters.model.options.OptionPageEditor;
 
 /**
  *

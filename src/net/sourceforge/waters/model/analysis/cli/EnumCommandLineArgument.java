@@ -37,7 +37,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 

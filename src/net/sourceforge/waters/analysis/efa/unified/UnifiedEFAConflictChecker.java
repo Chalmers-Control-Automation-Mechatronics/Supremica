@@ -52,12 +52,12 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -303,7 +303,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage page)
   {

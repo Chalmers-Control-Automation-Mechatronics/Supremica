@@ -52,12 +52,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ComponentKindOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ComponentKindOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;

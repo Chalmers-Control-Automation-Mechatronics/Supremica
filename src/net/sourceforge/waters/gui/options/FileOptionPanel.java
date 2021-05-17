@@ -44,7 +44,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.gui.dialog.FileInputCell;
 
 import org.supremica.gui.ide.IDE;
@@ -73,7 +73,7 @@ class FileOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public FileOption getOption()
   {

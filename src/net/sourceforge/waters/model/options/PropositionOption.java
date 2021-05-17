@@ -31,44 +31,80 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of
- * {@link String} type.
+ * A configurable parameter to pass a proposition event ({@link EventProxy})
+ * to a {@link ModelAnalyzer}.
  *
  * @author Brandon Bassett
  */
 
-public class StringOption extends Option<String>
+public class PropositionOption extends Option<EventProxy>
 {
   //#########################################################################
   //# Constructors
-  public StringOption(final String id,
-                      final String shortName,
-                      final String description,
-                      final String commandLineOption,
-                      final String defaultValue)
+  public PropositionOption(final String id,
+                           final String shortName,
+                           final String description,
+                           final String commandLineOption,
+                           final DefaultKind kind)
   {
-    super(id, shortName, description, commandLineOption, defaultValue);
+    super(id, shortName, description, commandLineOption, null);
+    mDefaultKind = kind;
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
-  @Override
-  public OptionEditor<String> createEditor(final OptionContext context)
+  //# Simple Access
+  public DefaultKind getDefaultKind()
   {
-    return context.createStringEditor(this);
+    return mDefaultKind;
+  }
+
+  public int getIntegerValue(final EventEncoding enc)
+  {
+    return enc.getEventCode(getValue());
   }
 
   @Override
   public void set(final String text)
   {
-    setValue(text);
+    //Do nothing
   }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.options.Option
+  @Override
+  public OptionEditor<EventProxy> createEditor(final OptionContext context)
+  {
+    return context.createPropositionEditor(this);
+  }
+
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Inner Enumeration DefaultKind
+  public enum DefaultKind {
+    PREVENT_NULL,
+    ALLOW_NULL,
+    DEFAULT_NULL
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final DefaultKind mDefaultKind;
 
 }

@@ -60,7 +60,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
  *
  * <P>This is a dummy implementation of the {@link SupervisorReductionFactory}
  * interface, making it possible to configure Supremica's supervisor through
- * the {@link net.sourceforge.waters.analysis.options.Option Option}
+ * the {@link net.sourceforge.waters.model.options.Option Option}
  * interfaces of Waters.</P>
  *
  * @author Robi Malik

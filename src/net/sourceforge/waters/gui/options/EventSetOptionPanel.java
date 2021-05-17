@@ -50,8 +50,8 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.gui.analyzer.EventSetPanel;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -82,7 +82,7 @@ class EventSetOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public EventSetOption getOption()
   {

@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -90,7 +90,7 @@ public class SimplifierOptionPage
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
+  //# net.sourceforge.waters.model.options.SelectorLeafOptionPage
   @Override
   public EnumOption<AutomatonSimplifierFactory> getTopSelectorOption()
   {

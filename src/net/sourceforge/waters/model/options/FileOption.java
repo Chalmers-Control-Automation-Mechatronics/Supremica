@@ -31,12 +31,54 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
+
+import java.io.File;
+
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+
 
 /**
+ * A configurable parameter of a {@link ModelAnalyzer} of <CODE>file</CODE> type.
  *
- * @author Benjamin Wheeler
+ * @author Brandon Bassett
  */
-public interface OptionPageEditor<T extends OptionPage> {
+
+public class FileOption extends Option<File>
+{
+  //#########################################################################
+  //# Constructors
+  public FileOption(final String id,
+                    final String shortName,
+                    final String description,
+                    final String commandLineOption)
+  {
+    this(id, shortName, description, commandLineOption, null);
+  }
+
+  public FileOption(final String id,
+                    final String shortName,
+                    final String description,
+                    final String commandLineOption,
+                    final File defaultValue)
+  {
+    super(id, shortName, description, commandLineOption, defaultValue);
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.options.Option
+  @Override
+  public OptionEditor<File> createEditor(final OptionContext context)
+  {
+    return context.createFileEditor(this);
+  }
+
+  @Override
+  public void set(final String text)
+  {
+    final File value = new File(text);
+    setValue(value);
+  }
 
 }

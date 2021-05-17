@@ -37,7 +37,7 @@ import java.util.Vector;
 
 import javax.swing.JComboBox;
 
-import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.model.options.EnumOption;
 
 
 class EnumOptionPanel<T>
@@ -74,7 +74,7 @@ class EnumOptionPanel<T>
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public EnumOption<T> getOption()
   {

@@ -41,13 +41,13 @@ import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 import org.supremica.automata.BDD.EFA.TimeInvariantAttributeFactory;
@@ -136,7 +136,7 @@ public class AttributeFactoryManager implements OptionChangeListener
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionChangeListener
+  //# Interface net.sourceforge.waters.model.options.OptionChangeListener
   @Override
   public void optionChanged(final OptionChangeEvent event)
   {
@@ -149,7 +149,7 @@ public class AttributeFactoryManager implements OptionChangeListener
   private void register()
   {
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
-      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+      WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     diagnosabilityOption.addOptionChangeListener(this);
     Config.GUI_ANALYZER_INCLUDE_HISC.addOptionChangeListener(this);
     Config.INCLUDE_RAS_SUPPORT.addOptionChangeListener(this);
@@ -161,7 +161,7 @@ public class AttributeFactoryManager implements OptionChangeListener
     mAttributeInfoMap.clear();
     mAttributeFactories.add(DefaultAttributeFactory.getInstance());
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
-      OptionPage.DiagnosabilityCheck.getTopSelectorOption();
+      WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       mAttributeFactories.add(DiagnosabilityAttributeFactory.getInstance());
     }

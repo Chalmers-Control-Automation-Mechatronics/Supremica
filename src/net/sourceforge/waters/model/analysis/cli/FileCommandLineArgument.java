@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.io.File;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ParseException;
 

@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.util.Arrays;
 import java.util.List;
@@ -117,7 +117,7 @@ public class EnumOption<E> extends Option<E>
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option<E>
+  //# Overrides for net.sourceforge.waters.model.options.Option<E>
   @Override
   public OptionEditor<E> createEditor(final OptionContext context)
   {

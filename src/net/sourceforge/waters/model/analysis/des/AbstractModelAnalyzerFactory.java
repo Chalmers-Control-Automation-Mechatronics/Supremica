@@ -35,17 +35,17 @@ package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ComponentKindOption;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.analysis.options.PropositionOption;
-import net.sourceforge.waters.analysis.options.StringListOption;
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ComponentKindOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.PropositionOption;
+import net.sourceforge.waters.model.options.StringListOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 
 /**

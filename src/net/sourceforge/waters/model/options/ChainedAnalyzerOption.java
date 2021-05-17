@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -111,7 +111,7 @@ public class ChainedAnalyzerOption
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.options.Option<ModelAnalyzerFactoryLoader>
+  //# net.sourceforge.waters.model.options.Option<ModelAnalyzerFactoryLoader>
   @Override
   public OptionEditor<ModelAnalyzerFactoryLoader>
   createEditor(final OptionContext context)

@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
 import java.util.Collection;
 import java.util.List;
@@ -96,7 +96,7 @@ public class AnalysisOptionPage
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.options.SelectorLeafOptionPage
+  //# net.sourceforge.waters.model.options.SelectorLeafOptionPage
   @Override
   public EnumOption<ModelAnalyzerFactoryLoader> getTopSelectorOption()
   {
@@ -125,7 +125,7 @@ public class AnalysisOptionPage
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.LeafOptionPage
+  //# Overrides for net.sourceforge.waters.model.options.LeafOptionPage
   @Override
   public String getShortDescription()
   {

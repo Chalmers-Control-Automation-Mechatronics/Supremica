@@ -38,10 +38,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -87,7 +87,7 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {

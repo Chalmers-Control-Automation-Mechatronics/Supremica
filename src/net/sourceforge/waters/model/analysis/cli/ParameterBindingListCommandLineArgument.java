@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 

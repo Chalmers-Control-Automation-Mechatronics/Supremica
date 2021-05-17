@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -128,7 +128,7 @@ public class TRControllabilityChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {

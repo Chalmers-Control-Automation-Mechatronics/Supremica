@@ -48,7 +48,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -58,6 +57,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.ConfigPages;
 
 
 /**
@@ -87,7 +87,8 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mTopTabbedPane = (OptionTabbedPane) OptionPage.TOP_LEVEL_AGGREGATOR.createEditor(mContext);
+    mTopTabbedPane = (OptionTabbedPane)
+      ConfigPages.ROOT.createEditor(mContext);
     add(mTopTabbedPane, constraints);
 
     // Error label
@@ -195,6 +196,7 @@ public abstract class ParametrisedOptionsDialog extends JDialog
 
   private final OptionTabbedPane mTopTabbedPane;
   private final SearchQuery mQuery;
+
 
   //#########################################################################
   //# Class Constants

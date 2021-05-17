@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.options;
 
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.gui.dialog.IntegerInputCell;
 
 
@@ -59,7 +59,7 @@ class PositiveIntOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public PositiveIntOption getOption()
   {

@@ -51,11 +51,11 @@ import net.sourceforge.waters.analysis.distributed.application.DistributedServer
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerificationJob;
-import net.sourceforge.waters.analysis.options.FileOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
-import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;

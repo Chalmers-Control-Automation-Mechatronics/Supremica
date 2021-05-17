@@ -35,8 +35,6 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -45,6 +43,8 @@ import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.gui.ide.IDE;
 
@@ -70,7 +70,7 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
   @Override
   protected AnalysisOptionPage getOptionPage()
   {
-    return OptionPage.Synthesis;
+    return WatersOptionPages.SYNTHESIS;
   }
 
   @Override

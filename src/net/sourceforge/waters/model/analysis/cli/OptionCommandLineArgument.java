@@ -33,9 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.cli;
 
-import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.model.options.Configurable;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionEditor;
 
 
 /**
@@ -57,7 +57,7 @@ public abstract class OptionCommandLineArgument<T>
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor<T>
+  //# Interface net.sourceforge.waters.model.options.OptionEditor<T>
   @Override
   public Option<T> getOption()
   {

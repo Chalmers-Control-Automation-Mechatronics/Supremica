@@ -38,9 +38,9 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

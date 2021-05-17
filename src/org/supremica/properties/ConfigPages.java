@@ -2,9 +2,9 @@ package org.supremica.properties;
 
 import static org.supremica.properties.Config.*;
 
-import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
-import net.sourceforge.waters.analysis.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.model.options.AggregatorOptionPage;
+import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 public class ConfigPages
 {
@@ -143,12 +143,19 @@ public class ConfigPages
 
   public static final AggregatorOptionPage GUI_AGGREGATOR_OPTION_PAGE =
     new AggregatorOptionPage("GUI", ConfigPages.GUI_EDITOR, ConfigPages.GUI_SIMULATOR,
-                             ConfigPages.GUI_ANALYZER, OptionPage.GUI_COMPILER);
+                             ConfigPages.GUI_ANALYZER, WatersOptionPages.COMPILER);
 
   public static final AggregatorOptionPage ANALYZER_AGGREGATOR_OPTION_PAGE =
     new AggregatorOptionPage("Supremica Analyzer", ConfigPages.ALGORITHMS_SYNCHRONIZATION,
                              ConfigPages.ALGORITHMS_VERIFICATION, ConfigPages.ALGORITHMS_SYNTHESIS,
                              ConfigPages.ALGORITHMS_MINIMIZATION,
                              ConfigPages.ALGORITHMS_BDD, ConfigPages.GUI_DOT);
+
+  public static final AggregatorOptionPage ROOT =
+    new AggregatorOptionPage("Supremica",
+                             IDE_AGGREGATOR_OPTION_PAGE,
+                             GUI_AGGREGATOR_OPTION_PAGE,
+                             WatersOptionPages.ANALYSIS,
+                             ANALYZER_AGGREGATOR_OPTION_PAGE);
 
 }

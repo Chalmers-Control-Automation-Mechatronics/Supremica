@@ -35,11 +35,11 @@ package net.sourceforge.waters.model.analysis.cli;
 
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.analysis.options.ChainedAnalyzerOptionPage;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOptionPage;
 
 
 /**
@@ -66,7 +66,7 @@ public class ChainedAnalyzerCommandLineArgument
 
   //#########################################################################
   //# Interface
-  //# net.sourceforge.waters.analysis.options.OptionEditor<ModelAnalyzerFactoryLoader>
+  //# net.sourceforge.waters.model.options.OptionEditor<ModelAnalyzerFactoryLoader>
   @Override
   public ChainedAnalyzerOption getOption()
   {

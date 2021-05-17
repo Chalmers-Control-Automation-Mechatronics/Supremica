@@ -35,7 +35,7 @@ package net.sourceforge.waters.gui.options;
 
 import javax.swing.JCheckBox;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.model.options.BooleanOption;
 
 
 class BooleanOptionPanel
@@ -71,7 +71,7 @@ class BooleanOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public BooleanOption getOption()
   {

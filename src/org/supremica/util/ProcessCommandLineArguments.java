@@ -18,7 +18,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.analysis.options.OptionFileManager;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -47,12 +47,15 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
+import org.apache.logging.log4j.LogManager;
+
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
+import org.supremica.properties.ConfigPages;
 
 import org.xml.sax.SAXException;
 
@@ -90,15 +93,15 @@ public class ProcessCommandLineArguments
           final String fileName = args[i];
           final File propFile = new File(fileName);
           try {
-            if (!propFile.exists()) {
-              System.out.println("Creating property file: "
-                                 + propFile.getAbsolutePath());
+            if (!propFile.isFile()) {
+              LogManager.getLogger().warn("Creating property file {}",
+                                          propFile.getAbsolutePath());
               propFile.createNewFile();
             }
-            OptionFileManager.loadProperties(propFile);
-          } catch (final Exception e) {
-            System.err.println("Error reading properties file: "
-                               + propFile.getAbsolutePath());
+            OptionFileManager.loadProperties(ConfigPages.ROOT, propFile);
+          } catch (final IOException exception) {
+            LogManager.getLogger().error("Error reading properties file {}",
+                                         propFile.getAbsolutePath());
           }
         }
       } else if (args[i].equals("-e") || args[i].equals("--epsfigs")) {

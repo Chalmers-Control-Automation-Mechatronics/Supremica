@@ -36,8 +36,8 @@ package net.sourceforge.waters.gui.logging;
 import java.io.File;
 import java.io.Serializable;
 
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.logging.log4j.Level;

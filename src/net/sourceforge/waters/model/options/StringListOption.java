@@ -31,78 +31,61 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.model.options;
 
-import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.swing.Action;
-
-import net.sourceforge.waters.model.options.EnumOption;
-
-import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
- * <P>An action to change an enumeration-type property.</P>
+ * A configurable parameter of a {@link ModelAnalyzer} of a
+ * {@link List} of {@link String} type.
  *
- * <P>This a generic popup menu action, parameterised with an
- * {@link EnumOption} from Supremica's configuration and one value. When
- * triggered, it sets the property to the specified value, and triggers
- * saving of the configuration file if the property was changed.</P>
- *
- * <P>This action is intended for popup menus only, it does not update its
- * enablement status or react to property changes.</P>
- *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
 
-public class ConfigEnumPropertyAction<E extends Enum<E>>
-  extends WatersAction
+public class StringListOption extends Option<List<String>>
 {
-
   //#########################################################################
-  //# Constructor
-  /**
-   * Creates a new enumeration property action.
-   * @param ide       The IDE.
-   * @param option    The property affected by the action.
-   * @param value     The value assigned to the property when the action
-   *                  is triggered.
-   * @param comment   A comment to explain the action. Menu items are
-   *                  labelled by the string representation of the value,
-   *                  while the comment is used as a tool tip.
-   */
-  ConfigEnumPropertyAction(final IDE ide,
-                           final EnumOption<E> option,
-                           final E value,
-                           final String comment)
+  //# Constructors
+  public StringListOption(final String id,
+                          final String shortName,
+                          final String description,
+                          final String commandLineOption)
   {
-    super(ide);
-    putValue(Action.NAME, value.toString());
-    putValue(Action.SHORT_DESCRIPTION, comment);
-    mOption = option;
-    mValue = value;
-    setEnabled(true);
+    super(id, shortName, description, commandLineOption,
+          Collections.emptyList(), new LinkedList<>());
+    setEditable(false);
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Overrides for net.sourceforge.waters.model.options.Option
   @Override
-  public void actionPerformed(final ActionEvent event)
+  public OptionEditor<List<String>> createEditor(final OptionContext context)
   {
-    mOption.setValue(mValue);
+    return context.createStringListEditor(this);
   }
 
+  @Override
+  public void set(final String text)
+  {
+    getValue().add(text);
+  }
 
-  //#########################################################################
-  //# Data Members
-  private final EnumOption<E> mOption;
-  private final E mValue;
+  @Override
+  public void restoreDefaultValue()
+  {
+    getValue().clear();
+  }
 
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -5473433986208336416L;
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
 
 }

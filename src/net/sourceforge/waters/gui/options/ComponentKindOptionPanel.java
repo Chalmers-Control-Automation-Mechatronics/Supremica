@@ -41,13 +41,13 @@ import java.awt.Insets;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.analysis.options.ComponentKindOption;
-import net.sourceforge.waters.analysis.options.OptionContext;
+import net.sourceforge.waters.model.options.ComponentKindOption;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.OptionContext;
 
 
 class ComponentKindOptionPanel
@@ -106,7 +106,7 @@ class ComponentKindOptionPanel
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
   public ComponentKindOption getOption()
   {

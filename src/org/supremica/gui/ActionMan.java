@@ -47,7 +47,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.sourceforge.waters.analysis.options.OptionFileManager;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;

@@ -47,10 +47,10 @@ import java.util.regex.Pattern;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -359,7 +359,7 @@ public class CommandLineToolTest
       final AnalysisOptionPage page = operation.getOptionPage();
       page.restoreDefaultValues();
     }
-    OptionPage.GUI_COMPILER.restoreDefaultValues();
+    WatersOptionPages.COMPILER.restoreDefaultValues();
   }
 
   @Override

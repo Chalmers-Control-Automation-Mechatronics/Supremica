@@ -37,9 +37,9 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
@@ -73,7 +73,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {

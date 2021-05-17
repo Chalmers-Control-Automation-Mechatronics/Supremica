@@ -39,8 +39,8 @@ import java.util.List;
 
 import javax.swing.JTabbedPane;
 
-import net.sourceforge.waters.analysis.options.AggregatorOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.options.AggregatorOptionPage;
+import net.sourceforge.waters.model.options.OptionPage;
 
 /**
  *

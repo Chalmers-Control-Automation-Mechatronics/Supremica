@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -111,7 +111,7 @@ public class TRLanguageInclusionChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {

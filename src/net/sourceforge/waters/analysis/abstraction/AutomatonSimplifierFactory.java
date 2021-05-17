@@ -36,8 +36,8 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
 
 
 /**

@@ -40,8 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**

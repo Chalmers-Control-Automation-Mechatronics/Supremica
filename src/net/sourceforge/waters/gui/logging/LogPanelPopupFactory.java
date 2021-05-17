@@ -38,7 +38,7 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 
-import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;

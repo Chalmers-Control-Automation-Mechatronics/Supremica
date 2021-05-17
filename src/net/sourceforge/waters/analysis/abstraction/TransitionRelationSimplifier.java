@@ -35,7 +35,7 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.Configurable;
+import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;

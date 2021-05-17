@@ -56,9 +56,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.SelectorLeafOptionPage;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 

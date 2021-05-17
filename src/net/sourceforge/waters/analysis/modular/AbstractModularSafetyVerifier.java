@@ -35,10 +35,10 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.analysis.options.EnumOption;
-import net.sourceforge.waters.analysis.options.LeafOptionPage;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;

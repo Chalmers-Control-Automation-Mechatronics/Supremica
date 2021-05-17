@@ -34,8 +34,8 @@
 
 package net.sourceforge.waters.model.compiler;
 
-import net.sourceforge.waters.analysis.options.BooleanOption;
-import net.sourceforge.waters.analysis.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
 
 
 /**

@@ -59,8 +59,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
 
-import net.sourceforge.waters.analysis.options.EventSetOption;
-import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;

@@ -41,10 +41,9 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
-import net.sourceforge.waters.analysis.options.OptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -54,6 +53,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -133,7 +133,7 @@ public class BackgroundCompiler
       }
     };
     final List<Option<?>> options =
-      mCompiler.getOptions(OptionPage.GUI_COMPILER);
+      mCompiler.getOptions(WatersOptionPages.COMPILER);
     mOptions = new ArrayList<>(options.size());
     for (final Option<?> option : options) {
       if (option.isEditable()) {

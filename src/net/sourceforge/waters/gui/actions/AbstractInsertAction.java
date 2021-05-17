@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -88,7 +88,7 @@ public abstract class AbstractInsertAction
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.OptionChangeListener
+  //# Interface net.sourceforge.waters.model.options.OptionChangeListener
   @Override
   public void optionChanged(final OptionChangeEvent event)
   {

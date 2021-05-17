@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.analysis.options.AnalysisOptionPage;
-import net.sourceforge.waters.analysis.options.OptionPage;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,7 +68,7 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
   @Override
   protected AnalysisOptionPage getOptionPage()
   {
-    return OptionPage.StateCounter;
+    return WatersOptionPages.STATE_COUNT;
   }
 
   @Override

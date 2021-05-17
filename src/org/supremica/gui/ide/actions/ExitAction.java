@@ -41,7 +41,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.analysis.options.OptionFileManager;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;

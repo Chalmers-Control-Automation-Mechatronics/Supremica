@@ -31,83 +31,95 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import java.util.Properties;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer}, which can hold a
- * {@link List} of {@link ParameterBindingProxy} objects.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class ParameterBindingListOption
-  extends Option<List<ParameterBindingProxy>>
+public class AggregatorOptionPage extends OptionPage
 {
+
   //#########################################################################
-  //# Constructors
-  public ParameterBindingListOption(final String id,
-                                    final String shortName,
-                                    final String description,
-                                    final String commandLineOption)
+  //# Constructor
+  public AggregatorOptionPage(final String title, final OptionPage... pages)
   {
-    super(id, shortName, description, commandLineOption,
-          Collections.emptyList(), new LinkedList<>());
-    setEditable(false);
+    mTitle = title;
+    mPages = new LinkedList<OptionPage>();
+    for (final OptionPage page : pages) {
+      mPages.add(page);
+    }
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Simple Access
+  public void addPage(final OptionPage page)
+  {
+    mPages.add(page);
+  }
+
+  public List<OptionPage> getPages()
+  {
+    return mPages;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.options.OptionPage
   @Override
-  public OptionEditor<List<ParameterBindingProxy>>
+  public String getTitle()
+  {
+    return mTitle;
+  }
+
+  @Override
+  public LeafOptionPage getLeafOptionPage(final String prefix)
+  {
+    for (final OptionPage page : mPages) {
+      final LeafOptionPage found = page.getLeafOptionPage(prefix);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public OptionPageEditor<? extends OptionPage>
   createEditor(final OptionContext context)
   {
-    return context.createParameterBindingListEditor(this);
+    return context.createAggregatorOptionPageEditor(this);
   }
 
   @Override
-  public void set(final String text)
-    throws ParseException
+  public void loadProperties(final Properties properties)
   {
-    final String[] parts = text.split("=");
-    if (parts.length != 2) {
-      throw new ParseException("Can't convert '" + text +
-                               "' to a parameter binding.", 0);
+    for (final OptionPage page : mPages) {
+      page.loadProperties(properties);
     }
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final ExpressionParser parser = new ExpressionParser(factory, optable);
-    final SimpleExpressionProxy expr = parser.parse(parts[1]);
-    final ParameterBindingProxy binding =
-      factory.createParameterBindingProxy(parts[0], expr);
-    getValue().add(binding);
   }
 
   @Override
-  public void restoreDefaultValue()
+  public void saveProperties(final Writer writer, final boolean saveAll)
+    throws IOException
   {
-    getValue().clear();
+    for (final OptionPage page : mPages) {
+      page.saveProperties(writer, saveAll);
+    }
   }
 
-  @Override
-  public boolean isPersistent()
-  {
-    return false;
-  }
+
+  //#########################################################################
+  //# Data Members
+  private final String mTitle;
+  private final List<OptionPage> mPages;
 
 }

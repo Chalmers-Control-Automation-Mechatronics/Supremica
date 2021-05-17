@@ -31,7 +31,9 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.model.options;
+
+import java.awt.Color;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
@@ -43,52 +45,52 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * @author Brandon Bassett
  */
 
-public class BooleanOption extends Option<Boolean>
+public class ColorOption extends Option<Color>
 {
   //#########################################################################
   //# Constructors
-  public BooleanOption(final String id,
+  public ColorOption(final String id,
                        final String shortName,
                        final String description,
                        final String commandLineOption,
-                       final boolean defaultValue)
+                       final Color defaultValue)
   {
    super(id, shortName, description, commandLineOption, defaultValue);
-  }
-
-  public BooleanOption(final String id,
-                       final String shortName,
-                       final String description,
-                       final String commandLineOption,
-                       final boolean defaultValue,
-                       final boolean editable)
-  {
-   super(id, shortName, description, commandLineOption, defaultValue);
-   setEditable(editable);
   }
 
 
   //#########################################################################
   //# Type-specific Access
-  public boolean getBooleanValue()
-  {
-    return getValue().booleanValue();
-  }
-
   @Override
   public void set(final String text)
   {
-    final boolean boolval = Boolean.parseBoolean(text);
-    setValue(boolval);
+    final Color color = Color.decode(text);
+    setValue(color);
+  }
+
+  @Override
+  public String getAsString()
+  {
+    final int rgb = getValue().getRGB() & 0xffffff;
+    final String hex = Integer.toHexString(rgb | 0x1000000);
+    return "#" + hex.substring(1);
+  }
+
+  @Override
+  public String getDefaultAsString()
+  {
+    final int rgb = getDefaultValue().getRGB() & 0xffffff;
+    final String hex = Integer.toHexString(rgb | 0x1000000);
+    return "#" + hex.substring(1);
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  //# Overrides for net.sourceforge.waters.model.options.Option
   @Override
-  public OptionEditor<Boolean> createEditor(final OptionContext context)
+  public OptionEditor<Color> createEditor(final OptionContext context)
   {
-    return context.createBooleanEditor(this);
+    return context.createColorEditor(this);
   }
 
 }

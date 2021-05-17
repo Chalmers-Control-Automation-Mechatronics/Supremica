@@ -31,80 +31,24 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
-
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.EventProxy;
+package net.sourceforge.waters.model.options;
 
 
 /**
- * A configurable parameter to pass a proposition event ({@link EventProxy})
- * to a {@link ModelAnalyzer}.
+ * An object that can assign an option's value through user interaction.
+ * This interface is mainly a marker interface. The specifics how options
+ * are edited are determined by the classes implementing this interface.
  *
- * @author Brandon Bassett
+ * @see  net.sourceforge.waters.gui.options.OptionPanel OptionPanel
+ * @author Robi Malik
  */
 
-public class PropositionOption extends Option<EventProxy>
+public interface OptionEditor<T>
 {
-  //#########################################################################
-  //# Constructors
-  public PropositionOption(final String id,
-                           final String shortName,
-                           final String description,
-                           final String commandLineOption,
-                           final DefaultKind kind)
-  {
-    super(id, shortName, description, commandLineOption, null);
-    mDefaultKind = kind;
-  }
 
-
-  //#########################################################################
-  //# Simple Access
-  public DefaultKind getDefaultKind()
-  {
-    return mDefaultKind;
-  }
-
-  public int getIntegerValue(final EventEncoding enc)
-  {
-    return enc.getEventCode(getValue());
-  }
-
-  @Override
-  public void set(final String text)
-  {
-    //Do nothing
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.options.Option
-  @Override
-  public OptionEditor<EventProxy> createEditor(final OptionContext context)
-  {
-    return context.createPropositionEditor(this);
-  }
-
-  @Override
-  public boolean isPersistent()
-  {
-    return false;
-  }
-
-
-  //#########################################################################
-  //# Inner Enumeration DefaultKind
-  public enum DefaultKind {
-    PREVENT_NULL,
-    ALLOW_NULL,
-    DEFAULT_NULL
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final DefaultKind mDefaultKind;
+  /**
+   * Gets the option controlled by this option editor.
+   */
+  public Option<T> getOption();
 
 }

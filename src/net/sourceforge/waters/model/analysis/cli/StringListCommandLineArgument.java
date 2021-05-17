@@ -36,8 +36,8 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.model.options.Configurable;
+import net.sourceforge.waters.model.options.Option;
 
 public class StringListCommandLineArgument
   extends OptionCommandLineArgument<List<String>>

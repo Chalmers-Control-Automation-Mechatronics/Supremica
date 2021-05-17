@@ -31,45 +31,13 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
-
-import java.util.List;
+package net.sourceforge.waters.model.options;
 
 
 /**
- * <P>An interface for algorithms and other objects that can be configured
- * through the options interface of Waters.</P>
- *
- * <P>After obtaining a configurable object, the code can call its
- * {@link #getOptions(LeafOptionPage) getOptions()} method to obtain the
- * list of all supported options. Then after editing their values,
- * e.g., through their respective option editors ({@link OptionEditor}),
- * the values are sent to the configurable using {@link #setOption(Option)
- * setOption()}, before starting the algorithm.</P>
- *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
 
-public interface Configurable
-{
-
-  /**
-   * Returns the options supported by this configurable.
-   * @param  db   Option database containing parameters.
-   * @return List of options from the given database that are supported
-   *         by the configurable. The list should be ordered to support
-   *         reasonable presentation to the user.
-   */
-  public List<Option<?>> getOptions(LeafOptionPage db);
-
-  /**
-   * Configures the configurable using the given option. This method
-   * retrieves the current value from the option and assigns it to
-   * the configurable.
-   * @param  option  The option to be used, which should be an element
-   *                 of the list returned by a previous call to
-   *                 {@link #getOptions(LeafOptionPage) getOptions()}.
-   */
-  public void setOption(Option<?> option);
+public interface OptionPageEditor<T extends OptionPage> {
 
 }

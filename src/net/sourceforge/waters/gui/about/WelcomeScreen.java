@@ -52,8 +52,8 @@ import javax.swing.JPanel;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 
-import net.sourceforge.waters.analysis.options.OptionChangeEvent;
-import net.sourceforge.waters.analysis.options.OptionChangeListener;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
