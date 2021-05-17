@@ -67,7 +67,6 @@ public class ParameterBindingListOption
   {
     super(id, shortName, description, commandLineOption,
           Collections.emptyList(), new LinkedList<>());
-    setEditable(false);
   }
 
 

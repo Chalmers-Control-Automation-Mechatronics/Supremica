@@ -50,6 +50,7 @@ import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -64,10 +65,12 @@ public abstract class WatersAnalyzeDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
-  public WatersAnalyzeDialog(final IDE owner,
-                             final ProductDESProxy des)
+  protected WatersAnalyzeDialog(final IDE owner,
+                                final ProductDESProxy des,
+                                final AnalysisOperation operation)
   {
     super(owner);
+    mOperation = operation;
     final String title = getAnalysisName();
     setTitle(title);
     mRunner = new AnalyzerThread();
@@ -108,6 +111,11 @@ public abstract class WatersAnalyzeDialog extends JDialog
     return (IDE) getOwner();
   }
 
+  protected AnalysisOperation getOperation()
+  {
+    return mOperation;
+  }
+
   protected ModelAnalyzer getModelAnalyzer()
   {
     return mAnalyzer;
@@ -116,7 +124,10 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   //#########################################################################
   //# Abstract Methods
-  protected abstract String getAnalysisName();
+  protected String getAnalysisName()
+  {
+    return mOperation.getAnalysisName();
+  }
 
   protected abstract String getFailureText();
 
@@ -265,11 +276,13 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   //#########################################################################
   //# Data Members
+  private final AnalysisOperation mOperation;
   private final AnalyzerThread mRunner;
-  private ModelAnalyzer mAnalyzer;
   private final JPanel mBottomPanel;
   private final JButton mExitButton;
   private final JLabel mInformationLabel;
+
+  private ModelAnalyzer mAnalyzer;
 
 
   //#########################################################################

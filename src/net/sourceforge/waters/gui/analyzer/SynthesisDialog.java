@@ -38,6 +38,7 @@ import java.util.Collection;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
@@ -96,7 +97,7 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
     public SynthesisPopUpDialog(final IDE owner,
                                 final ProductDESProxy des)
     {
-      super(owner, des);
+      super(owner, des, AnalysisOperation.SYNTHESIS);
     }
 
     //#######################################################################

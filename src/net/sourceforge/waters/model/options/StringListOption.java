@@ -58,7 +58,6 @@ public class StringListOption extends Option<List<String>>
   {
     super(id, shortName, description, commandLineOption,
           Collections.emptyList(), new LinkedList<>());
-    setEditable(false);
   }
 
 

@@ -38,6 +38,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
@@ -59,10 +60,11 @@ public abstract class WatersVerificationDialog extends WatersAnalyzeDialog
 
   //#########################################################################
   //# Constructor
-  public WatersVerificationDialog(final IDE owner,
-                            final ProductDESProxy des)
+  protected WatersVerificationDialog(final IDE owner,
+                                     final ProductDESProxy des,
+                                     final AnalysisOperation operation)
   {
-    super(owner, des);
+    super(owner, des, operation);
   }
 
 
@@ -76,9 +78,21 @@ public abstract class WatersVerificationDialog extends WatersAnalyzeDialog
 
   //#########################################################################
   //# Abstract Methods
-  protected abstract String getFailureDescription();
+  @Override
+  protected String getAnalysisName()
+  {
+    return getOperation().getAnalysisName() + " Check";
+  }
 
-  protected abstract String getSuccessDescription();
+  protected String getFailureDescription()
+  {
+    return getOperation().getFailureDescription();
+  }
+
+  protected String getSuccessDescription()
+  {
+    return getOperation().getSuccessDescription();
+  }
 
 
   //#########################################################################

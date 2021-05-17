@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.analyzer;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
@@ -88,23 +89,11 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
     public StateCounterPopUpDialog(final IDE owner,
                                    final ProductDESProxy des)
     {
-      super(owner, des);
+      super(owner, des, AnalysisOperation.STATE_COUNT);
     }
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
-    @Override
-    public void succeed()
-    {
-      super.succeed();
-    }
-
-    @Override
-    protected String getAnalysisName()
-    {
-      return TITLE;
-    }
-
     @Override
     protected String getFailureText()
     {

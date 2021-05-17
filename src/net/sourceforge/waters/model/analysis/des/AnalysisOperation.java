@@ -70,8 +70,7 @@ public enum AnalysisOperation
     }
   },
 
-  CONTROL_LOOP_CHECK("ControlLoopChecker",
-                     "waters.analysis.loop", "Control Loop",
+  CONTROL_LOOP_CHECK("waters.analysis.loop", "Control Loop",
                      "has a control loop", "is control-loop free")
   {
     @Override
@@ -107,8 +106,7 @@ public enum AnalysisOperation
     }
   },
 
-  LANGUAGE_INCLUSION_CHECK("LanguageInclusionChecker",
-                           "waters.analysis.languageinclusion",
+  LANGUAGE_INCLUSION_CHECK("waters.analysis.languageinclusion",
                            "Language Inclusion",
                            "does not satisfy language inclusion",
                            "satisfies language inclusion")
@@ -122,8 +120,7 @@ public enum AnalysisOperation
     }
   },
 
-  STATE_COUNT("StateCounter", "waters.analysis.statecount", "State Count",
-                null, null)
+  STATE_COUNT("waters.analysis.statecount", "State Count")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -134,9 +131,7 @@ public enum AnalysisOperation
     }
   },
 
-  SYNCHRONOUS_PRODUCT("SynchronousProductBuilder",
-                      "waters.analysis.syncprod", "Synchronization",
-                      null, null)
+  SYNCHRONOUS_PRODUCT("waters.analysis.syncprod", "Synchronization")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -147,9 +142,7 @@ public enum AnalysisOperation
     }
   },
 
-  SYNTHESIS("SupervisorSynthesizer",
-                         "waters.analysis.synthesis", "Synthesis",
-                         null, null)
+  SYNTHESIS("waters.analysis.synthesis", "Synthesis")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -164,21 +157,16 @@ public enum AnalysisOperation
   //#########################################################################
   //# Constructor
   private AnalysisOperation(final String optionPagePrefix,
-                            final String analysisName,
-                            final String failureDescription,
-                            final String successDescription)
+                            final String analysisName)
   {
-    this(analysisName + "Checker", optionPagePrefix, analysisName,
-         failureDescription, successDescription);
+    this(optionPagePrefix, analysisName, null, null);
   }
 
-  private AnalysisOperation(final String key,
-                            final String optionPagePrefix,
+  private AnalysisOperation(final String optionPagePrefix,
                             final String analysisName,
                             final String failureDescription,
                             final String successDescription)
   {
-    mKey = key;
     mOptionPagePrefix = optionPagePrefix;
     mAnalysisName = analysisName;
     mFailureDescription = failureDescription;
@@ -188,11 +176,6 @@ public enum AnalysisOperation
 
   //#########################################################################
   //# Simple Access
-  public String getKey()
-  {
-    return mKey;
-  }
-
   public String getOptionPagePrefix()
   {
     return mOptionPagePrefix;
@@ -229,13 +212,12 @@ public enum AnalysisOperation
   @Override
   public String toString()
   {
-    return mKey;
+    return mOptionPagePrefix;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final String mKey;
   private final String mOptionPagePrefix;
   private final String mAnalysisName;
   private final String mFailureDescription;

@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.analyzer;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
@@ -85,27 +86,11 @@ public class ConflictCheckDialog extends ParametrisedAnalysisDialog
     public ConflictCheckPopUpDialog(final IDE owner,
                                     final ProductDESProxy des)
     {
-      super(owner, des);
+      super(owner, des, AnalysisOperation.CONFLICT_CHECK);
     }
 
-    @Override
-    protected String getAnalysisName()
-    {
-      return TITLE;
-    }
-
-    @Override
-    protected String getFailureDescription()
-    {
-      return "is blocking";
-    }
-
-    @Override
-    protected String getSuccessDescription()
-    {
-      return "is nonblocking";
-    }
-
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
     protected ModelAnalyzer createAndConfigureModelAnalyzer()
     {

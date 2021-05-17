@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.analyzer;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
@@ -99,31 +100,20 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
     public SynchronousProductPopUpDialog(final IDE owner,
                                          final ProductDESProxy des)
     {
-      super(owner, des);
+      super(owner, des, AnalysisOperation.SYNCHRONOUS_PRODUCT);
     }
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
-    public void succeed()
-    {
-      super.succeed();
-    }
-
-    @Override
-    protected String getAnalysisName()
-    {
-      return TITLE;
-    }
-
-    @Override
     protected String getFailureText()
     {
       //Failure occurs when result is null, check if running for statistics
-      if(!getAnalyzer().isDetailedOutputEnabled())
+      if (!getAnalyzer().isDetailedOutputEnabled()) {
         return getSuccessText();
-
-      return "Synchronous Product has failed.";
+      } else {
+        return "Synchronous Product has failed.";
+      }
     }
 
     @Override

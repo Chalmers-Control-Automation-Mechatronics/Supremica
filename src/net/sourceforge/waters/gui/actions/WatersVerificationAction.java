@@ -37,10 +37,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -54,6 +50,10 @@ import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -112,7 +112,7 @@ public abstract class WatersVerificationAction
     final IDE ide = getIDE();
     @SuppressWarnings("unused")
     final VerificationDialog dialog =
-      new VerificationDialog(ide, compiledDES, createAndConfigureModelVerifier());
+      new VerificationDialog(ide, compiledDES, mOperation);
   }
 
   @Override
@@ -251,33 +251,13 @@ public abstract class WatersVerificationAction
     //# Constructor
     public VerificationDialog(final IDE owner,
                               final ProductDESProxy des,
-                              final ModelAnalyzer Verifier)
+                              final AnalysisOperation operation)
     {
-      super(owner, des);
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.gui.dialog.WatersVerifyDialog
-    @Override
-    protected String getFailureDescription()
-    {
-      return WatersVerificationAction.this.getFailureDescription();
-    }
-
-    @Override
-    protected String getSuccessDescription()
-    {
-      return WatersVerificationAction.this.getSuccessDescription();
+      super(owner, des, operation);
     }
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
-    @Override
-    protected String getAnalysisName()
-    {
-      return WatersVerificationAction.this.getCheckName() + " check";
-    }
-
     @Override
     protected ModelAnalyzer createAndConfigureModelAnalyzer()
     {
@@ -289,7 +269,11 @@ public abstract class WatersVerificationAction
     private static final long serialVersionUID = -3327360941008729348L;
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final AnalysisOperation mOperation;
+
 
   //#########################################################################
   //# Class Constants
