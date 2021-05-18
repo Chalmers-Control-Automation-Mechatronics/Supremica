@@ -90,13 +90,12 @@ class ColorOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final ColorChooser colorChooser = getEntryComponent();
     final Color value = colorChooser.getColor();
     final ColorOption option = getOption();
     option.setValue(value);
-    return true;
   }
 
 

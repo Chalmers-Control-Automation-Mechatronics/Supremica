@@ -82,14 +82,13 @@ class EnumOptionPanel<T>
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final JComboBox<T> comboBox = getEntryComponent();
     final int index = comboBox.getSelectedIndex();
     final T value = comboBox.getItemAt(index);
     final EnumOption<T> option = getOption();
     option.setValue(value);
-    return true;
   }
 
 }

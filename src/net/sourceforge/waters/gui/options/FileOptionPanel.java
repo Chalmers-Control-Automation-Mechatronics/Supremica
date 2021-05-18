@@ -44,8 +44,8 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.gui.dialog.FileInputCell;
+import net.sourceforge.waters.model.options.FileOption;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
@@ -81,15 +81,12 @@ class FileOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     if (mCell.shouldYieldFocus()) {
       final FileOption option = getOption();
       final File file = mCell.getValue();
       option.setValue(file);
-      return true;
-    } else {
-      return false;
     }
   }
 

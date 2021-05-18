@@ -46,7 +46,7 @@ public enum AnalysisOperation
 {
   //#########################################################################
   //# Enumeration
-  CONFLICT_CHECK("waters.analysis.conflict", "Conflict",
+  CONFLICT_CHECK("ConflictChecker", "waters.analysis.conflict", "Conflict",
                  "is blocking", "is nonblocking")
   {
     @Override
@@ -58,7 +58,8 @@ public enum AnalysisOperation
     }
   },
 
-  CONTROLLABILITY_CHECK("waters.analysis.controllability", "Controllability",
+  CONTROLLABILITY_CHECK("ControllabilityChecker",
+                        "waters.analysis.controllability", "Controllability",
                         "is not controllable", "is controllable")
   {
     @Override
@@ -70,7 +71,7 @@ public enum AnalysisOperation
     }
   },
 
-  CONTROL_LOOP_CHECK("waters.analysis.loop", "Control Loop",
+  CONTROL_LOOP_CHECK("ControlLoopChecker", "waters.analysis.loop", "Control Loop",
                      "has a control loop", "is control-loop free")
   {
     @Override
@@ -82,7 +83,7 @@ public enum AnalysisOperation
     }
   },
 
-  DEADLOCK_CHECK("waters.analysis.deadlock", "Deadlock",
+  DEADLOCK_CHECK("DeadlockChecker", "waters.analysis.deadlock", "Deadlock",
                  "has a deadlock", "is deadlock free")
   {
     @Override
@@ -94,7 +95,8 @@ public enum AnalysisOperation
     }
   },
 
-  DIAGNOSABILITY_CHECK("waters.analysis.diagnosability", "Diagnosability",
+  DIAGNOSABILITY_CHECK("DiagnosabilityChecker",
+                       "waters.analysis.diagnosability", "Diagnosability",
                        "is not diagnosable", "is diagnosable")
   {
     @Override
@@ -106,7 +108,8 @@ public enum AnalysisOperation
     }
   },
 
-  LANGUAGE_INCLUSION_CHECK("waters.analysis.languageinclusion",
+  LANGUAGE_INCLUSION_CHECK("LanguageInclusionChecker",
+                           "waters.analysis.languageinclusion",
                            "Language Inclusion",
                            "does not satisfy language inclusion",
                            "satisfies language inclusion")
@@ -120,7 +123,7 @@ public enum AnalysisOperation
     }
   },
 
-  STATE_COUNT("waters.analysis.statecount", "State Count")
+  STATE_COUNT("StateCounter", "waters.analysis.statecount", "State Count")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -131,7 +134,8 @@ public enum AnalysisOperation
     }
   },
 
-  SYNCHRONOUS_PRODUCT("waters.analysis.syncprod", "Synchronization")
+  SYNCHRONOUS_PRODUCT("SynchrounousProductBuilder",
+                      "waters.analysis.syncprod", "Synchronization")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -142,7 +146,7 @@ public enum AnalysisOperation
     }
   },
 
-  SYNTHESIS("waters.analysis.synthesis", "Synthesis")
+  SYNTHESIS("SupervsorSynthesizer", "waters.analysis.synthesis", "Synthesis")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -156,17 +160,20 @@ public enum AnalysisOperation
 
   //#########################################################################
   //# Constructor
-  private AnalysisOperation(final String optionPagePrefix,
+  private AnalysisOperation(final String key,
+                            final String optionPagePrefix,
                             final String analysisName)
   {
-    this(optionPagePrefix, analysisName, null, null);
+    this(key, optionPagePrefix, analysisName, null, null);
   }
 
-  private AnalysisOperation(final String optionPagePrefix,
+  private AnalysisOperation(final String key,
+                            final String optionPagePrefix,
                             final String analysisName,
                             final String failureDescription,
                             final String successDescription)
   {
+    mKey = key;
     mOptionPagePrefix = optionPagePrefix;
     mAnalysisName = analysisName;
     mFailureDescription = failureDescription;
@@ -212,12 +219,13 @@ public enum AnalysisOperation
   @Override
   public String toString()
   {
-    return mOptionPagePrefix;
+    return mKey;
   }
 
 
   //#########################################################################
   //# Data Members
+  private String mKey;
   private final String mOptionPagePrefix;
   private final String mAnalysisName;
   private final String mFailureDescription;

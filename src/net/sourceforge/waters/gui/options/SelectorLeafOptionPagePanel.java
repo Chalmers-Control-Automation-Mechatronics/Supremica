@@ -148,7 +148,8 @@ public class SelectorLeafOptionPagePanel<S>
     final List<Option<?>> options = mPage.getOptions(key);
     panel.replaceOptions(options);
     constraints.weighty = 1.0;
-    add(panel, constraints);
+    final JComponent scroll = panel.asScrollableComponent();
+    add(scroll, constraints);
   }
 
   /**
@@ -295,7 +296,7 @@ public class SelectorLeafOptionPagePanel<S>
   }
 
   @Override
-  public boolean selectOption(final OptionPanel<?> option)
+  public boolean scrollToVisible(final OptionPanel<?> option)
   {
     final EnumOption<?> top = mPage.getTopSelectorOption();
     return selectOption(option, top);
@@ -372,7 +373,7 @@ public class SelectorLeafOptionPagePanel<S>
       mPage.getSubSelectorOption(selectorOption, key);
     if (subSelectorOption == null) {
       final SimpleLeafOptionPagePanel panel = mPanelMap.get(key);
-      if (panel.selectOption(option)) {
+      if (panel.scrollToVisible(option)) {
         return true;
       }
     } else {

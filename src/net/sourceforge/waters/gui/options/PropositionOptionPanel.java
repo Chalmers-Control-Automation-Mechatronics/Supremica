@@ -42,12 +42,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.options.PropositionOption;
 
 
 class PropositionOptionPanel
@@ -72,7 +72,7 @@ class PropositionOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final PropositionOption option = getOption();
     final JComboBox<EventProxy> comboBox = getEntryComponent();
@@ -83,7 +83,6 @@ class PropositionOptionPanel
     } else {
       option.setValue(value);
     }
-    return true;
   }
 
 

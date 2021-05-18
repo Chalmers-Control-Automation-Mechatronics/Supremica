@@ -183,7 +183,7 @@ public abstract class ParametrisedOptionsDialog extends JDialog
       lastMatched.getLabel()
       .setBorder(BorderFactory.createLineBorder(getBackground()));
     }
-    mTopTabbedPane.selectOption(result);
+    mTopTabbedPane.scrollToVisible(result);
     result.getLabel().setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
   }

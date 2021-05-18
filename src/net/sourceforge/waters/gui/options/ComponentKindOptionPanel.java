@@ -41,12 +41,12 @@ import java.awt.Insets;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.model.options.ComponentKindOption;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.ComponentKindOption;
 import net.sourceforge.waters.model.options.OptionContext;
 
 
@@ -114,7 +114,7 @@ class ComponentKindOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final JPanel panel = getEntryComponent();
     for (final Component child : panel.getComponents()) {
@@ -130,7 +130,6 @@ class ComponentKindOptionPanel
         }
       }
     }
-    return true;
   }
 
 

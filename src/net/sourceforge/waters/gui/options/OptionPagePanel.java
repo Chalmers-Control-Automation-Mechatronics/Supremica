@@ -75,11 +75,13 @@ interface OptionPagePanel<P extends OptionPage>
   public void search(SearchQuery query);
 
   /**
-   * Selects the given option.
-   * @param  panel   Option panel representing the option to be selected/
-   * @return <CODE>true</CODE> if the option was found and selected
-   *         within this option page panel, <CODE>false</CODE> otherwise.
+   * Ensures that the given option is displayed by calling {@link
+   * JComponent#scrollRectToVisible(java.awt.Rectangle) scrollRectToVisible()}
+   * on the parent component.
+   * @param  panel   Option panel representing the option to be displayed.
+   * @return <CODE>true</CODE> if the option was found and displayed,
+   *         <CODE>false</CODE> otherwise.
    */
-  public boolean selectOption(OptionPanel<?> panel);
+  public boolean scrollToVisible(OptionPanel<?> panel);
 
 }

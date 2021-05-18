@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.gui.options;
 
-import net.sourceforge.waters.model.options.DoubleOption;
 import net.sourceforge.waters.gui.dialog.DoubleInputCell;
+import net.sourceforge.waters.model.options.DoubleOption;
 
 
 class DoubleOptionPanel
@@ -66,16 +66,13 @@ class DoubleOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final DoubleInputCell cell = getEntryComponent();
     if (cell.shouldYieldFocus()) {
       final DoubleOption option = getOption();
       final double value = cell.getValue();
       option.setValue(value);
-      return true;
-    } else {
-      return false;
     }
   }
 

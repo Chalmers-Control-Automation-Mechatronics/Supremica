@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
+import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -86,7 +87,43 @@ public abstract class OptionPanel<T> implements OptionEditor<T>
     return mEntryComponent;
   }
 
-  abstract boolean commitValue();
+  abstract void commitValue();
+
+  /**
+   * Checks whether this option panel matches the given search query and
+   * updates the query accordingly.
+   */
+  void search(final SearchQuery query)
+  {
+    if (query.matches(getLabel().getText())) {
+      query.addResult(this);
+    }
+  }
+
+  /**
+   * Tries to display the given option by calling {@link
+   * JComponent#scrollRectToVisible(java.awt.Rectangle) scrollRectToVisible()}
+   * on the parent component.
+   * @param  panel   Option panel representing the option to be displayed.
+   * @return <CODE>true</CODE> if the given option is equal to this option
+   *         (or contained within its children) and was displayed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  boolean scrollToVisible(final OptionPanel<?> panel)
+  {
+    if (this == panel) {
+      final JLabel label = getLabel();
+      final Rectangle bounds = label.getBounds();
+      bounds.x -= 2;
+      bounds.y-= 2;
+      bounds.width += 4;
+      bounds.height += 4;
+      label.scrollRectToVisible(bounds);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 
   //#########################################################################

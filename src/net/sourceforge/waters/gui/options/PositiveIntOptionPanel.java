@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.gui.options;
 
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.gui.dialog.IntegerInputCell;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 
 class PositiveIntOptionPanel
@@ -67,16 +67,13 @@ class PositiveIntOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final IntegerInputCell cell = getEntryComponent();
     if (cell.shouldYieldFocus()) {
       final PositiveIntOption option = getOption();
       final int value = cell.getValue();
       option.setValue(value);
-      return true;
-    } else {
-      return false;
     }
   }
 

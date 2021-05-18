@@ -36,7 +36,6 @@ package net.sourceforge.waters.gui.options;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -136,27 +135,20 @@ class SimpleLeafOptionPagePanel
   @Override
   public void search(final SearchQuery query)
   {
-    for (final OptionPanel<?> panel : mOptionPanels) {
-      if (query.matches(panel.getLabel().getText())) {
-        query.addResult(panel);
-      }
+    for (final OptionPanel<?> subPanel : mOptionPanels) {
+      subPanel.search(query);
     }
   }
 
   @Override
-  public boolean selectOption(final OptionPanel<?> panel)
+  public boolean scrollToVisible(final OptionPanel<?> option)
   {
-    if (mOptionPanels.contains(panel)) {
-      final Rectangle bounds = panel.getLabel().getBounds();
-      bounds.x -= 2;
-      bounds.y-= 2;
-      bounds.width += 4;
-      bounds.height += 4;
-      scrollRectToVisible(bounds);
-      return true;
-    } else {
-      return false;
+    for (final OptionPanel<?> subPanel : mOptionPanels) {
+      if (subPanel.scrollToVisible(option)) {
+        return true;
+      }
     }
+    return false;
   }
 
 

@@ -68,13 +68,12 @@ class StringOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final StringOption option = getOption();
     final JTextField textField = getEntryComponent();
     final String value = textField.getText();
     option.setValue(value);
-    return true;
   }
 
 

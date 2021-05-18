@@ -108,11 +108,11 @@ public class AggregatorOptionPagePanel
   }
 
   @Override
-  public boolean selectOption(final OptionPanel<?> option)
+  public boolean scrollToVisible(final OptionPanel<?> option)
   {
     int t = 0;
     for (final OptionPagePanel<?> subPanel : mSubPanels) {
-      if (subPanel.selectOption(option)) {
+      if (subPanel.scrollToVisible(option)) {
         setSelectedIndex(t);
         return true;
       }

@@ -50,12 +50,12 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.model.options.EventSetOption;
-import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.gui.analyzer.EventSetPanel;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 
 import org.supremica.gui.ide.IDE;
 
@@ -90,11 +90,10 @@ class EventSetOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final EventSetOption option = getOption();
     option.setValue(mCurrentValue);
-    return true;
   }
 
 

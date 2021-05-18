@@ -79,13 +79,12 @@ class BooleanOptionPanel
   }
 
   @Override
-  public boolean commitValue()
+  public void commitValue()
   {
     final JCheckBox checkBox = getEntryComponent();
     final boolean value = checkBox.isSelected();
     final BooleanOption option = getOption();
     option.setValue(value);
-    return true;
   }
 
 }

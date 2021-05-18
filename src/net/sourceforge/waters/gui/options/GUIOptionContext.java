@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 import java.util.List;
@@ -46,7 +45,6 @@ import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -158,22 +156,20 @@ public class GUIOptionContext implements OptionContext
   }
 
   @Override
-  public OptionEditor<Boolean>
-  createBooleanEditor(final BooleanOption option)
+  public BooleanOptionPanel createBooleanEditor(final BooleanOption option)
   {
     return new BooleanOptionPanel(this, option);
   }
 
   @Override
-  public OptionEditor<ModelAnalyzerFactoryLoader>
+  public ChainedAnalyzerOptionPanel
   createChainedAnalyzerEditor(final ChainedAnalyzerOption option)
   {
-    return createEnumEditor(option);
+    return new ChainedAnalyzerOptionPanel(this, option);
   }
 
   @Override
-  public OptionEditor<Color>
-  createColorEditor(final ColorOption option)
+  public ColorOptionPanel createColorEditor(final ColorOption option)
   {
     return new ColorOptionPanel(this, option);
   }
