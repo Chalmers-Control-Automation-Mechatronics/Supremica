@@ -39,6 +39,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,37 +57,37 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 
 /**
  * <P>A panel to edit an option page with selectors.</P>
  *
- * <P>The option group panel displays one or more combo boxes to select
- * option sets and, for the selected option set, its description
+ * <P>The selector leaf option page panel displays one or more combo boxes
+ * to select option sets and, for the selected option set, its description
  * (if available) followed by the scrollable list of option panels.</P>
  *
- * <P>The option group panel initialises all needed combo boxes and
- * sub-panels when it is first created, and afterwards switches between
+ * <P>The selector leaf option page panel initialises all needed combo boxes
+ * and sub-panels when it is first created, and afterwards switches between
  * the components as needed. This is done to facilitate operations like
  * search that depend on all option panels being available.</P>
  *
  * @author Benjamin Wheeler
  */
 
-public class OptionGroupPanel<S>
+public class SelectorLeafOptionPagePanel<S>
   extends JPanel
-  implements OptionContainer<SelectorLeafOptionPage<S>>
+  implements OptionPagePanel<SelectorLeafOptionPage<S>>
 {
 
   //#########################################################################
   //# Constructors
-  public OptionGroupPanel(final GUIOptionContext context,
-                          final SelectorLeafOptionPage<S> page)
+  SelectorLeafOptionPagePanel(final GUIOptionContext context,
+                              final SelectorLeafOptionPage<S> page)
   {
     mContext = context;
     mPage = page;
@@ -105,6 +106,7 @@ public class OptionGroupPanel<S>
   private void initializeMaps(final EnumOption<?> selectorOption,
                               final Map<String,OptionPanel<?>> sharedPanels)
   {
+    final List<Option<?>> empty = Collections.emptyList();
     final ComboBoxHandler<?> handler = new ComboBoxHandler<>(selectorOption);
     mComboBoxMap.put(selectorOption, handler);
     for (final Object key : selectorOption.getEnumConstants()) {
@@ -115,12 +117,9 @@ public class OptionGroupPanel<S>
         initializeMaps(subSelectorOption, sharedPanels);
       } else {
         // has options
-        @SuppressWarnings("unchecked")
-        final S typedKey = (S) key;
-        final List<Option<?>> options = mPage.getOptions(typedKey);
-        final OptionListPanel panel =
-          new OptionListPanel(mContext, mPage, sharedPanels, options);
-        mPanelMap.put(typedKey, panel);
+        final SimpleLeafOptionPagePanel panel =
+          new SimpleLeafOptionPagePanel(mContext, sharedPanels, empty);
+        mPanelMap.put(key, panel);
       }
     }
   }
@@ -145,9 +144,9 @@ public class OptionGroupPanel<S>
     if (descriptionPanel != null) {
       add(descriptionPanel, constraints);
     }
-    final OptionListPanel panel = mPanelMap.get(key);
+    final SimpleLeafOptionPagePanel panel = mPanelMap.get(key);
     final List<Option<?>> options = mPage.getOptions(key);
-    panel.populateOptions(mContext, mPage, options);
+    panel.replaceOptions(options);
     constraints.weighty = 1.0;
     add(panel, constraints);
   }
@@ -262,8 +261,20 @@ public class OptionGroupPanel<S>
 
 
   //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.gui.options.OptionContainer<SelectorLeafOptionPage<S>>
+  //# Interface
+  //# net.sourceforge.waters.gui.options.OptionPagePanel<SelectorLeafOptionPage<S>>
+  @Override
+  public JComponent asComponent()
+  {
+    return this;
+  }
+
+  @Override
+  public JComponent asScrollableComponent()
+  {
+    return this;
+  }
+
   @Override
   public void commitOptions()
   {
@@ -271,7 +282,7 @@ public class OptionGroupPanel<S>
     for (final ComboBoxHandler<?> handler : mComboBoxMap.values()) {
       handler.commit();
     }
-    for (final OptionListPanel panel : mPanelMap.values()) {
+    for (final SimpleLeafOptionPagePanel panel : mPanelMap.values()) {
       panel.commitOptions();
     }
   }
@@ -327,7 +338,7 @@ public class OptionGroupPanel<S>
     final EnumOption<?> subSelectorOption =
       mPage.getSubSelectorOption(selectorOption, key);
     if (subSelectorOption == null) {
-      final OptionListPanel panel = mPanelMap.get(key);
+      final SimpleLeafOptionPagePanel panel = mPanelMap.get(key);
       panel.search(query);
     } else {
       search(query, subSelectorOption);
@@ -360,7 +371,7 @@ public class OptionGroupPanel<S>
     final EnumOption<?> subSelectorOption =
       mPage.getSubSelectorOption(selectorOption, key);
     if (subSelectorOption == null) {
-      final OptionListPanel panel = mPanelMap.get(key);
+      final SimpleLeafOptionPagePanel panel = mPanelMap.get(key);
       if (panel.selectOption(option)) {
         return true;
       }
@@ -467,7 +478,7 @@ public class OptionGroupPanel<S>
   private final GUIOptionContext mContext;
   private final SelectorLeafOptionPage<S> mPage;
   private final Map<EnumOption<?>,ComboBoxHandler<?>> mComboBoxMap;
-  private final Map<S,OptionListPanel> mPanelMap;
+  private final Map<Object,SimpleLeafOptionPagePanel> mPanelMap;
   private JTextPane mDescriptionTextPane;
 
 

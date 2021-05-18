@@ -44,7 +44,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -60,6 +59,7 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 import org.supremica.gui.ide.IDE;
 
@@ -91,9 +91,9 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mGroupPanel = (OptionGroupPanel<ModelAnalyzerFactoryLoader>)
-      getOptionPage().createEditor(mContext);
-    add(mGroupPanel, constraints);
+    final AnalysisOptionPage page = getOptionPage();
+    mPanel = mContext.createSelectorLeafOptionPageEditor(page);
+    add(mPanel, constraints);
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -168,7 +168,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     final IDE ide = mContext.getIDE();
     final FocusTracker tracker = ide.getFocusTracker();
     if (tracker.shouldYieldFocus(this)) {
-      mGroupPanel.commitOptions();
+      mPanel.commitOptions();
       updateModelAnalyzer();
       for (final Option<?> option : getOptionPage().getCurrentOptions()) {
         mCurrentModelAnalyzer.setOption(option);
@@ -186,7 +186,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
   {
     try {
       final ModelAnalyzerFactoryLoader loader =
-        mGroupPanel.getSelectedValue();
+        mPanel.getSelectedValue();
       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
       mCurrentModelAnalyzer = createAnalyzer(factory);
     } catch (ClassNotFoundException |
@@ -208,7 +208,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final OptionGroupPanel<ModelAnalyzerFactoryLoader> mGroupPanel;
+  private final SelectorLeafOptionPagePanel<ModelAnalyzerFactoryLoader> mPanel;
   private ModelAnalyzer mCurrentModelAnalyzer;
 
 

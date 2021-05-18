@@ -33,17 +33,53 @@
 
 package net.sourceforge.waters.gui.options;
 
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+
 import net.sourceforge.waters.model.options.OptionPage;
 import net.sourceforge.waters.model.options.OptionPageEditor;
 
+
 /**
+ * Interface for GUI-based implementations of {@link OptionPageEditor}.
  *
  * @author Benjamin Wheeler
  */
-public interface OptionContainer<T extends OptionPage>
-  extends OptionPageEditor<T>
+
+interface OptionPagePanel<P extends OptionPage>
+  extends OptionPageEditor<P>
 {
+
+  /**
+   * Casts and returns this option page panel as a {@link JComponent}.
+   */
+  public JComponent asComponent();
+
+  /**
+   * Depending on the type of option page panel, creates a {@link
+   * JScrollPane} containing this option page panel or simply casts this
+   * option page panel as a {@link JComponent}.
+   */
+  public JComponent asScrollableComponent();
+
+  /**
+   * Updates the state of options within this panel to match what has
+   * been entered in their entry components.
+   */
   public void commitOptions();
+
+  /**
+   * Searches the panel for options matching the given query and
+   * updates the query for any found matches.
+   */
   public void search(SearchQuery query);
+
+  /**
+   * Selects the given option.
+   * @param  panel   Option panel representing the option to be selected/
+   * @return <CODE>true</CODE> if the option was found and selected
+   *         within this option page panel, <CODE>false</CODE> otherwise.
+   */
   public boolean selectOption(OptionPanel<?> panel);
+
 }

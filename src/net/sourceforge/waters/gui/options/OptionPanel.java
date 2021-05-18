@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -92,14 +93,27 @@ public abstract class OptionPanel<T> implements OptionEditor<T>
   //# GUI
   JLabel createLabel()
   {
-    String text = mOption.getShortName();
+    final String text = mOption.getShortName();
     if (text == null) {
-      text = "";
+      return new JLabel();
+    } else {
+      return new JLabel(text);
     }
-    return new JLabel(text);
   }
 
   abstract Component createEntryComponent();
+
+  void addComponentsToPanel(final JPanel panel,
+                            final GridBagConstraints constraints)
+  {
+    constraints.gridwidth = 1;
+    final JLabel label = getLabel();
+    constraints.gridx = 0;
+    panel.add(label, constraints);
+    final Component entry = getEntryComponent();
+    constraints.gridx = 1;
+    panel.add(entry, constraints);
+  }
 
 
   //#########################################################################

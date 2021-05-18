@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -45,11 +44,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
 
@@ -57,63 +54,75 @@ import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
  *
  * @author Benjamin Wheeler
  */
-public class OptionListPanel extends JScrollPane implements OptionContainer<SimpleLeafOptionPage> {
+class SimpleLeafOptionPagePanel
+  extends JPanel
+  implements OptionPagePanel<SimpleLeafOptionPage>
+{
 
-  public OptionListPanel(final GUIOptionContext context,
-                         final SimpleLeafOptionPage page)
+  //#########################################################################
+  //# Constructors
+  SimpleLeafOptionPagePanel(final GUIOptionContext context,
+                            final SimpleLeafOptionPage page)
   {
-    this(context, page, null, page.getRegisteredOptions());
+    this(context, null, page.getRegisteredOptions());
   }
 
-  public OptionListPanel(final GUIOptionContext context,
-                         final LeafOptionPage map,
-                         final Map<String, OptionPanel<?>> optionPanels,
-                         final Collection<Option<?>> options)
+  SimpleLeafOptionPagePanel(final GUIOptionContext context,
+                            final Map<String, OptionPanel<?>> sharedPanels,
+                            final Collection<Option<?>> options)
   {
-    mSharedOptionPanels = optionPanels != null ? optionPanels
-      : new HashMap<>();
+    mContext = context;
+    mSharedOptionPanels =
+      sharedPanels != null ? sharedPanels : new HashMap<>();
     mOptionPanels = new LinkedList<>();
-    populateOptions(context, map, options);
+    setLayout(new GridBagLayout());
+    showOptions(options);
   }
 
-  public void populateOptions(final GUIOptionContext context,
-                              final LeafOptionPage map,
-                              final Collection<Option<?>> options)
-  {
-    final JPanel internalPane = new JPanel();
-    setViewportView(internalPane);
 
-    internalPane.setLayout(new GridBagLayout());
+  //#########################################################################
+  //# Set Up
+  void replaceOptions(final Collection<Option<?>> options)
+  {
+    removeAll();
+    mOptionPanels.clear();
+    showOptions(options);
+    revalidate();
+  }
+
+  private void showOptions(final Collection<Option<?>> options)
+  {
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridy = 0;
     constraints.anchor = GridBagConstraints.WEST;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.insets = new Insets(0, 2, 0, 2);
     constraints.weightx = constraints.weighty = 1.0;
-
-    mOptionPanels.clear();
-    final boolean persistentOnly = context.getWatersAnalyzerPanel() == null;
+    final boolean persistentOnly = mContext.getWatersAnalyzerPanel() == null;
     for (final Option<?> option : options) {
       if (option.isEditable() && (!persistentOnly || option.isPersistent())) {
-        OptionPanel<?> panel = mSharedOptionPanels.get(option.getID());
-        if (panel == null) {
-          panel = (OptionPanel<?>) option.createEditor(context);
-        }
-        if (panel == null) {
-          continue;
-        }
-        mSharedOptionPanels.put(option.getID(), panel);
+        final OptionPanel<?> panel = getPanel(option);
         mOptionPanels.add(panel);
-        final JLabel label = panel.getLabel();
-        constraints.gridx = 0;
-        internalPane.add(label, constraints);
-        final Component entry = panel.getEntryComponent();
-        constraints.gridx = 1;
-        internalPane.add(entry, constraints);
+        panel.addComponentsToPanel(this, constraints);
         constraints.gridy++;
       }
     }
-    revalidate();
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.gui.options.OptionPagePanel<SimpleLeafOptionPage>
+  @Override
+  public JComponent asComponent()
+  {
+    return this;
+  }
+
+  @Override
+  public JComponent asScrollableComponent()
+  {
+    return new JScrollPane(this);
   }
 
   @Override
@@ -143,15 +152,39 @@ public class OptionListPanel extends JScrollPane implements OptionContainer<Simp
       bounds.y-= 2;
       bounds.width += 4;
       bounds.height += 4;
-      ((JComponent)panel.getLabel().getParent()).scrollRectToVisible(bounds);
+      scrollRectToVisible(bounds);
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private OptionPanel<?> getPanel(final Option<?> option)
+  {
+    OptionPanel<?> panel = mSharedOptionPanels.get(option.getID());
+    if (panel == null) {
+      panel = (OptionPanel<?>) option.createEditor(mContext);
+      if (panel != null) {
+        mSharedOptionPanels.put(option.getID(), panel);
+      }
+    }
+    return panel;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final GUIOptionContext mContext;
   private final Map<String, OptionPanel<?>> mSharedOptionPanels;
   private final List<OptionPanel<?>> mOptionPanels;
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = 1843000430507667498L;
+
 
 }

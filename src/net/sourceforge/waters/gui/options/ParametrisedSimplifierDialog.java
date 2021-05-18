@@ -48,8 +48,6 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -61,6 +59,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.SimplifierOptionPage;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
@@ -71,9 +71,8 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * Abstract class that auto-generates a GUI that is based on the provided simplifier(s) getParameters method
- * where one is provided on creation or populateAlgorithmComboBox() uses a class specific
- * list of simplifiers
+ * Abstract class that auto-generates a dialog to configure and
+ * invoke a transition relation simplifier from the Waters Analyser.
  *
  * @author Benjamin Wheeler
  */
@@ -98,9 +97,8 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mGroupPanel = (OptionGroupPanel<AutomatonSimplifierCreator>)
-      mPage.createEditor(mContext);
-    add(mGroupPanel, constraints);
+    mPanel = mContext.createSelectorLeafOptionPageEditor(mPage);
+    add(mPanel, constraints);
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -177,9 +175,9 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
       final FocusTracker tracker = ide.getFocusTracker();
       if (tracker.shouldYieldFocus(this)) {
-        mGroupPanel.commitOptions();
+        mPanel.commitOptions();
         final AutomatonSimplifierCreator creator =
-          mGroupPanel.getSelectedValue();
+          mPanel.getSelectedValue();
         final AutomatonBuilder builder = creator.createBuilder(factory);
         builder.setModel(aut);
 
@@ -223,7 +221,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final OptionGroupPanel<AutomatonSimplifierCreator> mGroupPanel;
+  private final SelectorLeafOptionPagePanel<AutomatonSimplifierCreator> mPanel;
   private final SimplifierOptionPage mPage;
 
 

@@ -42,24 +42,6 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
-import net.sourceforge.waters.model.options.AggregatorOptionPage;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.model.options.ColorOption;
-import net.sourceforge.waters.model.options.ComponentKindOption;
-import net.sourceforge.waters.model.options.DoubleOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.EventSetOption;
-import net.sourceforge.waters.model.options.FileOption;
-import net.sourceforge.waters.model.options.OptionEditor;
-import net.sourceforge.waters.model.options.OptionPageEditor;
-import net.sourceforge.waters.model.options.ParameterBindingListOption;
-import net.sourceforge.waters.model.options.PositiveIntOption;
-import net.sourceforge.waters.model.options.PropositionOption;
-import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
-import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
-import net.sourceforge.waters.model.options.StringListOption;
-import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -76,7 +58,24 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.options.AggregatorOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.ColorOption;
+import net.sourceforge.waters.model.options.ComponentKindOption;
+import net.sourceforge.waters.model.options.DoubleOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.OptionContext;
+import net.sourceforge.waters.model.options.OptionEditor;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.PropositionOption;
+import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
+import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
+import net.sourceforge.waters.model.options.StringListOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -250,24 +249,24 @@ public class GUIOptionContext implements OptionContext
   }
 
   @Override
-  public OptionPageEditor<SimpleLeafOptionPage>
+  public SimpleLeafOptionPagePanel
   createSimpleLeafOptionPageEditor(final SimpleLeafOptionPage page)
   {
-    return new OptionListPanel(this, page);
+    return new SimpleLeafOptionPagePanel(this, page);
   }
 
   @Override
-  public <S> OptionPageEditor<SelectorLeafOptionPage<S>>
+  public <S> SelectorLeafOptionPagePanel<S>
   createSelectorLeafOptionPageEditor(final SelectorLeafOptionPage<S> page)
   {
-    return new OptionGroupPanel<S>(this, page);
+    return new SelectorLeafOptionPagePanel<S>(this, page);
   }
 
   @Override
-  public OptionTabbedPane
+  public AggregatorOptionPagePanel
   createAggregatorOptionPageEditor(final AggregatorOptionPage page)
   {
-    return new OptionTabbedPane(this, page);
+    return new AggregatorOptionPagePanel(this, page);
   }
 
 

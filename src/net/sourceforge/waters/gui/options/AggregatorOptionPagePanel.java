@@ -33,72 +33,102 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.Component;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 import net.sourceforge.waters.model.options.AggregatorOptionPage;
 import net.sourceforge.waters.model.options.OptionPage;
 
+
 /**
  *
  * @author Benjamin Wheeler
  */
-public class OptionTabbedPane extends JTabbedPane
-  implements OptionContainer<AggregatorOptionPage>
+
+public class AggregatorOptionPagePanel
+  extends JTabbedPane
+  implements OptionPagePanel<AggregatorOptionPage>
 {
 
-  public OptionTabbedPane(final GUIOptionContext context, final AggregatorOptionPage page)
+  //#########################################################################
+  //# Constructor
+  AggregatorOptionPagePanel(final GUIOptionContext context,
+                            final AggregatorOptionPage page)
   {
-    super();
-    optionChildren = new LinkedList<>();
-    for (final OptionPage tab : page.getPages()) {
-      final OptionContainer<? extends OptionPage> editor =
-        (OptionContainer<? extends OptionPage>) tab.createEditor(context);
-      addTab(tab.getTitle(), (Component) editor);
-      optionChildren.add(editor);
+    mSubPanels = new LinkedList<>();
+    for (final OptionPage subPage : page.getPages()) {
+      final OptionPagePanel<?> editor =
+        (OptionPagePanel<?>) subPage.createEditor(context);
+      final JComponent panel = editor.asScrollableComponent();
+      addTab(subPage.getTitle(), panel);
+      mSubPanels.add(editor);
     }
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.gui.options.OptionPagePanel<AggregatorOptionPage>
+  @Override
+  public JComponent asComponent()
+  {
+    return this;
+  }
+
+  @Override
+  public JComponent asScrollableComponent()
+  {
+    return this;
   }
 
   @Override
   public void commitOptions()
   {
-    for (final OptionContainer<?> c : optionChildren) {
-      c.commitOptions();
+    for (final OptionPagePanel<?> subPanel : mSubPanels) {
+      subPanel.commitOptions();
     }
   }
 
   @Override
   public void search(final SearchQuery query)
   {
-    final OptionContainer<?> selected = (OptionContainer<?>) getSelectedComponent();
-    if (selected != null) selected.search(query);
-    for (final OptionContainer<?> c : optionChildren) {
-      c.search(query);
+    final int t = getSelectedIndex();
+    if (t >= 0) {
+      final OptionPagePanel<?> selected = mSubPanels.get(t);
+      selected.search(query);
+      for (final OptionPagePanel<?> subPanel : mSubPanels) {
+        if (subPanel != selected) {
+          subPanel.search(query);
+        }
+      }
     }
   }
 
   @Override
-  public boolean selectOption(final OptionPanel<?> panel)
+  public boolean selectOption(final OptionPanel<?> option)
   {
-    for (int t=0; t<getTabCount(); t++) {
-      final Component c = getComponentAt(t);
-      if (c instanceof OptionContainer
-        && ((OptionContainer<?>)c).selectOption(panel)) {
-        setSelectedComponent(c);
+    int t = 0;
+    for (final OptionPagePanel<?> subPanel : mSubPanels) {
+      if (subPanel.selectOption(option)) {
+        setSelectedIndex(t);
         return true;
       }
-    }
-    for (final OptionContainer<?> c : optionChildren) {
-      if (c.selectOption(panel)) return true;
+      t++;
     }
     return false;
   }
 
-  private final List<OptionContainer<?>> optionChildren;
 
+  //#########################################################################
+  //# Data Members
+  private final List<OptionPagePanel<?>> mSubPanels;
+
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = 5842441972089354096L;
 
 }

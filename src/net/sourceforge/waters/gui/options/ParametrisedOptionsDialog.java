@@ -87,8 +87,8 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mTopTabbedPane = (OptionTabbedPane)
-      ConfigPages.ROOT.createEditor(mContext);
+    mTopTabbedPane =
+      mContext.createAggregatorOptionPageEditor(ConfigPages.ROOT);
     add(mTopTabbedPane, constraints);
 
     // Error label
@@ -194,7 +194,7 @@ public abstract class ParametrisedOptionsDialog extends JDialog
   private final IDE mIde;
   private final GUIOptionContext mContext;
 
-  private final OptionTabbedPane mTopTabbedPane;
+  private final AggregatorOptionPagePanel mTopTabbedPane;
   private final SearchQuery mQuery;
 
 
