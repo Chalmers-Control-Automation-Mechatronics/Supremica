@@ -148,11 +148,22 @@ public class CommandLineToolTest
   public void testAnalyzer_MonolithicDiagnosability()
     throws Exception
   {
-    final File file = getInputWmod("tests", "diagnosability", "notDiag_1");
+    final File file = getInputWmod("tests", "diagnosability", "five_faults");
     final String[] args = new String[]
       {"Monolithic", "DiagnosabilityChecker", file.toString()};
     testCommandLine("mono-diag", args, false,
+                    "\"The fault-class 'F1' is not diagnosable.\"",
                     "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
+  }
+
+  public void testAnalyzer_MonolithicDiagnosabilityFault()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "diagnosability", "five_faults");
+    final String[] args = new String[]
+      {"Monolithic", "DiagnosabilityChecker", file.toString(),
+       "-fault", "F3"};
+    testCommandLine("mono-diag-fault", args, true);
   }
 
   public void testAnalyzer_NativeControllability()

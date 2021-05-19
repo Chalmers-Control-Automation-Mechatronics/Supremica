@@ -270,6 +270,13 @@ public class MonolithicDiagnosabilityVerifierTest
     runModelVerifier(des, false);
   }
 
+  public void testFiveFaults() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "five_faults.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testSmallFactory2nd() throws Exception
   {
     final ProductDESProxy des =

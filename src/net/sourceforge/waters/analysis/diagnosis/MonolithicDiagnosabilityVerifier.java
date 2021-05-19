@@ -37,21 +37,21 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -76,6 +76,13 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.StringListOption;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -136,9 +143,23 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   }
 
   @Override
+  public void setFaultClasses(final List<String> faultClasses)
+  {
+    mConfiguredFaultClasses = faultClasses;
+  }
+
+  @Override
+  public List<String> getFaultClasses()
+  {
+    return mConfiguredFaultClasses;
+  }
+
+  @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_DiagnosabilityChecker_FaultClasses);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_FinalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.
@@ -150,7 +171,11 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   public void setOption(final Option<?> option)
   {
     if (option.hasID(AbstractModelAnalyzerFactory.
-                     OPTION_ModelAnalyzer_FinalStateLimit)) {
+                     OPTION_DiagnosabilityChecker_FaultClasses)) {
+      final StringListOption listOption = (StringListOption) option;
+      setFaultClasses(listOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
       final PositiveIntOption intOption = (PositiveIntOption) option;
       setNodeLimit(intOption.getIntValue());
     } else if (option.hasID(AbstractModelAnalyzerFactory.
@@ -166,10 +191,49 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   //#########################################################################
   //# Invocation
   @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    final ProductDESProxy des = getModel();
+
+    final Set<String> foundFaultClasses = new LinkedHashSet<>();
+    for (final EventProxy event : des.getEvents()) {
+      final String faultClass = getEventFaultClass(event);
+      if (faultClass != null) {
+        foundFaultClasses.add(faultClass);
+      }
+    }
+    if (mConfiguredFaultClasses == null) {
+      mUsedFaultClasses = new ArrayList<>(foundFaultClasses);
+    } else if (foundFaultClasses.size() < mConfiguredFaultClasses.size()) {
+      mUsedFaultClasses = new LinkedList<>(mConfiguredFaultClasses);
+      final Logger logger = LogManager.getLogger();
+      final ListIterator<String> iter = mUsedFaultClasses.listIterator();
+      while (iter.hasNext()) {
+        final String faultClass = iter.next();
+        if (!foundFaultClasses.contains(faultClass)) {
+          logger.warn("Fault class '{}' not found in model, ignored.",
+                      faultClass);
+          iter.remove();
+        }
+      }
+    } else {
+      mUsedFaultClasses = new ArrayList<>(mConfiguredFaultClasses);
+    }
+
+    mSynchronousProductBuilder = new TRSynchronousProductBuilder(des);
+  }
+
+  @Override
   public boolean run() throws AnalysisException
   {
     try {
       setUp();
+      if (mUsedFaultClasses.isEmpty()) {
+        return setSatisfiedResult();
+      }
+
       mSynchronousProductBuilder.run();
       final TRSynchronousProductResult spResult =
         mSynchronousProductBuilder.getAnalysisResult();
@@ -182,7 +246,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final int numEvents = enc.getNumberOfProperEvents();
       final int numStates = rel.getNumberOfStates();
       mEventObservable = new boolean[numEvents];
-      final THashSet<String> faultClasses = new THashSet<>();
       final TIntArrayList initStates = new TIntArrayList();
       for (int i = 0; i < numStates; i++) {
         if (rel.isInitial(i)) {
@@ -192,63 +255,60 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       for (int i = EventEncoding.NONTAU; i < numEvents; i++) {
         final EventProxy event = enc.getProperEvent(i);
         if (event != null) {
-          final String faultClass = getEventFaultClass(event);
-          if (faultClass != null) {
-            faultClasses.add(faultClass);
-          }
           mEventObservable[i] = event.isObservable();
         }
       }
-      mNumberOfFaultClasses = faultClasses.size();
-      if (!faultClasses.isEmpty()) {
-        mFaultEvent = new boolean[numEvents];
-        mStateIndexMap = new TLongIntHashMap(numStates, 0.5f, -1, -1);
-        final StateProcessor processor = new VerifierStateProcessor();
-        for (final String faultClass : faultClasses) {
-          mCurrentFaultClass = faultClass;
-          for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-            final EventProxy event = enc.getProperEvent(e);
-            final String eventFaultClass = getEventFaultClass(event);
-            mFaultEvent[e] = faultClass.equals(eventFaultClass);
-          }
-          mComponentStack.clear();
-          mControlStack.clear();
-          mStateIndexMap.clear();
-          mIndexStateMap.clear();
-          mNumberOfTransitions = 0;
-          for (int x = 0; x < initStates.size(); x++) {
-            for (int y = 0; y <= x; y++) {
-              final int initA = initStates.get(y);
-              final int initB = initStates.get(x);
-              final long verifierInit = (((long) initA) << 32) | initB;
-              lastVerInit = mIndexStateMap.size();
-              mStateIndexMap.put(verifierInit, lastVerInit);
-              mIndexStateMap.add(verifierInit);
-              mControlStack.push(lastVerInit, lastVerInit);
-            }
-          }
-          while (!mControlStack.isEmpty()) {
-            checkAbort();
-            final int i = mControlStack.getTopIndex();
-            if (!mControlStack.isTopExpanded()) {
-              final int dfsIndex = mComponentStack.size() | MSB1;
-              mControlStack.setLink(i, dfsIndex);
-              mControlStack.setTopIndex(dfsIndex);
-              mComponentStack.add(i);
-              expand(i, processor);
-            } else {
-              final int p = mControlStack.getTopParent();
-              mControlStack.pop();
-              if (!close(i, p)) {
-                final CounterExampleProxy counterExample =
-                  computeCounterExample();
-                addVerifierStatistics();
-                return setFailedResult(counterExample);
-              }
-            }
-          }
-          addVerifierStatistics();
+      mFaultEvent = new boolean[numEvents];
+      mStateIndexMap = new TLongIntHashMap(numStates, 0.5f, -1, -1);
+      final StateProcessor processor = new VerifierStateProcessor();
+      for (final String faultClass : mUsedFaultClasses) {
+        boolean gotFault = false;
+        for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+          final EventProxy event = enc.getProperEvent(e);
+          final String eventFaultClass = getEventFaultClass(event);
+          gotFault |= mFaultEvent[e] = faultClass.equals(eventFaultClass);
         }
+        if (!gotFault) {
+          continue;
+        }
+        mCurrentFaultClass = faultClass;
+        mComponentStack.clear();
+        mControlStack.clear();
+        mStateIndexMap.clear();
+        mIndexStateMap.clear();
+        mNumberOfTransitions = 0;
+        for (int x = 0; x < initStates.size(); x++) {
+          for (int y = 0; y <= x; y++) {
+            final int initA = initStates.get(y);
+            final int initB = initStates.get(x);
+            final long verifierInit = (((long) initA) << 32) | initB;
+            lastVerInit = mIndexStateMap.size();
+            mStateIndexMap.put(verifierInit, lastVerInit);
+            mIndexStateMap.add(verifierInit);
+            mControlStack.push(lastVerInit, lastVerInit);
+          }
+        }
+        while (!mControlStack.isEmpty()) {
+          checkAbort();
+          final int i = mControlStack.getTopIndex();
+          if (!mControlStack.isTopExpanded()) {
+            final int dfsIndex = mComponentStack.size() | MSB1;
+            mControlStack.setLink(i, dfsIndex);
+            mControlStack.setTopIndex(dfsIndex);
+            mComponentStack.add(i);
+            expand(i, processor);
+          } else {
+            final int p = mControlStack.getTopParent();
+            mControlStack.pop();
+            if (!close(i, p)) {
+              final CounterExampleProxy counterExample =
+                computeCounterExample();
+              addVerifierStatistics();
+              return setFailedResult(counterExample);
+            }
+          }
+        }
+        addVerifierStatistics();
       }
       return setSatisfiedResult();
     } catch (final AnalysisException exception) {
@@ -258,21 +318,18 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     }
   }
 
-
-  @Override
-  protected void setUp()
-    throws AnalysisException
-  {
-    super.setUp();
-    mSynchronousProductBuilder =
-      new TRSynchronousProductBuilder(getModel());
-  }
-
   @Override
   protected void tearDown()
   {
     super.tearDown();
+    mUsedFaultClasses = null;
     mSynchronousProductBuilder = null;
+  }
+
+  @Override
+  public DualCounterExampleProxy getCounterExample()
+  {
+    return (DualCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -572,7 +629,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     final String nameB = "non-faulty";
     final String ceName = getModel().getName() + "-undiagnosable";
     final String ceComment;
-    if (mNumberOfFaultClasses == 1) {
+    if (mUsedFaultClasses.size() == 1 && mConfiguredFaultClasses == null) {
       ceComment = "The system is not diagnosable.";
     } else {
       ceComment = "The fault-class '" + mCurrentFaultClass +
@@ -880,9 +937,11 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
 
   //#########################################################################
   //# Instance Variables
+  private List<String> mConfiguredFaultClasses = null;
+  private List<String> mUsedFaultClasses = null;
+
   private boolean[] mEventObservable;
   private boolean[] mFaultEvent;
-  private int mNumberOfFaultClasses;
   private String mCurrentFaultClass;
   private TLongIntHashMap mStateIndexMap;
   private final TLongArrayList mIndexStateMap =

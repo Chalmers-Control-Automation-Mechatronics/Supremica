@@ -33,7 +33,11 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.List;
+
 import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
+
 
 /**
  * <P>A model verifier that checks whether a system of composed automata
@@ -63,5 +67,43 @@ import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 
 public interface DiagnosabilityChecker extends ModelVerifier
 {
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets the fault classes to be checked for diagnosability.
+   * @param faultClasses List of the names of classes (FAULT attributes of
+   *                     events). If non <CODE>null</CODE>, only the
+   *                     specified fault classes will be checked in the
+   *                     order proved. If <CODE>null</CODE>, all fault
+   *                     classes in the model will be checked.
+   */
+  public void setFaultClasses(List<String> faultClasses);
+
+  /**
+   * Gets the fault classes to be check for diagnosability.
+   * @see #setFaultClasses(List) setFaultClasses()
+   */
+  public List<String> getFaultClasses();
+
+
+  //#########################################################################
+  //# More Specific Access to the Results
+  /**
+   * Gets a counterexample if the model was found to be not diagnosable.
+   * A diagnosability counterexample consists of two traces, with equal
+   * sequences of observable events, one of which contains a fault while the
+   * other does not, and with an infinite sequence of observable events
+   * following the fault.
+   * @return A counterexample object constructed for the input product DES
+   *         of this diagnosability checker that shares its automata and
+   *         event objects.
+   * @throws IllegalStateException if this method is called before
+   *         model checking has completed, i.e., before {@link #run()}
+   *         has been called, or model checking has found that the
+   *         property is satisfied and there is no counterexample.
+   */
+  @Override
+  public DualCounterExampleProxy getCounterExample();
 
 }

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="five_faults">
+<B:Comment>A diagnosability checker test with five fault classes.
+Only class F3 (event f3) is diagnosable.
+Used to check whether the diagnosability checker can check diagnosability for only a specified event.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+<EventDecl Kind="CONTROLLABLE" Name="b"/>
+<EventDecl Kind="CONTROLLABLE" Name="c"/>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="f1">
+<B:AttributeMap>
+<B:Attribute Name="FAULT" Value="F1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="f5">
+<B:AttributeMap>
+<B:Attribute Name="FAULT" Value="F5"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="f2">
+<B:AttributeMap>
+<B:Attribute Name="FAULT" Value="F2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="f3">
+<B:AttributeMap>
+<B:Attribute Name="FAULT" Value="F3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="f4">
+<B:AttributeMap>
+<B:Attribute Name="FAULT" Value="F4"/>
+</B:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="plant">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="144" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="240" Y="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="240" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point X="240" Y="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="-2" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="f1"/>
+<SimpleIdentifier Name="f2"/>
+<SimpleIdentifier Name="f4"/>
+<SimpleIdentifier Name="f5"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S2" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S3">
+<LabelBlock>
+<SimpleIdentifier Name="f3"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S3" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="c"/>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

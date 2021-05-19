@@ -35,6 +35,9 @@ package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ComponentKindOption;
 import net.sourceforge.waters.model.options.EnumOption;
@@ -43,9 +46,6 @@ import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.options.StringListOption;
 import net.sourceforge.waters.model.options.StringOption;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 
 /**
@@ -204,6 +204,11 @@ public abstract class AbstractModelAnalyzerFactory
               "Loop Events",
               "Non-Loop Events"));
 
+    db.register(new StringListOption
+      (OPTION_DiagnosabilityChecker_FaultClasses,
+       "Fault class", "Fault class to be checked for diagnosability",
+       "-fault"));
+
     db.register(new BooleanOption
              (OPTION_SupervisorSynthesizer_DetailedOutputEnabled,
               "Create supervisor automata",
@@ -338,6 +343,9 @@ public abstract class AbstractModelAnalyzerFactory
 
   public static final String OPTION_ControlLoopChecker_LoopEvents =
     "ControlLoopChecker.LoopEvents";
+
+  public static final String OPTION_DiagnosabilityChecker_FaultClasses =
+    "DiagnosabilityChecker.FaultClasses";
 
   public static final String OPTION_LanguageInclusionChecker_Property =
     "LanguageInclusionChecker.Property";
