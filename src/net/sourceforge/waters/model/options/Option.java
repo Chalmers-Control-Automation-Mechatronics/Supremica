@@ -235,7 +235,7 @@ public abstract class Option<T> implements Cloneable
     if (ProxyTools.equals(value, mValue)) {
       return false;
     } else {
-      final String oldValue = getAsString();
+      final String oldValue = getGuiName(mValue);
       mValue = value;
       firePropertyChanged(oldValue);
       return true;
@@ -250,24 +250,39 @@ public abstract class Option<T> implements Cloneable
     setValue(mDefaultValue);
   }
 
+  /**
+   * Changes the current value of this option by parsing the given
+   * string.
+   * @throws ParseException to indicate the the text cannot be
+   *         converted to an option value.
+   */
   public abstract void set(String text) throws ParseException;
 
-  public String getAsString()
+  /**
+   * Gets the GUI representable name of the given option value, which is
+   * to render combo boxes or similar components. The default
+   * implementation calls {@link #toString()} while also displaying
+   * <CODE>null</CODE> values as an empty string.
+   */
+  public String getGuiName(final T value)
   {
-    if (mValue == null) {
+    if (value == null) {
       return "";
     } else {
-      return mValue.toString();
+      return value.toString();
     }
   }
 
-  public String getDefaultAsString()
+  /**
+   * Gets the raw name of the given option value, which can be
+   * displayed in the console or in property files. The default
+   * implementation simply calls {@link #toString()}, but this may be
+   * overridden in subclasses that distinguish pretty GUI names from
+   * console names.
+   */
+  public String getConsoleName(final T value)
   {
-    if (mDefaultValue == null) {
-      return "";
-    } else {
-      return mDefaultValue.toString();
-    }
+    return getGuiName(value);
   }
 
 
@@ -294,7 +309,7 @@ public abstract class Option<T> implements Cloneable
   public void firePropertyChanged(final String oldValue)
   {
     if (mListeners != null) {
-      final String newValue = getAsString();
+      final String newValue = getGuiName(mValue);
       final OptionChangeEvent event =
         new OptionChangeEvent(this, oldValue, newValue);
       final List<OptionChangeListener> copy =
@@ -328,8 +343,8 @@ public abstract class Option<T> implements Cloneable
                    final boolean saveAll)
     throws IOException
   {
-    final String value = getAsString();
-    final String defaultValue = getDefaultAsString();
+    final String value = getConsoleName(mValue);
+    final String defaultValue = getConsoleName(mDefaultValue);
     if (saveAll || !value.equals(defaultValue)) {
       writer.append("# ");
       final String pageComment = page.getShortDescription();
@@ -343,9 +358,11 @@ public abstract class Option<T> implements Cloneable
       writer.append('.');
       final String escapedKey = OptionFileManager.getEscapedString(getID());
       writer.append(escapedKey);
-      writer.append(" ");
       final String escapedValue = OptionFileManager.getEscapedString(value);
-      writer.append(escapedValue);
+      if (!escapedValue.isEmpty()) {
+        writer.append(" ");
+        writer.append(escapedValue);
+      }
       writer.append("\n\n");
     }
   }

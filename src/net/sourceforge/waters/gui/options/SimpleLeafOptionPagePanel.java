@@ -101,9 +101,11 @@ class SimpleLeafOptionPagePanel
     for (final Option<?> option : options) {
       if (option.isEditable() && (!persistentOnly || option.isPersistent())) {
         final OptionPanel<?> panel = getPanel(option);
-        mOptionPanels.add(panel);
-        panel.addComponentsToPanel(this, constraints);
-        constraints.gridy++;
+        if (panel != null) {
+          mOptionPanels.add(panel);
+          panel.addComponentsToPanel(this, constraints);
+          constraints.gridy++;
+        }
       }
     }
   }

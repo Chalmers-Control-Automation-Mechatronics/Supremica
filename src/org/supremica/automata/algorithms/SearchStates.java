@@ -246,7 +246,7 @@ public class SearchStates
         }
 
         // Remove last state separator
-        final int idx = str.lastIndexOf(Config.GENERAL_STATE_SEPARATOR.getAsString());
+        final int idx = str.lastIndexOf(Config.GENERAL_STATE_SEPARATOR.getValue());
         str.delete(idx, str.length());
 
         return new String(str);

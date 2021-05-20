@@ -45,6 +45,13 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.options.AggregatorOptionPage;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
@@ -57,6 +64,7 @@ import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionContext;
 import net.sourceforge.waters.model.options.OptionEditor;
 import net.sourceforge.waters.model.options.OptionPageEditor;
 import net.sourceforge.waters.model.options.ParameterBindingListOption;
@@ -66,14 +74,6 @@ import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
 import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
 import net.sourceforge.waters.model.options.StringListOption;
 import net.sourceforge.waters.model.options.StringOption;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.options.OptionContext;
 
 
 /**
@@ -430,10 +430,10 @@ public class CommandLineOptionContext implements OptionContext
     {
       super("cli", "Command Line Tool");
       register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
-                                 "Verbose logging output",
+                                 "Verbose log output",
                                  "+verbose|+v", false));
       register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
-                                 "Suppress all logging output",
+                                 "Suppress all log output",
                                  "+quiet|+q", false));
       register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
                                  "Print statistics", "+stats", false));
@@ -456,15 +456,15 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Class Constants
-  public static final String OPTION_CommandLineTool_Verbose =
-    "CommandLineTool.Verbose";
+  public static final String OPTION_CommandLineTool_Csv =
+    "CommandLineTool.Csv";
   public static final String OPTION_CommandLineTool_Quiet =
     "CommandLineTool.Quiet";
   public static final String OPTION_CommandLineTool_Stats =
     "CommandLineTool.Stats";
   public static final String OPTION_CommandLineTool_Timeout =
     "CommandLineTool.Timeout";
-  public static final String OPTION_CommandLineTool_Csv =
-    "CommandLineTool.Csv";
+  public static final String OPTION_CommandLineTool_Verbose =
+    "CommandLineTool.Verbose";
 
 }

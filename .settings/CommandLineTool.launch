@@ -11,7 +11,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.model.analysis.cli.CommandLineTool"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="Modular ControllabilityChecker examples/waters/tests/trafficlights2006/ac61.wmod"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-mod -cont examples/waters/tests/trafficlights2006/ac61.wmod"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
 </launchConfiguration>

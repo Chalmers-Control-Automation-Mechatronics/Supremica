@@ -33,12 +33,9 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.sourceforge.waters.model.analysis.cli.OptionCommandLineArgument;
 
 
 /**
@@ -57,6 +54,17 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
   public ListedEnumFactory()
   {
     mRegisteredElements = new LinkedList<E>();
+  }
+
+  public ListedEnumFactory(final List<E> elements)
+  {
+    mRegisteredElements = elements;
+  }
+
+  public ListedEnumFactory(final List<E> elements, final E defaultValue)
+  {
+    mRegisteredElements = elements;
+    mDefaultValue = defaultValue;
   }
 
 
@@ -96,17 +104,6 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
       return super.getDefaultValue();
     } else {
       return mDefaultValue;
-    }
-  }
-
-  @Override
-  public void dumpEnumeration(final PrintStream stream, final int indent)
-  {
-    super.dumpEnumeration(stream, indent);
-    if (mDefaultValue != null) {
-      OptionCommandLineArgument.doIndent(stream, indent);
-      stream.print("Default is: ");
-      stream.println(mDefaultValue);
     }
   }
 

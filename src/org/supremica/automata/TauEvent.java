@@ -44,13 +44,13 @@ public class TauEvent extends LabeledEvent
 
       if(isControllable)
       {
-          toOriginalMap.put(Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString() + DELIMITER + count, event);
-          return Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString() + DELIMITER + count++;    // should really increment count twice on each call?
+          toOriginalMap.put(Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getValue() + DELIMITER + count, event);
+          return Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getValue() + DELIMITER + count++;    // should really increment count twice on each call?
       }
       else
       {
-          toOriginalMap.put(Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString() + DELIMITER + count, event);
-          return Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString() + DELIMITER + count++;
+          toOriginalMap.put(Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getValue() + DELIMITER + count, event);
+          return Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getValue() + DELIMITER + count++;
       }
     }
 

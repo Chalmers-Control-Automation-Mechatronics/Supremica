@@ -31,58 +31,61 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.options;
+package net.sourceforge.waters.model.analysis;
 
-import java.awt.Color;
-
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of
- * <CODE>boolean</CODE> type.
+ * An implementation of the {@link EnumFactory} interface for a standard
+ * Java enumeration. Initialised with the class of enumeration with
+ * an optional default value.
  *
- * @author Brandon Bassett
+ * @author Robi Malik
  */
 
-public class ColorOption extends Option<Color>
+public class JavaEnumFactory<E extends Enum<E>> extends EnumFactory<E>
 {
+
   //#########################################################################
   //# Constructors
-  public ColorOption(final String id,
-                       final String shortName,
-                       final String description,
-                       final String commandLineOption,
-                       final Color defaultValue)
+  public JavaEnumFactory(final Class<? extends E> clazz)
   {
-   super(id, shortName, description, commandLineOption, defaultValue);
+    mEnumConstants = Arrays.asList(clazz.getEnumConstants());
+    mDefaultValue = null;
+  }
+
+  public JavaEnumFactory(final Class<? extends E> clazz,
+                         final E defaultValue)
+  {
+    mEnumConstants = Arrays.asList(clazz.getEnumConstants());
+    mDefaultValue = defaultValue;
   }
 
 
   //#########################################################################
-  //# Type-specific Access
+  //# Interface net.sourceforge.waters.model.analysis.EnumFactory
   @Override
-  public void set(final String text)
+  public List<E> getEnumConstants()
   {
-    final Color color = Color.decode(text);
-    setValue(color);
+    return mEnumConstants;
   }
 
   @Override
-  public String getGuiName(final Color color)
+  public E getDefaultValue()
   {
-    final int rgb = color.getRGB() & 0xffffff;
-    final String hex = Integer.toHexString(rgb | 0x1000000);
-    return "#" + hex.substring(1);
+    if (mDefaultValue == null) {
+      return super.getDefaultValue();
+    } else {
+      return mDefaultValue;
+    }
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.options.Option
-  @Override
-  public OptionEditor<Color> createEditor(final OptionContext context)
-  {
-    return context.createColorEditor(this);
-  }
+  //# Data Members
+  private final List<E> mEnumConstants;
+  private final E mDefaultValue;
 
 }

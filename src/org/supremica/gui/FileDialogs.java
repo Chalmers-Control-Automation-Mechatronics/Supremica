@@ -281,9 +281,9 @@ public class FileDialogs
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getSMVFilter());
 
-        return fileExporter;		
+        return fileExporter;
 	}
-	
+
     public static JFileChooser getSTSFileExporter()
     {
         final JFileChooser fileExporter = fd.getFileExporter();
@@ -451,7 +451,7 @@ public class FileDialogs
             fileImporter = new JFileChooser();
 
             fileImporter.setDialogType(JFileChooser.OPEN_DIALOG);
-            fileImporter.setCurrentDirectory(new java.io.File(Config.FILE_OPEN_PATH.getAsString()));
+            fileImporter.setCurrentDirectory(new java.io.File(Config.FILE_OPEN_PATH.getValue()));
             fileImporter.setMultiSelectionEnabled(true);
         }
 
@@ -465,7 +465,7 @@ public class FileDialogs
             fileExporter = new StandardExtensionFileChooser();
 
             fileExporter.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileExporter.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.getAsString()));
+            fileExporter.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.getValue()));
             fileExporter.setMultiSelectionEnabled(false);
         }
 
@@ -479,7 +479,7 @@ public class FileDialogs
             fileSaveAs = new StandardExtensionFileChooser();
 
             fileSaveAs.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileSaveAs.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.getAsString()));
+            fileSaveAs.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.getValue()));
             fileSaveAs.setMultiSelectionEnabled(false);
         }
 
@@ -522,7 +522,7 @@ public class FileDialogs
 	{
 		if (this.smvFilter == null)
 			this.smvFilter = this.makeFileFilter(".smv", "SMV files (*.smv)");
-		
+
 		return smvFilter;
 	}
     private FileFilter getSTSFilter()

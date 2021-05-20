@@ -34,19 +34,26 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.JavaEnumFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
+
 /**
+ * Enumeration of possible verification and other analysis operations
+ * accessible though GUI or command line.
  *
- * @author Benjamin Wheeler
+ * @author Robi Malik, Benjamin Wheeler
  */
+
 public enum AnalysisOperation
 {
   //#########################################################################
   //# Enumeration
-  CONFLICT_CHECK("ConflictChecker", "waters.analysis.conflict", "Conflict",
+  CONFLICT_CHECK("waters.analysis.conflict", "Conflict", "-conf",
                  "is blocking", "is nonblocking")
   {
     @Override
@@ -58,8 +65,8 @@ public enum AnalysisOperation
     }
   },
 
-  CONTROLLABILITY_CHECK("ControllabilityChecker",
-                        "waters.analysis.controllability", "Controllability",
+  CONTROLLABILITY_CHECK("waters.analysis.controllability",
+                        "Controllability", "-cont",
                         "is not controllable", "is controllable")
   {
     @Override
@@ -71,7 +78,7 @@ public enum AnalysisOperation
     }
   },
 
-  CONTROL_LOOP_CHECK("ControlLoopChecker", "waters.analysis.loop", "Control Loop",
+  CONTROL_LOOP_CHECK("waters.analysis.loop", "Control Loop", "-loop",
                      "has a control loop", "is control-loop free")
   {
     @Override
@@ -83,7 +90,7 @@ public enum AnalysisOperation
     }
   },
 
-  DEADLOCK_CHECK("DeadlockChecker", "waters.analysis.deadlock", "Deadlock",
+  DEADLOCK_CHECK("waters.analysis.deadlock", "Deadlock", "-dl",
                  "has a deadlock", "is deadlock free")
   {
     @Override
@@ -95,8 +102,8 @@ public enum AnalysisOperation
     }
   },
 
-  DIAGNOSABILITY_CHECK("DiagnosabilityChecker",
-                       "waters.analysis.diagnosability", "Diagnosability",
+  DIAGNOSABILITY_CHECK("waters.analysis.diagnosability",
+                       "Diagnosability", "-diag",
                        "is not diagnosable", "is diagnosable")
   {
     @Override
@@ -108,9 +115,8 @@ public enum AnalysisOperation
     }
   },
 
-  LANGUAGE_INCLUSION_CHECK("LanguageInclusionChecker",
-                           "waters.analysis.languageinclusion",
-                           "Language Inclusion",
+  LANGUAGE_INCLUSION_CHECK("waters.analysis.languageinclusion",
+                           "Language Inclusion", "-lang",
                            "does not satisfy language inclusion",
                            "satisfies language inclusion")
   {
@@ -123,7 +129,7 @@ public enum AnalysisOperation
     }
   },
 
-  STATE_COUNT("StateCounter", "waters.analysis.statecount", "State Count")
+  STATE_COUNT("waters.analysis.statecount", "State Count", "-count")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -134,8 +140,8 @@ public enum AnalysisOperation
     }
   },
 
-  SYNCHRONOUS_PRODUCT("SynchrounousProductBuilder",
-                      "waters.analysis.syncprod", "Synchronization")
+  SYNCHRONOUS_PRODUCT("waters.analysis.syncprod",
+                      "Synchronization", "Synchronous Product", "-sync")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -146,7 +152,8 @@ public enum AnalysisOperation
     }
   },
 
-  SYNTHESIS("SupervsorSynthesizer", "waters.analysis.synthesis", "Synthesis")
+  SYNTHESIS("waters.analysis.synthesis",
+            "Synthesis", "Supervisor Synthesis", "-synth")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -160,22 +167,35 @@ public enum AnalysisOperation
 
   //#########################################################################
   //# Constructor
-  private AnalysisOperation(final String key,
-                            final String optionPagePrefix,
-                            final String analysisName)
+  private AnalysisOperation(final String optionPagePrefix,
+                            final String analysisName,
+                            final String consoleName)
   {
-    this(key, optionPagePrefix, analysisName, null, null);
+    this(optionPagePrefix, analysisName, analysisName, consoleName);
   }
 
-  private AnalysisOperation(final String key,
-                            final String optionPagePrefix,
+  private AnalysisOperation(final String optionPagePrefix,
+                            final String shortAnalysisName,
+                            final String longAnalysisName,
+                            final String consoleName)
+  {
+    mOptionPagePrefix = optionPagePrefix;
+    mShortAnalysisName = shortAnalysisName;
+    mLongAnalysisName = longAnalysisName;
+    mConsoleName = consoleName;
+    mFailureDescription = mSuccessDescription = null;
+  }
+
+  private AnalysisOperation(final String optionPagePrefix,
                             final String analysisName,
+                            final String consoleName,
                             final String failureDescription,
                             final String successDescription)
   {
-    mKey = key;
     mOptionPagePrefix = optionPagePrefix;
-    mAnalysisName = analysisName;
+    mLongAnalysisName = analysisName + " Check";
+    mShortAnalysisName = analysisName;
+    mConsoleName = consoleName;
     mFailureDescription = failureDescription;
     mSuccessDescription = successDescription;
   }
@@ -194,9 +214,19 @@ public enum AnalysisOperation
       WatersOptionPages.ANALYSIS.getLeafOptionPage(mOptionPagePrefix);
   }
 
-  public String getAnalysisName()
+  public String getShortAnalysisName()
   {
-    return mAnalysisName;
+    return mShortAnalysisName;
+  }
+
+  public String getLongAnalysisName()
+  {
+    return mLongAnalysisName;
+  }
+
+  public String getConsoleName()
+  {
+    return mConsoleName;
   }
 
   public String getFailureDescription()
@@ -209,9 +239,24 @@ public enum AnalysisOperation
     return mSuccessDescription;
   }
 
+
+  //#########################################################################
+  //# Creating Model Analysers
   public abstract ModelAnalyzer createModelAnalyzer
     (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
-      throws AnalysisConfigurationException;
+    throws AnalysisConfigurationException;
+
+  public ModelAnalyzer createAndConfigureModelAnalyzer
+    (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
+  {
+    final ModelAnalyzer analyzer = createModelAnalyzer(factory, desFactory);
+    final AnalysisOptionPage page = getOptionPage();
+    for (final Option<?> option : analyzer.getOptions(page)) {
+      analyzer.setOption(option);
+    }
+    return analyzer;
+  }
 
 
   //#########################################################################
@@ -219,16 +264,51 @@ public enum AnalysisOperation
   @Override
   public String toString()
   {
-    return mKey;
+    return mShortAnalysisName;
+  }
+
+
+  //#########################################################################
+  //# Enum Factory
+  public static EnumFactory<AnalysisOperation> getEnumFactory()
+  {
+    return AnalysisOperationEnumFactory.INSTANCE;
+  }
+
+
+  private static class AnalysisOperationEnumFactory
+    extends JavaEnumFactory<AnalysisOperation>
+  {
+    //#######################################################################
+    //# Constructor
+    private AnalysisOperationEnumFactory()
+    {
+      super(AnalysisOperation.class, CONTROLLABILITY_CHECK);
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.EnumFactory<AnalysisOperation>
+    @Override
+    public String getConsoleName(final AnalysisOperation operation)
+    {
+      return operation.getConsoleName();
+    }
+
+    //#######################################################################
+    //# Singleton Instance
+    private static AnalysisOperationEnumFactory INSTANCE =
+      new AnalysisOperationEnumFactory();
   }
 
 
   //#########################################################################
   //# Data Members
-  private String mKey;
   private final String mOptionPagePrefix;
-  private final String mAnalysisName;
+  private final String mShortAnalysisName;
+  private final String mLongAnalysisName;
   private final String mFailureDescription;
   private final String mSuccessDescription;
+  private final String mConsoleName;
 
 }

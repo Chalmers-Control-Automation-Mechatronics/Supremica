@@ -78,12 +78,6 @@ public abstract class WatersVerificationDialog extends WatersAnalyzeDialog
 
   //#########################################################################
   //# Abstract Methods
-  @Override
-  protected String getAnalysisName()
-  {
-    return getOperation().getAnalysisName() + " Check";
-  }
-
   protected String getFailureDescription()
   {
     return getOperation().getFailureDescription();

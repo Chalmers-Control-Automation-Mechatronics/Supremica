@@ -120,8 +120,8 @@ public class SynchronizationOptions
 		this.requireConsistentImmediate = true;
 		this.rememberDisabledEvents = false;
 		this.unobsEventsSynch = Config.SYNC_UNOBS_EVENTS_SYNC.getValue();
-		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getAsString();
-		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getAsString();
+		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getValue();
+		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getValue();
         this.EFAMode = false;
 
 	}

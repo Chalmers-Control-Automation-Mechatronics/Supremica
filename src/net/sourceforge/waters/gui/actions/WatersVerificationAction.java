@@ -158,7 +158,7 @@ public abstract class WatersVerificationAction
   //# Factory Access
   protected String getCheckName()
   {
-    return mOperation.getAnalysisName();
+    return mOperation.getShortAnalysisName();
   }
 
   protected String getFailureDescription()

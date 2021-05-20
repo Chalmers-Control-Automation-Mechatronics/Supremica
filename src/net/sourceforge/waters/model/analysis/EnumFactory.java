@@ -49,20 +49,42 @@ import net.sourceforge.waters.model.analysis.cli.OptionCommandLineArgument;
 public abstract class EnumFactory<E>
 {
 
+  //#######################################################################
+  //# Access
   /**
    * Gets an immutable list the items in this enumeration.
    */
-  public abstract List<? extends E> getEnumConstants();
+  public abstract List<E> getEnumConstants();
 
   /**
-   * Gets the enumeration value corresponding to the given string
-   * (case-insensitive).
-   * @return Enumeration value if present, or <CODE>null</CODE>
+   * Gets the enumeration value corresponding to the given string.
+   * String comparison is case-insensitive and uses the console name.
+   * @return Enumeration value if present, or <CODE>null</CODE>.
+   * @see #getConsoleName(Object) getConsoleName()
    */
   public E getEnumValue(final String name)
   {
     for (final E value : getEnumConstants()) {
       final String eName = getConsoleName(value);
+      if (eName.equalsIgnoreCase(name)) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Gets the enumeration value corresponding to the given string.
+   * String comparison is case-insensitive and uses {@link #toString()}.
+   * This method is not normally used for parsing but subclasses can
+   * call it for legacy processing.
+   * @return Enumeration value if present, or <CODE>null</CODE>.
+   * @see #getEnumValue(String)
+   */
+  protected E getEnumValueFallback(final String name)
+  {
+    for (final E value : getEnumConstants()) {
+      final String eName = value.toString();
       if (eName.equalsIgnoreCase(name)) {
         return value;
       }
@@ -85,15 +107,23 @@ public abstract class EnumFactory<E>
    * to the given stream so as to provide a listing of possible values
    * for an error message.
    */
-  public void dumpEnumeration(final PrintStream stream, final int indent)
+  public void dumpEnumeration(final PrintStream stream,
+                              final int indent,
+                              final String choiceName,
+                              final boolean showDefault)
   {
     OptionCommandLineArgument.doIndent(stream, indent);
-    stream.println("Possible values are:");
+    stream.print("Possible ");
+    stream.print(choiceName);
+    stream.println(" are:");
     int column = 0;
     boolean first = true;
     for (final E item : getEnumConstants()) {
+      if (!isDisplayedInConsole(item)) {
+        continue;
+      }
       String label = getConsoleName(item);
-      if (item == getDefaultValue()) {
+      if (showDefault && item == getDefaultValue()) {
         label += " (default)";
       }
       final int len = label.length();
@@ -122,13 +152,26 @@ public abstract class EnumFactory<E>
 
   /**
    * Gets the raw name of the given enumeration element, which can be
-   * displayed in the console. The default implementation simply calls
-   * {@link #toString()}, but this may be overridden in subclasses that
-   * distinguish pretty GUI names from console names.
+   * displayed in the console or used for parsing. The default
+   * implementation simply calls {@link #toString()}, but this may be
+   * overridden in subclasses that distinguish pretty GUI names from
+   * console names.
    */
   public String getConsoleName(final E item)
   {
     return item.toString();
+  }
+
+  /**
+   * Returns whether the given enumeration element will be displayed
+   * when listing the enumeration by the {@link
+   * #dumpEnumeration(PrintStream,int,String,boolean)
+   * dumpEnumeration()} method.
+   * @return  <CODE>true</CODE> by default but can be overriden.
+   */
+  public boolean isDisplayedInConsole(final E item)
+  {
+    return true;
   }
 
 }

@@ -153,7 +153,7 @@ public class GraphSavePDFAction
                                         PDF);
       mFileChooser.addChoosableFileFilter(filter);
       mFileChooser.setFileFilter(filter);
-      final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
+      final File startdir = new File(Config.FILE_OPEN_PATH.getValue());
       mFileChooser.setCurrentDirectory(startdir);
     }
     if (mChooserPathFollowsModule) {

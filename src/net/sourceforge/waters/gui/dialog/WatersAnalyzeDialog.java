@@ -126,7 +126,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
   //# Abstract Methods
   protected String getAnalysisName()
   {
-    return mOperation.getAnalysisName();
+    return mOperation.getLongAnalysisName();
   }
 
   protected abstract String getFailureText();

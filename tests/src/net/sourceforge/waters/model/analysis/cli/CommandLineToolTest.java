@@ -99,8 +99,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
-      {"BDD", "LanguageInclusionChecker", file.toString(),
-       "-property", "the_property", "-nout"};
+      {"-bdd", "-lang", file.toString(), "-property", "the_property", "-nout"};
     testCommandLine("bdd-lang", args, false, "!counterexample:", "!Statistics:");
   }
 
@@ -109,7 +108,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWdes("handwritten", "small_factory_2");
     final String[] args = new String[]
-      {"Modular", "ControllabilityChecker", file.toString()};
+      {"-mod", "-cont", file.toString()};
     testCommandLine("mod-cont", args, true);
   }
 
@@ -118,8 +117,8 @@ public class CommandLineToolTest
   {
     final File file = getInputWdes("handwritten", "small_factory_2");
     final String[] args = new String[]
-      {"Modular", "ControllabilityChecker", file.toString(),
-       "-chain", "BDD", "-v", "-dynamic"};
+      {"-mod", "-cont", file.toString(),
+       "-chain", "-bdd", "-v", "-dynamic"};
     testCommandLine("mod-bdd-cont", args, "DEBUG Depth .*", "true \\(.*");
   }
 
@@ -128,9 +127,9 @@ public class CommandLineToolTest
   {
     final File file = getInputWdes("handwritten", "small_factory_2");
     final String[] args = new String[]
-      {"Modular", "ControllabilityChecker", file.toString(), "-stats",
-        "-chain", "TRCompositional", "-islimit", "100",
-        "-chain", "BDD", "-v", "-pack", "buddy"};
+      {"-mod", "-cont", file.toString(), "-stats",
+        "-chain", "-trcomp", "-islimit", "100",
+        "-chain", "-bdd", "-v", "-pack", "buddy"};
     testCommandLine("mod-trcomp-bdd-cont", args,
                     "DEBUG SpecialEventsFinder .*", "DEBUG Depth .*",
                     "true \\(.*");
@@ -141,7 +140,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "small_factory_2u");
     final String[] args = new String[]
-      {"Monolithic", "ControllabilityChecker", file.toString()};
+      {"-mono", "-cont", file.toString()};
     testCommandLine("mono-cont", args, false, "counterexample:", "!Statistics");
   }
 
@@ -150,7 +149,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "diagnosability", "five_faults");
     final String[] args = new String[]
-      {"Monolithic", "DiagnosabilityChecker", file.toString()};
+      {"-mono", "-diag", file.toString()};
     testCommandLine("mono-diag", args, false,
                     "\"The fault-class 'F1' is not diagnosable.\"",
                     "TRACE #1: faulty.*", "TRACE #2: non-faulty.*");
@@ -161,8 +160,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "diagnosability", "five_faults");
     final String[] args = new String[]
-      {"Monolithic", "DiagnosabilityChecker", file.toString(),
-       "-fault", "F3"};
+      {"-mono", "-diag", file.toString(), "-fault", "F3"};
     testCommandLine("mono-diag-fault", args, true);
   }
 
@@ -171,7 +169,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWdes("handwritten", "small_factory_2");
     final String[] args = new String[]
-      {"Native", "ControllabilityChecker", file.toString()};
+      {"-native", "-cont", file.toString()};
     testCommandLine("native-cont", args, true);
   }
 
@@ -180,7 +178,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "generalisedNonblocking", "g1");
     final String[] args = new String[]
-      {"Native", "ConflictChecker", file.toString(),
+      {"-native", "-conf", file.toString(),
        "-premarking", ":alpha", "-marking", ":accepting"};
     testCommandLine("native-gnonblocking", args, true);
   }
@@ -190,7 +188,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
-      {"Native", "LanguageInclusionChecker", file.toString(),
+      {"-native", "-lang", file.toString(),
        "-property", "the_property", "-stats"};
     testCommandLine("native-lang", args, false,
                     "counterexample:", "Statistics:");
@@ -202,7 +200,7 @@ public class CommandLineToolTest
     final File file1 = getInputWmod("handwritten", "small_factory_2");
     final File file2 = getInputWmod("handwritten", "small_factory_2u");
     final String[] args = new String[]
-      {"TRCompositional", "ControllabilityChecker",
+      {"-trcomp", "-cont",
        file1.toString(), file2.toString(), "-q", "-nout"};
     testCommandLine("trcomp-cont", args,
                     "small_factory_2 ... true \\(.*",
@@ -214,7 +212,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "nasty", "five_properties");
     final String[] args = new String[]
-      {"TRCompositional", "LanguageInclusionChecker",
+      {"-trcomp", "-lang",
        file.toString(), "-property", "prop[3]"};
     testCommandLine("trcomp-lang", args, true);
   }
@@ -224,7 +222,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "bad_factory");
     final String[] args = new String[]
-      {"TRCompositional", "ConflictChecker", file.toString()};
+      {"-trcomp", "-conf", file.toString()};
     testCommandLine("trcomp-conf", args, false, "counterexample:");
   }
 
@@ -236,7 +234,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "transferline");
     final String[] args = new String[]
-      {"Native", "StateCounter", "-D", "N=2", "-stats", file.toString()};
+      {"-native", "-count", "-D", "N=2", "-stats", file.toString()};
     testCommandLine("binding", args, true, "Total number of states: 410");
   }
 
@@ -245,7 +243,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "small_factory_2u");
     final String[] args = new String[]
-      {"Modular", "ControllabilityChecker", "--", file.toString()};
+      {"-mod", "-cont", "--", file.toString()};
     testCommandLine("end", args, false);
   }
 
@@ -254,7 +252,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args =
-      new String[] {"Monolithic", "ControllabilityChecker",
+      new String[] {"-mono", "-cont",
                     "--", "-opt", file.toString()};
     testCommandLine("end-bad", args,
                     "FATAL ERROR \\(BadFileTypeException\\)");
@@ -265,7 +263,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "small_factory_2");
     final String[] args =
-      new String[] {"Monolithic", "ControllabilityChecker",
+      new String[] {"-mono", "-cont",
                     "-fslimit", "xxx", file.toString()};
     testCommandLine("fslimit-bad", args,
                     "Option -fslimit xxx does not specify an integer\\.");
@@ -276,7 +274,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "small_factory_2");
     final String[] args =
-      new String[] {"Monolithic", "ControllabilityChecker",
+      new String[] {"-mono", "-cont",
                     "-fslimit", "3", file.toString()};
     testCommandLine("fslimit-overflow", args, "!true.*", "OVERFLOW \\(.*");
   }
@@ -285,7 +283,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args =
-      new String[] {"Monolithic", "DiagnosabilityChecker", "-help"};
+      new String[] {"-mono", "-diag", "-help"};
     testCommandLine("help", args,
                     "=MonolithicDiagnosabilityVerifier supports the following options:",
                     "=-fslimit <n>.*",
@@ -299,8 +297,8 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args =
-      new String[] {"TRCompositional", "ConflictChecker",
-                    "-chain", "Native", "-help"};
+      new String[] {"-trcomp", "-conf",
+                    "-chain", "-native", "-help"};
     testCommandLine("help-chain", args,
                     "=NativeConflictChecker supports the following options:",
                     "-mode <value>.*",
@@ -317,7 +315,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "dining_philosophers");
     final String[] args = new String[]
-      {"BDD", "ConflictChecker", file.toString(), "-marking", "eaten"};
+      {"-bdd", "-conf", file.toString(), "-marking", "eaten"};
     testCommandLine("marking-bad", args, "FATAL.*", ".*'eaten'.*");
   }
 
@@ -326,7 +324,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "small_factory_2");
     final String[] args = new String[]
-      {"BDD", "ConflictChecker", file.toString(), "-q"};
+      {"-bdd", "-conf", file.toString(), "-q"};
     testCommandLine("quiet", args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
   }
 
@@ -335,7 +333,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "incremental_suite", "agv");
     final String[] args = new String[]
-      {"Native", "ConflictChecker", "-timeout", "1", file.toString()};
+      {"-native", "-conf", "-timeout", "1", file.toString()};
     testCommandLine("timeout", args, "!true.*", "TIMEOUT \\(.*");
   }
 
@@ -343,7 +341,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args = new String[]
-      {"Monolithic", "DiagnosabilityChecker", "-verose"};
+      {"-mono", "-diag", "-verose"};
     testCommandLine("unsupported", args, "Unsupported option -verose.*");
   }
 
@@ -352,7 +350,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "controlled_philosophers");
     final String[] args = new String[]
-      {"BDD", "ConflictChecker", file.toString(),
+      {"-bdd", "-conf", file.toString(),
        "-marking", "eaten[0]", "-verbose"};
     testCommandLine("verbose", args,
                     "DEBUG Depth .*", "DEBUG Coreachability .*");

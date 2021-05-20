@@ -127,7 +127,7 @@ public final class BDDExtendedGuardGenerator {
     NEQUAL = String.format(" %s ", ct.getNotEqualsOperator().getName());
 
     // options for saving IDD
-    automataBDD.setPathRoot(Config.FILE_SAVE_PATH.getAsString() +
+    automataBDD.setPathRoot(Config.FILE_SAVE_PATH.getValue() +
                             File.separator);
     generateIDD_PS = options.getSaveIDDInFile();
 

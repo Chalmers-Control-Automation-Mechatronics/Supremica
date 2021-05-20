@@ -38,7 +38,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
-import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -74,11 +73,10 @@ public class AnalysisOptionPage
   public AnalysisOptionPage(final AnalysisOperation operation,
                             final boolean canBeDisabled)
   {
-    super(operation.getOptionPagePrefix(), operation.getAnalysisName());
+    super(operation.getOptionPagePrefix(), operation.getShortAnalysisName());
     mOperation = operation;
-    mCanBeDisabled = canBeDisabled;
     final EnumFactory<ModelAnalyzerFactoryLoader> enumFactory =
-      createEnumFactory(operation);
+      ModelAnalyzerFactoryLoader.createEnumFactory(operation, canBeDisabled);
     mAlgorithmOption = new EnumOption<ModelAnalyzerFactoryLoader>
       ("Algorithm", "Algorithm", null, null, enumFactory);
     register(mAlgorithmOption);
@@ -129,49 +127,12 @@ public class AnalysisOptionPage
   @Override
   public String getShortDescription()
   {
-    return mOperation.getAnalysisName();
+    return mOperation.getShortAnalysisName();
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
-    (final AnalysisOperation operation)
-  {
-    final ProductDESProxyFactory desFactory =
-      ProductDESElementFactory.getInstance();
-    final ListedEnumFactory<ModelAnalyzerFactoryLoader> enumFactory =
-      new ListedEnumFactory<>();
-    boolean hasDefault = false;
-    for (final ModelAnalyzerFactoryLoader loader :
-         ModelAnalyzerFactoryLoader.values()) {
-      if (loader == ModelAnalyzerFactoryLoader.Disabled && mCanBeDisabled) {
-        enumFactory.register(loader, true);
-        hasDefault = true;
-      } else {
-        try {
-          final ModelAnalyzerFactory factory =
-            loader.getModelAnalyzerFactory();
-          final ModelAnalyzer analyzer =
-            operation.createModelAnalyzer(factory, desFactory);
-          if (analyzer != null) {
-            enumFactory.register(loader);
-            if (!hasDefault && loader == ModelAnalyzerFactoryLoader.DEFAULT) {
-              enumFactory.setDefaultValue(loader);
-              hasDefault = true;
-            }
-          }
-        } catch (ClassNotFoundException |
-                 AnalysisConfigurationException |
-                 UnsatisfiedLinkError |
-                 NoClassDefFoundError exception) {
-          // skip this factory
-        }
-      }
-    }
-    return enumFactory;
-  }
-
   private void registerAnalyzerFactoryOptions()
   {
     for (final ModelAnalyzerFactoryLoader loader :
@@ -193,6 +154,5 @@ public class AnalysisOptionPage
   //# Data Members
   private final AnalysisOperation mOperation;
   private final EnumOption<ModelAnalyzerFactoryLoader> mAlgorithmOption;
-  private final boolean mCanBeDisabled;
 
 }

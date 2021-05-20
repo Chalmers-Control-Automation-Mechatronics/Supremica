@@ -2,131 +2,34 @@
 
 THIS=`readlink -f $0`
 DIR=`dirname $THIS`
+NAME=`basename $THIS`
 
 export LD_LIBRARY_PATH=$DIR
 
 WPACK="net.sourceforge.waters"
-FACTORY="Native"
-MEM1="-Xmx512m"
+MEM1="-Xmx1024m"
 MEM2=
+EA=
 ARGS=
-FACTORY=
-MAIN_FACTORY=
 
 
 for F in "$@"; do
     case $F in
-    -bdd)
-        FACTORY="BDD"
-        ;;
-    -comp|-compositional)
-        FACTORY="Compositional"
-        ;;
-#   -dist)
-#       FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"
-#       ;;
-    -gnb)
-        FACTORY="GNB"
-        ;;
-    -mod|-modular)
-        FACTORY="Modular"
-        ;;
-    -mono)
-        FACTORY="Monolithic"
-        ;;
-    -native)
-        FACTORY="Native"
-        ;;
-    -po)
-        FACTORY="PartialOrder"
-        ;;
-    -trcomp)
-        FACTORY="TRCompositional"
-        ;;
-    -conf)
-        CHECK="ConflictChecker"
-        ;;
-    -cont)
-        CHECK="ControllabilityChecker"
-        ;;
-    -count)
-        CHECK="StateCounter"
-        ;;
-    -diag)
-        CHECK="DiagnosabilityChecker"
-        ;;
-    -deadlock|-dl)
-        CHECK="DeadlockChecker"
-        ;;
-    -lang)
-        CHECK="LanguageInclusionChecker"
-        ;;
-    -loop)
-        CHECK="ControlLoopChecker"
-        ;;
-    -synth)
-        CHECK="SupervisorSynthesizer"
-        ;;
-    -alf)
-        CHECK="ControlLoopChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDActivityLoopChecker\""
-        ;;
-    -sdc2a)
-        CHECK="LanguageInclusionChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCTwoAVerifier\""
-        ;;
-    -sdc31a)
-        CHECK="LanguageInclusionChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCThree1AVerifier\""
-        ;;
-    -sdc31b)
-        CHECK="LanguageInclusionChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCThree1BVerifier\""
-        ;;
-    -sdc4)
-        CHECK="LanguageInclusionChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCFourVerifier\""
-        ;;
-    -sdspb)
-        CHECK="LanguageInclusionChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDSingularProhibitableBehaviorVerifier\""
-        ;;
-    -sic5)
-        CHECK="ConflictChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty5Verifier\""
-        ;;
-    -sic6)
-        CHECK="ConflictChecker"
-        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty6Verifier\""
-        ;;
     -Xmx*)
         MEM1="$F"
         ;;
     -Xss*)
         MEM2="$F"
         ;;
+    -ea|-enableassertions)
+	EA=-enableassertions
+	;;
     *)
         ARGS="$ARGS \"$F\""
         ;;
     esac
-    if [ "" != "$FACTORY" ]; then
-        if [ "" = "$MAIN_FACTORY" ]; then
-            MAIN_FACTORY=$FACTORY
-        else
-            ARGS="$ARGS -chain $FACTORY"
-        fi
-        FACTORY=
-    fi
 done
 
-OK=1
-if [ "" = "$CHECK" ]; then
-    echo "No check specified!"
-    echo "Available options are: -conf -cont -count -dl -lang -loop -synth"
-    OK=0
-fi
+eval java -cp "$DIR/Supremica.jar" $EA $MEM1 $MEM2 \
+     $WPACK.model.analysis.cli.CommandLineTool @name $NAME "$ARGS" 
 
-if [ $OK = 1 ]; then
-    eval java -cp "$DIR/Supremica.jar" -enableassertions $MEM1 $MEM2 \
-        $WPACK.model.analysis.cli.CommandLineTool $MAIN_FACTORY $CHECK "$ARGS"
-fi

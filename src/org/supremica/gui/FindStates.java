@@ -902,7 +902,7 @@ class FreeFormPanel
 		x2Box.add(new JLabel("State Separator: "));
 
 		// sep_str = new JTextField(".", 30);
-		sep_str = new JTextField(Config.GENERAL_STATE_SEPARATOR.getAsString(), 30);
+		sep_str = new JTextField(Config.GENERAL_STATE_SEPARATOR.getValue(), 30);
 
 		x2Box.add(sep_str);
 		yBox.add(Box.createVerticalGlue());

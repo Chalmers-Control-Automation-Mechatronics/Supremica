@@ -118,12 +118,6 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
     }
 
     @Override
-    protected String getAnalysisName()
-    {
-      return TITLE;
-    }
-
-    @Override
     protected String getFailureText()
     {
       return "Synthesis failed. There is no solution to the control problem.";

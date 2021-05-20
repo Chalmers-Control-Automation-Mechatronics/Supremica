@@ -261,11 +261,11 @@ public class AutomatonMinimizer
           final AutomataToWaters importer = new AutomataToWaters(factory);
           final AutomatonProxy aut = importer.convertAutomaton(theAutomaton);
           final Collection<EventProxy> hidden = new ArrayList<EventProxy>(2);
-          final String tau = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
+          final String tau = Config.MINIMIZATION_SILENT_EVENT_NAME.getValue();
           final String tau_c =
-            Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
+            Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getValue();
           final String tau_u =
-            Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
+            Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getValue();
           for (final EventProxy event : aut.getEvents()) {
             final String name = event.getName();
             if (name.equals(tau) || name.equals(tau_c) || name.equals(tau_u)) {
@@ -2635,7 +2635,7 @@ public class AutomatonMinimizer
         int count = 0;
 
         // Get/create silent event tau
-        final String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
+        final String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getValue();
         LabeledEvent tau = aut.getAlphabet().getEvent(silentName);
         if (tau == null)
         {
@@ -2684,7 +2684,7 @@ public class AutomatonMinimizer
         int count = 0;
 
         // Add silent event (if it's not already there)
-        final String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
+        final String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getValue();
         LabeledEvent tau_u = aut.getAlphabet().getEvent(silentUName);
         if (tau_u == null)
         {
@@ -3084,7 +3084,7 @@ public class AutomatonMinimizer
             while (innerChange)
             {
                 // Find new states
-                final StateSet newStates = blockingStates.previousStates(Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString());
+                final StateSet newStates = blockingStates.previousStates(Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getValue());
                 // Remove outgoing arcs from newStates
                 for (final State state : newStates)
                 {

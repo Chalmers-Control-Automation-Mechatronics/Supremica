@@ -34,12 +34,11 @@
 package net.sourceforge.waters.model.analysis.cli;
 
 import java.io.PrintStream;
-import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.options.EnumOption;
 
 /**
  *
@@ -53,12 +52,18 @@ public class EnumCommandLineArgument<E> extends OptionCommandLineArgument<E>
   public EnumCommandLineArgument(final EnumOption<E> option)
   {
     super(option);
-    mEnumFactory = new JavaEnumFactory<E>(option);
   }
 
 
   //#######################################################################
-  //# Simple Access
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.cli.CommandLineArgument
+  @Override
+  public EnumOption<E> getOption()
+  {
+    return (EnumOption<E>) super.getOption();
+  }
+
   @Override
   protected String getArgumentTemplate()
   {
@@ -75,25 +80,20 @@ public class EnumCommandLineArgument<E> extends OptionCommandLineArgument<E>
   {
     iter.remove();
     if (iter.hasNext()) {
+      final EnumOption<E> option = getOption();
       final String arg = iter.next();
-      parse(arg);
+      try {
+        option.set(arg);
+      } catch (final ParseException exception) {
+        System.err.println(exception.getMessage());
+        option.dumpEnumeration(System.err, 0);
+        System.exit(1);
+      }
       iter.remove();
       setUsed(true);
     } else {
       failMissingValue();
     }
-  }
-
-  public void parse(final String arg)
-  {
-    final E value = mEnumFactory.getEnumValue(arg);
-    if (value == null) {
-      final String msg = getErrorMessage();
-      System.err.println(msg);
-      mEnumFactory.dumpEnumeration(System.err, 0);
-      System.exit(1);
-    }
-    else getOption().setValue(value);
   }
 
 
@@ -103,71 +103,8 @@ public class EnumCommandLineArgument<E> extends OptionCommandLineArgument<E>
   public void dump(final PrintStream stream)
   {
     super.dump(stream);
-    mEnumFactory.dumpEnumeration(stream, INDENT);
+    final EnumOption<E> option = getOption();
+    option.dumpEnumeration(stream, INDENT);
   }
-
-  protected String getErrorMessage()
-  {
-    return "Bad value for " + getCommandLineCode() + " option!";
-  }
-
-
-  //#########################################################################
-  //# Static Enum Parsing
-  public static <E extends Enum<E>> E parse(final CommandLineOptionContext context,
-                                            final Class<E> eclass,
-                                            final String name,
-                                            final String value)
-  {
-    final EnumOption<E> option =
-      new EnumOption<E>(null, null, null, null, eclass.getEnumConstants());
-    final EnumCommandLineArgument<E> parser =
-      new EnumCommandLineArgument<E>(option) {
-      @Override
-      protected String getErrorMessage()
-      {
-        return "Bad value for " + name + "!";
-      }
-    };
-    parser.parse(value);
-    return parser.getValue();
-  }
-
-
-  //#########################################################################
-  //# Inner Class JavaEnumFactory
-  private static class JavaEnumFactory<E>
-    extends EnumFactory<E>
-  {
-    //#######################################################################
-    //# Constructor
-    private JavaEnumFactory(final EnumOption<E> enumOption)
-    {
-      mEnumOption = enumOption;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.analysis.ExtensibleEnumFactory
-    @Override
-    public List<? extends E> getEnumConstants()
-    {
-      return mEnumOption.getEnumConstants();
-    }
-
-    @Override
-    public String getConsoleName(final E item)
-    {
-      return item.toString();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final EnumOption<E> mEnumOption;
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final EnumFactory<E> mEnumFactory;
 
 }

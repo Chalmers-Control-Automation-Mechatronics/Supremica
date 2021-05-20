@@ -141,7 +141,7 @@ public class ChainedAnalyzerOptionPage
   public String getShortDescription()
   {
     final AnalysisOperation operation = getAnalysisOperation();
-    return operation.getAnalysisName();
+    return operation.getShortAnalysisName();
   }
 
   @Override

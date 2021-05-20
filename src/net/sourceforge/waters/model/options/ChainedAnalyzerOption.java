@@ -35,11 +35,11 @@ package net.sourceforge.waters.model.options;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Properties;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
-import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -64,13 +64,14 @@ public class ChainedAnalyzerOption
     (final String id,
      final String shortName,
      final String description,
-     final AnalysisOptionPage db,
+     final AnalysisOptionPage parentPage,
      final ModelAnalyzerFactoryLoader parentLoader,
      final String... chainSuppressions)
   {
     super(id, shortName, description, "-chain",
-          createEnumFactory(db, parentLoader));
-    mOptionPage = new ChainedAnalyzerOptionPage(db, this, chainSuppressions);
+          createEnumFactory(parentPage, parentLoader));
+    mOptionPage =
+      new ChainedAnalyzerOptionPage(parentPage, this, chainSuppressions);
     mParentLoader = parentLoader;
   }
 
@@ -174,27 +175,6 @@ public class ChainedAnalyzerOption
     }
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static EnumFactory<ModelAnalyzerFactoryLoader>
-  createEnumFactory(final SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> parentPage,
-                    final ModelAnalyzerFactoryLoader parentLoader)
-  {
-    final EnumOption<ModelAnalyzerFactoryLoader> selector =
-      parentPage.getCurrentPageSelectorOption();
-    final ListedEnumFactory<ModelAnalyzerFactoryLoader> result =
-      new ListedEnumFactory<>();
-    for (final ModelAnalyzerFactoryLoader loader :
-         selector.getEnumConstants()) {
-      if (loader != ModelAnalyzerFactoryLoader.Disabled &&
-          loader != parentLoader) {
-        result.register(loader, loader == ModelAnalyzerFactoryLoader.DEFAULT);
-      }
-    }
-    return result;
-  }
-
   private static AnalysisConfigurationException
   createAnalysisConfigurationException(final ModelAnalyzerFactoryLoader loader,
                                        final ClassNotFoundException exception)
@@ -202,6 +182,17 @@ public class ChainedAnalyzerOption
     return new AnalysisConfigurationException
       ("Could not create chained analyzer for " + loader.toString() +
        " factory.", exception);
+  }
+
+  private static EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
+    (final SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> parentPage,
+     final ModelAnalyzerFactoryLoader parentLoader)
+  {
+    final EnumOption<ModelAnalyzerFactoryLoader> selector =
+      parentPage.getCurrentPageSelectorOption();
+    final List<ModelAnalyzerFactoryLoader> loaders =
+      selector.getEnumConstants();
+    return ModelAnalyzerFactoryLoader.createEnumFactory(loaders, parentLoader);
   }
 
 

@@ -157,7 +157,7 @@ public class IDE
     pack();
     mSplitPaneVertical.setDividerLocation(0.9);
 
-    final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
+    final File startdir = new File(Config.FILE_OPEN_PATH.getValue());
     mFileChooser = new JFileChooser(startdir);
 
     // Initialise document managers and register listeners

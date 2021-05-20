@@ -35,6 +35,13 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
@@ -48,27 +55,37 @@ import java.lang.reflect.Method;
 
 public enum ModelAnalyzerFactoryLoader
 {
-  Disabled("net.sourceforge.waters.model.analysis.des.DisabledModelAnalyzerFactory") {
+  Disabled("net.sourceforge.waters.model.analysis.des.DisabledModelAnalyzerFactory", "-disabled") {
     @Override
     public String toString() { return "(disabled)"; }
   },
-  BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
-  Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory"),
-  GNB("net.sourceforge.waters.analysis.gnonblocking.GNBModelVerifierFactory"),
-  Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory"),
-  Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory"),
-  Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory"),
-  PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory"),
-  Supremica("org.supremica.automata.waters.SupremicaModelAnalyzerFactory"),
-  TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory"),
-  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory");
+  BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory", "-bdd"),
+  Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory", "-comp"),
+  GNB("net.sourceforge.waters.analysis.gnonblocking.GNBModelVerifierFactory", "-gnb"),
+  Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory", "-mod"),
+  Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory", "-mono"),
+  Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory", "-native"),
+  PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory", "-po"),
+  Supremica("org.supremica.automata.waters.SupremicaModelAnalyzerFactory", "-sup"),
+  TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory", "-trcomp"),
+  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory", "trmono");
 
 
   //#########################################################################
   //# Constructor
-  private ModelAnalyzerFactoryLoader(final String classname)
+  private ModelAnalyzerFactoryLoader(final String classname,
+                                     final String consoleName)
   {
     mClassName = classname;
+    mConsoleName = consoleName;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public String getConsoleName()
+  {
+    return mConsoleName;
   }
 
 
@@ -115,12 +132,135 @@ public enum ModelAnalyzerFactoryLoader
 
 
   //#########################################################################
-  //# Data Members
-  private String mClassName;
+  //# Creating Enum Factories
+  public static EnumFactory<ModelAnalyzerFactoryLoader> getEnumFactory()
+  {
+    return ModelAnalyzerFactoryLoaderEnumFactory.INSTANCE;
+  }
+
+  public static EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
+    (final AnalysisOperation operation, final boolean canBeDisabled)
+  {
+    return new ModelAnalyzerFactoryLoaderEnumFactory(operation, canBeDisabled);
+  }
+
+  public static EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
+    (final List<ModelAnalyzerFactoryLoader> loaders,
+     final ModelAnalyzerFactoryLoader suppressedLoader)
+  {
+    return new ModelAnalyzerFactoryLoaderEnumFactory(loaders, suppressedLoader);
+  }
+
+
+  private static class ModelAnalyzerFactoryLoaderEnumFactory
+    extends ListedEnumFactory<ModelAnalyzerFactoryLoader>
+  {
+    //#######################################################################
+    //# Constructors
+    private ModelAnalyzerFactoryLoaderEnumFactory()
+    {
+      for (final ModelAnalyzerFactoryLoader loader :
+           ModelAnalyzerFactoryLoader.values()) {
+        if (loader.getConsoleName() != null) {
+          register(loader, loader == Monolithic);
+        }
+      }
+    }
+
+    private ModelAnalyzerFactoryLoaderEnumFactory
+      (final AnalysisOperation operation, final boolean canBeDisabled)
+    {
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      for (final ModelAnalyzerFactoryLoader loader :
+           ModelAnalyzerFactoryLoader.values()) {
+        if (loader == Disabled && canBeDisabled) {
+          register(loader);
+        } else {
+          try {
+            final ModelAnalyzerFactory factory =
+              loader.getModelAnalyzerFactory();
+            final ModelAnalyzer analyzer =
+              operation.createModelAnalyzer(factory, desFactory);
+            if (analyzer != null) {
+              register(loader);
+            }
+          } catch (ClassNotFoundException |
+                   AnalysisConfigurationException |
+                   UnsatisfiedLinkError |
+                   NoClassDefFoundError exception) {
+            // skip this factory
+          }
+        }
+      }
+      findDefault();
+    }
+
+    private ModelAnalyzerFactoryLoaderEnumFactory
+      (final List<ModelAnalyzerFactoryLoader> loaders,
+       final ModelAnalyzerFactoryLoader suppressedLoader)
+    {
+      for (final ModelAnalyzerFactoryLoader loader : loaders) {
+        if (loader != suppressedLoader) {
+          register(loader);
+        }
+      }
+      findDefault();
+    }
+
+    private void findDefault()
+    {
+      for (final ModelAnalyzerFactoryLoader loader : getEnumConstants()) {
+        switch (loader) {
+        case Disabled:
+        case Native:
+          setDefaultValue(loader);
+          return;
+        case Monolithic:
+          setDefaultValue(Monolithic);
+          break;
+        default:
+          break;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.EnumFactory<AnalysisOperation>
+    @Override
+    public ModelAnalyzerFactoryLoader getEnumValue(final String name)
+    {
+      final ModelAnalyzerFactoryLoader loader = super.getEnumValue(name);
+      if (loader != null) {
+        return loader;
+      } else {
+        return getEnumValueFallback(name);
+      }
+    }
+
+    @Override
+    public String getConsoleName(final ModelAnalyzerFactoryLoader loader)
+    {
+      return loader.getConsoleName();
+    }
+
+    @Override
+    public boolean isDisplayedInConsole(final ModelAnalyzerFactoryLoader loader)
+    {
+      return loader != Disabled;
+    }
+
+    //#######################################################################
+    //# Singleton Instance
+    private static ModelAnalyzerFactoryLoaderEnumFactory INSTANCE =
+      new ModelAnalyzerFactoryLoaderEnumFactory();
+  }
 
 
   //#########################################################################
-  //# Class Constants
-  public static final ModelAnalyzerFactoryLoader DEFAULT = Monolithic;
+  //# Data Members
+  private String mClassName;
+  private String mConsoleName;
 
 }

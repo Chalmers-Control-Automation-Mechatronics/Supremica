@@ -159,7 +159,7 @@ public class LegacyOption
     // waters.analysis.diagnosability.Algorithm
     createBooleanReplacement("gui.analyzer.includeDiagnosability",
                              "waters.analysis.diagnosability.Algorithm",
-                             "(disabled)", "Monolithic");
+                             "-disabled", "-mono");
     // gui.editor.edgeArrowAtEnd
     createBooleanExtension("gui.editor.edgeArrowAtEnd", "End", "Middle");
   }

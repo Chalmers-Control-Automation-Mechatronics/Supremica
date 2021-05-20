@@ -33,11 +33,14 @@
 
 package net.sourceforge.waters.model.options;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.expr.ParseException;
 
 
 /**
@@ -53,30 +56,38 @@ public class EnumOption<E> extends Option<E>
   //# Constructors
   public EnumOption(final String id,
                     final String shortName,
+                    final EnumFactory<E> factory)
+  {
+    this(id, shortName, null, null, factory);
+  }
+
+  public EnumOption(final String id,
+                    final String shortName,
                     final String description,
                     final String commandLineOption,
-                    final EnumFactory<? extends E> factory)
+                    final EnumFactory<E> factory)
   {
     super(id, shortName, description, commandLineOption,
           factory.getDefaultValue());
-    mEnumConstants = factory.getEnumConstants();
+    mEnumFactory = factory;
   }
 
   public EnumOption(final String id,
                     final String name,
                     final List<E> enumConstants)
   {
-    this(id, name, enumConstants, enumConstants.get(0));
+    this(id, name, null, null, enumConstants, enumConstants.get(0));
   }
 
   public EnumOption(final String id,
                     final String name,
+                    final String description,
+                    final String commandLineOption,
                     final List<E> enumConstants,
                     final E defaultValue)
   {
-    super(id, name, null, null, defaultValue);
-    assert enumConstants.contains(defaultValue);
-    mEnumConstants = enumConstants;
+    super(id, name, description, commandLineOption, defaultValue);
+    mEnumFactory = new ListedEnumFactory<E>(enumConstants, defaultValue);
   }
 
   public EnumOption(final String id,
@@ -96,23 +107,37 @@ public class EnumOption<E> extends Option<E>
                     final E[] enumConstants,
                     final E defaultValue)
   {
-    super(id, shortName, description, commandLineOption, defaultValue);
-    mEnumConstants = Arrays.asList(enumConstants);
+    this(id, shortName, description, commandLineOption,
+         Arrays.asList(enumConstants), defaultValue);
   }
 
   public EnumOption(final EnumOption<E> template,
-                    final EnumFactory<? extends E> factory)
+                    final EnumFactory<E> factory)
   {
     super(template, factory.getDefaultValue());
-    mEnumConstants = factory.getEnumConstants();
+    mEnumFactory = factory;
   }
 
 
   //#########################################################################
   //# Type-specific Access
-  public List<? extends E> getEnumConstants()
+  public List<E> getEnumConstants()
   {
-    return mEnumConstants;
+    return mEnumFactory.getEnumConstants();
+  }
+
+  public void dumpEnumeration(final PrintStream stream,
+                              final int indent)
+  {
+    dumpEnumeration(stream, indent, "values", true);
+  }
+
+  public void dumpEnumeration(final PrintStream stream,
+                              final int indent,
+                              final String choiceName,
+                              final boolean showDefault)
+  {
+    mEnumFactory.dumpEnumeration(stream, indent, choiceName, showDefault);
   }
 
 
@@ -126,36 +151,27 @@ public class EnumOption<E> extends Option<E>
 
   @Override
   public void set(final String text)
+    throws ParseException
   {
-    final E value = parseObject(text);
+    final E value = mEnumFactory.getEnumValue(text);
     if (value != null) {
       setValue(value);
-    }
-    else {
-      final String message = "Enum value '"+value+"' could not be found.";
-      throw new IllegalArgumentException(message);
+    } else {
+      final String message =
+        "Unsupported value '" + text + "' for " + getShortName() + ".";
+      throw new ParseException(message, 0);
     }
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Parses a string into the enumeration type associated with this property.
-   */
-  private E parseObject(final String name)
+  @Override
+  public String getConsoleName(final E value)
   {
-    for (final E value : mEnumConstants) {
-      if (value.toString().equalsIgnoreCase(name)) {
-        return value;
-      }
-    }
-    return null;
+    return mEnumFactory.getConsoleName(value);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final List<? extends E> mEnumConstants;
+  private final EnumFactory<E> mEnumFactory;
 
 }

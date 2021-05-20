@@ -36,10 +36,11 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.options.Configurable;
 
 /**
  *
@@ -54,9 +55,23 @@ public abstract class CommandLineArgument
   @Override
   public int compareTo(final CommandLineArgument arg)
   {
-    final String code = getCommandLineCode();
-    final String argCode = arg.getCommandLineCode();
-    return code.compareTo(argCode);
+    final Iterator<String> iter1 = getKeys().iterator();
+    final Iterator<String> iter2 = arg.getKeys().iterator();
+    while (iter1.hasNext() && iter2.hasNext()) {
+      final String key1 = iter1.next();
+      final String key2 = iter2.next();
+      final int result = key1.compareToIgnoreCase(key2);
+      if (result != 0) {
+        return result;
+      }
+    }
+    if (iter1.hasNext()) {
+      return 1;
+    } else if (iter2.hasNext()) {
+      return -1;
+    } else {
+      return 0;
+    }
   }
 
 
@@ -71,6 +86,7 @@ public abstract class CommandLineArgument
   {
     mUsed = used;
   }
+
 
   //#########################################################################
   //# Hooks
@@ -117,6 +133,9 @@ public abstract class CommandLineArgument
   public void dump(final PrintStream stream)
   {
     final String name = getCommandLineCode();
+    if (name.startsWith("@")) {
+      return;
+    }
     final String template = getArgumentTemplate();
     stream.print(name);
     int len = name.length();
