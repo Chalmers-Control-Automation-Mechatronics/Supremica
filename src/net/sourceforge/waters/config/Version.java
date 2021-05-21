@@ -36,6 +36,7 @@ package net.sourceforge.waters.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.net.URL;
 import java.text.DateFormat;
@@ -217,6 +218,37 @@ public class Version
     } catch (final NumberFormatException exception) {
       return -1;
     }
+  }
+
+  public static void printConsoleInfo(final PrintStream stream)
+  {
+    final Version version = getInstance();
+    stream.println(version.getTitle());
+    stream.print("Built ");
+    stream.println(version.getPrintableBuildTime());
+    stream.print("Dynamic libraries ");
+    final String osType = version.getOSType();
+    if (osType == null) {
+      stream.println("unavailable");
+    } else {
+      stream.print("compiled for ");
+      stream.print(osType);
+      if (version.checkOSType()) {
+        try {
+          System.loadLibrary("waters");
+        } catch (final UnsatisfiedLinkError error) {
+          stream.print(" - failed to load");
+        }
+      } else {
+        stream.print(" - incompatible");
+      }
+      stream.println();
+    }
+    stream.print("Running in Java ");
+    stream.println(version.getJavaVersionText());
+    stream.print("Maximum available memory: ");
+    stream.print(Runtime.getRuntime().maxMemory() / 0x100000L);
+    stream.println(" MiB");
   }
 
 

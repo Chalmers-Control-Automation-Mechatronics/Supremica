@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
@@ -194,6 +195,27 @@ public class CommandLineToolTest
                     "counterexample:", "Statistics:");
   }
 
+  public void testAnalyzer_TRCompConflict()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "bad_factory");
+    final String[] args = new String[]
+      {"-trcomp", "-conf", file.toString()};
+    testCommandLine("trcomp-conf", args, false, "counterexample:");
+  }
+
+  public void testAnalyzer_TRCompConflictProperties()
+    throws Exception
+  {
+    final File file = getInputWmod("valid", "central_locking", "verriegel2");
+    final File props = getInputProperties("tests", "nasty", "junit");
+    final String[] args = new String[]
+      {"-trcomp", "-conf", file.toString(),
+       "-p", props.toString(), "-q", "-stats"};
+    testCommandLine("trcomp-conf-p", args, true,
+                    ".*SelfloopSubsumptionTRSimplifier.*", "!WARN.*");
+  }
+
   public void testAnalyzer_TRCompControllability()
     throws Exception
   {
@@ -215,15 +237,6 @@ public class CommandLineToolTest
       {"-trcomp", "-lang",
        file.toString(), "-property", "prop[3]"};
     testCommandLine("trcomp-lang", args, true);
-  }
-
-  public void testAnalyzer_TRCompConflict()
-    throws Exception
-  {
-    final File file = getInputWmod("handwritten", "bad_factory");
-    final String[] args = new String[]
-      {"-trcomp", "-conf", file.toString()};
-    testCommandLine("trcomp-conf", args, false, "counterexample:");
   }
 
 
@@ -310,6 +323,13 @@ public class CommandLineToolTest
                     "=-quiet\\|-q.*");
   }
 
+  public void testOption_Name()
+    throws Exception
+  {
+    final String[] args = new String[] {"@name", "junit"};
+    testCommandLine("name", args, "USAGE: junit <.*");
+  }
+
   public void testOption_MarkingBad()
     throws Exception
   {
@@ -356,6 +376,14 @@ public class CommandLineToolTest
                     "DEBUG Depth .*", "DEBUG Coreachability .*");
   }
 
+  public void testOption_Version()
+    throws Exception
+  {
+    final String[] args = new String[] {"@name", "wcheck", "-version"};
+    testCommandLine("version", args,
+                    Version.getInstance().getTitle());
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.junit.AbstractWatersTest
@@ -397,6 +425,11 @@ public class CommandLineToolTest
     return getInputFile(path, ".wdes");
   }
 
+  private File getInputProperties(final String... path)
+  {
+    return getInputFile(path, ".properties");
+  }
+
   private void testCommandLine(final String name,
                                final String[] args,
                                final String... outputPatterns)
@@ -433,7 +466,8 @@ public class CommandLineToolTest
     final List<PatternHandler> antiPatterns =
       new ArrayList<>(outputPatterns.length);
     if (expectedResult != null) {
-      final String resultRegex = String.format("%b \\(.*", expectedResult);
+      final String resultRegex =
+        String.format("([a-zA-Z0-9]+ \\.\\.\\. )?%b \\(.*", expectedResult);
       final PatternHandler resultPattern = new PatternHandler(resultRegex);
       patterns.add(resultPattern);
     }

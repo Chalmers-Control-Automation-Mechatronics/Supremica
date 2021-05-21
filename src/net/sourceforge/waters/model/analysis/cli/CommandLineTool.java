@@ -45,7 +45,9 @@ import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 
+import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -65,7 +67,6 @@ import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
@@ -89,6 +90,7 @@ import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -141,15 +143,19 @@ public class CommandLineTool implements Configurable
     final Formatter formatter = new Formatter(System.out);
 
     try {
-      int firstOptionIndex = 0;
-      if (args.length < 2) {
-        usage();
-      } else if (args[0].equals("@name")) {
-        mToolName = args[1];
-        if (args.length < 4) {
-          usage();
-        }
+      int firstOptionIndex;
+      if (args.length >= 2 && args[0].equals("@name")) {
         firstOptionIndex = 2;
+        mToolName = args[1];
+      } else {
+        firstOptionIndex = 0;
+      }
+      if (args.length == firstOptionIndex + 1 &&
+          args[firstOptionIndex].equals("-version")) {
+        Version.printConsoleInfo(System.out);
+        System.exit(0);
+      } else if (args.length < firstOptionIndex + 2) {
+        usage();
       }
       final String algorithmArg = args[firstOptionIndex++];
       final String operationArg = args[firstOptionIndex++];
@@ -220,7 +226,7 @@ public class CommandLineTool implements Configurable
       }
 
       final Watchdog watchdog = new Watchdog(mAnalyzer, mTimeout);
-      if (mTimeout > 0 && mTimeout < Integer.MAX_VALUE) {
+      if (mTimeout > 0) {
         watchdog.start();
       }
 
@@ -373,7 +379,9 @@ public class CommandLineTool implements Configurable
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, CommandLineOptionContext.
-                         OPTION_CommandLineTool_Verbose);
+                         OPTION_CommandLineTool_Csv);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Properties);
     page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Quiet);
     page.append(options, CommandLineOptionContext.
@@ -381,7 +389,7 @@ public class CommandLineTool implements Configurable
     page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Timeout);
     page.append(options, CommandLineOptionContext.
-                         OPTION_CommandLineTool_Csv);
+                         OPTION_CommandLineTool_Verbose);
     return options;
   }
 
@@ -389,13 +397,36 @@ public class CommandLineTool implements Configurable
   public void setOption(final Option<?> option)
   {
     if (option.hasID(CommandLineOptionContext.
-                     OPTION_CommandLineTool_Verbose)) {
-      final BooleanOption flag = (BooleanOption) option;
-      if (flag.getBooleanValue()) {
-        mVerbosity = Level.ALL;
+                     OPTION_CommandLineTool_Csv)) {
+      final FileOption opt = (FileOption) option;
+      final File file = opt.getValue();
+      if (file != null) {
+        try {
+          final OutputStream stream = new FileOutputStream(file, true);
+          mCsv = new PrintWriter(stream);
+        } catch (final FileNotFoundException exception) {
+          LogManager.getLogger().error("Can't open output file {}.", file);
+          System.exit(1);
+        }
       }
     } else if (option.hasID(CommandLineOptionContext.
-                            OPTION_CommandLineTool_Quiet)) {
+                            OPTION_CommandLineTool_Properties)) {
+      final FileOption opt = (FileOption) option;
+      final File file = opt.getValue();
+      if (file != null) {
+        try {
+          final Properties properties = OptionFileManager.loadProperties(file);
+          WatersOptionPages.WATERS_ROOT.loadProperties(properties);
+        } catch (final FileNotFoundException exception) {
+          LogManager.getLogger().error("Properties file {} not found.", file);
+          System.exit(1);
+        } catch (final IOException exception) {
+          LogManager.getLogger().error("Error reading properties file {}.", file);
+          System.exit(1);
+        }
+      }
+    } else  if (option.hasID(CommandLineOptionContext.
+                             OPTION_CommandLineTool_Quiet)) {
       final BooleanOption flag = (BooleanOption) option;
       if (flag.getBooleanValue()) {
         mVerbosity = Level.OFF;
@@ -407,18 +438,15 @@ public class CommandLineTool implements Configurable
     } else if (option.hasID(CommandLineOptionContext.
                             OPTION_CommandLineTool_Timeout)) {
       final PositiveIntOption opt = (PositiveIntOption) option;
-      mTimeout = opt.getIntValue();
+      final int timeout = opt.getIntValue();
+      if (timeout < Integer.MAX_VALUE) {
+        mTimeout = timeout;
+      }
     } else if (option.hasID(CommandLineOptionContext.
-                            OPTION_CommandLineTool_Csv)) {
-      final FileOption opt = (FileOption) option;
-      final File file = opt.getValue();
-      if (file != null) {
-        try {
-          final OutputStream stream = new FileOutputStream(file, true);
-          mCsv = new PrintWriter(stream);
-        } catch (final FileNotFoundException exception) {
-          throw new WatersRuntimeException(exception);
-        }
+                            OPTION_CommandLineTool_Verbose)) {
+      final BooleanOption flag = (BooleanOption) option;
+      if (flag.getBooleanValue()) {
+        mVerbosity = Level.ALL;
       }
     }
   }

@@ -45,6 +45,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -231,6 +232,7 @@ public class CommandLineOptionContext implements OptionContext
     if (includeSpecials) {
       source.addSpecialArgument(new EndArgument());
       source.addSpecialArgument(new HelpArgument());
+      source.addSpecialArgument(new VersionArgument());
     }
   }
 
@@ -420,6 +422,35 @@ public class CommandLineOptionContext implements OptionContext
 
 
   //#########################################################################
+  //# Inner Class VersionArgument
+  private class VersionArgument extends CommandLineArgument
+  {
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.cli.CommandLineArgument
+    @Override
+    public String getCommandLineCode()
+    {
+      return "-version";
+    }
+
+    @Override
+    public String getDescription()
+    {
+      return "Show version information and exit";
+    }
+
+    @Override
+    public void parse(final CommandLineOptionContext context,
+                      final ListIterator<String> iter)
+    {
+      Version.printConsoleInfo(System.out);
+      System.exit(0);
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class CommandLineToolOptionPage
   private class CommandLineToolOptionPage
     extends SimpleLeafOptionPage
@@ -429,9 +460,10 @@ public class CommandLineOptionContext implements OptionContext
     public CommandLineToolOptionPage()
     {
       super("cli", "Command Line Tool");
-      register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
-                                 "Verbose log output",
-                                 "+verbose|+v", false));
+      register(new FileOption(OPTION_CommandLineTool_Csv, null,
+                              "Save statistics in CSV file", "-csv"));
+      register(new FileOption(OPTION_CommandLineTool_Properties, null,
+                              "Read options from properties file", "-p"));
       register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
                                  "Suppress all log output",
                                  "+quiet|+q", false));
@@ -440,8 +472,9 @@ public class CommandLineOptionContext implements OptionContext
       register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
                                      "Maximum allowed runtime in seconds",
                                      "-timeout"));
-      register(new FileOption(OPTION_CommandLineTool_Csv, null,
-                              "Save statistics in CSV file", "-csv"));
+      register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
+                                 "Verbose log output",
+                                 "+verbose|+v", false));
     }
   }
 
@@ -458,6 +491,8 @@ public class CommandLineOptionContext implements OptionContext
   //# Class Constants
   public static final String OPTION_CommandLineTool_Csv =
     "CommandLineTool.Csv";
+  public static final String OPTION_CommandLineTool_Properties =
+    "CommandLineTool.Properties";
   public static final String OPTION_CommandLineTool_Quiet =
     "CommandLineTool.Quiet";
   public static final String OPTION_CommandLineTool_Stats =

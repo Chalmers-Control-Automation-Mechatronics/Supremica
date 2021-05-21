@@ -69,31 +69,40 @@ public final class OptionFileManager
   //#########################################################################
   //# Loading
   public static void loadProperties(final OptionPage root,
-                                    final File theFile)
+                                    final File file)
     throws IOException
   {
     mRoot = root;
-    mPropertyFile = theFile; // this is the file we load properties from, it should also be the one to save to
-    updateProperties(mRoot, mPropertyFile);
+    mPropertyFile = file; // this is the file we load properties from, it should also be the one to save to
+    final Properties properties = loadProperties(file);
+    updateProperties(mRoot, properties);
+  }
+
+  public static Properties loadProperties(final File file)
+    throws IOException
+  {
+    final FileInputStream stream = new FileInputStream(file);
+    try {
+      final Properties properties = new Properties();
+      properties.load(new BufferedInputStream(stream));
+      LegacyOption.transformProperties(properties);
+      return properties;
+    } finally {
+      stream.close();
+    }
   }
 
   /**
    * Load properties from file.
    */
   public static void updateProperties(final OptionPage root,
-                                      final File propertyFile)
-    throws IOException
+                                      final Properties properties)
   {
-    final FileInputStream stream = new FileInputStream(propertyFile);
     try {
-      final Properties properties = new Properties();
-      properties.load(new BufferedInputStream(stream));
-      LegacyOption.transformProperties(properties);
       mReadingPropertyFile = true;
       root.loadProperties(properties);
       warnAboutUnused(properties);
     } finally {
-      stream.close();
       mReadingPropertyFile = false;
     }
   }
