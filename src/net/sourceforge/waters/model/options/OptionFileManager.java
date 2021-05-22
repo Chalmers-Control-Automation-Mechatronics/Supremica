@@ -68,6 +68,10 @@ public final class OptionFileManager
 
   //#########################################################################
   //# Loading
+  /**
+   * Loads options from properties file into given option page.
+   * Also records this option page and file to be used when saving.
+   */
   public static void loadProperties(final OptionPage root,
                                     final File file)
     throws IOException
@@ -78,6 +82,10 @@ public final class OptionFileManager
     updateProperties(mRoot, properties);
   }
 
+  /**
+   * Loads properties from file.
+   * Also applies legacy option transformations.
+   */
   public static Properties loadProperties(final File file)
     throws IOException
   {
@@ -93,7 +101,8 @@ public final class OptionFileManager
   }
 
   /**
-   * Load properties from file.
+   * Updates option page based on properties map.
+   * Warns about options that appear in the map but are not defined.
    */
   public static void updateProperties(final OptionPage root,
                                       final Properties properties)

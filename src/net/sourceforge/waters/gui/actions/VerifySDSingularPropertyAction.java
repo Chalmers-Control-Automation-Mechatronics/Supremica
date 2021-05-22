@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDSingularProhibitableBehaviorVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -51,20 +52,27 @@ public class VerifySDSingularPropertyAction extends WatersVerificationAction
   }
 
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
-    return "S-Singular Prohibitable Behaviour";
+    return "S-Singular Prohibitable Behaviour Check";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "does not satisfy S-Singular Prohibitable Behaviour Property ";
+    return "does not exhibit S-singular prohibitable behaviour";
+  }
+
+  @Override
+  protected String getSuccessDescription()
+  {
+    return "exhibits S-singular prohibitable behaviour";
   }
 
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final LanguageInclusionChecker checker =
       (LanguageInclusionChecker) super.createAndConfigureModelVerifier(desFactory);
@@ -73,12 +81,6 @@ public class VerifySDSingularPropertyAction extends WatersVerificationAction
     } else {
       return new SDSingularProhibitableBehaviorVerifier(checker, null, desFactory);
     }
-  }
-
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "satisfies S-Singular Prohibitable Behaviour";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

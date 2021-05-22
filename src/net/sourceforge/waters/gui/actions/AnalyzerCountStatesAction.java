@@ -38,7 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.StateCounterDialog;
+import net.sourceforge.waters.gui.analyzer.ParametrisedStateCounterDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
 import org.supremica.gui.ide.IDE;
@@ -73,7 +73,7 @@ public class AnalyzerCountStatesAction extends WatersAnalyzerAction
   {
     final IDE ide = getIDE();
     if (ide != null) {
-      new StateCounterDialog(getAnalyzerPanel());
+      new ParametrisedStateCounterDialog(getAnalyzerPanel());
     }
   }
 

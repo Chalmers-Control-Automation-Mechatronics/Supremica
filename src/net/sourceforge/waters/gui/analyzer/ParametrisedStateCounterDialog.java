@@ -34,81 +34,97 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
-import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.WatersOptionPages;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The dialog to launch a diagnosability check from the Waters analyser.
+ * The dialog to launch a state counter from the Waters analyser.
  *
- * @author Robi Malik
+ * @author Brandon Bassett
  */
-
-public class DiagnosabilityCheckDialog extends ParametrisedAnalysisDialog
+public class ParametrisedStateCounterDialog extends ParametrisedAnalysisDialog
 {
 
-  //#########################################################################
+  //#######################################################################
   //# Constructor
-  public DiagnosabilityCheckDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedStateCounterDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel);
-    setTitle(TITLE);
+    super(panel, AnalysisOperation.STATE_COUNT);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected AnalysisOptionPage getOptionPage()
+  protected StateCounter getAnalyzer()
   {
-    return WatersOptionPages.DIAGNOSABILITY;
+    return (StateCounter) super.getAnalyzer();
   }
 
   @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
-                                                    final ProductDESProxy des)
+  protected WatersAnalyzeDialog createAnalyzeDialog
+    (final IDE ide, final ProductDESProxy des)
   {
-    return new DiagnosabilityCheckPopUpDialog(ide, des);
+    final StateCounter counter = getAnalyzer();
+    counter.setModel(des);
+    return new StateCounterPopUpDialog(ide, counter);
   }
 
 
   //#########################################################################
-  //# Inner Class DiagnosabilityCheckPopUpDialog
-  private class DiagnosabilityCheckPopUpDialog extends WatersVerificationDialog
+  //# Inner Class StateCounterPopUpDialog
+  private class StateCounterPopUpDialog extends WatersAnalyzeDialog
   {
     //#######################################################################
     //# Constructor
-    public DiagnosabilityCheckPopUpDialog(final IDE owner,
-                                          final ProductDESProxy des)
+    public StateCounterPopUpDialog(final IDE owner,
+                                   final StateCounter counter)
     {
-      super(owner, des, AnalysisOperation.DIAGNOSABILITY_CHECK);
+      super(owner, AnalysisOperation.STATE_COUNT, counter);
     }
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
+    protected String getFailureText()
     {
-      return getAnalyzer();
+      return "State Counter has failed.";
+    }
+
+    @Override
+    protected String getSuccessText()
+    {
+      final AnalysisResult result = getAnalyzer().getAnalysisResult();
+      final double numStates = result.getTotalNumberOfStates();
+      final double numTrans = result.getTotalNumberOfTransitions();
+      final Logger logger = LogManager.getFormatterLogger();
+      if (numTrans >= 0) {
+        logger.info("Synchronous product has %.0f states and %.0f transitions.",
+                    numStates, numTrans);
+      } else {
+        logger.info("Synchronous product has %.0f states.", numStates);
+      }
+
+      return "State Counter has succeded";
     }
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = -3453813712277345474L;
+    private static final long serialVersionUID = -8288851080599242814L;
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Diagnosability Check";
-
-  private static final long serialVersionUID = -872573554126822984L;
+  private static final long serialVersionUID = 1069804247073793761L;
 
 }

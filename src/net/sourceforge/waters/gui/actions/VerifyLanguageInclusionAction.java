@@ -33,13 +33,14 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -51,8 +52,8 @@ import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -65,9 +66,17 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class VerifyLanguageInclusionAction extends WatersVerificationAction
-                                            implements ModelObserver
+/**
+ * The action to invoke a language inclusion check through the Verify menu.
+ *
+ * @author Robi Malik
+ */
+
+public class VerifyLanguageInclusionAction
+  extends WatersVerificationAction
+  implements ModelObserver
 {
+
   //#########################################################################
   //# Constructors
   public VerifyLanguageInclusionAction(final IDE ide)
@@ -96,40 +105,40 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
       }
       putValue(Action.NAME, "Check propert" + suffix + ' ' + name);
     }
+    putValue(Action.SHORT_DESCRIPTION,
+             "Perform language inclusion check to verify properties");
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
-  protected String getCheckName()
+  String getFailureDescription()
   {
-    return "Language Inclusion";
-  }
-
-  @Override
-  protected String getFailureDescription()
-  {
-    if (mNamedProxy == null)
-      return "does not satisfy Language Inclusion";
-    else
+    if (mNamedProxy == null) {
+      return "does not satisfy language inclusion";
+    } else {
       return "does not satisfy property " + mNamedProxy.getName();
+    }
   }
 
   @Override
-  protected String getSuccessDescription()
+  String getSuccessDescription()
   {
-    if (mNamedProxy == null)
-      return "satisfies Language Inclusion";
-    else
+    if (mNamedProxy == null) {
+      return "satisfies language inclusion";
+    } else {
       return "satisfies property " + mNamedProxy.getName();
+    }
   }
 
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
-    final LanguageInclusionChecker checker =
-      (LanguageInclusionChecker) super.createAndConfigureModelVerifier(desFactory);
+    final ModelVerifier checker =
+      super.createAndConfigureModelVerifier(desFactory);
     if (checker != null && mNamedProxy != null) {
       if (mNamedProxy instanceof AutomatonProxy) {
         final KindTranslator translator = new SingleAutomatonKindTranslator();
@@ -232,6 +241,7 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
     }
   }
 
+
   //#########################################################################
   //# Inner Class SingleComponentKindTranslator
   private class SingleComponentKindTranslator
@@ -274,19 +284,30 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
   {
     //#######################################################################
     //# Invocation
-    private boolean containsProperty(final ModuleProxy proxy)
+    private boolean containsProperty(final ModuleProxy module)
     {
       try {
-        return visitModuleProxy(proxy);
+        return visitModuleProxy(module);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
     }
 
-    private Boolean isProperty(final Proxy proxy)
-    throws VisitorException
+    private boolean containsProperty(final Proxy proxy)
+      throws VisitorException
     {
-      return (Boolean)proxy.acceptVisitor(this);
+      return (Boolean) proxy.acceptVisitor(this);
+    }
+
+    private boolean containsProperty(final Collection<? extends Proxy> list)
+      throws VisitorException
+    {
+      for (final Proxy proxy : list) {
+        if (containsProperty(proxy)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     //#######################################################################
@@ -298,31 +319,23 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
     }
 
     @Override
-    public Boolean visitForeachProxy(final ForeachProxy foreach)
-    throws VisitorException
+    public Boolean visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
     {
-      for (final Proxy child : foreach.getBody()) {
-        if (isProperty(child)) {
-          return true;
-        }
-      }
-      return false;
+      return containsProperty(module.getComponentList());
     }
 
     @Override
-    public Boolean visitModuleProxy(final ModuleProxy proxy)
-    throws VisitorException
+    public Boolean visitNestedBlockProxy(final NestedBlockProxy block)
+      throws VisitorException
     {
-      for (final Proxy child : proxy.getComponentList())
-        if (isProperty(child))
-          return true;
-      return false;
+      return containsProperty(block.getBody());
     }
 
     @Override
-    public Boolean visitSimpleComponentProxy(final SimpleComponentProxy proxy)
+    public Boolean visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
-      return proxy.getKind() == ComponentKind.PROPERTY;
+      return comp.getKind() == ComponentKind.PROPERTY;
     }
   }
 

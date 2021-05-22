@@ -55,16 +55,23 @@ import org.supremica.gui.ide.ModuleContainer;
  * @author Robi Malik
  */
 
-public abstract class WatersVerificationDialog extends WatersAnalyzeDialog
+public class WatersVerificationDialog extends WatersAnalyzeDialog
 {
 
   //#########################################################################
   //# Constructor
-  protected WatersVerificationDialog(final IDE owner,
-                                     final ProductDESProxy des,
-                                     final AnalysisOperation operation)
+  public WatersVerificationDialog(final IDE owner,
+                                  final AnalysisOperation operation,
+                                  final ModelVerifier verifier)
   {
-    super(owner, des, operation);
+    super(owner, operation, verifier);
+  }
+
+  public WatersVerificationDialog(final IDE owner,
+                                  final AnalysisOperation operation,
+                                  final Throwable exception)
+  {
+    super(owner, operation, exception);
   }
 
 
@@ -75,17 +82,16 @@ public abstract class WatersVerificationDialog extends WatersAnalyzeDialog
     return (ModelVerifier) getModelAnalyzer();
   }
 
-
-  //#########################################################################
-  //# Abstract Methods
   protected String getFailureDescription()
   {
-    return getOperation().getFailureDescription();
+    final AnalysisOperation operation = getOperation();
+    return operation.getFailureDescription();
   }
 
   protected String getSuccessDescription()
   {
-    return getOperation().getSuccessDescription();
+    final AnalysisOperation operation = getOperation();
+    return operation.getSuccessDescription();
   }
 
 

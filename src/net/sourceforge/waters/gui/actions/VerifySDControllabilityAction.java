@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDControllabilityChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -49,7 +50,7 @@ public class VerifySDControllabilityAction extends WatersVerificationAction
   }
 
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "SD Controllability i";
   }
@@ -57,6 +58,7 @@ public class VerifySDControllabilityAction extends WatersVerificationAction
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final ControllabilityChecker checker =
       (ControllabilityChecker) super.createAndConfigureModelVerifier(desFactory);

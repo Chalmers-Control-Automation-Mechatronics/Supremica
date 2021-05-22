@@ -49,11 +49,12 @@ public class VerifyControllabilityAction extends WatersVerificationAction
 {
 
   //#########################################################################
-  //# Constructors
+  //# Constructor
   protected VerifyControllabilityAction(final IDE ide)
   {
     super(ide, AnalysisOperation.CONTROLLABILITY_CHECK);
   }
+
 
   //#########################################################################
   //# Class Constants

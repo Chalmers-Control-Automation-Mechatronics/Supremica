@@ -33,81 +33,121 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
-import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
+import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.gui.ide.IDE;
 
+
 /**
- * The dialog to launch a language inclusion check from the Waters analyser.
+ * The dialog to launch a supervisor synthesiser from the Waters analyser.
  *
- * @author Brandon Bassett
+ * @author Brandon Bassett, Robi Malik
  */
-public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
+
+public class ParametrisedSynthesisDialog extends ParametrisedAnalysisDialog
 {
 
   //#########################################################################
   //# Constructor
-  public LanguageInclusionCheckDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedSynthesisDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel);
-    setTitle(TITLE);
+    super(panel, AnalysisOperation.SYNTHESIS);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected AnalysisOptionPage getOptionPage()
+  protected SupervisorSynthesizer getAnalyzer()
   {
-    return WatersOptionPages.LANGUAGE_INCLUSION;
+    return (SupervisorSynthesizer) super.getAnalyzer();
   }
 
   @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
-                                                    final ProductDESProxy des)
+  protected WatersAnalyzeDialog createAnalyzeDialog
+    (final IDE ide, final ProductDESProxy des)
   {
-    return new LanguageInclusionCheckPopUpDialog(ide, des);
+    final SupervisorSynthesizer synthesizer = getAnalyzer();
+    synthesizer.setModel(des);
+    return new SynthesisPopUpDialog(ide, synthesizer);
   }
 
 
   //#########################################################################
-  //# Inner Class LanguageInclusionCheckPopUpDialog
-  private class LanguageInclusionCheckPopUpDialog extends WatersVerificationDialog
+  //# Inner Class SynthesisPopUpDialog
+  private class SynthesisPopUpDialog extends WatersAnalyzeDialog
   {
-
     //#######################################################################
     //# Constructor
-    public LanguageInclusionCheckPopUpDialog(final IDE owner,
-                                             final ProductDESProxy des)
+    public SynthesisPopUpDialog(final IDE owner,
+                                final SupervisorSynthesizer synthesizer)
     {
-      super(owner, des, AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
+      super(owner, AnalysisOperation.SYNTHESIS, synthesizer);
     }
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
+    public void succeed()
     {
-      return getAnalyzer();
+      super.succeed();
+      final ProductDESResult result = getAnalyzer().getAnalysisResult();
+      final Collection<? extends AutomatonProxy> supervisors =
+        result.getComputedAutomata();
+      if (supervisors != null) {
+        final GUIOptionContext context = getContext();
+        final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
+        final AutomataTable table = panel.getAutomataTable();
+        table.insertAndSelect(supervisors);
+      }
+    }
+
+    @Override
+    protected String getFailureText()
+    {
+      return "Synthesis failed. There is no solution to the control problem.";
+    }
+
+    @Override
+    protected String getSuccessText()
+    {
+      final ProductDESResult result =  getAnalyzer().getAnalysisResult();
+      final Collection<? extends AutomatonProxy> supervisors =
+        result.getComputedAutomata();
+      if (supervisors == null) {
+        return "Synthesis successful. " +
+               "A supervisor exists, but it has not been constructed.";
+      } else {
+        final int size = supervisors.size();
+        switch (size) {
+        case 0:
+          return "The system already satisfies all control objectives. " +
+                 "No supervisor is needed.";
+        case 1:
+          return "Successfully synthesised a supervisor.";
+        default:
+          return "Successfully synthesised " + size + " supervisor components.";
+        }
+      }
     }
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 7981974814785870939L;
+    private static final long serialVersionUID = 6159733639861131531L;
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Language Inclusion Check";
-
-  private static final long serialVersionUID = -1921272985614515952L;
+  private static final long serialVersionUID = -622825450495392984L;
 
 }

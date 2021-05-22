@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDPlantCompletenessChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -51,20 +52,27 @@ public class VerifySDPlantCompletenessAction extends WatersVerificationAction
   }
 
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
-    return "Plant Completeness";
+    return "Plant Completeness Check";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "does not satisfy Plant Completeness";
+    return "does not satisfy plant completeness";
+  }
+
+  @Override
+  protected String getSuccessDescription()
+  {
+    return "satisfies plant completeness";
   }
 
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final ControllabilityChecker checker =
       (ControllabilityChecker) super.createAndConfigureModelVerifier(desFactory);
@@ -73,12 +81,6 @@ public class VerifySDPlantCompletenessAction extends WatersVerificationAction
     } else {
       return new SDPlantCompletenessChecker(desFactory,checker);
     }
-  }
-
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "satisfies Plant Completeness";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

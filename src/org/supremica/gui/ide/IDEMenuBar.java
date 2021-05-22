@@ -56,7 +56,7 @@ import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.OptionChangeEvent;
 import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerCountStatesAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
@@ -103,11 +103,11 @@ import net.sourceforge.waters.gui.actions.SimulationResetAction;
 import net.sourceforge.waters.gui.actions.SimulationShowAllAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
-import net.sourceforge.waters.gui.actions.VerifyConflictCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyConflictAction;
 import net.sourceforge.waters.gui.actions.VerifyControlLoopAction;
 import net.sourceforge.waters.gui.actions.VerifyControllabilityAction;
-import net.sourceforge.waters.gui.actions.VerifyDeadlockCheckAction;
-import net.sourceforge.waters.gui.actions.VerifyDiagnosabilityCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyDeadlockAction;
+import net.sourceforge.waters.gui.actions.VerifyDiagnosabilityAction;
 import net.sourceforge.waters.gui.actions.VerifyHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.VerifyHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.VerifyLanguageInclusionAction;
@@ -365,10 +365,10 @@ public class IDEMenuBar
       actions.getAction(VerifyControllabilityAction.class);
     menu.add(controllability);
     final Action conflict =
-      actions.getAction(VerifyConflictCheckAction.class);
+      actions.getAction(VerifyConflictAction.class);
     menu.add(conflict);
     final Action deadlock =
-      actions.getAction(VerifyDeadlockCheckAction.class);
+      actions.getAction(VerifyDeadlockAction.class);
     menu.add(deadlock);
     final Action controlLoop =
         actions.getAction(VerifyControlLoopAction.class);
@@ -381,7 +381,7 @@ public class IDEMenuBar
     addOption(diagnosabilityOption);
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
       final Action diagnosability =
-        actions.getAction(VerifyDiagnosabilityCheckAction.class);
+        actions.getAction(VerifyDiagnosabilityAction.class);
       menu.add(diagnosability);
     }
     addOption(Config.GUI_ANALYZER_INCLUDE_HISC);
@@ -564,7 +564,7 @@ public class IDEMenuBar
       actions.getAction(AnalyzerDeadlockCheckAction.class);
     menu.add(deadlock);
     final Action controllability =
-      actions.getAction(AnalyzerControlLoopCheckAction.class);
+      actions.getAction(AnalyzerLoopCheckAction.class);
     menu.add(controllability);
     final Action languageInclusion =
       actions.getAction(AnalyzerLanguageInclusionCheckAction.class);

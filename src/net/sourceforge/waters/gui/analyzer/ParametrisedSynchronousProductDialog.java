@@ -33,135 +33,116 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.util.Collection;
-
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ProductDESResult;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.WatersOptionPages;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 
+
 /**
- * The dialog to launch a supervisor synthesiser from the Waters analyser.
+ * The dialog to launch a synchronous product builder from the Waters
+ * analyser.
  *
- * @author Brandon Bassett, Robi Malik
+ * @author George Hewlett, Brandon Bassett
  */
-public class SynthesisDialog extends ParametrisedAnalysisDialog
+public class ParametrisedSynchronousProductDialog
+  extends ParametrisedAnalysisDialog
 {
 
-  //#########################################################################
+  //#######################################################################
   //# Constructor
-  public SynthesisDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedSynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel);
-    setTitle(TITLE);
+    super(panel, AnalysisOperation.SYNCHRONOUS_PRODUCT);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected AnalysisOptionPage getOptionPage()
+  protected SynchronousProductBuilder getAnalyzer()
   {
-    return WatersOptionPages.SYNTHESIS;
+    return (SynchronousProductBuilder) super.getAnalyzer();
   }
 
   @Override
-  protected SupervisorSynthesizer getAnalyzer()
+  protected WatersAnalyzeDialog createAnalyzeDialog
+    (final IDE ide, final ProductDESProxy des)
   {
-    return (SupervisorSynthesizer) super.getAnalyzer();
-  }
-
-  @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
-                                                    final ProductDESProxy des)
-  {
-    return new SynthesisPopUpDialog(ide, des);
+    final SynchronousProductBuilder builder = getAnalyzer();
+    builder.setModel(des);
+    return new SynchronousProductPopUpDialog(ide, builder);
   }
 
 
   //#########################################################################
-  //# Inner Class SynthesisPopUpDialog
-  private class SynthesisPopUpDialog extends WatersAnalyzeDialog
+  //# Inner Class SynchronousProductPopUpDialog
+  private class SynchronousProductPopUpDialog extends WatersAnalyzeDialog
   {
     //#######################################################################
     //# Constructor
-    public SynthesisPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+    public SynchronousProductPopUpDialog(final IDE owner,
+                                         final SynchronousProductBuilder builder)
     {
-      super(owner, des, AnalysisOperation.SYNTHESIS);
+      super(owner, AnalysisOperation.SYNCHRONOUS_PRODUCT, builder);
     }
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
-    public void succeed()
-    {
-      super.succeed();
-      final ProductDESResult result = getAnalyzer().getAnalysisResult();
-      final Collection<? extends AutomatonProxy> supervisors =
-        result.getComputedAutomata();
-      if (supervisors != null) {
-        final GUIOptionContext context = getContext();
-        final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
-        final AutomataTable table = panel.getAutomataTable();
-        table.insertAndSelect(supervisors);
-      }
-    }
-
-    @Override
     protected String getFailureText()
     {
-      return "Synthesis failed. There is no solution to the control problem.";
+      //Failure occurs when result is null, check if running for statistics
+      if (!getAnalyzer().isDetailedOutputEnabled()) {
+        return getSuccessText();
+      } else {
+        return "Synchronous Product has failed.";
+      }
     }
 
     @Override
     protected String getSuccessText()
     {
-      final ProductDESResult result =  getAnalyzer().getAnalysisResult();
-      final Collection<? extends AutomatonProxy> supervisors =
-        result.getComputedAutomata();
-      if (supervisors == null) {
-        return "Synthesis successful. " +
-               "A supervisor exists, but it has not been constructed.";
-      } else {
-        final int size = supervisors.size();
-        switch (size) {
-        case 0:
-          return "The system already satisfies all control objectives. " +
-                 "No supervisor is needed.";
-        case 1:
-          return "Successfully synthesised a supervisor.";
-        default:
-          return "Successfully synthesised " + size + " supervisor components.";
+      final AutomatonResult result = getAnalyzer().getAnalysisResult();
+      final AutomatonProxy aut = result.getComputedProxy();
+      if (aut == null) {
+        // Statistics run
+        final Logger logger = LogManager.getFormatterLogger();
+        if (result.getPeakNumberOfTransitions() >= 0) {
+          logger.info("Synchronous product has %.0f transitions.",
+                      result.getPeakNumberOfTransitions());
         }
+        if (result.getPeakNumberOfStates() >= 0) {
+          logger.info("Synchronous product has %.0f states.",
+                      result.getPeakNumberOfStates());
+        }
+        return "Successfully produced synchronous product. Printing statistics to log.";
+      } else {
+        final GUIOptionContext context = getContext();
+        final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
+        final AutomataTable table = panel.getAutomataTable();
+        table.insertAndSelect(aut);
+        return "Successfully produced synchronous product.";
       }
-    }
-
-    @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
-    {
-      return getAnalyzer();
     }
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 6159733639861131531L;
+    private static final long serialVersionUID = -4410961155882957875L;
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Supervisor Synthesis";
-
-  private static final long serialVersionUID = -622825450495392984L;
+  private static final long serialVersionUID = -5945541495761539710L;
 
 }

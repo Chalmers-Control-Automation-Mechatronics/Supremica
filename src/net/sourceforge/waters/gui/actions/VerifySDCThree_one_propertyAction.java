@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDThreeOneVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -51,7 +52,7 @@ public class VerifySDCThree_one_propertyAction extends WatersVerificationAction
   }
 
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "SD Controllability iii.1";
   }
@@ -65,6 +66,7 @@ public class VerifySDCThree_one_propertyAction extends WatersVerificationAction
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final LanguageInclusionChecker checker =
       (LanguageInclusionChecker) super.createAndConfigureModelVerifier(desFactory);

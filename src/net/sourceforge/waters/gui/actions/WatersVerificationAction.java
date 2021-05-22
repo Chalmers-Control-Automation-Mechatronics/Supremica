@@ -43,17 +43,9 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -64,32 +56,23 @@ import org.supremica.gui.ide.ModuleContainer;
  * @author Andrew Holland, Robi Malik, Benjamin Wheeler
  */
 
-public abstract class WatersVerificationAction
+public class WatersVerificationAction
   extends WatersAction
-  implements OptionChangeListener, CompilationObserver
+  implements CompilationObserver
 {
 
   //#########################################################################
   //# Constructor
-  protected WatersVerificationAction(final IDE ide)
-  {
-    this(ide, null);
-  }
-
   protected WatersVerificationAction(final IDE ide,
                                      final AnalysisOperation operation)
   {
     super(ide);
     mOperation = operation;
     ide.attach(this);
-    putValue(Action.NAME, getCheckName() + " check");
-    putValue(Action.SHORT_DESCRIPTION,
-             "Check for " + getCheckName() + " issues");
+    putValue(Action.NAME, getWindowTitle());
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
-    final EnumOption<ModelAnalyzerFactoryLoader> option = getSelectorOption();
-    if (option != null) {
-      option.addOptionChangeListener(this);
-    }
+    putValue(Action.SHORT_DESCRIPTION,
+             "Check whether the model " + getSuccessDescription());
     updateEnabledStatus();
   }
 
@@ -107,12 +90,18 @@ public abstract class WatersVerificationAction
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.compiler.CompilationObserver
   @Override
-  public void compilationSucceeded(final ProductDESProxy compiledDES)
+  public void compilationSucceeded(final ProductDESProxy des)
   {
     final IDE ide = getIDE();
-    @SuppressWarnings("unused")
-    final VerificationDialog dialog =
-      new VerificationDialog(ide, compiledDES, mOperation);
+    try {
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final ModelVerifier verifier = createAndConfigureModelVerifier(factory);
+      verifier.setModel(des);
+      new EditorVerificationDialog(ide, verifier);
+    } catch (final AnalysisConfigurationException exception) {
+      new WatersVerificationDialog(ide, mOperation, exception);
+    }
   }
 
   @Override
@@ -132,141 +121,76 @@ public abstract class WatersVerificationAction
 
 
   //#########################################################################
-  //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-  @Override
-  public void optionChanged(final OptionChangeEvent event)
-  {
-    updateEnabledStatus();
-  }
-
-
-  //#########################################################################
   //# Enablement
   void updateEnabledStatus()
   {
     final ModuleContainer container = getActiveModuleContainer();
-    if (container == null) {
-      setEnabled(false);
-      return;
-    }
-    final ModelAnalyzer analyzer = createModelVerifier();
-    setEnabled(analyzer != null);
+    setEnabled(container != null);
   }
 
 
   //#########################################################################
-  //# Factory Access
-  protected String getCheckName()
+  //# Hooks
+  String getWindowTitle()
   {
-    return mOperation.getShortAnalysisName();
+    return mOperation.getLongWindowTitle();
   }
 
-  protected String getFailureDescription()
+  String getFailureDescription()
   {
     return mOperation.getFailureDescription();
   }
 
-  protected String getSuccessDescription()
+  String getSuccessDescription()
   {
     return mOperation.getSuccessDescription();
   }
 
-  ModelAnalyzerFactory getModelAnalyzerFactory()
-    throws ClassNotFoundException
-  {
-    final EnumOption<ModelAnalyzerFactoryLoader> option = getSelectorOption();
-    if (option == null) {
-      return null;
-    } else {
-      final ModelAnalyzerFactoryLoader loader = option.getValue();
-      return loader.getModelAnalyzerFactory();
-    }
-  }
-
-  ModelVerifier createModelVerifier()
-  {
-    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
-    return createModelVerifier(factory);
-  }
-
-  ModelVerifier createModelVerifier(final ProductDESProxyFactory desFactory)
-  {
-    try {
-      final ModelAnalyzerFactory vFactory = getModelAnalyzerFactory();
-      if (vFactory == null) {
-        return null;
-      } else {
-        return (ModelVerifier) mOperation.createModelAnalyzer(vFactory,
-                                                              desFactory);
-      }
-    } catch (final ClassNotFoundException |
-                   AnalysisConfigurationException exception) {
-      return null;
-    }
-  }
-
-  ModelVerifier createAndConfigureModelVerifier()
-  {
-    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
-    return createAndConfigureModelVerifier(factory);
-  }
-
-  protected ModelVerifier createAndConfigureModelVerifier
+  ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
-    final ModelVerifier verifier = createModelVerifier(desFactory);
-    if (verifier == null) {
-      return null;
-    }
-    final AnalysisOptionPage page = mOperation.getOptionPage();
-    if (page != null) {
-      for (final Option<?> option : verifier.getOptions(page)) {
-        if (option.isPersistent()) {
-          verifier.setOption(option);
-        }
-      }
-    }
-    return verifier;
+    return (ModelVerifier)
+      mOperation.createAndConfigureModelAnalyzer(desFactory);
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private EnumOption<ModelAnalyzerFactoryLoader> getSelectorOption()
-  {
-    if (mOperation == null) {
-      return null;
-    } else {
-      final AnalysisOptionPage page = mOperation.getOptionPage();
-      return page.getTopSelectorOption();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class VerificationDialog
-  private class VerificationDialog extends WatersVerificationDialog
+  //# Inner Class EditorVerificationDialog
+  private class EditorVerificationDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
-    public VerificationDialog(final IDE owner,
-                              final ProductDESProxy des,
-                              final AnalysisOperation operation)
+    private EditorVerificationDialog(final IDE owner,
+                                     final ModelVerifier verifier)
     {
-      super(owner, des, operation);
+      super(owner, mOperation, verifier);
     }
 
     //#######################################################################
-    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
+    //# Overrides for
+    //# net.sourceforge.waters.gui.dialog.WatersVerificationDialog
     @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
+    protected String getWindowTitle()
     {
-      return WatersVerificationAction.this.createAndConfigureModelVerifier();
+      return WatersVerificationAction.this.getWindowTitle();
+    }
+
+    @Override
+    protected String getFailureDescription()
+    {
+      return WatersVerificationAction.this.getFailureDescription();
+    }
+
+    @Override
+    protected String getSuccessDescription()
+    {
+      return WatersVerificationAction.this.getSuccessDescription();
     }
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = -3327360941008729348L;
+    private static final long serialVersionUID = -6733519535021432164L;
   }
 
 

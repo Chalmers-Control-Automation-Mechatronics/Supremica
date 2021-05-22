@@ -40,7 +40,7 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.SynthesisDialog;
+import net.sourceforge.waters.gui.analyzer.ParametrisedSynthesisDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
@@ -77,7 +77,7 @@ public class AnalyzerSynthesisAction extends WatersAnalyzerAction
   {
     final IDE ide = getIDE();
     if (ide != null) {
-      new SynthesisDialog(getAnalyzerPanel());
+      new ParametrisedSynthesisDialog(getAnalyzerPanel());
     }
   }
 

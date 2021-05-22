@@ -64,7 +64,7 @@ public class VerifyHISCCPControllabilityAction
   //# Overrides for base class
   //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "HISC-CP Controllability";
   }

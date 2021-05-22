@@ -419,7 +419,7 @@ public class WatersPopupActionManager
   public IDEAction getAnalyzerControlLoopCheckAction()
   {
     final WatersActionManager master = mIDE.getActions();
-    return master.getAction(AnalyzerControlLoopCheckAction.class);
+    return master.getAction(AnalyzerLoopCheckAction.class);
   }
 
   public IDEAction getAnalyzerControllabilityCheckAction()

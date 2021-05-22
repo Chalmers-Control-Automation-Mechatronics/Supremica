@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -65,7 +66,7 @@ public class VerifySICProperty5Action
   //# Overrides for base class
   //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "SIC Property V";
   }
@@ -79,6 +80,7 @@ public class VerifySICProperty5Action
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final ConflictChecker conflictChecker =
       (ConflictChecker) super.createAndConfigureModelVerifier(desFactory);

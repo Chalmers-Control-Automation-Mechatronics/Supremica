@@ -73,7 +73,7 @@ public class AnalysisOptionPage
   public AnalysisOptionPage(final AnalysisOperation operation,
                             final boolean canBeDisabled)
   {
-    super(operation.getOptionPagePrefix(), operation.getShortAnalysisName());
+    super(operation.getOptionPagePrefix(), operation.getShortWindowTitle());
     mOperation = operation;
     final EnumFactory<ModelAnalyzerFactoryLoader> enumFactory =
       ModelAnalyzerFactoryLoader.createEnumFactory(operation, canBeDisabled);
@@ -127,7 +127,7 @@ public class AnalysisOptionPage
   @Override
   public String getShortDescription()
   {
-    return mOperation.getShortAnalysisName();
+    return mOperation.getShortWindowTitle();
   }
 
 

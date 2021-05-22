@@ -59,7 +59,6 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.Option;
 
 import org.supremica.gui.ide.IDE;
 
@@ -76,11 +75,14 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
-  public ParametrisedAnalysisDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedAnalysisDialog(final WatersAnalyzerPanel panel,
+                                    final AnalysisOperation operation)
   {
     super(panel.getModuleContainer().getIDE());
-    final ErrorLabel errorLabel = new ErrorLabel();
-    mContext = new GUIOptionContext(panel, this, errorLabel);
+    mOperation = operation;
+    setTitle(operation.getLongWindowTitle());
+    mErrorLabel = new ErrorLabel();
+    mContext = new GUIOptionContext(panel, this, mErrorLabel);
 
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
@@ -91,13 +93,13 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    final AnalysisOptionPage page = getOptionPage();
+    final AnalysisOptionPage page = operation.getOptionPage();
     mPanel = mContext.createSelectorLeafOptionPageEditor(page);
     add(mPanel, constraints);
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
-    errorPanel.add(errorLabel);
+    errorPanel.add(mErrorLabel);
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weighty = 0.0;
     add(errorPanel, constraints);
@@ -134,6 +136,11 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
 
   //#########################################################################
   //# Simple Access
+  public AnalysisOperation getOperation()
+  {
+    return mOperation;
+  }
+
   public GUIOptionContext getContext()
   {
     return mContext;
@@ -144,16 +151,14 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     return mContext.getProductDESProxyFactory();
   }
 
-
-  //#########################################################################
-  //# Hooks
-  protected abstract AnalysisOptionPage getOptionPage();
-
   protected ModelAnalyzer getAnalyzer()
   {
     return mCurrentModelAnalyzer;
   }
 
+
+  //#########################################################################
+  //# Hooks
   /**
    * Generates the pop-up dialog that shows the result of using the analyser.
    */
@@ -169,9 +174,13 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     final FocusTracker tracker = ide.getFocusTracker();
     if (tracker.shouldYieldFocus(this)) {
       mPanel.commitOptions();
-      updateModelAnalyzer();
-      for (final Option<?> option : getOptionPage().getCurrentOptions()) {
-        mCurrentModelAnalyzer.setOption(option);
+      final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+      try {
+        mCurrentModelAnalyzer =
+          mOperation.createAndConfigureModelAnalyzer(desFactory);
+      } catch (final AnalysisConfigurationException exception) {
+        mErrorLabel.displayError(exception.getMessage());
+        return;
       }
       final ProductDESProxy des = mContext.getProductDES();
       final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
@@ -188,27 +197,23 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
       final ModelAnalyzerFactoryLoader loader =
         mPanel.getSelectedValue();
       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-      mCurrentModelAnalyzer = createAnalyzer(factory);
-    } catch (ClassNotFoundException |
-             AnalysisConfigurationException exception) {
+      final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+      mCurrentModelAnalyzer =
+        mOperation.createModelAnalyzer(factory, desFactory);
+    } catch (final ClassNotFoundException exception) {
       throw new WatersRuntimeException(exception);
+    } catch (final AnalysisConfigurationException exception) {
+      mErrorLabel.displayError(exception.getMessage());
     }
-  }
-
-  private ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory factory)
-    throws AnalysisConfigurationException
-  {
-    final AnalysisOptionPage page = getOptionPage();
-    final AnalysisOperation operation = page.getAnalysisOperation();
-    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
-    return operation.createModelAnalyzer(factory, desFactory);
   }
 
 
   //#########################################################################
   //# Data Members
+  private final AnalysisOperation mOperation;
   private final GUIOptionContext mContext;
   private final SelectorLeafOptionPagePanel<ModelAnalyzerFactoryLoader> mPanel;
+  private final ErrorLabel mErrorLabel;
   private ModelAnalyzer mCurrentModelAnalyzer;
 
 

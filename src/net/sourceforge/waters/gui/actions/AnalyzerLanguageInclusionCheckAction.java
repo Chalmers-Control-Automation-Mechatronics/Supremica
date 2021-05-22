@@ -33,14 +33,10 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.LanguageInclusionCheckDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
@@ -48,53 +44,29 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the Conflict Check dialog in the Waters analyser.
+ * The action to invoke the language inclusion check dialog in the Waters
+ * analyser.
  *
  * @author Brandon Bassett
  */
 
-public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
+public class AnalyzerLanguageInclusionCheckAction
+  extends AnalyzerVerificationAction
 {
 
   //#########################################################################
   //# Constructor
   protected AnalyzerLanguageInclusionCheckAction(final IDE ide)
   {
-    super(ide);
-    putValue(Action.NAME, "Language Inclusion Check ...");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
-    //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
-    //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
-    updateEnabledStatus();
+    super(ide, AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Overrides for
+  //# net.sourceforge.waters.gui.actions.AnalyzerVerificationAction
   @Override
-  public void actionPerformed(final ActionEvent arg0)
-  {
-    final IDE ide = getIDE();
-    if (ide != null) {
-      new LanguageInclusionCheckDialog(getAnalyzerPanel());
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
-      updateEnabledStatus();
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
+  protected void updateEnabledStatus()
   {
     final AutomataTable table = getAnalyzerTable();
     if (table == null) {
@@ -112,6 +84,9 @@ public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
     }
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   private boolean propertyExists()
   {
     final AutomataTable table = getAnalyzerTable();

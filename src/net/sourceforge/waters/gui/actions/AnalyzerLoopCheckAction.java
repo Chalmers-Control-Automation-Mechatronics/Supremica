@@ -33,17 +33,55 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
-public class VerifyConflictCheckAction
-extends WatersVerificationAction
+
+/**
+ * The action to invoke the loop check dialog in the Waters analyser.
+ *
+ * @author Brandon Bassett
+ */
+
+public class AnalyzerLoopCheckAction extends AnalyzerVerificationAction
 {
-  protected VerifyConflictCheckAction(final IDE ide)
+  //#########################################################################
+  //# Constructor
+  protected AnalyzerLoopCheckAction(final IDE ide)
   {
-    super(ide, AnalysisOperation.CONFLICT_CHECK);
+    super(ide, AnalysisOperation.LOOP_CHECK);
   }
 
-  private static final long serialVersionUID = -8684703946705836025L;
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.gui.actions.AnalyzerVerificationAction
+  @Override
+  protected void updateEnabledStatus()
+  {
+    final AutomataTable table = getAnalyzerTable();
+    if (table == null) {
+      setEnabled(false);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether automata have control loops");
+    } else if (table.getSelectedRowCount() > 0) {
+      setEnabled(true);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether the selected automata have control loops");
+    } else {
+      setEnabled(table.getRowCount() > 0);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether all automata have control loops");
+    }
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 636028154288275788L;
+
 }

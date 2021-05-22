@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDCTwobVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -51,7 +52,7 @@ public class VerifySDCTwoBPropertyAction extends WatersVerificationAction
   }
 
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "SD controllability ii_b";
   }
@@ -65,7 +66,8 @@ public class VerifySDCTwoBPropertyAction extends WatersVerificationAction
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
-  {
+    throws AnalysisConfigurationException
+ {
     final ConflictChecker conflictChecker =
       (ConflictChecker) super.createAndConfigureModelVerifier(desFactory);
     if (conflictChecker == null) {

@@ -33,80 +33,52 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.gui.ide.IDE;
 
 /**
- * The dialog to launch a controllability check from the Waters analyser.
+ * The dialog to launch a deadlock check from the Waters analyser.
  *
  * @author Brandon Bassett
  */
-public class ControllabilityCheckDialog extends ParametrisedAnalysisDialog
+public class ParametrisedVerificationDialog extends ParametrisedAnalysisDialog
 {
 
   //#########################################################################
   //# Constructor
-  public ControllabilityCheckDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedVerificationDialog(final WatersAnalyzerPanel panel,
+                                        final AnalysisOperation operation)
   {
-    super(panel);
-    setTitle(TITLE);
+    super(panel, operation);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected AnalysisOptionPage getOptionPage()
+  protected ModelVerifier getAnalyzer()
   {
-    return WatersOptionPages.CONTROLLABILITY;
+    return (ModelVerifier) super.getAnalyzer();
   }
 
   @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
-                                                    final ProductDESProxy des)
+  protected WatersVerificationDialog createAnalyzeDialog
+    (final IDE ide, final ProductDESProxy des)
   {
-    return new ControllabilityCheckPopUpDialog(ide, des);
-  }
-
-
-  //#########################################################################
-  //# Inner Class ControllabilityCheckPopUpDialog
-  private class ControllabilityCheckPopUpDialog extends WatersVerificationDialog
-  {
-    //#######################################################################
-    //# Constructor
-    public ControllabilityCheckPopUpDialog(final IDE owner,
-                                           final ProductDESProxy des)
-    {
-      super(owner, des, AnalysisOperation.CONTROLLABILITY_CHECK);
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
-    @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
-    {
-      return getAnalyzer();
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 6159733639861131531L;
+    final AnalysisOperation operation = getOperation();
+    final ModelVerifier verifier = getAnalyzer();
+    verifier.setModel(des);
+    return new WatersVerificationDialog(ide, operation, verifier);
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Controllability Check";
-
-  private static final long serialVersionUID = -4439172093952073552L;
+  private static final long serialVersionUID = 7587116260533051091L;
 
 }

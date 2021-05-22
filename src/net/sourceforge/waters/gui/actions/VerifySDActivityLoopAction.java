@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDActivityLoopChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -56,7 +57,7 @@ public class VerifySDActivityLoopAction extends WatersVerificationAction
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "Activity Loop";
   }
@@ -70,6 +71,7 @@ public class VerifySDActivityLoopAction extends WatersVerificationAction
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final ControlLoopChecker checker =
       (ControlLoopChecker) super.createAndConfigureModelVerifier(desFactory);

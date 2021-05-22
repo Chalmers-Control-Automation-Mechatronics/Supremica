@@ -33,55 +33,78 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.analyzer.ParametrisedVerificationDialog;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke a diagnosability check through the editor's
- * Verify menu.
- *
- * @see DiagnosabilityChecker
+ * Abstract superclass for actions that invoke a verification operation
+ * in the Waters analyser.
  *
  * @author Robi Malik
  */
 
-public class VerifyDiagnosabilityCheckAction extends WatersVerificationAction
+public abstract class AnalyzerVerificationAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
-  //# Constructors
-  protected VerifyDiagnosabilityCheckAction(final IDE ide)
+  //# Constructor
+  protected AnalyzerVerificationAction(final IDE ide,
+                                       final AnalysisOperation operation)
   {
-    super(ide, AnalysisOperation.DIAGNOSABILITY_CHECK);
+    super(ide);
+    mOperation = operation;
+    putValue(Action.NAME, operation.getLongWindowTitle() + " ...");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
+    updateEnabledStatus();
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  //# Interface java.awt.event.ActionListener
   @Override
-  protected String getCheckName()
+  public void actionPerformed(final ActionEvent arg0)
   {
-    return "Diagnosability";
+    final IDE ide = getIDE();
+    if (ide != null) {
+      final WatersAnalyzerPanel panel = getAnalyzerPanel();
+      new ParametrisedVerificationDialog(panel, mOperation);
+    }
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
   @Override
-  protected String getFailureDescription()
+  public void update(final EditorChangedEvent event)
   {
-    return "is not diagnosable";
+    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
+      updateEnabledStatus();
+    }
   }
 
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "is diagnosable";
-  }
+
+  //#########################################################################
+  //# Hooks
+  protected abstract void updateEnabledStatus();
+
+
+  //#########################################################################
+  //# Data Members
+  private final AnalysisOperation mOperation;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -6505471793647504953L;
+  private static final long serialVersionUID = 1520642680879701265L;
 
 }

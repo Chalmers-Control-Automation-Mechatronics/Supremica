@@ -33,14 +33,10 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.DiagnosabilityCheckDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
@@ -51,52 +47,29 @@ import org.supremica.gui.ide.IDE;
  * @author Robi Malik
  */
 
-public class AnalyzerDiagnosabilityCheckAction extends WatersAnalyzerAction
+public class AnalyzerDiagnosabilityCheckAction
+  extends AnalyzerVerificationAction
 {
 
   //#########################################################################
   //# Constructor
   protected AnalyzerDiagnosabilityCheckAction(final IDE ide)
   {
-    super(ide);
-    putValue(Action.NAME, "Diagnosability Check ...");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
-    updateEnabledStatus();
+    super(ide, AnalysisOperation.DIAGNOSABILITY_CHECK);
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Overrides for
+  //# net.sourceforge.waters.gui.actions.AnalyzerVerificationAction
   @Override
-  public void actionPerformed(final ActionEvent arg0)
-  {
-    final IDE ide = getIDE();
-    if (ide != null) {
-      new DiagnosabilityCheckDialog(getAnalyzerPanel());
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
-      updateEnabledStatus();
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
+  protected void updateEnabledStatus()
   {
     final AutomataTable table = getAnalyzerTable();
     if (table == null) {
       setEnabled(false);
       putValue(Action.SHORT_DESCRIPTION,
-               "Check whether automaton is diagnosable");
+               "Check whether automata are diagnosable");
     } else if (table.getSelectedRowCount() > 0) {
       setEnabled(true);
       putValue(Action.SHORT_DESCRIPTION,

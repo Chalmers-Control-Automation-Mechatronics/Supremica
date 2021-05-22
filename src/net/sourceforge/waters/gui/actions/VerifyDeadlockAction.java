@@ -31,81 +31,33 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
-import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
-import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.gui.ide.IDE;
 
+
 /**
- * The dialog to launch a conflict check from the Waters analyser.
+ * The action to invoke a deadlock check through the editor's
+ * Verify menu.
  *
- * @author Brandon Bassett
+ * @author Hani al-Bahri
  */
-public class ConflictCheckDialog extends ParametrisedAnalysisDialog
+
+public class VerifyDeadlockAction extends WatersVerificationAction
 {
 
   //#########################################################################
   //# Constructor
-  public ConflictCheckDialog(final WatersAnalyzerPanel panel)
+  protected VerifyDeadlockAction(final IDE ide)
   {
-    super(panel);
-    setTitle(TITLE);
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
-                                                    final ProductDESProxy des)
-  {
-    return new ConflictCheckPopUpDialog(ide, des);
-  }
-
-  @Override
-  protected AnalysisOptionPage getOptionPage()
-  {
-    return WatersOptionPages.CONFLICT;
-  }
-
-
-  //#########################################################################
-  //# Inner Class ConflictCheckPopUpDialog
-  private class ConflictCheckPopUpDialog extends WatersVerificationDialog
-  {
-    //#######################################################################
-    //# Constructor
-    public ConflictCheckPopUpDialog(final IDE owner,
-                                    final ProductDESProxy des)
-    {
-      super(owner, des, AnalysisOperation.CONFLICT_CHECK);
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
-    @Override
-    protected ModelAnalyzer createAndConfigureModelAnalyzer()
-    {
-      return getAnalyzer();
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 6159733639861131531L;
+    super(ide, AnalysisOperation.DEADLOCK_CHECK);
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Conflict Check";
+  private static final long serialVersionUID = -8684703946705836025L;
 
-  private static final long serialVersionUID = -4771975182146634793L;
 }

@@ -33,11 +33,14 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.JavaEnumFactory;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
@@ -52,8 +55,8 @@ import net.sourceforge.waters.model.options.WatersOptionPages;
 public enum AnalysisOperation
 {
   //#########################################################################
-  //# Enumeration
-  CONFLICT_CHECK("waters.analysis.conflict", "Conflict", "-conf",
+  //# Standard Operations
+  CONFLICT_CHECK("waters.analysis.conflict", "conflict", "-conf",
                  "is blocking", "is nonblocking")
   {
     @Override
@@ -66,7 +69,7 @@ public enum AnalysisOperation
   },
 
   CONTROLLABILITY_CHECK("waters.analysis.controllability",
-                        "Controllability", "-cont",
+                        "controllability", "-cont",
                         "is not controllable", "is controllable")
   {
     @Override
@@ -78,7 +81,7 @@ public enum AnalysisOperation
     }
   },
 
-  CONTROL_LOOP_CHECK("waters.analysis.loop", "Control Loop", "-loop",
+  CONTROL_LOOP_CHECK("waters.analysis.loop", "control loop", "-controlloop",
                      "has a control loop", "is control-loop free")
   {
     @Override
@@ -90,7 +93,7 @@ public enum AnalysisOperation
     }
   },
 
-  DEADLOCK_CHECK("waters.analysis.deadlock", "Deadlock", "-dl",
+  DEADLOCK_CHECK("waters.analysis.deadlock", "deadlock", "-dl",
                  "has a deadlock", "is deadlock free")
   {
     @Override
@@ -103,7 +106,7 @@ public enum AnalysisOperation
   },
 
   DIAGNOSABILITY_CHECK("waters.analysis.diagnosability",
-                       "Diagnosability", "-diag",
+                       "diagnosability", "-diag",
                        "is not diagnosable", "is diagnosable")
   {
     @Override
@@ -116,7 +119,7 @@ public enum AnalysisOperation
   },
 
   LANGUAGE_INCLUSION_CHECK("waters.analysis.languageinclusion",
-                           "Language Inclusion", "-lang",
+                           "language inclusion", "-lang",
                            "does not satisfy language inclusion",
                            "satisfies language inclusion")
   {
@@ -129,7 +132,19 @@ public enum AnalysisOperation
     }
   },
 
-  STATE_COUNT("waters.analysis.statecount", "State Count", "-count")
+  LOOP_CHECK("waters.analysis.loop", "loop", "-loop",
+             "has a loop", "is free")
+  {
+    @Override
+    public final ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createControlLoopChecker(desFactory);
+    }
+  },
+
+  STATE_COUNT("waters.analysis.statecount", "state count", "-count")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -141,7 +156,7 @@ public enum AnalysisOperation
   },
 
   SYNCHRONOUS_PRODUCT("waters.analysis.syncprod",
-                      "Synchronization", "Synchronous Product", "-sync")
+                      "Synchronization", "synchronous product", "-sync")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -153,7 +168,7 @@ public enum AnalysisOperation
   },
 
   SYNTHESIS("waters.analysis.synthesis",
-            "Synthesis", "Supervisor Synthesis", "-synth")
+            "Synthesis", "supervisor synthesis", "-synth")
   {
     @Override
     public ModelAnalyzer createModelAnalyzer
@@ -161,6 +176,22 @@ public enum AnalysisOperation
         throws AnalysisConfigurationException
     {
       return factory.createSupervisorSynthesizer(desFactory);
+    }
+  },
+
+
+  //#########################################################################
+  //# Sampled Data (SD) Verification
+  SD_III2("waters.analysis.languageinclusion",
+          "SD controllability iii.2", "-sd32",
+          "does not satisfy SD controllability point iii.2",
+          "satisfies SD controllability point iii.2")
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+    {
+      return new MonolithicNerodeEChecker(desFactory);
     }
   };
 
@@ -193,7 +224,7 @@ public enum AnalysisOperation
                             final String successDescription)
   {
     mOptionPagePrefix = optionPagePrefix;
-    mLongAnalysisName = analysisName + " Check";
+    mLongAnalysisName = analysisName + " check";
     mShortAnalysisName = analysisName;
     mConsoleName = consoleName;
     mFailureDescription = failureDescription;
@@ -219,9 +250,19 @@ public enum AnalysisOperation
     return mShortAnalysisName;
   }
 
+  public String getShortWindowTitle()
+  {
+    return toTitle(mShortAnalysisName);
+  }
+
   public String getLongAnalysisName()
   {
     return mLongAnalysisName;
+  }
+
+  public String getLongWindowTitle()
+  {
+    return toTitle(mLongAnalysisName);
   }
 
   public String getConsoleName()
@@ -239,6 +280,24 @@ public enum AnalysisOperation
     return mSuccessDescription;
   }
 
+  private static String toTitle(final String text)
+  {
+    final int len = text.length();
+    final StringBuilder builder = new StringBuilder(len);
+    boolean newWord = true;
+    for (int i = 0; i < len; i++) {
+      final char ch = text.charAt(i);
+      if (newWord) {
+        builder.append(Character.toTitleCase(ch));
+        newWord = false;
+      } else {
+        builder.append(ch);
+        newWord = (ch == ' ');
+      }
+    }
+    return builder.toString();
+  }
+
 
   //#########################################################################
   //# Creating Model Analysers
@@ -247,15 +306,23 @@ public enum AnalysisOperation
     throws AnalysisConfigurationException;
 
   public ModelAnalyzer createAndConfigureModelAnalyzer
-    (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+    (final ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException
   {
-    final ModelAnalyzer analyzer = createModelAnalyzer(factory, desFactory);
-    final AnalysisOptionPage page = getOptionPage();
-    for (final Option<?> option : analyzer.getOptions(page)) {
-      analyzer.setOption(option);
+    try {
+      final AnalysisOptionPage page = getOptionPage();
+      final EnumOption<ModelAnalyzerFactoryLoader> selector =
+        page.getTopSelectorOption();
+      final ModelAnalyzerFactoryLoader loader = selector.getValue();
+      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+      final ModelAnalyzer analyzer = createModelAnalyzer(factory, desFactory);
+      for (final Option<?> option : analyzer.getOptions(page)) {
+        analyzer.setOption(option);
+      }
+      return analyzer;
+    } catch (final ClassNotFoundException exception) {
+      throw new WatersRuntimeException(exception);
     }
-    return analyzer;
   }
 
 
@@ -293,6 +360,12 @@ public enum AnalysisOperation
     public String getConsoleName(final AnalysisOperation operation)
     {
       return operation.getConsoleName();
+    }
+
+    @Override
+    public boolean isDisplayedInConsole(final AnalysisOperation operation)
+    {
+      return operation != CONTROL_LOOP_CHECK && operation != SD_III2;
     }
 
     //#######################################################################

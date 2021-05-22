@@ -61,7 +61,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new AnalyzerSynchronousProductAction(ide));
     addAction(new AnalyzerSynthesisAction(ide));
     addAction(new AnalyzerConflictCheckAction(ide));
-    addAction(new AnalyzerControlLoopCheckAction(ide));
+    addAction(new AnalyzerLoopCheckAction(ide));
     addAction(new AnalyzerControllabilityCheckAction(ide));
     addAction(new AnalyzerDeadlockCheckAction(ide));
     addAction(new AnalyzerDiagnosabilityCheckAction(ide));
@@ -115,11 +115,11 @@ public abstract class WatersActionManager implements Observer
     addAction(new ToolGroupNodeAction(ide));
     addAction(new ToolNodeAction(ide));
     addAction(new ToolSelectAction(ide));
-    addAction(new VerifyConflictCheckAction(ide));
+    addAction(new VerifyConflictAction(ide));
     addAction(new VerifyControllabilityAction(ide));
     addAction(new VerifyControlLoopAction(ide));
-    addAction(new VerifyDeadlockCheckAction(ide));
-    addAction(new VerifyDiagnosabilityCheckAction(ide));
+    addAction(new VerifyDeadlockAction(ide));
+    addAction(new VerifyDiagnosabilityAction(ide));
     addAction(new VerifyHISCCPControllabilityAction(ide));
     try {
       addAction(new VerifyHISCCPInterfaceConsistencyAction(ide));

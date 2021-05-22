@@ -510,7 +510,7 @@ public class CommandLineTool implements Configurable
   {
     System.err.print(ProxyTools.getShortClassName(factory));
     System.err.print(" does not support ");
-    System.err.print(operation.getLongAnalysisName().toLowerCase());
+    System.err.print(operation.getLongAnalysisName());
     System.err.println(".");
     final AnalysisOptionPage page = operation.getOptionPage();
     final EnumOption<ModelAnalyzerFactoryLoader> selector =

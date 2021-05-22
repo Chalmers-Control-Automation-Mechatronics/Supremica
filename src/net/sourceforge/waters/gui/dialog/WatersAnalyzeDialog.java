@@ -52,7 +52,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 import org.supremica.gui.ide.IDE;
 
@@ -65,24 +64,36 @@ public abstract class WatersAnalyzeDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
-  protected WatersAnalyzeDialog(final IDE owner,
-                                final ProductDESProxy des,
-                                final AnalysisOperation operation)
+  private WatersAnalyzeDialog(final IDE owner,
+                              final AnalysisOperation operation)
   {
     super(owner);
     mOperation = operation;
-    final String title = getAnalysisName();
-    setTitle(title);
-    mRunner = new AnalyzerThread();
     mBottomPanel = new JPanel();
     mInformationLabel = new JLabel();
     mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
-    setInformationText(title + " is running...");
     final Border outer = BorderFactory.createRaisedBevelBorder();
     final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
     final Border border = BorderFactory.createCompoundBorder(outer, inner);
     mInformationLabel.setBorder(border);
     mExitButton = new JButton("Abort");
+    mBottomPanel.add(mExitButton, BorderLayout.WEST);
+    final Container pane = getContentPane();
+    pane.add(mInformationLabel, BorderLayout.CENTER);
+    pane.add(mBottomPanel, BorderLayout.SOUTH);
+  }
+
+  protected WatersAnalyzeDialog(final IDE owner,
+                                final AnalysisOperation operation,
+                                final ModelAnalyzer analyzer)
+  {
+    this(owner, operation);
+    final String title = getWindowTitle();
+    setTitle("Running " + title);
+    setInformationText(title + " is running...");
+    mAnalyzer = analyzer;
+    mRunner = new AnalyzerThread();
+    mRunner.setPriority(Thread.MIN_PRIORITY);
     mExitButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e)
@@ -91,16 +102,18 @@ public abstract class WatersAnalyzeDialog extends JDialog
         dispose();
       }
     });
-    mBottomPanel.add(mExitButton, BorderLayout.WEST);
-    final Container pane = getContentPane();
-    pane.add(mInformationLabel, BorderLayout.CENTER);
-    pane.add(mBottomPanel, BorderLayout.SOUTH);
     setLocationAndSize();
     setVisible(true);
-    mAnalyzer = createAndConfigureModelAnalyzer();
-    mAnalyzer.setModel(des);
-    mRunner.setPriority(Thread.MIN_PRIORITY);
     mRunner.start();
+  }
+
+  protected WatersAnalyzeDialog(final IDE owner,
+                                final AnalysisOperation operation,
+                                final Throwable exception)
+  {
+    this(owner, operation);
+    error(exception);
+    setVisible(true);
   }
 
 
@@ -124,22 +137,22 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   //#########################################################################
   //# Abstract Methods
-  protected String getAnalysisName()
+  protected String getWindowTitle()
   {
-    return mOperation.getLongAnalysisName();
+    return mOperation.getLongWindowTitle();
   }
 
   protected abstract String getFailureText();
 
   protected abstract String getSuccessText();
 
-  protected abstract ModelAnalyzer createAndConfigureModelAnalyzer();
-
 
   //#########################################################################
   //# Buttons
   public void succeed()
   {
+    final String title = getWindowTitle() + " Successful";
+    setTitle(title);
     setInformationText(getSuccessText());
     mExitButton.setText("OK");
     mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
@@ -155,6 +168,9 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   public void fail()
   {
+    final String title = getWindowTitle() + " Failed";
+    setTitle(title);
+    setInformationText(getFailureText());
     mExitButton.setText("OK");
     mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
     mExitButton.addActionListener(new ActionListener() {
@@ -164,12 +180,13 @@ public abstract class WatersAnalyzeDialog extends JDialog
         WatersAnalyzeDialog.this.dispose();
       }
     });
-    setInformationText(getFailureText());
     setLocationAndSize();
   }
 
   public void error(final Throwable exception)
   {
+    final String title = getWindowTitle() + " Error";
+    setTitle(title);
     if (exception instanceof OutOfMemoryError) {
       setInformationText("ERROR: Out of Memory");
     } else {
@@ -220,8 +237,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
       } catch (final AnalysisAbortException exception) {
         // Do nothing: Aborted
         return;
-      } catch (final AnalysisException | NoClassDefFoundError |
-               UnsatisfiedLinkError exception) {
+      } catch (final AnalysisException exception) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run()
@@ -242,24 +258,18 @@ public abstract class WatersAnalyzeDialog extends JDialog
         });
         return;
       }
-      final AnalysisResult result = mAnalyzer.getAnalysisResult();
-      if (result.isSatisfied()) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          final AnalysisResult result = mAnalyzer.getAnalysisResult();
+          if (result.isSatisfied()) {
             succeed();
-          }
-        });
-      } else {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
+          } else {
             fail();
           }
-        });
-      }
+        }
+      });
     }
 
     public boolean abort()
@@ -277,11 +287,11 @@ public abstract class WatersAnalyzeDialog extends JDialog
   //#########################################################################
   //# Data Members
   private final AnalysisOperation mOperation;
-  private final AnalyzerThread mRunner;
   private final JPanel mBottomPanel;
   private final JButton mExitButton;
   private final JLabel mInformationLabel;
 
+  private AnalyzerThread mRunner;
   private ModelAnalyzer mAnalyzer;
 
 

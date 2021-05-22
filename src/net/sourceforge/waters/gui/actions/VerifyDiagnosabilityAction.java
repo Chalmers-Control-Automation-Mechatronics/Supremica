@@ -34,28 +34,33 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the deadlock check operation.
+ * The action to invoke a diagnosability check through the editor's
+ * Verify menu.
  *
- * @author Hani al-Bahri
+ * @see DiagnosabilityChecker
+ *
+ * @author Robi Malik
  */
 
-public class VerifyDeadlockCheckAction extends WatersVerificationAction
+public class VerifyDiagnosabilityAction extends WatersVerificationAction
 {
 
   //#########################################################################
   //# Constructor
-  protected VerifyDeadlockCheckAction(final IDE ide)
+  public VerifyDiagnosabilityAction(final IDE ide)
   {
-    super(ide, AnalysisOperation.DEADLOCK_CHECK);
+    super(ide, AnalysisOperation.DIAGNOSABILITY_CHECK);
   }
+
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -8684703946705836025L;
+  private static final long serialVersionUID = -6505471793647504953L;
 
 }

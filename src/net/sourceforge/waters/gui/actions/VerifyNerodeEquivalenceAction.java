@@ -33,45 +33,31 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
 
+/**
+ * The action to invoke a check for SD controllability property iii.2
+ * through the Verify menu.
+ *
+ * @author Mahvash Baloch, Robi Malik
+ */
+
 public class VerifyNerodeEquivalenceAction extends WatersVerificationAction
 {
 
+  //#########################################################################
+  //# Constructor
   protected VerifyNerodeEquivalenceAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.SD_III2);
   }
 
-  @Override
-  protected String getCheckName()
-  {
-    return "SD Controllability iii.2 ";
-  }
 
-  @Override
-  protected String getFailureDescription()
-  {
-    return "does not satisfy SD Controllability Point iii.2";
-  }
-
-  @Override
-  protected ModelVerifier createModelVerifier
-    (final ProductDESProxyFactory desFactory)
-  {
-    return new MonolithicNerodeEChecker(desFactory);
-  }
-
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "satisfies SD Controllability Point iii.2";
-  }
-
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -1008097797553564719L;
+
 }

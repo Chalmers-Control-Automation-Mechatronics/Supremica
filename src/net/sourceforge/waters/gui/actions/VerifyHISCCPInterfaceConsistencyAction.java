@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.actions;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -66,7 +67,7 @@ public class VerifyHISCCPInterfaceConsistencyAction
   //# Overrides for base class
   //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
-  protected String getCheckName()
+  protected String getWindowTitle()
   {
     return "HISC-CP Interface Consistency";
   }
@@ -80,6 +81,7 @@ public class VerifyHISCCPInterfaceConsistencyAction
   @Override
   protected ModelVerifier createAndConfigureModelVerifier
     (final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
     final ConflictChecker checker =
       (ConflictChecker) super.createAndConfigureModelVerifier(desFactory);

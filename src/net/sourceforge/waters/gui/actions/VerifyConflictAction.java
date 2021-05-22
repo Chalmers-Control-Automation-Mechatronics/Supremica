@@ -33,85 +33,31 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-
-import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.ControlLoopDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the Conflict Check dialog in the Waters analyser.
+ * The action to invoke the conflict check through the editor's
+ * Verify menu.
  *
- * @author Brandon Bassett
+ * @author Robi Malik
  */
 
-public class AnalyzerControlLoopCheckAction extends WatersAnalyzerAction
+public class VerifyConflictAction extends WatersVerificationAction
 {
+
   //#########################################################################
   //# Constructor
-  protected AnalyzerControlLoopCheckAction(final IDE ide)
+  public VerifyConflictAction(final IDE ide)
   {
-    super(ide);
-    putValue(Action.NAME, "Control Loop Check ...");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
-    //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
-    //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
-    updateEnabledStatus();
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent arg0)
-  {
-    final IDE ide = getIDE();
-    if (ide != null) {
-      new ControlLoopDialog(getAnalyzerPanel());
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
-      updateEnabledStatus();
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
-  {
-    final AutomataTable table = getAnalyzerTable();
-    if (table == null) {
-      setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Check whether automata have control loops");
-    } else if (table.getSelectedRowCount() > 0) {
-      setEnabled(true);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Check whether the selected automata have control loops");
-    } else {
-      setEnabled(table.getRowCount() > 0);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Check whether all automata have control loops");
-    }
+    super(ide, AnalysisOperation.CONFLICT_CHECK);
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 636028154288275788L;
+  private static final long serialVersionUID = -8684703946705836025L;
 
 }

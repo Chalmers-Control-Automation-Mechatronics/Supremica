@@ -33,65 +33,35 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.ConflictCheckDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the Conflict Check dialog in the Waters analyser.
+ * The action to invoke the conflict check dialog in the Waters analyser.
  *
  * @author Brandon Bassett
  */
 
-public class AnalyzerConflictCheckAction extends WatersAnalyzerAction
+public class AnalyzerConflictCheckAction extends AnalyzerVerificationAction
 {
   //#########################################################################
   //# Constructor
   protected AnalyzerConflictCheckAction(final IDE ide)
   {
-    super(ide);
-    putValue(Action.NAME, "Conflict Check ...");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
-    //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
-    //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
-    updateEnabledStatus();
+    super(ide, AnalysisOperation.CONFLICT_CHECK);
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Overrides for
+  //# net.sourceforge.waters.gui.actions.AnalyzerVerificationAction
   @Override
-  public void actionPerformed(final ActionEvent arg0)
-  {
-    final IDE ide = getIDE();
-    if (ide != null) {
-      new ConflictCheckDialog(getAnalyzerPanel());
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
-      updateEnabledStatus();
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
+  protected void updateEnabledStatus()
   {
     final AutomataTable table = getAnalyzerTable();
     if (table == null) {
