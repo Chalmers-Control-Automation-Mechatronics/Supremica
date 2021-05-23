@@ -38,11 +38,14 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
@@ -146,6 +149,18 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
     super.setUp();
     mFirstResult = true;
     mFailedAnswer = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public List<Option<?>> getOptions(final LeafOptionPage db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.remove(options, AbstractModelAnalyzerFactory.
+                       OPTION_ConflictChecker_ConfiguredDefaultMarking);
+    return options;
   }
 
 

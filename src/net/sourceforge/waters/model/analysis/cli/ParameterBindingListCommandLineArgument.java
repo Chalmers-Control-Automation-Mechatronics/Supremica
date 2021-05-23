@@ -36,9 +36,10 @@ package net.sourceforge.waters.model.analysis.cli;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.options.ParameterBindingListOption;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.options.Configurable;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
 
 public class ParameterBindingListCommandLineArgument
   extends OptionCommandLineArgument<List<ParameterBindingProxy>>
@@ -97,6 +98,14 @@ public class ParameterBindingListCommandLineArgument
       }
     } else {
       failMissingValue();
+    }
+  }
+
+  @Override
+  public void configure(final Configurable configurable)
+  {
+    if (isUsed()) {
+      super.configure(configurable);
     }
   }
 

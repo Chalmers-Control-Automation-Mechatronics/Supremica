@@ -33,12 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
@@ -58,43 +53,7 @@ public class VerifySICProperty5Action
   //# Constructor
   protected VerifySICProperty5Action(final IDE ide)
   {
-    super(ide, AnalysisOperation.CONFLICT_CHECK);
-  }
-
-
-  //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
-  protected String getWindowTitle()
-  {
-    return "SIC Property V";
-  }
-
-  @Override
-  protected String getFailureDescription()
-  {
-    return "does not satisfy SIC Property V";
-  }
-
-  @Override
-  protected ModelVerifier createAndConfigureModelVerifier
-    (final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
-  {
-    final ConflictChecker conflictChecker =
-      (ConflictChecker) super.createAndConfigureModelVerifier(desFactory);
-    if (conflictChecker == null) {
-      return null;
-    } else {
-      return new SICProperty5Verifier(conflictChecker, null, desFactory);
-    }
-  }
-
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "satisfies SIC Property V";
+    super(ide, AnalysisOperation.SIC5);
   }
 
 

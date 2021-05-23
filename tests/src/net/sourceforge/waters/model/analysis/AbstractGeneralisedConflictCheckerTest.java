@@ -41,8 +41,8 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -79,12 +79,14 @@ public abstract class AbstractGeneralisedConflictCheckerTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mBuilder = new SICPropertyBuilder(factory);
+    mAlpha = mOmega = null;
   }
 
   @Override
   protected void tearDown() throws Exception
   {
     mBuilder = null;
+    mAlpha = mOmega = null;
     super.tearDown();
   }
 
@@ -318,27 +320,37 @@ public abstract class AbstractGeneralisedConflictCheckerTest
   protected void configureModelVerifier(final ProductDESProxy des)
   {
     super.configureModelVerifier(des);
+    final ConflictChecker checker = getModelVerifier();
     final Set<EventProxy> events = des.getEvents();
-    // checks that this des does include the precondition marking :alpha
-    for (final EventProxy event : events) {
-      if (event.getName().equals(":alpha")
-          && event.getKind() == EventKind.PROPOSITION) {
-        mAlpha = event;
-        final ConflictChecker modelVer = getModelVerifier();
-        modelVer.setConfiguredPreconditionMarking(event);
-        return;
+    if (mOmega != null) {
+      if (!events.contains(mOmega)) {
+        fail("Model '" + des.getName() + "' does not contain the marking '" +
+             mOmega.getName() + "'.");
+      }
+      checker.setConfiguredDefaultMarking(mOmega);
+    }
+    if (mAlpha == null) {
+      mAlpha = AbstractConflictChecker.getMarkingProposition(des, ALPHA);
+      if (mAlpha == null) {
+        fail("Model '" + des.getName() +
+             "' does not contain the precondition marking '" + ALPHA + "'.");
+      }
+    } else {
+      if (!events.contains(mAlpha)) {
+        fail("Model '" + des.getName() +
+             "' does not contain the precondition marking '" +
+             mAlpha.getName() + "'.");
       }
     }
-    fail("Model '" + des.getName() +
-         "' does not contain a proposition named :alpha.");
+    checker.setConfiguredPreconditionMarking(mAlpha);
   }
 
   @Override
   protected void configure(final ModuleCompiler compiler)
   {
     super.configure(compiler);
-    final ArrayList<String> propositions = new ArrayList<String>(2);
-    propositions.add(":alpha");
+    final ArrayList<String> propositions = new ArrayList<>(2);
+    propositions.add(ALPHA);
     propositions.add(EventDeclProxy.DEFAULT_MARKING_NAME);
     compiler.setEnabledPropositionNames(propositions);
     compiler.setHISCCompileMode(mHISCCompileMode);
@@ -382,6 +394,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest
     mBuilder.setInputModel(des);
     final EventProxy answer = findAnswerEvent(des, eventName);
     final ProductDESProxy answerDES = mBuilder.createSIC5Model(answer);
+    mAlpha = mBuilder.getGeneralisedPrecondition();
+    mOmega = mBuilder.getOutputMarking();
     final DocumentManager docman = getDocumentManager();
     final ProxyMarshaller<ProductDESProxy> marshaller =
       docman.findProxyMarshaller(ProductDESProxy.class);
@@ -413,7 +427,13 @@ public abstract class AbstractGeneralisedConflictCheckerTest
   //#########################################################################
   //# Data Members
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
-  private EventProxy mAlpha = null;
   private SICPropertyBuilder mBuilder;
+  private EventProxy mAlpha = null;
+  private EventProxy mOmega = null;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String ALPHA = ":alpha";
 
 }

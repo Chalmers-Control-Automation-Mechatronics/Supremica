@@ -33,10 +33,16 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 
 
 /**
@@ -112,6 +118,27 @@ abstract public class AbstractSICConflictChecker
   public boolean supportsNondeterminism()
   {
     return mChecker.supportsNondeterminism();
+  }
+
+  @Override
+  public List<Option<?>> getOptions(final LeafOptionPage db)
+  {
+    final List<Option<?>> options = mChecker.getOptions(db);
+    db.remove(options, AbstractModelAnalyzerFactory.
+                       OPTION_ConflictChecker_ConfiguredPreconditionMarking);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ConflictChecker_ConfiguredDefaultMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredDefaultMarking(propOption.getValue());
+    } else {
+      mChecker.setOption(option);
+    }
   }
 
 

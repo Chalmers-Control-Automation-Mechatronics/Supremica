@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -247,7 +248,10 @@ public class CommandLineTool implements Configurable
           fullName = ModuleCompiler.getParametrizedName(module, bindings);
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          if (!keepPropositions) {
+          if (operation == AnalysisOperation.SIC5 ||
+              operation == AnalysisOperation.SIC6) {
+            compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+          } else if (!keepPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }
           compiler.setEnabledPropertyNames(empty);

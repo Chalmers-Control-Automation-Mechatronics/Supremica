@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
+import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -176,6 +178,37 @@ public enum AnalysisOperation
         throws AnalysisConfigurationException
     {
       return factory.createSupervisorSynthesizer(desFactory);
+    }
+  },
+
+
+  //#########################################################################
+  //# Hierarchical Interface-Based Supervisory Control (HISC) Verification
+  SIC5("waters.analysis.conflict", "SIC property V", "-sic5",
+       "does not satisfy SIC property V", "satisfies SIC property V")
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      final ConflictChecker conflictChecker =
+        factory.createConflictChecker(desFactory);
+      return new SICProperty5Verifier(conflictChecker, null, desFactory);
+    }
+  },
+
+  SIC6("waters.analysis.conflict", "SIC property VI", "-sic6",
+       "does not satisfy SIC property VI", "satisfies SIC property VI")
+  {
+    @Override
+    public ModelAnalyzer createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      final ConflictChecker conflictChecker =
+        factory.createConflictChecker(desFactory);
+      return new SICProperty6Verifier(conflictChecker, null, desFactory);
     }
   },
 

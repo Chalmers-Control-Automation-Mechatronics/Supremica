@@ -242,6 +242,7 @@ public class ModuleInstanceCompiler
     mIndexAdder = new IndexAdder();
     mNameSpaceVariablesContext = new NameSpaceVariablesContext();
     mInputModule = module;
+    mTopLevel = true;
   }
 
 
@@ -819,6 +820,7 @@ public class ModuleInstanceCompiler
     default:
       break;
     }
+    final boolean wasTopLevel = mTopLevel;
 
     final CompilationInfo compilationInfo = getCompilationInfo();
     SourceInfo info = null;
@@ -845,6 +847,7 @@ public class ModuleInstanceCompiler
           mDocumentManager.load(uri, filename, ModuleProxy.class);
         mContext = new ModuleBindingContext(module, fullname, info, mContext);
         mNameSpace = mNameSpace.getOrAddChildNameSpace(suffix);
+        mTopLevel = false;
         compilationInfo.setExceptions(new MultiEvalException());
         visitModuleProxy(module);
         if (compilationInfo.hasExceptions()) {
@@ -886,6 +889,7 @@ public class ModuleInstanceCompiler
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
         mHISCCompileMode = HISCCompileMode.HISC_HIGH;
       }
+      mTopLevel = wasTopLevel;
       if (info != null) {
         compilationInfo.popParentSourceInfo();
       }
@@ -1151,7 +1155,7 @@ public class ModuleInstanceCompiler
     } else {
       binding = null;
     }
-    if (binding == null && scope == ScopeKind.REQUIRED_PARAMETER) {
+    if (binding == null && !mTopLevel && scope == ScopeKind.REQUIRED_PARAMETER) {
       final String paramname = ident.toString();
       throw new UndefinedIdentifierException
         (paramname, "required parameter", null);
@@ -1653,7 +1657,7 @@ public class ModuleInstanceCompiler
   //#########################################################################
   //# Data Members
 
-  //  Utilities:
+  // Utilities:
   private final DocumentManager mDocumentManager;
   private final ModuleProxyFactory mFactory;
   private final ModuleProxyCloner mCloner;
@@ -1666,14 +1670,15 @@ public class ModuleInstanceCompiler
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
   private final ModuleProxy mInputModule;
 
-  //  Configurations:
+  // Configurations:
   private boolean mIsOptimizationEnabled = true;
   private boolean mGeneratingConditionals = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
-  //  Module Information:
+  // Module Information:
+  private boolean mTopLevel;
   private boolean mHasEFSMElements;
   private boolean m1stPass; // Used in the method visitModuleProxy().
 

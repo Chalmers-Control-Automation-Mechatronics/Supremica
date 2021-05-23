@@ -42,7 +42,9 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -56,7 +58,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 public abstract class AbstractConflictCheckerTest extends
@@ -191,6 +192,7 @@ public abstract class AbstractConflictCheckerTest extends
   //# Coreachability Model
   protected ProductDESProxy createLanguageInclusionModel
     (final ProductDESProxy des, final Map<AutomatonProxy,StateProxy> inittuple)
+    throws EventNotFoundException
   {
     return createLanguageInclusionModel(des, inittuple, null);
   }
@@ -199,30 +201,29 @@ public abstract class AbstractConflictCheckerTest extends
     (final ProductDESProxy des,
      final Map<AutomatonProxy,StateProxy> inittuple,
      final Collection<EventProxy> disabledEvents)
+    throws EventNotFoundException
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final Collection<EventProxy> oldevents = des.getEvents();
     final int numevents = oldevents.size();
     final Collection<EventProxy> newevents =
         new ArrayList<EventProxy>(numevents);
-    EventProxy oldmarking = null;
-    EventProxy newmarking = null;
+    final ConflictChecker checker = getModelVerifier();
+    EventProxy oldMarking = checker.getConfiguredDefaultMarking();
+    if (oldMarking == null) {
+      oldMarking = AbstractConflictChecker.findMarkingProposition(des);
+    }
+    EventProxy newMarking = null;
     for (final EventProxy oldevent : oldevents) {
-      if (oldevent.getKind() == EventKind.PROPOSITION) {
+      if (oldevent.getKind() == EventKind.PROPOSITION &&
+          oldevent == oldMarking) {
         final String eventname = oldevent.getName();
-        if (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-          oldmarking = oldevent;
-          newmarking =
-              factory.createEventProxy(eventname, EventKind.UNCONTROLLABLE);
-          newevents.add(newmarking);
-        }
+        newMarking =
+          factory.createEventProxy(eventname, EventKind.UNCONTROLLABLE);
+        newevents.add(newMarking);
       } else {
         newevents.add(oldevent);
       }
-    }
-    if (oldmarking == null) {
-      throw new IllegalArgumentException
-        ("Default marking proposition not found in model!");
     }
     final Collection<AutomatonProxy> oldautomata = des.getAutomata();
     final int numaut = oldautomata.size();
@@ -231,7 +232,7 @@ public abstract class AbstractConflictCheckerTest extends
     for (final AutomatonProxy oldaut : oldautomata) {
       final StateProxy init = inittuple.get(oldaut);
       final AutomatonProxy newaut =
-        createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
+        createLanguageInclusionAutomaton(oldaut, init, oldMarking, newMarking);
       newautomata.add(newaut);
     }
     if (disabledEvents != null) {
@@ -239,7 +240,7 @@ public abstract class AbstractConflictCheckerTest extends
         (":disable", ComponentKind.PLANT, disabledEvents);
       newautomata.add(disable);
     }
-    final AutomatonProxy prop = createPropertyAutomaton(newmarking);
+    final AutomatonProxy prop = createPropertyAutomaton(newMarking);
     newautomata.add(prop);
     final String name = des.getName() + "-coreachability";
     return factory.createProductDESProxy(name, newevents, newautomata);

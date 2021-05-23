@@ -39,6 +39,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
@@ -337,6 +338,7 @@ public abstract class AbstractSICProperty6VerifierTest extends
   @Override
   protected ProductDESProxy createLanguageInclusionModel
     (final ProductDESProxy des, final Map<AutomatonProxy,StateProxy> inittuple)
+    throws EventNotFoundException
   {
     final Collection<EventProxy> events = des.getEvents();
     final Collection<EventProxy> iface = new ArrayList<EventProxy>();

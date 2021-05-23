@@ -70,8 +70,6 @@ public class CompilerOptions
     "normalizingCompiler";
   public static final String OPTION_ModuleCompiler_AutomatonVariablesCompiler =
     "automatonVariablesCompiler";
-  public static final String OPTION_ModuleCompiler_HISCCompiler =
-    "hiscCompiler";
 
 
   //#########################################################################
@@ -102,9 +100,5 @@ public class CompilerOptions
     (OPTION_ModuleCompiler_AutomatonVariablesCompiler,
      "Automaton Variables Compiler",
      "Allow automaton names in EFSM guards", "-autvars", false);
-  public static final BooleanOption HISC_COMPILER = new BooleanOption
-    (OPTION_ModuleCompiler_HISCCompiler, "HISC high-level only",
-     "Compile as HISC module, only including interfaces of low levels",
-     "-hisc", false, false);
 
 }

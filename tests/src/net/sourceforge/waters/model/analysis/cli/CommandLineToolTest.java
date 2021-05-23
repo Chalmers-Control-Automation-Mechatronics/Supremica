@@ -195,6 +195,15 @@ public class CommandLineToolTest
                     "counterexample:", "Statistics:");
   }
 
+  public void testAnalyzer_NativeSIC5()
+    throws Exception
+  {
+    final File file = getInputWmod("despot", "testHISC", "hisc8_low2");
+    final String[] args = new String[]
+      {"-native", "-sic5", file.toString()};
+    testCommandLine("native-sic5", args, false, ".*SIC property V.*");
+  }
+
   public void testAnalyzer_TRCompConflict()
     throws Exception
   {
@@ -237,6 +246,17 @@ public class CommandLineToolTest
       {"-trcomp", "-lang",
        file.toString(), "-property", "prop[3]"};
     testCommandLine("trcomp-lang", args, true);
+  }
+
+  public void testAnalyzer_TRCompSIC6()
+    throws Exception
+  {
+    final File file = getInputWmod("despot", "testHISC", "hisc2_low1");
+    final String[] args = new String[]
+      {"-trcomp", "-sic6", "-method", "GNB", file.toString(), "-stats"};
+    testCommandLine("trcomp-sic6", args, false,
+                    ".*SIC property VI.*",
+                    ".*ObservationEquivalenceTRSimplifier.*");
   }
 
 

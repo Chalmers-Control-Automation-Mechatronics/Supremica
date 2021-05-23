@@ -56,7 +56,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 /**
@@ -142,12 +141,9 @@ public class SICPropertyBuilder
 
   public void setOutputMarkings()
   {
-    final String omega = ":omega";
-    mOutputMarking =
-      mFactory.createEventProxy(omega, EventKind.PROPOSITION, true);
-    final String alpha = ":alpha";
-    mPreconditionMarking =
-      mFactory.createEventProxy(alpha, EventKind.PROPOSITION, true);
+    mOutputMarking = mPreconditionMarking = null;
+    ensureOutputMarking();
+    ensurePreconditionMarking();
   }
 
 
@@ -169,21 +165,13 @@ public class SICPropertyBuilder
   }
 
   /**
-   * Builds a model for checking SIC Property V with respect to the
+   * Builds a model for checking SIC property V with respect to the
    * given answer event.
    */
   public ProductDESProxy createSIC5Model(final EventProxy answer)
   {
-    if (mOutputMarking == null) {
-      mOutputMarking =
-          mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
-                                    EventKind.PROPOSITION, true);
-    }
-    if (mPreconditionMarking == null) {
-      final String alphaNm = ":alpha";
-      mPreconditionMarking =
-          mFactory.createEventProxy(alphaNm, EventKind.PROPOSITION, true);
-    }
+    ensureOutputMarking();
+    ensurePreconditionMarking();
     final Collection<AutomatonProxy> oldAutomata = mModel.getAutomata();
     final int numaut = oldAutomata.size();
     final List<AutomatonProxy> newAutomata =
@@ -248,7 +236,7 @@ public class SICPropertyBuilder
     final String name = desname + '-' + ansname.replace(':', '-');
     final String comment =
       "Automatically generated from '" + desname +
-      "' to check SIC Property V with respect to answer event '" + ansname +
+      "' to check SIC property V with respect to answer event '" + ansname +
       "'.";
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(name, comment, null, newEvents,
@@ -258,21 +246,14 @@ public class SICPropertyBuilder
   }
 
   /**
-   * Builds a model for checking SIC Property V with respect to the
+   * Builds a model for checking SIC property V with respect to the
    * given answer event.
    */
   public ProductDESProxy createCompositionalSIC5Model(final EventProxy answer)
   throws AnalysisException
   {
-    if (mOutputMarking == null) {
-      final String omega = ":omega";
-      mOutputMarking = mFactory.createEventProxy(omega, EventKind.PROPOSITION);
-    }
-    if (mPreconditionMarking == null) {
-      final String alpha = ":alpha";
-      mPreconditionMarking =
-        mFactory.createEventProxy(alpha, EventKind.PROPOSITION);
-    }
+    ensureOutputMarking();
+    ensurePreconditionMarking();
     final Collection<EventProxy> props = new ArrayList<EventProxy>(2);
     props.add(mOutputMarking);
     props.add(mPreconditionMarking);
@@ -320,7 +301,7 @@ public class SICPropertyBuilder
     final String name = desname + '-' + ansname.replace(':', '-');
     final String comment =
       "Automatically generated from '" + desname +
-      "' to check SIC Property V with respect to answer event '" + ansname +
+      "' to check SIC property V with respect to answer event '" + ansname +
       "'.";
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(name, comment, null, newEvents,
@@ -330,17 +311,13 @@ public class SICPropertyBuilder
   }
 
   /**
-   * Builds a model for checking SIC Property VI.
+   * Builds a model for checking SIC property VI.
    */
   public ProductDESProxy createSIC6Model()
   {
     assert mInputMarking != null :
-      "SIC Property VI conversion requires default marking of input model!";
-    if (mPreconditionMarking == null) {
-      final String alphaNm = ":alpha";
-      mPreconditionMarking =
-          mFactory.createEventProxy(alphaNm, EventKind.PROPOSITION, true);
-    }
+      "SIC property VI conversion requires default marking of input model!";
+    ensurePreconditionMarking();
     if (mTau == null) {
       mTau =
         mFactory.createEventProxy(":sic6", EventKind.UNCONTROLLABLE, false);
@@ -372,7 +349,7 @@ public class SICPropertyBuilder
     final String name = desname + "-sic6";
     final String comment =
       "Automatically generated from '" + desname +
-      "' to check SIC Property VI.";
+      "' to check SIC property VI.";
     final ProductDESProxy newModel =
       mFactory.createProductDESProxy(name, comment, null,
                                      newEvents, newAutomata);
@@ -434,12 +411,12 @@ public class SICPropertyBuilder
     String comment;
     if (answer != null) {
       traceName = modelname + "-sic5";
-      comment = modelname + " does not satisfy SIC Property V. " +
+      comment = modelname + " does not satisfy SIC property V. " +
         "The answer event " + answer.getName() +
         " can no longer be executed, although it is required by the interface.";
     } else {
       traceName = modelname + "-sic6";
-      comment = modelname + " does not satisfy SIC Property VI.";
+      comment = modelname + " does not satisfy SIC property VI.";
     }
     final TraceProxy convertedTrace = mFactory.createTraceProxy(convertedSteps);
     final ConflictKind kind = counter.getKind();
@@ -452,6 +429,24 @@ public class SICPropertyBuilder
 
   //#########################################################################
   //# Auxiliary Methods
+  private void ensureOutputMarking()
+  {
+    if (mOutputMarking == null) {
+      final String omega = ":omega";
+      mOutputMarking =
+        mFactory.createEventProxy(omega, EventKind.PROPOSITION, true);
+    }
+  }
+
+  private void ensurePreconditionMarking()
+  {
+    if (mPreconditionMarking == null) {
+      final String alpha = ":alpha";
+      mPreconditionMarking =
+        mFactory.createEventProxy(alpha, EventKind.PROPOSITION, true);
+    }
+  }
+
   private AutomatonProxy createCompositionalSIC5Automaton
     (final AutomatonProxy aut,
      final EventProxy answer,
@@ -643,7 +638,7 @@ public class SICPropertyBuilder
   }
 
   /**
-   * Creates the test automaton added to the model to check SIC Property VI.
+   * Creates the test automaton added to the model to check SIC property VI.
    */
   private AutomatonProxy createSIC6Test()
   {

@@ -60,8 +60,7 @@ public class WatersOptionPages
                              CompilerOptions.OPTIMIZING_COMPILER,
                              CompilerOptions.EFSM_COMPILER,
                              CompilerOptions.NORMALIZING_COMPILER,
-                             CompilerOptions.AUTOMATON_VARIABLES_COMPILER,
-                             CompilerOptions.HISC_COMPILER);
+                             CompilerOptions.AUTOMATON_VARIABLES_COMPILER);
 
   public static final AnalysisOptionPage CONFLICT =
     new AnalysisOptionPage(AnalysisOperation.CONFLICT_CHECK);

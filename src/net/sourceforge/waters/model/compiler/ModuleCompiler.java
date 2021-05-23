@@ -46,13 +46,6 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.Configurable;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.ParameterBindingListOption;
-import net.sourceforge.waters.model.options.StringListOption;
-import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -80,6 +73,13 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.Configurable;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.StringListOption;
+import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -267,8 +267,6 @@ public class ModuleCompiler extends AbortableCompiler
                          OPTION_ModuleCompiler_NormalizingCompiler);
     page.append(options, CompilerOptions.
                          OPTION_ModuleCompiler_AutomatonVariablesCompiler);
-    page.append(options, CompilerOptions.
-                         OPTION_ModuleCompiler_HISCCompiler);
     return options;
   }
 
@@ -296,14 +294,6 @@ public class ModuleCompiler extends AbortableCompiler
                             OPTION_ModuleCompiler_AutomatonVariablesCompiler)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setAutomatonVariablesEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(CompilerOptions.
-                            OPTION_ModuleCompiler_HISCCompiler)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      if (boolOption.getBooleanValue()) {
-        setHISCCompileMode(HISCCompileMode.HISC_HIGH);
-      } else {
-        setHISCCompileMode(HISCCompileMode.NOT_HISC);
-      }
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_LanguageInclusionChecker_Property)) {
       final StringListOption opt = (StringListOption) option;

@@ -3,6 +3,11 @@ package org.supremica.properties;
 import java.awt.Color;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.gui.logging.IDELogLevel;
+import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
+import net.sourceforge.waters.gui.renderer.LayoutMode;
+import net.sourceforge.waters.gui.util.IconSet;
+import net.sourceforge.waters.gui.util.LookAndFeelOption;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ColorOption;
 import net.sourceforge.waters.model.options.DoubleOption;
@@ -10,11 +15,6 @@ import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.options.StringOption;
-import net.sourceforge.waters.gui.logging.IDELogLevel;
-import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
-import net.sourceforge.waters.gui.renderer.LayoutMode;
-import net.sourceforge.waters.gui.util.IconSet;
-import net.sourceforge.waters.gui.util.LookAndFeelOption;
 
 import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.algorithms.EquivalenceRelation;
@@ -83,7 +83,7 @@ public class Config
      "Default File Save Path", "Default file save path", null, System.getProperty("user.home"));
 
 
-  //GENERAL
+  //GUI_IDE
   public static final PositiveIntOption GUI_IDE_WIDTH = new PositiveIntOption
     ("ideFrameWidth",
      "IDE Width", "Width at which IDE opens", null, 1024, false);
