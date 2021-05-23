@@ -33,24 +33,16 @@ public class Config
 
   //GENERAL
   public static final EnumOption<LookAndFeelOption> GENERAL_LOOK_AND_FEEL = new EnumOption<>
-    ("javaLookAndFeel", "Java Look&Feel (requires restart)", "Java Look&Feel (requires restart)",
-      null, LookAndFeelOption.values(), LookAndFeelOption.DEFAULT);
-  public static final StringOption GENERAL_STATE_SEPARATOR = new StringOption
-    ("generalStateSeparator",
-      "State Separator Character", "State separator character", null, ".");
-  public static final StringOption GENERAL_STATE_LABEL_SEPARATOR = new StringOption
-    ("generalStateLabelSeparator",
-      "State Label Separator Character", "State label separator character", null, ".");
+    ("javaLookAndFeel", "Java Look&Feel (requires restart)",
+     "Java Look&Feel (requires restart)",
+    null, LookAndFeelOption.values(), LookAndFeelOption.DEFAULT);
+  public static final EnumOption<IconSet> GUI_EDITOR_ICONSET = new EnumOption<>
+    ("iconSet", "Icon Set and Font Scaling (requires restart)",
+     "Size of icons and fonts displayed in the IDE (requires restart)",
+     null, IconSet.values(), IconSet.WATERS_16);
   public static final BooleanOption GENERAL_STUDENT_VERSION = new BooleanOption
     ("generalStudentVersion",
      "Student Verison", "Student version", null, false, false);
-  public static final BooleanOption INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanOption
-    ("includeExperimentalAlgorithms",
-     "Include Experimental Algorithms (requires restart)", "Include experimental algorithms (requires restart)", null, false) {
-    {
-      VerificationType.DIAGNOSABILITY.setConfigOption(this);
-    }
-  };
 
 
   //GENERAL_LOG
@@ -76,11 +68,13 @@ public class Config
 
   //GENERAL_FILE
   public static final StringOption FILE_OPEN_PATH = new StringOption
-    ("fileOpenPath",
-     "Default File Open Path", "Default file open path", null, System.getProperty("user.home"));
+    ("fileOpenPath", "Default File Open Path",
+     "Default directory when opening modules and other input files",
+     null, System.getProperty("user.home"));
   public static final StringOption FILE_SAVE_PATH = new StringOption
-    ("fileSavePath",
-     "Default File Save Path", "Default file save path", null, System.getProperty("user.home"));
+    ("fileSavePath", "Default File Save Path",
+     "Default directory when creating log and other output files",
+     null, System.getProperty("user.home"));
 
 
   //GUI_IDE
@@ -107,15 +101,14 @@ public class Config
 
 
   //GUI_EDITOR
-  public static final EnumOption<IconSet> GUI_EDITOR_ICONSET = new EnumOption<>
-  ("iconSet", "Icon Set and Font Scaling (requires restart)", "Icon set and font scaling (requires restart)",
-    null, IconSet.values(), IconSet.WATERS_16);
   public static final ColorOption GUI_EDITOR_BACKGROUND_COLOR = new ColorOption
-  ("backgroundColor", "Automaton Background Colour", "Automaton background colour",
-    null, Color.WHITE);
+    ("backgroundColor", "Automaton Background Colour",
+     "Background colour of the graph editor when creating automata",
+     null, Color.WHITE);
   public static final EnumOption<LayoutMode> GUI_EDITOR_LAYOUT_MODE = new EnumOption<>
-  ("layoutMode", "Layout Mode", "Layout mode",
-    null, LayoutMode.values(), LayoutMode.Default);
+    ("layoutMode", "Layout Mode",
+      "General mode how automata are rendered in the graph editor",
+     null, LayoutMode.values(), LayoutMode.Default);
   public static final BooleanOption GUI_EDITOR_DEFAULT_EMPTY_MODULE = new BooleanOption
     ("defaultEmptyModule", "Open with an Empty Module",
      "Open an empty module when launching Supremica without options", null, true);
@@ -156,23 +149,6 @@ public class Config
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SD = new BooleanOption
     ("includeSD", "Include Sampled-Data Checks",
      "Add sampled-data property checks in editor's Verify menu", null, false);
-  public static final BooleanOption GUI_ANALYZER_INCLUDE_OP = new BooleanOption
-    ("includeOP", "Include Observer Projection Algorithms",
-     "Include Observer Projection (OP) in Supremica analyzer", null, false) {
-    {
-      VerificationType.OP.setConfigOption(this);
-    }
-  };
-  public static final BooleanOption GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER = new BooleanOption
-    ("guiAnalyzerSendPropertiesToAnalyzer", "Send properties to analyzer",
-     "Display property automata from the editor in Supremica analyzer", null, false);
-  public static final BooleanOption GUI_ANALYZER_AUTOMATON_VIEWER_USE_CONTROLLED_SURFACE = new BooleanOption
-    ("automatonViewerUseControlledSurface",
-     "Use controlled surface panel to display automata",
-     "Use new controlled surface panel to display an automaton", null, false);
-  public static final BooleanOption INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanOption
-    ("includeBoundedUnconTools",
-     "Include Unbounded Controllability Tools", "Include unbounded controllability tools", null, false);
   public static final BooleanOption INCLUDE_WATERS_ANALYZER = new BooleanOption
     ("useWatersAnalyzer", "Use Waters Analyzer",
      "Analyzer tab uses new Waters analyzer instead of Supremica", null, false);
@@ -225,6 +201,33 @@ public class Config
     ("dotAutomaticUpdate",
      "Automatic Layout Update", "Do automatic update of the layout", null, true);
 
+  //SUPREMICA_GENERAL
+  public static final StringOption GENERAL_STATE_SEPARATOR = new StringOption
+    ("generalStateSeparator",
+      "State Separator Character", "State separator character", null, ".");
+  public static final StringOption GENERAL_STATE_LABEL_SEPARATOR = new StringOption
+    ("generalStateLabelSeparator",
+      "State Label Separator Character", "State label separator character", null, ".");
+  public static final BooleanOption GUI_ANALYZER_INCLUDE_OP = new BooleanOption
+    ("includeOP", "Include Observer Projection Algorithms",
+     "Include Observer Projection (OP) in Supremica analyzer", null, false) {
+    {
+      VerificationType.OP.setConfigOption(this);
+    }
+  };
+  public static final BooleanOption GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER = new BooleanOption
+    ("guiAnalyzerSendPropertiesToAnalyzer", "Send properties to analyzer",
+     "Display property automata from the editor in Supremica analyzer", null, false);
+  public static final BooleanOption INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanOption
+    ("includeBoundedUnconTools",
+     "Include Unbounded Controllability Tools", "Include unbounded controllability tools", null, false);
+  public static final BooleanOption INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanOption
+    ("includeExperimentalAlgorithms",
+     "Include Experimental Algorithms", "Include experimental algorithms", null, false) {
+    {
+      VerificationType.DIAGNOSABILITY.setConfigOption(this);
+    }
+  };
 
   //ALGORITHMS_SYNCHRONIZATION
   public static final BooleanOption SYNC_FORBID_UNCON_STATES = new BooleanOption

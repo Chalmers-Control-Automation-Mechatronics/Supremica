@@ -233,53 +233,9 @@ public class AnalyzerAutomataPanel
                         }
                         else if (selectedAutomata.size() == 1)
                         {
-                            if (!Config.GUI_ANALYZER_AUTOMATON_VIEWER_USE_CONTROLLED_SURFACE.getValue())
-                            {
-                                final Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
-                                final AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);
-                                analyzerPanel.setRightComponent(automatonPanel);
-                            }
-                            /*
-                            else
-                            {
-                                Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
-                                ModuleContainer flatModuleContainer = moduleContainer.getFlatModuleContainer();
-
-                                //GraphProxy currGraphProxy = moduleContainer.getFlatGraphProxy(selectedAutomaton.getName());
-                                //ModuleProxy currModuleProxy = moduleContainer.getFlatModuleProxy();
-//                                                                if (currGraphProxy == null)
-//                                                                {
-//                                                                        logger.error("AnalyzerAutomataPanel.currGraphProxy == null");
-//                                                                        return;
-//                                                                }
-//                                                                if (currModuleProxy == null)
-//                                                                {
-//                                                                        logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
-//                                                                        return;
-//                                                                }
-
-                                //boolean isSubject = currGraphProxy instanceof GraphSubject;
-                                //logger.info("isGraphSubject: " + isSubject);
-                                //isSubject = currModuleProxy instanceof ModuleSubject;
-                                //logger.info("isModuleSubject: " + isSubject);
-
-                                try
-                                {
-                                    //EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
-                                    //ControlledSurface surface = new ControlledSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
-
-                                    ComponentViewPanel componentView = flatModuleContainer.getComponentViewPanel(selectedAutomaton.getName());
-
-                                    analyzerPanel.setRightComponent(componentView);
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger.error(ex);
-                                    return;
-                                }
-
-                            }
-                             */
+                            final Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
+                            final AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);
+                            analyzerPanel.setRightComponent(automatonPanel);
                         }
                         else
                         {

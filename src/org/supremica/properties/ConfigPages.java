@@ -15,10 +15,8 @@ public class ConfigPages
                              GUI_IDE_XPOS, GUI_IDE_YPOS,
                              GUI_IDE_MAXIMIZED,
                              GENERAL_LOOK_AND_FEEL,
-                             GENERAL_STATE_SEPARATOR,
-                             GENERAL_STATE_LABEL_SEPARATOR,
-                             GENERAL_STUDENT_VERSION,
-                             INCLUDE_EXPERIMENTAL_ALGORITHMS);
+                             GUI_EDITOR_ICONSET,
+                             GENERAL_STUDENT_VERSION);
 
   public static final SimpleLeafOptionPage GENERAL_LOG =
     new SimpleLeafOptionPage("general.log", "Log",
@@ -33,7 +31,6 @@ public class ConfigPages
 
   public static final SimpleLeafOptionPage GUI_EDITOR =
     new SimpleLeafOptionPage("gui.editor", "Editor",
-                             GUI_EDITOR_ICONSET,
                              GUI_EDITOR_BACKGROUND_COLOR,
                              GUI_EDITOR_BACKGROUND_COLOR,
                              GUI_EDITOR_LAYOUT_MODE,
@@ -66,14 +63,10 @@ public class ConfigPages
 
   public static final SimpleLeafOptionPage GUI_ANALYZER =
     new SimpleLeafOptionPage("gui.analyzer", "Analyzer",
+                             INCLUDE_WATERS_ANALYZER,
                              GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS,
                              GUI_ANALYZER_INCLUDE_HISC,
-                             GUI_ANALYZER_INCLUDE_SD,
-                             GUI_ANALYZER_INCLUDE_OP,
-                             GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER,
-                             GUI_ANALYZER_AUTOMATON_VIEWER_USE_CONTROLLED_SURFACE,
-                             INCLUDE_BOUNDED_UNCON_TOOLS,
-                             INCLUDE_WATERS_ANALYZER);
+                             GUI_ANALYZER_INCLUDE_SD);
 
   public static final SimpleLeafOptionPage GUI_SIMULATOR =
     new SimpleLeafOptionPage("gui.simulator", "Simulator",
@@ -88,6 +81,15 @@ public class ConfigPages
                              DOT_WITH_CIRCLES, DOT_USE_STATE_COLORS,
                              DOT_USE_ARC_COLORS, DOT_USE_MULTI_LABELS,
                              DOT_AUTOMATIC_UPDATE);
+
+  public static final SimpleLeafOptionPage SUPREMICA_GENERAL =
+    new SimpleLeafOptionPage("supremica.general", "General",
+                             GENERAL_STATE_SEPARATOR,
+                             GENERAL_STATE_LABEL_SEPARATOR,
+                             GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER,
+                             GUI_ANALYZER_INCLUDE_OP,
+                             INCLUDE_BOUNDED_UNCON_TOOLS,
+                             INCLUDE_EXPERIMENTAL_ALGORITHMS);
 
   public static final SimpleLeafOptionPage ALGORITHMS_SYNCHRONIZATION =
     new SimpleLeafOptionPage("algorithms.synchronization", "Synchronization",
@@ -146,8 +148,11 @@ public class ConfigPages
                              ConfigPages.GUI_ANALYZER, WatersOptionPages.COMPILER);
 
   public static final AggregatorOptionPage ANALYZER_AGGREGATOR_OPTION_PAGE =
-    new AggregatorOptionPage("Supremica Analyzer", ConfigPages.ALGORITHMS_SYNCHRONIZATION,
-                             ConfigPages.ALGORITHMS_VERIFICATION, ConfigPages.ALGORITHMS_SYNTHESIS,
+    new AggregatorOptionPage("Supremica Analyzer",
+                             ConfigPages.SUPREMICA_GENERAL,
+                             ConfigPages.ALGORITHMS_SYNCHRONIZATION,
+                             ConfigPages.ALGORITHMS_VERIFICATION,
+                             ConfigPages.ALGORITHMS_SYNTHESIS,
                              ConfigPages.ALGORITHMS_MINIMIZATION,
                              ConfigPages.ALGORITHMS_BDD, ConfigPages.GUI_DOT);
 

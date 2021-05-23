@@ -139,31 +139,60 @@ public class LegacyOption
   //# Static Initialisation
   static {
     mLegacyMap = new HashMap<>(16);
+    // general->supremica.general
+    createSimpleReplacement("general.generalStateSeparator",
+                            "supremica.general.generalStateSeparator");
+    createSimpleReplacement("general.generalStateLabelSeparator",
+                            "supremica.general.generalStateLabelSeparator");
+    createSimpleReplacement("general.includeExperimentalAlgorithms",
+                            "supremica.general.includeExperimentalAlgorithms");
     // gui->general
-    createSimpleReplacement("gui.ideFrameWidth", "general.ideFrameWidth");
-    createSimpleReplacement("gui.ideFrameHeight", "general.ideFrameHeight");
-    createSimpleReplacement("gui.ideFrameX", "general.ideFrameX");
-    createSimpleReplacement("gui.ideFrameY", "general.ideFrameY");
-    createSimpleReplacement("gui.ideFrameMaximized", "general.ideFrameMaximized");
-    // gui->gui.compiler
-    createSimpleReplacement("gui.includeInstantiation", "gui.compiler.includeInstantiation");
-    createSimpleReplacement("gui.backgroundCompiler", "gui.compiler.backgroundCompiler");
-    createSimpleReplacement("gui.optimizingCompiler", "gui.compiler.optimizingCompiler");
-    createSimpleReplacement("gui.normalizingCompiler", "gui.compiler.normalizingCompiler");
-    createSimpleReplacement("gui.automatonVariablesCompiler", "gui.compiler.automatonVariablesCompiler");
-    // algorithms.hmi->gui.compiler
-    createSimpleReplacement("algorithms.hmi.expandEFA", "gui.compiler.efsmCompiler");
+    createSimpleReplacement("gui.ideFrameWidth",
+                            "general.ideFrameWidth");
+    createSimpleReplacement("gui.ideFrameHeight",
+                            "general.ideFrameHeight");
+    createSimpleReplacement("gui.ideFrameX",
+                            "general.ideFrameX");
+    createSimpleReplacement("gui.ideFrameY",
+                            "general.ideFrameY");
+    createSimpleReplacement("gui.ideFrameMaximized",
+                            "general.ideFrameMaximized");
     // gui->misc
     createSimpleReplacement("gui.includeRASSupport", "misc.includeRASSupport");
+    // gui->gui.compiler
+    createSimpleReplacement("gui.includeInstantiation",
+                            "gui.compiler.includeInstantiation");
+    createSimpleReplacement("gui.backgroundCompiler",
+                            "gui.compiler.backgroundCompiler");
+    createSimpleReplacement("gui.optimizingCompiler",
+                            "gui.compiler.optimizingCompiler");
+    createSimpleReplacement("gui.normalizingCompiler",
+                            "gui.compiler.normalizingCompiler");
+    createSimpleReplacement("gui.automatonVariablesCompiler",
+                            "gui.compiler.automatonVariablesCompiler");
+    // gui.editor->general
+    createSimpleReplacement("gui.editor.iconSet",
+                            "general.iconSet");
+    // gui.editor.edgeArrowAtEnd
+    createBooleanExtension("gui.editor.edgeArrowAtEnd", "End", "Middle");
+    // gui.analyzer->supremica.general
+    createSimpleReplacement("gui.analyzer.includeOP",
+                            "supremica.general.includeOP");
+    createSimpleReplacement("gui.analyzer.guiAnalyzerSendPropertiesToAnalyzer",
+                            "supremica.general.guiAnalyzerSendPropertiesToAnalyzer");
+    createSimpleReplacement("gui.analyzer.automatonViewerUseControlledSurface",
+                            "supremica.general.automatonViewerUseControlledSurface");
+    createSimpleReplacement("gui.analyzer.includeBoundedUnconTools",
+                            "supremica.general.includeBoundedUnconTools");
     // gui.analyzer.includeDiagnosability ->
     // waters.analysis.diagnosability.Algorithm
     createBooleanReplacement("gui.analyzer.includeDiagnosability",
                              "waters.analysis.diagnosability.Algorithm",
                              "-disabled", "-mono");
-    // gui.editor.edgeArrowAtEnd
-    createBooleanExtension("gui.editor.edgeArrowAtEnd", "End", "Middle");
+    // algorithms.hmi->gui.compiler
+    createSimpleReplacement("algorithms.hmi.expandEFA",
+                            "gui.compiler.efsmCompiler");
   }
-
 
   private static void createSimpleReplacement(final String legacyName,
                                               final String replacementName)
