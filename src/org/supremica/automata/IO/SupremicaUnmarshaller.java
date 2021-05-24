@@ -18,7 +18,6 @@ import java.util.Collections;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
-import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
@@ -66,12 +65,7 @@ public class SupremicaUnmarshaller implements ProxyUnmarshaller<Project>
   @Override
   public String getDefaultExtension()
   {
-    return ".xml";
-  }
-
-  public String getDescription()
-  {
-    return "Supremica Project files [*.xml]";
+    return SupremicaMarshaller.XML_FILE_FILTER.getExtension();
   }
 
   @Override
@@ -81,18 +75,10 @@ public class SupremicaUnmarshaller implements ProxyUnmarshaller<Project>
     return Collections.singletonList(ext);
   }
 
-  public FileFilter getDefaultFileFilter()
-  {
-    final String ext = getDefaultExtension();
-    final String description = getDescription();
-    return StandardExtensionFileFilter.getFilter(description, ext);
-  }
-
   @Override
   public Collection<FileFilter> getSupportedFileFilters()
   {
-    final FileFilter filter = getDefaultFileFilter();
-    return Collections.singletonList(filter);
+    return Collections.singletonList(SupremicaMarshaller.XML_FILE_FILTER);
   }
 
 

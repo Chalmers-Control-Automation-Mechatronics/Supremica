@@ -183,11 +183,6 @@ public class SAXCounterExampleMarshaller
     super.marshal(cex, filename);
   }
 
-  @Override
-  public String getDefaultExtension()
-  {
-    return ".wtra";
-  }
 
   @Override
   public Class<CounterExampleProxy> getDocumentClass()
@@ -195,14 +190,10 @@ public class SAXCounterExampleMarshaller
     return CounterExampleProxy.class;
   }
 
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.marshaller.SAXMarshaller<CounterExampleProxy>
   @Override
-  public String getDescription()
+  public StandardExtensionFileFilter getDefaultFileFilter()
   {
-      return "Waters trace files [*.wtra]";
+    return WTRA_FILE_FILTER;
   }
 
 
@@ -211,5 +202,11 @@ public class SAXCounterExampleMarshaller
   private final CounterExampleSaturator mSaturator;
 
   private boolean mSaturating = false;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static StandardExtensionFileFilter WTRA_FILE_FILTER =
+    new StandardExtensionFileFilter("Waters counterexample files (*.wtra)", ".wtra");
 
 }

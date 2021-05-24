@@ -279,7 +279,7 @@ public class ScheduleDialog
     public void prepareAutoTest()
             throws Exception
     {
-        final File rootDir = new File(Config.FILE_OPEN_PATH.getValue());
+        final File rootDir = Config.FILE_OPEN_PATH.getValue();
         final File[] files = rootDir.listFiles(new FilenameFilter()
             {
                 @Override

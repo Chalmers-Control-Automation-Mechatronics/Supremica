@@ -157,9 +157,6 @@ public class IDE
     pack();
     mSplitPaneVertical.setDividerLocation(0.9);
 
-    final File startdir = new File(Config.FILE_OPEN_PATH.getValue());
-    mFileChooser = new JFileChooser(startdir);
-
     // Initialise document managers and register listeners
     mDocumentContainerManager = new DocumentContainerManager(this);
     attach(this);
@@ -221,6 +218,10 @@ public class IDE
 
   public JFileChooser getFileChooser()
   {
+    if (mFileChooser == null) {
+      final File startDir = Config.FILE_OPEN_PATH.getValue();
+      mFileChooser = new JFileChooser(startDir);
+    }
     return mFileChooser;
   }
 
@@ -558,7 +559,7 @@ public class IDE
   private final WelcomeScreen mWelcomeScreen;
   private final JSplitPane mSplitPaneVertical;
   private final LogPanel mLogPanel;
-  private final JFileChooser mFileChooser;
+  private JFileChooser mFileChooser;
 
 
   //#########################################################################

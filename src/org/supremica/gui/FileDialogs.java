@@ -451,7 +451,7 @@ public class FileDialogs
             fileImporter = new JFileChooser();
 
             fileImporter.setDialogType(JFileChooser.OPEN_DIALOG);
-            fileImporter.setCurrentDirectory(new java.io.File(Config.FILE_OPEN_PATH.getValue()));
+            fileImporter.setCurrentDirectory(Config.FILE_OPEN_PATH.getValue());
             fileImporter.setMultiSelectionEnabled(true);
         }
 
@@ -465,7 +465,7 @@ public class FileDialogs
             fileExporter = new StandardExtensionFileChooser();
 
             fileExporter.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileExporter.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.getValue()));
+            fileExporter.setCurrentDirectory(Config.FILE_SAVE_PATH.getValue());
             fileExporter.setMultiSelectionEnabled(false);
         }
 
@@ -479,7 +479,7 @@ public class FileDialogs
             fileSaveAs = new StandardExtensionFileChooser();
 
             fileSaveAs.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileSaveAs.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.getValue()));
+            fileSaveAs.setCurrentDirectory(Config.FILE_SAVE_PATH.getValue());
             fileSaveAs.setMultiSelectionEnabled(false);
         }
 

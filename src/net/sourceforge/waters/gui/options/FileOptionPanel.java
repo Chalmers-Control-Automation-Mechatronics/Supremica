@@ -43,13 +43,21 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.gui.dialog.FileInputCell;
 import net.sourceforge.waters.model.options.FileOption;
 
-import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
+
+/**
+ * An option panel to edit a {@link FileOption} through the GUI.
+ * Consists of a text field to enter a file name and a button to display
+ * a {@link JFileChooser}.
+ *
+ * @author Brandon Bassett, Robi Malik
+ */
 
 class FileOptionPanel
   extends OptionPanel<File>
@@ -60,15 +68,6 @@ class FileOptionPanel
                   final FileOption option)
   {
     super(context, option);
-  }
-
-
-  //#########################################################################
-  //# Simple Access
-  @Override
-  JPanel getEntryComponent()
-  {
-    return (JPanel) super.getEntryComponent();
   }
 
 
@@ -85,7 +84,7 @@ class FileOptionPanel
   {
     if (mCell.shouldYieldFocus()) {
       final FileOption option = getOption();
-      final File file = mCell.getValue();
+      final File file = getCurrentFile();
       option.setValue(file);
     }
   }
@@ -109,8 +108,13 @@ class FileOptionPanel
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.gridy = 0;
 
-    final File defaultPath = new File(Config.FILE_SAVE_PATH.getValue());
-    mCell = new FileInputCell(defaultPath, true);
+    final File defaultDirectory;
+    if (option.getType() == FileOption.Type.OUTPUT_FILE) {
+      defaultDirectory = Config.FILE_SAVE_PATH.getValue();
+    } else {
+      defaultDirectory = Config.FILE_OPEN_PATH.getValue();
+    }
+    mCell = new FileInputCell(defaultDirectory, true);
     mCell.setValue(file);
     mCell.setColumns(15);
     final GUIOptionContext context = getContext();
@@ -138,19 +142,57 @@ class FileOptionPanel
   //# Auxiliary Methods
   private void showFileChooser()
   {
-    final GUIOptionContext context = getContext();
-    final IDE ide = context.getIDE();
-    final JFileChooser chooser = ide.getFileChooser();
+    final FileOption option = getOption();
+    final JFileChooser chooser = new JFileChooser();
     File file = mCell.getValue();
     if (file != null) {
       chooser.setSelectedFile(file);
+    } else {
+      chooser.setCurrentDirectory(mCell.getDefaultDirectory());
     }
     chooser.resetChoosableFileFilters();
+    final FileFilter[] filters = option.getFileFilters();
+    if (filters != null) {
+      for (final FileFilter filter : filters) {
+        chooser.addChoosableFileFilter(filter);
+      }
+      chooser.setFileFilter(filters[0]);
+    }
+    chooser.setDialogTitle(option.getShortName());
+    switch (option.getType()) {
+    case INPUT_FILE:
+      chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      break;
+    case OUTPUT_FILE:
+      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      break;
+    case DIRECTORY:
+      chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+      chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      if (file != null) {
+        chooser.setCurrentDirectory(file);
+      }
+      break;
+    }
+    final GUIOptionContext context = getContext();
     final Component parent = context.getDialogParent();
-    if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+    if (chooser.showDialog(parent, "OK") == JFileChooser.APPROVE_OPTION) {
       file = chooser.getSelectedFile();
       mCell.setValue(file);
       mCell.shouldYieldFocus();
+    }
+  }
+
+  private File getCurrentFile()
+  {
+    final FileOption option = getOption();
+    final File file = mCell.getValue();
+    if (file == null && option.getType() == FileOption.Type.DIRECTORY) {
+      return mCell.getDefaultDirectory();
+    } else {
+      return file;
     }
   }
 

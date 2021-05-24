@@ -41,6 +41,12 @@ import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
+import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.EventSetOption;
@@ -49,12 +55,6 @@ import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.PropositionOption;
-import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
-import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
@@ -137,9 +137,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
 //            ...));
     db.register(new FileOption
            (OPTION_OPSearchAutomatonSimplifier_LogFile,
-            "Log File",
-            "",
-            ""));
+            "Log File", "", "", FileOption.Type.OUTPUT_FILE));
   }
 
 

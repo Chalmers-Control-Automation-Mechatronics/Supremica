@@ -149,11 +149,10 @@ public class GraphSavePDFAction
       mFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
       mFileChooser.setMultiSelectionEnabled(false);
       final FileFilter filter =
-        new StandardExtensionFileFilter("PDF (*.pdf)",
-                                        PDF);
+        new StandardExtensionFileFilter("PDF (*.pdf)", PDF);
       mFileChooser.addChoosableFileFilter(filter);
       mFileChooser.setFileFilter(filter);
-      final File startdir = new File(Config.FILE_OPEN_PATH.getValue());
+      final File startdir = Config.FILE_OPEN_PATH.getValue();
       mFileChooser.setCurrentDirectory(startdir);
     }
     if (mChooserPathFollowsModule) {

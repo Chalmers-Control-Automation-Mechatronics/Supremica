@@ -461,9 +461,11 @@ public class CommandLineOptionContext implements OptionContext
     {
       super("cli", "Command Line Tool");
       register(new FileOption(OPTION_CommandLineTool_Csv, null,
-                              "Save statistics in CSV file", "-csv"));
+                              "Save statistics in CSV file", "-csv",
+                              FileOption.Type.OUTPUT_FILE));
       register(new FileOption(OPTION_CommandLineTool_Properties, null,
-                              "Read options from properties file", "-p"));
+                              "Read options from properties file", "-p",
+                              FileOption.Type.INPUT_FILE));
       register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
                                  "Suppress all log output",
                                  "+quiet|+q", false));

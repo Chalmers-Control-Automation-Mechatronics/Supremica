@@ -105,9 +105,9 @@ public class SAXModuleMarshaller
   //# net.sourceforge.waters.model.marshaller.ProxyMarshaller<ModuleProxy>
   //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ModuleProxy>
   @Override
-  public String getDefaultExtension()
+  public StandardExtensionFileFilter getDefaultFileFilter()
   {
-    return ".wmod";
+    return WMOD_FILE_FILTER;
   }
 
   @Override
@@ -118,12 +118,11 @@ public class SAXModuleMarshaller
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.marshaller.SAXMarshaller<ModuleProxy>
-  @Override
-  public String getDescription()
-  {
-      return "Waters Module files [*.wmod]";
-  }
+  //# Class Constants
+  public static StandardExtensionFileFilter WMOD_FILE_FILTER =
+    new StandardExtensionFileFilter("Waters Module files (*.wmod)", ".wmod");
 
 }
+
+
+

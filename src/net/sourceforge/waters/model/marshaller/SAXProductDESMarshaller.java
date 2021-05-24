@@ -79,9 +79,9 @@ public class SAXProductDESMarshaller
   //# net.sourceforge.waters.model.marshaller.ProxyMarshaller<ProductDESProxy>
   //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ProductDESProxy>
   @Override
-  public String getDefaultExtension()
+  public StandardExtensionFileFilter getDefaultFileFilter()
   {
-    return ".wdes";
+    return WDES_FILE_FILTER;
   }
 
   @Override
@@ -92,12 +92,8 @@ public class SAXProductDESMarshaller
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.marshaller.SAXMarshaller<ProductDESProxy>
-  @Override
-  public String getDescription()
-  {
-      return "Waters Product DES files [*.wdes]";
-  }
+  //# Class Constants
+  public static StandardExtensionFileFilter WDES_FILE_FILTER =
+    new StandardExtensionFileFilter("Waters Product DES files (*.wdes)", ".wdes");
 
 }

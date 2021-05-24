@@ -34,8 +34,6 @@
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -49,32 +47,6 @@ public class StandardExtensionFileFilter
   extends javax.swing.filechooser.FileFilter
   implements java.io.FileFilter
 {
-
-  //#########################################################################
-  //# Singletons
-  /**
-   * Returns a file filter for a given extension. This method tries to
-   * ensure that only one file filter object is created for any given type,
-   * by creating a lookup table indexed by the extension. If a file filter
-   * with a given extension is found, that object is returned, ignoring the
-   * description.
-   * @param  description A textual description of the files accepted by
-   *                     this filter, to be displayed in the file chooser's
-   *                     file type selection box.
-   * @param  ext         The filename extension accepted by the filter,
-   *                     with preceding dot.
-   */
-  public static StandardExtensionFileFilter getFilter(final String description,
-                                                      final String ext)
-  {
-    StandardExtensionFileFilter filter = mFilterMap.get(ext);
-    if (filter == null) {
-      filter = new StandardExtensionFileFilter(description, ext);
-      mFilterMap.put(ext, filter);
-    }
-    return filter;
-  }
-
 
   //#########################################################################
   //# Constructors
@@ -111,6 +83,14 @@ public class StandardExtensionFileFilter
     mExtension = ext;
     mDescription = description;
     mAcceptsDirectories = dirs;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public String getExtension()
+  {
+    return mExtension;
   }
 
 
@@ -205,11 +185,5 @@ public class StandardExtensionFileFilter
   private final String mExtension;
   private final String mDescription;
   private final boolean mAcceptsDirectories;
-
-
-  //#########################################################################
-  //# Static Class Variables
-  private static final Map<String,StandardExtensionFileFilter> mFilterMap =
-    new HashMap<String,StandardExtensionFileFilter>();
 
 }

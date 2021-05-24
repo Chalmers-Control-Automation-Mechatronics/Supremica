@@ -37,6 +37,8 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
@@ -121,7 +123,9 @@ public class CompositionalModelAnalyzerFactory
               "Dump file name",
               "If set, any abstracted model will be written to this file " +
               "before being sent for monolithic analysis.",
-              "-dump"));
+              "-dump", null, FileOption.Type.OUTPUT_FILE,
+              SAXModuleMarshaller.WMOD_FILE_FILTER,
+              SAXProductDESMarshaller.WDES_FILE_FILTER));
     db.register(new EnumOption<PreselectingMethod>
              (OPTION_AbstractCompositionalModelAnalyzer_PreselectingMethod,
               "Preselection method",

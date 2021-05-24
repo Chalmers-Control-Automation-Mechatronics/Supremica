@@ -35,6 +35,8 @@ package net.sourceforge.waters.model.options;
 
 import java.io.File;
 
+import javax.swing.filechooser.FileFilter;
+
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
@@ -46,23 +48,49 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 public class FileOption extends Option<File>
 {
+
+  //#########################################################################
+  //# Inner Enumeration Type
+  public enum Type { INPUT_FILE, OUTPUT_FILE, DIRECTORY };
+
+
   //#########################################################################
   //# Constructors
   public FileOption(final String id,
                     final String shortName,
                     final String description,
-                    final String commandLineOption)
+                    final String commandLineOption,
+                    final Type type,
+                    final FileFilter... filters)
   {
-    this(id, shortName, description, commandLineOption, null);
+    this(id, shortName, description, commandLineOption,
+         null, type, filters);
   }
 
   public FileOption(final String id,
                     final String shortName,
                     final String description,
                     final String commandLineOption,
-                    final File defaultValue)
+                    final File defaultValue,
+                    final Type type,
+                    final FileFilter... filters)
   {
     super(id, shortName, description, commandLineOption, defaultValue);
+    mType = type;
+    mFileFilters = filters.length > 0 ? filters : null;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public Type getType()
+  {
+    return mType;
+  }
+
+  public FileFilter[] getFileFilters()
+  {
+    return mFileFilters;
   }
 
 
@@ -80,5 +108,11 @@ public class FileOption extends Option<File>
     final File value = new File(text);
     setValue(value);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final Type mType;
+  private final FileFilter[] mFileFilters;
 
 }

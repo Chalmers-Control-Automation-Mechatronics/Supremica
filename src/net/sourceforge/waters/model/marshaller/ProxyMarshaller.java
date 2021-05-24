@@ -36,20 +36,14 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.filechooser.FileFilter;
-
 import net.sourceforge.waters.model.base.DocumentProxy;
 
 
 /**
- * <P>
- * The basic marshaller interface.
- * </P>
+ * <P>The basic marshaller interface.</P>
  *
- * <P>
- * The ProxyMarshaller provides the basic means for the {@link DocumentManager}
- * to marshal, i.e., save documents in various file formats.
- * </P>
+ * <P>The ProxyMarshaller provides the basic means for the {@link DocumentManager}
+ * to marshal, i.e., save documents in various file formats.</P>
  *
  * @author Robi Malik
  */
@@ -57,8 +51,8 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 public interface ProxyMarshaller<D extends DocumentProxy>
 {
 
-  // #########################################################################
-  // # Access Methods
+  //#########################################################################
+  //# Access Methods
   /**
    * Writes a document to a file.
    *
@@ -74,8 +68,9 @@ public interface ProxyMarshaller<D extends DocumentProxy>
   public void marshal(final D docproxy, final File filename)
       throws WatersMarshalException, IOException;
 
-  // #########################################################################
-  // # Type Information
+
+  //#########################################################################
+  //# Type Information
   /**
    * Gets the class of documents handled by this marshaller.
    */
@@ -91,6 +86,6 @@ public interface ProxyMarshaller<D extends DocumentProxy>
    * Only one file filter is created, and this method ensures that the same
    * object is returned by each call.
    */
-  public FileFilter getDefaultFileFilter();
+  public StandardExtensionFileFilter getDefaultFileFilter();
 
 }

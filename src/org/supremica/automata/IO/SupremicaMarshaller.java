@@ -12,8 +12,6 @@ package org.supremica.automata.IO;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.filechooser.FileFilter;
-
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 
@@ -23,14 +21,17 @@ import org.supremica.automata.Project;
 public class SupremicaMarshaller
     implements ProxyMarshaller<Project>
 {
+
     //#########################################################################
     //# Constructor
     public SupremicaMarshaller()
     {
     }
 
+
     //#########################################################################
     //# Interface net.sourceforge.waters.model.marshaller.ProxyMarshaller
+    @Override
     public void marshal(final Project project, final File filename)
         throws IOException
     {
@@ -38,25 +39,28 @@ public class SupremicaMarshaller
         exporter.serialize(filename.getAbsolutePath());
     }
 
+    @Override
     public Class<Project> getDocumentClass()
     {
         return Project.class;
     }
 
+    @Override
     public String getDefaultExtension()
     {
-        return ".xml";
+        return XML_FILE_FILTER.getExtension();
     }
 
-    public String getDescription()
+    @Override
+    public StandardExtensionFileFilter getDefaultFileFilter()
     {
-        return "Supremica Project files [*.xml]";
+        return XML_FILE_FILTER;
     }
 
-    public FileFilter getDefaultFileFilter()
-    {
-        final String ext = getDefaultExtension();
-        final String description = getDescription();
-        return StandardExtensionFileFilter.getFilter(description, ext);
-    }
+
+    //#########################################################################
+    //# Class Constants
+    public static StandardExtensionFileFilter XML_FILE_FILTER =
+      new StandardExtensionFileFilter("Supremica Project files (*.xml)", ".xml");
+
 }

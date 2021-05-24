@@ -126,7 +126,7 @@ public class GraphSaveEPSAction
                                         EPS);
       mFileChooser.addChoosableFileFilter(filter);
       mFileChooser.setFileFilter(filter);
-      final File startdir = new File(Config.FILE_OPEN_PATH.getValue());
+      final File startdir = Config.FILE_SAVE_PATH.getValue();
       mFileChooser.setCurrentDirectory(startdir);
     }
     if (mChooserPathFollowsModule) {

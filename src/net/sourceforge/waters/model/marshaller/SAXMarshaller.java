@@ -176,11 +176,10 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   }
 
   @Override
-  public FileFilter getDefaultFileFilter()
+  public String getDefaultExtension()
   {
-    final String ext = getDefaultExtension();
-    final String description = getDescription();
-    return StandardExtensionFileFilter.getFilter(description, ext);
+    final StandardExtensionFileFilter filter = getDefaultFileFilter();
+    return filter.getExtension();
   }
 
   @Override
@@ -197,11 +196,6 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   {
     return mImporter;
   }
-
-
-  //#########################################################################
-  //# Hooks
-  public abstract String getDescription();
 
 
   //#########################################################################

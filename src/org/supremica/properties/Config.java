@@ -1,6 +1,7 @@
 package org.supremica.properties;
 
 import java.awt.Color;
+import java.io.File;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.gui.logging.IDELogLevel;
@@ -31,7 +32,10 @@ import org.supremica.util.BDD.OrderingAlgorithm;
 public class Config
 {
 
-  //GENERAL
+  //#########################################################################
+  //# Options
+
+  // GENERAL
   public static final EnumOption<LookAndFeelOption> GENERAL_LOOK_AND_FEEL = new EnumOption<>
     ("javaLookAndFeel", "Java Look&Feel (requires restart)",
      "Java Look&Feel (requires restart)",
@@ -43,41 +47,6 @@ public class Config
   public static final BooleanOption GENERAL_STUDENT_VERSION = new BooleanOption
     ("generalStudentVersion",
      "Student Verison", "Student version", null, false, false);
-
-
-  //GENERAL_LOG
-  public static final EnumOption<IDELogLevel> LOG_GUI_VERBOSITY = new EnumOption<>
-  ("logLevelGUI", "Verbosity Level for GUI", "Verbosity level for graphical user interface",
-    null, IDELogLevel.values(), IDELogLevel.INFO);
-  public static final EnumOption<IDELogLevel> LOG_CONSOLE_VERBOSITY = new EnumOption<>
-  ("logLevelConsole", "Verbosity Level for Console", "Verbosity level for console (stderr)",
-    null, IDELogLevel.values(), IDELogLevel.NONE);
-  public static final FileOption LOG_FILE = new FileOption
-    ("logFileName", "Log File",
-     "File to capture log output with log file verbosity", "");
-  public static final EnumOption<IDELogLevel> LOG_FILE_VERBOSITY = new EnumOption<>
-  ("logLevelFile", "Verbosity Level for Log File", "Verbosity level for log file",
-    null, IDELogLevel.values(), IDELogLevel.NONE);
-  public static final BooleanOption GENERAL_REDIRECT_STDOUT = new BooleanOption
-    ("generalRedirectStdout",
-     "Capture stdout in GUI", "Capture stdout (System.out.println) in GUI", null, false);
-  public static final BooleanOption GENERAL_REDIRECT_STDERR = new BooleanOption
-    ("generalRedirectStderr",
-     "Capture stderr in GUI", "Capture stderr (System.err.println) in GUI", null, false);
-
-
-  //GENERAL_FILE
-  public static final StringOption FILE_OPEN_PATH = new StringOption
-    ("fileOpenPath", "Default File Open Path",
-     "Default directory when opening modules and other input files",
-     null, System.getProperty("user.home"));
-  public static final StringOption FILE_SAVE_PATH = new StringOption
-    ("fileSavePath", "Default File Save Path",
-     "Default directory when creating log and other output files",
-     null, System.getProperty("user.home"));
-
-
-  //GUI_IDE
   public static final PositiveIntOption GUI_IDE_WIDTH = new PositiveIntOption
     ("ideFrameWidth",
      "IDE Width", "Width at which IDE opens", null, 1024, false);
@@ -94,6 +63,39 @@ public class Config
     ("ideFrameMaximized",
      "Maximized Window", "Whether or not the IDE opens as a maximised window",
      null, false, false);
+
+
+  // GENERAL_LOG
+  public static final EnumOption<IDELogLevel> LOG_GUI_VERBOSITY = new EnumOption<>
+  ("logLevelGUI", "Verbosity Level for GUI", "Verbosity level for graphical user interface",
+    null, IDELogLevel.values(), IDELogLevel.INFO);
+  public static final EnumOption<IDELogLevel> LOG_CONSOLE_VERBOSITY = new EnumOption<>
+  ("logLevelConsole", "Verbosity Level for Console", "Verbosity level for console (stderr)",
+    null, IDELogLevel.values(), IDELogLevel.NONE);
+  public static final FileOption LOG_FILE = new FileOption
+    ("logFileName", "Log File",
+     "File to capture log output with log file verbosity", "-log",
+     FileOption.Type.OUTPUT_FILE);
+  public static final EnumOption<IDELogLevel> LOG_FILE_VERBOSITY = new EnumOption<>
+  ("logLevelFile", "Verbosity Level for Log File", "Verbosity level for log file",
+    null, IDELogLevel.values(), IDELogLevel.NONE);
+  public static final BooleanOption GENERAL_REDIRECT_STDOUT = new BooleanOption
+    ("generalRedirectStdout",
+     "Capture stdout in GUI", "Capture stdout (System.out.println) in GUI", null, false);
+  public static final BooleanOption GENERAL_REDIRECT_STDERR = new BooleanOption
+    ("generalRedirectStderr",
+     "Capture stderr in GUI", "Capture stderr (System.err.println) in GUI", null, false);
+
+
+  // GENERAL_FILE
+  public static final FileOption FILE_OPEN_PATH = new FileOption
+    ("fileOpenPath", "Default File Open Path",
+     "Default directory when opening modules and other input files",
+     null, getHomeDirectory(), FileOption.Type.DIRECTORY);
+  public static final FileOption FILE_SAVE_PATH = new FileOption
+    ("fileSavePath", "Default File Save Path",
+     "Default directory when creating log and other output files",
+     null, getHomeDirectory(), FileOption.Type.DIRECTORY);
 
 
   //GUI_COMPILER
@@ -138,7 +140,7 @@ public class Config
      "Maximum time (in milliseconds) before stopping automatic graph layout", null, 10000);
 
 
-  //GUI_ANALYZER
+  // GUI_ANALYZER
   public static final BooleanOption GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS = new BooleanOption
     ("includeSeamlessSynthesis", "Include Seamless Synthesis",
      "Include symbolic synthesis option in editor's Analyze menu", null, true);
@@ -154,7 +156,7 @@ public class Config
      "Analyzer tab uses new Waters analyzer instead of Supremica", null, false);
 
 
-  //GUI_SIMULATOR
+  // GUI_SIMULATOR
   public static final BooleanOption INCLUDE_ANIMATOR = new BooleanOption
     ("includeAnimator",
      "Include 2D Graphical Animator", "Include 2D Graphical Animator", null, false);
@@ -166,7 +168,7 @@ public class Config
      "Simulator Cycle Time", "Simulator cycle time in milliseconds", null, 100);
 
 
-  //GUI_DOT
+  // GUI_DOT
   public static final BooleanOption DOT_USE = new BooleanOption
     ("dotUse",
      "Use Dot", "Use dot", null, true);
@@ -201,13 +203,13 @@ public class Config
     ("dotAutomaticUpdate",
      "Automatic Layout Update", "Do automatic update of the layout", null, true);
 
-  //SUPREMICA_GENERAL
+  // SUPREMICA_GENERAL
   public static final StringOption GENERAL_STATE_SEPARATOR = new StringOption
     ("generalStateSeparator",
-      "State Separator Character", "State separator character", null, ".");
+     "State Separator Character", "State separator character", null, ".");
   public static final StringOption GENERAL_STATE_LABEL_SEPARATOR = new StringOption
     ("generalStateLabelSeparator",
-      "State Label Separator Character", "State label separator character", null, ".");
+     "State Label Separator Character", "State label separator character", null, ".");
   public static final BooleanOption GUI_ANALYZER_INCLUDE_OP = new BooleanOption
     ("includeOP", "Include Observer Projection Algorithms",
      "Include Observer Projection (OP) in Supremica analyzer", null, false) {
@@ -229,7 +231,7 @@ public class Config
     }
   };
 
-  //ALGORITHMS_SYNCHRONIZATION
+  // ALGORITHMS_SYNCHRONIZATION
   public static final BooleanOption SYNC_FORBID_UNCON_STATES = new BooleanOption
     ("syncForbidUncontrollableStates",
      "Forbid Uncontrollable States when Synchronizing", "Forbid uncontrollable states when synchronizing", null, true);
@@ -252,7 +254,7 @@ public class Config
      "Unobservable (non-tau) Events Synchronize", "Unobservable (non-tau) events synchronize", null, false);
 
 
-  //ALGORITHMS_VERIFICATION
+  // ALGORITHMS_VERIFICATION
   public static final EnumOption<VerificationType> VERIFY_VERIFICATION_TYPE = new EnumOption<>
   ("verifyVerificationType", "Default Verification Type", "Default verification type",
     null, VerificationType.values(), VerificationType.CONTROLLABILITY);
@@ -279,7 +281,7 @@ public class Config
      "Show counterexample as info in log", null, false);
 
 
-  //ALGORITHMS_SYNTHESIS
+  // ALGORITHMS_SYNTHESIS
   public static final EnumOption<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE = new EnumOption<>
   ("synthesisSynthesisType", "Default Synthesis Type", "Default synthesis type",
     null, SynthesisType.values(), SynthesisType.NONBLOCKING_CONTROLLABLE);
@@ -336,7 +338,7 @@ public class Config
      "Consider Supervisors as Plants", "Consider supervisors as plants", null, false);
 
 
-  //ALGORITHMS_MINIMIZATION
+  // ALGORITHMS_MINIMIZATION
   public static final EnumOption<EquivalenceRelation> MINIMIZATION_EQUIVALENCE_RELATION = new EnumOption<>
   ("minimizationEquivalenceRelation", "Default Equivalence Relation", "Default equivalence relation",
     null, EquivalenceRelation.values(), EquivalenceRelation.LANGUAGEEQUIVALENCE);
@@ -372,7 +374,7 @@ public class Config
      "Use Tau Event Map", "Use Tau Event Map", null, true);
 
 
-  //ALGORITHMS_BDD
+  // ALGORITHMS_BDD
   public static final EnumOption<BDDPackage> BDD2_BDD_LIBRARY = new EnumOption<>
   ("libraryName", "BDD Library", "BDD Library",
     null, BDDPackage.values(), BDDPackage.JAVA);
@@ -402,7 +404,6 @@ public class Config
   public static final PositiveIntOption BDD_PARTITION_MAX = new PositiveIntOption
     ("bddMaxPartitionSize",
      "Max Partition Size", "Max partition size", null, 10000);
-
   public static final BooleanOption SYNTHESIS_PEAK_BDD = new BooleanOption
     ("peakBDD",
      "Compute and print peak BDD", "Compute and print peak BDD", null, false);
@@ -414,7 +415,7 @@ public class Config
      "Profiling", "profiling", null, false);
 
 
-  //MISC
+  // MISC
   public static final BooleanOption TUM_EXTERNAL_ON = new BooleanOption
     ("tumExternalOn",
      "Activate TUM Options", "Activate TUM options", null, false);
@@ -426,20 +427,23 @@ public class Config
      "Support for the XML fault tree format from SystemWaver", null, false);
 
 
-  private static Config instance = null;
-
-  /**
-   * This class should only be instantiated to guarantee that it is loaded.
-   */
+  //#########################################################################
+  //# Dummy Constructor to prevent instantiation
   private Config()
   {
   }
 
-  public static Config getInstance()
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static File getHomeDirectory()
   {
-      if (instance == null)
-          instance = new Config();
-      return instance;
+    final String home = System.getProperty("user.home");
+    if (home != null) {
+      return new File(home);
+    } else {
+      return new File(".");
+    }
   }
 
 }

@@ -34,13 +34,13 @@
 package net.sourceforge.waters.analysis.distributed;
 
 import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.options.StringOption;
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
 
 /**
@@ -95,9 +95,8 @@ public class DistributedModelVerifierFactory
               "-nodes"));
     db.register(new FileOption
              (OPTION_DistributedModelVerifierFactory_ResultsDump,
-              null,
-              "File to dump job result into",
-              "-resultsdump"));
+              null, "File to dump job result into",
+              "-resultsdump", FileOption.Type.OUTPUT_FILE));
     db.register(new BooleanOption
              (OPTION_DistributedModelVerifierFactory_Shutdown,
               null,
