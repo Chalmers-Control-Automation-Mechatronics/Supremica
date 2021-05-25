@@ -40,9 +40,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -328,37 +328,37 @@ public class AutomataGroup
   /**
    * Runs the Monolithic SCC Control Loop Checker to determine information on
    * the subset of Automata in this group.
-   * @param checker The Control Loop Checker to use. It should contain the
+   * @param monolithicVerifier The Control Loop Checker to use. It should contain the
    *                {@link KindTranslator} and a factory before being called.
    * @param nodesRemaining
    *                The amount of space left in the model checker.
    */
-  void run(final MonolithicSCCControlLoopChecker checker,
+  void run(final ControlLoopChecker monolithicVerifier,
            final int nodesRemaining)
     throws AnalysisException
   {
     if (mValidRun)
       return;
     int spaceLeft;
-    if (checker.getAnalysisResult() != null)
-      spaceLeft = (int) (nodesRemaining + checker.getAnalysisResult().getTotalNumberOfStates());
+    if (monolithicVerifier.getAnalysisResult() != null)
+      spaceLeft = (int) (nodesRemaining + monolithicVerifier.getAnalysisResult().getTotalNumberOfStates());
     else
       spaceLeft = nodesRemaining;
     final ProductDESProxy passer;
-    passer = checker.getFactory().createProductDESProxy(getName() , mSensitiveEvents, mAllAutomata);
-    checker.setModel(passer);
-    checker.setNodeLimit(spaceLeft);
-    if (checker.run())
+    passer = monolithicVerifier.getFactory().createProductDESProxy(getName() , mSensitiveEvents, mAllAutomata);
+    monolithicVerifier.setModel(passer);
+    monolithicVerifier.setNodeLimit(spaceLeft);
+    if (monolithicVerifier.run())
     {
       mCounterExample = null;
     }
     else
     {
-      mCounterExample = checker.getCounterExample();
+      mCounterExample = monolithicVerifier.getCounterExample();
     }
-    spaceLeft = (int) (spaceLeft - checker.getAnalysisResult().getTotalNumberOfStates());
-    mNonLoopEvents = checker.getNonLoopEvents();
-    mStats = checker.getAnalysisResult();
+    spaceLeft = (int) (spaceLeft - monolithicVerifier.getAnalysisResult().getTotalNumberOfStates());
+    mNonLoopEvents = monolithicVerifier.getNonLoopEvents();
+    mStats = monolithicVerifier.getAnalysisResult();
     //System.out.println(getStatisticsText());
     //System.out.println(getTextNonLoop());
     mValidRun = true;

@@ -43,14 +43,11 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AbstractControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -63,6 +60,10 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 
 /**
@@ -172,7 +173,8 @@ public class ModularControlLoopChecker
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, ModularModelVerifierFactory.
                        OPTION_ModularControlLoopChecker_MergeVersion);
-    // TODO OPTION_ModelAnalyzer_SecondaryFactory - beware SCC
+    // TODO OPTION_ModularControlLoopChecker_Chain
+    // Only MonolithicSCCControlLoopChecker available at present :-(
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_FinalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.
@@ -552,7 +554,7 @@ public class ModularControlLoopChecker
   //#########################################################################
   //# Data Members
   private ManipulativeTranslator mTranslator;
-  private MonolithicSCCControlLoopChecker mMonolithicVerifier;
+  private ControlLoopChecker mMonolithicVerifier;
   private List<AutomataGroup> mAutoSets;
   private Set<EventProxy> mLoopEvents;
   private final int mNodesRemaining = 3000000;

@@ -33,20 +33,16 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import net.sourceforge.waters.model.options.EventSetOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -67,6 +63,10 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 /**
  * <P>A monolithic implementation of a control-loop checker.</P>
@@ -81,6 +81,7 @@ public class MonolithicSCCControlLoopChecker
   extends AbstractModelVerifier
   implements ControlLoopChecker
 {
+
   //#########################################################################
   //# Constructors
   public MonolithicSCCControlLoopChecker(final ProductDESProxyFactory factory)
@@ -239,17 +240,17 @@ public class MonolithicSCCControlLoopChecker
   @Override
   public Collection<EventProxy> getNonLoopEvents()
   {
-    final HashSet<EventProxy> output = new HashSet<EventProxy>();
-    for (final EventProxy event : mEventList)
-    {
-      if (getKindTranslator().getEventKind(event) == EventKind.CONTROLLABLE)
-      {
-        if (!mLoopEvents.contains(event))
-          output.add(event);
+    final KindTranslator translator = getKindTranslator();
+    final Set<EventProxy> output = new THashSet<>();
+    for (final EventProxy event : mEventList) {
+      if (translator.getEventKind(event) == EventKind.CONTROLLABLE &&
+          !mLoopEvents.contains(event)) {
+        output.add(event);
       }
     }
     return output;
   }
+
 
   //#########################################################################
   //# Setting the Result
@@ -277,9 +278,9 @@ public class MonolithicSCCControlLoopChecker
     final KindTranslator translator = getKindTranslator();
 
     mControlLoopFree = true;
-    mAutomataList = new ArrayList<AutomatonProxy>();
-    mEventList = new ArrayList<EventProxy>();
-    mTransitionList = new ArrayList<ArrayList<TransitionProxy>>();
+    mAutomataList = new ArrayList<>();
+    mEventList = new ArrayList<>();
+    mTransitionList = new ArrayList<>();
 
     // create Automaton list
     for (final AutomatonProxy aProxy : des.getAutomata()) {
@@ -492,21 +493,19 @@ public class MonolithicSCCControlLoopChecker
             new EncodedStateTuple(encode(mNextTuple));
           if (addState(encodedNextTuple)) {
             visit(encodedNextTuple);
-          }
-          else {
+          } else {
             encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
             if (encodedNextTuple.getVisited() == false) {
               visit(encodedNextTuple);
             }
           }
           if (encodedNextTuple.getInComponent() == false) {
-            if (encodedNextTuple.getRoot() < encodedCurrTuple.getRoot())
-            {
+            if (encodedNextTuple.getRoot() < encodedCurrTuple.getRoot()) {
               encodedCurrTuple.setRoot(encodedNextTuple.getRoot());
             }
           }
         }
-      }  else { // UNCONTROLLABLE
+      } else { // UNCONTROLLABLE
         if (eventAvailable(currTuple, i)) {
           mNumTrans++;
           final EncodedStateTuple encodedNextTuple =
@@ -515,36 +514,27 @@ public class MonolithicSCCControlLoopChecker
         }
       }
     }
-    if (encodedCurrTuple.getRoot() == thisState)
-    {
+    if (encodedCurrTuple.getRoot() == thisState) {
       encodedCurrTuple.setInComponent(true);
       final int stackSize = stack.size();
-      if (stackSize != 0)
-      {
+      if (stackSize != 0) {
         getLoopEvents(encodedCurrTuple);
-        while (stack.size() > firstStackSize)
-        {
+        while (stack.size() > firstStackSize) {
           final EncodedStateTuple popped = stack.pop();
           popped.setInComponent(true);
           getLoopEvents(popped);
-          if (stack.size() == 0)
-            break;
         }
       }
-      if (stackSize != stack.size())
-      {
+      if (stackSize != stack.size()) {
         mControlLoopFree = false;
-      }
-      else
-      {
+      } else {
         for (int i = 0; i < mNumEvent; i++) { // for all events
           if (mGlobalEventMap[i]) { // CONTROLLABLE
             if (eventAvailable(currTuple, i)) {
               EncodedStateTuple encodedNextTuple =
                 new EncodedStateTuple(encode(mNextTuple));
               encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
-              if (encodedNextTuple == encodedCurrTuple) // Self-loop
-              {
+              if (encodedNextTuple == encodedCurrTuple) { // Self-loop
                 mControlLoopFree = false;
                 getLoopEvents(encodedNextTuple);
               }
@@ -552,9 +542,9 @@ public class MonolithicSCCControlLoopChecker
           }
         }
       }
-    }
-    else
+    } else {
       stack.push(encodedCurrTuple);
+    }
   }
 
   /**
@@ -628,13 +618,13 @@ public class MonolithicSCCControlLoopChecker
     Set<TransitionProperty> loopStates =
       new THashSet<TransitionProperty>();
     List<EncodedStateTuple> list = new ArrayList<EncodedStateTuple>();
-    ArrayList<Integer> indexList = new ArrayList<Integer>();
+    TIntArrayList indexList = new TIntArrayList();
 
     // find a shortest path from mInitialStateTuple to mRootStateTuple:
     // for both controllable events and uncontrollable events
     // if mInitialStateTuple != mRootStateTuple
 
-    Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> temp = findLoop();
+    Pair<ArrayList<EncodedStateTuple>, TIntArrayList> temp = findLoop();
     list = temp.getFirst();
     indexList = temp.getSecond();
 
@@ -651,12 +641,12 @@ public class MonolithicSCCControlLoopChecker
       (tracename, des, tracelist, loopIndex);
   }
 
-  private Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> findLoop() throws AnalysisAbortException
+  private Pair<ArrayList<EncodedStateTuple>, TIntArrayList> findLoop() throws AnalysisAbortException
   {
     EncodedStateTuple encodedCurrTuple = new EncodedStateTuple(mNumInts);
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
     final THashSet<EncodedStateTuple> set = new THashSet<EncodedStateTuple>();
-    final ArrayList<Integer> indexList = new ArrayList<Integer>();
+    final TIntArrayList indexList = new TIntArrayList();
     indexList.add(0);
     int indexSize = 0;
     layeredList.add(mEncodedInitialStateTuple);
@@ -692,12 +682,12 @@ public class MonolithicSCCControlLoopChecker
           throw new AnalysisAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
         }
       }
-    final Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> output
-    = new Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>>(layeredList, indexList);
+    final Pair<ArrayList<EncodedStateTuple>, TIntArrayList> output
+    = new Pair<ArrayList<EncodedStateTuple>, TIntArrayList>(layeredList, indexList);
   return output;
   }
 
-  private ArrayList<EventProxy> addPathToLoop(final List<EncodedStateTuple> list, final ArrayList<Integer> indexList)
+  private ArrayList<EventProxy> addPathToLoop(final List<EncodedStateTuple> list, final TIntArrayList indexList)
   {
     final List<EventProxy> fakeTraceList = new ArrayList<EventProxy>();
     final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
@@ -724,19 +714,18 @@ public class MonolithicSCCControlLoopChecker
     }
 
     // Invert tracelist
-    for (int looper = 0; looper < fakeTraceList.size(); looper++)
-    {
+    for (int looper = 0; looper < fakeTraceList.size(); looper++) {
       output.add(fakeTraceList.get(fakeTraceList.size() - looper - 1));
     }
     return output;
   }
 
-  private Pair<ArrayList<EncodedStateTuple>,ArrayList<Integer>> findCycle()
+  private Pair<ArrayList<EncodedStateTuple>,TIntArrayList> findCycle()
     throws AnalysisAbortException, OverflowException
   {
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
     final THashSet<EncodedStateTuple> set = new THashSet<EncodedStateTuple>();
-    final ArrayList<Integer> indexList = new ArrayList<Integer>();
+    final TIntArrayList indexList = new TIntArrayList();
     indexList.add(0);
     int indexSize = 1;
     layeredList.add(mEncodedRootStateTuple);
@@ -776,13 +765,13 @@ public class MonolithicSCCControlLoopChecker
         throw new AnalysisAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
       }
     }
-    final Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> output
-      = new Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>>(layeredList, indexList);
+    final Pair<ArrayList<EncodedStateTuple>, TIntArrayList> output
+      = new Pair<ArrayList<EncodedStateTuple>, TIntArrayList>(layeredList, indexList);
     return output;
   }
 
   private String stringDump(final ArrayList<EncodedStateTuple> layeredList,
-                            final ArrayList<Integer> indexList)
+                            final TIntArrayList indexList)
   {
     String output = "";
     for (int layer = 0; layer < indexList.size(); layer++)
@@ -799,7 +788,7 @@ public class MonolithicSCCControlLoopChecker
 
   private Set<TransitionProperty> getTransitionProxies
     (final List<EncodedStateTuple>layeredList,
-     final List<Integer> indexList)
+     final TIntArrayList indexList)
     throws AnalysisAbortException, OverflowException
   {
     final Set<TransitionProperty> output = new THashSet<TransitionProperty>();
@@ -862,19 +851,6 @@ public class MonolithicSCCControlLoopChecker
     return traceList;
   }
 
-  @SuppressWarnings("unused")
-  private boolean arrayEqual(final int[] scan, final int[] val)
-  {
-    if (scan.length != val.length)
-      return false;
-    for (int looper = 0; looper < scan.length; looper++)
-    {
-      if (scan[looper] != val[looper])
-        return false;
-    }
-    return true;
-  }
-
   /**
    * It checks current state tuple is in the control loop
    * @param encodedCurrTuple encoded current state tuple
@@ -899,23 +875,21 @@ public class MonolithicSCCControlLoopChecker
    */
   private void getLoopEvents(final EncodedStateTuple state)
   {
-    final HashSet<EventProxy> output = new HashSet<EventProxy>();
+    final Set<EventProxy> output = new THashSet<>();
     final int[] currState = new int[mNumAutomata];
     decode(state.getCodes(), currState);
     for (int i = 0; i < mNumConEvent; i++) { // for all controllable events
       if (eventAvailable(currState, i)) {
-          EncodedStateTuple encodedNextTuple =
-            new EncodedStateTuple(encode(mNextTuple));
-          encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
-          if (encodedNextTuple != null) // If false, then this state hasn't been visited yet, it soon will
-          {
-            if (encodedNextTuple.getRoot() == state.getRoot())
-            {
-              output.add(mEventList.get(i));
-            }
+        EncodedStateTuple encodedNextTuple =
+          new EncodedStateTuple(encode(mNextTuple));
+        encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
+        if (encodedNextTuple != null) { // If false, then this state hasn't been visited yet, it soon will
+          if (encodedNextTuple.getRoot() == state.getRoot()) {
+            output.add(mEventList.get(i));
           }
-          else
-            throw new UnsupportedOperationException("The state hasn't been visited yet");
+        } else {
+          throw new UnsupportedOperationException("The state hasn't been visited yet");
+        }
       }
     }
     mLoopEvents.addAll(output);
@@ -994,13 +968,13 @@ public class MonolithicSCCControlLoopChecker
   private boolean mControlLoopFree;
 
   /** a list of automata in the model */
-  private ArrayList<AutomatonProxy> mAutomataList;
+  private List<AutomatonProxy> mAutomataList;
 
   /** number of automata in the model */
   private int mNumAutomata;
 
   /** a list of events in the model */
-  private ArrayList<EventProxy> mEventList;
+  private List<EventProxy> mEventList;
 
   /** number of all events in the model */
   private int mNumEvent;
@@ -1012,7 +986,7 @@ public class MonolithicSCCControlLoopChecker
   private double mNumTrans;
 
   /** a list of transitions in the model */
-  private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
+  private List<List<TransitionProxy>> mTransitionList;
 
   /** a map of state tuple in synchronised model */
   private StateHashSet<EncodedStateTuple> mGlobalStateSet;
@@ -1067,7 +1041,7 @@ public class MonolithicSCCControlLoopChecker
   /** a list contains masks needed for each automaton */
   private int mNumBitsMasks[];
 
-  /** a number of integers used to encode synchronized state */
+  /** a number of integers used to encode synchronised state */
   private int mNumInts;
 
   /** an index of first automaton in each integer buffer */

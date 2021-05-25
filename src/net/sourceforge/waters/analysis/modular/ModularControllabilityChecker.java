@@ -48,9 +48,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -71,6 +68,9 @@ import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
@@ -138,10 +138,10 @@ public class ModularControllabilityChecker
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.prepend(options, ModularModelVerifierFactory.
-                        OPTION_ModularControllabilityChecker_CollectsFailedSpecs);
-    db.prepend(options, ModularModelVerifierFactory.
-                        OPTION_ModularControllabilityChecker_StartsWithSmallestSpec);
+    db.append(options, ModularModelVerifierFactory.
+                       OPTION_ModularControllabilityChecker_StartsWithSmallestSpec);
+    db.append(options, ModularModelVerifierFactory.
+                       OPTION_ModularControllabilityChecker_CollectsFailedSpecs);
     db.append(options, ModularModelVerifierFactory.
                        OPTION_ModularControllabilityChecker_Chain);
     return options;
