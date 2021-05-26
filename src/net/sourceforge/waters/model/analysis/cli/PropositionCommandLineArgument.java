@@ -35,11 +35,14 @@ package net.sourceforge.waters.model.analysis.cli;
 
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
@@ -90,12 +93,16 @@ public class PropositionCommandLineArgument
   {
     if (isUsed()) {
       final ProductDESProxy des = context.getProductDES();
-      if (des != null) {
-        final EventProxy marking =
-          AbstractConflictChecker.findMarkingProposition(des, mName);
-        final Option<EventProxy> option = getOption();
-        option.setValue(marking);
+      final EventProxy marking;
+      if (des == null) {
+        final ProductDESProxyFactory factory =
+          ProductDESElementFactory.getInstance();
+        marking = factory.createEventProxy(mName, EventKind.PROPOSITION);
+      } else {
+        marking = AbstractConflictChecker.findMarkingProposition(des, mName);
       }
+      final Option<EventProxy> option = getOption();
+      option.setValue(marking);
     }
   }
 

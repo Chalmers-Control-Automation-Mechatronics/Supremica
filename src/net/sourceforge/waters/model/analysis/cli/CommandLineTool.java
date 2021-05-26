@@ -39,15 +39,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
-import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -60,11 +57,9 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.Watchdog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -165,11 +160,9 @@ public class CommandLineTool implements Configurable
       }
 
       final ModelAnalyzerFactoryLoader factoryLoader = parseEnumValue
-        ("cli.algorithm", "algorithm",
-         ModelAnalyzerFactoryLoader.getEnumFactory(), algorithmArg);
+        ("algorithm", ModelAnalyzerFactoryLoader.getEnumFactory(), algorithmArg);
       final AnalysisOperation operation = parseEnumValue
-        ("cli.operation", "operation",
-         AnalysisOperation.getEnumFactory(), operationArg);
+        ("operation", AnalysisOperation.getEnumFactory(), operationArg);
       final ModelAnalyzerFactory factory =
         factoryLoader.getModelAnalyzerFactory();
       final ProductDESProxyFactory desFactory =
@@ -180,7 +173,7 @@ public class CommandLineTool implements Configurable
         failUnsupportedAlgorithm(operation, factory);
       }
 
-      final List<String> argList = new LinkedList<String>();
+      final List<String> argList = new LinkedList<>();
       for (int i = firstOptionIndex; i < args.length; i++) {
         final String arg = args[i];
         argList.add(arg);
@@ -211,11 +204,6 @@ public class CommandLineTool implements Configurable
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);
-
-      final boolean keepPropositions =
-        mAnalyzer instanceof ConflictChecker ||
-        mAnalyzer instanceof SupervisorSynthesizer;
-      final Collection<String> empty = Collections.emptyList();
 
       if (mVerbosity != null) {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
@@ -248,13 +236,7 @@ public class CommandLineTool implements Configurable
           fullName = ModuleCompiler.getParametrizedName(module, bindings);
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          if (operation == AnalysisOperation.SIC5 ||
-              operation == AnalysisOperation.SIC6) {
-            compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
-          } else if (!keepPropositions) {
-            compiler.setEnabledPropositionNames(empty);
-          }
-          compiler.setEnabledPropertyNames(empty);
+          operation.preConfigure(compiler);
           mContext.configure(compiler);
           watchdog.addAbortable(compiler);
           try {
@@ -458,13 +440,12 @@ public class CommandLineTool implements Configurable
 
   //#########################################################################
   //# Auxiliary Methods
-  private <E extends Enum<E>> E parseEnumValue(final String optionCode,
-                                               final String description,
+  private <E extends Enum<E>> E parseEnumValue(final String description,
                                                final EnumFactory<E> factory,
                                                final String text)
   {
     final EnumOption<E> option =
-      new EnumOption<>("cli.operation", "operation", factory);
+      new EnumOption<>("cli." + description, description, factory);
     try {
       option.set(text);
     } catch (final ParseException exception) {
@@ -537,7 +518,7 @@ public class CommandLineTool implements Configurable
 
   //#########################################################################
   //# Data Members
-  private Level mVerbosity = Level.DEBUG;
+  private Level mVerbosity = Level.INFO;
   private boolean mStats = false;
   private int mTimeout = -1;
   private PrintWriter mCsv = null;

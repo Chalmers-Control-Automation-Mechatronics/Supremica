@@ -382,6 +382,25 @@ public abstract class Option<T> implements Cloneable
 
 
   //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringBuilder builder = new StringBuilder();
+    builder.append(mID);
+    builder.append(" \"");
+    builder.append(mShortName);
+    builder.append("\" = ");
+    if (mValue == null) {
+      builder.append(" null");
+    } else {
+      builder.append(mValue);
+    }
+    return builder.toString();
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final String mID;
   private final String mShortName;

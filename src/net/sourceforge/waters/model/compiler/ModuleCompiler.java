@@ -36,9 +36,7 @@ package net.sourceforge.waters.model.compiler;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +58,7 @@ import net.sourceforge.waters.model.compiler.efsm.EFSMNormaliser;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -78,8 +77,8 @@ import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.options.StringListOption;
-import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -300,29 +299,19 @@ public class ModuleCompiler extends AbortableCompiler
       final Collection<String> props = opt.getValue();
       setEnabledPropertyNames(props);
     } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ConflictChecker_ConfiguredDefaultMarkingString) ||
-               option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ConflictChecker_ConfiguredPreconditionMarkingString)) {
-      final StringOption opt = (StringOption) option;
-      final String name = opt.getValue();
-      final Collection<String> current = getEnabledPropositionNames();
-      if (current == null || current.isEmpty()) {
-        final Collection<String> props;
-        if (option.hasID(AbstractModelAnalyzerFactory.
-                         OPTION_ConflictChecker_ConfiguredPreconditionMarkingString)) {
-          props = new ArrayList<>(2);
-          props.add(EventDeclProxy.DEFAULT_MARKING_NAME);
-          props.add(name);
-        } else {
-          props = Collections.singletonList(name);
-        }
-        setEnabledPropositionNames(props);
-      } else if (!current.contains(name)) {
-        final int size = current.size() + 1;
-        final Collection<String> props = new ArrayList<>(size);
-        props.addAll(current);
-        props.add(name);
-        setEnabledPropositionNames(props);
+                            OPTION_ConflictChecker_ConfiguredDefaultMarking)) {
+      final PropositionOption opt = (PropositionOption) option;
+      final EventProxy event = opt.getValue();
+      final String name =
+        event == null ? EventDeclProxy.DEFAULT_MARKING_NAME : event.getName();
+      addEnabledPropositionName(name);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ConflictChecker_ConfiguredPreconditionMarking)) {
+      final PropositionOption opt = (PropositionOption) option;
+      final EventProxy event = opt.getValue();
+      if (event != null) {
+        final String name = event.getName();
+        addEnabledPropositionName(name);
       }
     }
   }
@@ -698,6 +687,14 @@ public class ModuleCompiler extends AbortableCompiler
   public Collection<String> getEnabledPropositionNames()
   {
     return mEnabledPropositionNames;
+  }
+
+  private void addEnabledPropositionName(final String name)
+  {
+    if (mEnabledPropositionNames == null) {
+      mEnabledPropositionNames = new LinkedList<>();
+    }
+    mEnabledPropositionNames.add(name);
   }
 
   /**

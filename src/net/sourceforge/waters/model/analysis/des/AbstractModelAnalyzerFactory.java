@@ -391,9 +391,4 @@ public abstract class AbstractModelAnalyzerFactory
   public static final String OPTION_SynchronousProductBuilder_RemovingSelfloops =
     "SynchronousProductBuilder.RemovingSelfloops";
 
-  public static final String OPTION_ConflictChecker_ConfiguredDefaultMarkingString =
-    "ConflictChecker.ConfiguredDefaultMarkingString";
-  public static final String OPTION_ConflictChecker_ConfiguredPreconditionMarkingString =
-    "ConflictChecker.ConfiguredPreconditionMarkingString";
-
 }

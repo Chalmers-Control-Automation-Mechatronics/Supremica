@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.Collections;
+import java.util.LinkedList;
+
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
@@ -40,6 +44,7 @@ import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.JavaEnumFactory;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.EnumOption;
@@ -126,6 +131,13 @@ public enum AnalysisOperation
                            "satisfies language inclusion")
   {
     @Override
+    public void preConfigure(final ModuleCompiler compiler)
+    {
+      compiler.setEnabledPropositionNames(Collections.emptyList());
+      compiler.setEnabledPropertyNames(null);
+    }
+
+    @Override
     public ModelAnalyzer createModelAnalyzer
       (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
         throws AnalysisConfigurationException
@@ -188,6 +200,13 @@ public enum AnalysisOperation
        "does not satisfy SIC property V", "satisfies SIC property V")
   {
     @Override
+    public void preConfigure(final ModuleCompiler compiler)
+    {
+      super.preConfigure(compiler);
+      compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+    }
+
+    @Override
     public ModelAnalyzer createModelAnalyzer
       (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
         throws AnalysisConfigurationException
@@ -201,6 +220,13 @@ public enum AnalysisOperation
   SIC6("waters.analysis.conflict", "SIC property VI", "-sic6",
        "does not satisfy SIC property VI", "satisfies SIC property VI")
   {
+    @Override
+    public void preConfigure(final ModuleCompiler compiler)
+    {
+      super.preConfigure(compiler);
+      compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+    }
+
     @Override
     public ModelAnalyzer createModelAnalyzer
       (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
@@ -333,7 +359,13 @@ public enum AnalysisOperation
 
 
   //#########################################################################
-  //# Creating Model Analysers
+  //# Configuring Model Analysers
+  public void preConfigure(final ModuleCompiler compiler)
+  {
+    compiler.setEnabledPropertyNames(new LinkedList<>());
+    compiler.setEnabledPropositionNames(new LinkedList<>());
+  }
+
   public abstract ModelAnalyzer createModelAnalyzer
     (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException;

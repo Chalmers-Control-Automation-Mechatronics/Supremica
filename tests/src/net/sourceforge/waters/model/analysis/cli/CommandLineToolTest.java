@@ -101,7 +101,8 @@ public class CommandLineToolTest
     final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
       {"-bdd", "-lang", file.toString(), "-property", "the_property", "-nout"};
-    testCommandLine("bdd-lang", args, false, "!counterexample:", "!Statistics:");
+    testCommandLine("bdd-lang", args, false,
+                    "!DEBUG", "!counterexample:", "!Statistics:");
   }
 
   public void testAnalyzer_ModularControllability()
