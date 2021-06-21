@@ -221,6 +221,15 @@ public class TarjanControlStack
     setStackIndex(mUsedTop, index);
   }
 
+  /**
+   * Flags the top-most entry as expanded.
+   */
+  public void setTopExpanded()
+  {
+    final int index = getTopIndex();
+    setTopIndex(index | MSB1);
+  }
+
 
   //#########################################################################
   //# Link Access

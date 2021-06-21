@@ -46,9 +46,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -73,6 +70,9 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
@@ -908,7 +908,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
   }
 
-  private void storeInitialStates()
+  public void storeInitialStates()
     throws AnalysisException
   {
     final TIntArrayList nondeterministicIndices = new TIntArrayList();
@@ -965,7 +965,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
    * creating new states and storing information as needed.
    * @param  source  Number of state to be expanded.
    */
-  private void expandState(final int source)
+  public void expandState(final int source)
     throws AnalysisException
   {
     if (source != mDeadlockState) {
