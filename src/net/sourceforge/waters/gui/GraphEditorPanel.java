@@ -2888,11 +2888,13 @@ public class GraphEditorPanel
     void commitDrag(final Point point)
     {
       super.commitDrag(point);
-      mIsCommittingSecondaryGraph = true;
-      commitSecondaryGraph();
-      clearSecondaryGraph();
-      mIsCommittingSecondaryGraph = false;
-      updateOverlap();
+      if (getSecondaryGraph() != null) {
+        mIsCommittingSecondaryGraph = true;
+        commitSecondaryGraph();
+        clearSecondaryGraph();
+        mIsCommittingSecondaryGraph = false;
+        updateOverlap();
+      }
     }
 
     @Override
@@ -3180,6 +3182,8 @@ public class GraphEditorPanel
       if (mShouldCommit) {
         super.commitSecondaryGraph();
         adjustSize();
+        assert mMoveVisitor != null;
+        assert mMoveVisitor.mMovedObjects != null;
         final List<ProxySubject> movedObjects =
           new ArrayList<>(mMoveVisitor.mMovedObjects);
         scrollToVisible(movedObjects);

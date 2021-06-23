@@ -358,29 +358,33 @@ public class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
-    final AutomataTableModel model = getModel();
-    final TIntArrayList indexList = new TIntArrayList(items.size());
-    for (final Proxy proxy : items) {
-      if (proxy instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) proxy;
-        indexList.add(model.getIndex(aut));
+    if (!items.isEmpty()) {
+      final AutomataTableModel model = getModel();
+      final TIntArrayList indexList = new TIntArrayList(items.size());
+      for (final Proxy proxy : items) {
+        if (proxy instanceof AutomatonProxy) {
+          final AutomatonProxy aut = (AutomatonProxy) proxy;
+          final int index = model.getIndex(aut);
+          assert index >= 0;
+          indexList.add(index);
+        }
       }
-    }
-    indexList.sort();
-    int start = -1;
-    int end = -1;
-    for (int i = 0; i < indexList.size(); i++) {
-      final int position = indexList.get(i);
-      if (start == -1) {
-        start = end = position;
-      } else if (position > end + 1) {
-        addRowSelectionInterval(start, end);
-        start = end = position;
-      } else {
-        end = position;
+      indexList.sort();
+      int start = -1;
+      int end = -1;
+      for (int i = 0; i < indexList.size(); i++) {
+        final int position = indexList.get(i);
+        if (start == -1) {
+          start = end = position;
+        } else if (position > end + 1) {
+          addRowSelectionInterval(start, end);
+          start = end = position;
+        } else {
+          end = position;
+        }
       }
+      addRowSelectionInterval(start, end);
     }
-    addRowSelectionInterval(start, end);
   }
 
   @Override
