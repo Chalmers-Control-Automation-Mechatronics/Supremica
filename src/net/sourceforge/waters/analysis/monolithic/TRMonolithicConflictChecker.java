@@ -43,12 +43,21 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+
+
+/**
+ * Monolithic conflict checker implementation based on Tarjan's algorithm.
+ *
+ * Incomplete: does not yet support counterexamples and generalised
+ * nonblocking.
+ *
+ * @author Benjamin Wheeler
+ */
 
 public class TRMonolithicConflictChecker
   extends AbstractTRMonolithicModelAnalyzer implements ConflictChecker
@@ -71,26 +80,38 @@ public class TRMonolithicConflictChecker
   }
 
 
+  @Override
+  public void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+
+    final EventProxy markingEvent;
+    if (mConfiguredMarking == null) {
+      final ProductDESProxy model = getModel();
+      markingEvent = AbstractConflictChecker.findMarkingProposition(model);
+    } else {
+      markingEvent = mConfiguredMarking;
+    }
+    mUsedMarking = getMarkingInfo(markingEvent);
+  }
 
   @Override
   public boolean run() throws AnalysisException
   {
 
     try {
-
       setUp();
-
-      if (getConfiguredDefaultMarking() == null) {
-        setConfiguredDefaultMarking(setUpUsedDefaultMarking());
-      }
 
       mCompStack = new TIntArrayList();
       mControlStack = new ExtendedTarjanControlStack();
 
       final VerificationResult result = getAnalysisResult();
 
-      storeInitialStates();
-      mControlStack.push(0, 0);
+      final int numInitialStates = storeInitialStates();
+      for (int s = 0; s < numInitialStates; s++) {
+        mControlStack.push(s, s);
+      }
 
       while (!mControlStack.isEmpty()) {
         final int i = mControlStack.getTopIndex();
@@ -104,8 +125,7 @@ public class TRMonolithicConflictChecker
           if (result.isFinished()) return result.isSatisfied();
         }
       }
-
-      getAnalysisResult().setSatisfied(true);
+      result.setSatisfied(true);
 
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -151,11 +171,7 @@ public class TRMonolithicConflictChecker
       k = mCompStack.size() - 1;
       do {
         j = mCompStack.get(k);
-
-        final EventProxy markingEvent = getConfiguredDefaultMarking();
-        final MarkingInfo markingInfo = getMarkingInfo(markingEvent);
-
-        if (markingInfo.isMarkedState(j)) {
+        if (mUsedMarking.isMarkedState(j)) {
           nonblocking = true;
           break;
         }
@@ -297,12 +313,6 @@ public class TRMonolithicConflictChecker
     return null;
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return false;
-  }
-
 
   @Override
   protected void tearDown()
@@ -339,37 +349,12 @@ public class TRMonolithicConflictChecker
   }
 
 
-
-
-  /**
-   * Determines the marking proposition to be used.
-   * This method returns the marking proposition specified by the {@link
-   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method,
-   * if non-null, or the default marking proposition of the input model.
-   * @throws EventNotFoundException to indicate that the a
-   *         <CODE>null</CODE> marking was specified, but input model does
-   *         not contain any proposition with the default marking name.
-   */
-  protected EventProxy setUpUsedDefaultMarking()
-    throws EventNotFoundException
-  {
-    if (mUsedMarking == null) {
-      if (mConfiguredMarking == null) {
-        final ProductDESProxy model = getModel();
-        mUsedMarking = AbstractConflictChecker.findMarkingProposition(model);
-      } else {
-        mUsedMarking = mConfiguredMarking;
-      }
-    }
-    return mUsedMarking;
-  }
-
   private TIntArrayList mCompStack;
   private ExtendedTarjanControlStack mControlStack;
   private int mKnownNumberOfStates;
   private int mTransitionMode;
 
-  private EventProxy mUsedMarking;
+  private MarkingInfo mUsedMarking;
   private EventProxy mConfiguredMarking;
 
   private static final int EXPANDING = 0;
@@ -379,8 +364,5 @@ public class TRMonolithicConflictChecker
   private static final int OPEN = 0;
   private static final int EXPANDED = 0x80000000;
   private static final int CLOSED = -1;
-
-
-
 
 }

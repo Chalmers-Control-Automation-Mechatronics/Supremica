@@ -147,7 +147,7 @@ public class TarjanControlStack
    * @param  stackPosAbove  The stack index of a stack entry above
    *                        the stack entry to become the new top.
    * @param  newParent      The true state index of the new parent state,
-   *                        i.e., the parent from where the moved state is
+   *                        i.e., the parent where the moved state is
    *                        considered to be expanded from after the move.
    */
   public void moveToTop(final int stackPosAbove, final int newParent)
@@ -161,9 +161,11 @@ public class TarjanControlStack
       setStackLink(mDummyTop, pos);
       final int index = getStackIndex(pos);
       setLink(index, mDummyTop);
-      final int indexBelow = getStackIndex(stackPosBelow);
-      if ((indexBelow & MSB1) == 0) {
-        setLink(indexBelow, stackPosAbove);
+      if (stackPosBelow >= 0) {
+        final int indexBelow = getStackIndex(stackPosBelow);
+        if ((indexBelow & MSB1) == 0) {
+          setLink(indexBelow, stackPosAbove);
+        }
       }
       final int oldTopIndex = getStackIndex(mUsedTop);
       if ((oldTopIndex & MSB1) == 0) {

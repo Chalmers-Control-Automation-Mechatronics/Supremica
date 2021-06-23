@@ -908,7 +908,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
   }
 
-  public void storeInitialStates()
+  public int storeInitialStates()
     throws AnalysisException
   {
     final TIntArrayList nondeterministicIndices = new TIntArrayList();
@@ -932,11 +932,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         }
       }
       if (!found) {
-        return;
+        return 0;
       }
     }
     storeInitialStates(nondeterministicIndices, 0);
-    mNumberOfInitialStates = mStateSpace.size();
+    return mNumberOfInitialStates = mStateSpace.size();
   }
 
   private void storeInitialStates(final TIntArrayList nondeterministicIndices,
