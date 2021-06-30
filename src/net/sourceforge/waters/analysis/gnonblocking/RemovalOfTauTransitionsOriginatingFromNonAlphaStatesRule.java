@@ -134,7 +134,7 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule
     final TransitionRelationSimplifier simplifier = getSimplifier();
     try {
       simplifier.setTransitionRelation(rel);
-      simplifier.setPropositions(alphaID, omegaID);
+      simplifier.setMarkings(alphaID, omegaID);
       final boolean modified = simplifier.run();
       if (modified) {
         rel.removeRedundantPropositions();

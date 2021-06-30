@@ -426,7 +426,7 @@ public abstract class AbstractTRSimplifierTest
   {
     final AbstractMarkingTRSimplifier simplifier =
       (AbstractMarkingTRSimplifier) mSimplifier;
-    simplifier.setPropositions(mAlphaID, mOmegaID);
+    simplifier.setMarkings(mAlphaID, mOmegaID);
   }
 
   /**

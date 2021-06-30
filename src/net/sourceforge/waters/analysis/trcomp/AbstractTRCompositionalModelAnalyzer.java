@@ -1482,7 +1482,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
 
     final int precond =
       usedPreconditionMarking == null ? -1 : PRECONDITION_MARKING;
-    chain.setPropositions(precond, DEFAULT_MARKING);
+    chain.setMarkings(precond, DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
 

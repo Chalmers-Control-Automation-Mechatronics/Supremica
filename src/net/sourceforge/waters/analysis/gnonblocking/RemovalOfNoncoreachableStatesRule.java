@@ -126,7 +126,7 @@ class RemovalOfNoncoreachableStatesRule extends TRSimplifierAbstractionRule
     final TransitionRelationSimplifier simplifier = getSimplifier();
     try {
       simplifier.setTransitionRelation(rel);
-      simplifier.setPropositions(alphaID, defaultID);
+      simplifier.setMarkings(alphaID, defaultID);
       simplifier.setAppliesPartitionAutomatically(false);
       final boolean modified = simplifier.run();
       if (modified) {

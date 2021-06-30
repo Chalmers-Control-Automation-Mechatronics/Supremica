@@ -110,9 +110,15 @@ public class ConditionalTRSimplifier
   }
 
   @Override
-  public void setPropositions(final int preconditionID, final int defaultID)
+  public void setMarkings(final int preconditionID, final int defaultID)
   {
-    mConditionalChain.setPropositions(preconditionID, defaultID);
+    mConditionalChain.setMarkings(preconditionID, defaultID);
+  }
+
+  @Override
+  public void setPropositionMask(final long mask)
+  {
+    mConditionalChain.setPropositionMask(mask);
   }
 
   @Override

@@ -114,7 +114,7 @@ public abstract class AbstractTRSimplifier
   @Override
   public void setDefaultMarkingID(final int defaultID)
   {
-    setPropositions(-1, defaultID);
+    setMarkings(-1, defaultID);
   }
 
   /**
@@ -128,7 +128,19 @@ public abstract class AbstractTRSimplifier
    *          or <CODE>-1</CODE> if unused or not present.
    */
   @Override
-  public void setPropositions(final int preconditionID, final int defaultID)
+  public void setMarkings(final int preconditionID, final int defaultID)
+  {
+  }
+
+  /**
+   * Sets the mask of propositions respected by the simplifier.
+   * The default implementation does nothing but subclasses may override it.
+   * @param  mask   The bit mask of the significant propositions,
+   *                or&nbsp;<CODE>-1</CODE> to indicate that all propositions
+   *                are significant.
+   */
+  @Override
+  public void setPropositionMask(final long mask)
   {
   }
 

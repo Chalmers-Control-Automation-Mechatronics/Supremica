@@ -1078,7 +1078,7 @@ public class TRCompositionalConflictChecker
                                                    partitioningListener);
 
     chain.setTransitionLimit(limit);
-    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    chain.setMarkings(PRECONDITION_MARKING, DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
 

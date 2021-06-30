@@ -93,7 +93,7 @@ public abstract class AbstractMarkingTRSimplifier
    *          or <CODE>-1</CODE> if unused or not present.
    */
   @Override
-  public void setPropositions(final int preconditionID, final int defaultID)
+  public void setMarkings(final int preconditionID, final int defaultID)
   {
     mPreconditionMarkingID = preconditionID;
     mDefaultMarkingID = defaultID;

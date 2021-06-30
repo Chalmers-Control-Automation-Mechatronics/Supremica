@@ -143,7 +143,7 @@ public class TauLoopRemovalTRSimplifier
   }
 
   @Override
-  public void setPropositions(final int preconditionID, final int defaultID)
+  public void setMarkings(final int preconditionID, final int defaultID)
   {
     mDefaultMarkingID = defaultID;
   }

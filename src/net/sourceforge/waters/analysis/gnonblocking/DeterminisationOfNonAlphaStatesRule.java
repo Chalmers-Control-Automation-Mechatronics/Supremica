@@ -167,7 +167,7 @@ class DeterminisationOfNonAlphaStatesRule
     final NonAlphaDeterminisationTRSimplifier simplifier = getSimplifier();
     try {
       simplifier.setTransitionRelation(rel);
-      simplifier.setPropositions(alphaCode, -1);
+      simplifier.setMarkings(alphaCode, -1);
       if (simplifier.run()) {
         mPartition = simplifier.getResultPartition();
         rel.removeRedundantPropositions();

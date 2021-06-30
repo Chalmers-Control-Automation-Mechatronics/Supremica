@@ -35,12 +35,12 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.options.Configurable;
 
 
 /**
@@ -107,7 +107,19 @@ public interface TransitionRelationSimplifier
    * @param defaultID       The default (omega) marking used,
    *                        or <CODE>-1</CODE>.
    */
-  public void setPropositions(final int preconditionID, final int defaultID);
+  public void setMarkings(final int preconditionID, final int defaultID);
+
+  /**
+   * Sets the mask of propositions respected by the simplifier.
+   * Different from the markings, which have special semantics, the mask
+   * contains all propositions that a simplifier needs to be aware of and
+   * preserve.
+   * @param  mask   The bit mask of the significant propositions,
+   *                or&nbsp;<CODE>-1</CODE> to indicate that all propositions
+   *                are significant.
+   * @see #setMarkings(int, int) setMarkings
+   */
+  public void setPropositionMask(long mask);
 
   /**
    * Sets the state limit. The states limit specifies the maximum

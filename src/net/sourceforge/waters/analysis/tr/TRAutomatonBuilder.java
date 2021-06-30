@@ -34,12 +34,10 @@
 package net.sourceforge.waters.analysis.tr;
 
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
@@ -50,6 +48,10 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 
 
 /**
@@ -93,6 +95,10 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
                             OPTION_AbstractMarking_DefaultMarkingID)) {
       final PropositionOption propOption = (PropositionOption) option;
       mDefaultMarking = propOption.getValue();
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_ObservationEquivalence_PropositionMask)) {
+      final EventSetOption eventSetOption = (EventSetOption) option;
+      mMarkingSet = eventSetOption.getValue();
     } else {
       mSimplifier.setOption(option);
     }
@@ -123,7 +129,22 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
     final EventEncoding enc = mTrAut.getEventEncoding();
     final int preconditionID = enc.getEventCode(mPreconditionMarking);
     final int defaultID = enc.getEventCode(mDefaultMarking);
-    mSimplifier.setPropositions(preconditionID, defaultID);
+    mSimplifier.setMarkings(preconditionID, defaultID);
+    final ListBufferTransitionRelation rel = mTrAut.getTransitionRelation();
+    long mask = rel.createMarkings();
+    if (preconditionID >= 0) {
+      mask = rel.addMarking(mask, preconditionID);
+    }
+    if (defaultID >= 0) {
+      mask = rel.addMarking(mask, defaultID);
+    }
+    if (mMarkingSet != null) {
+      for (final EventProxy marking : mMarkingSet) {
+        final int id = enc.getEventCode(marking);
+        mask = rel.addMarking(mask, id);
+      }
+    }
+    mSimplifier.setPropositionMask(mask);
   }
 
   @Override
@@ -173,6 +194,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
 
   private EventProxy mPreconditionMarking;
   private EventProxy mDefaultMarking;
+  private Set<EventProxy> mMarkingSet;
 
   private TRAutomatonProxy mTrAut;
 

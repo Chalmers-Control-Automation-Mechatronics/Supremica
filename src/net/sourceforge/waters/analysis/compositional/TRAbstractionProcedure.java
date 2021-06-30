@@ -199,7 +199,7 @@ abstract class TRAbstractionProcedure
                        EventStatus.STATUS_UNUSED);
       }
     }
-    mSimplifier.setPropositions(preconditionMarkingID, defaultMarkingID);
+    mSimplifier.setMarkings(preconditionMarkingID, defaultMarkingID);
     return enc;
   }
 

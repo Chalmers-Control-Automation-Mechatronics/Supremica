@@ -150,7 +150,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule
     final SilentIncomingTRSimplifier simplifier = getSimplifier();
     try {
       simplifier.setTransitionRelation(rel);
-      simplifier.setPropositions(alphaID, -1);
+      simplifier.setMarkings(alphaID, -1);
       simplifier.setRestrictsToUnreachableStates(mRestrictsToUnreachableStates);
       final boolean modified = simplifier.run();
       if (modified) {

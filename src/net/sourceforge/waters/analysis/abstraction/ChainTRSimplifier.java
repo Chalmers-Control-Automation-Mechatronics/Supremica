@@ -162,10 +162,18 @@ public class ChainTRSimplifier
   }
 
   @Override
-  public void setPropositions(final int preconditionID, final int defaultID)
+  public void setMarkings(final int preconditionID, final int defaultID)
   {
     for (final TransitionRelationSimplifier step : mSteps) {
-      step.setPropositions(preconditionID, defaultID);
+      step.setMarkings(preconditionID, defaultID);
+    }
+  }
+
+  @Override
+  public void setPropositionMask(final long mask)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.setPropositionMask(mask);
     }
   }
 

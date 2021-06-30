@@ -102,6 +102,7 @@ public class EventSetOption extends Option<Set<EventProxy>>
     //Do nothing
   }
 
+
   //#########################################################################
   //# Inner Enumeration EventKind
   public enum DefaultKind {

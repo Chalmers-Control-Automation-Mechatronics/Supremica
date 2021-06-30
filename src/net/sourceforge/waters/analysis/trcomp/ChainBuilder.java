@@ -326,7 +326,8 @@ public class ChainBuilder
      final int stateLimit,
      final int transitionLimit,
      final boolean selfloopOnlyEventsUsed,
-     final TRSimplificationListener listener) {
+     final TRSimplificationListener listener)
+  {
     final ChainTRSimplifier chain = startedAbstractionChain;
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();

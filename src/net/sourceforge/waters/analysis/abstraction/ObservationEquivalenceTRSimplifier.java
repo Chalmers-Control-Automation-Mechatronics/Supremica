@@ -185,6 +185,7 @@ public class ObservationEquivalenceTRSimplifier
    *                are significant.
    * @see #setUpInitialPartitionBasedOnMarkings()
    */
+  @Override
   public void setPropositionMask(final long mask)
   {
     mPropositionMask = mask;
@@ -311,37 +312,40 @@ public class ObservationEquivalenceTRSimplifier
   public void setOption(final Option<?> option)
   {
 
-    if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_Equivalence)) {
-      final EnumOption<Equivalence> propOption = (EnumOption<Equivalence>) option;
+    if (option.hasID(StepSimplifierFactory.
+                     OPTION_ObservationEquivalence_Equivalence)) {
+      final EnumOption<Equivalence> propOption =
+        (EnumOption<Equivalence>) option;
       final Equivalence value = propOption.getValue();
       setEquivalence(value);
-    }
-    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode)) {
-      final EnumOption<TransitionRemoval> propOption = (EnumOption<TransitionRemoval>) option;
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_ObservationEquivalence_TransitionRemovalMode)) {
+      final EnumOption<TransitionRemoval> propOption =
+        (EnumOption<TransitionRemoval>) option;
       final TransitionRemoval value = propOption.getValue();
       setTransitionRemovalMode(value);
-    }
-    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode)) {
-      final EnumOption<MarkingMode> propOption = (EnumOption<MarkingMode>) option;
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_ObservationEquivalence_MarkingMode)) {
+      final EnumOption<MarkingMode> propOption =
+        (EnumOption<MarkingMode>) option;
       final MarkingMode value = propOption.getValue();
       setMarkingMode(value);
-    }
-    else if (option.hasID(StepSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware)) {
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_TransitionRelationSimplifier_DumpStateAware)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setDumpStateAware(value);
-    }
-    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_UsingLocalEvents)) {
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_ObservationEquivalence_UsingLocalEvents)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setUsingLocalEvents(value);
-    }
-    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_InfoEnabled)) {
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_ObservationEquivalence_InfoEnabled)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setInfoEnabled(value);
-    }
-    else {
+    } else {
       super.setOption(option);
     }
   }
@@ -371,7 +375,7 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   @Override
-  public void setPropositions(final int preconditionID, final int defaultID)
+  public void setMarkings(final int preconditionID, final int defaultID)
   {
     long mask = 0;
     if (preconditionID >= 0) {
