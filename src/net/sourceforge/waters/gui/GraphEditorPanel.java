@@ -2100,9 +2100,16 @@ public class GraphEditorPanel
     {
       // LogManager.getLogger().info("ToolController.mouseDragged");
       final Point mousePosition = event.getPoint();
-      final Point point = applyInverseTransform(mousePosition);
-      updateHighlighting(point);
-      if (mInternalDragAction != null) {
+      // Scroll to point to support autoscroll as per Swing convention
+      final Rectangle rect =
+        new Rectangle(mousePosition.x, mousePosition.y, 1, 1);
+      scrollRectToVisible(rect);
+      if (mInternalDragAction == null) {
+        // Highlight items under cursor
+        final Point point = applyInverseTransform(mousePosition);
+        updateHighlighting(point);
+      } else {
+        // Drag something
         mInternalDragAction.continueDrag(event);
         mClickedItem = null;
       }
@@ -2757,6 +2764,7 @@ public class GraphEditorPanel
       mShiftDown = event.isShiftDown();
       mControlDown = event.isControlDown();
       final Point mousePosition = event.getPoint();
+
       final Point point = applyInverseTransform(mousePosition);
       return continueDrag(point);
     }
@@ -4210,7 +4218,6 @@ public class GraphEditorPanel
         for (final ProxySubject item : mMovedObjects) {
           item.acceptVisitor(this);
         }
-        scrollToVisible(mSelection.asList());
       } catch (final VisitorException exception) {
         throw new WatersRuntimeException(exception);
       }
@@ -4503,6 +4510,9 @@ public class GraphEditorPanel
                                  (int)mDisplacement.getY(), false, null);
           }
           commitGraph(null, true, true, x, y);
+          final List<ProxySubject> movedObjects =
+            new ArrayList<>(mMoveVisitor.mMovedObjects);
+          scrollToVisible(movedObjects);
           mMoveVisitor = null;
           clearSecondaryGraph();
           return;

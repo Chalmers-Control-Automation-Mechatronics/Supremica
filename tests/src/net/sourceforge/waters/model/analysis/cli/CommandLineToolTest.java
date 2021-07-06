@@ -100,7 +100,8 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
-      {"-bdd", "-lang", file.toString(), "-property", "the_property", "-nout"};
+      {"-bdd", "-lang", file.toString(), "-pack", "java",
+       "-property", "the_property", "-nout"};
     testCommandLine("bdd-lang", args, false,
                     "!DEBUG", "!counterexample:", "!Statistics:");
   }
@@ -120,7 +121,7 @@ public class CommandLineToolTest
     final File file = getInputWdes("handwritten", "small_factory_2");
     final String[] args = new String[]
       {"-mod", "-cont", file.toString(),
-       "-chain", "-bdd", "-v", "-dynamic"};
+       "-chain", "-bdd", "-pack", "buddy", "-v", "-dynamic"};
     testCommandLine("mod-bdd-cont", args, "DEBUG Depth .*", "true \\(.*");
   }
 
@@ -131,7 +132,7 @@ public class CommandLineToolTest
     final String[] args = new String[]
       {"-mod", "-cont", file.toString(), "-stats",
         "-chain", "-trcomp", "-islimit", "100",
-        "-chain", "-bdd", "-v", "-pack", "buddy"};
+        "-chain", "-bdd", "-pack", "java", "-v"};
     testCommandLine("mod-trcomp-bdd-cont", args,
                     "DEBUG SpecialEventsFinder .*", "DEBUG Depth .*",
                     "true \\(.*");
@@ -308,8 +309,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "small_factory_2");
     final String[] args =
-      new String[] {"-mono", "-cont",
-                    "-fslimit", "3", file.toString()};
+      new String[] {"-mono", "-cont", "-fslimit", "3", file.toString()};
     testCommandLine("fslimit-overflow", args, "!true.*", "OVERFLOW \\(.*");
   }
 
@@ -331,8 +331,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args =
-      new String[] {"-trcomp", "-conf",
-                    "-chain", "-native", "-help"};
+      new String[] {"-trcomp", "-conf", "-chain", "-native", "-help"};
     testCommandLine("help-chain", args,
                     "=NativeConflictChecker supports the following options:",
                     "-mode <value>.*",
@@ -356,7 +355,7 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("handwritten", "dining_philosophers");
     final String[] args = new String[]
-      {"-bdd", "-conf", file.toString(), "-marking", "eaten"};
+      {"-bdd", "-conf", file.toString(), "-pack", "cudd", "-marking", "eaten"};
     testCommandLine("marking-bad", args, "FATAL.*", ".*'eaten'.*");
   }
 
@@ -392,7 +391,7 @@ public class CommandLineToolTest
     final File file = getInputWmod("handwritten", "controlled_philosophers");
     final String[] args = new String[]
       {"-bdd", "-conf", file.toString(),
-       "-marking", "eaten[0]", "-verbose"};
+       "-marking", "eaten[0]", "-verbose", "-pack", "cudd"};
     testCommandLine("verbose", args,
                     "DEBUG Depth .*", "DEBUG Coreachability .*");
   }
@@ -401,8 +400,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args = new String[] {"@name", "wcheck", "-version"};
-    testCommandLine("version", args,
-                    Version.getInstance().getTitle());
+    testCommandLine("version", args, Version.getInstance().getTitle());
   }
 
 
@@ -477,9 +475,9 @@ public class CommandLineToolTest
       CommandLineTool.main(args);
     } finally {
       LogManager.shutdown();
+      output.close();
       System.setOut(sysOut);
       System.setErr(sysErr);
-      output.close();
     }
 
     final List<PatternHandler> patterns =

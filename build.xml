@@ -547,17 +547,13 @@ Class-Path: ${manifest.pathlist}</echo>
         </junit>
     </target>
     
-    <target name="-run_test_minimization" depends="-jar_supremica,-jar_supremica_tests">
-        <mkdir dir="${logs.results}/algorithms/minimization"/>
-        <delete>
-            <fileset dir="${logs.results}/algorithms/minimization" includes="**/log4j.log"/>
-        </delete>
-        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}">
+    <target name="-run_test_cli" depends="-jar_supremica,-jar_supremica_tests">
+        <mkdir dir="${logs.results}"/>
+        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
-                    <include name="org/supremica/automata/algorithms/minimization/*.java"/>
-                    <include name="org/supremica/automata/algorithms/TestAutomataVerifier.java"/>
+                    <include name="net/sourceforge/waters/model/analysis/cli/*Test.java"/>
                 </fileset>
             </batchtest>
             <classpath>
@@ -567,7 +563,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement path="${java.class.path}"/>
             </classpath>
             <sysproperty key="supremica.test.inputdir" value="${basedir}/tests/testfiles"/>
-            <sysproperty key="waters.test.inputdir" value="${basedir}/${examples}"/>
+            <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
             <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
@@ -696,7 +692,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="test" depends="-run_tests,test_report"
      description="Runs unit tests and produces a test report. This is a comprehensive test that takes several minutes."/>
 
-    <target name="test_min" depends="-run_test_minimization,test_report"/>
+    <target name="test_cli" depends="-run_test_cli,test_report"/>
     
     <target name="test_short" depends="-run_tests_short,test_report"
      description="Runs unit tests and produces a test report. This is a shorter est that should take less than a minute."/>
