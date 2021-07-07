@@ -2885,8 +2885,8 @@ public class GraphEditorPanel
         final Rectangle2D bounds =
           getShapeProducer().getMinimumBoundingRectangle();
         final Rectangle view = getVisibleRect();
-        final double marginX = movementMargin * view.width;
-        final double marginY = movementMargin * view.height;
+        final double marginX = movementMargin * view.width / mAdjustedZoomFactor;
+        final double marginY = movementMargin * view.height / mAdjustedZoomFactor;
         final int x = (int) Math.floor(bounds.getMinX() - marginX);
         final int y = (int) Math.floor(bounds.getMinY() - marginY);
         final int w = (int) Math.ceil(bounds.getMaxX() + marginX) - x;
@@ -3997,6 +3997,7 @@ public class GraphEditorPanel
     @Override
     boolean continueDrag(final Point point)
     {
+      mController.updateHighlighting(point);
       if (super.continueDrag(point)) {
         Point2D current = getDragCurrent();
         if (!mCanCreateSelfloop) {
