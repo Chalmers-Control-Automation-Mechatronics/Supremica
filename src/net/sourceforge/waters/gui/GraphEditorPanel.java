@@ -968,7 +968,19 @@ public class GraphEditorPanel
       return;
     }
     mBoundsMayHaveChanged = false;
+    adjustSize(null);
+  }
 
+  /**
+   * Recalculates the canvas size while drag-selecting. This method performs
+   * the same operation as {@link #adjustSize()}, with the option to pass in
+   * a additional rectangle also to be included in the canvas size
+   * calculation.
+   * @param  dragZone  Rectangle to be included in canvas size calculation,
+   *                   or <CODE>null</CODE>.
+   */
+  private void adjustSize(final Rectangle dragZone)
+  {
     // 1. Find the area covered by the graph plus margins
     final Rectangle2D area2D = getShapeProducer().getMinimumBoundingRectangle();
     final Rectangle bounds = area2D.getBounds();
@@ -986,17 +998,22 @@ public class GraphEditorPanel
       bounds.setBounds(x0, y0, x1 - x0, y1 - y0);
     }
 
+    if (dragZone != null) {
+      bounds.add(dragZone);
+    }
+
     // 2. Include the top-left corner of the viewport in the area
     final Container parent = getParent();
     final boolean useViewPort =
       mCurrentBounds != null && parent != null && parent instanceof JViewport;
     if (useViewPort) {
-      final Rectangle view = getVisibleRect();
-      final int x = view.x + mCurrentBounds.x;
-      final int y = view.y + mCurrentBounds.y;
+      final Rectangle rawView = getVisibleRect();
+      final Rectangle view = applyInverseTransform(rawView);
+      final int x = view.x;
+      final int y = view.y;
       bounds.add(x, y);
       // If the top-left corner is not (0,0), also include the top-right
-      // and/or bottom-left. to stop Swing from scrolling the graph
+      // and/or bottom-left, to stop Swing from scrolling the graph
       if (x > bounds.x) {
         bounds.add(x + view.width, y);
       }
@@ -1012,7 +1029,7 @@ public class GraphEditorPanel
     final Dimension preferredSize = bounds.getSize();
     setPreferredSize(preferredSize);
     revalidate();
-    if (useViewPort &&
+    if (useViewPort && mInternalDragAction == null &&
         (bounds.x != mCurrentBounds.x || bounds.y != mCurrentBounds.y)) {
       final JViewport viewport = (JViewport) parent;
       final Point viewPosition = viewport.getViewPosition();
@@ -2100,10 +2117,6 @@ public class GraphEditorPanel
     {
       // LogManager.getLogger().info("ToolController.mouseDragged");
       final Point mousePosition = event.getPoint();
-      // Scroll to point to support autoscroll as per Swing convention
-      final Rectangle rect =
-        new Rectangle(mousePosition.x, mousePosition.y, 1, 1);
-      scrollRectToVisible(rect);
       if (mInternalDragAction == null) {
         // Highlight items under cursor
         final Point point = applyInverseTransform(mousePosition);
@@ -2113,6 +2126,10 @@ public class GraphEditorPanel
         mInternalDragAction.continueDrag(event);
         mClickedItem = null;
       }
+      // Scroll to point to support autoscroll as per Swing convention
+      final Rectangle rect =
+        new Rectangle(mousePosition.x, mousePosition.y, 1, 1);
+      scrollRectToVisible(rect);
     }
 
     @Override
@@ -2441,7 +2458,9 @@ public class GraphEditorPanel
       super.mouseDragged(event);
     }
 
-    Command mLastNodeCommand = null;
+    //#######################################################################
+    //# Data Members
+     private Command mLastNodeCommand = null;
   }
 
 
@@ -2769,14 +2788,15 @@ public class GraphEditorPanel
       return continueDrag(point);
     }
 
-    public boolean isControlDown(){
+    boolean isControlDown()
+    {
       return mControlDown;
     }
 
-    public boolean isShiftDown(){
+    boolean isShiftDown()
+    {
       return mShiftDown;
     }
-
 
     /**
      * Completes this internal dragging operation. This method is overridden
@@ -2857,9 +2877,24 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private BigInternalDragAction(final Point start)
+    private BigInternalDragAction(final double movementMargin,
+                                  final Point start)
     {
       super(start);
+      if (movementMargin >= 0.0) {
+        final Rectangle2D bounds =
+          getShapeProducer().getMinimumBoundingRectangle();
+        final Rectangle view = getVisibleRect();
+        final double marginX = movementMargin * view.width;
+        final double marginY = movementMargin * view.height;
+        final int x = (int) Math.floor(bounds.getMinX() - marginX);
+        final int y = (int) Math.floor(bounds.getMinY() - marginY);
+        final int w = (int) Math.ceil(bounds.getMaxX() + marginX) - x;
+        final int h = (int) Math.ceil(bounds.getMaxY() + marginY) - y;
+        mMovementLimits = new Rectangle(x, y, w, h);
+      } else {
+        mMovementLimits = null;
+      }
     }
 
     //#######################################################################
@@ -2885,6 +2920,7 @@ public class GraphEditorPanel
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
+        restrictToLimits(point);
         createSecondaryGraph();
         return true;
       } else {
@@ -2912,6 +2948,27 @@ public class GraphEditorPanel
       clearSecondaryGraph();
     }
 
+    //#######################################################################
+    //# Auxiliary Methods
+    void restrictToLimits(final Point point)
+    {
+      if (mMovementLimits != null) {
+        if (point.x < mMovementLimits.x) {
+          point.x = mMovementLimits.x;
+        } else if (point.x > mMovementLimits.x + mMovementLimits.width) {
+          point.x = mMovementLimits.x + mMovementLimits.width;
+        }
+        if (point.y < mMovementLimits.y) {
+          point.y = mMovementLimits.y;
+        } else if (point.y > mMovementLimits.y + mMovementLimits.height) {
+          point.y = mMovementLimits.y + mMovementLimits.height;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Rectangle mMovementLimits;
   }
 
 
@@ -2930,7 +2987,8 @@ public class GraphEditorPanel
       mShiftOrControlDown = false;
     }
 
-    private InternalDragActionSelect(final Point start, final boolean shiftOrControlDown)
+    private InternalDragActionSelect(final Point start,
+                                     final boolean shiftOrControlDown)
     {
       this(start);
       mShiftOrControlDown = shiftOrControlDown;
@@ -2943,6 +3001,14 @@ public class GraphEditorPanel
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
+        // Enlarge the canvas to include the drag area (unless too big)
+        final Rectangle dragZone = getDragRectangle();
+        final Rectangle rawView = getVisibleRect();
+        final Rectangle view = applyInverseTransform(rawView);
+        if (dragZone.height <= view.height / 2 &&
+            dragZone.width <= view.width / 2) {
+          adjustSize(dragZone);
+        }
         final List<ProxySubject> dragged = getDragSelection();
         final GraphSelection prev = getPreviousSelection();
         final GraphSelection newSelection;
@@ -3033,9 +3099,10 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionMove(final Point start, final boolean shiftOrControlDown)
+    private InternalDragActionMove(final Point start,
+                                   final boolean shiftOrControlDown)
     {
-      super(start);
+      super(mMoveMarginVisitor.getMoveMargin(), start);
       if (!shiftOrControlDown) {
         if (!isSelected(mFocusedObject)) {
           replaceSelection(mFocusedObject);
@@ -3159,6 +3226,7 @@ public class GraphEditorPanel
     @Override
     boolean continueDrag(final Point point)
     {
+      restrictToLimits(point);
       final Point start = getDragStart();
       int dx;
       int dy;
@@ -3575,7 +3643,7 @@ public class GraphEditorPanel
     //# Constructors
     private InternalDragActionInitial(final Point start)
     {
-      super(start);
+      super(0.0, start);
       mNode = (SimpleNodeSubject) mFocusedObject;
       replaceSelection(mFocusedObject);
     }
@@ -3683,7 +3751,7 @@ public class GraphEditorPanel
     private InternalDragActionResizeGroupNode(final Handle handle,
                                               final Point start)
     {
-      super(start);
+      super(0.5, start);
       mGroup = (GroupNodeSubject) mFocusedObject;
       replaceSelection(mFocusedObject);
       final Rectangle2D rect = mGroup.getGeometry().getRectangle();
@@ -3889,7 +3957,7 @@ public class GraphEditorPanel
      */
     private InternalDragActionEdge(final Point start)
     {
-      super(start);
+      super(0.0, start);
       mSource = (NodeSubject) mFocusedObject;
       mAnchor = GeometryTools.getDefaultPosition(mSource, getDragStart());
       mIsSource = false;
@@ -3905,7 +3973,7 @@ public class GraphEditorPanel
     private InternalDragActionEdge(final Handle handle,
                                    final Point start)
     {
-      super(start);
+      super(0.0, start);
       mSource = null;
       mAnchor = null;
       mOrigEdge = (EdgeSubject) mFocusedObject;
@@ -4157,6 +4225,69 @@ public class GraphEditorPanel
      */
     private boolean mCanCreateSelfloop;
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class MoveMarginVisitor
+  /**
+   * Auxiliary class to compute the amount of freedom of movement when
+   * dragging dependent on the current selection. Selections that include
+   * a node can be dragged more freely while enlarging the graph, whereas
+   * the movement for edges and labels alone is more constrained.
+   */
+  private class MoveMarginVisitor extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private double getMoveMargin()
+    {
+      try {
+        double result = 0.0;
+        for (final Proxy proxy : mSelection) {
+          final double margin = (Double) proxy.acceptVisitor(this);
+          if (margin > result) {
+            result = margin;
+          }
+        }
+        return result;
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Double visitEdgeProxy(final EdgeProxy edge)
+    {
+      return 0.25;
+    }
+
+    @Override
+    public Object visitGuardActionBlockProxy
+      (final GuardActionBlockProxy block)
+    {
+      return 0.25;
+    }
+
+    @Override
+    public Object visitLabelBlockProxy(final LabelBlockProxy block)
+    {
+      return 0.25;
+    }
+
+    @Override
+    public Object visitLabelGeometryProxy(final LabelGeometryProxy label)
+    {
+      return 0.25;
+    }
+
+    @Override
+    public Object visitNodeProxy(final NodeProxy node)
+    {
+      return 0.75;
+    }
   }
 
 
@@ -5255,6 +5386,7 @@ public class GraphEditorPanel
     new EventDeclListModelObserver();
   private final SelectableAncestorVisitor mSelectableAncestorVisitor =
     new SelectableAncestorVisitor();
+  private final MoveMarginVisitor mMoveMarginVisitor = new MoveMarginVisitor();
   private GraphSelection mSelection = new GraphSelection();
 
   private final IdentifierPasteVisitor mIdentifierPasteVisitor =

@@ -37,6 +37,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
@@ -48,8 +49,6 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
@@ -58,6 +57,8 @@ import net.sourceforge.waters.gui.renderer.Renderer;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 
 import org.supremica.properties.Config;
 
@@ -166,6 +167,21 @@ public class GraphPanel
     final int x = (int) Math.round(tranformed.getX());
     final int y = (int) Math.round(tranformed.getY());
     return new Point(x, y);
+  }
+
+  protected Rectangle applyInverseTransform(final Rectangle rectangle)
+  {
+    final AffineTransform inverse = getInverseTransform();
+    final Point point = new Point(rectangle.x, rectangle.y);
+    final Point2D transformed1 = inverse.transform(point, null);
+    final int x = (int) Math.floor(transformed1.getX());
+    final int y = (int) Math.floor(transformed1.getY());
+    point.x += rectangle.width;
+    point.y += rectangle.height;
+    final Point2D transformed2 = inverse.transform(point, null);
+    final int w = (int) Math.ceil(transformed2.getX()) - x;
+    final int h = (int) Math.ceil(transformed2.getY()) - y;
+    return new Rectangle(x, y, w, h);
   }
 
   protected void clearTransform()
