@@ -43,6 +43,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -99,6 +100,7 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
   protected void setUp() throws Exception
   {
     super.setUp();
+    IconAndFontLoader.initialize();
     mIDE = new IDE();
     mSubjectFactory = ModuleSubjectFactory.getInstance();
     mPlainCloner = ModuleElementFactory.getCloningInstance();
