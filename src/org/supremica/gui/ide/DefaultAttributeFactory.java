@@ -35,6 +35,7 @@
 
 package org.supremica.gui.ide;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -101,12 +102,20 @@ public class DefaultAttributeFactory implements AttributeFactory
   /**
    * The attribute key used to suppress EPS generation.
    */
-  public static final String EPS_SUPPRESS_KEY = "EPS:suppress";
+  public static final String EPS_SUPPRESS_AUTOMATON = "EPS:suppress";
+  /**
+   * The attribute key used to suppress EPS generation.
+   */
+  public static final String EPS_SUPPRESS_STATE_NAMES = "EPS:suppressStateNames";
 
 
-   //#########################################################################
+  //#########################################################################
   //# Attribute List Constants
-  private static final Collection<String> ATTRIBUTES_FOR_AUTOMATON =
-    Collections.singletonList(EPS_SUPPRESS_KEY);
+  private static final Collection<String> ATTRIBUTES_FOR_AUTOMATON;
+  static {
+    ATTRIBUTES_FOR_AUTOMATON = new ArrayList<String>(2);
+    ATTRIBUTES_FOR_AUTOMATON.add(EPS_SUPPRESS_AUTOMATON);
+    ATTRIBUTES_FOR_AUTOMATON.add(EPS_SUPPRESS_STATE_NAMES);
+  }
 
 }

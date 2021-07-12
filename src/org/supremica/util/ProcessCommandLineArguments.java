@@ -11,25 +11,15 @@ package org.supremica.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
-import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
-import net.sourceforge.waters.gui.renderer.GeometryChecker;
-import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
-import net.sourceforge.waters.gui.renderer.RenderingContext;
-import net.sourceforge.waters.model.base.DefaultProxyVisitor;
+import net.sourceforge.waters.gui.renderer.EPSGenerator;
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -38,13 +28,9 @@ import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.ComponentProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
-import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.apache.logging.log4j.LogManager;
@@ -54,7 +40,6 @@ import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
-import org.supremica.gui.ide.DefaultAttributeFactory;
 import org.supremica.properties.ConfigPages;
 
 import org.xml.sax.SAXException;
@@ -70,24 +55,23 @@ import org.xml.sax.SAXException;
 public class ProcessCommandLineArguments
 {
   /**
-   * Processes an array of arguments. Returns a list of files to be opened on
-   * startup.
+   * Processes an array of arguments. Returns a list of files to be opened
+   * on startup.
    */
   public static List<File> process(final String[] args)
   {
     boolean quit = false;
-    final boolean verbose = false;
+    boolean verbose = false;
     final List<File> filesToOpen = new LinkedList<File>();
 
     for (int i = 0; i < args.length; i++) {
-      if (args[i].equals("-h") || args[i].equals("-?")
-          || args[i].equals("--help") || args[i].equals("--usage")) {
+      if (args[i].equals("-h") || args[i].equals("-?") ||
+          args[i].equals("--help") || args[i].equals("--usage")) {
         // Print usage
         printUsage();
         // Quit after this
         quit = true;
-      }
-      if (args[i].equals("-p") || args[i].equals("--properties")) {
+      } else if (args[i].equals("-p") || args[i].equals("--properties")) {
         // Load properties
         if (++i < args.length) {
           final String fileName = args[i];
@@ -160,12 +144,8 @@ public class ProcessCommandLineArguments
               throw new ClassCastException("Unknown document type");
             }
 
-            // Loop through components and print eps-figures
-            //module.acceptVisitor(new EPSPrinterVisitor(module));
-            final List<Proxy> components = module.getComponentList();
-            final DefaultProxyVisitor visitor =
-              new EPSPrinterVisitor(module, verbose);
-            visitor.visitCollection(components);
+            final EPSGenerator generator = new EPSGenerator(module, verbose);
+            generator.generateEPS(module);
           } catch (final IOException ex) {
             System.err.println("IO problem: " + ex);
           } catch (final WatersUnmarshalException ex) {
@@ -174,8 +154,6 @@ public class ProcessCommandLineArguments
             System.err.println("Problem importing to module: " + ex);
           } catch (final ClassCastException ex) {
             System.err.println("Only import of modules is supported: " + ex);
-          } catch (final VisitorException ex) {
-            System.err.println("Problems when visiting module: " + ex);
           }
         }
         // Quit after this (even if there were no files)
@@ -183,6 +161,8 @@ public class ProcessCommandLineArguments
       } else if (args[i].equals("-v") || args[i].equals("--version")) {
         System.out.println(Version.getInstance().toString());
         quit = true;
+      } else if (args[i].equals("--verbose")) {
+        verbose = true;
       } else {
         final String filename = args[i];
         final File currFile = new File(filename);
@@ -212,103 +192,13 @@ public class ProcessCommandLineArguments
       .println(Version.getInstance().toString() + "\n"
                + "More information about Supremica is available at www.supremica.org\n"
                + "\n"
-               + "Usage: IDE [OPTION] MODULE_FILES\n"
+               + "Usage: IDE [options] <module files>\n"
                + "\n"
                + "Options:\n"
-               + "-p, --properties FILE        Load properties from FILE\n"
-               + "-e, --epsfigs FILE...        Create eps-figures from all components in FILEs\n"
-               + "--svgfigs FILE               Create svg-figures from all components in FILE\n"
-               + "-l, --list [FILE]            List properties with current values (or values in FILE)\n"
-               + "-?, -h, --help, --usage      Show this help message\n"
-               + "--verbose                    be extra verbose\n"
-               + "-v, --version                show version\n" + "\n");
+               + "-p, --properties <file>  Load properties from <file>\n"
+               + "-e, --epsfigs <file>     Create eps-figures from all components in <file>\n"
+               + "-?, -h, --help, --usage  Show this help message\n"
+               + "--verbose                Be extra verbose\n"
+               + "-v, --version            Show version\n");
   }
-}
-
-
-/**
- * Visitor for visiting all simple components and producing .eps files for the
- * graphs.
- */
-class EPSPrinterVisitor extends DefaultModuleProxyVisitor
-{
-
-  //#######################################################################
-  //# Constructor
-  EPSPrinterVisitor(final ModuleProxy module, final boolean verbose)
-  {
-    final ModuleContext mcontext = new ModuleContext(module);
-    mContext = new ModuleRenderingContext(mcontext);
-    mVerbose = verbose;
-  }
-
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  /**
-   * Skip everything except simple components.
-   */
-  @Override
-  public Object visitComponentProxy(final ComponentProxy comp)
-  {
-    return null;
-  }
-
-  /**
-   * Visit the children of foreach constructs in the component list.
-   */
-  @Override
-  public Object visitForeachProxy(final ForeachProxy foreach)
-    throws VisitorException
-  {
-    final Collection<Proxy> body = foreach.getBody();
-    return visitCollection(body);
-  }
-
-  /**
-   * Visit simpleComponent and output eps-file. The only reason that
-   * visitGraphProxy is not used instead is that we need the name ...
-   */
-  @Override
-  public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
-  {
-    final Map<String,String> attribs = comp.getAttributes();
-    final String name = comp.getName();
-    final GraphProxy graph = comp.getGraph();
-    if (attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_KEY)) {
-      if (mVerbose) {
-        System.out.println("Not generating EPS for " + name +
-          ": suppressed.");
-      }
-    } else if (!GeometryChecker.hasGeometry(graph)) {
-      if (mVerbose) {
-        System.out.println("Not generating EPS for " + name +
-          ": missing geometry.");
-      }
-    } else {
-      final File file = new File(name + ".eps");
-      try {
-        final EPSGraphPrinter printer =
-          new EPSGraphPrinter(graph, mContext, file);
-        printer.print();
-        // Log
-        if (mVerbose) {
-          System.out.println("Wrote " + file.getAbsolutePath());
-        }
-      } catch (final IOException exception) {
-        if (mVerbose) {
-          System.out.println("Failed generating EPS for " + name + ": " +
-            exception.getMessage());
-        }
-      }
-    }
-    // Return any value ...
-    return null;
-  }
-
-
-  //#######################################################################
-  //# Data Members
-  private final RenderingContext mContext;
-  private final boolean mVerbose;
-
 }

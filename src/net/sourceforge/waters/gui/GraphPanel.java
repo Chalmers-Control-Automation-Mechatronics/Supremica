@@ -50,6 +50,7 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
+import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
@@ -250,21 +251,6 @@ public class GraphPanel
   }
 
   /**
-   * Called when printing.
-   */
-  @Override
-  protected void printComponent(final Graphics g)
-  {
-    final ProxyShapeProducer producer = new ProxyShapeProducer(mGraph,
-                             new PrintRenderingContext(mModuleContext));
-    final Renderer renderer =
-      new Renderer(getDrawnGraph(), getDrawnObjects(), producer);
-    renderer.renderGraph((Graphics2D) g);
-    // Reset stroke
-    AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
-  }
-
-  /**
    * Called when painting.
    */
   @Override
@@ -284,6 +270,22 @@ public class GraphPanel
       new Renderer(getDrawnGraph(), getDrawnObjects(), getShapeProducer());
     renderer.renderGraph(g2d);
     g2d.setTransform(old);
+  }
+
+  /**
+   * Called when printing. Should not be used anymore&mdash;printing is
+   * done through {@link EPSGraphPrinter}.
+   */
+  @Override
+  protected void printComponent(final Graphics g)
+  {
+    final ProxyShapeProducer producer = new ProxyShapeProducer(mGraph,
+                             new PrintRenderingContext(mModuleContext));
+    final Renderer renderer =
+      new Renderer(getDrawnGraph(), getDrawnObjects(), producer);
+    renderer.renderGraph((Graphics2D) g);
+    // Reset stroke
+    AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
   }
 
   @Override

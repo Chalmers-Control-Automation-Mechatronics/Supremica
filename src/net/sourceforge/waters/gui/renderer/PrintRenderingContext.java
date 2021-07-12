@@ -35,13 +35,47 @@ package net.sourceforge.waters.gui.renderer;
 
 import net.sourceforge.waters.gui.ModuleContext;
 
+import org.supremica.properties.Config;
+
 
 public class PrintRenderingContext extends ModuleRenderingContext
 {
 
+  //#########################################################################
+  //# Constructor
   public PrintRenderingContext(final ModuleContext context)
   {
-    super(context);
+    this(context, true);
   }
+
+  public PrintRenderingContext(final ModuleContext context,
+                               final boolean renderingStateNames)
+  {
+    super(context);
+    mRenderingStateNames = renderingStateNames &&
+      !Config.GUI_EDITOR_STATE_NAMES_HIDDEN.getBooleanValue();
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setRenderingStateNames(final boolean rendering)
+  {
+    mRenderingStateNames = rendering &&
+      !Config.GUI_EDITOR_STATE_NAMES_HIDDEN.getBooleanValue();
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+  @Override
+  public boolean isRenderingStateNames()
+  {
+    return mRenderingStateNames;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mRenderingStateNames;
 
 }

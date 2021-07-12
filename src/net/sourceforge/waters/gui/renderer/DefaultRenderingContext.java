@@ -77,7 +77,7 @@ public class DefaultRenderingContext
 {
 
   //#########################################################################
-  //# Constructors
+  //# Constructor
   protected DefaultRenderingContext()
   {
   }
@@ -95,6 +95,9 @@ public class DefaultRenderingContext
   public RenderingInformation getRenderingInformation(final Proxy proxy,
                                                       final ColorGroup group)
   {
+    if (group == ColorGroup.NODE_LABEL && !isRenderingStateNames()) {
+      return null;
+    }
     final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.getValue();
     final Color color = layout.getColor
       (group, GraphPanel.DragOverStatus.NOTDRAG, false, false, false);
@@ -109,7 +112,7 @@ public class DefaultRenderingContext
 
   @Override
   public ColorInfo getMarkingColorInfo(final GraphProxy graph,
-                                final SimpleNodeProxy node)
+                                       final SimpleNodeProxy node)
   {
     final PlainEventListProxy props = node.getPropositions();
     final List<Proxy> elist = props.getEventIdentifierList();
@@ -118,6 +121,12 @@ public class DefaultRenderingContext
     } else {
       return PropositionIcon.getDefaultMarkedColors();
     }
+  }
+
+  @Override
+  public boolean isRenderingStateNames()
+  {
+    return !Config.GUI_EDITOR_STATE_NAMES_HIDDEN.getBooleanValue();
   }
 
   @Override

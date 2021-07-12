@@ -35,12 +35,12 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -60,6 +60,7 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.supremica.automata.Project;
@@ -189,7 +190,27 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
 
   //#########################################################################
   //# Constructor
-  private EPSGenerator(final File outputDir, final boolean verbose)
+  /**
+   * Creates an EPS generator that writes into the directory that contains
+   * the given module.
+   */
+  public EPSGenerator(final ModuleProxy module, final boolean verbose)
+  {
+    File outputDirectory;
+    try {
+      final File file = module.getFileLocation();
+      outputDirectory = file.getParentFile();
+    } catch (final MalformedURLException exception) {
+      outputDirectory = null;
+    }
+    mOutputDirectory = outputDirectory;
+    mVerbose = verbose;
+  }
+
+  /**
+   * Creates an EPS generator that writes into the given directory.
+   */
+  public EPSGenerator(final File outputDir, final boolean verbose)
   {
     mOutputDirectory = outputDir;
     mVerbose = verbose;
@@ -198,12 +219,16 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
 
   //#######################################################################
   //# Invocation
-  private void generateEPS(final ModuleProxy module)
+  /**
+   * Generates and saves <CODE>.eps</CODE> files for all simple components
+   * in the given module.
+   */
+  public void generateEPS(final ModuleProxy module)
     throws IOException
   {
     try {
       final ModuleContext context = new ModuleContext(module);
-      mContext = new ModuleRenderingContext(context);
+      mContext = new PrintRenderingContext(context);
       module.acceptVisitor(this);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
@@ -254,7 +279,7 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
     final String name = comp.getName();
     final Map<String,String> attribs = comp.getAttributes();
     final GraphProxy graph = comp.getGraph();
-    if (attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_KEY)) {
+    if (attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_AUTOMATON)) {
       if (mVerbose) {
         System.out.println("Not generating EPS for " + name +
                            ": suppressed.");
@@ -267,6 +292,9 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
     } else {
       final File file = new File(mOutputDirectory, name + ".eps");
       try {
+        final boolean stateNamesHidden =
+          attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_STATE_NAMES);
+        mContext.setRenderingStateNames(!stateNamesHidden);
         final EPSGraphPrinter printer =
           new EPSGraphPrinter(graph, mContext, file);
         printer.print();
@@ -286,6 +314,6 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
   //# Data Members
   private final File mOutputDirectory;
   private final boolean mVerbose;
-  private RenderingContext mContext;
+  private PrintRenderingContext mContext;
 
 }

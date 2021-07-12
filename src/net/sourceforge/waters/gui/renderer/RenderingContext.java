@@ -42,6 +42,9 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 
+import org.supremica.gui.ide.DefaultAttributeFactory;
+import org.supremica.properties.Config;
+
 
 public interface RenderingContext
 {
@@ -87,8 +90,16 @@ public interface RenderingContext
                                                        SimpleNodeProxy node);
 
   /**
-   * Returns whether given event may cause the proposition status of
-   * the given graph to change. The proposition status of a graph
+   * Returns whether state names are rendered in the current context.
+   * Rendering of state names can be disabled globally through option
+   * {@link Config#GUI_EDITOR_STATE_NAMES_HIDDEN} or per automaton
+   * through attribute {@link DefaultAttributeFactory#EPS_SUPPRESS_STATE_NAMES}
+   */
+  public boolean isRenderingStateNames();
+
+  /**
+   * Returns whether the given model change event may cause the proposition
+   * status of the given graph to change. The proposition status of a graph
    * indicates whether the graph uses any propositions, i.e., whether
    * states without propositions are rendered with a filled or a
    * transparent background.

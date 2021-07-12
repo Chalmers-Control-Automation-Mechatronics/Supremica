@@ -1754,6 +1754,9 @@ public class GraphEditorPanel
     public RenderingInformation getRenderingInformation(final Proxy proxy,
                                                         final ColorGroup group)
     {
+      if (group == ColorGroup.NODE_LABEL && !isRenderingStateNames()) {
+        return null;
+      }
       final ProxySubject item = (ProxySubject) proxy;
       final boolean focused = isRenderedFocused(item);
       final boolean selected = isRenderedSelected(item);
@@ -2624,10 +2627,8 @@ public class GraphEditorPanel
                   new InternalDragActionEdge(handle, getStartPoint());
               }
             }
-          }
-          else{
-            mInternalDragAction =
-              new InternalDragActionDND(getStartPoint());
+          } else {
+            mInternalDragAction = new InternalDragActionDND(getStartPoint());
           }
 
         }
@@ -4244,14 +4245,19 @@ public class GraphEditorPanel
     private double getMoveMargin()
     {
       try {
-        double result = 0.0;
-        for (final Proxy proxy : mSelection) {
-          final double margin = (Double) proxy.acceptVisitor(this);
-          if (margin > result) {
-            result = margin;
+        if (mSelection.getMode() == GraphSelection.SelectionMode.EVENT_LABELS) {
+          final LabelBlockProxy block = mSelection.getSelectedLabelBlock();
+          return visitLabelBlockProxy(block);
+        } else {
+          double result = 0.0;
+          for (final Proxy proxy : mSelection) {
+            final double margin = (Double) proxy.acceptVisitor(this);
+            if (margin > result) {
+              result = margin;
+            }
           }
+          return result;
         }
-        return result;
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
@@ -4266,26 +4272,26 @@ public class GraphEditorPanel
     }
 
     @Override
-    public Object visitGuardActionBlockProxy
+    public Double visitGuardActionBlockProxy
       (final GuardActionBlockProxy block)
     {
       return 0.25;
     }
 
     @Override
-    public Object visitLabelBlockProxy(final LabelBlockProxy block)
+    public Double visitLabelBlockProxy(final LabelBlockProxy block)
     {
       return 0.25;
     }
 
     @Override
-    public Object visitLabelGeometryProxy(final LabelGeometryProxy label)
+    public Double visitLabelGeometryProxy(final LabelGeometryProxy label)
     {
       return 0.25;
     }
 
     @Override
-    public Object visitNodeProxy(final NodeProxy node)
+    public Double visitNodeProxy(final NodeProxy node)
     {
       return 0.75;
     }

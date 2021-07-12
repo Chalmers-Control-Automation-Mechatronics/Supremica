@@ -37,6 +37,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -50,8 +51,10 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 import org.supremica.gui.ide.ComponentEditorPanel;
+import org.supremica.gui.ide.DefaultAttributeFactory;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
@@ -84,7 +87,8 @@ public class GraphSaveEPSAction
       final ModuleProxy module = surface.getModule();
       // The name of the graph ...
       final ComponentEditorPanel panel = getActiveComponentEditorPanel();
-      final String name = panel.getComponent().getName();
+      final SimpleComponentProxy comp = panel.getComponent();
+      final String name = comp.getName();
       final JFileChooser chooser = getFileChooser(module, name);
       if (chooser.showSaveDialog(ide) != JFileChooser.APPROVE_OPTION) {
         return;
@@ -101,7 +105,12 @@ public class GraphSaveEPSAction
         // JAR URL---no file---no preselection of directory.
       }
       final GraphProxy graph = surface.getDrawnGraph();
-      final ProxyShapeProducer shaper = new ProxyShapeProducer(graph, new PrintRenderingContext(surface.getModuleContext()));
+      final Map<String,String> attribs = comp.getAttributes();
+      final boolean stateNamesHidden =
+        attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_STATE_NAMES);
+      final PrintRenderingContext context =
+        new PrintRenderingContext(surface.getModuleContext(), !stateNamesHidden);
+      final ProxyShapeProducer shaper = new ProxyShapeProducer(graph, context);
       final EPSGraphPrinter printer = new EPSGraphPrinter(graph, shaper, file);
       try {
         printer.print();

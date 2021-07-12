@@ -38,8 +38,6 @@ import java.awt.Color;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.GraphPanel;
 
-import org.supremica.properties.Config;
-
 
 /**
  * Enumeration of possible layout modes used by the graph renderer.
@@ -69,11 +67,6 @@ public enum LayoutMode
       switch (group) {
       case GROUP_NODE:
         return EditorColor.DEFAULTCOLOR_NODEGROUP;
-      case NODE_LABEL:
-        if (Config.GUI_EDITOR_STATE_NAMES_HIDDEN.getValue()) {
-          return null;
-        }
-        // fall through ...
       default:
         return Color.BLACK;
       }

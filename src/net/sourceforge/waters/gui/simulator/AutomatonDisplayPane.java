@@ -593,6 +593,9 @@ public class AutomatonDisplayPane
       } else {
         final RenderingStatus status;
         if (orig instanceof LabelGeometrySubject) {
+          if (!isRenderingStateNames()) {
+            return null;
+          }
           final LabelGeometrySubject geo = (LabelGeometrySubject) orig;
           final Proxy node = (Proxy) geo.getParent();
           status = getRenderingStatus(node);
