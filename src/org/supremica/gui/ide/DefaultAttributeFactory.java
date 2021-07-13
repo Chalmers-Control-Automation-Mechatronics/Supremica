@@ -100,11 +100,13 @@ public class DefaultAttributeFactory implements AttributeFactory
   //#########################################################################
   //# String Constants
   /**
-   * The attribute key used to suppress EPS generation.
+   * The attribute key used to suppress <CODE>.eps</CODE> generation for
+   * an automaton.
    */
   public static final String EPS_SUPPRESS_AUTOMATON = "EPS:suppress";
   /**
-   * The attribute key used to suppress EPS generation.
+   * The attribute key used to suppress generation of state names
+   * when printing.
    */
   public static final String EPS_SUPPRESS_STATE_NAMES = "EPS:suppressStateNames";
 

@@ -912,10 +912,10 @@ public class GraphEditorPanel
     } else {
       final int x = (int) Math.floor(area.getX());
       final int grid = getGridSize();
-      final int x0 = Math.floorDiv(x - LOWER_MARGIN, grid) * grid;
+      final int x0 = Math.floorDiv(x - MARGIN, grid) * grid;
       final double width = area.getWidth() + 2.0 * (area.getX() - x0);
       final int y = (int) Math.floor(area.getY());
-      final int y0 = Math.floorDiv(y - LOWER_MARGIN, grid) * grid;
+      final int y0 = Math.floorDiv(y - MARGIN, grid) * grid;
       final double height = area.getHeight() + 2.0 * (area.getY() - y0);
       final Rectangle view = getVisibleRect();
       return Math.min(view.width / width, view.height / height);
@@ -947,8 +947,9 @@ public class GraphEditorPanel
   {
     adjustSize();
     final AffineTransform transform = new AffineTransform();
-    transform.translate(-mCurrentBounds.x, -mCurrentBounds.y);
+    // concatenation: scale o translate, so first translate then scale,
     transform.scale(mAdjustedZoomFactor, mAdjustedZoomFactor);
+    transform.translate(-mCurrentBounds.getX(), -mCurrentBounds.getY());
     return transform;
   }
 
@@ -964,11 +965,10 @@ public class GraphEditorPanel
    */
   private void adjustSize()
   {
-    if (!mBoundsMayHaveChanged) {
-      return;
+    if (mBoundsMayHaveChanged) {
+      mBoundsMayHaveChanged = false;
+      adjustSize(null);
     }
-    mBoundsMayHaveChanged = false;
-    adjustSize(null);
   }
 
   /**
@@ -982,63 +982,81 @@ public class GraphEditorPanel
   private void adjustSize(final Rectangle dragZone)
   {
     // 1. Find the area covered by the graph plus margins
-    final Rectangle2D area2D = getShapeProducer().getMinimumBoundingRectangle();
-    final Rectangle bounds = area2D.getBounds();
+    final Rectangle2D bounds = getShapeProducer().getMinimumBoundingRectangle();
+    double x0 = bounds.getX();
+    double y0 = bounds.getY();
+    double x1 = bounds.getMaxX();
+    double y1 = bounds.getMaxY();
     if (!bounds.isEmpty()) {
-      final int grid = getGridSize();
-      final double gz = grid * mAdjustedZoomFactor;
-      final int x0 = (int) (gz *
-        Math.floorDiv(bounds.x - LOWER_MARGIN, grid));
-      final int x1 = (int) Math.ceil(gz *
-        Math.floorDiv((int) bounds.getMaxX() + grid - 1 + UPPER_MARGIN, grid));
-      final int y0 = (int) (gz *
-        Math.floorDiv(bounds.y - LOWER_MARGIN, grid));
-      final int y1 = (int) Math.ceil(gz *
-        Math.floorDiv((int) bounds.getMaxY() + grid - 1 + UPPER_MARGIN, grid));
-      bounds.setBounds(x0, y0, x1 - x0, y1 - y0);
+      x0 -= MARGIN;
+      y0 -= MARGIN;
+      x1 += MARGIN;
+      y1 += MARGIN;
     }
-
     if (dragZone != null) {
-      bounds.add(dragZone);
+      x0 = Math.min(x0, dragZone.getX());
+      y0 = Math.min(y0, dragZone.getY());
+      x1 = Math.max(x1, dragZone.getMaxX());
+      y1 = Math.max(x0, dragZone.getMaxY());
+    }
+    if (mCurrentBounds == null) {
+      final int grid = getGridSize();
+      if (grid != 1) {
+        x0 = grid * Math.floor(x0 / grid);
+        y0 = grid * Math.floor(y0 / grid);
+        x1 = grid * Math.ceil(x1 / grid);
+        y1 = grid * Math.ceil(y1 / grid);
+      }
     }
 
     // 2. Include the top-left corner of the viewport in the area
-    final Container parent = getParent();
-    final boolean useViewPort =
-      mCurrentBounds != null && parent != null && parent instanceof JViewport;
-    if (useViewPort) {
-      final Rectangle rawView = getVisibleRect();
-      final Rectangle view = applyInverseTransform(rawView);
-      final int x = view.x;
-      final int y = view.y;
-      bounds.add(x, y);
-      // If the top-left corner is not (0,0), also include the top-right
-      // and/or bottom-left, to stop Swing from scrolling the graph
-      if (x > bounds.x) {
-        bounds.add(x + view.width, y);
-      }
-      if (y > bounds.y) {
-        bounds.add(x, y + view.height);
-      }
+    final JViewport viewPort = getViewPort();
+    final Point2D viewPosition2D;
+    if (viewPort == null) {
+      viewPosition2D = null;
+    } else if (mCurrentBounds == null) {
+      viewPosition2D = new Point2D.Double(x0, y0);
+    } else {
+      final Point viewPosition = viewPort.getViewPosition();
+      viewPosition2D = applyInverseTransform2D(viewPosition);
+      final double viewX = viewPosition2D.getX();
+      final double viewY = viewPosition2D.getY();
+      x0 = Math.min(x0, viewX);
+      y0 = Math.min(y0, viewY);
+      x1 = Math.max(x1, viewX + MARGIN);
+      y1 = Math.max(y1, viewY + MARGIN);
     }
+    bounds.setRect(x0, y0, x1 - x0, y1 - y0);
 
     // 3. If the bounds have changed, set the preferred size and view position
     if (mCurrentBounds != null && mCurrentBounds.equals(bounds)) {
       return;
     }
-    final Dimension preferredSize = bounds.getSize();
-    setPreferredSize(preferredSize);
-    revalidate();
-    if (useViewPort && mInternalDragAction == null &&
-        (bounds.x != mCurrentBounds.x || bounds.y != mCurrentBounds.y)) {
-      final JViewport viewport = (JViewport) parent;
-      final Point viewPosition = viewport.getViewPosition();
-      viewPosition.x += mCurrentBounds.x - bounds.x;
-      viewPosition.y += mCurrentBounds.y - bounds.y;
-      viewport.setViewPosition(viewPosition);
-    }
     clearTransform();
     mCurrentBounds = bounds;
+    final int width = (int) Math.ceil((x1 - x0) * mAdjustedZoomFactor);
+    final int height = (int) Math.ceil((y1 - y0) * mAdjustedZoomFactor);
+    final Dimension preferredSize = new Dimension(width, height);
+    setPreferredSize(preferredSize);
+    revalidate();
+    if (viewPort != null && mInternalDragAction == null) {
+      final AffineTransform transform = getTransform();
+      transform.transform(viewPosition2D, viewPosition2D);
+      final Point viewPoint =
+        new Point((int) Math.round(viewPosition2D.getX()),
+                  (int) Math.round(viewPosition2D.getY()));
+      viewPort.setViewPosition(viewPoint);
+    }
+  }
+
+  private JViewport getViewPort()
+  {
+    final Container parent = getParent();
+    if (parent != null && parent instanceof JViewport) {
+      return (JViewport) parent;
+    } else {
+      return null;
+    }
   }
 
   private static int getGridSize()
@@ -2853,7 +2871,7 @@ public class GraphEditorPanel
      */
     private final Point mDragStart;
     /**
-     * The last position of the mouse cursor evalutaed during an internal
+     * The last position of the mouse cursor evaluated during an internal
      * dragging operation.
      */
     private Point mDragCurrent;
@@ -3004,10 +3022,11 @@ public class GraphEditorPanel
       if (super.continueDrag(point)) {
         // Enlarge the canvas to include the drag area (unless too big)
         final Rectangle dragZone = getDragRectangle();
-        final Rectangle rawView = getVisibleRect();
-        final Rectangle view = applyInverseTransform(rawView);
-        if (dragZone.height <= view.height / 2 &&
-            dragZone.width <= view.width / 2) {
+        final Rectangle view = getVisibleRect();
+        final double viewWidth = view.width / mAdjustedZoomFactor;
+        final double viewHeight = view.height / mAdjustedZoomFactor;
+        if (dragZone.height <= 0.5 * viewHeight &&
+            dragZone.width <= 0.5 * viewWidth) {
           adjustSize(dragZone);
         }
         final List<ProxySubject> dragged = getDragSelection();
@@ -4374,7 +4393,6 @@ public class GraphEditorPanel
       }
     }
 
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -4618,36 +4636,26 @@ public class GraphEditorPanel
       case NODE_LABELS:
         if (up || down || left || right) {
           e.consume();
-          final int x = left ? -1 : right ? 1 : 0;
-          final int y = up ? -1 : down ? 1 : 0;
+          final int distance =
+            Math.max(1, (int) Math.round(1.0 / mAdjustedZoomFactor));
+          final int dx = left ? -distance : right ? distance : 0;
+          final int dy = up ? -distance : down ? distance : 0;
           mMoveVisitor = new MoveVisitor();
-          final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
-          final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-          final GraphSubject g0 = (GraphSubject) cloner.getClone(getGraph());
           final UndoInterface undoInterface = mRoot.getUndoInterface();
-
-          if(mDisplacement == null){
-            mDisplacement = new Point2D.Double(x, y);
-          }
-          else if(mLastCommand != null && mLastCommand == undoInterface.getLastCommand()){
+          if (mDisplacement == null) {
+            mDisplacement = new Point(dx, dy);
+          } else if(mLastCommand != null &&
+                    mLastCommand == undoInterface.getLastCommand()){
             mLastCommand.setUpdatesSelection(false);
             undoInterface.undoAndRemoveLastCommand();
-            mDisplacement.setLocation(x+mDisplacement.getX(),
-                                      y+mDisplacement.getY());
-          }
-          else{
-            mDisplacement.setLocation(x,y);
+            mDisplacement.setLocation(dx + mDisplacement.x,
+                                      dy + mDisplacement.y);
+          } else {
+            mDisplacement.setLocation(dx, dy);
           }
           createSecondaryGraph();
-          mMoveVisitor.moveAll((int)mDisplacement.getX(),
-                               (int)mDisplacement.getY(), false, null);
-          while(eq.equals(g0, getSecondaryGraph())){
-            mDisplacement.setLocation(x+mDisplacement.getX(),
-                                      y+mDisplacement.getY());
-            mMoveVisitor.moveAll((int)mDisplacement.getX(),
-                                 (int)mDisplacement.getY(), false, null);
-          }
-          commitGraph(null, true, true, x, y);
+          mMoveVisitor.moveAll(mDisplacement.x, mDisplacement.y, false, null);
+          commitGraph(null, true, true, dx, dy);
           final List<ProxySubject> movedObjects =
             new ArrayList<>(mMoveVisitor.mMovedObjects);
           scrollToVisible(movedObjects);
@@ -5373,7 +5381,7 @@ public class GraphEditorPanel
    * all graphical objects plus margins. The bounds may be larger than the
    * panel/viewport because scrollbars are used.
    */
-  private Rectangle mCurrentBounds = null;
+  private Rectangle2D mCurrentBounds = null;
   /**
    * A flag indicating that the bounds ({@link #mCurrentBounds}) may have
    * changed and need to be recalculated.
@@ -5402,15 +5410,14 @@ public class GraphEditorPanel
   private List<Observer> mObservers;
 
   private Command mLastCommand = null;
-  private Point2D mDisplacement = null;
+  private Point mDisplacement = null;
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -5441237464454813450L;
 
-  private static final int LOWER_MARGIN = 32;
-  private static final int UPPER_MARGIN = 128;
+  private static final int MARGIN = 32;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }

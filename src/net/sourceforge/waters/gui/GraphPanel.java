@@ -161,28 +161,18 @@ public class GraphPanel
     return mInverseTransform;
   }
 
-  protected Point applyInverseTransform(final Point point)
+  protected Point2D applyInverseTransform2D(final Point point)
   {
     final AffineTransform inverse = getInverseTransform();
-    final Point2D tranformed = inverse.transform(point, null);
+    return inverse.transform(point, null);
+  }
+
+  protected Point applyInverseTransform(final Point point)
+  {
+    final Point2D tranformed = applyInverseTransform2D(point);
     final int x = (int) Math.round(tranformed.getX());
     final int y = (int) Math.round(tranformed.getY());
     return new Point(x, y);
-  }
-
-  protected Rectangle applyInverseTransform(final Rectangle rectangle)
-  {
-    final AffineTransform inverse = getInverseTransform();
-    final Point point = new Point(rectangle.x, rectangle.y);
-    final Point2D transformed1 = inverse.transform(point, null);
-    final int x = (int) Math.floor(transformed1.getX());
-    final int y = (int) Math.floor(transformed1.getY());
-    point.x += rectangle.width;
-    point.y += rectangle.height;
-    final Point2D transformed2 = inverse.transform(point, null);
-    final int w = (int) Math.ceil(transformed2.getX()) - x;
-    final int h = (int) Math.ceil(transformed2.getY()) - y;
-    return new Rectangle(x, y, w, h);
   }
 
   protected void clearTransform()
@@ -233,14 +223,15 @@ public class GraphPanel
       graphics.setColor(EditorColor.GRIDCOLOR);
       final int grid = Config.GUI_EDITOR_GRID_SIZE.getValue();
       final AffineTransform inverse = getInverseTransform();
-      final Point pt = new Point(0, 0);
-      final Point2D result = inverse.transform(pt, null);
-      final int x0 = Math.floorDiv((int) Math.floor(result.getX()), grid) * grid;
-      final int y0 = Math.floorDiv((int) Math.floor(result.getY()), grid) * grid;
-      pt.setLocation(getWidth(), getHeight());
-      inverse.transform(pt, result);
-      final int x1 = (int) Math.ceil(result.getX());
-      final int y1 = (int) Math.ceil(result.getY());
+      final Rectangle view = getVisibleRect();
+      final Point2D pt = new Point2D.Double(view.x, view.y);
+      inverse.transform(pt, pt);
+      final int x0 = grid * (int) Math.floor(pt.getX() / grid);
+      final int y0 = grid * (int) Math.floor(pt.getY() / grid);
+      pt.setLocation(view.x + view.width, view.y + view.height);
+      inverse.transform(pt, pt);
+      final int x1 = (int) Math.ceil(pt.getX());
+      final int y1 = (int) Math.ceil(pt.getY());
       for (int x = x0; x <= x1; x += grid) {
         graphics.drawLine(x, y0, x, y1);
       }
