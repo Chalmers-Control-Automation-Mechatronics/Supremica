@@ -1,368 +1,367 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="ball_Process" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
-    <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="button_automatic_pressed"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="button_automatic_released"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="button_manual_pressed"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="button_manual_released"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="gk_ball_out_of_gatekeeper"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_enter_ball"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="gk_has_ball"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_in_go_in"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_in_go_out"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_in_is_in"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_in_is_out"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_out_go_in"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_out_go_out"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_out_is_in"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_out_is_out"/>
-        <EventDecl Kind="CONTROLLABLE" Name="gk_release_ball"/>
-        <EventDecl Kind="CONTROLLABLE" Name="mode_automatic"/>
-        <EventDecl Kind="CONTROLLABLE" Name="mode_manual"/>
-    </EventDeclList>
-    <ComponentList>
-        <SimpleComponent Kind="SPEC" Name="Progress spec: Manual or automatic mode">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="q_0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="q_1"/>
-                    <SimpleNode Name="q_2"/>
-                    <SimpleNode Name="q_3"/>
-                    <SimpleNode Name="q_4"/>
-                    <SimpleNode Name="q_5"/>
-                    <SimpleNode Name="q_6"/>
-                    <SimpleNode Name="q_7"/>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="q_0" Target="q_1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_0" Target="q_2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_1" Target="q_0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_1" Target="q_1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_2" Target="q_2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_2" Target="q_3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_3" Target="q_3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_3" Target="q_4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_4" Target="q_4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_4" Target="q_5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_5" Target="q_5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_5" Target="q_6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_6" Target="q_6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_6" Target="q_7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_7" Target="q_0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_7" Target="q_7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant: Gatekeeper - Out">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="in">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="out">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="in" Target="in">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_out_go_in"/>
-                            <SimpleIdentifier Name="gk_out_is_in"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="in" Target="out">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_out_go_out"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="out" Target="in">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_out_go_in"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="out" Target="out">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_out_go_out"/>
-                            <SimpleIdentifier Name="gk_out_is_out"/>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant: Gatekeeper - In">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="in">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="out">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="in" Target="in">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_in_go_in"/>
-                            <SimpleIdentifier Name="gk_in_is_in"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="in" Target="out">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_in_go_out"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="out" Target="in">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_in_go_in"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="out" Target="out">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_in_go_out"/>
-                            <SimpleIdentifier Name="gk_in_is_out"/>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="Progress spec: Gatekeeper (gk)">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="q_0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="q_1"/>
-                    <SimpleNode Name="q_1_1"/>
-                    <SimpleNode Name="q_2"/>
-                    <SimpleNode Name="q_3"/>
-                    <SimpleNode Name="q_4"/>
-                    <SimpleNode Name="q_5"/>
-                    <SimpleNode Name="q_6"/>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="q_0" Target="q_1_1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_enter_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_1" Target="q_2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_has_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_1_1" Target="q_1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_in_go_out"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_2" Target="q_3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_in_go_in"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_3" Target="q_4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_release_ball"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_4" Target="q_5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_out_go_out"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_5" Target="q_6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_ball_out_of_gatekeeper"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_6" Target="q_0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="gk_out_go_in"/>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant: Automatic button">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="q_0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="q_1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="q_2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="q_0" Target="q_1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="button_automatic_pressed"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_1" Target="q_2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="button_automatic_released"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_2" Target="q_0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_automatic"/>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant: Disable events">
-            <Graph>
-                <LabelBlock>
-                    <SimpleIdentifier Name="gk_in_is_in"/>
-                    <SimpleIdentifier Name="gk_in_is_out"/>
-                    <SimpleIdentifier Name="gk_out_is_in"/>
-                    <SimpleIdentifier Name="gk_out_is_out"/>
-                </LabelBlock>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="dummy">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                </NodeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant: Manual button">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="q_0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="q_1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                    <SimpleNode Name="q_2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="q_0" Target="q_1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="button_manual_pressed"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_1" Target="q_2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="button_manual_released"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="q_2" Target="q_0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="mode_manual"/>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-    </ComponentList>
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="ball_Process">
+<B:Comment></B:Comment>
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="button_automatic_pressed"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="button_automatic_released"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="button_manual_pressed"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="button_manual_released"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="gk_ball_out_of_gatekeeper"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_enter_ball"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="gk_has_ball"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_in_go_in"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_in_go_out"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_in_is_in"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_in_is_out"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_out_go_in"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_out_go_out"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_out_is_in"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_out_is_out"/>
+<EventDecl Kind="CONTROLLABLE" Name="gk_release_ball"/>
+<EventDecl Kind="CONTROLLABLE" Name="mode_automatic"/>
+<EventDecl Kind="CONTROLLABLE" Name="mode_manual"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="manual_or_automatic_mode">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q_0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q_1"/>
+<SimpleNode Name="q_2"/>
+<SimpleNode Name="q_3"/>
+<SimpleNode Name="q_4"/>
+<SimpleNode Name="q_5"/>
+<SimpleNode Name="q_6"/>
+<SimpleNode Name="q_7"/>
+</NodeList>
+<EdgeList>
+<Edge Source="q_0" Target="q_1">
+<LabelBlock>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_0" Target="q_2">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_1" Target="q_0">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_1" Target="q_1">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_2" Target="q_2">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_2" Target="q_3">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_3" Target="q_3">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_3" Target="q_4">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_4" Target="q_4">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_4" Target="q_5">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_5" Target="q_5">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_5" Target="q_6">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_6" Target="q_6">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_6" Target="q_7">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_7" Target="q_0">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_7" Target="q_7">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="gatekeeper_out">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="in">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="out">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="in" Target="in">
+<LabelBlock>
+<SimpleIdentifier Name="gk_out_go_in"/>
+<SimpleIdentifier Name="gk_out_is_in"/>
+</LabelBlock>
+</Edge>
+<Edge Source="in" Target="out">
+<LabelBlock>
+<SimpleIdentifier Name="gk_out_go_out"/>
+</LabelBlock>
+</Edge>
+<Edge Source="out" Target="in">
+<LabelBlock>
+<SimpleIdentifier Name="gk_out_go_in"/>
+</LabelBlock>
+</Edge>
+<Edge Source="out" Target="out">
+<LabelBlock>
+<SimpleIdentifier Name="gk_out_go_out"/>
+<SimpleIdentifier Name="gk_out_is_out"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="gatekeeper_in">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="in">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="out">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="in" Target="in">
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_go_in"/>
+<SimpleIdentifier Name="gk_in_is_in"/>
+</LabelBlock>
+</Edge>
+<Edge Source="in" Target="out">
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_go_out"/>
+</LabelBlock>
+</Edge>
+<Edge Source="out" Target="in">
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_go_in"/>
+</LabelBlock>
+</Edge>
+<Edge Source="out" Target="out">
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_go_out"/>
+<SimpleIdentifier Name="gk_in_is_out"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="gatekeeper_gk">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q_0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q_1"/>
+<SimpleNode Name="q_1_1"/>
+<SimpleNode Name="q_2"/>
+<SimpleNode Name="q_3"/>
+<SimpleNode Name="q_4"/>
+<SimpleNode Name="q_5"/>
+<SimpleNode Name="q_6"/>
+</NodeList>
+<EdgeList>
+<Edge Source="q_0" Target="q_1_1">
+<LabelBlock>
+<SimpleIdentifier Name="gk_enter_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_1" Target="q_2">
+<LabelBlock>
+<SimpleIdentifier Name="gk_has_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_1_1" Target="q_1">
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_go_out"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_2" Target="q_3">
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_go_in"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_3" Target="q_4">
+<LabelBlock>
+<SimpleIdentifier Name="gk_release_ball"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_4" Target="q_5">
+<LabelBlock>
+<SimpleIdentifier Name="gk_out_go_out"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_5" Target="q_6">
+<LabelBlock>
+<SimpleIdentifier Name="gk_ball_out_of_gatekeeper"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_6" Target="q_0">
+<LabelBlock>
+<SimpleIdentifier Name="gk_out_go_in"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="automatic_button">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q_0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q_1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q_2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="q_0" Target="q_1">
+<LabelBlock>
+<SimpleIdentifier Name="button_automatic_pressed"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_1" Target="q_2">
+<LabelBlock>
+<SimpleIdentifier Name="button_automatic_released"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_2" Target="q_0">
+<LabelBlock>
+<SimpleIdentifier Name="mode_automatic"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="disable_events">
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="gk_in_is_in"/>
+<SimpleIdentifier Name="gk_in_is_out"/>
+<SimpleIdentifier Name="gk_out_is_in"/>
+<SimpleIdentifier Name="gk_out_is_out"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="dummy">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="manual_button">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="q_0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q_1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="q_2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="q_0" Target="q_1">
+<LabelBlock>
+<SimpleIdentifier Name="button_manual_pressed"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_1" Target="q_2">
+<LabelBlock>
+<SimpleIdentifier Name="button_manual_released"/>
+</LabelBlock>
+</Edge>
+<Edge Source="q_2" Target="q_0">
+<LabelBlock>
+<SimpleIdentifier Name="mode_manual"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
 </Module>
