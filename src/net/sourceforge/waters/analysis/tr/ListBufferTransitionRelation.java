@@ -749,7 +749,6 @@ public class ListBufferTransitionRelation implements EventStatusProvider
 
   /**
    * Gets the initial status of the given state.
-   *
    * @return <CODE>true</CODE> if the state is an initial state,
    *         <CODE>false</CODE> otherwise.
    */
@@ -760,11 +759,10 @@ public class ListBufferTransitionRelation implements EventStatusProvider
 
   /**
    * Sets the initial status of the given state.
-   *
    * @param state
    *          The ID of state to be modified.
    * @param init
-   *          <CODE>true</CODE> if the state is to be ab initial state,
+   *          <CODE>true</CODE> if the state is to be an initial state,
    *          <CODE>false</CODE> otherwise.
    */
   public void setInitial(final int state, final boolean init)

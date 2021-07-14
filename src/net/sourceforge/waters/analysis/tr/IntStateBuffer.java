@@ -397,17 +397,19 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public void setMarked(final int state, final int prop, final boolean value)
   {
-    final int pattern = 1 << prop;
-    if (value) {
-      mStateInfo[state] |= pattern;
-    } else {
-      if (!mPropositionStatus.isPropositionUsed(prop)) {
-        mPropositionStatus.setPropositionUsed(prop, true);
-        for (int s = 0; s < mStateInfo.length; s++) {
-          mStateInfo[s] |= pattern;
+    if (prop >= 0) {
+      final int pattern = 1 << prop;
+      if (value) {
+        mStateInfo[state] |= pattern;
+      } else {
+        if (!mPropositionStatus.isPropositionUsed(prop)) {
+          mPropositionStatus.setPropositionUsed(prop, true);
+          for (int s = 0; s < mStateInfo.length; s++) {
+            mStateInfo[s] |= pattern;
+          }
         }
+        mStateInfo[state] &= ~pattern;
       }
-      mStateInfo[state] &= ~pattern;
     }
   }
 
