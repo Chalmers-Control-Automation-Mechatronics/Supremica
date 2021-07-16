@@ -250,7 +250,7 @@ public class ConditionalTRSimplifier
     final ListBufferTransitionRelation input = getTransitionRelation();
     final int config = mConditionalChain.getPreferredInputConfiguration();
     ListBufferTransitionRelation output =
-      new ListBufferTransitionRelation(input, config);
+      isCopying() ? new ListBufferTransitionRelation(input, config) : input;
     mConditionalChain.setTransitionRelation(output);
     final boolean result;
     if (isRecoveringFromOverflow()) {
@@ -272,7 +272,11 @@ public class ConditionalTRSimplifier
     if (!checkPostCondition(output)) {
       return false;
     }
-    input.copyFrom(output);
+    if (isCopying()) {
+      input.copyFrom(output);
+    } else {
+      setTransitionRelation(output);
+    }
     final TRPartition partition = mConditionalChain.getResultPartition();
     setResultPartition(partition);
     mChainWasApplied = true;
@@ -327,9 +331,24 @@ public class ConditionalTRSimplifier
    * @param  result  The transition relation returned by the encapsulated
    *                 chain, which may become the result of the conditional
    *                 simplifier.
+   * @see #isCopying()
    */
   protected boolean checkPostCondition(final ListBufferTransitionRelation result)
     throws AnalysisException
+  {
+    return true;
+  }
+
+  /**
+   * <P>Returns whether the conditional simplifier makes a copy of the
+   * transition relation before invoking the encapsulated chain.</P>
+   *
+   * <P>This method is typically overridden in a subclass. Its default
+   * behaviour returns <CODE>true</CODE> so that a copy is made.</P>
+   *
+   * @see #checkPostCondition(ListBufferTransitionRelation) checkPostCondition()
+   */
+  protected boolean isCopying()
   {
     return true;
   }
@@ -345,7 +364,7 @@ public class ConditionalTRSimplifier
    * Otherwise exceptions thrown by the encapsulated simplifier chain are also
    * thrown by the conditional simplifier.</P>
    *
-   * <P>his method is typically overridden in a subclass. Its default
+   * <P>This method is typically overridden in a subclass. Its default
    * behaviour returns <CODE>true</CODE> so that exceptions are caught.</P>
    *
    * @see OverflowException

@@ -90,7 +90,7 @@ public class ProjectingSupervisorReductionTRSimplifier
   //# Configuration
   /**
    * Sets the state limit. The states limit specifies the maximum
-   * number of verifier pairs that will be created by the OP-Verifier.
+   * number of verifier pairs that will be created.
    * @param limit
    *          The new state limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of states.
@@ -131,6 +131,16 @@ public class ProjectingSupervisorReductionTRSimplifier
     return mEnsuringOP;
   }
 
+  public void setPreSimplificationEnabled(final boolean enable)
+  {
+    mPreSimplificationEnabled = enable;
+  }
+
+  public boolean isPreSimplificationEnabled()
+  {
+    return mPreSimplificationEnabled;
+  }
+
 
   //#########################################################################
   //# Interface
@@ -155,8 +165,8 @@ public class ProjectingSupervisorReductionTRSimplifier
   {
     super.requestAbort();
     mVerifierBuilder.requestAbort();
-    if (mLoopRemover != null) {
-      mLoopRemover.requestAbort();
+    if (mPreSimplifier != null) {
+      mPreSimplifier.requestAbort();
     }
   }
 
@@ -165,8 +175,8 @@ public class ProjectingSupervisorReductionTRSimplifier
   {
     super.resetAbort();
     mVerifierBuilder.resetAbort();
-    if (mLoopRemover != null) {
-      mLoopRemover.resetAbort();
+    if (mPreSimplifier != null) {
+      mPreSimplifier.resetAbort();
     }
   }
 
@@ -174,15 +184,29 @@ public class ProjectingSupervisorReductionTRSimplifier
   //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
-  protected void setUo() throws AnalysisException
+  @Override
+  protected void setUp() throws AnalysisException
   {
     super.setUp();
-    if (mEnsuringOP) {
-      mLoopRemover = new TauLoopRemovalTRSimplifier();
-      mLoopRemover.setTauOnly(false);
-      mLoopRemover.setAppliesPartitionAutomatically(false);
-      mLoopRemover.setPreferredOutputConfiguration
+    if (mEnsuringOP || mPreSimplificationEnabled) {
+      final ChainTRSimplifier chain = new ChainTRSimplifier();
+      final TransitionRelationSimplifier hider =
+        new SpecialEventsTRSimplifier();
+      chain.add(hider);
+      final SupervisorReductionLoopRemover loopRemover = new
+        SupervisorReductionLoopRemover();
+      loopRemover.setTauOnly(true);
+      loopRemover.setAppliesPartitionAutomatically(true);
+      chain.add(loopRemover);
+      final SupervisorReductionConditionalSimplifier condition =
+        new SupervisorReductionConditionalSimplifier();
+      final SilentIncomingTRSimplifier silentRemover =
+        new SilentIncomingTRSimplifier();
+      condition.add(silentRemover);
+      chain.add(condition);
+      chain.setPreferredOutputConfiguration
         (mVerifierBuilder.getPreferredInputConfiguration());
+      mPreSimplifier = chain;
     }
   }
 
@@ -221,7 +245,7 @@ public class ProjectingSupervisorReductionTRSimplifier
   protected void tearDown()
   {
     super.tearDown();
-    mLoopRemover = null;
+    mPreSimplifier = null;
     mEventInfo = null;
     mOutstandingInfo = null;
     mKnownBest = null;
@@ -291,13 +315,26 @@ public class ProjectingSupervisorReductionTRSimplifier
       final int e = info.getEvent();
       final byte status = rel.getProperEventStatus(e);
       rel.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
-      if (!mVerifierBuilder.isSuitableProjection(rel)) {
-        rel.setProperEventStatus(e, status);
-      } else if (mVerifierBuilder.isOPAcceptable()) {
-        numRemoved += uncertain.size() + 1;
-        uncertain.clear();
-      } else {
+      try {
+        if (!mVerifierBuilder.isSuitableProjection(rel)) {
+          rel.setProperEventStatus(e, status);
+        } else if (mVerifierBuilder.isOPAcceptable()) {
+          numRemoved += uncertain.size() + 1;
+          uncertain.clear();
+        } else {
+          uncertain.add(e);
+        }
+      } catch (final OverflowException exception) {
         uncertain.add(e);
+        LogManager.getLogger().warn
+          ("Overflow building verifier, seach for projection stopped.");
+        break;
+      } catch (final OutOfMemoryError error) {
+        System.gc();
+        uncertain.add(e);
+        LogManager.getLogger().warn
+          ("Out of memory building verifier, seach for projection stopped.");
+        break;
       }
     }
     for (int i = 0; i < uncertain.size(); i++) {
@@ -312,7 +349,16 @@ public class ProjectingSupervisorReductionTRSimplifier
   {
     setUpOutstandingInfo();
     final ResultInfo parent = new ResultInfo();
-    searchExhaustively(parent, 0);
+    try {
+      searchExhaustively(parent, 0);
+    } catch (final OverflowException exception) {
+      LogManager.getLogger().warn
+        ("Overflow building verifier, seach for projection stopped.");
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      LogManager.getLogger().warn
+        ("Out of memory building verifier, seach for projection stopped.");
+    }
     if (mKnownBest == null) {
       return 0;
     } else {
@@ -355,43 +401,6 @@ public class ProjectingSupervisorReductionTRSimplifier
         rel.setProperEventStatus(e, status & ~EventStatus.STATUS_LOCAL);
       }
     }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private boolean isCompatibilityPreservingPartition(final TRPartition partition)
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int dumpIndex = rel.getDumpStateIndex();
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    final TIntArrayList supEvents = getSupervisedEvents();
-    for (int i = 0; i < supEvents.size(); i++) {
-      final int e = supEvents.get(i);
-      for (final int[] clazz : partition.getClasses()) {
-        boolean enabling = false;
-        boolean disabling = false;
-        for (final int s : clazz) {
-          iter.reset(s, e);
-          while (iter.advance()) {
-            if (iter.getCurrentTargetState() == dumpIndex) {
-              if (enabling) {
-                return false;
-              } else {
-                disabling = true;
-              }
-            } else {
-              if (disabling) {
-                return false;
-              } else {
-                enabling = true;
-              }
-            }
-          }
-        }
-      }
-    }
-    return true;
   }
 
 
@@ -541,6 +550,90 @@ public class ProjectingSupervisorReductionTRSimplifier
 
 
   //#########################################################################
+  //# Inner Class SupervisorReductionLoopRemover
+  private class SupervisorReductionLoopRemover
+    extends TauLoopRemovalTRSimplifier
+  {
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+    @Override
+    public void applyResultPartition()
+      throws AnalysisException
+    {
+      if (isCompatibilityPreservingPartition()) {
+        mFailedSimplification = false;
+        super.applyResultPartition();
+      } else {
+        mFailedSimplification = true;
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean isCompatibilityPreservingPartition()
+    {
+      final TRPartition partition = getResultPartition();
+      if (partition != null) {
+        final ListBufferTransitionRelation rel = getTransitionRelation();
+        final int dumpIndex = rel.getDumpStateIndex();
+        final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+        final TIntArrayList supEvents = getSupervisedEvents();
+        for (int i = 0; i < supEvents.size(); i++) {
+          final int e = supEvents.get(i);
+          for (final int[] clazz : partition.getClasses()) {
+            boolean enabling = false;
+            boolean disabling = false;
+            for (final int s : clazz) {
+              iter.reset(s, e);
+              while (iter.advance()) {
+                if (iter.getCurrentTargetState() == dumpIndex) {
+                  if (enabling) {
+                    return false;
+                  } else {
+                    disabling = true;
+                  }
+                } else {
+                  if (disabling) {
+                    return false;
+                  } else {
+                    enabling = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return true;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class SupervisorReductionConditionalSimplifier
+  private class SupervisorReductionConditionalSimplifier
+    extends ConditionalTRSimplifier
+  {
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.analysis.abstraction.ConditionalTRSimplifier
+    @Override
+    protected boolean checkPreCondition()
+      throws AnalysisException
+    {
+      return !mFailedSimplification;
+    }
+
+    @Override
+    protected boolean isCopying()
+    {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class SupervisorReductionVerifierBuilder
   private class SupervisorReductionVerifierBuilder extends VerifierBuilder
   {
@@ -549,19 +642,15 @@ public class ProjectingSupervisorReductionTRSimplifier
     private boolean isSuitableProjection(ListBufferTransitionRelation rel)
       throws AnalysisException
     {
-      if (mLoopRemover != null) {
-        mLoopRemover.setTransitionRelation(rel);
-        if (mLoopRemover.run()) {
-          final TRPartition partition = mLoopRemover.getResultPartition();
-          if (!isCompatibilityPreservingPartition(partition)) {
-            return false;
-          }
-          final int config = getPreferredInputConfiguration();
-          rel = new ListBufferTransitionRelation(rel, config);
-          mLoopRemover.setTransitionRelation(rel);
-          mLoopRemover.applyResultPartition();
-          rel = mLoopRemover.getTransitionRelation();
+      if (mPreSimplifier != null) {
+        final int config = mPreSimplifier.getPreferredInputConfiguration();
+        rel = new ListBufferTransitionRelation(rel, config);
+        mPreSimplifier.setTransitionRelation(rel);
+        mPreSimplifier.run();
+        if (mFailedSimplification) {
+          return false;
         }
+        rel = mPreSimplifier.getTransitionRelation();
       }
       return buildVerifier(rel);
     }
@@ -606,12 +695,14 @@ public class ProjectingSupervisorReductionTRSimplifier
   //# Data Members
   private boolean mExhaustive = false;
   private boolean mEnsuringOP = false;
+  private boolean mPreSimplificationEnabled = true;
 
-  private TauLoopRemovalTRSimplifier mLoopRemover = null;
   private final SupervisorReductionVerifierBuilder mVerifierBuilder =
     new SupervisorReductionVerifierBuilder();
+  private TransitionRelationSimplifier mPreSimplifier;
   private List<EventInfo> mEventInfo;
   private ResultInfo[] mOutstandingInfo;
   private Result mKnownBest;
+  private boolean mFailedSimplification;
 
 }

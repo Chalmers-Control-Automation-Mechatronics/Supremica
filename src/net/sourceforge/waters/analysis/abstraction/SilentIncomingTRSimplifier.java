@@ -41,24 +41,24 @@ import gnu.trove.stack.array.TIntArrayStack;
 import java.util.BitSet;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
  * <P>A list buffer transition relation implementation of the
  * <I>Silent Incoming Rule</I> or the <I>Only Silent Incoming Rule</I>.</P>
  *
- * <P>The <I>Silent Incoming Rule</I> removes a transition
- * when a tau event links two states <I>x</I> and&nbsp;<I>y</I> where at most
+ * <P>The <I>Silent Incoming Rule</I> removes a transition when a &tau;
+ * event links two states <I>x</I> and&nbsp;<I>y</I> where at most
  * the source state&nbsp;<I>x</I> contains the precondition
- * marking&nbsp;<I>alpha</I>. If the target state&nbsp;<I>y</I> becomes
+ * marking&nbsp;&alpha;. If the target state&nbsp;<I>y</I> becomes
  * unreachable, it is removed, too. All transitions originating from the target
  * state&nbsp;<I>y</I> are copied to the source state&nbsp;<I>x</I>.</P>
  *
@@ -72,20 +72,20 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * configured, only transitions leading to states not marked by the
  * precondition marking can be abstracted (as described above). Without a
  * precondition marking, only transitions leading to states with an outgoing
- * always enabled ({@link EventStatus#STATUS_ALWAYS_ENABLED}) transition
- * can be abstracted.</P>
+ * &tau; or always enabled ({@link EventStatus#STATUS_ALWAYS_ENABLED})
+ * transition can be abstracted.</P>
  *
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification
  * in Supervisory Control. SIAM Journal of Control and Optimization,
- * <STRONG>48</STRONG>(3), 1914-1938, 2009.<BR>
+ * <STRONG>48</STRONG>(3), 1914&ndash;1938, 2009.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying
  * Generalised Nonblocking. Proc. 7th International Conference on Control and
- * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ * Automation, ICCA'09, 448&ndash;453, Christchurch, New Zealand, 2009.<BR>
  * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
  * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
  * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
- * 147-162, Queenstown, New Zealand, 2013.</P>
+ * 147&ndash;162, Queenstown, New Zealand, 2013.</P>
  *
  * @author Rachel Francis, Robi Malik, Colin Pilbrow
  */
@@ -158,11 +158,9 @@ public class SilentIncomingTRSimplifier
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, StepSimplifierFactory.
-               OPTION_SubsetConstruction_MaxIncrease);
+              OPTION_SilentIncoming_RestrictsToUnreachableStates);
     db.append(options, StepSimplifierFactory.
               OPTION_TransitionRelationSimplifier_DumpStateAware);
-    db.append(options, StepSimplifierFactory.
-               OPTION_SubsetConstruction_FailingEventsAsSelfLoops);
     return options;
   }
 
@@ -171,10 +169,13 @@ public class SilentIncomingTRSimplifier
   {
     if (option.hasID(StepSimplifierFactory.
                      OPTION_SilentIncoming_RestrictsToUnreachableStates)) {
-      final BooleanOption propOption = (BooleanOption) option;
-      setRestrictsToUnreachableStates(propOption.getValue());
-    }
-    else {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setRestrictsToUnreachableStates(boolOption.getValue());
+    } else if (option.hasID(StepSimplifierFactory.
+                            OPTION_TransitionRelationSimplifier_DumpStateAware)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDumpStateAware(boolOption.getValue());
+    } else {
       super.setOption(option);
     }
   }

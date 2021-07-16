@@ -111,7 +111,7 @@ public class ProjectingSupervisorReductionFactory
 
 
   //#########################################################################
-  //# Setting Synthesizer Options
+  //# Setting Synthesiser Options
   public static void configureSynthesizer
     (final SupervisorSynthesizer synthesizer,
      final SupervisorReductionProjectionMethod method)

@@ -46,10 +46,25 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * <P>A list buffer transition relation implementation of the
  * <I>Only Silent Outgoing Rule</I>.</P>
  *
- * <P>The <I>Only Silent Outgoing Rule</I> removes all states&nbsp;<I>x</I>
- * that do not have the alpha or default marking, if they only have outgoing
- * tau transitions. The incoming transitions to&nbsp;<I>x</I> are redirected
- * to all the (tau) successor states of&nbsp;<I>x</I>.</P>
+ * <P>The original <I>Only Silent Outgoing Rule</I> (Flordal &amp; Malik,
+ * 2009) removes all states&nbsp;<I>x</I> that do not have the precondition
+ * or default marking, if they only have outgoing &tau; transitions. The
+ * incoming transitions to&nbsp;<I>x</I> are redirected to all the (&tau;)
+ * successor states of&nbsp;<I>x</I>. If <I>x</I> is an initial state,
+ * then its successors become initial states.</P>
+ *
+ * <P>This simplifier implements a slightly enhanced version that allows
+ * the state&nbsp;<I>x</I> to have the default marking. If <I>x</I> is
+ * marked and at least one of its (&tau;) successors is also marked, then
+ * <I>x</I> can still be removed as above.</P>
+ *
+ * <P><I>References:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
+ * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3),
+ * 1914&ndash;1938, 2009.<BR>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control, <STRONG>58</STRONG>(8), 1&ndash;13, 2013.</P>
  *
  * @author Rachel Francis, Robi Malik
  */
@@ -130,29 +145,33 @@ public class OnlySilentOutgoingTRSimplifier
     main:
     for (int source = 0; source < numStates; source++) {
       if (rel.isReachable(source) &&
-          !rel.isMarked(source, omegaID) &&
           (alphaID < 0 || !rel.isMarked(source, alphaID))) {
         checkAbort();
+        boolean markingNeeded =
+          omegaID >= 0 && rel.isMarked(source, omegaID);
         iter.resetState(source);
         while (iter.advance()) {
           final int eventID = iter.getCurrentEvent();
           if (eventID == tauID) {
             final int target = iter.getCurrentTargetState();
             targets.add(target);
+            markingNeeded &= !rel.isMarked(target, omegaID);
           } else {
             targets.clear();
             continue main;
           }
         }
         if (!targets.isEmpty()) {
-          rel.removeOutgoingTransitions(source, tauID);
-          for (int i = 0; i < targets.size(); i++) {
-            final int target = targets.get(i);
-            rel.copyIncomingTransitions(source, target);
+          if (!markingNeeded) {
+            rel.removeOutgoingTransitions(source, tauID);
+            for (int i = 0; i < targets.size(); i++) {
+              final int target = targets.get(i);
+              rel.copyIncomingTransitions(source, target);
+            }
+            rel.removeIncomingTransitions(source);
+            rel.setReachable(source, false);
+            modified = true;
           }
-          rel.removeIncomingTransitions(source);
-          rel.setReachable(source, false);
-          modified = true;
           targets.clear();
         }
       }

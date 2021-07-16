@@ -192,6 +192,7 @@ public class VerifierBuilder implements Abortable
     mVerifierStatePairs = new TLongArrayList(numStates);
     mVerifierStateMap =
       new WatersLongIntHashMap(numStates, VerifierPairHashingStrategy.INSTANCE);
+    mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     mTransitionIterator1 = mTransitionRelation.createSuccessorsReadOnlyIterator();
     mTransitionIterator2 = mTransitionRelation.createSuccessorsReadOnlyIterator();
     mVerificationSuccess = mOPSatisfied = true;

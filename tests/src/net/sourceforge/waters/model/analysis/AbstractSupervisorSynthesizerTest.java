@@ -449,6 +449,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testRansomwareSample() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "ransomware_sample.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testRobotAssemblyCell() throws Exception
   {
     final ProductDESProxy des =

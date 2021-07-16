@@ -173,16 +173,23 @@ public interface SupervisorReductionFactory
     private ConditionalSupervisorReductionSubChain()
     {
       add(new SpecialEventsTRSimplifier());
+      add(new TauLoopRemovalTRSimplifier());
+      add(new SilentIncomingTRSimplifier());
+      final ObservationEquivalenceTRSimplifier bisimulator1 =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator1.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+      add(bisimulator1);
       final SubsetConstructionTRSimplifier subset =
         new SubsetConstructionTRSimplifier();
       subset.setDumpStateAware(true);
-      subset.setMaxIncrease(2.0);
+      subset.setMaxIncrease(2.5);
       add(subset);
-      final ObservationEquivalenceTRSimplifier bisimulator =
+      final ObservationEquivalenceTRSimplifier bisimulator2 =
         new ObservationEquivalenceTRSimplifier();
-      bisimulator.setEquivalence
+      bisimulator2.setEquivalence
         (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-      add(bisimulator);
+      add(bisimulator2);
     }
 
     //#######################################################################

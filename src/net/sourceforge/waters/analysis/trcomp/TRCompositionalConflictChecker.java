@@ -65,11 +65,6 @@ import net.sourceforge.waters.analysis.compositional.CompositionalConflictCheckR
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -101,6 +96,11 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.logging.log4j.LogManager;
@@ -115,14 +115,14 @@ import org.apache.logging.log4j.Logger;
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
  * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3),
- * 1914-1938, 2009.<BR>
+ * 1914&ndash;1938, 2009.<BR>
  * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
  * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
- * Control <STRONG>58</STRONG>(8), 1-13, 2013.<BR>
+ * Control, <STRONG>58</STRONG>(8), 1&ndash;13, 2013.<BR>
  * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
- * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Always Enabled Events and Selfloop-only Events. 2nd International
  * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
- * 147-162, Queenstown, New Zealand, 2013.</P>
+ * 147&ndash;162, Queenstown, New Zealand, 2013.</P>
  *
  * @author Robi Malik
  */
