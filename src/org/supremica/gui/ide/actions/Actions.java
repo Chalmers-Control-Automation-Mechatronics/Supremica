@@ -135,14 +135,7 @@ public class Actions extends WatersActionManager
      */
     private final List<IDEAction> mIDEActions = new LinkedList<IDEAction>();
 
-    // Printing Actions
-    public IDEAction editorPrintAction = new EditorPrintAction(mIDEActions);
-
     // Editor Actions
-    public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(mIDEActions);
-    public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(mIDEActions);
-    public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
-    public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
     public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
     public IDEAction editorGenerateTextLabelAction = new EditorGenerateTextLabelAction(mIDEActions);
     public IDEAction editorRemoveGABlocksAction = new EditorRemoveGABlocksAction(mIDEActions);
