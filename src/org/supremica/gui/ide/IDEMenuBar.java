@@ -90,6 +90,7 @@ import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.InstantiateModuleAction;
+import net.sourceforge.waters.gui.actions.IDEOpenAction;
 import net.sourceforge.waters.gui.actions.OptionsAction;
 import net.sourceforge.waters.gui.actions.RecompileAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
@@ -142,7 +143,6 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
-import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.OpenFTAction;
 import org.supremica.gui.ide.actions.OpenFTSpecAction;
 import org.supremica.gui.ide.actions.OpenRASAction;
@@ -634,7 +634,7 @@ public class IDEMenuBar
     menu.setMnemonic(KeyEvent.VK_F); // ALT-F - Create module event?
     final Action newmod = actions.getAction(NewAction.class);
     menu.add(newmod);
-    final Action open = actions.getAction(OpenAction.class);
+    final Action open = actions.getAction(IDEOpenAction.class);
     menu.add(open);
     addOption(Config.INCLUDE_RAS_SUPPORT);
     if (Config.INCLUDE_RAS_SUPPORT.getBooleanValue()) {

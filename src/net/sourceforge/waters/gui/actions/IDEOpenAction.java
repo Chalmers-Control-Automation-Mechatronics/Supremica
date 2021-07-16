@@ -33,8 +33,9 @@
 //# carries forward this exception.
 //###########################################################################
 
-package org.supremica.gui.ide.actions;
+package net.sourceforge.waters.gui.actions;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -52,6 +53,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.actions.ImportAction;
 
 
 /**
@@ -66,12 +68,12 @@ import org.supremica.gui.ide.IDE;
  * @author Robi Malik
  */
 
-public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
+public class IDEOpenAction extends IDEAction
 {
 
-  // #######################################################################
-  // # Constructor
-  OpenAction(final IDE ide)
+  //#######################################################################
+  //# Constructor
+  IDEOpenAction(final IDE ide)
   {
     super(ide);
     putValue(Action.NAME, "Open ...");
@@ -82,8 +84,9 @@ public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPEN);
   }
 
-  // #######################################################################
-  // # Interface java.awt.event.ActionListener
+
+  //#######################################################################
+  //# Interface java.awt.event.ActionListener
   @Override
   public void actionPerformed(final ActionEvent event)
   {
@@ -112,16 +115,22 @@ public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
     final int choice = chooser.showOpenDialog(frame);
     // Load the files ...
     if (choice == JFileChooser.APPROVE_OPTION) {
-      final File[] filearray = chooser.getSelectedFiles();
-      final List<File> filelist = Arrays.asList(filearray);
-      final DocumentContainerManager cmanager =
+      try {
+        ide.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        final File[] filearray = chooser.getSelectedFiles();
+        final List<File> filelist = Arrays.asList(filearray);
+        final DocumentContainerManager cmanager =
           ide.getDocumentContainerManager();
-      cmanager.openContainers(filelist);
+        cmanager.openContainers(filelist);
+      } finally {
+        ide.setCursor(Cursor.getDefaultCursor());
+      }
     }
   }
 
-  // #########################################################################
-  // # Class Constants
-  private static final long serialVersionUID = 1L;
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 7572381378564260924L;
 
 }

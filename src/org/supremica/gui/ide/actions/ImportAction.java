@@ -43,6 +43,7 @@ import java.util.List;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.actions.IDEOpenAction;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -58,7 +59,7 @@ import org.supremica.gui.ide.ImportDialog;
  * hierarchy of modules, as opposed to a single module.
  *
  * @see ImportDialog
- * @see OpenAction
+ * @see IDEOpenAction
  * @author Robi Malik
  */
 

@@ -53,6 +53,7 @@ import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
+import net.sourceforge.waters.gui.actions.IDEOpenAction;
 import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
 import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
 import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
@@ -74,7 +75,6 @@ import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.NewAction;
-import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
 
 
@@ -221,7 +221,7 @@ public class IDEToolBar
   {
     final Actions actions = mIDE.getActions();
     addAction(actions.getAction(NewAction.class));
-    addAction(actions.getAction(OpenAction.class));
+    addAction(actions.getAction(IDEOpenAction.class));
     addAction(actions.getAction(SaveAction.class));
     //addAction(actions.editorPrintAction);
     addSeparator();

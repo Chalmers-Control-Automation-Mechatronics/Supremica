@@ -55,7 +55,6 @@ public class Actions extends WatersActionManager
     {
         super(ide);
         addAction(new NewAction(ide));
-        addAction(new OpenAction(ide));
         addAction(new OpenRASAction(ide));
         addAction(new OpenFTAction(ide));
         addAction(new OpenFTSpecAction(ide));
