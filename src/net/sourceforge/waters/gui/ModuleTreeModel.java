@@ -57,6 +57,7 @@ import net.sourceforge.waters.model.module.NestedBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -72,6 +73,7 @@ import net.sourceforge.waters.subject.module.NestedBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
 /**
@@ -517,8 +519,15 @@ class ModuleTreeModel
       throws VisitorException
     {
       final IdentifierSubject subject = (IdentifierSubject) ident;
-      final ProxySubject parent = SubjectTools.getProxyParent(subject);
-      return parent.acceptVisitor(this) != null ? ident : null;
+      final Subject parent = subject.getParent();
+      if (parent instanceof Proxy) {
+        final Proxy proxyParent = (ProxySubject) parent;
+        return proxyParent.acceptVisitor(this);
+      } else {
+        final Proxy proxyParent = SubjectTools.getProxyParent(parent);
+        final Object visibleAncestor = proxyParent.acceptVisitor(this);
+        return visibleAncestor == proxyParent ? ident : visibleAncestor;
+      }
     }
 
     @Override
@@ -556,6 +565,15 @@ class ModuleTreeModel
       final PlainEventListSubject subject = (PlainEventListSubject) plain;
       final ProxySubject parent = SubjectTools.getProxyParent(subject);
       return parent.acceptVisitor(this);
+    }
+
+    @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionSubject subject = (SimpleExpressionSubject) expr;
+      final Proxy proxyParent = SubjectTools.getProxyParent(subject);
+      return proxyParent.acceptVisitor(this);
     }
   }
 

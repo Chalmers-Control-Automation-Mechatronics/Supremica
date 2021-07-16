@@ -618,6 +618,23 @@ public abstract class ModuleTree
   //#########################################################################
   //# Overrides for javax.swing.JTree
   @Override
+  public String convertValueToText(final Object value,
+                                   final boolean selected,
+                                   final boolean expanded,
+                                   final boolean leaf,
+                                   final int row,
+                                   final boolean hasFocus)
+  {
+    if (value instanceof Proxy) {
+      final Proxy proxy = (Proxy) value;
+      return getPrintString(proxy, expanded);
+    } else {
+      return super.convertValueToText(value, selected, expanded,
+                                      leaf, row, hasFocus);
+    }
+  }
+
+  @Override
   public String getToolTipText(final MouseEvent event)
   {
     final TreePath path = getClosestPathForLocation(event.getX(), event.getY());
