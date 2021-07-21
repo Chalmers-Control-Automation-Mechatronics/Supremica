@@ -31,8 +31,9 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.sd;
 
+import net.sourceforge.waters.analysis.monolithic.StateTuple;
 
 /**
  * Representation of a node in the reachability tree for SD Property iii.2

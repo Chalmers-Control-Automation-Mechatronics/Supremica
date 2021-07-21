@@ -67,7 +67,7 @@ public class MonolithicDeadlockCheckerTest extends
   protected DeadlockChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final DeadlockChecker checker = new TRDeadlockChecker();
+    final DeadlockChecker checker = new TRMonolithicDeadlockChecker();
     checker.setNodeLimit(3000000);
     return checker;
   }

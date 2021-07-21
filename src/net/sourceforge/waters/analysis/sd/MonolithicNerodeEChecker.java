@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.sd;
 
 import gnu.trove.set.hash.THashSet;
 
@@ -42,9 +42,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.sd.NerodeDiagnostics;
-import net.sourceforge.waters.analysis.sd.NerodeEquVerificationResult;
-import net.sourceforge.waters.analysis.sd.NerodeKindTranslator;
+import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
+import net.sourceforge.waters.analysis.monolithic.StateTuple;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;

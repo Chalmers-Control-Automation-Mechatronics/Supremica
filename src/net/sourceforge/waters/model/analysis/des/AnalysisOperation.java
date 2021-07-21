@@ -39,7 +39,7 @@ import java.util.LinkedList;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
-import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
+import net.sourceforge.waters.analysis.sd.MonolithicNerodeEChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.JavaEnumFactory;

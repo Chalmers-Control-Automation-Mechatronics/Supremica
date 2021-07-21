@@ -38,11 +38,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.ComponentKindOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
@@ -62,6 +57,11 @@ import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ComponentKindOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.StringOption;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

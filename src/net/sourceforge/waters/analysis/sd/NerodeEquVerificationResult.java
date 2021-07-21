@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.sd;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;

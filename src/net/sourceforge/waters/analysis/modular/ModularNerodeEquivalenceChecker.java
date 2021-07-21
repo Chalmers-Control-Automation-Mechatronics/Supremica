@@ -49,7 +49,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
-import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
+import net.sourceforge.waters.analysis.sd.MonolithicNerodeEChecker;
 import net.sourceforge.waters.analysis.sd.NerodeEquVerificationResult;
 import net.sourceforge.waters.analysis.sd.NerodeKindTranslator;
 import net.sourceforge.waters.model.analysis.AnalysisException;

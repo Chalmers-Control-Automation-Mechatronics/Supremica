@@ -65,11 +65,15 @@ import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.PositiveIntOption;
@@ -260,6 +264,21 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     return mStateCallback;
   }
 
+  /**
+   * Determines whether controllability is to be checked during synchronous
+   * product exploration. If this method returns <CODE>true</CODE>, the
+   * event and automaton data structures are set up for a controllability
+   * check, and the method {@link #handleUncontrollableState(int, int)
+   * handleUncontrollableState()} is called if an uncontrollable state
+   * is detected during expansion.
+   * @return  <CODE>false</CODE> by default,
+   *          but can be overridden by subclasses.
+   */
+  public boolean isSensitiveToControllability()
+  {
+    return false;
+  }
+
   public int getDefaultConfig()
   {
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
@@ -318,7 +337,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     setUpDeadlockInfo();
     // Add transition information to event info ...
     final List<EventInfo> eventInfoList =
-      setUpTransitions(mTRAutomata, eventInfoMap, supportsNondeterminism());
+      setUpTransitions(mTRAutomata, eventInfoMap, false);
     // Sort event info and merge local events
     postProcessEventInfo(eventInfoList);
   }
@@ -418,12 +437,20 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           }
         }
       }
+      final KindTranslator translator = getKindTranslator();
       for (int e = EventEncoding.TAU; e < enc.getNumberOfProperEvents(); e++) {
         if ((enc.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
           // For any used event: create event info if not yet present
           final EventProxy event = enc.getProperEvent(e);
           if (!eventInfoMap.containsKey(event)) {
-            final EventInfo info = new EventInfo(event);
+            final boolean controllable;
+            if (isSensitiveToControllability()) {
+              controllable =
+                translator.getEventKind(event) == EventKind.CONTROLLABLE;
+            } else {
+              controllable = true;
+            }
+            final EventInfo info = new EventInfo(event, controllable);
             eventInfoMap.put(event, info);
             if (mConfiguredEventEncoding != null) {
               final int confCode = mConfiguredEventEncoding.getEventCode(event);
@@ -511,9 +538,13 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   protected List<EventInfo> setUpTransitions
     (final TRAutomatonProxy[] automata,
      final Map<EventProxy,EventInfo> eventInfoMap,
-     final boolean nondeterminismSupported)
+     final boolean reverse)
     throws AnalysisException
   {
+    final boolean controllabilitySensitive =
+      !reverse && isSensitiveToControllability();
+    final boolean nondeterminismSupported =
+      reverse || supportsNondeterminism();
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
     final Collection<EventProxy> events = des.getEvents();
@@ -522,22 +553,27 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     final List<EventInfo> eventInfoList = new ArrayList<>(numEvents);
     for (int a = 0; a < numAutomata; a++) {
       final TRAutomatonProxy aut = automata[a];
+      final boolean plant = !controllabilitySensitive ||
+        translator.getComponentKind(aut) == ComponentKind.PLANT;
       final DeadlockInfo deadlockInfo =
         mDeadlockInfo == null ? null : mDeadlockInfo[a];
       final EventEncoding enc = aut.getEventEncoding();
       final int numLocalEvents = enc.getNumberOfProperEvents();
       for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
         checkAbort();
-        final byte status = enc.getProperEventStatus(local);
+        byte status = enc.getProperEventStatus(local);
         if (EventStatus.isUsedEvent(status)) {
           final EventProxy event = enc.getProperEvent(local);
           if (event == null) {
             assert local == EventEncoding.TAU;
             assert nondeterminismSupported;
+            final boolean controllable = !controllabilitySensitive ||
+              EventStatus.isControllableEvent(status);
             final AutomatonEventInfo autInfo =
-              new AutomatonEventInfo(a, aut, local, deadlockInfo, true, true);
+              new AutomatonEventInfo(a, aut, plant, local, controllable,
+                                     deadlockInfo, true);
             if (!autInfo.isBlocked()) {
-              final EventInfo info = new EventInfo(null);
+              final EventInfo info = new EventInfo(null, controllable);
               info.addAutomatonEventInfo(autInfo);
               info.setOutputCode(EventEncoding.TAU);
               info.sort();
@@ -546,14 +582,19 @@ public abstract class AbstractTRMonolithicModelAnalyzer
                                                         status);
             }
           } else {
-            final int global =
-              mOutputEventEncoding.addEvent(event, translator, status);
             final EventInfo info = eventInfoMap.get(event);
+            final boolean controllable =
+              !controllabilitySensitive || info.isControllable();
+            if (controllable) {
+              status |= EventStatus.STATUS_CONTROLLABLE;
+            }
+            final int global =
+              mOutputEventEncoding.addProperEvent(event, status);
             if (info != null && !info.isBlocked()) {
               info.setOutputCode(global);
               final AutomatonEventInfo autInfo =
-                new AutomatonEventInfo(a, aut, local, deadlockInfo,
-                                       true, nondeterminismSupported);
+                new AutomatonEventInfo(a, aut, plant, local, controllable,
+                                       deadlockInfo, nondeterminismSupported);
               info.addAutomatonEventInfo(autInfo);
             }
           }
@@ -849,9 +890,10 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   protected boolean expandState(final int[] encoded,
                                 final int[] decoded,
                                 final EventInfo event)
-    throws OverflowException
+    throws AnalysisException
   {
-    if (event.isEnabled(decoded)) {
+    final AutomatonEventInfo disablingAut = event.findDisabling(decoded);
+    if (disablingAut == null) {
       if (mPruningDeadlocks && event.isForbidden()) {
         final int e = event.getOutputCode();
         createDeadlockTransition(e);
@@ -860,6 +902,14 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         }
       } else {
         createSuccessorStates(encoded, decoded, event);
+      }
+    } else if (isSensitiveToControllability() &&
+               !event.isControllable() &&
+               !disablingAut.isPlant()) {
+      final int e = event.getOutputCode();
+      final int a = disablingAut.getAutomatonIndex();
+      if (!handleUncontrollableState(e, a)) {
+        return false;
       }
     }
     return true;
@@ -1029,9 +1079,41 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     createTransition(event, mDeadlockState);
   }
 
+  /**
+   * Callback for new transitions. This method is called whenever state
+   * exploration has discovered a new transition. The event and target
+   * state numbers are provided as arguments. The source state of the
+   * transition is obtained by calling {@link #getCurrentSource()}.
+   */
   protected void createTransition(final int event, final int target)
     throws OverflowException
   {
+  }
+
+  /**
+   * Callback for uncontrollable states. This method is called when state
+   * exploration has discovered an uncontrollable state, i.e., a state
+   * where an uncontrollable event is enabled in all plants but not in
+   * all specifications. The number of the uncontrollable event and
+   * the automaton index of a specification disabling this event are provided
+   * as arguments. The uncontrollable source state is obtained by calling
+   * {@link #getCurrentSource()}. This callback is only called for analysers
+   * that enable controllability checking by overriding {@link
+   * #isSensitiveToControllability()}.
+   * @param  event  The uncontrollable event that causes controllability to
+   *                fail, identified by its event index in the output event
+   *                encoding.
+   * @param  spec   The first specification that disables the uncontrollable
+   *                event, identified by its index in the list of input
+   *                automata.
+   * @return <CODE>true</CODE> if state exploration should continue after
+   *         this uncontrollable state, <CODE>false</CODE> to stop
+   *         exploration immediately.
+   */
+  protected boolean handleUncontrollableState(final int event, final int spec)
+    throws AnalysisException
+  {
+    return true;
   }
 
   private static void createSuccessorStatesEncoded
@@ -1376,11 +1458,12 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   {
     //#######################################################################
     //# Constructor
-    private EventInfo(final EventProxy event)
+    private EventInfo(final EventProxy event, final boolean controllable)
     {
       mEvent = event;
       mOutputCode = -1;
-      mStatus = EventStatus.STATUS_NONE;
+      mStatus =
+        controllable ? EventStatus.STATUS_CONTROLLABLE : EventStatus.STATUS_NONE;
       mBlocked = false;
       mDisablingAutomata = new ArrayList<>();
       mUpdatingAutomata = new ArrayList<>();
@@ -1394,16 +1477,25 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       throws AnalysisException
     {
       mEvent = null;
-      mStatus = EventStatus.STATUS_NONE;
       mBlocked = false;
       final Collection<AutomatonEventInfo> autParts =
         new ArrayList<>(parts.size());
+      boolean first = true;
+      boolean controllable = true;
       for (final EventInfo part : parts) {
         mOutputCode = part.mOutputCode;
         assert part.mDisablingAutomata.size() == 1;
         final AutomatonEventInfo autPart = part.mDisablingAutomata.get(0);
         autParts.add(autPart);
+        if (first) {
+          controllable = part.isControllable();
+          first = false;
+        } else {
+          assert controllable == part.isControllable();
+        }
       }
+      mStatus =
+        controllable ? EventStatus.STATUS_CONTROLLABLE : EventStatus.STATUS_NONE;
       final AutomatonEventInfo merged =
         new AutomatonEventInfo(autParts, aut,
                                deadlockInfo, nondeterminismSupported);
@@ -1432,6 +1524,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     public boolean isBlocked()
     {
       return mBlocked;
+    }
+
+    public boolean isControllable()
+    {
+      return EventStatus.isControllableEvent(mStatus);
     }
 
     public boolean isLocal()
@@ -1489,6 +1586,20 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
 
     //#######################################################################
+    //# Uncontrollability
+    public boolean canCauseUncontrollability()
+    {
+      if (!isControllable()) {
+        for (final AutomatonEventInfo info : mDisablingAutomata) {
+          if (!info.isPlant() && info.getProbability() < 1.0f) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
     //# Merging of Local Events
     private boolean isMergible(final EventInfo info)
     {
@@ -1505,7 +1616,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     //# Setup
     private void reset()
     {
-      mStatus = EventStatus.STATUS_NONE;
+      mStatus = EventStatus.STATUS_CONTROLLABLE; // for reverse
       mBlocked = false;
       mDisablingAutomata.clear();
       mUpdatingAutomata.clear();
@@ -1526,7 +1637,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     {
       if (mBlocked) {
         // nothing ...
-      } else if (info.isBlocked()) {
+      } else if (info.isBlocked() &&
+                 (isControllable() || info.isPlant())) {
         mBlocked = true;
         mDisablingAutomata.clear();
         mUpdatingAutomata.clear();
@@ -1570,14 +1682,14 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
     //#######################################################################
     //# State Expansion
-    public boolean isEnabled(final int[] decoded)
+    public AutomatonEventInfo findDisabling(final int[] decoded)
     {
       for (final AutomatonEventInfo info : mDisablingAutomata) {
         if (!info.isEnabled(decoded)) {
-          return false;
+          return info;
         }
       }
-      return true;
+      return null;
     }
 
     public void createSuccessorStatesEncoded
@@ -1600,6 +1712,32 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         (mUpdateSequence, mOutputCode, decodedTarget, selfloopOnly, builder);
     }
 
+    public TraceStepProxy buildFinalTraceStep
+      (final AbstractTRMonolithicModelAnalyzer analyzer, final int s)
+    {
+      final int numAut = analyzer.mTRAutomata.length;
+      final int[] encoded =
+        new int[analyzer.mStateTupleEncoding.getNumberOfWords()];
+      final int[] decoded = new int[numAut];
+      analyzer.mStateSpace.getContents(s, encoded);
+      analyzer.mStateTupleEncoding.decode(encoded, decoded);
+      final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
+      for (final AutomatonEventInfo info : mDisablingAutomata) {
+        if (!info.isDetermistic()) {
+          final int t = info.getFirstSuccessorState(s);
+          if (t >= 0) {
+            final int a = info.getAutomatonIndex();
+            final AutomatonProxy aut = analyzer.getInputAutomaton(a);
+            final StateProxy state = analyzer.getInputState(a, t);
+            stateMap.put(aut, state);
+          }
+        }
+      }
+      final ProductDESProxyFactory factory = analyzer.getFactory();
+      return factory.createTraceStepProxy(mEvent, stateMap);
+    }
+
+
     //#######################################################################
     //# Interface java.util.Comparable<EventInfo>
     @Override
@@ -1609,6 +1747,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       final boolean stronglyForbidden2 = info.isStronglyForbidden();
       if (stronglyForbidden1 != stronglyForbidden2) {
         return stronglyForbidden1 ? -1 : 1;
+      }
+      final boolean controllable1 = isControllable();
+      final boolean controllable2 = info.isControllable();
+      if (controllable1 != controllable2) {
+        return controllable1 ? 1 : -1;
       }
       final boolean stronglyLocal1 = isStronglyLocal();
       final boolean stronglyLocal2 = info.isStronglyLocal();
@@ -1660,17 +1803,20 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     //# Constructor
     private AutomatonEventInfo(final int autIndex,
                                final TRAutomatonProxy aut,
+                               final boolean plant,
                                final int e,
+                               final boolean controllable,
                                final DeadlockInfo deadlockInfo,
-                               final boolean canBlock,
                                final boolean nondeterminismSupported)
       throws NondeterministicDESException
     {
       mAutomatonIndex = autIndex;
+      mPlant = plant;
+      mControllable = controllable;
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator.resetEvent(e);
-      countTransitions(aut, deadlockInfo, canBlock, nondeterminismSupported);
+      countTransitions(aut, deadlockInfo, true, nondeterminismSupported);
     }
 
     private AutomatonEventInfo(final Collection<AutomatonEventInfo> parts,
@@ -1682,6 +1828,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       assert !parts.isEmpty();
       final AutomatonEventInfo first = parts.iterator().next();
       mAutomatonIndex = first.mAutomatonIndex;
+      mPlant = first.mPlant;
+      mControllable = first.mControllable;
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       final int numEvents = rel.getNumberOfProperEvents();
       final EventStatusProvider provider =
@@ -1692,9 +1840,14 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           provider.setProperEventStatus(e, status);
         }
       }
+      final byte status = mControllable ?
+        EventStatus.STATUS_LOCAL | EventStatus.STATUS_CONTROLLABLE :
+        EventStatus.STATUS_LOCAL;
       for (final AutomatonEventInfo part : parts) {
+        assert mPlant == part.mPlant;
+        assert mControllable == part.mControllable;
         final int e = part.mTransitionIterator.getFirstEvent();
-        provider.setProperEventStatus(e, EventStatus.STATUS_LOCAL);
+        provider.setProperEventStatus(e, status);
       }
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator = new StatusGroupTransitionIterator
@@ -1754,6 +1907,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       return mAutomatonIndex;
     }
 
+    public boolean isPlant()
+    {
+      return mPlant;
+    }
+
     public boolean isDetermistic()
     {
       return mDeterministic;
@@ -1767,6 +1925,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     public boolean isBlocked()
     {
       return mBlocked;
+    }
+
+    public float getProbability()
+    {
+      return mProbability;
     }
 
     public TransitionIterator getTransitionIterator()
@@ -1860,23 +2023,45 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       }
     }
 
+    public int getFirstSuccessorState(final int state)
+    {
+      mTransitionIterator.resetState(state);
+      if (mTransitionIterator.advance()) {
+        return mTransitionIterator.getCurrentToState();
+      } else {
+        return -1;
+      }
+    }
+
+
     //#######################################################################
     //# Interface java.util.Comparable<AutomatonEventInfo>
     @Override
     public int compareTo(final AutomatonEventInfo info)
     {
+      if (!mControllable) {
+        final boolean prioritised1 = mPlant && mProbability < 1.0f;
+        final boolean prioritised2 = info.mPlant && info.mProbability < 1.0f;
+        if (prioritised1 && !prioritised2) {
+          return -1;
+        } else if (prioritised2 && !prioritised1) {
+          return 1;
+        }
+      }
       if (mProbability < info.mProbability) {
         return -1;
       } else if (mProbability > info.mProbability) {
         return 1;
       } else {
-        return 0;
+        return mAutomatonIndex - info.mAutomatonIndex;
       }
     }
 
     //#######################################################################
     //# Data Members
     private final int mAutomatonIndex;
+    private final boolean mPlant;
+    private final boolean mControllable;
     private boolean mDeterministic;
     private boolean mSelfloopOnly;
     private boolean mBlocked;

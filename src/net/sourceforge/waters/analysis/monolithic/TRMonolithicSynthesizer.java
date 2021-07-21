@@ -24,14 +24,14 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-public class TRMonolithicSynthesizer extends AbstractTRMonolithicModelAnalyzer implements SupervisorSynthesizer
+public class TRMonolithicSynthesizer
+  extends AbstractTRMonolithicModelAnalyzer implements SupervisorSynthesizer
 {
 
   //#########################################################################
   //# Constructors
   public TRMonolithicSynthesizer(final ProductDESProxyFactory factory)
   {
-    super();
     mFactory = factory;
   }
 
@@ -231,15 +231,12 @@ public class TRMonolithicSynthesizer extends AbstractTRMonolithicModelAnalyzer i
 
       final ProductDESProxyFactory desFactory = mFactory;
 
-
-      final int numEvents = getNumberOfProperEvents() + 1; // +1 to account for tau event
-      mPreTransitionBuffer = new PreTransitionBuffer(numEvents);
-
-      final int numStates = getStateSpace().size();
-
       final EventEncoding enc = getOutputEventEncoding();
+      final int numEvents = enc.getNumberOfProperEvents();
+      mPreTransitionBuffer = new PreTransitionBuffer(numEvents);
       final int markedEvent = enc.getEventCode(mUsedMarking);
 
+      final int numStates = getStateSpace().size();
       final ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(mOutputName,
                                          ComponentKind.SUPERVISOR,

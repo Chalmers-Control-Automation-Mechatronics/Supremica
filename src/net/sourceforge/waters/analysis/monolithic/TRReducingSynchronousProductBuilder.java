@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -44,12 +46,9 @@ import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -248,7 +247,7 @@ public class TRReducingSynchronousProductBuilder
                                            final int localIndex,
                                            final EventInfo event,
                                            final boolean terminal)
-    throws OverflowException
+    throws AnalysisException
   {
     if (localIndex < mEnabledLocalEvents.size()) {
       final StronglyLocalEventInfo info = mEnabledLocalEvents.get(localIndex);

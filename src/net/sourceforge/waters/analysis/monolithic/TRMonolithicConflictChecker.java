@@ -38,7 +38,6 @@ import gnu.trove.list.array.TIntArrayList;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.TarjanControlStack;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -60,9 +59,11 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  */
 
 public class TRMonolithicConflictChecker
-  extends AbstractTRMonolithicModelAnalyzer implements ConflictChecker
+  extends TRAbstractModelVerifier implements ConflictChecker
 {
 
+  //#########################################################################
+  //# Constructors
   public TRMonolithicConflictChecker()
   {
     this(null);
@@ -80,6 +81,44 @@ public class TRMonolithicConflictChecker
   }
 
 
+  //#########################################################################
+  //# Configuration
+  @Override
+  public void setConfiguredDefaultMarking(final EventProxy marking)
+  {
+    mConfiguredMarking = marking;
+    mUsedMarking = null;
+  }
+
+  @Override
+  public EventProxy getConfiguredDefaultMarking()
+  {
+    return mConfiguredMarking;
+  }
+
+  @Override
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
+  {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public EventProxy getConfiguredPreconditionMarking()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean isDetailedOutputEnabled()
+  {
+    // TODO implement counterexample
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Invocation
   @Override
   public void setUp()
     throws AnalysisException
@@ -99,7 +138,6 @@ public class TRMonolithicConflictChecker
   @Override
   public boolean run() throws AnalysisException
   {
-
     try {
       setUp();
 
@@ -136,6 +174,15 @@ public class TRMonolithicConflictChecker
     return getAnalysisResult().isSatisfied();
   }
 
+  @Override
+  public ConflictCounterExampleProxy getCounterExample()
+  {
+    return (ConflictCounterExampleProxy) super.getCounterExample();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void expand(final int i) throws AnalysisException {
 
     final StateTupleEncoding ste = getStateTupleEncoding();
@@ -243,76 +290,6 @@ public class TRMonolithicConflictChecker
     }
 
   }
-
-
-
-  @Override
-  public boolean isSatisfied()
-  {
-    return getAnalysisResult().isSatisfied();
-  }
-
-  @Override
-  public void setCounterExampleEnabled(final boolean enable)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public boolean isCounterExampleEnabled()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public VerificationResult getAnalysisResult()
-  {
-    return (VerificationResult) super.getAnalysisResult();
-  }
-
-  @Override
-  public VerificationResult createAnalysisResult()
-  {
-    return new DefaultVerificationResult(this);
-  }
-
-
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mConfiguredMarking = marking;
-    mUsedMarking = null;
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mConfiguredMarking;
-  }
-
-  @Override
-  public void setConfiguredPreconditionMarking(final EventProxy marking)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public EventProxy getConfiguredPreconditionMarking()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public ConflictCounterExampleProxy getCounterExample()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 
   @Override
   protected void tearDown()

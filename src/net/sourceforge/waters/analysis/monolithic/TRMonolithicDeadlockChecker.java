@@ -34,10 +34,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -54,7 +51,6 @@ import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
@@ -69,19 +65,19 @@ import org.apache.logging.log4j.Logger;
  * @author Hani al-Bahri
  */
 
-public class TRDeadlockChecker
+public class TRMonolithicDeadlockChecker
   extends TRAbstractModelVerifier
   implements DeadlockChecker
 {
 
   //#########################################################################
   //# Constructors
-  public TRDeadlockChecker()
+  public TRMonolithicDeadlockChecker()
   {
     super(ConflictKindTranslator.getInstanceControllable());
   }
 
-  public TRDeadlockChecker(final ProductDESProxy model)
+  public TRMonolithicDeadlockChecker(final ProductDESProxy model)
   {
     super(model, ConflictKindTranslator.getInstanceControllable());
   }
@@ -142,18 +138,15 @@ public class TRDeadlockChecker
   {
     boolean isDeadlock = true;
     for (final EventInfo event : getEventInfo()) {
-      if (event.isEnabled(decoded)) {
+      if (event.findDisabling(decoded) == null) {
         createSuccessorStates(encoded, decoded, event);
         isDeadlock = false;
       }
     }
     if (isDeadlock) {
-      setUpReverseTransitions();
-      final DeadlockCallback deadlockCallback = new DeadlockCallback();
-      setStateCallback(deadlockCallback);
-      // Create counter example ..
+      final int target = getCurrentSource();
       final ConflictCounterExampleProxy counterexample =
-        buildCounterExample(deadlockCallback);
+        buildCounterExample(target);
       setFailedResult(counterexample);
     }
   }
@@ -196,61 +189,15 @@ public class TRDeadlockChecker
 
 
   //#########################################################################
-  //# Methods to Build the Counterexample
-  private ConflictCounterExampleProxy buildCounterExample
-    (final DeadlockCallback callback)
-    throws OverflowException
+  //# Counterexamples
+  private ConflictCounterExampleProxy buildCounterExample(final int target)
+    throws AnalysisException
   {
-
-    final AutomatonProxy[] automataArray= getTRAutomata();
-    final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-    final int numaut = getTRAutomata().length;
-    final Map<AutomatonProxy,StateProxy> stateMap =
-                          new HashMap<AutomatonProxy,StateProxy>(numaut);
-    final int numInit = getNumberOfInitialStates();
     final ProductDESProxyFactory factory = getFactory();
-     int[] encodedSource;
-     int[] decodedSource;
-
-    int current = getCurrentSource();
-
-    // Until we reach the start state...
-    do {
-      encodedSource =
-        new int[getStateTupleEncoding().getNumberOfWords()];
-      decodedSource =
-        new int[getStateTupleEncoding().getNumberOfAutomata()];
-      getStateSpace().getContents(current, encodedSource);
-      getStateTupleEncoding().decode(encodedSource, decodedSource);
-      for (final EventInfo event : getEventInfo()) {
-        if (event.isEnabled(decodedSource)) {
-          callback.setEvent(event.getEvent());
-          // expand ..
-          createSuccessorStates(encodedSource, decodedSource, event);
-        }
-      }
-      final int next = callback.getSmallestStateIndex();
-      for (int i = 0; i < automataArray.length; i++) {
-        final AutomatonProxy aut = getInputAutomaton(i);
-        final int indx = decodedSource[i];
-        final StateProxy state = getInputState(i, indx);
-        stateMap.put(aut, state);
-      }
-      final TraceStepProxy step;
-      if (current >= numInit) {
-        final EventProxy event = callback.getSmallestStateEvent();
-        step = factory.createTraceStepProxy(event, stateMap);
-        stateMap.clear();
-        current = next;
-      } else {
-        step = factory.createTraceStepProxy(null, stateMap);
-        current = -1;
-      }
-      steps.add(0, step);
-    } while (current >= 0);
     final String traceName = getTraceName();
     final ProductDESProxy des = getModel();
     final Collection<AutomatonProxy> automata = des.getAutomata();
+    final List<TraceStepProxy> steps = buildTraceToBadState(target);
     final TraceProxy trace = factory.createTraceProxy(steps);
     return
       factory.createConflictCounterExampleProxy(traceName, null, null, des,
@@ -265,66 +212,6 @@ public class TRDeadlockChecker
   {
     final ProductDESProxy model = getModel();
     return AbstractDeadlockChecker.getTraceName(model);
-  }
-
-
-  //#########################################################################
-  //# Inner Class DeadlockCallback
-  private class DeadlockCallback implements StateCallback
-  {
-
-    //#######################################################################
-    //# Constructor
-    private DeadlockCallback()
-    {
-      final int size = getStateTupleEncoding().getNumberOfWords();
-      mEncoded = new int[size];
-      mSmallestStateIndex = getCurrentSource();
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.monolithic.
-    //# TRAbstractModelAnalyzer.StateCallback
-    @Override
-    public boolean newState(final int[] tuple)
-      throws OverflowException
-    {
-      getStateTupleEncoding().encode(tuple, mEncoded);
-      final int currentStateIndex = getStateSpace().getIndex(mEncoded);
-      // if -1; then not visited, so skip
-      if (currentStateIndex !=-1) {
-        if (currentStateIndex < mSmallestStateIndex) {
-          mSmallestStateIndex = currentStateIndex;
-          mSmallestStateEvent = mCurrentEvent;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    //#######################################################################
-    //# Simple Access
-    private void setEvent(final EventProxy event)
-    {
-      mCurrentEvent = event;
-    }
-
-    private int getSmallestStateIndex()
-    {
-      return mSmallestStateIndex;
-    }
-
-    private EventProxy getSmallestStateEvent()
-    {
-      return mSmallestStateEvent;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int[] mEncoded;
-    private int mSmallestStateIndex;
-    private EventProxy mCurrentEvent;
-    private EventProxy mSmallestStateEvent;
   }
 
 }

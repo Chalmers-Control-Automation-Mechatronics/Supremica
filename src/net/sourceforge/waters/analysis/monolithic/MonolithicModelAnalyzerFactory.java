@@ -98,10 +98,10 @@ public class MonolithicModelAnalyzerFactory
   }
 
   @Override
-  public TRDeadlockChecker createDeadlockChecker
+  public TRMonolithicDeadlockChecker createDeadlockChecker
     (final ProductDESProxyFactory factory)
   {
-    return new TRDeadlockChecker();
+    return new TRMonolithicDeadlockChecker();
   }
 
   @Override
