@@ -34,37 +34,73 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
-import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
- * A Java implementation of the monolithic controllability check algorithm,
+ * A Java implementation of the monolithic language inclusion check algorithm,
  * based on {@link ListBufferTransitionRelation} as automaton representation.
  *
  * @author Robi Malik
  */
 
-public class TRMonolithicControllabilityChecker
+public class TRMonolithicLanguageInclusionChecker
   extends TRMonolithicSafetyVerifier
-  implements ControllabilityChecker
+  implements LanguageInclusionChecker
 {
 
   //#########################################################################
   //# Constructors
-  public TRMonolithicControllabilityChecker()
+  public TRMonolithicLanguageInclusionChecker()
   {
-    super(ControllabilityKindTranslator.getInstance(),
-          ControllabilityDiagnostics.getInstance());
+    super(LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance());
   }
 
-  public TRMonolithicControllabilityChecker(final ProductDESProxy model)
+  public TRMonolithicLanguageInclusionChecker(final ProductDESProxy model)
   {
     super(model,
-          ControllabilityKindTranslator.getInstance(),
-          ControllabilityDiagnostics.getInstance());
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance());
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.monolithic.
+  //# AbstractTRMonolithicModelAnalyzer
+  @Override
+  protected void setUpAutomata()
+    throws AnalysisException
+  {
+    super.setUpAutomata();
+    final int numAut = getTRAutomata().length;
+    int failedSpec = -1;
+    for (int a = 0; a < numAut; a++) {
+      final TRAutomatonProxy aut = getTRAutomaton(a);
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      if (rel.getFirstInitialState() < 0) {
+        final KindTranslator translator = getKindTranslator();
+        if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+          setSatisfiedResult();
+          return;
+        } else {
+          failedSpec = a;
+        }
+      }
+    }
+    if (failedSpec >= 0) {
+      final SafetyCounterExampleProxy counterExample =
+        buildCounterExample(-1, -1, failedSpec);
+      setFailedResult(counterExample);
+    }
   }
 
 }

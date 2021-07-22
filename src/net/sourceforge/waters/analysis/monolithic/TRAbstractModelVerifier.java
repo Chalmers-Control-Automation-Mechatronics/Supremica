@@ -154,22 +154,9 @@ public abstract class TRAbstractModelVerifier
   //#########################################################################
   //# Invocation
   @Override
-  protected void setUp()
-    throws AnalysisException
-  {
-    super.setUp();
-  }
-
-  @Override
   public VerificationResult createAnalysisResult()
   {
     return new DefaultVerificationResult(this);
-  }
-
-  @Override
-  protected void tearDown()
-  {
-    super.tearDown();
   }
 
 
@@ -201,6 +188,13 @@ public abstract class TRAbstractModelVerifier
 
   //#########################################################################
   //# Counterexamples
+  @Override
+  protected void tearDown()
+  {
+    setStateCallback(null);
+    super.tearDown();
+  }
+
   protected List<TraceStepProxy> buildTraceToBadState(int target)
     throws AnalysisException
   {

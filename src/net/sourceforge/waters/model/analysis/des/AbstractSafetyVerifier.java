@@ -35,9 +35,6 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -45,6 +42,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 
 /**
@@ -67,6 +67,8 @@ public abstract class AbstractSafetyVerifier
    * Creates a new safety verifier.
    * @param  translator  The kind translator is used to remap component and
    *                     event kinds.
+   * @param  diag        Diagnostics object to generate names and comments
+   *                     for counterexamples.
    * @param  factory     The factory used for trace construction.
    */
   public AbstractSafetyVerifier(final KindTranslator translator,
@@ -81,6 +83,8 @@ public abstract class AbstractSafetyVerifier
    * @param  model       The model to be checked by this verifier.
    * @param  translator  The kind translator is used to remap component and
    *                     event kinds.
+   * @param  diag        Diagnostics object to generate names and comments
+   *                     for counterexamples.
    * @param  factory     The factory used for trace construction.
    */
   public AbstractSafetyVerifier(final ProductDESProxy model,

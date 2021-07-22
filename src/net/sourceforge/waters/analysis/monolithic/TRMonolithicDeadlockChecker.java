@@ -125,14 +125,6 @@ public class TRMonolithicDeadlockChecker
   }
 
   @Override
-  protected void tearDown()
-  {
-    setStateCallback(null);
-    super.tearDown();
-  }
-
-
-  @Override
   protected void expandState(final int[] encoded, final int[] decoded)
     throws AnalysisException
   {

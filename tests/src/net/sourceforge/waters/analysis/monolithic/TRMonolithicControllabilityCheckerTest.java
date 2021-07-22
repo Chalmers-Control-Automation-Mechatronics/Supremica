@@ -33,38 +33,41 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.model.analysis.
+  AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
-import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-/**
- * A Java implementation of the monolithic controllability check algorithm,
- * based on {@link ListBufferTransitionRelation} as automaton representation.
- *
- * @author Robi Malik
- */
-
-public class TRMonolithicControllabilityChecker
-  extends TRMonolithicSafetyVerifier
-  implements ControllabilityChecker
+public class TRMonolithicControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
-  //# Constructors
-  public TRMonolithicControllabilityChecker()
-  {
-    super(ControllabilityKindTranslator.getInstance(),
-          ControllabilityDiagnostics.getInstance());
+  //# Entry points in junit.framework.TestCase
+  public static Test suite() {
+    final TestSuite testSuite =
+      new TestSuite(TRMonolithicControllabilityCheckerTest.class);
+    return testSuite;
   }
 
-  public TRMonolithicControllabilityChecker(final ProductDESProxy model)
+  public static void main(final String[] args)
   {
-    super(model,
-          ControllabilityKindTranslator.getInstance(),
-          ControllabilityDiagnostics.getInstance());
+    junit.textui.TestRunner.run(suite());
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
+  protected ControllabilityChecker
+    createModelVerifier(final ProductDESProxyFactory factory)
+  {
+    return new TRMonolithicControllabilityChecker();
   }
 
 }

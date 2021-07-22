@@ -72,6 +72,27 @@ public class TRMonolithicModelAnalyzerFactory
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
   @Override
+  public TRMonolithicControllabilityChecker createControllabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRMonolithicControllabilityChecker();
+  }
+
+  @Override
+  public TRMonolithicDeadlockChecker createDeadlockChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRMonolithicDeadlockChecker();
+  }
+
+  @Override
+  public TRMonolithicLanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRMonolithicLanguageInclusionChecker();
+  }
+
+  @Override
   public TRSynchronousProductBuilder createSynchronousProductBuilder
     (final ProductDESProxyFactory factory)
   {
