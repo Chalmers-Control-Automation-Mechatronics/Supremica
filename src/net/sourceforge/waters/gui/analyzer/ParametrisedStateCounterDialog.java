@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
-import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
+import net.sourceforge.waters.gui.dialog.AnalysisOperationProgressDialog;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -71,8 +71,10 @@ public class ParametrisedStateCounterDialog extends ParametrisedAnalysisDialog
   }
 
   @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog
-    (final IDE ide, final ProductDESProxy des)
+  protected AnalysisOperationProgressDialog createAnalyzeDialog
+    (final IDE ide,
+     final ProductDESProxy des,
+     final ModelAnalyzerFactoryLoader loader)
   {
     final StateCounter counter = getAnalyzer();
     counter.setModel(des);
@@ -82,7 +84,7 @@ public class ParametrisedStateCounterDialog extends ParametrisedAnalysisDialog
 
   //#########################################################################
   //# Inner Class StateCounterPopUpDialog
-  private class StateCounterPopUpDialog extends WatersAnalyzeDialog
+  private class StateCounterPopUpDialog extends AnalysisOperationProgressDialog
   {
     //#######################################################################
     //# Constructor

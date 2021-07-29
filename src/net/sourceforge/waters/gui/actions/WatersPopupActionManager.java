@@ -41,8 +41,6 @@ import java.net.URI;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -51,6 +49,8 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 
@@ -440,34 +440,44 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerDiagnosabilityCheckAction.class);
   }
 
+  public IDEAction getAnalyzerHideAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerHideAction.class);
+  }
+
+  public IDEAction getAnalyzerHideAction(final AutomatonProxy aut)
+  {
+    return new AnalyzerHideAction(mIDE, aut);
+  }
+
   public IDEAction getAnalyzerLanguageInclusionCheckAction()
   {
     final WatersActionManager master = mIDE.getActions();
     return master.getAction(AnalyzerLanguageInclusionCheckAction.class);
   }
 
-  public IDEAction getAnalyzerStateCounterCheckAction()
+  public IDEAction getAnalyzerStateCountAction()
   {
     final WatersActionManager master = mIDE.getActions();
     return master.getAction(AnalyzerCountStatesAction.class);
+  }
+
+  public IDEAction getAnalyzerSimplificationAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerSimplificationAction.class);
+  }
+
+  public IDEAction getAnalyzerSimplificationAction(final AutomatonProxy aut)
+  {
+    return new AnalyzerSimplificationAction(mIDE, aut);
   }
 
   public IDEAction getAnalyzerWorkbenchAction()
   {
     final WatersActionManager master = mIDE.getActions();
     return master.getAction(AnalyzerWorkbenchAction.class);
-  }
-
-  public IDEAction getAnalyzerTRSimplifierAction()
-  {
-    final WatersActionManager master = mIDE.getActions();
-    return master.getAction(AnalyzerSimplifierAction.class);
-  }
-
-  public IDEAction getAnalyzerHideAction()
-  {
-    final WatersActionManager master = mIDE.getActions();
-    return master.getAction(AnalyzerHideAction.class);
   }
 
   //#########################################################################

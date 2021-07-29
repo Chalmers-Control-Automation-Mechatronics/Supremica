@@ -107,8 +107,9 @@ class AliasesTreePopupFactory
       addPropertiesAndDeleteMenuItems(proxy);
       return null;
     }
-
   }
+
+
   //#######################################################################
   //# Data Members
   private final AliasesTreePopupVisitor mVisitor;

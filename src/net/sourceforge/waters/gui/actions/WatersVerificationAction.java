@@ -38,7 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
-import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
+import net.sourceforge.waters.gui.dialog.VerificationProgressDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -100,7 +100,7 @@ public class WatersVerificationAction
       verifier.setModel(des);
       new EditorVerificationDialog(ide, verifier);
     } catch (final AnalysisConfigurationException exception) {
-      new WatersVerificationDialog(ide, mOperation, exception);
+      new VerificationProgressDialog(ide, mOperation, exception);
     }
   }
 
@@ -157,7 +157,7 @@ public class WatersVerificationAction
 
   //#########################################################################
   //# Inner Class EditorVerificationDialog
-  private class EditorVerificationDialog extends WatersVerificationDialog
+  private class EditorVerificationDialog extends VerificationProgressDialog
   {
     //#######################################################################
     //# Constructor

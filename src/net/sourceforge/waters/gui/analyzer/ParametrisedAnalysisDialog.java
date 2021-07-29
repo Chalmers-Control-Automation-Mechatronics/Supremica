@@ -33,54 +33,73 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.gui.dialog.VerificationProgressDialog;
+import net.sourceforge.waters.gui.options.ParametrisedInvocationDialog;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
 
-import org.supremica.gui.ide.IDE;
 
 /**
- * The dialog to launch a deadlock check from the Waters analyser.
+ * Dialog for a verification, synthesis, or similar operation invoked
+ * through the Waters analyser. The specific operation is specified as
+ * an {@link AnalysisOperation}, which determines an option page that
+ * is used to create a GUI.
  *
  * @author Brandon Bassett
  */
-public class ParametrisedVerificationDialog extends ParametrisedAnalysisDialog
-{
 
+public abstract class ParametrisedAnalysisDialog
+  extends ParametrisedInvocationDialog<ModelAnalyzerFactoryLoader>
+{
   //#########################################################################
   //# Constructor
-  public ParametrisedVerificationDialog(final WatersAnalyzerPanel panel,
-                                        final AnalysisOperation operation)
+  public ParametrisedAnalysisDialog(final WatersAnalyzerPanel panel,
+                                    final AnalysisOperation operation)
   {
-    super(panel, operation);
+    super(panel, operation.getOptionPage());
+    mOperation = operation;
+    setTitle(operation.getLongWindowTitle());
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
-  @Override
-  protected ModelVerifier getAnalyzer()
+  //# Simple Access
+  public AnalysisOperation getOperation()
   {
-    return (ModelVerifier) super.getAnalyzer();
+    return mOperation;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.gui.options.ParametrisedInvocationDialog
+  @Override
+  protected AnalysisOptionPage getOptionPage()
+  {
+    return mOperation.getOptionPage();
   }
 
   @Override
-  protected VerificationProgressDialog createAnalyzeDialog
-    (final IDE ide,
-     final ProductDESProxy des,
-     final ModelAnalyzerFactoryLoader loader)
+  protected ModelAnalyzer createModelAnalyzer(final ModelAnalyzerFactoryLoader loader)
+    throws AnalysisConfigurationException, ClassNotFoundException
   {
-    final AnalysisOperation operation = getOperation();
-    final ModelVerifier verifier = getAnalyzer();
-    verifier.setModel(des);
-    return new VerificationProgressDialog(ide, operation, verifier);
+    final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return mOperation.createModelAnalyzer(factory, desFactory);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final AnalysisOperation mOperation;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 7587116260533051091L;
+  private static final long serialVersionUID = -3610355726871200803L;
 
 }

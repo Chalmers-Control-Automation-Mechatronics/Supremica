@@ -37,8 +37,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -46,47 +44,41 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
-import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
-import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
-import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.dialog.AnalysisProgressDialog;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.SimplifierOptionPage;
-import net.sourceforge.waters.model.options.WatersOptionPages;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.sourceforge.waters.model.options.SelectorLeafOptionPage;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * Abstract class that auto-generates a dialog to configure and
- * invoke a transition relation simplifier from the Waters Analyser.
+ * Superclass for dialogs that invoke an analysis or simplification
+ * operation in the Waters Analyser. Generates a GUI to select algorithms
+ * and/or options based on a {@link SelectorLeafOptionPage}.
  *
- * @author Benjamin Wheeler
+ * @author Brandon Bassett
  */
 
-public abstract class ParametrisedSimplifierDialog extends JDialog
+public abstract class ParametrisedInvocationDialog<S> extends JDialog
 {
   //#########################################################################
   //# Constructor
-  public ParametrisedSimplifierDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedInvocationDialog(final WatersAnalyzerPanel panel,
+                                      final SelectorLeafOptionPage<S> page)
   {
     super(panel.getModuleContainer().getIDE());
-    final ErrorLabel errorLabel = new ErrorLabel();
-    mContext = new GUIOptionContext(panel, this, errorLabel);
-    mPage = WatersOptionPages.SIMPLIFICATION;
+    mErrorLabel = new ErrorLabel();
+    mContext = new GUIOptionContext(panel, this, mErrorLabel);
 
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
@@ -97,12 +89,12 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mPanel = mContext.createSelectorLeafOptionPageEditor(mPage);
+    mPanel = mContext.createSelectorLeafOptionPageEditor(page);
     add(mPanel, constraints);
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
-    errorPanel.add(errorLabel);
+    errorPanel.add(mErrorLabel);
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weighty = 0.0;
     add(errorPanel, constraints);
@@ -132,19 +124,9 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
     pack();
     setLocationRelativeTo(mContext.getIDE());
-
-    final int numSelected = mContext.getWatersAnalyzerPanel()
-      .getAutomataTable()
-      .getCurrentSelection()
-      .size();
-    if (numSelected == 1) {
-      setVisible(true);
-    }
-    else {
-      LogManager.getLogger().error("Exactly one automaton must be selected.");
-      dispose();
-    }
+    setVisible(true);
   }
+
 
   //#########################################################################
   //# Simple Access
@@ -153,76 +135,99 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     return mContext;
   }
 
+  protected ProductDESProxyFactory getProductDESProxyFactory()
+  {
+    return mContext.getProductDESProxyFactory();
+  }
+
+  protected ModelAnalyzer getAnalyzer()
+  {
+    if (mCurrentModelAnalyzer == null) {
+      updateModelAnalyzer();
+    }
+    return mCurrentModelAnalyzer;
+  }
+
+
+  //#########################################################################
+  //# Hooks
+  /**
+   * Returns the option page used to generate this dialog.
+   */
+  protected abstract SelectorLeafOptionPage<S> getOptionPage();
+
+  /**
+   * Creates a new model analyser.
+   * @param  selector  The current value for the top selector option
+   *                   in the GUI, which determines what kind of analyser
+   *                   is needed.
+   */
+  protected abstract ModelAnalyzer createModelAnalyzer(S selector)
+    throws AnalysisConfigurationException, ClassNotFoundException;
+
+  /**
+   * Configures a model analyser based on the committed options in the
+   * option page.
+   * @param  analyzer  The analyser to be configured.
+   */
+  protected void configureModelAnalyzer(final ModelAnalyzer analyzer)
+  {
+    final SelectorLeafOptionPage<S> page = getOptionPage();
+    for (final Option<?> option : mCurrentModelAnalyzer.getOptions(page)) {
+      mCurrentModelAnalyzer.setOption(option);
+    }
+  }
+
+  /**
+   * Generates the pop-up dialog that shows progress while running the
+   * analysis operation and/or its result.
+   */
+  protected abstract AnalysisProgressDialog createAnalyzeDialog
+    (IDE ide, ProductDESProxy des, S selector);
+
+
   //#########################################################################
   //# Auxiliary Methods
   private void commitDialog()
   {
     final IDE ide = mContext.getIDE();
-
-    final WatersAnalyzerPanel panel = mContext.getWatersAnalyzerPanel();
-    final AutomataTable table = panel.getAutomataTable();
-    final List<AutomatonProxy> automata = table.getOperationArgument();
-    final AutomatonProxy aut = automata.iterator().next();
-
-    final AutomataTableModel model = panel.getAutomataTableModel();
-
-    final Logger logger = LogManager.getLogger();
-
-    try {
-
-      final ProductDESProxyFactory factory =
-        mContext.getProductDESProxyFactory();
-
-      final FocusTracker tracker = ide.getFocusTracker();
-      if (tracker.shouldYieldFocus(this)) {
-        mPanel.commitOptions();
-        final AutomatonSimplifierCreator creator =
-          mPanel.getSelectedValue();
-        final AutomatonBuilder builder = creator.createBuilder(factory);
-        builder.setModel(aut);
-
-        final BooleanOption keepOriginalOption = (BooleanOption) mPage.get
-          (AutomatonSimplifierFactory.
-           OPTION_AutomatonSimplifierFactory_KeepOriginal);
-        final boolean keepOriginal = keepOriginalOption.getBooleanValue();
-        if (keepOriginal) {
-          final String newName = model.getUniqueAutomatonName(aut.getName());
-          builder.setOutputName(newName);
-        } else {
-          builder.setOutputName(aut.getName());
-        }
-
-        for (final Option<?> option : mPage.getCurrentOptions()) {
-          builder.setOption(option);
-        }
-        builder.run();
-        final AutomatonProxy result = builder.getComputedAutomaton();
-        if (keepOriginal) {
-          model.insertRow(result);
-          final List<AutomatonProxy> autList = new ArrayList<>();
-          autList.add(result);
-          table.clearSelection();
-          table.addToSelection(autList);
-          table.scrollToVisible(autList);
-        } else {
-          model.replaceAutomaton(aut, result);
-        }
+    final FocusTracker tracker = ide.getFocusTracker();
+    if (tracker.shouldYieldFocus(this)) {
+      mPanel.commitOptions();
+      final S selector = updateModelAnalyzer();
+      if (selector != null) {
+        configureModelAnalyzer(mCurrentModelAnalyzer);
+        final ProductDESProxy des = mContext.getProductDES();
+        final JDialog dialog = createAnalyzeDialog(ide, des, selector);
         dispose();
+        if (dialog != null) {
+          dialog.setVisible(true);
+        }
       }
-
-    } catch (final AnalysisException exception) {
-      logger.error(exception.getMessage());
-      return;
     }
+  }
 
+  private S updateModelAnalyzer()
+  {
+    try {
+      final S selector = mPanel.getSelectedValue();
+      mCurrentModelAnalyzer = createModelAnalyzer(selector);
+      return selector;
+    } catch (final ClassNotFoundException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final AnalysisConfigurationException exception) {
+      mErrorLabel.displayError(exception.getMessage());
+      return null;
+    }
   }
 
 
   //#########################################################################
   //# Data Members
   private final GUIOptionContext mContext;
-  private final SelectorLeafOptionPagePanel<AutomatonSimplifierCreator> mPanel;
-  private final SimplifierOptionPage mPage;
+  private final SelectorLeafOptionPagePanel<S> mPanel;
+  private final ErrorLabel mErrorLabel;
+  private ModelAnalyzer mCurrentModelAnalyzer;
 
 
   //#########################################################################

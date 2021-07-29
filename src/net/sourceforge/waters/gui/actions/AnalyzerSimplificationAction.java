@@ -34,29 +34,38 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.SimplifierDialog;
+import net.sourceforge.waters.gui.analyzer.ParametrisedSimplificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the Simplifier dialog in the Waters analyser.
+ * The action to invoke a simplification operation (with dialog) in the
+ * Waters analyser.
  *
  * @author Benjamin Wheeler
  */
 
-public class AnalyzerSimplifierAction extends WatersAnalyzerAction
+public class AnalyzerSimplificationAction extends WatersAnalyzerAction
 {
   //#########################################################################
   //# Constructor
-  protected AnalyzerSimplifierAction(final IDE ide)
+  AnalyzerSimplificationAction(final IDE ide)
+  {
+    this(ide, null);
+  }
+
+  AnalyzerSimplificationAction(final IDE ide, final AutomatonProxy aut)
   {
     super(ide);
+    mAutomaton = aut;
     putValue(Action.NAME, "Simplify ...");
     updateEnabledStatus();
   }
@@ -65,11 +74,22 @@ public class AnalyzerSimplifierAction extends WatersAnalyzerAction
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   @Override
-  public void actionPerformed(final ActionEvent arg0)
+  public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();
     if (ide != null) {
-      new SimplifierDialog(getAnalyzerPanel());
+      final AutomatonProxy aut;
+      if (mAutomaton == null) {
+        final AutomataTable table = getAnalyzerTable();
+        final List<AutomatonProxy> automata = table.getOperationArgument();
+        if (automata.isEmpty()) {
+          return;
+        }
+        aut = automata.iterator().next();
+      } else {
+        aut = mAutomaton;
+      }
+      new ParametrisedSimplificationDialog(getAnalyzerPanel(), aut);
     }
   }
 
@@ -89,17 +109,28 @@ public class AnalyzerSimplifierAction extends WatersAnalyzerAction
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    final AutomataTable table = getAnalyzerTable();
-    if (table == null || table.getSelectedRowCount() != 1) {
-      setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Apply a simplification algorithm to an automaton");
-    } else {
+    if (mAutomaton != null) {
       setEnabled(true);
       putValue(Action.SHORT_DESCRIPTION,
-               "Apply a simplification algorithm to the selected automaton");
+               "Apply a simplification algorithm to this automaton");
+    } else {
+      final AutomataTable table = getAnalyzerTable();
+      if (table == null || table.getSelectedRowCount() != 1) {
+        setEnabled(false);
+        putValue(Action.SHORT_DESCRIPTION,
+          "Apply a simplification algorithm to an automaton");
+      } else {
+        setEnabled(true);
+        putValue(Action.SHORT_DESCRIPTION,
+          "Apply a simplification algorithm to the selected automaton");
+      }
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final AutomatonProxy mAutomaton;
 
 
   //#########################################################################

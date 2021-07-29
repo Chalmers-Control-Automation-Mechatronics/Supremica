@@ -35,14 +35,15 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AnalyzerHideDialog;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 import org.supremica.gui.ide.IDE;
 
@@ -57,11 +58,16 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
 {
   //#########################################################################
   //# Constructor
-  protected AnalyzerHideAction(final IDE ide)
+  AnalyzerHideAction(final IDE ide)
+  {
+    this(ide, null);
+  }
+
+  AnalyzerHideAction(final IDE ide, final AutomatonProxy aut)
   {
     super(ide);
+    mAutomaton = aut;
     putValue(Action.NAME, "Hide Events ...");
-    putValue(Action.SHORT_DESCRIPTION, "Hide events in the selected automaton");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_H);
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_HIDE);
     updateEnabledStatus();
@@ -71,16 +77,22 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   @Override
-  public void actionPerformed(final ActionEvent arg0)
+  public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();
     if (ide != null) {
-      final WatersAnalyzerPanel panel = getAnalyzerPanel();
-      final AutomataTable table = panel.getAutomataTable();
-      final int rowCount = table.getSelectedRowCount();
-      if (rowCount == 1) {
-        new AnalyzerHideDialog(ide, panel);
+      final AutomatonProxy aut;
+      if (mAutomaton == null) {
+        final AutomataTable table = getAnalyzerTable();
+        final List<AutomatonProxy> automata = table.getOperationArgument();
+        if (automata.isEmpty()) {
+          return;
+        }
+        aut = automata.iterator().next();
+      } else {
+        aut = mAutomaton;
       }
+      new AnalyzerHideDialog(ide, getAnalyzerPanel(), aut);
     }
   }
 
@@ -100,9 +112,26 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    final AutomataTable table = getAnalyzerTable();
-    setEnabled(table != null && table.getSelectedRowCount() == 1);
+    if (mAutomaton != null) {
+      setEnabled(true);
+      putValue(Action.SHORT_DESCRIPTION, "Hide events in this automaton");
+    } else {
+      final AutomataTable table = getAnalyzerTable();
+      if (table == null || table.getSelectedRowCount() != 1) {
+        setEnabled(false);
+        putValue(Action.SHORT_DESCRIPTION, "Hide events in an automaton");
+      } else {
+        setEnabled(true);
+        putValue(Action.SHORT_DESCRIPTION,
+                 "Hide events in the selected automaton");
+      }
+    }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final AutomatonProxy mAutomaton;
 
 
   //#########################################################################

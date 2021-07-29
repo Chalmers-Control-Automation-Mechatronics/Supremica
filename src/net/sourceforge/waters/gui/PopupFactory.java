@@ -54,6 +54,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
  * <P>Any component using pop-up menus should use a subclass of this class
  * and override some of the methods:</P>
  * <UL>
+ * <LI>{@link #addMenuItems(Proxy) addMenuItems()}</LI>
  * <LI>{@link #addDefaultMenuItems()}</LI>
  * <LI>{@link #addItemSpecificMenuItems(Proxy) addItemSpecificMenuItems()}</LI>
  * <LI>{@link #addCommonMenuItems()}</LI>
@@ -155,12 +156,7 @@ public abstract class PopupFactory
   {
     final JPopupMenu popup = mPopupMenu = new JPopupMenu();
     mEvent = event;
-    if (proxy == null) {
-      addDefaultMenuItems();
-    } else {
-      addItemSpecificMenuItems(proxy);
-    }
-    addCommonMenuItems();
+    addMenuItems(proxy);
     mPopupMenu = null;
     return popup;
   }
@@ -173,11 +169,20 @@ public abstract class PopupFactory
     return mMaster;
   }
 
+  /**
+   * The popup menu being created. This method is used to query the
+   * menu during execution of {@link #addMenuItems(Proxy) addMenuItems()}.
+   * This access is provided to facilitate the creation of context-sensitive
+   * menus using visitors.
+   */
   protected JPopupMenu getPopup()
   {
     return mPopupMenu;
   }
 
+  /**
+   * The event that triggered the creation of the current popup.
+   */
   protected MouseEvent getEvent()
   {
     return mEvent;
@@ -187,10 +192,33 @@ public abstract class PopupFactory
   //#########################################################################
   //# Shared Menu Items
   /**
+   * Populates a popup menu.
+   * By default, this method is called when creating a popup menu before
+   * adding any items. The default behaviour is to call either
+   * {@link #addDefaultMenuItems()} or {@link #addItemSpecificMenuItems(Proxy)
+   * addItemSpecificMenuItems()}, depending on whether the popup is created
+   * with an item under the cursor, and afterwards call {@link
+   * #addCommonMenuItems()}. When overriding this method, the popup menu to
+   * be populated is available through {@link #getPopup()}.
+   * @param  proxy  The item under the cursor when the popup is created,
+   *                or <CODE>null</CODE>.
+   */
+  protected void addMenuItems(final Proxy proxy)
+  {
+    if (proxy == null) {
+      addDefaultMenuItems();
+    } else {
+      addItemSpecificMenuItems(proxy);
+    }
+    addCommonMenuItems();
+  }
+
+  /**
    * Adds default menu items to the menu.
-   * This method is called when creating a popup without any item under
-   * the cursor. Menu items are inserted at the beginning of the menu,
-   * instead of any item-specific actions, before the common menu items.
+   * By default, this method is called from {@link #addMenuItems(Proxy)
+   * addMenuItems()} when creating a popup without any item under the cursor.
+   * Menu items are inserted at the beginning of the menu, instead of any
+   * item-specific actions, before the common menu items.
    */
   protected void addDefaultMenuItems()
   {
@@ -200,12 +228,14 @@ public abstract class PopupFactory
 
   /**
    * Adds menu items for a specific object to the menu.
-   * This method is called when creating a popup without with the given
+   * By default, this method is called from {@link #addMenuItems(Proxy)
+   * addMenuItems()} when creating a popup without with the given
    * <CODE>proxy</CODE> under the cursor. Menu items are inserted at the
-   * beginning of the menu, before the common menu items.
-   * This method can be overridden by subclasses to provided context-specific
-   * popup menus. The default implementation merely calls {@link
+   * beginning of the menu, before the common menu items. This method can
+   * be overridden by subclasses to provide context-specific popup menus.
+   * The default implementation merely calls {@link
    * #addPropertiesAndDeleteMenuItems(Proxy) addPropertiesAndDeleteMenuItems()}.
+   * @param  proxy  The item under the cursor.
    */
   protected void addItemSpecificMenuItems(final Proxy proxy)
   {
@@ -232,10 +262,11 @@ public abstract class PopupFactory
 
   /**
    * Adds common menu items to the menu.
-   * This method is called after the insertion of the item-specific (or
-   * default) menu items has been completed. It adds menu items that are
-   * always available in the panel. The default creates the generic
-   * 'cut', 'copy', 'paste', 'select all', and 'deselect all' menu buttons.
+   * By default, this method is called from {@link #addMenuItems(Proxy)
+   * addMenuItems()} after the insertion of the item-specific (or default)
+   * menu items has been completed. It adds menu items that are always
+   * available in the panel. The default creates the generic 'cut', 'copy',
+   *  'paste', 'select all', and 'deselect all' menu buttons.
    */
   protected void addCommonMenuItems()
   {

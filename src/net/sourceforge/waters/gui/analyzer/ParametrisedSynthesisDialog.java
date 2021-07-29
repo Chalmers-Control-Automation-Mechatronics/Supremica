@@ -35,10 +35,10 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.dialog.AnalysisOperationProgressDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
-import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -73,8 +73,10 @@ public class ParametrisedSynthesisDialog extends ParametrisedAnalysisDialog
   }
 
   @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog
-    (final IDE ide, final ProductDESProxy des)
+  protected AnalysisOperationProgressDialog createAnalyzeDialog
+    (final IDE ide,
+     final ProductDESProxy des,
+     final ModelAnalyzerFactoryLoader loader)
   {
     final SupervisorSynthesizer synthesizer = getAnalyzer();
     synthesizer.setModel(des);
@@ -84,7 +86,7 @@ public class ParametrisedSynthesisDialog extends ParametrisedAnalysisDialog
 
   //#########################################################################
   //# Inner Class SynthesisPopUpDialog
-  private class SynthesisPopUpDialog extends WatersAnalyzeDialog
+  private class SynthesisPopUpDialog extends AnalysisOperationProgressDialog
   {
     //#######################################################################
     //# Constructor

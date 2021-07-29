@@ -50,25 +50,28 @@ import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
+ * A dialog to be displayed while and after an analysis operation is
+ * running. It informs the user of the running operation and provides
+ * a button to abort the operation. When the operation is finished,
+ * it may display information about the result and possibly further
+ * options, e.g. switching to counterexample visualisation.
+ *
  * @author George Hewlett, Andrew Holland, Robi Malik
  */
 
-public abstract class WatersAnalyzeDialog extends JDialog
+public abstract class AnalysisProgressDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
-  private WatersAnalyzeDialog(final IDE owner,
-                              final AnalysisOperation operation)
+  private AnalysisProgressDialog(final IDE owner)
   {
     super(owner);
-    mOperation = operation;
     mBottomPanel = new JPanel();
     mInformationLabel = new JLabel();
     mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -83,12 +86,11 @@ public abstract class WatersAnalyzeDialog extends JDialog
     pane.add(mBottomPanel, BorderLayout.SOUTH);
   }
 
-  protected WatersAnalyzeDialog(final IDE owner,
-                                final AnalysisOperation operation,
-                                final ModelAnalyzer analyzer)
+  protected AnalysisProgressDialog(final IDE owner,
+                                   final ModelAnalyzer analyzer,
+                                   final String title)
   {
-    this(owner, operation);
-    final String title = getWindowTitle();
+    this(owner);
     setTitle("Running " + title);
     setInformationText(title + " is running...");
     mAnalyzer = analyzer;
@@ -107,11 +109,10 @@ public abstract class WatersAnalyzeDialog extends JDialog
     mRunner.start();
   }
 
-  protected WatersAnalyzeDialog(final IDE owner,
-                                final AnalysisOperation operation,
-                                final Throwable exception)
+  protected AnalysisProgressDialog(final IDE owner,
+                                   final Throwable exception)
   {
-    this(owner, operation);
+    this(owner);
     error(exception);
     setVisible(true);
   }
@@ -124,11 +125,6 @@ public abstract class WatersAnalyzeDialog extends JDialog
     return (IDE) getOwner();
   }
 
-  protected AnalysisOperation getOperation()
-  {
-    return mOperation;
-  }
-
   protected ModelAnalyzer getModelAnalyzer()
   {
     return mAnalyzer;
@@ -137,14 +133,17 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   //#########################################################################
   //# Abstract Methods
-  protected String getWindowTitle()
+  protected abstract String getWindowTitle();
+
+  protected String getFailureText()
   {
-    return mOperation.getLongWindowTitle();
+    return getWindowTitle() + " Failed";
   }
 
-  protected abstract String getFailureText();
-
-  protected abstract String getSuccessText();
+  protected String getSuccessText()
+  {
+    return getWindowTitle() + " Successful";
+  }
 
 
   //#########################################################################
@@ -160,7 +159,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent e)
       {
-        WatersAnalyzeDialog.this.dispose();
+        AnalysisProgressDialog.this.dispose();
       }
     });
     setLocationAndSize();
@@ -177,7 +176,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent e)
       {
-        WatersAnalyzeDialog.this.dispose();
+        AnalysisProgressDialog.this.dispose();
       }
     });
     setLocationAndSize();
@@ -198,7 +197,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent e)
       {
-        WatersAnalyzeDialog.this.dispose();
+        AnalysisProgressDialog.this.dispose();
       }
     });
     setLocationAndSize();
@@ -286,7 +285,6 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   //#########################################################################
   //# Data Members
-  private final AnalysisOperation mOperation;
   private final JPanel mBottomPanel;
   private final JButton mExitButton;
   private final JLabel mInformationLabel;

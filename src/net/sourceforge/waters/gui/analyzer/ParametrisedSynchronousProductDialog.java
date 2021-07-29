@@ -33,11 +33,11 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.dialog.AnalysisOperationProgressDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
-import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -75,8 +75,10 @@ public class ParametrisedSynchronousProductDialog
   }
 
   @Override
-  protected WatersAnalyzeDialog createAnalyzeDialog
-    (final IDE ide, final ProductDESProxy des)
+  protected AnalysisOperationProgressDialog createAnalyzeDialog
+    (final IDE ide,
+     final ProductDESProxy des,
+     final ModelAnalyzerFactoryLoader loader)
   {
     final SynchronousProductBuilder builder = getAnalyzer();
     builder.setModel(des);
@@ -86,7 +88,7 @@ public class ParametrisedSynchronousProductDialog
 
   //#########################################################################
   //# Inner Class SynchronousProductPopUpDialog
-  private class SynchronousProductPopUpDialog extends WatersAnalyzeDialog
+  private class SynchronousProductPopUpDialog extends AnalysisOperationProgressDialog
   {
     //#######################################################################
     //# Constructor

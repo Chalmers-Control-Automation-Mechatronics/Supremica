@@ -52,24 +52,33 @@ import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
+ * A dialog to be displayed while and after a verification operation is
+ * running. It informs the user of the running operation and provides
+ * a button to abort the operation. When the operation is finished,
+ * it displays the result and offers to switch to counterexample
+ * visualisation.
+ *
+ * This is a specific subclass of {@link AnalysisOperationProgressDialog}
+ * to support verification-specific functionality.
+ *
  * @author Robi Malik
  */
 
-public class WatersVerificationDialog extends WatersAnalyzeDialog
+public class VerificationProgressDialog extends AnalysisOperationProgressDialog
 {
 
   //#########################################################################
   //# Constructor
-  public WatersVerificationDialog(final IDE owner,
-                                  final AnalysisOperation operation,
-                                  final ModelVerifier verifier)
+  public VerificationProgressDialog(final IDE owner,
+                                    final AnalysisOperation operation,
+                                    final ModelVerifier verifier)
   {
     super(owner, operation, verifier);
   }
 
-  public WatersVerificationDialog(final IDE owner,
-                                  final AnalysisOperation operation,
-                                  final Throwable exception)
+  public VerificationProgressDialog(final IDE owner,
+                                    final AnalysisOperation operation,
+                                    final Throwable exception)
   {
     super(owner, operation, exception);
   }
@@ -136,7 +145,7 @@ public class WatersVerificationDialog extends WatersAnalyzeDialog
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          WatersVerificationDialog.this.dispose();
+          VerificationProgressDialog.this.dispose();
           final IDE ide = getIDE();
           final ModuleContainer container =
             (ModuleContainer) ide.getActiveDocumentContainer();

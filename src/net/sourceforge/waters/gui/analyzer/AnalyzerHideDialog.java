@@ -52,8 +52,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sourceforge.waters.model.options.EventSetOption;
-import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -68,6 +66,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.EventSetOption.DefaultKind;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -77,9 +77,13 @@ public class AnalyzerHideDialog extends JDialog {
 
   //#######################################################################
   //# Constructors
-  public AnalyzerHideDialog(final IDE ide, final WatersAnalyzerPanel panel) {
-
+  public AnalyzerHideDialog(final IDE ide,
+                            final WatersAnalyzerPanel panel,
+                            final AutomatonProxy aut)
+  {
+    super(ide);
     setTitle("Hide Events");
+    mAutomaton = aut;
 
     final EventSetOption option =
       new EventSetOption(null,
@@ -90,13 +94,11 @@ public class AnalyzerHideDialog extends JDialog {
                          "Visible Events",
                          "Hidden Events");
     final LoggerErrorDisplay error = new LoggerErrorDisplay();
-    final GUIOptionContext context = new GUIOptionContext(panel,
-                                                    ide,
-                                                    error);
+    final GUIOptionContext context =
+      new GUIOptionContext(panel, ide, error);
 
     final ProductDESProxy des = context.getProductDES();
     final Set<EventProxy> events = des.getEvents();
-    final AutomatonProxy aut = des.getAutomata().iterator().next();
     final EventEncoding enc = aut instanceof TRAutomatonProxy ?
       ((TRAutomatonProxy)aut).getEventEncoding() : new EventEncoding();
 
@@ -134,8 +136,6 @@ public class AnalyzerHideDialog extends JDialog {
       }
     });
 
-
-
     final JPanel buttonPane = new JPanel();
     buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 
@@ -168,8 +168,6 @@ public class AnalyzerHideDialog extends JDialog {
     buttonPane.add(okButton);
     buttonPane.add(cancelButton);
 
-
-
     final JPanel controlPane = new JPanel();
     controlPane.setLayout(new GridLayout(0, 2));
     mKeepOriginalCheckBox =
@@ -181,7 +179,6 @@ public class AnalyzerHideDialog extends JDialog {
     mUseTauEventCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
     controlPane.add(mUseTauEventCheckBox);
 
-
     final JPanel allButtonsPane = new JPanel();
     pane.add(allButtonsPane, BorderLayout.SOUTH);
     allButtonsPane.setLayout(new BorderLayout());
@@ -192,7 +189,6 @@ public class AnalyzerHideDialog extends JDialog {
     setLocationRelativeTo(parent);
     pack();
     setVisible(true);
-
   }
 
   private void hideEvents(final GUIOptionContext context,
@@ -200,12 +196,6 @@ public class AnalyzerHideDialog extends JDialog {
                             throws AnalysisException {
 
     final ProductDESProxyFactory factory = context.getProductDESProxyFactory();
-
-    final AutomatonProxy aut = context.getProductDES()
-      .getAutomata()
-      .iterator()
-      .next();
-
     final EventEncoding newEnc = new EventEncoding();
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
 
@@ -228,7 +218,7 @@ public class AnalyzerHideDialog extends JDialog {
         newEnc.addEvent(event, translator, newStatus);
       }
     }
-    for (final EventProxy event : aut.getEvents()) {
+    for (final EventProxy event : mAutomaton.getEvents()) {
       if (event.getKind() == EventKind.PROPOSITION) {
         newEnc.addProposition(event, true);
       }
@@ -239,7 +229,7 @@ public class AnalyzerHideDialog extends JDialog {
         if (localEvents.contains(enc.getTauEvent())) {
           newEnc.addSilentEvent(enc.getTauEvent());
         } else {
-          final String name = generateTauName(":tau", aut.getEvents());
+          final String name = generateTauName(":tau", mAutomaton.getEvents());
           final EventProxy silent =
             factory.createEventProxy(name, EventKind.UNCONTROLLABLE, false);
           newEnc.addSilentEvent(silent);
@@ -251,7 +241,7 @@ public class AnalyzerHideDialog extends JDialog {
     }
 
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-    final TRAutomatonProxy result = new TRAutomatonProxy(aut, newEnc, config);
+    final TRAutomatonProxy result = new TRAutomatonProxy(mAutomaton, newEnc, config);
 
     final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
     if (mKeepOriginalCheckBox.isSelected()) {
@@ -259,12 +249,13 @@ public class AnalyzerHideDialog extends JDialog {
       table.insertAndSelect(result);
     } else {
       final AutomataTableModel model = panel.getAutomataTableModel();
-      model.replaceAutomaton(aut, result);
+      model.replaceAutomaton(mAutomaton, result);
     }
   }
 
   private String generateTauName(final String baseName,
-                                 final Collection<EventProxy> allEvents) {
+                                 final Collection<EventProxy> allEvents)
+  {
     String name = null;
     for (int n=0;; n++) {
       name = (n == 0) ? baseName : baseName+":"+n;
@@ -282,7 +273,8 @@ public class AnalyzerHideDialog extends JDialog {
     return name;
   }
 
-  private void updateEventPanel() {
+  private void updateEventPanel()
+  {
     final Set<EventProxy> visibleEvents = new THashSet<>();
     for (final Object[] row : mStatusPanel.getData()) {
       final EventProxy event = (EventProxy) row[0];
@@ -294,7 +286,8 @@ public class AnalyzerHideDialog extends JDialog {
     mEventPanel.setSelectedEvents(visibleEvents);
   }
 
-  private void updateStatusPanel() {
+  private void updateStatusPanel()
+  {
     final Set<EventProxy> visibleEvents = mEventPanel.getSelectedEvents();
     for (final Object[] row : mStatusPanel.getData()) {
       final EventProxy event = (EventProxy) row[0];
@@ -302,12 +295,15 @@ public class AnalyzerHideDialog extends JDialog {
     }
   }
 
+
   //#######################################################################
   //# Data Members
+  private final AutomatonProxy mAutomaton;
   private final EventSetPanel mEventPanel;
   private final EventStatusPanel mStatusPanel;
   private final JCheckBox mKeepOriginalCheckBox;
   private final JCheckBox mUseTauEventCheckBox;
+
 
   //#######################################################################
   //# Class Constants

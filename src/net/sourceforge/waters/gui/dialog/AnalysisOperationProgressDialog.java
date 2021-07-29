@@ -31,28 +31,73 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.dialog;
 
-import net.sourceforge.waters.gui.options.ParametrisedSimplifierDialog;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+
+import org.supremica.gui.ide.IDE;
+
 
 /**
- * @author Benjamin Wheeler
+ * A dialog to be displayed while and after an analysis operation is
+ * running. It informs the user of the running operation and provides
+ * a button to abort the operation. When the operation is finished,
+ * it may display information about the result and possibly further
+ * options, e.g. switching to counterexample visualisation.
+ *
+ * This is a specific subclass of {@link AnalysisOperationProgressDialog}
+ * for operations that are defined by a {@link AnalysisOperation} object.
+ *
+ * @author Robi Malik
  */
-public class SimplifierDialog extends ParametrisedSimplifierDialog
-{
 
+public abstract class AnalysisOperationProgressDialog
+  extends AnalysisProgressDialog
+{
   //#########################################################################
   //# Constructor
-  public SimplifierDialog(final WatersAnalyzerPanel panel)
+  protected AnalysisOperationProgressDialog(final IDE owner,
+                                            final AnalysisOperation operation,
+                                            final ModelAnalyzer analyzer)
   {
-    super(panel);
-    setTitle(TITLE);
+    super(owner, analyzer, operation.getLongWindowTitle());
+    mOperation = operation;
   }
+
+  protected AnalysisOperationProgressDialog(final IDE owner,
+                                            final AnalysisOperation operation,
+                                            final Throwable exception)
+  {
+    super(owner, exception);
+    mOperation = operation;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  protected AnalysisOperation getOperation()
+  {
+    return mOperation;
+  }
+
+
+  //#########################################################################
+  //# Abstract Methods
+  @Override
+  protected String getWindowTitle()
+  {
+    return mOperation.getLongWindowTitle();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final AnalysisOperation mOperation;
+
 
   //#########################################################################
   //# Class Constants
-  private static final String TITLE = "Simplifier";
-
-  private static final long serialVersionUID = -4439172093952073552L;
+  private static final long serialVersionUID = -2478548485525996982L;
 
 }

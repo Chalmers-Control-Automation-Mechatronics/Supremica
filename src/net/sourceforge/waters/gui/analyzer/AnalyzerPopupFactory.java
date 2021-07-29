@@ -35,11 +35,13 @@ package net.sourceforge.waters.gui.analyzer;
 
 import javax.swing.JPopupMenu;
 
-import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
 
@@ -54,12 +56,13 @@ class AnalyzerPopupFactory
     super(master);
   }
 
+
   //#########################################################################
   //# Shared Menu Items
   @Override
-  protected void addCommonMenuItems()
+  protected void addMenuItems(final Proxy proxy)
   {
-    super.addCommonMenuItems();
+    super.addMenuItems(proxy);
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     popup.addSeparator();
@@ -90,11 +93,14 @@ class AnalyzerPopupFactory
       popup.add(diagnosability);
     }
     popup.addSeparator();
-    final IDEAction hide = master.getAnalyzerHideAction();
-    popup.add(hide);
-    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
-    popup.add(trSimplifier);
-    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
+    if (proxy != null && proxy instanceof AutomatonProxy) {
+      final AutomatonProxy aut = (AutomatonProxy) proxy;
+      final IDEAction hide = master.getAnalyzerHideAction(aut);
+      popup.add(hide);
+      final IDEAction simplify = master.getAnalyzerSimplificationAction(aut);
+      popup.add(simplify);
+    }
+    final IDEAction stateCounter = master.getAnalyzerStateCountAction();
     popup.add(stateCounter);
   }
 
