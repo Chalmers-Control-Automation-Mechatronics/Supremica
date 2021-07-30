@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="silentIncoming02">
-<B:Comment>A smple test for the silent incoming rule.</B:Comment>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="tauElimination02">
+<B:Comment>A test for language preservinbg tau transition removal. State S3 is on two different paths with tau transitions.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 <EventDecl Kind="CONTROLLABLE" Name="a"/>
@@ -24,7 +24,7 @@
 </SimpleNode>
 <SimpleNode Name="S1">
 <PointGeometry>
-<Point X="272" Y="80"/>
+<Point X="288" Y="80"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
 <Point X="0" Y="10"/>
@@ -40,7 +40,7 @@
 </SimpleNode>
 <SimpleNode Name="S3">
 <PointGeometry>
-<Point X="272" Y="208"/>
+<Point X="288" Y="208"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
 <Point X="0" Y="10"/>
@@ -67,9 +67,6 @@
 <LabelBlock>
 <SimpleIdentifier Name="tau"/>
 </LabelBlock>
-<SplineGeometry>
-<Point X="288" Y="144"/>
-</SplineGeometry>
 </Edge>
 <Edge Source="S1" Target="S1">
 <LabelBlock>
@@ -87,30 +84,24 @@
 <Point X="10" Y="-29"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="219" Y="154"/>
-</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="after">
-<Graph>
+<Graph Deterministic="false">
 <NodeList>
 <SimpleNode Initial="true" Name="S0">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
 <PointGeometry>
-<Point X="112" Y="128"/>
+<Point X="176" Y="80"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
+<Point X="-9" Y="14"/>
 </LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="S1">
 <PointGeometry>
-<Point X="208" Y="128"/>
+<Point X="288" Y="80"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
 <Point X="0" Y="10"/>
@@ -118,10 +109,10 @@
 </SimpleNode>
 <SimpleNode Name="S2">
 <PointGeometry>
-<Point X="112" Y="256"/>
+<Point X="176" Y="208"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
+<Point X="-4" Y="10"/>
 </LabelGeometry>
 </SimpleNode>
 </NodeList>
@@ -129,58 +120,83 @@
 <Edge Source="S0" Target="S2">
 <LabelBlock>
 <SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-3"/>
+</LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="128" Y="192"/>
+<Point X="192" Y="144"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="S0" Target="S1">
 <LabelBlock>
 <SimpleIdentifier Name="b"/>
 <LabelGeometry Anchor="NW">
-<Point X="-9" Y="-28"/>
+<Point X="-7" Y="3"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="160" Y="112"/>
+<Point X="232" Y="64"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="S1" Target="S1">
 <LabelBlock>
 <SimpleIdentifier Name="b"/>
 <LabelGeometry Anchor="NW">
-<Point X="14" Y="8"/>
+<Point X="10" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="4"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="255" Y="87"/>
+<Point X="232" Y="96"/>
 </SplineGeometry>
 </Edge>
 <Edge Source="S2" Target="S0">
 <LabelBlock>
-<SimpleIdentifier Name="tau"/>
 <SimpleIdentifier Name="a"/>
 <LabelGeometry Anchor="NW">
-<Point X="2" Y="-18"/>
+<Point X="5" Y="-6"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="112" Y="256"/>
-</StartPointGeometry>
 <SplineGeometry>
-<Point X="96" Y="192"/>
+<Point X="160" Y="144"/>
 </SplineGeometry>
 </Edge>
-<Edge Source="S1" Target="S0">
+<Edge Source="S2" Target="S2">
 <LabelBlock>
-<SimpleIdentifier Name="tau"/>
 <SimpleIdentifier Name="a"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="178" Y="258"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S2" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
 <LabelGeometry Anchor="NW">
-<Point X="-1" Y="3"/>
+<Point X="-1" Y="6"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="154" Y="141"/>
+<Point X="260" Y="169"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="244" Y="155"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>

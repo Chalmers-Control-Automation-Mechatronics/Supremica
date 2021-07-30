@@ -50,6 +50,9 @@ import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * <P>A list buffer transition relation implementation of the
@@ -314,6 +317,17 @@ public class SilentIncomingTRSimplifier
     rel.removeTauSelfLoops();
     removeProperSelfLoopEvents();
     rel.removeRedundantPropositions();
+
+    final Logger logger = LogManager.getLogger();
+    if (logger.isDebugEnabled()) {
+      final TransitionIterator iter =
+        rel.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
+      int count = 0;
+      while (iter.advance()) {
+        count++;
+      }
+      logger.debug("{} tau transitions remaining.",  count);
+    }
   }
 
 

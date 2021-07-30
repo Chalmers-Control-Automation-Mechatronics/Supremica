@@ -222,7 +222,7 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
                    ("Language Equivalence",
                     "Compute the minimal deterministic automaton representing " +
                     "the same language as the automaton being simplified. " +
-                    "It is computed by a sequence of &tau;-loop removal, " +
+                    "It is computed by a sequence of &tau;-elimination, " +
                     "subset construction, and Hopcroft's minimisation " +
                     "algorithm.") {
       @Override

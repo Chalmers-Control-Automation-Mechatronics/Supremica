@@ -52,6 +52,7 @@ import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
+import net.sourceforge.waters.analysis.abstraction.TauEliminationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
@@ -316,7 +317,8 @@ public class ChainBuilder
     return chain;
   }
 
-  public static ChainTRSimplifier createProjectionChain() {
+  public static ChainTRSimplifier createProjectionChain()
+  {
     final ChainTRSimplifier startedAbstractionChain = startAbstractionChain(null);
     return createProjectionChain(startedAbstractionChain, 0, 0, false, null);
   }
@@ -329,10 +331,10 @@ public class ChainBuilder
      final TRSimplificationListener listener)
   {
     final ChainTRSimplifier chain = startedAbstractionChain;
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setSimplificationListener(listener);
-    chain.add(loopRemover);
+    final TransitionRelationSimplifier tauEliminator =
+      new TauEliminationTRSimplifier();
+    tauEliminator.setSimplificationListener(listener);
+    chain.add(tauEliminator);
     final SubsetConstructionTRSimplifier subset =
       new SubsetConstructionTRSimplifier();
     chain.add(subset);
@@ -355,7 +357,6 @@ public class ChainBuilder
     chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence);
     chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode);
     chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode);
-
     chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_DefaultMarkingID);
     chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_PreconditionMarkingID);
 

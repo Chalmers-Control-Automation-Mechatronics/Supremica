@@ -97,7 +97,15 @@ public class StepSimplifierFactory extends TRSimplifierFactory
         return new SubsetConstructionTRSimplifier();
       }
     });
-    creators.add(new TRSimplifierCreator("Supervisor Reduction",
+    creators.add(new TRSimplifierCreator("Supervisor Reduction (Cliques)",
+      "Simplify a supervisor by identifying cliques.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new SmallCliqueSupervisorReductionTRSimplifier();
+      }
+    });
+    creators.add(new TRSimplifierCreator("Supervisor Reduction (SW)",
       "Simplify a supervisor using the Su/Wonham " +
       "supervisor reduction algorithm.") {
       @Override
@@ -113,6 +121,17 @@ public class StepSimplifierFactory extends TRSimplifierFactory
       protected TransitionRelationSimplifier createTRSimplifier()
       {
         return new SynthesisObservationEquivalenceTRSimplifier();
+      }
+    });
+    creators.add(new TRSimplifierCreator("Tau Elimination",
+      "Collapse local event transitions while preserving language equivalence. " +
+      "This operation eliminates all &tau; transitions from a state machine " +
+      "while possibly introducing nondeterministic branching. The number of " +
+      "states cannot increase, but the number of transitions can.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new TauEliminationTRSimplifier();
       }
     });
   }

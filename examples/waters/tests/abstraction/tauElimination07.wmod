@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="tauloop04">
-<B:Comment>A test for tau-loop removal. This tests involves multiple tau-paths connecting the same states without forming a loop.</B:Comment>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="tauElimination07">
+<B:Comment>A test for language preservinbg tau transition removal. This tests involves multiple tau-paths connecting the same states without forming a loop.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="repair1"/>
 <EventDecl Kind="CONTROLLABLE" Name="start2"/>
@@ -110,6 +110,78 @@
 </LabelBlock>
 <SplineGeometry>
 <Point X="156" Y="113"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="after">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="S:0">
+<PointGeometry>
+<Point X="112" Y="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-70" Y="1"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S:1">
+<PointGeometry>
+<Point X="112" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="2"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S:0" Target="S:0">
+<LabelBlock>
+<SimpleIdentifier Name="repair1"/>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="110" Y="44"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S:0" Target="S:1">
+<LabelBlock>
+<SimpleIdentifier Name="start2"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="97" Y="147"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S:1" Target="S:0">
+<LabelBlock>
+<SimpleIdentifier Name="repair1"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="127" Y="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S:1" Target="S:1">
+<LabelBlock>
+<SimpleIdentifier Name="start2"/>
+<SimpleIdentifier Name="repair1"/>
+<LabelGeometry Anchor="NW">
+<Point X="-67" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="113" Y="240"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>

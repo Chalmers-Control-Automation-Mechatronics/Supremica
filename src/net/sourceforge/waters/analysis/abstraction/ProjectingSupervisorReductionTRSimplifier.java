@@ -193,17 +193,17 @@ public class ProjectingSupervisorReductionTRSimplifier
       final TransitionRelationSimplifier hider =
         new SpecialEventsTRSimplifier();
       chain.add(hider);
-      final SupervisorReductionLoopRemover loopRemover = new
-        SupervisorReductionLoopRemover();
-      loopRemover.setTauOnly(true);
-      loopRemover.setAppliesPartitionAutomatically(true);
-      chain.add(loopRemover);
-      final SupervisorReductionConditionalSimplifier condition =
-        new SupervisorReductionConditionalSimplifier();
-      final SilentIncomingTRSimplifier silentRemover =
-        new SilentIncomingTRSimplifier();
-      condition.add(silentRemover);
-      chain.add(condition);
+      final TauEliminationTRSimplifier tauEliminator = new
+        TauEliminationTRSimplifier();
+      tauEliminator.setTauOnly(true);
+      tauEliminator.setAppliesPartitionAutomatically(true);
+      chain.add(tauEliminator);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+      bisimulator.setAppliesPartitionAutomatically(true);
+      chain.add(bisimulator);
       chain.setPreferredOutputConfiguration
         (mVerifierBuilder.getPreferredInputConfiguration());
       mPreSimplifier = chain;
@@ -551,6 +551,7 @@ public class ProjectingSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Inner Class SupervisorReductionLoopRemover
+  @SuppressWarnings("unused")
   private class SupervisorReductionLoopRemover
     extends TauLoopRemovalTRSimplifier
   {
@@ -612,6 +613,7 @@ public class ProjectingSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Inner Class SupervisorReductionConditionalSimplifier
+  @SuppressWarnings("unused")
   private class SupervisorReductionConditionalSimplifier
     extends ConditionalTRSimplifier
   {
