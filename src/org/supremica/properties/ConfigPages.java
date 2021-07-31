@@ -16,6 +16,7 @@ public class ConfigPages
                              GUI_IDE_MAXIMIZED,
                              GENERAL_LOOK_AND_FEEL,
                              GUI_EDITOR_ICONSET,
+                             GENERAL_HEAP_SIZE,
                              GENERAL_STUDENT_VERSION);
 
   public static final SimpleLeafOptionPage GENERAL_LOG =

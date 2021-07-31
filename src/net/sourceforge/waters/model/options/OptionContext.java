@@ -129,6 +129,12 @@ public interface OptionContext
   createDoubleEditor(DoubleOption option);
 
   /**
+   * Creates an option editor for a memory option.
+   */
+  public OptionEditor<String>
+  createMemoryOptionEditor(MemoryOption option);
+
+  /**
    * Creates an option editor for a proposition option.
    */
   public OptionEditor<EventProxy>

@@ -45,7 +45,10 @@ fi
 
 if [ ! -r $PROPFILE ]; then
     cp $SUPDIR/waters.properties $PROPFILE
+    HEAP=
+else
+    HEAP=`awk '/general\.javaHeapSize/ { print "-Xmx"$2 }' $PROPFILE`
 fi
 
 $JAVACMD -classpath "$SUPDIR/Supremica.jar" "-Djava.library.path=$SUPDIR" \
-  org.supremica.gui.ide.IDE -p $PROPFILE "$@" 2>&1 >/dev/null
+  $HEAP org.supremica.gui.ide.IDE -p $PROPFILE "$@" 2>&1 >/dev/null

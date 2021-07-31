@@ -142,18 +142,20 @@ public class PositiveIntOption extends Option<Integer>
       final int value = Integer.parseUnsignedInt(text);
       if (value >= mMinValue && value <= mMaxValue) {
         setValue(value);
-      }
-      else {
+      } else {
         final String error = "Value "+ value +
           " is out of range; must be between " + mMinValue + " and " +
           mMaxValue;
         throw new ParseException(error, 0);
       }
-    } catch(final NumberFormatException exception) {
+    } catch (final NumberFormatException exception) {
       throw new ParseException(exception, 0);
     }
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final int mMinValue;
   private final int mMaxValue;
 

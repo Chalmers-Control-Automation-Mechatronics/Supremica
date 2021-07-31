@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.compiler.CompilerOptions;
 
 /**
  * Container class for option pages used within Waters only.
- * This class contains option pages that can be used by ode that does not
+ * This class contains option pages that can be used by code that does not
  * link to Supremica licensed code.
  *
  * @author Robi Malik

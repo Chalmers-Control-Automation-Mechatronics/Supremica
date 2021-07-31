@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.options.DoubleOption;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.MemoryOption;
 import net.sourceforge.waters.model.options.OptionContext;
 import net.sourceforge.waters.model.options.OptionEditor;
 import net.sourceforge.waters.model.options.ParameterBindingListOption;
@@ -221,6 +222,13 @@ public class GUIOptionContext implements OptionContext
   createDoubleEditor(final DoubleOption option)
   {
     return new DoubleOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionEditor<String>
+  createMemoryOptionEditor(final MemoryOption option)
+  {
+    return new MemoryOptionPanel(this, option);
   }
 
   @Override

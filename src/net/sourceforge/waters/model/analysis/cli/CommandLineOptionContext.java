@@ -64,6 +64,7 @@ import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.model.options.FileOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.MemoryOption;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.OptionContext;
 import net.sourceforge.waters.model.options.OptionEditor;
@@ -166,6 +167,13 @@ public class CommandLineOptionContext implements OptionContext
   createPositiveIntEditor(final PositiveIntOption option)
   {
     return new PositiveIntCommandLineArgument(option);
+  }
+
+  @Override
+  public OptionEditor<String> createMemoryOptionEditor
+    (final MemoryOption option)
+  {
+    return null;
   }
 
   @Override

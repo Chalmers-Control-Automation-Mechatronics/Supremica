@@ -14,6 +14,7 @@ import net.sourceforge.waters.model.options.ColorOption;
 import net.sourceforge.waters.model.options.DoubleOption;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.MemoryOption;
 import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.options.StringOption;
 
@@ -44,6 +45,10 @@ public class Config
     ("iconSet", "Icon Set and Font Scaling (requires restart)",
      "Size of icons and fonts displayed in the IDE (requires restart)",
      null, IconSet.values(), IconSet.WATERS_16);
+  public static final MemoryOption GENERAL_HEAP_SIZE = new MemoryOption
+    ("javaHeapSize", "Maximum heap memory (requires restart)",
+     "Java heap size to be specific when launching the IDE the next time",
+     null, null);
   public static final BooleanOption GENERAL_STUDENT_VERSION = new BooleanOption
     ("generalStudentVersion",
      "Student Verison", "Student version", null, false, false);
