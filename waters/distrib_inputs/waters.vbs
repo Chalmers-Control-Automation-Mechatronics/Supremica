@@ -16,16 +16,30 @@ IF javaCmd = "" THEN
   Wscript.Quit(1)
 END IF
 Jar = ScriptDir & "\Supremica.jar"
+MemoryOption = ""
 
-Home = ENV("HOMEDRIVE") & ENV("HOMEPATH")
+Home = SHO.ExpandEnvironmentStrings("%USERPROFILE%")
 PropName = "waters.properties"
-PropPath = HOME & "\" & PropName
-IF NOT FSO.FileExists(PropPath) THEN
+PropPath = Home & "\" & PropName
+IF FSO.FileExists(PropPath) THEN
+  SET stream = FSO.OpenTextFile(PropPath)
+  DO WHILE NOT stream.AtEndOfStream
+    line = stream.ReadLine()
+    words = Split(line)
+    IF UBound(words) = 1 THEN
+      IF words(0) = "general.javaHeapSize" THEN
+        MemoryOption = " -Xmx" & words(1)
+        EXIT DO
+      END IF
+    END IF
+  LOOP
+  stream.Close
+ELSE
   SourcePath = ScriptDir &  "\" & PropName
   FSO.CopyFile SourcePath, PropPath 	
 END IF
 
-WatersCmd = javaCmd & " -classpath " & q & Jar & q & " org.supremica.gui.ide.IDE -p " & q & PropPath & q
+WatersCmd = javaCmd & " -classpath " & q & Jar & q & MemoryOption & " org.supremica.gui.ide.IDE -p " & q & PropPath & q
 limit = WScript.Arguments.Count - 1
 FOR i = 0 to limit
   arg = WScript.Arguments.Item(i)
