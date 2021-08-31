@@ -47,6 +47,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.SimplifierOptionPage;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
@@ -88,6 +89,10 @@ public class ParametrisedSimplificationDialog
     (final AutomatonSimplifierCreator creator)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final SimplifierOptionPage page = getOptionPage();
+    for (final Option<?> option : creator.getOptions(page)) {
+      creator.setOption(option);
+    }
     return creator.createBuilder(factory);
   }
 

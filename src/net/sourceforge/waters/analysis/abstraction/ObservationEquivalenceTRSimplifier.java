@@ -314,9 +314,9 @@ public class ObservationEquivalenceTRSimplifier
 
     if (option.hasID(StepSimplifierFactory.
                      OPTION_ObservationEquivalence_Equivalence)) {
-      final EnumOption<Equivalence> propOption =
+      final EnumOption<Equivalence> enumOption =
         (EnumOption<Equivalence>) option;
-      final Equivalence value = propOption.getValue();
+      final Equivalence value = enumOption.getValue();
       setEquivalence(value);
     } else if (option.hasID(StepSimplifierFactory.
                             OPTION_ObservationEquivalence_TransitionRemovalMode)) {
