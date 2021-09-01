@@ -419,7 +419,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>    
         <chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
         -->
-        <copy file="${distrib_inputs}/waters.bat" todir="${dist}"/>
         <copy file="${distrib_inputs}/waters.vbs" todir="${dist}"/>
         <copy file="${distrib_inputs}/waters" todir="${dist}"/>
         <chmod file="${dist}/waters" perm="755"/>
