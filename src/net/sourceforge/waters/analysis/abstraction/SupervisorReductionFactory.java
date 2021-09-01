@@ -82,7 +82,7 @@ public interface SupervisorReductionFactory
    *          or <CODE>null</CODE> to disable supervisor reduction.
    */
   public SupervisorReductionSimplifier createSupervisorReducer
-    (boolean localisation);
+    (boolean localisation, double maxIncrease);
 
   /**
    * Whether the supervisor reduction factory is configured to perform
@@ -110,7 +110,8 @@ public interface SupervisorReductionFactory
 
     public SupervisorReductionChain(final TransitionRelationSimplifier projector,
                                     final SupervisorReductionSimplifier main,
-                                    final boolean localisation)
+                                    final boolean localisation,
+                                    final double maxIncrease)
     {
       mMainSimplifier = main;
       if (localisation) {
@@ -118,7 +119,7 @@ public interface SupervisorReductionFactory
       }
       if (projector != null) {
         add(projector);
-        add(new ConditionalSupervisorReductionSubChain());
+        add(new ConditionalSupervisorReductionSubChain(maxIncrease));
       }
       add(main);
       add(new SelfloopSupervisorReductionTRSimplifier());
@@ -170,7 +171,7 @@ public interface SupervisorReductionFactory
   {
     //#######################################################################
     //# Constructor
-    private ConditionalSupervisorReductionSubChain()
+    private ConditionalSupervisorReductionSubChain(final double maxIncrease)
     {
       add(new SpecialEventsTRSimplifier());
       add(new TauLoopRemovalTRSimplifier());
@@ -183,7 +184,7 @@ public interface SupervisorReductionFactory
       final SubsetConstructionTRSimplifier subset =
         new SubsetConstructionTRSimplifier();
       subset.setDumpStateAware(true);
-      subset.setMaxIncrease(2.5);
+      subset.setMaxIncrease(maxIncrease);
       add(subset);
       final ObservationEquivalenceTRSimplifier bisimulator2 =
         new ObservationEquivalenceTRSimplifier();

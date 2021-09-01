@@ -104,7 +104,7 @@ public enum SupremicaSupervisorReductionFactory
 
   @Override
   public SupervisorReductionSimplifier createSupervisorReducer
-    (final boolean localisation)
+    (final boolean localisation, final double maxIncrease)
   {
     return null;
   }

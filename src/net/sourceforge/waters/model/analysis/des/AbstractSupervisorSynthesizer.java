@@ -39,13 +39,6 @@ import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReduction
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
-import net.sourceforge.waters.model.options.PropositionOption;
-import net.sourceforge.waters.model.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
@@ -53,6 +46,14 @@ import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.DoubleOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.PropositionOption;
+import net.sourceforge.waters.model.options.StringOption;
 
 
 /**
@@ -147,6 +148,16 @@ public abstract class AbstractSupervisorSynthesizer
     return mSupervisorLocalizationEnabled;
   }
 
+  public void setSupervisorReductionMaxIncrease(final double maxIncrease)
+  {
+    mSupervisorReductionMaxIncrease = maxIncrease;
+  }
+
+  public double getSupervisorReductionMaxIncrease()
+  {
+    return mSupervisorReductionMaxIncrease;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
@@ -178,6 +189,8 @@ public abstract class AbstractSupervisorSynthesizer
                        OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease);
     return options;
   }
 
@@ -230,6 +243,10 @@ public abstract class AbstractSupervisorSynthesizer
                             OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setSupervisorLocalizationEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease)) {
+      final DoubleOption doubleOption = (DoubleOption) option;
+      setSupervisorReductionMaxIncrease(doubleOption.getDoubleValue());
     } else {
       super.setOption(option);
     }
@@ -314,5 +331,6 @@ public abstract class AbstractSupervisorSynthesizer
   private SupervisorReductionFactory mSupervisorReductionFactory =
     new ProjectingSupervisorReductionFactory();
   private boolean mSupervisorLocalizationEnabled = false;
+  private double mSupervisorReductionMaxIncrease = 2.5;
 
 }

@@ -40,6 +40,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ComponentKindOption;
+import net.sourceforge.waters.model.options.DoubleOption;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.model.options.PositiveIntOption;
@@ -254,6 +255,13 @@ public abstract class AbstractModelAnalyzerFactory
               "for each controllable event that needs to be disabled.",
               "-loc",
               false));
+    db.register(new DoubleOption
+             (OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease,
+              "Growth limit for supervisor reduction",
+              "If using supervisor reduction projection, limit the growth " +
+              "of intermediate results by this factor.",
+              "-maxinc",
+              2.5, 1.0, Double.POSITIVE_INFINITY));
     db.register(new EnumOption<SupervisorReductionMainMethod>
              (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
               "Supervisor reduction method",
@@ -375,6 +383,8 @@ public abstract class AbstractModelAnalyzerFactory
     "SupervisorSynthesizer.OutputName";
   public static final String OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled =
     "SupervisorSynthesizer.SupervisorLocalisationEnabled";
+  public static final String OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease =
+    "SupervisorSynthesizer.SupervisorReductionMaxIncrease";
   public static final String OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod =
     "SupervisorSynthesizer.SupervisorReductionMainMethod";
   public static final String OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod =

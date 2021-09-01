@@ -104,9 +104,10 @@ public class SimpleSupervisorReductionFactory
 
   @Override
   public SupervisorReductionSimplifier createSupervisorReducer
-    (final boolean localisation)
+    (final boolean localisation, final double maxIncrease)
   {
-    return new SupervisorReductionChain(mProjector, mSimplifier, localisation);
+    return new SupervisorReductionChain(mProjector, mSimplifier,
+                                        localisation, maxIncrease);
   }
 
   @Override

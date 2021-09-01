@@ -55,10 +55,6 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -79,6 +75,11 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.DoubleOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,11 +90,11 @@ import org.apache.logging.log4j.Logger;
  *
  * <I>References:</I><BR>
  * Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian. On the Use of
- * Observation Equivalence in Synthesis Abstraction. Proc. 3rd IFAC Workshop
+ * Observation Equivalence in Synthesis Abstraction. 3rd IFAC Workshop
  * on Dependable Control of Discrete Systems, DCDS&nbsp;2011,
  * Saarbr&uuml;cken, Germany, 2011.<BR>
  * Sahar Mohajerani, Robi Malik, Martin Fabian. Nondeterminism Avoidance in
- * Compositional Synthesis of Discrete Event Systems, Proc. 7th International
+ * Compositional Synthesis of Discrete Event Systems, 7th International
  * Conference on Automation Science and Engineering, CASE&nbsp;2011, Trieste,
  * Italy.
  *
@@ -295,6 +296,16 @@ public class CompositionalAutomataSynthesizer
     return mSupervisorLocalizationEnabled;
   }
 
+  public void setSupervisorReductionMaxIncrease(final double maxIncrease)
+  {
+    mSupervisorReductionMaxIncrease = maxIncrease;
+  }
+
+  public double getSupervisorReductionMaxIncrease()
+  {
+    return mSupervisorReductionMaxIncrease;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
@@ -319,6 +330,9 @@ public class CompositionalAutomataSynthesizer
         iter.add(addition);
         addition = db.get(AbstractModelAnalyzerFactory.
                           OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled);
+        iter.add(addition);
+        addition = db.get(AbstractModelAnalyzerFactory.
+                          OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease);
         iter.add(addition);
         break;
       }
@@ -353,6 +367,10 @@ public class CompositionalAutomataSynthesizer
                             OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setSupervisorLocalizationEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease)) {
+      final DoubleOption doubleOption = (DoubleOption) option;
+      setSupervisorReductionMaxIncrease(doubleOption.getDoubleValue());
     } else {
       super.setOption(option);
     }
@@ -416,7 +434,8 @@ public class CompositionalAutomataSynthesizer
       (HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR);
     if (isDetailedOutputEnabled()) {
       mMainSupervisorReducer = mSupervisorReductionFactory.
-        createSupervisorReducer(mSupervisorLocalizationEnabled);
+        createSupervisorReducer(mSupervisorLocalizationEnabled,
+                                mSupervisorReductionMaxIncrease);
       if (mMainSupervisorReducer != null) {
         final int stateLimit = getInternalStateLimit();
         mMainSupervisorReducer.setStateLimit(stateLimit);
@@ -1428,6 +1447,7 @@ public class CompositionalAutomataSynthesizer
   private SupervisorReductionFactory mSupervisorReductionFactory =
     new ProjectingSupervisorReductionFactory();
   private boolean mSupervisorLocalizationEnabled = false;
+  private double mSupervisorReductionMaxIncrease = 2.5;
 
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private TransitionRelationSimplifier mPreSupervisorReducer;
