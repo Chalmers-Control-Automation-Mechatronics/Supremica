@@ -49,10 +49,12 @@
  */
 package org.supremica.util;
 
-import org.supremica.util.SupremicaException;
-import org.supremica.automata.StateStorage;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import org.supremica.automata.AutomataIndexFormHelper;
-import java.util.*;
+import org.supremica.automata.StateStorage;
 
 /**
  * Insert <int_1, int_2, int_3, ..., int_n, prev_state, int_status>
@@ -62,23 +64,23 @@ public final class IntArrayHashTable
 {
 	private int[][] theTable;
 	private int size;
-	private float loadFactor;
+	private final float loadFactor;
 	private boolean doExpand = true;
 	private int maxSize;
 
-	public IntArrayHashTable(int capacity)
+	public IntArrayHashTable(final int capacity)
 	{
 		this(capacity, 0.75f);
 	}
 
-	public IntArrayHashTable(int capacity, boolean doExpand)
+	public IntArrayHashTable(final int capacity, final boolean doExpand)
 	{
 		this(capacity);
 
 		this.doExpand = doExpand;
 	}
 
-	public IntArrayHashTable(int capacity, float loadFactor)
+	public IntArrayHashTable(int capacity, final float loadFactor)
 	{
 		if ((capacity <= 0) || (loadFactor <= 0.0))
 		{
@@ -99,7 +101,8 @@ public final class IntArrayHashTable
 		}
 	}
 
-	public int size()
+	@Override
+  public int size()
 	{
 		return size;
 	}
@@ -111,11 +114,12 @@ public final class IntArrayHashTable
 	 * that entry. Otherwise add theArray
 	 * and return null.
 	 */
-	public int[] add(int[] theArray)
+	@Override
+  public int[] add(final int[] theArray)
 		throws SupremicaException
 	{
-		int table[][] = theTable;
-		int hash = hashCodeIntArray(theArray);
+		final int table[][] = theTable;
+		final int hash = hashCodeIntArray(theArray);
 		int index = getTableIndex(hash);
 
 		while (true)
@@ -131,7 +135,7 @@ public final class IntArrayHashTable
 			}
 			else
 			{
-				int[] newArray = AutomataIndexFormHelper.createCopyOfState(theArray);
+				final int[] newArray = AutomataIndexFormHelper.createCopyOfState(theArray);
 
 				table[index] = newArray;
 
@@ -154,9 +158,10 @@ public final class IntArrayHashTable
 		}
 	}
 
-	public void clear()
+	@Override
+  public void clear()
 	{
-		int table[][] = theTable;
+		final int table[][] = theTable;
 
 		for (int i = 0; i < table.length; i++)
 		{
@@ -169,10 +174,11 @@ public final class IntArrayHashTable
 	/**
 	 * Returns an int[] if it exists otherwise null
 	 */
-	public int[] get(int[] theArray)
+	@Override
+  public int[] get(final int[] theArray)
 	{
-		int table[][] = theTable;
-		int hash = hashCodeIntArray(theArray);
+		final int table[][] = theTable;
+		final int hash = hashCodeIntArray(theArray);
 		int index = getTableIndex(hash);
 
 		while (true)
@@ -196,16 +202,16 @@ public final class IntArrayHashTable
 	/**
 	 * Return the element at index
 	 */
-	public int[] get(int index)
+	public int[] get(final int index)
 	{
 		return theTable[index];
 	}
 
 	// Returns the index of theArray if it exists otherwise -1
-	public int getIndex(int[] theArray)
+	public int getIndex(final int[] theArray)
 	{
-		int table[][] = theTable;
-		int hash = hashCodeIntArray(theArray);
+		final int table[][] = theTable;
+		final int hash = hashCodeIntArray(theArray);
 		int index = getTableIndex(hash);
 
 		while (true)
@@ -232,29 +238,29 @@ public final class IntArrayHashTable
 				return theTable.getIndex(theArray);
 		}
 */
-	private int getTableIndex(int hash)
+	private int getTableIndex(final int hash)
 	{
 		return (hash & 0x7FFFFFFF) % theTable.length;
 	}
 
 	private void expandTable()
 	{
-		int[][] oldTable = theTable;
-		int oldCapacity = theTable.length;
-		int capacity = oldCapacity * 2 + 1;
+		final int[][] oldTable = theTable;
+		final int oldCapacity = theTable.length;
+		final int capacity = oldCapacity * 2 + 1;
 
 		theTable = new int[capacity][];
 		maxSize = (int) (capacity * loadFactor);
 
 		// System.err.println("Rehashing oldCapcity: " + oldCapacity + " newCapacity: " + capacity);
-		int[][] table = theTable;
+		final int[][] table = theTable;
 
 		for (int i = 0; i < oldTable.length; i++)
 		{
 			if (oldTable[i] != null)
 			{
-				int[] theArray = oldTable[i];
-				int hash = hashCodeIntArray(theArray);
+				final int[] theArray = oldTable[i];
+				final int hash = hashCodeIntArray(theArray);
 				int index = getTableIndex(hash);
 
 				while (true)
@@ -278,13 +284,13 @@ public final class IntArrayHashTable
 		{
 			if (oldTable[i] != null)
 			{
-				int[] currState = oldTable[i];
-				int prevStateIndex = currState[currState.length - AutomataIndexFormHelper.STATE_PREVSTATE_FROM_END];
+				final int[] currState = oldTable[i];
+				final int prevStateIndex = currState[currState.length - AutomataIndexFormHelper.STATE_PREVSTATE_FROM_END];
 
 				if (prevStateIndex != AutomataIndexFormHelper.STATE_NO_PREVSTATE)
 				{
-					int[] prevState = oldTable[prevStateIndex];
-					int newPrevStateIndex = getIndex(prevState);
+					final int[] prevState = oldTable[prevStateIndex];
+					final int newPrevStateIndex = getIndex(prevState);
 
 					AutomataIndexFormHelper.setPrevStateIndex(currState, newPrevStateIndex);
 				}
@@ -292,7 +298,7 @@ public final class IntArrayHashTable
 		}
 	}
 
-	private static int hashCodeIntArray(int[] theArray)
+	private static int hashCodeIntArray(final int[] theArray)
 	{    // The two last elements are special!
 		int hashCode = 1;
 
@@ -306,7 +312,7 @@ public final class IntArrayHashTable
 		return hashCode;
 	}
 
-	public static boolean equalsIntArray(int[] firstArray, int[] secondArray)
+	public static boolean equalsIntArray(final int[] firstArray, final int[] secondArray)
 	{    // The two last elements are not to be compared!
 		for (int i = 0;
 				i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA;
@@ -326,15 +332,17 @@ public final class IntArrayHashTable
 		return theTable;
 	}
 
-	public Iterator<?> iterator()
+	@Override
+  public Iterator<?> iterator()
 	{
 		return new IntArrayHashTableIterator();
 	}
 
-	public String toString()
+	@Override
+  public String toString()
 	{
-		StringBuilder theString = new StringBuilder();
-		int[][] table = theTable;
+		final StringBuilder theString = new StringBuilder();
+		final int[][] table = theTable;
 
 		theString.append("size: " + size + "\n");
 
@@ -342,12 +350,12 @@ public final class IntArrayHashTable
 		{
 			if (table[i] != null)
 			{
-				int[] theArray = table[i];
+				final int[] theArray = table[i];
 
 				theString.append(i);
 				theString.append(" ");
 
-				int optimalIndex = getTableIndex(hashCodeIntArray(theArray));
+				final int optimalIndex = getTableIndex(hashCodeIntArray(theArray));
 
 				theString.append(optimalIndex);
 
@@ -373,13 +381,13 @@ public final class IntArrayHashTable
 		return theString.toString();
 	}
 
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		int size = 4;
-		IntArrayHashTable theHashTable = new IntArrayHashTable(size);
-		int[] a1 = { 3, 4, 5, 1, 2, 2, 5 };
-		int[] a2 = { 7, 5, 6, 4, 1, 2, 5 };
-		int[] a3 = { 3, 4, 6, 2, 3, 22, 5 };
+		final int size = 4;
+		final IntArrayHashTable theHashTable = new IntArrayHashTable(size);
+		final int[] a1 = { 3, 4, 5, 1, 2, 2, 5 };
+		final int[] a2 = { 7, 5, 6, 4, 1, 2, 5 };
+		final int[] a3 = { 3, 4, 6, 2, 3, 22, 5 };
 
 		try
 		{
@@ -387,18 +395,18 @@ public final class IntArrayHashTable
 			System.out.println("add a2: " + Arrays.toString(theHashTable.add(a2)));
 			System.out.println("add a3: " + Arrays.toString(theHashTable.add(a3)));
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			System.err.println(e);
 		}
 
 		System.out.println("theHashTable: \n" + theHashTable);
 
-		Iterator<?> hashIt = theHashTable.iterator();
+		final Iterator<?> hashIt = theHashTable.iterator();
 
 		while (hashIt.hasNext())
 		{
-			int[] currElement = (int[]) hashIt.next();
+			final int[] currElement = (int[]) hashIt.next();
 
 			System.out.println(IntArrayList.toString(currElement));
 		}
@@ -412,13 +420,14 @@ public final class IntArrayHashTable
 
 		public IntArrayHashTableIterator() {}
 
-		public boolean hasNext()
+		@Override
+    public boolean hasNext()
 		{
 			if (nextIndex == -1)
 			{
 				nextIndex = currIndex + 1;
 
-				int size = theTable.length;
+				final int size = theTable.length;
 
 				while ((nextIndex < size) && (theTable[nextIndex] == null))
 				{
@@ -449,7 +458,8 @@ public final class IntArrayHashTable
 			}
 		}
 
-		public Object next()
+		@Override
+    public Object next()
 		{
 			/*
 			if (hasNext())
@@ -478,7 +488,7 @@ public final class IntArrayHashTable
 		{
 			if (hasNext())
 			{
-				int[] currObject = theTable[nextIndex];
+				final int[] currObject = theTable[nextIndex];
 
 				currIndex = nextIndex;
 				nextIndex = -1;
@@ -491,7 +501,8 @@ public final class IntArrayHashTable
 			}
 		}
 
-		public void remove()
+		@Override
+    public void remove()
 		{
 			if (theTable[currIndex] == null)
 			{

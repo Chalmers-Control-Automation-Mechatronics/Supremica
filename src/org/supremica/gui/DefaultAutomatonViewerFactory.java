@@ -36,12 +36,13 @@
 package org.supremica.gui;
 
 import org.supremica.automata.Automaton;
-import org.supremica.gui.AutomatonViewerFactory;
+
 
 public class DefaultAutomatonViewerFactory
 	implements AutomatonViewerFactory
 {
-	public AutomatonViewer createAutomatonViewer(Automaton automaton)
+	@Override
+  public AutomatonViewer createAutomatonViewer(final Automaton automaton)
 		throws Exception
 	{
 		return new AutomatonViewer(automaton);

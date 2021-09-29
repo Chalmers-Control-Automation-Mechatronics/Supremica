@@ -35,15 +35,14 @@
 
 package org.supremica.gui;
 
-import javax.swing.*;
-import org.supremica.gui.MonitorableThread;
+import javax.swing.SwingUtilities;
 
 abstract public class Presenter
 	extends Thread
 {
 	MonitorableThread task;
 
-	public Presenter(MonitorableThread task)
+	public Presenter(final MonitorableThread task)
 	{
 		this.task = task;
 	}
@@ -52,7 +51,8 @@ abstract public class Presenter
 
 	abstract public void taskStopped();
 
-	public void run()
+	@Override
+  public void run()
 	{
 		try
 		{
@@ -60,7 +60,7 @@ abstract public class Presenter
 			// System.err.println("Presenter::run() - Waiting for " + task.getName() + " to be done");
 			task.join();
 		}
-		catch (InterruptedException excp)
+		catch (final InterruptedException excp)
 		{
 			System.err.println("Exception: " + excp);
 
@@ -69,7 +69,8 @@ abstract public class Presenter
 
 		final Runnable do_finish = new Runnable()
 		{
-			public void run()
+			@Override
+      public void run()
 			{
 				if (!task.wasStopped())
 				{

@@ -50,7 +50,7 @@
 package org.supremica.automata;
 
 import org.supremica.util.SupremicaException;
-import org.supremica.automata.Automata;
+
 
 /**
  * A monolithic supervisor works just like a modular supervisor with

@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -44,6 +43,7 @@ public class NativeSICProperty5VerifierTest extends
     AbstractSICProperty5VerifierTest
 {
 
+  @Override
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {

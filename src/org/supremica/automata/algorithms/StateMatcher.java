@@ -47,13 +47,10 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
 
-import org.supremica.automata.algorithms.SearchStates;
+package org.supremica.automata.algorithms;
 
 public interface StateMatcher
 {
 	boolean matches(SearchStates.StateIterator it);
 }
-
-//

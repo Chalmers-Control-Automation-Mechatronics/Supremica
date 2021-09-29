@@ -1,7 +1,7 @@
 /********************* ForbiddenEvent **********************/
 // Owner: MF
-/** 
- * Implementing forbidden partial states by self-looped 
+/**
+ * Implementing forbidden partial states by self-looped
  * "forbidden" events requires a child of LabeledEvent.
  * This implements that child.
  *
@@ -10,32 +10,27 @@
  **/
 package org.supremica.automata;
 
-import org.supremica.automata.LabeledEvent;
 import net.sourceforge.waters.model.des.EventProxy;
+
 
 public class ForbiddenEvent
 	extends LabeledEvent
 {
-//	public ForbiddenEvent()
-//	{
-//		super();
-//	}
-	
-	public ForbiddenEvent(String label)
+	public ForbiddenEvent(final String label)
 	{
 		super(label);
 	}
-	
-	public ForbiddenEvent(LabeledEvent event)
+
+	public ForbiddenEvent(final LabeledEvent event)
 	{
 		super(event);
 	}
-	
-	public ForbiddenEvent(EventProxy event_proxy)
+
+	public ForbiddenEvent(final EventProxy event_proxy)
 	{
 		super(event_proxy);
 	}
-	
+
 	@Override
 	public boolean isForbidden()
 	{

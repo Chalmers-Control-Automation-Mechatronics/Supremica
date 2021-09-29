@@ -36,7 +36,7 @@
 package org.supremica.gui;
 
 import org.supremica.automata.Automaton;
-import org.supremica.gui.AutomatonViewer;
+
 
 public interface AutomatonViewerFactory
 {

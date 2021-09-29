@@ -34,7 +34,6 @@
 package net.sourceforge.waters.analysis.hisc;
 
 import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -43,8 +42,8 @@ public class LargeCompositionalSICPropertyVVerifierTest extends
     AbstractLargeSICPropertyVVerifierTest
 {
 
-  protected ModelVerifier createModelVerifier(
-                                              final ProductDESProxyFactory factory)
+  @Override
+  protected ModelVerifier createModelVerifier(final ProductDESProxyFactory factory)
   {
     final CompositionalGeneralisedConflictChecker checker =
         new CompositionalGeneralisedConflictChecker(factory);

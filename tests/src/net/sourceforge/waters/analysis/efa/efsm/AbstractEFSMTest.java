@@ -37,13 +37,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMCompiler;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMEventEncoding;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystem;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystemImporter;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMTransitionRelation;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariableContext;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;

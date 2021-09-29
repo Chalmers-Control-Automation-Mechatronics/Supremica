@@ -36,7 +36,6 @@ package net.sourceforge.waters.analysis.trcomp;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.trcomp.TRCompositionalStateCounter;
 import net.sourceforge.waters.model.analysis.AbstractStateCounterTest;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

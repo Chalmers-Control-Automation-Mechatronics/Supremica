@@ -39,10 +39,6 @@ import java.util.Collection;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
@@ -457,6 +453,7 @@ public class ListBufferTransitionRelationTest extends
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractAnalysisTest
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
     compiler.setOptimizationEnabled(false);

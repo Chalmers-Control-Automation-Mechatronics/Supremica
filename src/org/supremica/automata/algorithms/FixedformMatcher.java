@@ -49,30 +49,30 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import org.supremica.automata.algorithms.StateMatcher;
-import org.supremica.automata.algorithms.SearchStates;
+import java.util.regex.Pattern;
+
 import org.supremica.automata.State;
 
 public class FixedformMatcher
 	implements StateMatcher
 {
-	private Pattern[] patterns;
-	private StateMatcherOptions[] options;
+	private final Pattern[] patterns;
+	private final StateMatcherOptions[] options;
 
-	public FixedformMatcher(Pattern[] patterns, StateMatcherOptions[] options)
+	public FixedformMatcher(final Pattern[] patterns, final StateMatcherOptions[] options)
 	{
 		this.patterns = patterns;
 		this.options = options;
 	}
 
-	public boolean matches(SearchStates.StateIterator it)
+	@Override
+  public boolean matches(final SearchStates.StateIterator it)
 	{
 		for (int i = 0; it.hasNext(); ++i, it.inc())
 		{
-			State currState = it.getState();
-			Matcher matcher = patterns[i].matcher(currState.getName());
+			final State currState = it.getState();
+			final Matcher matcher = patterns[i].matcher(currState.getName());
 
 			if (!matcher.matches())
 			{

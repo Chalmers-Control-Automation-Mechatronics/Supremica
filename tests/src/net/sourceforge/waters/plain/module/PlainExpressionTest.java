@@ -35,7 +35,6 @@ package net.sourceforge.waters.plain.module;
 
 import net.sourceforge.waters.model.expr.AbstractExpressionTest;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 public class PlainExpressionTest extends AbstractExpressionTest
@@ -56,6 +55,7 @@ public class PlainExpressionTest extends AbstractExpressionTest
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.expr.AbstractExpressionTest
+  @Override
   protected ModuleProxyFactory getFactory()
   {
     return ModuleElementFactory.getInstance();

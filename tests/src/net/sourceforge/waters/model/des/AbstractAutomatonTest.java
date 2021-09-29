@@ -41,11 +41,6 @@ import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 
 
 /**
@@ -244,6 +239,7 @@ public abstract class AbstractAutomatonTest
   /**
    * Creates the automata and stores them in memory for testing.
    */
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -479,6 +475,7 @@ public abstract class AbstractAutomatonTest
 
   }
 
+  @Override
   protected void tearDown() throws Exception
   {
     mAutomata = null;

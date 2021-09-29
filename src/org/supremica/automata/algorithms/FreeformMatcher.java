@@ -49,18 +49,17 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import org.supremica.automata.algorithms.StateMatcher;
-import org.supremica.automata.algorithms.SearchStates;
+import java.util.regex.Pattern;
+
 
 public class FreeformMatcher
 	implements StateMatcher
 {
-	private Pattern pattern;
-	private String stateSep;
+	private final Pattern pattern;
+	private final String stateSep;
 
-	public FreeformMatcher(Pattern p, String s)
+	public FreeformMatcher(final Pattern p, final String s)
 	{
 		pattern = p;
 		stateSep = s;
@@ -68,11 +67,12 @@ public class FreeformMatcher
 		// dbg: System.err.println("FreeformMatcher::constructing");
 	}
 
-	public boolean matches(SearchStates.StateIterator it)
+	@Override
+  public boolean matches(final SearchStates.StateIterator it)
 	{
 
 		// Make up a global name
-		StringBuilder stateName = new StringBuilder();
+		final StringBuilder stateName = new StringBuilder();
 
 		while (it.hasNext())
 		{
@@ -91,7 +91,7 @@ public class FreeformMatcher
 		 * System.err.println("FreeformMatcher::matching(\"" + state_name.toString() + "\"," + pattern.getPattern() + ") = " + new Boolean(result).toString());
 		 * return result;
 		 */
-		Matcher matcher = pattern.matcher(stateName.toString());
+		final Matcher matcher = pattern.matcher(stateName.toString());
 
 		return matcher.matches();
 	}

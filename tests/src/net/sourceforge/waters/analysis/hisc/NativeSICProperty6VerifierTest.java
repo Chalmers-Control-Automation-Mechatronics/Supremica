@@ -36,7 +36,6 @@ package net.sourceforge.waters.analysis.hisc;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -65,6 +64,7 @@ public class NativeSICProperty6VerifierTest extends
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {

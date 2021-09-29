@@ -49,14 +49,10 @@
  */
 package org.supremica.automata;
 
-import java.lang.String;
 import java.util.Map;
 
 import org.supremica.util.SupremicaException;
-import org.supremica.automata.Automata;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.State;
-import org.supremica.automata.KripkeLabel;
+
 
 /**
  * A compositional supervisor (see the "Supervision Equivalence"
@@ -82,24 +78,25 @@ public class CompositionalSupervisor
      * from a state (array) to a YES/NO verdict on whether the state
      * is allowed by the supervisor. Used by the isEnabled-method.
      */
-    public CompositionalSupervisor(Automata model, Map<KripkeLabel,KripkeLabel>[] mapArray, String compositionScheme)
+    public CompositionalSupervisor(final Automata model, final Map<KripkeLabel,KripkeLabel>[] mapArray, final String compositionScheme)
     throws SupremicaException
     {
         super(model);
     }
-    
+
     ////////////////////////////////////////
     // Supervisor interface methods       //
     // (inherited from ModularSupervisor  //
     // and overridden here)               //
     ////////////////////////////////////////
-    
+
     // We need to override this one
-    public boolean isEnabled(LabeledEvent event)
+    @Override
+    public boolean isEnabled(final LabeledEvent event)
     {
         // Find out which state the system would be in if event was execuded.
         // Save the current global state
-        State[] currentStateSave = (State[]) currentGlobalState.clone();
+        final State[] currentStateSave = currentGlobalState.clone();
         // We would end up (hypotetically) in some other state...
         try
         {
@@ -108,7 +105,7 @@ public class CompositionalSupervisor
             // Restore order
             currentGlobalState = currentStateSave;
         }
-        catch (EventDisabledException ex)
+        catch (final EventDisabledException ex)
         {
             // Restore order
             currentGlobalState = currentStateSave;
@@ -117,17 +114,18 @@ public class CompositionalSupervisor
             // enables or disables the event)
             return false;
         }
-        
+
         // ... examine if hypotheticalState maps to "OK" or "BAD".
-        
+
         // INSERT CODE HERE
-        
+
         return true;
     }
 
     /**
      * Returns a "flat" automata model representing the compositional supervisor.
      */
+    @Override
     public Automata getAsAutomata()
     {
         throw new UnsupportedOperationException("The algorithm for transforming the compositional supervisor to a 'flat' automata is not implemented.");

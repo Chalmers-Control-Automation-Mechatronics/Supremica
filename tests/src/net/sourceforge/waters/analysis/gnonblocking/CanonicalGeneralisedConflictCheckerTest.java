@@ -39,7 +39,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.gnonblocking.CanonicalGeneralisedConflictChecker;
 
 
 public class CanonicalGeneralisedConflictCheckerTest extends
@@ -63,6 +62,7 @@ public class CanonicalGeneralisedConflictCheckerTest extends
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker createModelVerifier(final ProductDESProxyFactory factory)
   {
     return new CanonicalGeneralisedConflictChecker(factory);
