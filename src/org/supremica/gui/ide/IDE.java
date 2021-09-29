@@ -427,10 +427,16 @@ public class IDE
     } else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.getValue()) {
       ide.openEmptyDocument();
     }
-    // Show!
-    ide.setVisible(true);
-    ide.initializeLoggers(hasFiles ||
-                          Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.getValue());
+    // Show---invokeLater seems necessary to launch from Eclipse 2021-09
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run()
+      {
+        ide.setVisible(true);
+        ide.initializeLoggers(hasFiles ||
+                              Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.getValue());
+      }
+    });
   }
 
 
