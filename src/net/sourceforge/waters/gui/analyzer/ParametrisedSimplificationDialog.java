@@ -125,7 +125,8 @@ public class ParametrisedSimplificationDialog
      final AutomatonSimplifierCreator creator)
   {
     final ModelAnalyzer analyzer = getAnalyzer();
-    return new SimplificationProgressDialog(ide, analyzer, creator.getName());
+    return new SimplificationProgressDialog
+      (ide, analyzer, creator.getName() + " Simplification");
   }
 
 

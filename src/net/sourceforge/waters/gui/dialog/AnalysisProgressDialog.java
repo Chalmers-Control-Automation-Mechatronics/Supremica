@@ -52,6 +52,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -222,6 +225,18 @@ public abstract class AnalysisProgressDialog extends JDialog
     mBottomPanel.add(button, BorderLayout.EAST);
   }
 
+  protected void showRunTime(final AnalysisResult result)
+  {
+    final long time = result.getRunTime();
+    if (time >= 0) {
+      final Logger logger = LogManager.getFormatterLogger();
+      if (logger.isInfoEnabled()) {
+        logger.info("%s completed in %.1fs.",
+                    getWindowTitle(), 0.001 * time);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class AnalyzerThread
@@ -262,6 +277,7 @@ public abstract class AnalysisProgressDialog extends JDialog
         public void run()
         {
           final AnalysisResult result = mAnalyzer.getAnalysisResult();
+          showRunTime(result);
           if (result.isSatisfied()) {
             succeed();
           } else {

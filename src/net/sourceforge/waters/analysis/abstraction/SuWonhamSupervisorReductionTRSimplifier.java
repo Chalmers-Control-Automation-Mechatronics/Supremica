@@ -48,9 +48,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -60,6 +57,9 @@ import net.sourceforge.waters.analysis.tr.WatersIntPairStack;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
@@ -835,8 +835,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
           }
           checkAbort();
           final ListBufferPartition partition = checkMergibility(state1, state2);
-          // System.out.format("%d/%d - %s\n", state1, state2,
-          //                   partition == null ? "failed" : "merged");
+//          final Logger logger = LogManager.getFormatterLogger();
+//          logger.debug("%d/%d - %s", state1, state2,
+//                       partition == null ? "failed" : "merged");
           result = incorporatePartition(result, partition);
         }
       }
@@ -893,8 +894,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
           }
           checkAbort();
           final ListBufferPartition partition = checkMergibility(state1, state2);
-          // System.out.format("%d/%d - %s\n", state1, state2,
-          //                   partition == null ? "failed" : "merged");
+//          final Logger logger = LogManager.getFormatterLogger();
+//          logger.debug("%d/%d - %s", state1, state2,
+//                       partition == null ? "failed" : "merged");
           result = incorporatePartition(result, partition);
           if (!rel.isReachable(state1)) {
             continue outerLoop;
@@ -954,8 +956,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
           }
           checkAbort();
           final ListBufferPartition partition = checkMergibility(state1, state2);
-          // System.out.format("%d/%d - %s\n", state1, state2,
-          //                   partition == null ? "failed" : "merged");
+//          final Logger logger = LogManager.getFormatterLogger();
+//          logger.debug("%d/%d - %s", state1, state2,
+//                       partition == null ? "failed" : "merged");
           result = incorporatePartition(result, partition);
           if (!rel.isReachable(state1)) {
             continue outerLoop;

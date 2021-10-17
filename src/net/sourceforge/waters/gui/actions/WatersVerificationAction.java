@@ -42,6 +42,7 @@ import net.sourceforge.waters.gui.dialog.VerificationProgressDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -186,6 +187,14 @@ public class WatersVerificationAction
     protected String getSuccessDescription()
     {
       return WatersVerificationAction.this.getSuccessDescription();
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.gui.dialog.AnalysisProgressDialog
+    @Override
+    protected void showRunTime(final AnalysisResult result)
+    {
     }
 
     //#######################################################################
