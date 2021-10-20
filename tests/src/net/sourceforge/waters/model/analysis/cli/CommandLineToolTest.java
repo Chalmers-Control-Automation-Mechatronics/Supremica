@@ -167,6 +167,15 @@ public class CommandLineToolTest
     testCommandLine("mono-diag-fault", args, true);
   }
 
+  public void testAnalyzer_MonolithicSynthesis()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "synthesis", "ransomware_sample");
+    final String[] args = new String[]
+      {"-mono", "-synth", "-red", "Small cliques", file.toString()};
+    testCommandLine("mono-synth", args, true, " *S:4", "! *S:5");
+  }
+
   public void testAnalyzer_NativeControllability()
     throws Exception
   {

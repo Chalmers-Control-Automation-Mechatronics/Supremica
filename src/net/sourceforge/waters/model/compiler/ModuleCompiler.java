@@ -299,7 +299,9 @@ public class ModuleCompiler extends AbortableCompiler
       final Collection<String> props = opt.getValue();
       setEnabledPropertyNames(props);
     } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ConflictChecker_ConfiguredDefaultMarking)) {
+                            OPTION_ConflictChecker_ConfiguredDefaultMarking) ||
+               option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking)) {
       final PropositionOption opt = (PropositionOption) option;
       final EventProxy event = opt.getValue();
       final String name =
