@@ -913,6 +913,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           return false;
         }
       } else {
+        // TODO Add Boolean return value to abandon state.
         createSuccessorStates(encoded, decoded, event);
       }
     } else if (isSensitiveToControllability() &&

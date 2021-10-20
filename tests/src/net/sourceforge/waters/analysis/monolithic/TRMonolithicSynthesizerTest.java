@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,8 +41,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
-import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -100,32 +96,7 @@ public class TRMonolithicSynthesizerTest
     throws Exception
   {
     super.checkResult(des, result, expect);
-    if (result.isSatisfied()) {
-      // For monolithic synthesis, check whether the computed supervisor is
-      // isomorphic (including markings) to the synchronous product of the
-      // expected result and the plants and specs in the system.
-      final Collection<? extends AutomatonProxy> computedSupervisors =
-        result.getComputedAutomata();
-      assertEquals("Monolithic synthesis did not return exactly one supervisor!",
-                   1, computedSupervisors.size());
-      final AutomatonProxy computedSupervisor =
-        computedSupervisors.iterator().next();
-      final ProductDESProxyFactory factory = getProductDESProxyFactory();
-      final MonolithicSynchronousProductBuilder builder =
-        new MonolithicSynchronousProductBuilder(des, factory);
-      builder.setOutputName(des.getName());
-      builder.setOutputKind(ComponentKind.SUPERVISOR);
-      builder.setRemovingSelfloops(true);
-      final EventProxy marking =
-        AbstractConflictChecker.findMarkingProposition(des);
-      final Collection<EventProxy> props = Collections.singletonList(marking);
-      builder.setPropositions(props);
-      assertTrue(builder.run());
-      final AutomatonProxy expectedSupervisor = builder.getComputedAutomaton();
-      final IsomorphismChecker checker =
-        new IsomorphismChecker(factory, false, true);
-      checker.checkIsomorphism(computedSupervisor, expectedSupervisor);
-    }
+    checkMonolithicResult(des, result);
   }
 
   @Override
