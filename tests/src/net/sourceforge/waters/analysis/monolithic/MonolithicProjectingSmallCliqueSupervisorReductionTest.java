@@ -71,6 +71,7 @@ public class MonolithicProjectingSmallCliqueSupervisorReductionTest
       new SimpleSupervisorReductionFactory(projector, simplifier);
     synthesizer.setSupervisorReductionFactory(reduction);
     synthesizer.setSupervisorLocalizationEnabled(true);
+    synthesizer.setSupervisorReductionMaxIncrease(8.0);
     return synthesizer;
   }
 

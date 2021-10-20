@@ -173,13 +173,16 @@ public interface SupervisorReductionFactory
     //# Constructor
     private ConditionalSupervisorReductionSubChain(final double maxIncrease)
     {
-      add(new SpecialEventsTRSimplifier());
-      add(new TauLoopRemovalTRSimplifier());
-      add(new SilentIncomingTRSimplifier());
+      // tau elimination seems more appealing but blow-up from subset
+      // construction increases, e.g. for transferline test case.
+      final TauEliminationTRSimplifier tauEliminator =
+        new TauEliminationTRSimplifier();
+      tauEliminator.setTauOnly(false);
+      add(tauEliminator);
       final ObservationEquivalenceTRSimplifier bisimulator1 =
         new ObservationEquivalenceTRSimplifier();
       bisimulator1.setEquivalence
-        (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       add(bisimulator1);
       final SubsetConstructionTRSimplifier subset =
         new SubsetConstructionTRSimplifier();

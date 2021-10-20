@@ -242,7 +242,7 @@ public class TauEliminationTRSimplifier
       return e == EventEncoding.TAU;
     } else {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final byte status = rel.getProperEventStatus(EventEncoding.TAU);
+      final byte status = rel.getProperEventStatus(e);
       return (status & EventStatus.STATUS_LOCAL) != 0;
     }
   }

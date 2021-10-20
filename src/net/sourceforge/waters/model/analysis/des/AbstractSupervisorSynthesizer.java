@@ -331,6 +331,6 @@ public abstract class AbstractSupervisorSynthesizer
   private SupervisorReductionFactory mSupervisorReductionFactory =
     new ProjectingSupervisorReductionFactory();
   private boolean mSupervisorLocalizationEnabled = false;
-  private double mSupervisorReductionMaxIncrease = 2.5;
+  private double mSupervisorReductionMaxIncrease = 10.0;
 
 }

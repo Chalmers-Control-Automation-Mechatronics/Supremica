@@ -261,7 +261,7 @@ public abstract class AbstractModelAnalyzerFactory
               "If using supervisor reduction projection, limit the growth " +
               "of intermediate results by this factor.",
               "-maxinc",
-              2.5, 1.0, Double.POSITIVE_INFINITY));
+              10.0, 1.0, Double.POSITIVE_INFINITY));
     db.register(new EnumOption<SupervisorReductionMainMethod>
              (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
               "Supervisor reduction method",
