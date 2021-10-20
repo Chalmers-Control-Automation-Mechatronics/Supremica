@@ -333,7 +333,9 @@ public class CommandLineToolTest
                     "=ModuleCompiler supports the following options:",
                     "=-opt\\|-nopt.*",
                     "=CommandLineTool supports the following options:",
-                    "=-quiet\\|-q.*");
+                    "=-quiet\\|-q.*",
+                    "=Java VM supports the following options:",
+                    "=-Xmx<memory>.*");
   }
 
   public void testOption_HelpChain()

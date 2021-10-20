@@ -37,6 +37,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -282,6 +283,9 @@ public class CommandLineOptionContext implements OptionContext
     for (final ArgumentSource source : mArgumentSources) {
       source.showHelpMessage(stream);
     }
+    final LeafOptionPage page = new JavaOptionPage();
+    final ArgumentSource source = new ArgumentSource(page);
+    source.showHelpMessage(stream);
   }
 
 
@@ -315,8 +319,21 @@ public class CommandLineOptionContext implements OptionContext
     private ArgumentSource(final LeafOptionPage page,
                            final Configurable configurable)
     {
-      mConfigurableClass = configurable.getClass();
+      mTitle = ProxyTools.getShortClassName(configurable);
       final List<Option<?>> options = configurable.getOptions(page);
+      mArguments = new ArrayList<>(options.size());
+      for (final Option<?> option : options) {
+        final OptionCommandLineArgument<?> arg = registerOption(option);
+        if (arg != null) {
+          mArguments.add(arg);
+        }
+      }
+    }
+
+    private ArgumentSource(final LeafOptionPage page)
+    {
+      mTitle = page.getTitle();
+      final Collection<Option<?>> options =  page.getRegisteredOptions();
       mArguments = new ArrayList<>(options.size());
       for (final Option<?> option : options) {
         final OptionCommandLineArgument<?> arg = registerOption(option);
@@ -346,7 +363,7 @@ public class CommandLineOptionContext implements OptionContext
 
     private void showHelpMessage(final PrintStream stream)
     {
-      stream.print(ProxyTools.getShortClassName(mConfigurableClass));
+      stream.print(mTitle);
       stream.println(" supports the following options:");
       final List<CommandLineArgument> args = new ArrayList<>(mArguments);
       Collections.sort(args);
@@ -363,7 +380,7 @@ public class CommandLineOptionContext implements OptionContext
 
     //#######################################################################
     //# Data Members
-    private final Class<? extends Configurable> mConfigurableClass;
+    private final String mTitle;
     private final List<CommandLineArgument> mArguments;
   }
 
@@ -490,6 +507,29 @@ public class CommandLineOptionContext implements OptionContext
 
 
   //#########################################################################
+  //# Inner Class JavaOptionPage
+  private class JavaOptionPage
+    extends SimpleLeafOptionPage
+  {
+    //#######################################################################
+    //# Constructor
+    public JavaOptionPage()
+    {
+      super("java", "Java VM");
+      register(new BooleanOption(OPTION_Java_Assertions, null,
+                                 "Enable assertions for debugging",
+                                 "+ea|+enableassertions", false));
+      register(new BooleanOption(OPTION_Java_Heap, null,
+                                 "Maximum heap memory, e.g., -Xmx2048m or -Xmx4g",
+                                 "+Xmx<memory>", false));
+      register(new BooleanOption(OPTION_Java_Stack, null,
+                                 "Maximum stack memory, e.g., -Xms1024m",
+                                 "+Xms<memory>", false));
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final Map<String,CommandLineArgument> mArgumentMap;
   private final List<ArgumentSource> mArgumentSources;
@@ -511,5 +551,9 @@ public class CommandLineOptionContext implements OptionContext
     "CommandLineTool.Timeout";
   public static final String OPTION_CommandLineTool_Verbose =
     "CommandLineTool.Verbose";
+
+  public static final String OPTION_Java_Assertions = "Java.Assertions";
+  public static final String OPTION_Java_Heap = "Java.Heap";
+  public static final String OPTION_Java_Stack = "Java.Stack";
 
 }
