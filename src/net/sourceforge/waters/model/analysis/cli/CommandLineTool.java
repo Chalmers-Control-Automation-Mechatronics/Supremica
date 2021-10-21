@@ -73,6 +73,8 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.SAXCounterExampleMarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
@@ -194,16 +196,21 @@ public class CommandLineTool implements Configurable
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final ValidUnmarshaller importer =
+      final ValidUnmarshaller validUnmarshaller =
         new ValidUnmarshaller(moduleFactory, optable);
       final SAXModuleMarshaller moduleMarshaller =
         new SAXModuleMarshaller(moduleFactory, optable, false);
       final SAXProductDESMarshaller desMarshaller =
         new SAXProductDESMarshaller(desFactory);
+      final SAXCounterExampleMarshaller traceMarshaller =
+        new SAXCounterExampleMarshaller(desFactory);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
-      docManager.registerUnmarshaller(importer);
+      docManager.registerUnmarshaller(validUnmarshaller);
+      docManager.registerMarshaller(desMarshaller);
+      docManager.registerMarshaller(moduleMarshaller);
+      docManager.registerMarshaller(traceMarshaller);
 
       if (mVerbosity != null) {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
@@ -290,13 +297,31 @@ public class CommandLineTool implements Configurable
           }
           if (result instanceof ProxyResult<?>) {
             final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
-            final Proxy proxy = proxyResult.getComputedProxy();
-            if (proxy != null) {
+            final Proxy resultProxy = proxyResult.getComputedProxy();
+            if (resultProxy != null) {
               final String description = proxyResult.getResultDescription();
-              System.out.println(SEPARATOR);
-              System.out.println(description + ":");
-              System.out.print(proxy);
-              additions = true;
+              if (mOutputFile != null && resultProxy instanceof DocumentProxy) {
+                final DocumentProxy resultDoc;
+                if (resultProxy instanceof ProductDESProxy &&
+                    SAXModuleMarshaller.WMOD_FILE_FILTER.accept(mOutputFile)) {
+                  final ProductDESProxy resultDES = (ProductDESProxy) resultProxy;
+                  final ProductDESImporter importer =
+                    new ProductDESImporter(moduleFactory, docManager);
+                  resultDoc = importer.importModule(resultDES);
+                } else {
+                  resultDoc = (DocumentProxy) resultProxy;
+                }
+                docManager.saveAs(resultDoc, mOutputFile);
+                if (mVerbosity.isLessSpecificThan(Level.INFO)) {
+                  formatter.format("%s saved to %s\n",
+                                   description, mOutputFile.toString());
+                }
+              } else {
+                System.out.println(SEPARATOR);
+                System.out.println(description + ":");
+                System.out.print(resultProxy);
+                additions = true;
+              }
             }
           }
         } catch (final OutOfMemoryError error) {
@@ -376,6 +401,8 @@ public class CommandLineTool implements Configurable
                          OPTION_CommandLineTool_Timeout);
     page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Verbose);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Xml);
     return options;
   }
 
@@ -434,6 +461,10 @@ public class CommandLineTool implements Configurable
       if (flag.getBooleanValue()) {
         mVerbosity = Level.ALL;
       }
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Xml)) {
+      final FileOption opt = (FileOption) option;
+      mOutputFile = opt.getValue();
     }
   }
 
@@ -522,6 +553,7 @@ public class CommandLineTool implements Configurable
   private boolean mStats = false;
   private int mTimeout = -1;
   private PrintWriter mCsv = null;
+  private File mOutputFile = null;
   private String mToolName =
     "java " + ProxyTools.getShortClassName(CommandLineTool.class);
   private boolean mCsvFirst = true;

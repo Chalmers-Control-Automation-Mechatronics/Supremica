@@ -48,8 +48,13 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.config.Version;
-import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
@@ -65,7 +70,7 @@ import org.apache.logging.log4j.LogManager;
  */
 
 public class CommandLineToolTest
-  extends AbstractWatersTest
+  extends AbstractAnalysisTest
 {
 
   //#########################################################################
@@ -167,13 +172,33 @@ public class CommandLineToolTest
     testCommandLine("mono-diag-fault", args, true);
   }
 
-  public void testAnalyzer_MonolithicSynthesis()
+  public void testAnalyzer_MonolithicSynthesisReduced()
     throws Exception
   {
     final File file = getInputWmod("tests", "synthesis", "ransomware_sample");
     final String[] args = new String[]
       {"-mono", "-synth", "-red", "Small cliques", file.toString()};
-    testCommandLine("mono-synth", args, true, " *S:4", "! *S:5");
+    testCommandLine("mono-synth-red", args, true, " *S:4", "! *S:5");
+  }
+
+  public void testAnalyzer_MonolithicSynthesisSaved()
+    throws Exception
+  {
+    final String name = "small_factory_2";
+    final File file = getInputWmod("tests", "synthesis", name);
+    final File saveFile = new File(getOutputDirectory(), name + ".wmod");
+    final String[] args = new String[]
+      {"-mono", "-synth", "-o", saveFile.toString(), file.toString()};
+    testCommandLine("mono-synth-saved", args, true,
+                    "supervisor saved to " + saveFile);
+    final DocumentManager manager = getDocumentManager();
+    final ModuleProxy module = (ModuleProxy) manager.load(saveFile);
+    final List<Proxy> components = module.getComponentList();
+    assertEquals("Unexpected number of components in output!",
+                 1, components.size());
+    final SimpleComponentProxy comp = (SimpleComponentProxy) components.get(0);
+    assertEquals("Unexpected component kind of output supervisor!",
+                 ComponentKind.SUPERVISOR, comp.getKind());
   }
 
   public void testAnalyzer_NativeControllability()

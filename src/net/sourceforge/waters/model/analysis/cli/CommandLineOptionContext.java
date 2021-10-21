@@ -502,6 +502,10 @@ public class CommandLineOptionContext implements OptionContext
       register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
                                  "Verbose log output",
                                  "+verbose|+v", false));
+      register(new FileOption(OPTION_CommandLineTool_Xml, null,
+                              "Save output data (counterexample or " +
+                              "supervisor) to XML file", "-o",
+                              FileOption.Type.OUTPUT_FILE));
     }
   }
 
@@ -551,6 +555,8 @@ public class CommandLineOptionContext implements OptionContext
     "CommandLineTool.Timeout";
   public static final String OPTION_CommandLineTool_Verbose =
     "CommandLineTool.Verbose";
+  public static final String OPTION_CommandLineTool_Xml =
+    "CommandLineTool.Xml";
 
   public static final String OPTION_Java_Assertions = "Java.Assertions";
   public static final String OPTION_Java_Heap = "Java.Heap";
