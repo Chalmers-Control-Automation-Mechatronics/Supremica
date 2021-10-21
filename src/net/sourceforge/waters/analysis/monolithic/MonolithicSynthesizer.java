@@ -375,9 +375,8 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
     mLocalStack = new ArrayDeque<int[]>();
     mBackTrace = new ArrayDeque<int[]>();
     mStateTuples = new ArrayList<int[]>();
-    mTransitionBuffer = new TIntArrayList();
     mUnvisited = new ArrayDeque<int[]>(100);
-    mNumStates = 0;
+    mNumStates = mNumTransitions = 0;
 
     final int[] sizes = StateTupleEncoding.getAutomataSizes(mAutomata);
     mSTEncoding = new StateTupleEncoding(sizes);
@@ -448,9 +447,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
     result.setTotalNumberOfEvents(mNumProperEvents - 1); // do not include tau
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
-    if (mTransitionBuffer != null) {
-      result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
-    }
+    result.setNumberOfTransitions(mNumTransitions);
     if (mMinimizationChain != null) {
       result.addSimplifierStatistics(mMinimizationChain);
     }
@@ -475,7 +472,6 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
     mGlobalVisited = null;
     mStateTuples = null;
     mUnvisited = null;
-    mTransitionBuffer = null;
     mTargetTuple = null;
     mMinimizationChain = mReductionChain = null;
   }
@@ -985,6 +981,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
                                 final int event) throws OverflowException
     {
       if (a == 0) {
+        mNumTransitions++;
         if (!processNewState(decodedSource, event, decodedSource == null)) {
           return false;
         }
@@ -1302,11 +1299,12 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
 
   private List<AutomatonProxy> mAutomata;
   private EventEncoding mEventEncoding;
-  private TIntArrayList mTransitionBuffer;
+  //private TIntArrayList mTransitionBuffer;
 
   private int mNumAutomata;
   private int mNumPlants;
   private int mNumStates;
+  private int mNumTransitions;
   private int mNumInitialStates;
   private int mNumProperEvents;
   private int mNumControllableEvents;

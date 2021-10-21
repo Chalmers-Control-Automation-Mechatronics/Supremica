@@ -111,17 +111,26 @@ public class DefaultProductDESResult
     if (automata != null) {
       final int numAutomata = automata.size();
       writer.println("Number of computed automata: " + numAutomata);
-      long total = 0;
-      int max = 0;
+      long totalStates = 0;
+      int maxStates = 0;
+      long totalTrans = 0;
+      int maxTrans = 0;
       for (final AutomatonProxy aut : automata) {
         final int numStates = aut.getStates().size();
-        total += numStates;
-        if (numStates > max) {
-          max = numStates;
+        totalStates += numStates;
+        if (numStates > maxStates) {
+          maxStates = numStates;
+        }
+        final int numTrans = aut.getTransitions().size();
+        totalTrans += numTrans;
+        if (numTrans > maxTrans) {
+          maxTrans = numTrans;
         }
       }
-      writer.println("Total number of computed states: " + total);
-      writer.println("Maximum number of computed states: " + max);
+      writer.println("Total number of computed states: " + totalStates);
+      writer.println("Maximum number of computed states: " + maxStates);
+      writer.println("Total number of computed transitions: " + totalTrans);
+      writer.println("Maximum number of computed transitions: " + maxTrans);
     }
   }
 
