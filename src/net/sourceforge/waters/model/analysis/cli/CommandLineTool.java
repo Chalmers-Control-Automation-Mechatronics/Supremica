@@ -227,6 +227,7 @@ public class CommandLineTool implements Configurable
       }
 
       for (final String name : argList) {
+        final long start = System.currentTimeMillis();
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
         final ProductDESProxy des;
@@ -236,7 +237,7 @@ public class CommandLineTool implements Configurable
           des = (ProductDESProxy) doc;
           fullName = des.getName();
         } else {
-          final long start = System.currentTimeMillis();
+          final long compileStart = System.currentTimeMillis();
           final ModuleProxy module = (ModuleProxy) doc;
           final List<ParameterBindingProxy> bindings =
             CompilerOptions.PARAMETER_BINDINGS.getValue();
@@ -249,12 +250,13 @@ public class CommandLineTool implements Configurable
           try {
             des = compiler.compile();
             final long stop = System.currentTimeMillis();
-            compileTime = stop - start;
+            compileTime = stop - compileStart;
           } catch (final EvalAbortException exception) {
             final long stop = System.currentTimeMillis();
-            compileTime = stop - start;
-            showSupportedException(exception);
+            final float difftime = 0.001f * (stop - start);
+            formatter.format("TIMEOUT (%.3f s)\n", difftime);
             final AnalysisResult result = new DefaultAnalysisResult(mAnalyzer);
+            compileTime = stop - compileStart;
             result.setCompileTime(compileTime);
             result.setException(exception);
             writeCSV(fullName, result);
@@ -270,7 +272,6 @@ public class CommandLineTool implements Configurable
           System.out.flush();
         }
 
-        final long start = System.currentTimeMillis();
         mContext.setProductDES(des);
         mContext.configure(mAnalyzer);
         mAnalyzer.setModel(des);
@@ -336,6 +337,10 @@ public class CommandLineTool implements Configurable
         } catch (final OverflowException overflow) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
+          final String msg = overflow.getMessage();
+          if (mVerbosity != Level.OFF && msg != null) {
+            System.out.println(msg);
+          }
           formatter.format("OVERFLOW (%.3f s)\n", difftime);
         } catch (final AnalysisAbortException abort) {
           final long stop = System.currentTimeMillis();

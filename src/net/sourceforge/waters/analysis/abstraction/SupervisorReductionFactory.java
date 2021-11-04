@@ -36,7 +36,12 @@ package net.sourceforge.waters.analysis.abstraction;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -119,7 +124,8 @@ public interface SupervisorReductionFactory
       }
       if (projector != null) {
         add(projector);
-        add(new ConditionalSupervisorReductionSubChain(maxIncrease));
+        add(new ConditionalSupervisorReductionSubChain(maxIncrease,
+                                                       localisation));
       }
       add(main);
       add(new SelfloopSupervisorReductionTRSimplifier());
@@ -171,8 +177,10 @@ public interface SupervisorReductionFactory
   {
     //#######################################################################
     //# Constructor
-    private ConditionalSupervisorReductionSubChain(final double maxIncrease)
+    private ConditionalSupervisorReductionSubChain(final double maxIncrease,
+                                                   final boolean recovering)
     {
+      mRecoveringFromOverflow = recovering;
       // tau elimination seems more appealing but blow-up from subset
       // construction increases, e.g. for transferline test case.
       final TauEliminationTRSimplifier tauEliminator =
@@ -215,10 +223,74 @@ public interface SupervisorReductionFactory
 
     @Override
     protected boolean checkPostCondition(final ListBufferTransitionRelation result)
+      throws OverflowException
     {
       final ListBufferTransitionRelation orig = getTransitionRelation();
-      return result.getNumberOfReachableStates() <=
-             orig.getNumberOfReachableStates();
+      if (result.getNumberOfReachableStates() <
+          orig.getNumberOfReachableStates()) {
+        return true;
+      } else {
+        if (mRecoveringFromOverflow) {
+          final Logger logger = LogManager.getLogger();
+          logger.warn("Projection fails to reduce the number of states, " +
+                      "reverting to original supervisor.");
+        } else {
+          throw new OverflowException
+            ("Projection fails to reduce number of states: " +
+             "better try without projection.");
+        }
+        return false;
+      }
     }
+
+    @Override
+    protected boolean isRecoveringFromOverflow()
+    {
+      return mRecoveringFromOverflow;
+    }
+
+    @Override
+    protected void handleOverflow(final OverflowKind kind,
+                                  final Throwable cause)
+      throws OverflowException
+    {
+      if (mRecoveringFromOverflow) {
+        final Logger logger = LogManager.getLogger();
+        switch (kind) {
+        case STATE:
+          logger.warn("Overflow trying to apply projection, " +
+                      "reverting to original supervisor.");
+          break;
+        case MEMORY:
+          logger.warn("Out of memory trying to apply projection, " +
+                      "reverting to original supervisor.");
+          break;
+        default:
+          break;
+        }
+      } else {
+        switch (kind) {
+        case STATE:
+          OverflowException overflow = new OverflowException
+            ("Growth limit exceeded trying to apply projection: " +
+             "either increase growth limit or try without projection.");
+          overflow.initCause(cause);
+          throw overflow;
+        case MEMORY:
+          overflow = new OverflowException
+            ("Out of memory trying to apply projection: " +
+             "better try without projection.");
+          overflow.initCause(cause);
+          throw overflow;
+        default:
+          break;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final boolean mRecoveringFromOverflow;
   }
+
 }

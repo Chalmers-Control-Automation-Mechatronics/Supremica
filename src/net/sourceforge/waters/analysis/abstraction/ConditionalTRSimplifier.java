@@ -39,6 +39,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 
 
 /**
@@ -257,13 +258,24 @@ public class ConditionalTRSimplifier
       try {
         result = mConditionalChain.run();
       } catch (final OverflowException exception) {
+        handleOverflow(exception.getOverflowKind(), exception);
         return false;
       } catch (final OutOfMemoryError error) {
         System.gc();
+        handleOverflow(OverflowKind.MEMORY, error);
         return false;
       }
     } else {
-      result = mConditionalChain.run();
+      try {
+        result = mConditionalChain.run();
+      } catch (final OverflowException exception) {
+        handleOverflow(exception.getOverflowKind(), exception);
+        throw exception;
+      } catch (final OutOfMemoryError error) {
+        System.gc();
+        handleOverflow(OverflowKind.MEMORY, error);
+        throw new OverflowException(error);
+      }
     }
     if (!result) {
       return false;
@@ -373,6 +385,30 @@ public class ConditionalTRSimplifier
   protected boolean isRecoveringFromOverflow()
   {
     return true;
+  }
+
+  /**
+   * <P>Callback for overflow conditions within the encapsulated simplifier
+   * chain. This method is called after catching an {@link OverflowException}
+   * or {@link OutOfMemoryError} when running the encapsulated chain.</P>
+   *
+   * <P>The default implementation of this handler is empty and does not
+   * need to be called when overriding it.</P>
+   *
+   * @param  kind    The type of overflow, such as {@link OverflowKind#STATE}
+   *                 or {@link OverflowKind#MEMORY}.
+   * @param  cause   The caught exception.
+   * @throws AnalysisException If the callback returns without throwing an
+   *         exception, the conditional simplifier decides based on its
+   *         configuration whether or not to throw an exception.
+   *         The callback may throw an exception to override the configured
+   *         behaviour.
+   * @see #isRecoveringFromOverflow()
+   */
+  protected void handleOverflow(final OverflowKind kind,
+                                final Throwable cause)
+    throws AnalysisException
+  {
   }
 
 
