@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.io.File;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -185,99 +184,18 @@ public abstract class AbstractTRSimplifierTest
 
   //#########################################################################
   //# Instantiating and Checking Modules
-  protected void runTransitionRelationSimplifier
-    (final String group, final String name,
-     final List<ParameterBindingProxy> bindings)
-  throws Exception
+  protected void runTransitionRelationSimplifier(final String... path)
+    throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runTransitionRelationSimplifier(groupdir, name, bindings);
+    runTransitionRelationSimplifier(null, path);
   }
 
   protected void runTransitionRelationSimplifier
-    (final String group, final String subdir,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
-  throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runTransitionRelationSimplifier(groupdir, subdir, name, bindings);
-  }
-
-  protected void runTransitionRelationSimplifier
-    (final File groupdir, final String subdir,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
-  throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runTransitionRelationSimplifier(dir, name, bindings);
-  }
-
-  protected void runTransitionRelationSimplifier
-    (final File dir, final String name,
-     final List<ParameterBindingProxy> bindings)
-  throws Exception
-  {
-    final File filename = new File(dir, name);
-    runTransitionRelationSimplifier(filename, bindings);
-  }
-
-
-  //#########################################################################
-  //# Checking Instantiated Product DES problems
-  protected void runTransitionRelationSimplifier(final String group,
-                                                 final String name)
-  throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runTransitionRelationSimplifier(groupdir, name);
-  }
-
-  protected void runTransitionRelationSimplifier(final String group,
-                                                 final String subdir,
-                                                 final String name)
-  throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runTransitionRelationSimplifier(groupdir, subdir, name);
-  }
-
-  protected void runTransitionRelationSimplifier(final File groupdir,
-                                                 final String subdir,
-                                                 final String name)
-  throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runTransitionRelationSimplifier(dir, name);
-  }
-
-  protected void runTransitionRelationSimplifier(final File dir,
-                                                 final String name)
-  throws Exception
-  {
-    final File filename = new File(dir, name);
-    runTransitionRelationSimplifier(filename);
-  }
-
-  protected void runTransitionRelationSimplifier(final File filename)
-  throws Exception
-  {
-    final List<ParameterBindingProxy> empty = null;
-    runTransitionRelationSimplifier(filename, empty);
-  }
-
-  protected void runTransitionRelationSimplifier
-    (final File filename,
-     final List<ParameterBindingProxy> bindings)
-  throws Exception
+    (final List<ParameterBindingProxy> bindings, final String... path)
+    throws Exception
   {
     mBindings = bindings;
-    final ProductDESProxy des = getCompiledDES(filename, bindings);
+    final ProductDESProxy des = getCompiledDES(bindings, path);
     runTransitionRelationSimplifier(des);
   }
 

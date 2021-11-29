@@ -42,9 +42,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.NameNotFoundException;
@@ -134,10 +137,10 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   protected ProductDESProxy getCompiledDES
     (final List<ParameterBindingProxy> bindings,
-     final String... names)
+     final String... path)
     throws Exception
   {
-    return getCompiledDESRaw(bindings, names);
+    return getCompiledDESRaw(bindings, path);
   }
 
   protected ProductDESProxy getCompiledDESRaw
@@ -280,6 +283,27 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       }
     }
     return result;
+  }
+
+  /**
+   * Creates an event encoding for use with the given product DES and
+   * automaton. This method obtains the event status obtained by calling
+   * {@link #getEventStatusFromAttributes(EventProxy)
+   * getEventStatusFromAttributes()} for each event in the automaton.
+   * More advanced event encodings can be defined by overriding this
+   * method.
+   */
+  protected EventEncoding createEventEncoding(final ProductDESProxy des,
+                                              final AutomatonProxy aut)
+    throws OverflowException
+  {
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final EventEncoding enc = new EventEncoding();
+    for (final EventProxy event : aut.getEvents()) {
+      final byte status = getEventStatusFromAttributes(event);
+      enc.addEvent(event, translator, status);
+    }
+    return enc;
   }
 
   /**

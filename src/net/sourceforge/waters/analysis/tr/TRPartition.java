@@ -190,6 +190,7 @@ public class TRPartition
   public int getClassCode(final int state)
   {
     setUpStateToClass();
+    assert state < mStateToClass.length;
     return mStateToClass[state];
   }
 

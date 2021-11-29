@@ -81,6 +81,9 @@ public class SimpleSupervisorReductionFactory
   /**
    * Creates a supervisor reduction factory that may or may not support
    * for non-localised supervisor reduction, optionally with projection.
+   * @param  projector     A transition relation simplifier that attempts
+   *                       to remove events before invoking the core
+   *                       simplifier.
    * @param  simplifier    The transition relation simplifier that implements
    *                       the core supervisor reduction algorithm.
    */
@@ -88,7 +91,28 @@ public class SimpleSupervisorReductionFactory
     (final TransitionRelationSimplifier projector,
      final SupervisorReductionSimplifier simplifier)
   {
+    this(projector, StateReorderingTRSimplifier.UNCHANGED, simplifier);
+  }
+
+  /**
+   * Creates a supervisor reduction factory that may or may not support
+   * for non-localised supervisor reduction, optionally with projection.
+   * @param  projector     A transition relation simplifier that attempts
+   *                       to remove events before invoking the core
+   *                       simplifier.
+   * @param  ordering      The state ordering to be imposed on the
+   *                       transition relation before invoking the core
+   *                       simplifier.
+   * @param  simplifier    The transition relation simplifier that implements
+   *                       the core supervisor reduction algorithm.
+   */
+  public SimpleSupervisorReductionFactory
+    (final TransitionRelationSimplifier projector,
+     final StateReorderingTRSimplifier.StateOrdering ordering,
+     final SupervisorReductionSimplifier simplifier)
+  {
     mProjector = projector;
+    mStateOrdering = ordering;
     mSimplifier = simplifier;
   }
 
@@ -107,7 +131,8 @@ public class SimpleSupervisorReductionFactory
     (final boolean localisation, final double maxIncrease)
   {
     return new SupervisorReductionChain(mProjector, mSimplifier,
-                                        localisation, maxIncrease);
+                                        mStateOrdering, localisation,
+                                        maxIncrease);
   }
 
   @Override
@@ -120,6 +145,7 @@ public class SimpleSupervisorReductionFactory
   //#########################################################################
   //# Data Members
   private final TransitionRelationSimplifier mProjector;
+  private final StateReorderingTRSimplifier.StateOrdering mStateOrdering;
   private final SupervisorReductionSimplifier mSimplifier;
 
 }

@@ -71,6 +71,28 @@ public class ProjectingSupervisorReductionFactory
 
   /**
    * Creates a supervisor reduction factory that performs supervisor reduction
+   * without projection.
+   * @param  method     An enum constant to specify the method of supervisor
+   *                    reduction.
+   * @param  ordering   The state ordering imposed on the transition
+   *                    relation before invoking the main step of
+   *                    supervisor reduction. It should be one of
+   *                    {@link StateReorderingTRSimplifier#UNCHANGED},
+   *                    {@link StateReorderingTRSimplifier#REVERSED},
+   *                    {@link StateReorderingTRSimplifier#BFS},
+   *                    {@link StateReorderingTRSimplifier#BFS_REVERSED},
+   *                    {@link StateReorderingTRSimplifier#DFS}, or
+   *                    {@link StateReorderingTRSimplifier#DFS_REVERSED}.
+   */
+  public ProjectingSupervisorReductionFactory
+    (final SupervisorReductionMainMethod method,
+     final StateReorderingTRSimplifier.StateOrdering ordering)
+  {
+    this(SupervisorReductionProjectionMethod.OFF, method, ordering);
+  }
+
+  /**
+   * Creates a supervisor reduction factory that performs supervisor reduction
    * and projection.
    * @param  projection An enum constant to specify the method of projection
    *                    to reduce the number of events before supervisor
@@ -82,8 +104,35 @@ public class ProjectingSupervisorReductionFactory
     (final SupervisorReductionProjectionMethod projection,
      final SupervisorReductionMainMethod main)
   {
+    this(projection, main, StateReorderingTRSimplifier.UNCHANGED);
+  }
+
+  /**
+   * Creates a supervisor reduction factory that performs supervisor reduction
+   * and projection.
+   * @param  projection An enum constant to specify the method of projection
+   *                    to reduce the number of events before supervisor
+   *                    reduction.
+   * @param  main       An enum constant to specify the main method of
+   *                    supervisor reduction.
+   * @param  ordering   The state ordering imposed on the transition
+   *                    relation before invoking the main step of
+   *                    supervisor reduction. It should be one of
+   *                    {@link StateReorderingTRSimplifier#UNCHANGED},
+   *                    {@link StateReorderingTRSimplifier#REVERSED},
+   *                    {@link StateReorderingTRSimplifier#BFS},
+   *                    {@link StateReorderingTRSimplifier#BFS_REVERSED},
+   *                    {@link StateReorderingTRSimplifier#DFS}, or
+   *                    {@link StateReorderingTRSimplifier#DFS_REVERSED}.
+   */
+  public ProjectingSupervisorReductionFactory
+    (final SupervisorReductionProjectionMethod projection,
+     final SupervisorReductionMainMethod main,
+     final StateReorderingTRSimplifier.StateOrdering ordering)
+  {
     mProjectionMethod = projection;
     mMainMethod = main;
+    mStateOrdering = ordering;
   }
 
 
@@ -109,6 +158,17 @@ public class ProjectingSupervisorReductionFactory
     return mMainMethod;
   }
 
+  public void setStateOrdering
+    (final StateReorderingTRSimplifier.StateOrdering ordering)
+  {
+    mStateOrdering = ordering;
+  }
+
+  public StateReorderingTRSimplifier.StateOrdering getStateOrdering()
+  {
+    return mStateOrdering;
+  }
+
 
   //#########################################################################
   //# Setting Synthesiser Options
@@ -128,6 +188,15 @@ public class ProjectingSupervisorReductionFactory
     final ProjectingSupervisorReductionFactory factory =
       ensureProjectingSupervisorReductionFactory(synthesizer);
     factory.setMainMethod(method);
+  }
+
+  public static void configureSynthesizer
+    (final SupervisorSynthesizer synthesizer,
+     final StateReorderingTRSimplifier.StateOrdering ordering)
+  {
+    final ProjectingSupervisorReductionFactory factory =
+      ensureProjectingSupervisorReductionFactory(synthesizer);
+    factory.setStateOrdering(ordering);
   }
 
   public static ProjectingSupervisorReductionFactory
@@ -169,7 +238,7 @@ public class ProjectingSupervisorReductionFactory
       final TransitionRelationSimplifier projector =
         mProjectionMethod.createSimplifier();
       final SupervisorReductionSimplifier main = mMainMethod.createSimplifier();
-      return new SupervisorReductionChain(projector, main,
+      return new SupervisorReductionChain(projector, main, mStateOrdering,
                                           localisation, maxIncrease);
     } else {
       return null;
@@ -189,5 +258,7 @@ public class ProjectingSupervisorReductionFactory
     SupervisorReductionProjectionMethod.OFF;
   private SupervisorReductionMainMethod mMainMethod =
     SupervisorReductionMainMethod.OFF;
+  private StateReorderingTRSimplifier.StateOrdering mStateOrdering =
+    StateReorderingTRSimplifier.UNCHANGED;
 
 }

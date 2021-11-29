@@ -37,6 +37,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.StateReorderingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
@@ -44,7 +45,7 @@ import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicSupervisorReductionTest extends
+public class MonolithicSupervisorReductionDiagonal1Test extends
   AbstractSupervisorSynthesizerTest
 {
 
@@ -66,7 +67,8 @@ public class MonolithicSupervisorReductionTest extends
       new MonolithicSynthesizer(factory);
     final SupervisorReductionFactory supRed =
       new ProjectingSupervisorReductionFactory
-      (SupervisorReductionMainMethod.SU_WONHAM);
+        (SupervisorReductionMainMethod.SU_WONHAM_DIAGONAL1,
+         StateReorderingTRSimplifier.BFS);
     synthesizer.setSupervisorReductionFactory(supRed);
     synthesizer.setSupervisorLocalizationEnabled(false);
     return synthesizer;
@@ -78,7 +80,7 @@ public class MonolithicSupervisorReductionTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicSupervisorReductionTest.class);
+      new TestSuite(MonolithicSupervisorReductionDiagonal1Test.class);
     return testSuite;
   }
 

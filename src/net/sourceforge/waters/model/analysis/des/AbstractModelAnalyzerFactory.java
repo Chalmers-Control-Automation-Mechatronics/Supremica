@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.analysis.abstraction.StateReorderingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -255,6 +256,12 @@ public abstract class AbstractModelAnalyzerFactory
               "for each controllable event that needs to be disabled.",
               "-loc",
               false));
+    db.register(new EnumOption<SupervisorReductionMainMethod>
+             (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
+              "Supervisor reduction method",
+              "Core algorithm to reduce the size of computed supervisors.",
+              "-red",
+              SupervisorReductionMainMethod.values()));
     db.register(new DoubleOption
              (OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease,
               "Growth limit for supervisor reduction",
@@ -262,18 +269,18 @@ public abstract class AbstractModelAnalyzerFactory
               "of intermediate results by this factor.",
               "-maxinc",
               10.0, 1.0, Double.POSITIVE_INFINITY));
-    db.register(new EnumOption<SupervisorReductionMainMethod>
-             (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
-              "Supervisor reduction method",
-              "Core algorithm to reduce the size of computed supervisors.",
-              "-red",
-              SupervisorReductionMainMethod.values()));
     db.register(new EnumOption<SupervisorReductionProjectionMethod>
              (OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod,
               "Supervisor reduction projection",
               "Method to reduce the number of events before supervisor reduction.",
               "-redproj",
               SupervisorReductionProjectionMethod.values()));
+    db.register(new EnumOption<StateReorderingTRSimplifier.StateOrdering>
+             (OPTION_SupervisorSynthesizer_SupervisorReductionStateOrdering,
+              "Supervisor reduction state ordering",
+              "State ordering for supervisor reduction.",
+              "-redso",
+              StateReorderingTRSimplifier.getStateOrderingEnumFactory()));
 
     db.register(new BooleanOption
              (OPTION_SynchronousProductBuilder_DetailedOutputEnabled,
@@ -389,6 +396,8 @@ public abstract class AbstractModelAnalyzerFactory
     "SupervisorSynthesizer.SupervisorReductionMainMethod";
   public static final String OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod =
     "SupervisorSynthesizer.SupervisorReductionProjectionMethod";
+  public static final String OPTION_SupervisorSynthesizer_SupervisorReductionStateOrdering =
+    "SupervisorSynthesizer.SupervisorReductionStateOrdering";
 
   public static final String OPTION_SynchronousProductBuilder_DetailedOutputEnabled =
     "SynchronousProductBuilder.DetailedOutputEnabled";

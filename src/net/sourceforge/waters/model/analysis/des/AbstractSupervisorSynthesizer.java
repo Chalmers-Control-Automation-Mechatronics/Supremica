@@ -36,6 +36,7 @@ package net.sourceforge.waters.model.analysis.des;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.StateReorderingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
@@ -186,9 +187,11 @@ public abstract class AbstractSupervisorSynthesizer
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod);
     db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod);
+                       OPTION_SupervisorSynthesizer_SupervisorReductionStateOrdering);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_SupervisorSynthesizer_SupervisorReductionMaxIncrease);
     return options;
@@ -237,6 +240,12 @@ public abstract class AbstractSupervisorSynthesizer
                             OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod)) {
       final EnumOption<SupervisorReductionProjectionMethod> enumOption =
         (EnumOption<SupervisorReductionProjectionMethod>) option;
+      ProjectingSupervisorReductionFactory.configureSynthesizer
+        (this, enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionStateOrdering)) {
+      final EnumOption<StateReorderingTRSimplifier.StateOrdering> enumOption =
+        (EnumOption<StateReorderingTRSimplifier.StateOrdering>) option;
       ProjectingSupervisorReductionFactory.configureSynthesizer
         (this, enumOption.getValue());
     } else if (option.hasID(AbstractModelAnalyzerFactory.

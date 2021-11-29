@@ -371,6 +371,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testMarked() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "marked.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testNoPlant1() throws Exception
   {
     final ProductDESProxy des =

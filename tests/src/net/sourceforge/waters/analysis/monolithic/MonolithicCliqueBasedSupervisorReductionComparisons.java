@@ -261,7 +261,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     throws EventNotFoundException
   {
     final SupervisorReductionFactory factory =
-      new SimpleSupervisorReductionFactory(null, simplifier);
+      new SimpleSupervisorReductionFactory(simplifier);
     mSynthesizer.setSupervisorReductionFactory(factory);
     super.configureSynthesizer(des);
   }
@@ -271,7 +271,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   //# Testing Procedure
   @Override
   protected ProductDESResult runSynthesizer(final ProductDESProxy des,
-                                final boolean expect)
+                                            final boolean expect)
     throws Exception
   {
     return runSynthesizer(des, null, expect);

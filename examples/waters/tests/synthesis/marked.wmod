@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="marked">
+<B:Comment>A test for supervisor reduction.
+In this example, most states are accepting, making it tempting to merge the dump state into an accepting state, in order to whether supervisor reduction correctly refrains from doing this.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="m"/>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="b"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="plant">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="failed">
+<PointGeometry>
+<Point X="192" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="malicious">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="failed">
+<LabelBlock>
+<SimpleIdentifier Name="m"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S2" Target="malicious">
+<LabelBlock>
+<SimpleIdentifier Name="m"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<EndPointGeometry>
+<Point X="128" Y="256"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SUPERVISOR" Name="sup">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S:0">
+<PointGeometry>
+<Point X="96" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S:1">
+<PointGeometry>
+<Point X="96" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S:2">
+<PointGeometry>
+<Point X="96" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S:3">
+<PointGeometry>
+<Point X="96" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S:0" Target="S:1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S:1" Target="S:2">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S:2" Target="S:3">
+<LabelBlock>
+<SimpleIdentifier Name="m"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

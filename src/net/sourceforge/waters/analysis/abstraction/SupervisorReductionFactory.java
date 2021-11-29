@@ -43,7 +43,6 @@ import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
  * An interface to define a supervisor reduction method that can be used
  * by synthesisers ({@link SupervisorSynthesizer}). A supervisor reduction
@@ -113,10 +112,12 @@ public interface SupervisorReductionFactory
       addInitialMinimisationSteps(includeCoreachability);
     }
 
-    public SupervisorReductionChain(final TransitionRelationSimplifier projector,
-                                    final SupervisorReductionSimplifier main,
-                                    final boolean localisation,
-                                    final double maxIncrease)
+    public SupervisorReductionChain
+      (final TransitionRelationSimplifier projector,
+       final SupervisorReductionSimplifier main,
+       final StateReorderingTRSimplifier.StateOrdering ordering,
+       final boolean localisation,
+       final double maxIncrease)
     {
       mMainSimplifier = main;
       if (localisation) {
@@ -126,6 +127,12 @@ public interface SupervisorReductionFactory
         add(projector);
         add(new ConditionalSupervisorReductionSubChain(maxIncrease,
                                                        localisation));
+      }
+      if (!ordering.isTrivial()) {
+        final StateReorderingTRSimplifier orderer =
+          new StateReorderingTRSimplifier();
+        orderer.setStateOrdering(ordering);
+        add(orderer);
       }
       add(main);
       add(new SelfloopSupervisorReductionTRSimplifier());
