@@ -10,7 +10,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="dist/Supremica.jar" sourcepath="src"/>
-	<classpathentry kind="lib" path="lib/log4j-api-2.12.0.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-core-2.12.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.15.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.15.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
