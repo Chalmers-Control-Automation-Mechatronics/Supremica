@@ -34,13 +34,11 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -123,18 +121,15 @@ public class AnalyzerWorkbenchAction extends WatersAnalyzerAction
         public void updated(final Object o) {}
 
         @Override
-        public void automatonAdded(final Automata auta, final Automaton automaton)
+        public void automatonAdded(final Automata automata,
+                                   final Automaton automaton)
         {
+          automaton.setName("wb_sup");
           final AutomataToWaters atw = new AutomataToWaters(factory, des,
                                                             AbstractConflictChecker.getMarkingProposition(des));
-          final AutomatonProxy proxy = atw.convertAutomaton(automaton);
-          final AutomataTableModel model = panel.getAutomataTableModel();
-          model.insertRow(proxy);
-          final List<AutomatonProxy> list = Arrays.asList(new AutomatonProxy[] {proxy});
+          final AutomatonProxy aut = atw.convertAutomaton(automaton);
           final AutomataTable table = panel.getAutomataTable();
-          panel.getAutomataTable().scrollToVisible(list);
-          table.clearSelection();
-          table.addToSelection(list);
+          table.insertAndSelect(aut);
         }
 
         @Override
