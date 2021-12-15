@@ -108,6 +108,25 @@ public class AboutPanel
     }
   }
 
+  public static boolean isDotAvailable()
+  {
+    if (Config.DOT_USE.getValue() &&
+        !(Config.DOT_EXECUTE_COMMAND.getValue()).equals("")) {
+      final DotVersionTask task = new DotVersionTask();
+      final Thread thread = new Thread(task);
+      thread.start();
+      try {
+        thread.join(500);
+      } catch (final InterruptedException exception) {
+        // Interrupted? Timeout? Never mind ...
+      }
+      task.kill();
+      return task.isDotAvailable();
+    } else {
+      return false;
+    }
+  }
+
 
   //#########################################################################
   //# Constructor
@@ -223,8 +242,8 @@ public class AboutPanel
     builder.append("Running in Java ");
     builder.append(version.getJavaVersionText());
     builder.append("<BR>");
-    if (Config.DOT_USE.getValue()
-      && !(Config.DOT_EXECUTE_COMMAND.getValue()).equals("")) {
+    if (Config.DOT_USE.getValue() &&
+        !(Config.DOT_EXECUTE_COMMAND.getValue()).equals("")) {
       final String dotVersion = getDotVersion();
       if (dotVersion == null) {
         builder.append("GraphViz <span style=\"color: red;\">not found</span><BR>");
@@ -316,6 +335,8 @@ public class AboutPanel
             if (minorVersion > 40) {
               mVersionInfo +=
                 " - <span style=\"color: red;\">incompatible</span>";
+            } else {
+              mDotAvailable = true;
             }
           }
         }
@@ -326,12 +347,17 @@ public class AboutPanel
 
     //#######################################################################
     //# Retrieving Result
-    String getVersionInfo()
+    private String getVersionInfo()
     {
       return mVersionInfo;
     }
 
-    void kill()
+    private boolean isDotAvailable()
+    {
+      return mDotAvailable;
+    }
+
+    private void kill()
     {
       if (mProcess != null) {
         mProcess.destroy();
@@ -342,6 +368,7 @@ public class AboutPanel
     //# Data Members
     private Process mProcess = null;
     private String mVersionInfo = null;
+    private boolean mDotAvailable = false;
 
   }
 

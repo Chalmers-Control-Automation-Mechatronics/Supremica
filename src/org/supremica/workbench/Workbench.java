@@ -17,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
+import net.sourceforge.waters.gui.about.AboutPanel;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -820,7 +823,24 @@ class ParamPanel
         this.wb = wb;
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Parameters"));
         setLayout(new GridLayout(0, 1));
-        add(show_graph = new JCheckBox("Show graph", true));
+        final boolean dotAvailable = AboutPanel.isDotAvailable();
+        add(show_graph = new JCheckBox("Show graph", dotAvailable));
+        if (!dotAvailable) {
+          show_graph.setEnabled(false);
+          final StringBuilder builder = new StringBuilder();
+          builder.append("<HTML><BODY><P STYLE=\"font-size: ");
+          builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+          builder.append("px; width: ");
+          builder.append((int) Math.ceil(320 * IconAndFontLoader.GLOBAL_SCALE_FACTOR));
+          builder.append("px;\">");
+          builder.append("GraphViz/Dot not available. ");
+          builder.append("To show the graph, please install GraphViz and ");
+          builder.append("configure it using menu <I>Configure</I>, ");
+          builder.append("<I>Options</I>, tab <I>Supremica Analyzer</I>, ");
+          builder.append("and sub-tab <I>Dot</I>.");
+          builder.append("</P></BODY></HTML>");
+          show_graph.setToolTipText(builder.toString());
+        }
         // These are not used?
         // add(list_uc = new JCheckBox("List new uncontrollable states", true));
         // add(list_nb = new JCheckBox("List new non-blocking states", true));
