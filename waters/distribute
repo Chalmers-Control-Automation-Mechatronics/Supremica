@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #############################################################################
+# USAGE:  distribute <host>  OR  distribute 552
 # Possible host: linux-labs.cms.waikato.ac.nz
 
 SUP_SRC=`dirname "$0"`/..
@@ -8,7 +9,7 @@ SUP_SRC=`readlink -f "$SUP_SRC"`
 SUP_DIST=$SUP_SRC/dist
 W_IN=distrib_inputs
 W_DIST_TMP=waters
-ARCHIVE_PREFIX=waterside27
+ARCHIVE_PREFIX=waterside271
 
 case "$1" in
     552)
@@ -102,8 +103,8 @@ chmod 644 $W_DIST_TMP/README.$RSUFFIX
 install -m 644 $SUP_SRC/platform/$PLATFORM/lib/* $W_DIST_TMP
 install -m 644 Supremica.jar $W_DIST_TMP
 install -m 644 $SUP_DIST/SupremicaLib.jar $W_DIST_TMP
-install -m 644 $SUP_DIST/log4j-api-2.17.0.jar $W_DIST_TMP
-install -m 644 $SUP_DIST/log4j-core-2.17.0.jar $W_DIST_TMP
+install -m 644 $SUP_DIST/log4j-api-2.17.1.jar $W_DIST_TMP
+install -m 644 $SUP_DIST/log4j-core-2.17.1.jar $W_DIST_TMP
 install -m 644 $W_IN/waters.properties $W_DIST_TMP
 
 if [ "$1" = "552" ]
