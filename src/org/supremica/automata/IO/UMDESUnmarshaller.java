@@ -36,7 +36,6 @@ public class UMDESUnmarshaller implements ProxyUnmarshaller<ModuleProxy>
   public UMDESUnmarshaller(final ModuleProxyFactory modfactory)
     throws SAXException
   {
-    builder = new ProjectBuildFromFSM();
     mImporter = new ProductDESImporter(modfactory);
   }
 
@@ -51,6 +50,7 @@ public class UMDESUnmarshaller implements ProxyUnmarshaller<ModuleProxy>
     final URL url = uri.toURL();
     final ProductDESProxy des;
     try {
+      final ProjectBuildFromFSM builder = new ProjectBuildFromFSM();
       des = builder.build(url);
       return mImporter.importModule(des);
     } catch (final Exception ex) {
@@ -88,6 +88,5 @@ public class UMDESUnmarshaller implements ProxyUnmarshaller<ModuleProxy>
 
   //#########################################################################
   //# Data Members
-  private final ProjectBuildFromFSM builder;
   private final ProductDESImporter mImporter;
 }
