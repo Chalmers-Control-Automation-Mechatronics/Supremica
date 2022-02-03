@@ -191,6 +191,7 @@ public class VerificationDialog implements ActionListener
     private final JComboBox<VerificationAlgorithm> algorithmSelector;
     private final JCheckBox showTrace;
     private final JTextArea note;
+//    private final JTextArea hint; // MF Already too much hinting going on by the above note
 
     //private JTextArea note;// = new JTextArea("Bananas...");
     //final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake!
@@ -212,6 +213,10 @@ public class VerificationDialog implements ActionListener
       note = new JTextArea("Note:\n" + "Currently, modular nonblocking\n"
                            + "verification is not supported.");
       note.setBackground(this.getBackground());
+
+//	  hint = new JTextArea("Heuristics: " + minimizationOptions.getMinimizationStrategy().toStringAbbreviated() +
+//	  		" / " + minimizationOptions.getMinimizationHeuristic().toStringAbbreviated() + "\n(Select heuristics on the Advanced options tab)");
+//	  hint.setBackground(this.getBackground());
 
       final Box mainBox = Box.createVerticalBox();
 

@@ -62,6 +62,8 @@ import org.supremica.util.ActionTimer;
  *
  * @author Knut &Aring;kesson
  * @since November 28, 2001
+ *
+ * MF fix issue #138 (Feb 2022), add log of the used strategy and heuristics
  */
 public class AutomataVerificationWorker
     extends Thread
@@ -248,6 +250,9 @@ public class AutomataVerificationWorker
 
             automataVerifier.displayInfo();
             logger.info("Verification completed after " + timer.toString());
+            // MF fix issue #138, add log of the used strategy and heuristics
+            logger.info("Heuristsics: " + minimizationOptions.getMinimizationStrategy().toStringAbbreviated() + " / " + minimizationOptions.getMinimizationHeuristic().toStringAbbreviated());
+            logger.debug("Spurious debug message, does it show?");
         }
         else
         {

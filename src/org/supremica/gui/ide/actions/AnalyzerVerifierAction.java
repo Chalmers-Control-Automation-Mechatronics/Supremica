@@ -57,7 +57,9 @@ import org.supremica.gui.VerificationDialog;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.ModuleContainer;
 
-
+/**
+ *	MF fix issue #138 (Feb 2022), make mOptions static final to remember setting between invokations
+**/
 public class AnalyzerVerifierAction
     extends IDEAction
 {
@@ -82,6 +84,9 @@ public class AnalyzerVerifierAction
         doAction();
     }
 
+	// MF, fix issue #138, static final makes Supremica remember the chosen options between invokations
+	static final MinimizationOptions mOptions = MinimizationOptions.getDefaultVerificationOptions();
+
     @Override
     public void doAction()
     {
@@ -101,8 +106,7 @@ public class AnalyzerVerifierAction
       }
       // Get the current options and allow the user to change them...
       final VerificationOptions vOptions = new VerificationOptions();
-      final MinimizationOptions mOptions =
-        MinimizationOptions.getDefaultVerificationOptions();
+ //     final MinimizationOptions mOptions = MinimizationOptions.getDefaultVerificationOptions();
       final VerificationDialog verificationDialog =
         new VerificationDialog(ide.getIDE(), vOptions, mOptions);
       verificationDialog.show();

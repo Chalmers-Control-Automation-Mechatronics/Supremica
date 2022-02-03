@@ -49,6 +49,11 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
+/**	MF fix issue #138 (Feb 2022)
+ *	To make the abbreviation visible in the dropdown list, add toStringLong()
+ *	which adds the abbreviation to the description (if they are different)
+ *	Set toString() to call toStringLong() to get the strings to fill in the dropdown
+**/
 public enum MinimizationSelectingHeuristic
 {
     MostLocal("Highest local ratio", "MaxL"),
@@ -74,8 +79,8 @@ public enum MinimizationSelectingHeuristic
 		this.abbreviation = abbreviation;
     }
 
-    @Override
-    public String toString()
+
+    public String toStringDescription()
     {
         return description;
     }
@@ -83,6 +88,26 @@ public enum MinimizationSelectingHeuristic
     public String toStringAbbreviated()
     {
         return abbreviation;
+    }
+
+	// Duplicated code here, see MinimizationStrategy.java, MinimizationHeuristic.java,
+	// MinimizationPreselectingHeuristic.java, MinimizationSelectingHeuristic.java
+	// The common parts should be merged into one.
+	public String toStringLong()
+	{
+		if (description != abbreviation)
+		{
+			// return description + "(" + abbreviation + ")";
+			return "(" + abbreviation + ") " + description;
+		}
+		// If description and abbreviation are the same string, return just that
+		return toStringDescription();
+	}
+
+    @Override
+    public String toString()
+    {
+        return toStringLong();
     }
 
     public static MinimizationSelectingHeuristic toStrategy(final String description)

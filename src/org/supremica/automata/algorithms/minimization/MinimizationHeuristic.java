@@ -53,6 +53,11 @@ import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.GeneticAlgorithms;
 
+/**	MF fix issue #138 (Feb 2022)
+ *	To make the abbreviation visible in the dropdown list, add toStringLong()
+ *	which adds the abbreviation to the description (if they are different)
+ *	Set toString() to call toStringLong() to get the strings to fill in the dropdown
+**/
 public enum MinimizationHeuristic
 {
     MostLocal("Highest local ratio", "maxL", Type.MAXIMIZE),
@@ -69,16 +74,16 @@ public enum MinimizationHeuristic
     GeneticAlgorithm("Genetic algorithm prediction", "genetic", Type.MINIMIZE),
     LeastFanning("Least fanning increase", "minFan", Type.MINIMIZE),
     Random("Random order", "rand", Type.MAXIMIZE);
-    
+
     private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
-    
+
     /** Textual description. */
     private final String description;
     /** Textual description abbreviated. */
     private final String abbreviation;
 
     private Type type;
-    
+
     private MinimizationHeuristic(String description, Type type)
     {
 		this(description, description, type);
@@ -87,11 +92,11 @@ public enum MinimizationHeuristic
     private MinimizationHeuristic(String description, String abbreviation, Type type)
     {
         this.description = description;
-		this.abbreviation = abbreviation; 
+		this.abbreviation = abbreviation;
         this.type = type;
     }
-    
-    public String toString()
+
+    public String toStringDescription()
     {
         return description;
     }
@@ -100,7 +105,27 @@ public enum MinimizationHeuristic
     {
         return abbreviation;
     }
-    
+
+	// Duplicated code here, see MinimizationStrategy.java, MinimizationHeuristic.java,
+	// MinimizationPreselectingHeuristic.java, MinimizationSelectingHeuristic.java
+	// The common parts should be merged into one.
+	public String toStringLong()
+	{
+		if (description != abbreviation)
+		{
+			// return description + "(" + abbreviation + ")";
+			return "(" + abbreviation + ") " + description;
+		}
+		// If description and abbreviation are the same string, return just that
+		return toStringDescription();
+	}
+
+    @Override
+    public String toString()
+    {
+		return toStringLong();
+	}
+
     public static MinimizationHeuristic toHeuristic(String description)
     {
         for (MinimizationHeuristic heuristic: values())
@@ -112,7 +137,7 @@ public enum MinimizationHeuristic
         }
         return null;
     }
-    
+
     /**
      * Return the value of automata in this heuristic.
      *
@@ -163,7 +188,7 @@ public enum MinimizationHeuristic
             int value = 0;
             for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
                 value += Math.pow(autIt.next().nbrOfStates(), 2);
-            
+
             return value;
         }
         else if (this == MostEvents || this == FewestEvents)
@@ -182,7 +207,7 @@ public enum MinimizationHeuristic
             int value = 0;
             for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
                 value += Math.pow(autIt.next().nbrOfTransitions(), 2);
-            
+
             return value;
         }
         else if (this == MostAutomata || this == FewestAutomata)
@@ -199,7 +224,7 @@ public enum MinimizationHeuristic
         }
         else if (this == LeastFanning)
         {
-            // How many connections does the most connected component in the selection have 
+            // How many connections does the most connected component in the selection have
             // and how many connections will the composition have?
             // (not counting in-selection connections)
             int mostNeighbours = 0;
@@ -223,10 +248,10 @@ public enum MinimizationHeuristic
             // Return the difference, i.e. the increase in connections
             return selectionNeighbours.size() - mostNeighbours;
         }
-        
+
         throw new Exception("Unknown heuristic.");
     }
-    
+
     /**
      * Maximization criteria?
      */
@@ -234,7 +259,7 @@ public enum MinimizationHeuristic
     {
         return type == Type.MAXIMIZE;
     }
-    
+
     /**
      * Minimization criteria?
      */
@@ -242,7 +267,7 @@ public enum MinimizationHeuristic
     {
         return type == Type.MINIMIZE;
     }
-    
+
     /**
      * Minimization criteria?
      */
@@ -250,7 +275,7 @@ public enum MinimizationHeuristic
     {
         return type == Type.SPECIAL;
     }
-    
+
     /**
      * The initial value for improvement comparisons.
      */

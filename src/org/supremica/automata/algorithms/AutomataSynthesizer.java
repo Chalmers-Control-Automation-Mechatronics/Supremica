@@ -421,7 +421,7 @@ public class AutomataSynthesizer
             (CompositionalSelectionHeuristicFactory.MaxC);
           }
 
-          logger.info("The heuristic is " + preselectingHeuristic +"/"+
+          logger.info("Heuristics: " + preselectingHeuristic +" / "+
             selectingHeuristic);
           synthesizer.run();
           final ProductDESResult watersResult =

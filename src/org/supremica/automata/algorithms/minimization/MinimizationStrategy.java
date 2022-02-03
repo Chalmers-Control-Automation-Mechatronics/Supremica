@@ -52,6 +52,11 @@ package org.supremica.automata.algorithms.minimization;
 import java.util.Map;
 import org.supremica.automata.*;
 
+/**	MF fix issue #138 (Feb 2022)
+ *	To make the abbreviation visible in the dropdown list, add toStringLong()
+ *	which adds the abbreviation to the description (if they are different)
+ *	Set toString() to call toStringLong() to get the strings to fill in the dropdown
+**/
 public enum MinimizationStrategy
 {
     AtLeastOneLocal("At least one local", "mustL", Type.SPECIAL),
@@ -67,16 +72,16 @@ public enum MinimizationStrategy
     RandomFirst("Pair with random automaton", "rand", Type.MAXIMIZE),
     ExperimentalMin("Experimental min", Type.MINIMIZE),
     ExperimentalMax("Experimental max", Type.MAXIMIZE);
-    
+
     private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
-    
+
     /** Textual description. */
     private final String description;
     /** Textual description abbreviated. */
     private final String abbreviation;
-    
+
     private final Type type;
-    
+
     private MinimizationStrategy(String description, Type type)
     {
         this(description, description, type);
@@ -88,17 +93,36 @@ public enum MinimizationStrategy
         this.abbreviation = abbreviation;
         this.type = type;
     }
-    
-    public String toString()
+
+    public String toStringDescription()
     {
         return description;
     }
+	// Duplicated code here, see MinimizationStrategy.java, MinimizationHeuristic.java,
+	// MinimizationPreselectingHeuristic.java, MinimizationSelectingHeuristic.java
+	// The common parts should be merged into one.
+	public String toStringLong()
+	{
+		if (description != abbreviation) // Yes! We really want reference comparison here
+		{
+			// return description + "(" + abbreviation + ")";
+			return "(" + abbreviation + ") " + description;
+		}
+		// If description and abbreviation are the same string, return just that
+		return toStringDescription();
+	}
 
     public String toStringAbbreviated()
     {
         return abbreviation;
     }
-    
+
+    @Override
+	public String toString()
+	{
+		return toStringLong(); // Was toStringDescription()
+	}
+
     public static MinimizationStrategy toStrategy(String description)
     {
         for (MinimizationStrategy strategy: values())
@@ -110,7 +134,7 @@ public enum MinimizationStrategy
         }
         return null;
     }
-    
+
     /**
      * Return the value of automata in this strategy.
      */
@@ -140,7 +164,7 @@ public enum MinimizationStrategy
         else
             throw new Exception("Unknown strategy.");
     }
-    
+
     /**
      * Maximization criteria?
      */
@@ -148,7 +172,7 @@ public enum MinimizationStrategy
     {
         return type == Type.MAXIMIZE;
     }
-    
+
     /**
      * Minimization criteria?
      */
@@ -156,7 +180,7 @@ public enum MinimizationStrategy
     {
         return type == Type.MINIMIZE;
     }
-    
+
     /**
      * Special strategy? Does not return values.
      */
@@ -164,7 +188,7 @@ public enum MinimizationStrategy
     {
         return type == Type.SPECIAL;
     }
-    
+
     /**
      * The initial value for improvement comparisons.
      */
