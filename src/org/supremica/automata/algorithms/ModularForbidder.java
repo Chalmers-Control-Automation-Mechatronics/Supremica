@@ -71,7 +71,7 @@ import org.supremica.automata.State;
  * MPZS - Multiple plant zero specification
  * MPSS - Multiple plant single specification
  * MPMS - Multiple plant multiple specification
- * Multiple := Nbr of automaton in a sub-state >= 1
+ * Multiple := Nbr of automaton in a sub-state &gt;= 1
  * @author patrik
  * @since December 10, 2009
  */
@@ -93,7 +93,6 @@ public class ModularForbidder
     /**
      *
      * @param input This class is based on data according to this structure
-     * @param project
      */
     public ModularForbidder(final ModularForbidderInput input, final Project project)
     {

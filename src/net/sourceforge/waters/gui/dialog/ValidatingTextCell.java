@@ -182,7 +182,7 @@ public abstract class ValidatingTextCell<T>
   //#########################################################################
   //# Actions
   /**
-   * Sets a keyboard binding for the &langle;ENTER&rangle; key.
+   * Sets a keyboard binding for the &lt;ENTER&gt; key.
    */
   public void addEnterAction(final Action action)
   {
@@ -190,7 +190,7 @@ public abstract class ValidatingTextCell<T>
   }
 
   /**
-   * Sets a keyboard binding for the &langle;ESCAPE&rangle; key.
+   * Sets a keyboard binding for the &lt;ESCAPE&gt; key.
    */
   public void addEscapeAction(final Action action)
   {

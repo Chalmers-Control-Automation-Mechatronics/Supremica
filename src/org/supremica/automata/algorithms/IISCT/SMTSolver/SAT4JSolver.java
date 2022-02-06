@@ -9,6 +9,12 @@
 
 package org.supremica.automata.algorithms.IISCT.SMTSolver;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,24 +64,24 @@ import org.sat4j.specs.IVec;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.ModelIterator;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 /**
- * A Constraint Satisfaction Problem (CSP) solver based on SAT4J CSP package. Given a set of
- constraints over variables, SAT4JSolver attempts to find all variables values that satisfies the
- * given constraints. Note that SAT4J does not contain a real CSP solver, it translates given CSP
- problems into SAT problems to solve them. Hence, it might get hot on variables with large domain
- (>5000 elements). Despite this fact, it is very efficient on solving problems with constraints
- * over boolean variables and logical connectivities (guess why?). The solver is equipped with
- * methods to work with sequence of conditional transitions where a sequence of updates is modelled
- * by automatic renaming of variables where next-variables (primed variables) of the i-th condition
- * in the sequence serve the current variables (unprimed variables) of i+1-th condition, and so on.
- * <p>
- * A sample code to use this solver is as follows.
+ * <P>A Constraint Satisfaction Problem (CSP) solver based on SAT4J CSP
+ * package.</P>
+ *
+ * <P>Given a set of constraints over variables, SAT4JSolver attempts
+ * to find all variables values that satisfies the given constraints. Note
+ * that SAT4J does not contain a real CSP solver, it translates given CSP
+ * problems into SAT problems to solve them. Hence, it might get hot on
+ * variables with large domain (&gt;5000 elements). Despite this fact, it
+ * is very efficient on solving problems with constraints over Boolean
+ * variables and logical connectivities (guess why?). The solver is equipped
+ * with methods to work with sequence of conditional transitions where a
+ * sequence of updates is modelled by automatic renaming of variables where
+ * next-variables (primed variables) of the i-th condition in the sequence
+ * serve the current variables (unprimed variables) of (i+1)-th condition,
+ * and so on.</p>
+ *
+ * <P>A sample code to use this solver is as follows.</P>
  * <PRE>
  * {@link SAT4JSolver} solver = new {@link #SAT4JSolver(SimpleEFAVariableContext) SAT4JSolver}(net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext) (varcontext)};
  * solver.{@link #init(java.util.List) init}(constraints);
@@ -85,14 +91,13 @@ import gnu.trove.set.hash.TIntHashSet;
  *    // Do something with the model
  * }
  * </PRE>
- * <p>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SAT4JSolver
 {
   /**
    * Creates a CSP solver.
-   * <p>
    * @param mode       Solver mode 0: default 1: light
    * @param timeout    Timeout for the solver in second
    * @param varContext Variables context
@@ -128,7 +133,6 @@ public class SAT4JSolver
   }
   /**
    * Creates a CSP solver.
-   * <p>
    * @param varContext Variables context
    */
   public SAT4JSolver(final SimpleEFAVariableContext varContext)
@@ -138,9 +142,6 @@ public class SAT4JSolver
 
   /**
    * Clears and initialises the solver using the given constraints.
-   * <p>
-   * @param exp
-   * @throws AnalysisException
    */
   public void init(final String exp)
    throws AnalysisException
@@ -151,10 +152,7 @@ public class SAT4JSolver
 
   /**
    * Clears and initialises the solver using the given constraint.
-   * <p>
    * @param exps List of constraints viewed as conjunction of constraints
-   * <p>
-   * @throws AnalysisException
    */
   public void init(final List<SimpleExpressionProxy> exps)
    throws AnalysisException
@@ -165,10 +163,6 @@ public class SAT4JSolver
 
   /**
    * Add the given constraint to the list of constraints
-   * <p>
-   * @param exp
-   * <p>
-   * @throws AnalysisException
    */
   public void addExpression(final String exp)
    throws AnalysisException
@@ -178,10 +172,6 @@ public class SAT4JSolver
 
   /**
    * Add negated of the given constraint to the list of constraints
-   * <p>
-   * @param str
-   * <p>
-   * @throws AnalysisException
    */
   public void addNegatedExpression(final String str)
    throws AnalysisException
@@ -191,10 +181,6 @@ public class SAT4JSolver
 
   /**
    * Add negated of the given constraint to the list of constraints
-   * <p>
-   * @param exps
-   * <p>
-   * @throws AnalysisException
    */
   public void addNegatedExpression(final List<SimpleExpressionProxy> exps)
    throws AnalysisException
@@ -206,10 +192,6 @@ public class SAT4JSolver
 
   /**
    * Add the given constraint to the list of constraints
-   * <p>
-   * @param exps
-   * <p>
-   * @throws AnalysisException
    */
   public void addExpression(final List<SimpleExpressionProxy> exps)
    throws AnalysisException
@@ -231,8 +213,6 @@ public class SAT4JSolver
 
   /**
    * Step forward to the given value.
-   * <p>
-   * @param step
    */
   public void stepTo(final int step)
   {
@@ -318,13 +298,9 @@ public class SAT4JSolver
    * Solves, learns, and stores values of unprimed variables of the initial step (marked by postfix
    * 0) that satisfied all constraints. Note that the {@link #solve()} method is automatically
    * called by the method.
-   * <p>
    * @param negate If the negated of the values must be stored.
-   * <p>
    * @return Returns <CODE>true</CODE> if the learning process was successful. Otherwise,
    *         <CODE>false</CODE>.
-   * <p>
-   * @throws AnalysisException
    */
   public boolean learn(final boolean negate) throws AnalysisException
   {
@@ -334,13 +310,9 @@ public class SAT4JSolver
   /**
    * Solves, learns, and stores values of unprimed variables of the particular step that satisfied
    * all constraints. Note that the {@link #solve()} method is automatically called by the method.
-   * <p>
    * @param negate  If the negated of the values must be stored.
    * @param postfix The step, initially it is 0.
-   * <p>
    * @return Returns true if the learning process was successful.
-   * <p>
-   * @throws AnalysisException
    */
   public boolean learn(final boolean negate, final int postfix)
    throws AnalysisException
@@ -393,10 +365,7 @@ public class SAT4JSolver
   /**
    * Returns whether there exists any solution for the current constraints. Note that
    * {@link #solve()} must be called before hand.
-   * <p>
    * @return <CODE>true</CODE> is there is any solution, <CODE>false</CODE> otherwise.
-   * <p>
-   * @throws AnalysisException
    */
   public boolean isSatisfiable()
    throws AnalysisException
@@ -414,7 +383,6 @@ public class SAT4JSolver
   /**
    * Returns a model that satisfies the current constraints. Note that {@link #isSatisfiable()} must
    * be called before hand.
-   * <p>
    * @return A map of variables to the values.
    */
   public Map<String, SimpleExpressionProxy> getModel()
@@ -425,9 +393,7 @@ public class SAT4JSolver
   /**
    * Returns a model that satisfies the current constraints. Note that {@link #isSatisfiable()} must
    * be called before hand.
-   * <p>
    * @param postfix The variables value at specific step. To get next value of step i use i+1.
-   * <p>
    * @return A map of variables to the values.
    */
   public Map<String, SimpleExpressionProxy> getModel(final int postfix)
@@ -445,7 +411,6 @@ public class SAT4JSolver
   /**
    * Returns the inner model, namely, variables with postfix. Note that {@link #isSatisfiable()}
    * must be called before hand.
-   * <p>
    * @return A map of inner variables to the values.
    */
   public THashMap<String, SimpleExpressionProxy> getInnerModel()
@@ -457,8 +422,6 @@ public class SAT4JSolver
   /**
    * Attempts to solve the CSP. Must be called before retrieving any model or checking the
    * satisfiability of the problem.
-   * <p>
-   * @throws AnalysisException
    */
   @SuppressWarnings("unchecked")
   public void solve() throws AnalysisException

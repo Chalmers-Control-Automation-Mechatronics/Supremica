@@ -713,64 +713,41 @@ Class-Path: ${manifest.pathlist}</echo>
 -->
     
     <target name="doc" depends="doc_supremica" description="Generate Javadoc documentation."/>
-    
+
     <target name="doc_supremica">
         <javadoc
             sourcepath="${src}"
             destdir="${doc}/api"
-            classpath="${lib}/${unjared}"
             encoding="ISO-8859-1"
             author="true"
             version="true"
             use="true"
-            private="true"
-            source="1.8"
             maxmemory="512m"
             windowtitle="Supremica API"
-            bottom="Copyright &#169; 2001 - 2011 Supremica and Knut Åkesson, Martin Fabian, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
+            additionalparam="-Xdoclint:all,-missing"
+            bottom="Copyright &#169; 2001 - 2022 Supremica and Knut Åkesson, Martin Fabian, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
             <doctitle><![CDATA[<h1>Supremica and Waters API Documentation</h1>]]></doctitle>
             <packageset dir="${src}">
                 <include name="org/supremica/**/*"/>
                 <include name="net/sourceforge/waters/**/*"/>
-                <exclude name="org/supremica/functionblocks/xsd/*/impl/**"/>
-                <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
-            </packageset>       
-            <link href="${java17.api.url}"
-                  offline="true" packagelistLoc="${docsrc}/offline/j2sdk"/>
-            <link href="${jaxme.api.url}"
-                  offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
-            <link href="${junit.api.url}"
-                  offline="true" packagelistLoc="${docsrc}/offline/junit"/>
-        </javadoc>
-    </target>
-    <!--        THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
-    <!--        overview="${templates}/Overview.html"      -->
-    
-    <target name="doc_waters">
-        <mkdir dir="${javadoc}"/>
-        <javadoc destdir="${javadoc}">
-            <packageset dir="${src}">
-                <include name="net/sourceforge/waters/xsd/**/*"/>
-                <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
             </packageset>
-            <packageset dir="${supremica.src}">
-                <include name="net/sourceforge/waters/**/*"/>
-                <exclude name="net/sourceforge/waters/gui/**"/>
-            </packageset>
-            <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
-            <link href="${java17.api.url}"
+            <link href="${java.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/j2sdk"/>
+            <link href="${javabdd.api.url}"
+                  offline="true" packagelistLoc="${docsrc}/offline/javabdd"/>
             <link href="${jaxme.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
             <link href="${junit.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/junit"/>
             <classpath>
-                <path refid="external-classpath"/>
+                <path refid="supremica.classpath"/>
                 <pathelement location="${junit.jar}"/>
             </classpath>
         </javadoc>
     </target>
-        
+    <!--        THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
+    <!--        overview="${templates}/Overview.html"      -->
+
     <target name="run">
         <java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">
             <arg value="-p"/>
@@ -783,7 +760,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <jvmarg value="-Xms128M"/>
             <jvmarg value="-Xmx1024M" />  
             <sysproperty key="java.library.path" file="${dist}"/>
-       </java>                
+       </java>
     </target>
     
     <target name="runLocal">

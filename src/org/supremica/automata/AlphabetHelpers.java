@@ -167,7 +167,7 @@ public class AlphabetHelpers
 
     /**
      * Builds an returns a map mapping events to sets of automata.
-     * (LabeledEvent) -> (Automata).
+     * (LabeledEvent) &rarr; (Automata).
      */
     public static EventToAutomataMap buildEventToAutomataMap(final Automata automata)
     {
@@ -192,7 +192,7 @@ public class AlphabetHelpers
     /**
      *
      * Builds an returns a map mapping uncontrollable events to sets automata.
-     * (uncontrollable LabeledEvent) -> (Set of Automata-objects).
+     * (uncontrollable LabeledEvent) &rarr; (Set of Automata-objects).
      */
     public static EventToAutomataMap buildUncontrollableEventToAutomataMap(final Automata automata)
     {

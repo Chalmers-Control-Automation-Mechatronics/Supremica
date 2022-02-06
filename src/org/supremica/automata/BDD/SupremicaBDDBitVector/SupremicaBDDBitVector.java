@@ -115,7 +115,6 @@ public abstract class SupremicaBDDBitVector
 
     /**
      * Same as {@link SupremicaBDDBitVector#initialize(long)}
-     * @param val
      */
     protected abstract void initialize(BigInteger val);
 
@@ -557,8 +556,6 @@ public abstract class SupremicaBDDBitVector
 
     /**
      * Sets a max and min value of the bit vector.
-     * @param min
-     * @param max
      * @return a new bit vector with the given bounds
      */
     public SupremicaBDDBitVector saturate(final int min, final int max) {
@@ -570,7 +567,6 @@ public abstract class SupremicaBDDBitVector
 
     /**
      * Sets a minimum value for the bit vector.
-     * @param val
      * @return a new bit vector with the given lower bound
      */
     private SupremicaBDDBitVector min(final int val)
@@ -586,7 +582,6 @@ public abstract class SupremicaBDDBitVector
 
     /**
      * Sets a maximum value for the bit vector.
-     * @param val
      * @return a new bit vector with the given upper bound
      */
     private SupremicaBDDBitVector max(final int val)

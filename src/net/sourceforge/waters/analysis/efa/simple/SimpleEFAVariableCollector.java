@@ -39,7 +39,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 
 /**
  * An implementation of {@link AbstractEFAVariableCollector}.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAVariableCollector

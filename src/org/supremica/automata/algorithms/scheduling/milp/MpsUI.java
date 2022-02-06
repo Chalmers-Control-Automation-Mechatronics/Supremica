@@ -7,15 +7,20 @@
 
 package org.supremica.automata.algorithms.scheduling.milp;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
 
 /**
  * This class constructs MILP problem files of MPS-format. The launchMilpSolver()-
- * and processSolutionFile()-methods are solver specific and thus left as abstract, 
+ * and processSolutionFile()-methods are solver specific and thus left as abstract,
  * to be implemented by the MILP solvers that accept the MPS-format.
  */
 public abstract class MpsUI
@@ -23,35 +28,36 @@ public abstract class MpsUI
 {
     /** The *.mps file that serves as an input to the Glpk-solver. */
     protected File mpsFile;
-    
+
     /** The *.sol file that stores the solution, i.e. the output of the Glpk-solver. */
     protected File solutionFile;
-    
+
     /** The process responsible for the MILP-solver. */
     protected Process milpProcess;
-    
+
     /** The pointer to the constructor of MILP-formulation. */
     protected Milp milpConstructor = null;
-            
+
     /** The optimal times (for each plant-state) that the GLPK solver returns */
     protected double[][] optimalTimes = null;
-    
+
     /** The optimal alt. path variables (booleans) for each [plant][start_state][end_state] */
     protected boolean[][][] optimalAltPathVariables = null;
-    
+
     Hashtable<String, Integer> binVarIndexMap = new Hashtable<String, Integer>();
     Hashtable<String, Integer> timeVarIndexMap = new Hashtable<String, Integer>();
     ArrayList<double[]>[] varCoeffs;
     ArrayList<Double> bUpper;
     ArrayList<Integer> equalityRowIndices;
-    
+
     /** Creates a new instance of GlpkUI */
-    public MpsUI(Milp milpConstructor)
+    public MpsUI(final Milp milpConstructor)
         throws Exception
     {
-        this.milpConstructor = milpConstructor;   
+        this.milpConstructor = milpConstructor;
     }
-    
+
+    @Override
     public void initialize()
         throws MilpException, IOException
     {
@@ -62,43 +68,44 @@ public abstract class MpsUI
         // Initialize the solution file
         solutionFile = File.createTempFile("milp", ".sol");
         solutionFile.deleteOnExit();
-        
+
         milpConstructor.addToMessages("model: " + mpsFile.getPath() + "\n", SchedulingConstants.MESSAGE_TYPE_INFO);
         milpConstructor.addToMessages("solution: " + solutionFile.getPath() + "\n", SchedulingConstants.MESSAGE_TYPE_INFO);
     }
-    
+
     /**
-     * Creates the *.mps-file that contains the MILP-formulation used as an input 
+     * Creates the *.mps-file that contains the MILP-formulation used as an input
      * to the MILP-solver.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void createModelFile()
         throws MilpException, IOException
     {
-        BufferedWriter w = new BufferedWriter(new FileWriter(mpsFile));        
-        
+        final BufferedWriter w = new BufferedWriter(new FileWriter(mpsFile));
+
         // Map the variable names to an index
-        for (int[] altPathVar : milpConstructor.getAltPathVaribles())
+        for (final int[] altPathVar : milpConstructor.getAltPathVaribles())
         {
             binVarIndexMap.put(makeAltPathsVariableStr(altPathVar), binVarIndexMap.size());
         }
-        for (String mutexVar : milpConstructor.getMutexVariables())
+        for (final String mutexVar : milpConstructor.getMutexVariables())
         {
             binVarIndexMap.put(mutexVar, binVarIndexMap.size());
         }
-        for (String internalPrecVar : milpConstructor.getInternalPrecVariables())
+        for (final String internalPrecVar : milpConstructor.getInternalPrecVariables())
         {
             binVarIndexMap.put(internalPrecVar, binVarIndexMap.size());
-        } 
+        }
         for (int i = 0; i < milpConstructor.getDeltaTimes().length; i++)
         {
             for (int j = 0; j < milpConstructor.getDeltaTimes()[i].length; j++)
             {
-                timeVarIndexMap.put("time[" + i + ", " + j + "]", 
+                timeVarIndexMap.put("time[" + i + ", " + j + "]",
                         timeVarIndexMap.size() + binVarIndexMap.size() + 1);
             }
         }
-        
+
         int constraintCounter = 0;
         equalityRowIndices = new ArrayList<Integer>();
         bUpper = new ArrayList<Double>();
@@ -107,47 +114,47 @@ public abstract class MpsUI
         {
             varCoeffs[i] = new ArrayList<double[]>();
         }
-        varCoeffs[binVarIndexMap.size()].add(new double[]{-1, 1}); // The makespan coefficient in the objective function 
-        
+        varCoeffs[binVarIndexMap.size()].add(new double[]{-1, 1}); // The makespan coefficient in the objective function
+
         // The cycle time constraints
-        for (int[] constr : milpConstructor.getCycleTimeConstraints())
+        for (final int[] constr : milpConstructor.getCycleTimeConstraints())
         {
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]")].
                     add(new double[]{constraintCounter, 1});
             varCoeffs[binVarIndexMap.size()].add(new double[]{constraintCounter++, -1});
             bUpper.add(new Double(0));
         }
-        
+
         // The initial (precedence) constraints
-        for (int[] constr : milpConstructor.getInitPrecConstraints())
+        for (final int[] constr : milpConstructor.getInitPrecConstraints())
         {
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]")].
                     add(new double[]{constraintCounter++, -1});
             bUpper.add(new Double(-1 * milpConstructor.getDeltaTimes()[constr[0]][constr[1]]));
         }
-        
+
         // The precedence constraints
-        for (int[] constr : milpConstructor.getPrecConstraints())
+        for (final int[] constr : milpConstructor.getPrecConstraints())
         {
-            int precedingVarIndex = timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]");
-            int followingVarIndex = timeVarIndexMap.get("time[" + constr[0] + ", " + constr[2] + "]");
-            
+            final int precedingVarIndex = timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]");
+            final int followingVarIndex = timeVarIndexMap.get("time[" + constr[0] + ", " + constr[2] + "]");
+
             double rhs = -1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON);
             //bUpper.add(new Double(-1 * (milpConstructor.getDeltaTimes()[constr[0]][constr[2]] + SchedulingConstants.EPSILON)));
-            
+
             // if this is a state where several paths converge, add a constraint,
             // containing an upstreams alt.paths variable for each converging path...
             if (constr.length > 3)
             {
                 rhs += SchedulingConstants.BIG_M_VALUE;
-                for (int[] altPathVar : milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]}))
+                for (final int[] altPathVar : milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]}))
                 {
                     varCoeffs[precedingVarIndex].add(new double[]{constraintCounter, 1});
                     varCoeffs[followingVarIndex].add(new double[]{constraintCounter, -1});
                     varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(altPathVar[0], altPathVar[1], altPathVar[2]))].
                             add(new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
                     bUpper.add(new Double(rhs));
-                    
+
                     constraintCounter++;
                 }
             }
@@ -156,12 +163,12 @@ public abstract class MpsUI
                 varCoeffs[precedingVarIndex].add(new double[]{constraintCounter, 1});
                 varCoeffs[followingVarIndex].add(new double[]{constraintCounter, -1});
                 bUpper.add(new Double(rhs));
-                
+
                 constraintCounter++;
             }
-            
+
             //TODO: Kolla om man vill lägga till aktiva altpathvars till varje prec.constraint, minskar detta LP-komplexiteten?
-            
+
 //            //test
 //            java.util.Collection<int[]> activeAltVars = milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]});
 //            for (int[] altVar : activeAltVars)
@@ -176,11 +183,11 @@ public abstract class MpsUI
 //                rhs += SchedulingConstants.BIG_M_VALUE;
 //            }
         }
-        
+
         // The alternative paths constraints
-        for (ArrayList<int[]> constrBlock : milpConstructor.getNewAltPathsConstraints())
+        for (final ArrayList<int[]> constrBlock : milpConstructor.getNewAltPathsConstraints())
         {
-            for (int[] constr : constrBlock)
+            for (final int[] constr : constrBlock)
             {
                 varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
                         constr[0], constr[1]))].add(new double[]{constraintCounter, 1});
@@ -189,11 +196,11 @@ public abstract class MpsUI
                 varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
                         constr[0], constr[1], constr[2]))].add(
                         new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
-                bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON - 
+                bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON -
                         milpConstructor.getDeltaTimes()[constr[0]][constr[2]]));
                 constraintCounter++;
             }
-            for (int[] constr : constrBlock)
+            for (final int[] constr : constrBlock)
             {
                 varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
                         constr[0], constr[1], constr[2]))].add(
@@ -202,30 +209,30 @@ public abstract class MpsUI
             bUpper.add(new Double(1));
             equalityRowIndices.add(constraintCounter++);
         }
-        
-        
+
+
         // The mutex constraints
 //        for (Constraint constr : milpConstructor.getMutexConstraints())
-        for (int[] constr : milpConstructor.getMutexConstraints())
-        {               
+        for (final int[] constr : milpConstructor.getMutexConstraints())
+        {
             //test
             // Find all active alt path variables for this b1u1-b2u2-pair
-            Hashtable<Integer, Integer> allActiveAltBinVars = new Hashtable<Integer, Integer>();
+            final Hashtable<Integer, Integer> allActiveAltBinVars = new Hashtable<Integer, Integer>();
             int convergingStatesCounter = 0;
             for (int i=0; i<6; i+=5)
             {
                 for (int j=i+1; j<i+5; j+=2)
                 {
-                    java.util.Collection<int[]> currActiveVars = milpConstructor.getActiveAltPathVars(
+                    final java.util.Collection<int[]> currActiveVars = milpConstructor.getActiveAltPathVars(
                             new int[]{constr[i], constr[j], constr[j+1]});
                     if (currActiveVars.size() > 0)
                     {
                         convergingStatesCounter++;
-                        for (int[] altVar : currActiveVars)
+                        for (final int[] altVar : currActiveVars)
                         {
-                            Integer currAltVar = binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
+                            final Integer currAltVar = binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
                                                                     altVar[0], altVar[1], altVar[2]));
-                            Integer currVarFrequency = allActiveAltBinVars.get(currAltVar);
+                            final Integer currVarFrequency = allActiveAltBinVars.get(currAltVar);
                             if (currVarFrequency == null)
                             {
                                 allActiveAltBinVars.put(currAltVar, 1);
@@ -238,43 +245,43 @@ public abstract class MpsUI
                     }
                 }
             }
-            
-            int mutexVarIndex = binVarIndexMap.get(milpConstructor.makeMutexVariable(
+
+            final int mutexVarIndex = binVarIndexMap.get(milpConstructor.makeMutexVariable(
                                         constr[0], constr[5], constr[10], constr[11]));
-            
+
             // Use the total alt path variable in the mutex constraint (note that sum(tot_alt_path) <= 4)
             varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
                     constr[5], constr[8]))].add(new double[]{constraintCounter, 1});
             varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
                     constr[0], constr[1]))].add(new double[]{constraintCounter, -1});
             varCoeffs[mutexVarIndex].add(new double[]{constraintCounter, -1*SchedulingConstants.BIG_M_VALUE});
-            for (Integer altPathVarIndex : allActiveAltBinVars.keySet())
+            for (final Integer altPathVarIndex : allActiveAltBinVars.keySet())
             {
                 varCoeffs[altPathVarIndex].add(new double[]{
                     constraintCounter, allActiveAltBinVars.get(altPathVarIndex) * SchedulingConstants.BIG_M_VALUE});
             }
             bUpper.add(new Double(convergingStatesCounter * SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON));
-            constraintCounter++;                
-            
+            constraintCounter++;
+
             // The dual constraint
             varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
                     constr[0], constr[3]))].add(new double[]{constraintCounter, 1});
             varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
                     constr[5], constr[6]))].add(new double[]{constraintCounter, -1});
             varCoeffs[mutexVarIndex].add(new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
-            for (Integer altPathVarIndex : allActiveAltBinVars.keySet())
+            for (final Integer altPathVarIndex : allActiveAltBinVars.keySet())
             {
                 varCoeffs[altPathVarIndex].add(new double[]{
                     constraintCounter, allActiveAltBinVars.get(altPathVarIndex) * SchedulingConstants.BIG_M_VALUE});
             }
             bUpper.add(new Double((1 + convergingStatesCounter) * SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON));
             constraintCounter++;
-        
+
             // Set mutexVar := 0 if any state involved in the current b/u-choice is unreached
             if (convergingStatesCounter > 0)
             {
                 varCoeffs[mutexVarIndex].add(new double[]{constraintCounter, 1});
-                for (Integer altPathVarIndex : allActiveAltBinVars.keySet())
+                for (final Integer altPathVarIndex : allActiveAltBinVars.keySet())
                 {
                     varCoeffs[altPathVarIndex].add(new double[]{
                         constraintCounter, -1.0 / convergingStatesCounter});
@@ -283,13 +290,13 @@ public abstract class MpsUI
                 constraintCounter++;
             }
         }
-        
+
         // The constraints due to external specifications //TODO... E-row!!!
-        for (ArrayList<int[]> xorConstraintsBlock : milpConstructor.getXorConstraints())
+        for (final ArrayList<int[]> xorConstraintsBlock : milpConstructor.getXorConstraints())
         {
-                        
+
             int rhs = 1;
-            for (int[] constr : xorConstraintsBlock)
+            for (final int[] constr : xorConstraintsBlock)
             {
                 if (constr.length == 1)
                 {
@@ -302,31 +309,31 @@ public abstract class MpsUI
                 }
             }
             constraintCounter++;
-            
+
             bUpper.add(new Double(rhs));
         }
-  
+
         // The circular wait constraints
-        IntArrayTreeSet unfeasiblePairs = new IntArrayTreeSet(); //test
-        for (CircularWaitConstraintBlock constraint : milpConstructor.getCircularWaitConstraints())
+        final IntArrayTreeSet unfeasiblePairs = new IntArrayTreeSet(); //test
+        for (final CircularWaitConstraintBlock constraint : milpConstructor.getCircularWaitConstraints())
         {
             //test
-            ArrayList<int[]> currUFPair = new ArrayList<int[]>();
-            boolean testReduction = false; // use this flag to override the reduction test
-            
+            final ArrayList<int[]> currUFPair = new ArrayList<int[]>();
+            final boolean testReduction = false; // use this flag to override the reduction test
+
             // The counters of 1's in the rhs of the constraint-to-be
             int uBoundCW = -1;
             int uBoundUF = -1;
-            
-            for (int[] varInfo : constraint)
+
+            for (final int[] varInfo : constraint)
             {
-                String mutexVar = makeMutexVariableStr(varInfo); // make the mutex-variable string
-                                
+                final String mutexVar = makeMutexVariableStr(varInfo); // make the mutex-variable string
+
                 int coeffUF = -1;
-                // if the current constraint info has correct plant ordering, the 
+                // if the current constraint info has correct plant ordering, the
                 // unfeasibility constraint should be (1 - var). In such a case, uBoundUF
                 // must be increased while the coefficient of 'var' is +1 (since 'var' is move to lhs).
-                if (varInfo[1] < varInfo[2]) 
+                if (varInfo[1] < varInfo[2])
                 {
                     uBoundUF++;
                     coeffUF = 1;
@@ -336,11 +343,11 @@ public abstract class MpsUI
                 {
                     uBoundCW++;
                 }
-                
+
                 //test
                 if (testReduction && constraint.size() == 2)
                 {
-                    int ufVarValue = (coeffUF == -1) ? 0 : 1;
+                    final int ufVarValue = (coeffUF == -1) ? 0 : 1;
                     currUFPair.add(new int[]{binVarIndexMap.get(mutexVar), ufVarValue});
                 }
                 else
@@ -350,25 +357,25 @@ public abstract class MpsUI
                     if (!constraint.hasBuffer())
                     {
                         // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
-                        // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
+                        // Note that the coefficient is opposite (in sign) to the UF-coefficient.
                         varCoeffs[binVarIndexMap.get(mutexVar)].add(new double[]{constraintCounter + 1, -1*coeffUF});
                     }
                 }
             }
-                       
+
             //test
             if (testReduction && currUFPair.size() > 0)
             {
                 boolean similarPairFound = false;
-                
-                java.util.SortedSet<int[]> headSet = unfeasiblePairs.headSet(new int[]{currUFPair.get(0)[0]+1, 0, 0, 0});
-                java.util.SortedSet<int[]> currVarSet = headSet.tailSet(new int[]{currUFPair.get(0)[0], 0, 0, 0});
+
+                final java.util.SortedSet<int[]> headSet = unfeasiblePairs.headSet(new int[]{currUFPair.get(0)[0]+1, 0, 0, 0});
+                final java.util.SortedSet<int[]> currVarSet = headSet.tailSet(new int[]{currUFPair.get(0)[0], 0, 0, 0});
 
                 if (currVarSet.size() > 0)
                 {
-                    for (int[] currPair : currVarSet)
+                    for (final int[] currPair : currVarSet)
                     {
-                        int[] similarPair = new int[]{currPair[2], Math.abs(currPair[3] - 1), 
+                        final int[] similarPair = new int[]{currPair[2], Math.abs(currPair[3] - 1),
                                                       currUFPair.get(1)[0], currUFPair.get(1)[1]};
                         if (unfeasiblePairs.contains(similarPair))
                         {
@@ -377,30 +384,30 @@ public abstract class MpsUI
                         }
                     }
                 }
-                
+
                 if (!similarPairFound)
                 {
-                    unfeasiblePairs.add(new int[]{currUFPair.get(0)[0], currUFPair.get(0)[1], 
+                    unfeasiblePairs.add(new int[]{currUFPair.get(0)[0], currUFPair.get(0)[1],
                                                   currUFPair.get(1)[0], currUFPair.get(1)[1]});
-                    
+
                     double currCoeff = (currUFPair.get(0)[1] == 0) ? -1 : 1;
-                    varCoeffs[currUFPair.get(0)[0]].add(new double[]{constraintCounter, currCoeff});           
+                    varCoeffs[currUFPair.get(0)[0]].add(new double[]{constraintCounter, currCoeff});
                     if (!constraint.hasBuffer())
                     {
                         // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
-                        // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
+                        // Note that the coefficient is opposite (in sign) to the UF-coefficient.
                         varCoeffs[currUFPair.get(0)[0]].add(new double[]{constraintCounter + 1, -1*currCoeff});
                     }
                     currCoeff = (currUFPair.get(1)[1] == 0) ? -1 : 1;
-                    varCoeffs[currUFPair.get(1)[0]].add(new double[]{constraintCounter, currCoeff});                    
+                    varCoeffs[currUFPair.get(1)[0]].add(new double[]{constraintCounter, currCoeff});
                     if (!constraint.hasBuffer())
                     {
                         // If there is no buffer here, add the coefficient for 'var' in the circular wait constraint.
-                        // Note that the coefficient is opposite (in sign) to the UF-coefficient. 
+                        // Note that the coefficient is opposite (in sign) to the UF-coefficient.
                         varCoeffs[currUFPair.get(1)[0]].add(new double[]{constraintCounter + 1, -1*currCoeff});
                     }
-                    
-                    double uBound = currUFPair.get(0)[1] + currUFPair.get(1)[1] - 1;
+
+                    final double uBound = currUFPair.get(0)[1] + currUFPair.get(1)[1] - 1;
                     bUpper.add(new Double(uBound));
                     if (!constraint.hasBuffer())
                     {
@@ -419,129 +426,129 @@ public abstract class MpsUI
                     constraintCounter++;
                 }
             }
-            
+
             constraintCounter++;
         }
-        
-        
-        
+
+
+
         // The shared events constraints (a block of constrains for each shared event)
-        for (ArrayList<ArrayList<ArrayList<int[]>>> eventBlock : milpConstructor.getSharedEventConstraints())
+        for (final ArrayList<ArrayList<ArrayList<int[]>>> eventBlock : milpConstructor.getSharedEventConstraints())
         {
             for (int i1 = 0; i1 < eventBlock.size() - 1; i1++)
             {
-                ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = eventBlock.get(i1);
-                
+                final ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = eventBlock.get(i1);
+
                 for (int i2 = i1+1; i2 < eventBlock.size(); i2++)
                 {
-                    ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = eventBlock.get(i2);
-                    
+                    final ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = eventBlock.get(i2);
+
                     // The hashtables are needed to ensure that the event occurs as many times in both plants
-                    Hashtable<Integer, Integer> firstPlantFrequencyMap = new Hashtable<Integer, Integer>();
-                    Hashtable<Integer, Integer> secondPlantFrequencyMap = new Hashtable<Integer, Integer>();
+                    final Hashtable<Integer, Integer> firstPlantFrequencyMap = new Hashtable<Integer, Integer>();
+                    final Hashtable<Integer, Integer> secondPlantFrequencyMap = new Hashtable<Integer, Integer>();
                     // Forced occurrences of an event (no path choices upstreams) are stored at index -1
                     firstPlantFrequencyMap.put(-1, 0);
                     secondPlantFrequencyMap.put(-1, 0);
-                    
+
                     for (int j1 = 0; j1 < allSharedTimeVarsInFirstPlant.size(); j1++)
                     {
-                        ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
-                        int[] firstPlantState = currSharedTimeVarsInFirstPlant.get(0);
-                        
+                        final ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
+                        final int[] firstPlantState = currSharedTimeVarsInFirstPlant.get(0);
+
                         // Update the frequency of forced event occurrence if there are no altPath variables for this plant-state
                         if (currSharedTimeVarsInFirstPlant.size() == 1)
                         {
-                            int forcedFrequency = firstPlantFrequencyMap.get(-1);
+                            final int forcedFrequency = firstPlantFrequencyMap.get(-1);
                             firstPlantFrequencyMap.put(-1, forcedFrequency + 1);
                         }
-                        
+
                         for (int j2 = 0; j2 < allSharedTimeVarsInFirstPlant.size(); j2++)
                         {
-                            ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);                            
-                            int[] secondPlantState = currSharedTimeVarsInSecondPlant.get(0);
-                            
+                            final ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);
+                            final int[] secondPlantState = currSharedTimeVarsInSecondPlant.get(0);
+
                             // Update the frequency of forced event occurrence if there are no altPath variables for this plant-state
                             if (currSharedTimeVarsInSecondPlant.size() == 1)
                             {
-                                int forcedFrequency = secondPlantFrequencyMap.get(-1);
+                                final int forcedFrequency = secondPlantFrequencyMap.get(-1);
                                 secondPlantFrequencyMap.put(-1, forcedFrequency + 1);
                             }
-                            
+
                             // Creating two constraints for each plant-state-pair
-                            varCoeffs[timeVarIndexMap.get("time[" + secondPlantState[0] + ", " + 
+                            varCoeffs[timeVarIndexMap.get("time[" + secondPlantState[0] + ", " +
                                     secondPlantState[1] + "]")].add(new double[]{constraintCounter, 1});
-                            varCoeffs[timeVarIndexMap.get("time[" + secondPlantState[0] + ", " + 
+                            varCoeffs[timeVarIndexMap.get("time[" + secondPlantState[0] + ", " +
                                     secondPlantState[1] + "]")].add(new double[]{constraintCounter + 1, -1});
-                            varCoeffs[timeVarIndexMap.get("time[" + firstPlantState[0] + ", " + 
+                            varCoeffs[timeVarIndexMap.get("time[" + firstPlantState[0] + ", " +
                                     firstPlantState[1] + "]")].add(new double[]{constraintCounter, -1});
-                            varCoeffs[timeVarIndexMap.get("time[" + firstPlantState[0] + ", " + 
+                            varCoeffs[timeVarIndexMap.get("time[" + firstPlantState[0] + ", " +
                                     firstPlantState[1] + "]")].add(new double[]{constraintCounter + 1, 1});
-                            
-                            // The occurrence frequency of each altPathVariable is important 
+
+                            // The occurrence frequency of each altPathVariable is important
                             int altPathCounter = 0;
-                            Hashtable<Integer, Integer> currFrequencyMap = new Hashtable<Integer, Integer>();
+                            final Hashtable<Integer, Integer> currFrequencyMap = new Hashtable<Integer, Integer>();
                             for (int k1 = 1; k1 < currSharedTimeVarsInFirstPlant.size(); k1++)
                             {
-                                int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
+                                final int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
                                         currSharedTimeVarsInFirstPlant.get(k1)));
-                                
+
                                 Integer currFrequency = currFrequencyMap.get(new Integer(altPathIndex));
                                 if (currFrequency == null)
                                 {
                                     currFrequency = new Integer(0);
                                 }
                                 currFrequencyMap.put(altPathIndex, currFrequency.intValue() + 1);
-                                
+
                                 Integer firstPlantFrequency = firstPlantFrequencyMap.get(new Integer(altPathIndex));
                                 if (firstPlantFrequency == null)
                                 {
                                     firstPlantFrequency = new Integer(0);
                                 }
                                 firstPlantFrequencyMap.put(altPathIndex, firstPlantFrequency.intValue() + 1);
-                                
+
                                 altPathCounter++;
                             }
                             for (int k2 = 1; k2 < currSharedTimeVarsInSecondPlant.size(); k2++)
                             {
-                                int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
+                                final int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
                                         currSharedTimeVarsInSecondPlant.get(k2)));
-                                
+
                                 Integer currFrequency = currFrequencyMap.get(new Integer(altPathIndex));
                                 if (currFrequency == null)
                                 {
                                     currFrequency = new Integer(0);
                                 }
                                 currFrequencyMap.put(altPathIndex, currFrequency.intValue() + 1);
-                                
+
                                 Integer secondPlantFrequency = secondPlantFrequencyMap.get(new Integer(altPathIndex));
                                 if (secondPlantFrequency == null)
                                 {
                                     secondPlantFrequency = new Integer(0);
                                 }
                                 secondPlantFrequencyMap.put(altPathIndex, secondPlantFrequency.intValue() + 1);
-                                
+
                                 altPathCounter++;
                             }
-                            
+
                             // The occurrence frequencys are added to the coefficients of current row for each variable
-                            for (Integer altPathIndex : currFrequencyMap.keySet())
+                            for (final Integer altPathIndex : currFrequencyMap.keySet())
                             {
-                                varCoeffs[altPathIndex].add(new double[]{constraintCounter, 
+                                varCoeffs[altPathIndex].add(new double[]{constraintCounter,
                                     SchedulingConstants.BIG_M_VALUE * currFrequencyMap.get(altPathIndex)});
-                                varCoeffs[altPathIndex].add(new double[]{constraintCounter + 1, 
+                                varCoeffs[altPathIndex].add(new double[]{constraintCounter + 1,
                                     SchedulingConstants.BIG_M_VALUE * currFrequencyMap.get(altPathIndex)});
                             }
-                            
+
                             // Two right-hand-side-expressions are needed
                             bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE * altPathCounter));
                             bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE * altPathCounter));
-                            
+
                             constraintCounter += 2;
                         }
                     }
-                    
-                    // The last constraint ensures that the number of event occurrences is equal in both plants 
-                    for (Integer altPathIndex : firstPlantFrequencyMap.keySet())
+
+                    // The last constraint ensures that the number of event occurrences is equal in both plants
+                    for (final Integer altPathIndex : firstPlantFrequencyMap.keySet())
                     {
                         if (altPathIndex > -1)
                         {
@@ -549,7 +556,7 @@ public abstract class MpsUI
                                 constraintCounter, -1 * firstPlantFrequencyMap.get(altPathIndex)});
                         }
                     }
-                    for (Integer altPathIndex : secondPlantFrequencyMap.keySet())
+                    for (final Integer altPathIndex : secondPlantFrequencyMap.keySet())
                     {
                         if (altPathIndex > -1)
                         {
@@ -560,7 +567,7 @@ public abstract class MpsUI
                     // The right-hand-side is generally = 0, but here it contains the numbers of
                     // forces event occurrences (no alt. paths upstreams)
                     bUpper.add(new Double(firstPlantFrequencyMap.get(-1) - secondPlantFrequencyMap.get(-1)));
-                    
+
                     // The list of equality row indices is updated
                     equalityRowIndices.add(constraintCounter);
                     constraintCounter++;
@@ -570,10 +577,10 @@ public abstract class MpsUI
 
         // Populate the mps-file
         w.write("NAME          DESUPREMICA\n");
-        
+
         w.write("ROWS\n");
         w.write(" N  MAKESP\n");
-//        int firstLConstrNr = milpConstructor.getCycleTimeConstraints().size() + 
+//        int firstLConstrNr = milpConstructor.getCycleTimeConstraints().size() +
 //                milpConstructor.getInitPrecConstraints().size() + milpConstructor.getPrecConstraints().size() +
 //                milpConstructor.getAltPathsConstraints().size() + milpConstructor.getMutexConstraints().size();
 //        for (int i = 0; i < firstLConstrNr; i++)
@@ -599,7 +606,7 @@ public abstract class MpsUI
                 w.write(" L  R" + i + "\n");
             }
         }
-        
+
         w.write("COLUMNS\n");
         for (int i = 0; i < varCoeffs.length; i++)
         {
@@ -616,16 +623,16 @@ public abstract class MpsUI
                 }
                 if (Math.IEEEremainder(j, 2) == 0)
                 {
-                    double[] currCoeffs = varCoeffs[i].get(j);
+                    final double[] currCoeffs = varCoeffs[i].get(j);
                     String currColStr = "    " + varName;
-                    String valueStr = "" + currCoeffs[1];
-                    
-                    int currColLength = currColStr.length();
+                    final String valueStr = "" + currCoeffs[1];
+
+                    final int currColLength = currColStr.length();
                     for (int k = 0; k < 14 - currColLength; k++) // The values are placed from 15-th char in MPS-format
                     {
                         currColStr += " ";
                     }
-                   
+
                     if (currCoeffs[0] > -1)
                     {
                         currColStr += "R" + (int)currCoeffs[0];
@@ -635,13 +642,13 @@ public abstract class MpsUI
                         currColStr += "MAKESP";
                     }
                     w.write(currColStr);
-                    
+
                     for (int k = 0; k < 36 - currColStr.length() - valueStr.length(); k++)
                     {
                         w.write(" ");
                     }
                     w.write(valueStr);
-                    
+
                     if (j == varCoeffs[i].size() - 1)
                     {
                         w.write("\n");
@@ -649,12 +656,12 @@ public abstract class MpsUI
                 }
                 else
                 {
-                    double[] currCoeffs = varCoeffs[i].get(j); 
-                    String currColStr = "   R" + (int)currCoeffs[0];
-                    String valueStr = "" + currCoeffs[1];
-                    
+                    final double[] currCoeffs = varCoeffs[i].get(j);
+                    final String currColStr = "   R" + (int)currCoeffs[0];
+                    final String valueStr = "" + currCoeffs[1];
+
                     w.write(currColStr);
-                    for (int k = 0; k < 25 - currColStr.length() - valueStr.length(); k++) 
+                    for (int k = 0; k < 25 - currColStr.length() - valueStr.length(); k++)
                     {
                         w.write(" ");
                     }
@@ -662,13 +669,13 @@ public abstract class MpsUI
                 }
             }
         }
-        
+
         w.write("RHS\n");
         for (int i = 0; i < bUpper.size(); i++)
         {
-            String currRhsStr = "    RHS1      R" + i;
-            String valueStr = "" + bUpper.get(i);
-            
+            final String currRhsStr = "    RHS1      R" + i;
+            final String valueStr = "" + bUpper.get(i);
+
             w.write(currRhsStr);
             for (int j = 0; j < 36 - currRhsStr.length() - valueStr.length(); j++)
             {
@@ -676,21 +683,21 @@ public abstract class MpsUI
             }
             w.write(valueStr + "\n");
         }
-        
+
         w.write("BOUNDS\n");
         for (int i = 0; i < binVarIndexMap.size(); i++)
         {
             w.write(" BV BND1      X" + i + "\n");
         }
-        
+
         w.write("ENDATA");
 
         w.flush();
         w.close();
     }
-    
-    protected void processConstraintString(String str, int constraintCounter)
-    {            
+
+    protected void processConstraintString(final String str, final int constraintCounter)
+    {
         double currBUpper = 0;
         int multiplier = -1;
         int tokenSign = 1;
@@ -698,7 +705,7 @@ public abstract class MpsUI
         boolean bigMMultiplication = false;
         boolean withinParenthesis = false;
 
-        StringTokenizer tokenizer = new StringTokenizer(str);
+        final StringTokenizer tokenizer = new StringTokenizer(str);
         String varToken = "";
         while (tokenizer.hasMoreTokens())
         {
@@ -742,15 +749,15 @@ public abstract class MpsUI
 
                 if (varToken.contains("delta"))
                 {
-                    int plantIndex = (new Integer(varToken.substring(
+                    final int plantIndex = (new Integer(varToken.substring(
                             varToken.indexOf("[") + 1, varToken.indexOf(",")).trim())).intValue();
-                    int stateIndex = (new Integer(varToken.substring(
+                    final int stateIndex = (new Integer(varToken.substring(
                             varToken.indexOf(",") + 1, varToken.indexOf("]")).trim())).intValue();
                     currBUpper += -1 * multiplier * tokenSign * milpConstructor.getDeltaTimes()[plantIndex][stateIndex];
                 }
                 else
                 {
-                    int timeVarIndex = timeVarIndexMap.get(varToken).intValue();
+                    final int timeVarIndex = timeVarIndexMap.get(varToken).intValue();
 
                     varCoeffs[timeVarIndex].add(new double[]{constraintCounter, multiplier * tokenSign});
                 }
@@ -762,11 +769,11 @@ public abstract class MpsUI
             }
             else if (currToken.contains("-"))
             {
-                tokenSign = -1; 
+                tokenSign = -1;
             }
             else if (currToken.contains("+"))
             {
-                tokenSign = 1; 
+                tokenSign = 1;
             }
             else if (currToken.contains("epsilon"))
             {
@@ -790,19 +797,19 @@ public abstract class MpsUI
                         currToken = currToken.substring(0, currToken.indexOf(";"));
                     }
 
-                    Integer binVarIndex = binVarIndexMap.get(currToken.trim());
+                    final Integer binVarIndex = binVarIndexMap.get(currToken.trim());
                     if (binVarIndex != null)
-                    {                                    
+                    {
                         varCoeffs[binVarIndex].add(new double[]{constraintCounter, multiplier * tokenSign});
                     }
                     else
-                    {                                                  
-                        Double constVal = new Double(currToken);
+                    {
+                        final Double constVal = new Double(currToken);
                         currBUpper += -1 * tokenSign * multiplier * constVal;
                     }
                 }
-                catch (NumberFormatException e){}
-            }   
+                catch (final NumberFormatException e){}
+            }
 
             if (bigMMultiplication && !withinParenthesis)
             {
@@ -812,8 +819,8 @@ public abstract class MpsUI
         }
         bUpper.add(currBUpper);
     }
-    
-    protected void fillOptimalVarArrays(Hashtable<Integer, Double> optimalTimeVarValues, Hashtable<Integer, Integer> optimalBinVarValues)
+
+    protected void fillOptimalVarArrays(final Hashtable<Integer, Double> optimalTimeVarValues, final Hashtable<Integer, Integer> optimalBinVarValues)
     {
         // Initialize the arrays of optimal variable values
         optimalTimes = new double[milpConstructor.getDeltaTimes().length][];
@@ -824,30 +831,30 @@ public abstract class MpsUI
             optimalAltPathVariables[i] = new boolean[milpConstructor.getDeltaTimes()[i].length]
                     [milpConstructor.getDeltaTimes()[i].length];
         }
-        
+
         // Fill the arrays of optimal times with appropriate values
-        for (String varKey : timeVarIndexMap.keySet())
+        for (final String varKey : timeVarIndexMap.keySet())
         {
-            int plantIndex = (new Integer(varKey.substring(varKey.indexOf("[") + 1, varKey.indexOf(",")).trim())).intValue();
-            int stateIndex = (new Integer(varKey.substring(varKey.indexOf(",") + 1, varKey.indexOf("]")).trim())).intValue();
-            
-            Double optimalVarValue = optimalTimeVarValues.get(timeVarIndexMap.get(varKey));
+            final int plantIndex = (new Integer(varKey.substring(varKey.indexOf("[") + 1, varKey.indexOf(",")).trim())).intValue();
+            final int stateIndex = (new Integer(varKey.substring(varKey.indexOf(",") + 1, varKey.indexOf("]")).trim())).intValue();
+
+            final Double optimalVarValue = optimalTimeVarValues.get(timeVarIndexMap.get(varKey));
             if (optimalVarValue != null)
             {
                 optimalTimes[plantIndex][stateIndex] = optimalVarValue.doubleValue();
             }
         }
         // Fill the arrays of optimal alt path variables with appropriate values
-        for (String varKey : binVarIndexMap.keySet())
+        for (final String varKey : binVarIndexMap.keySet())
         {
             // If this is an alt.path variable, then store it. Otherwise, do nothing.
             if (varKey.contains("_from_") && varKey.contains("_to_"))
             {
-                int[] plantStateIndices = unmakeAltPathsVariableStr(varKey);
-                Integer optimalVarValue = optimalBinVarValues.get(binVarIndexMap.get(varKey));
+                final int[] plantStateIndices = unmakeAltPathsVariableStr(varKey);
+                final Integer optimalVarValue = optimalBinVarValues.get(binVarIndexMap.get(varKey));
                 if (optimalVarValue != null)
                 {
-                    optimalAltPathVariables[plantStateIndices[0]][plantStateIndices[1]][plantStateIndices[2]] = 
+                    optimalAltPathVariables[plantStateIndices[0]][plantStateIndices[1]][plantStateIndices[2]] =
                             (optimalVarValue.intValue() == 1);
                 }
                 else
@@ -857,38 +864,41 @@ public abstract class MpsUI
             }
         }
     }
-    
+
     /**
      * Launches the GLPK-solver (glpsol.exe must be included in the path).
      */
+    @Override
     public void launchMilpSolver()
         throws MilpException, IOException
     {
         launchMilpSolver(mpsFile);
     }
-    
+
     /**
      * Launches the appropriate MILP-solver (that should be included in the path).
-     * This method-header allows to choose the model file manually (instead of 
+     * This method-header allows to choose the model file manually (instead of
      * a temporary file that would be created by the system automatically).
      */
     public abstract void launchMilpSolver(File mpsFile)
         throws MilpException, IOException;
-       
+
     /**
-     * Processes the output from the MILP-solver, transforming it into a sequence 
+     * Processes the output from the MILP-solver, transforming it into a sequence
      * of event firing times.
      */
+    @Override
     public abstract void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException;
-     
+
     /**
      * Deletes the temporary files that were created to interact with the MILP solver.
      * Called by the main class in case of emergency (e.g. undeleted temporary files
      * in case of exception).
      */
+    @Override
     public void cleanUp()
-    {     
+    {
         try
         {
             if (milpProcess != null)
@@ -901,51 +911,51 @@ public abstract class MpsUI
                     //mpsFile.delete();
             }
             if (solutionFile != null)
-            { 
+            {
                 solutionFile.delete();
             }
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
-            milpConstructor.addToMessages("Cleaning up of the GLPK-solver failed.", 
+            milpConstructor.addToMessages("Cleaning up of the GLPK-solver failed.",
                     SchedulingConstants.MESSAGE_TYPE_ERROR);
         }
     }
-    
+
     /** Returns the optimal event occurrence times for each plant-state. */
+    @Override
     public double[][] getOptimalTimes()
     {
         return optimalTimes;
     }
-    
+
     /** Returns the optimal alt. path variable choices. */
+    @Override
     public boolean[][][] getOptimalAltPathVariables()
     {
        return optimalAltPathVariables;
     }
-    
+
     /**
-     * Combines info about an alt.paths variable, 
-     * stored as int[plantIndex, fromStateIndex, toStateIndex], 
+     * Combines info about an alt.paths variable,
+     * stored as int[plantIndex, fromStateIndex, toStateIndex],
      * into string representation.
      */
-    public String makeAltPathsVariableStr(int[] altPathsVariable)
+    public String makeAltPathsVariableStr(final int[] altPathsVariable)
     {
         return "r" + altPathsVariable[0] + "_from_" + altPathsVariable[1] + "_to_" + altPathsVariable[2];
     }
 
     /**
-     * Combines the info about a variable into string representation. If the 
-     * plant ordering is incorrect (which is used by the CircularWaitConstraintBlocks 
+     * Combines the info about a variable into string representation. If the
+     * plant ordering is incorrect (which is used by the CircularWaitConstraintBlocks
      * to create correct logic), it is adjusted before constructing the variable.
-     * 
-     * @param mutexVariable
      * @return String representation of the variable
      */
-    public String makeMutexVariableStr(int[] mutexVariable)
-    {       
+    public String makeMutexVariableStr(final int[] mutexVariable)
+    {
         int[] localMutexVar;
-        
+
         if (mutexVariable[1] < mutexVariable[2])
         {
             localMutexVar = mutexVariable;
@@ -957,41 +967,41 @@ public abstract class MpsUI
             localMutexVar[1] = mutexVariable[2];
             localMutexVar[2] = mutexVariable[1];
             localMutexVar[3] = mutexVariable[4];
-            localMutexVar[4] = mutexVariable[3];        
+            localMutexVar[4] = mutexVariable[3];
         }
 
-        int varIndex = milpConstructor.getMutexVarCounterMap().get(localMutexVar);
+        final int varIndex = milpConstructor.getMutexVarCounterMap().get(localMutexVar);
 
         return "r" + localMutexVar[1] + "_books_z" + localMutexVar[0] +
                 "_before_r" + localMutexVar[2] + "_var" + varIndex;
     }
-    
-    protected int[] unmakeAltPathsVariableStr(String varStr)
+
+    protected int[] unmakeAltPathsVariableStr(final String varStr)
     {
-        int[] varIndices = new int[3];
-        
+        final int[] varIndices = new int[3];
+
         varIndices[0] = (new Integer(varStr.substring(1, varStr.indexOf("_")))).intValue();
         varIndices[1] = (new Integer(varStr.substring(varStr.indexOf("om_") + 3, varStr.indexOf("_to")))).intValue();
         varIndices[2] = (new Integer(varStr.substring(varStr.indexOf("to_") + 3, varStr.length()))).intValue();
-        
+
         return varIndices;
     }
-    
-    protected int representMutexConstraint(int p1, int st1, int p2, int st2, 
-            int mutexVarIndex, int mutexVarCoeff, int constraintCounter)
+
+    protected int representMutexConstraint(final int p1, final int st1, final int p2, final int st2,
+            final int mutexVarIndex, final int mutexVarCoeff, int constraintCounter)
     {
-        java.util.Collection<int[]> bookingAltPaths = milpConstructor.getActiveAltPathVars(
+        final java.util.Collection<int[]> bookingAltPaths = milpConstructor.getActiveAltPathVars(
                 new int[]{p1, st1});
-        java.util.Collection<int[]> unbookingAltPaths = milpConstructor.getActiveAltPathVars(
+        final java.util.Collection<int[]> unbookingAltPaths = milpConstructor.getActiveAltPathVars(
                 new int[]{p2, st2});
 
         if (bookingAltPaths.size() + unbookingAltPaths.size() > 0)
         {
-            for (int[] bAltPathVar : bookingAltPaths)
+            for (final int[] bAltPathVar : bookingAltPaths)
             {
-                int bAltPathIndex = binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
+                final int bAltPathIndex = binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
                         bAltPathVar[0], bAltPathVar[1], bAltPathVar[2]));
-                for (int[] uAltPathVar : unbookingAltPaths)
+                for (final int[] uAltPathVar : unbookingAltPaths)
                 {
                     varCoeffs[timeVarIndexMap.get(milpConstructor.makeTimeVariable(
                             p2, st2))].add(new double[]{constraintCounter, 1});
@@ -1002,13 +1012,13 @@ public abstract class MpsUI
                     varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
                             uAltPathVar[0], uAltPathVar[1], uAltPathVar[2]))].
                             add(new double[]{constraintCounter++, SchedulingConstants.BIG_M_VALUE});
-                    
-                    bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE * 
+
+                    bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE *
                             (bookingAltPaths.size() + unbookingAltPaths.size()) - SchedulingConstants.EPSILON));
                 }
             }
         }
-        
+
         return constraintCounter;
     }
 }

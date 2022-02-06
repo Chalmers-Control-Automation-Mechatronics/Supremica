@@ -310,8 +310,8 @@ public class Forbidder
 	 * @param automata The automata to which add self-loops (or dump-transitions)
 	 * @param states Set of state-sets where each state-set is a global state combination to forbid. This is a matrix where each row
 	 *			corresponds to a global state (with null elements if the global state is partial) and thus generates a forbidden event.
-	 *			(This is a rather in-efficient data structure, since typically the "matrix" is very sparse; consider Cat & Mouse with
-	 *			3 cats and 3 mice, there will be 270 entries of which 180 are null. A com.google.common.collect.Table<> would probably be better)
+	 *			(This is a rather in-efficient data structure, since typically the "matrix" is very sparse; consider Cat &amp; Mouse with
+	 *			3 cats and 3 mice, there will be 270 entries of which 180 are null. A com.google.common.collect.Table would probably be better)
 	 * @param prefix The event-prefix for the generated forbidden events
 	 * @param use_dump Determines whether to add forbidden self-loops or transitions to dump-state
 	 * @return A single spec that has all the generated forbidden events as blocked events

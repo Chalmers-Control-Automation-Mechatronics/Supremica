@@ -56,9 +56,6 @@ import java.util.NoSuchElementException;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.StateStorage;
 
-/**
- * Insert <int_1, int_2, int_3, ..., int_n, prev_state, int_status>
- */
 public final class IntArrayHashTable
 	implements StateStorage
 {

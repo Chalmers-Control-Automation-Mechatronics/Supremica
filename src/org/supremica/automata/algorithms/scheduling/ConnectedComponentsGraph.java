@@ -66,7 +66,7 @@ public class ConnectedComponentsGraph
     /**
      * Starts the procedure of finding and returning all cycles in the booking pairs
      * graph, that have rainbow-colored edges. Johnson's algorithm, see
-     * http://scitation.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=SMJCAT000004000001000077000001&idtype=cvips&gifs=yes
+     * http://scitation.aip.org/getabs/servlet/GetabsServlet?prog=normal&amp;id=SMJCAT000004000001000077000001&amp;idtype=cvips&amp;gifs=yes
      * B. D. Johnson, "Finding all the elementary cicruits of a directed graph",
      * is extended with a color check to find such cycles.
      */

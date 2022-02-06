@@ -5,29 +5,42 @@
 
 package org.supremica.automata.algorithms.scheduling.milp;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Hashtable;
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
  * @author Avenir Kobetski
  */
-public class CplexUI 
+public class CplexUI
         extends MpsUI
 {
-    public CplexUI(Milp milpConstructor)
+    public CplexUI(final Milp milpConstructor)
             throws Exception
     {
         super(milpConstructor);
     }
-    
-    public void launchMilpSolver(File mpsFile)
+
+    @Override
+    public void launchMilpSolver(final File mpsFile)
             throws MilpException, IOException
-    {      
+    {
         BufferedWriter commandWriter = null;
         try
         {
@@ -43,31 +56,31 @@ public class CplexUI
             // Write the results of optimization to a solution-file
             commandWriter.write("write " + solutionFile.getAbsolutePath() + "\n");
             // Authorize overwriting of the existing (temporary) solution file
-            commandWriter.write("y\n"); 
+            commandWriter.write("y\n");
             // Quit Cplex
             commandWriter.write("quit\n");
             // Close the command-line writer
             commandWriter.flush();
             commandWriter.close();
         }
-        catch (IOException milpNotFoundException)
+        catch (final IOException milpNotFoundException)
         {
             milpConstructor.addToMessages("The Cplex-solver 'cplex.exe' not found. " +
                     "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
-            
+
             throw new MilpException(milpNotFoundException.getMessage());
         }
-        
+
         // Listens for the output of MILP (that is the input to this application)...
-        BufferedReader milpEcho = new BufferedReader(
+        final BufferedReader milpEcho = new BufferedReader(
                 new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
-        
+
         // ...and prints it to stdout
         String milpEchoStr = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
-        {   
+        {
 //            System.out.println("echo: " + milpEchoStr);
-            
+
             if (milpEchoStr.contains("time ="))
             {
                 milpConstructor.addToMessages(milpEchoStr, SchedulingConstants.MESSAGE_TYPE_INFO);
@@ -89,18 +102,15 @@ public class CplexUI
 
     /**
      * Calls CplexSolutionParser to parse the xml-file containing the optimal MILP-solution.
-     * These values are then sent to fillOptimalVarArrays()-method, common to all MPS-format solvers. 
-     * 
-     * @throws org.supremica.automata.algorithms.scheduling.milp.MilpException
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * These values are then sent to fillOptimalVarArrays()-method, common to all MPS-format solvers.
      */
+    @Override
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
-    {        
-        CplexSolutionParser parser = new CplexSolutionParser(milpConstructor, solutionFile);
+    {
+        final CplexSolutionParser parser = new CplexSolutionParser(milpConstructor, solutionFile);
         parser.parseSolutionFile();
-        
+
         fillOptimalVarArrays(parser.getOptimalTimeVarValues(), parser.getOptimalBinVarValues());
     }
 }
@@ -109,42 +119,43 @@ class CplexSolutionParser extends DefaultHandler
 {
     Milp milpConstructor;
     File solFile;
-    
+
     Hashtable<Integer, Double> optimalTimeVarValues = new Hashtable<Integer, Double>();
     Hashtable<Integer, Integer> optimalBinVarValues = new Hashtable<Integer, Integer>();
-    
-    public CplexSolutionParser(Milp milpConstructor, File solFile)
+
+    public CplexSolutionParser(final Milp milpConstructor, final File solFile)
     {
         this.milpConstructor = milpConstructor;
         this.solFile = solFile;
     }
-    
+
     public void parseSolutionFile()
     {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        try 
+        final SAXParserFactory factory = SAXParserFactory.newInstance();
+        try
         {
-            SAXParser saxParser = factory.newSAXParser();
+            final SAXParser saxParser = factory.newSAXParser();
             saxParser.parse(solFile, this);
 
-        } 
-        catch (Throwable t) 
+        }
+        catch (final Throwable t)
         {
             t.printStackTrace();
         }
 
     }
-    
-    public void startElement(String uri, String localName, String qName, org.xml.sax.Attributes attr)
+
+    @Override
+    public void startElement(final String uri, final String localName, final String qName, final org.xml.sax.Attributes attr)
             throws SAXException
     {
         if (qName.equals("header"))
         {
-            milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + 
-                    milpConstructor.removeEpsilons((new Double(attr.getValue("objectiveValue"))).doubleValue()), 
+            milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " +
+                    milpConstructor.removeEpsilons((new Double(attr.getValue("objectiveValue"))).doubleValue()),
                         SchedulingConstants.MESSAGE_TYPE_INFO);
             milpConstructor.addToMessages("\tNr of nodes = " + attr.getValue("MIPNodes") +
-                    "; nr of iterations = " + attr.getValue("MIPIterations"), 
+                    "; nr of iterations = " + attr.getValue("MIPIterations"),
                     SchedulingConstants.MESSAGE_TYPE_INFO);
         }
         else if (qName.equals("variable"))
@@ -162,7 +173,7 @@ class CplexSolutionParser extends DefaultHandler
             }
         }
     }
-    
+
     public Hashtable<Integer, Double> getOptimalTimeVarValues()
     {
         return optimalTimeVarValues;

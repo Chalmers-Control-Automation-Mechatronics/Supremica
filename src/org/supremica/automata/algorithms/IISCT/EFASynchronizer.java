@@ -1,6 +1,12 @@
 
 package org.supremica.automata.algorithms.IISCT;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,12 +32,6 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.TIntHashSet;
 
 /**
  * A simple but not efficient implementation of synchronous composition for EFAs
@@ -77,9 +77,6 @@ public class EFASynchronizer {
 	 * Setting the synchronization mode. The default mode is 0. Mode 0: Normal
 	 * synchronization. Plants and specifications are not distinguish. Mode 1:
 	 * IPL mode. Mode 2: SCT mode. (TODO)
-	 * <p>
-	 *
-	 * @param mode
 	 */
 	public void setMode(final int mode) {
 		mMode = mode;
@@ -87,9 +84,6 @@ public class EFASynchronizer {
 
 	/**
 	 * Set to attach specification info to locations
-	 * <p>
-	 *
-	 * @param attach
 	 */
 	public void setAttachSpecToLocations(final boolean attach) {
 		mAttachSpecToLoc = attach;
@@ -97,12 +91,8 @@ public class EFASynchronizer {
 
 	/**
 	 * Run the synchronizer and construct the synchronized model.
-	 * <p>
-	 *
 	 * @return true if the synchronization is successfully finished, false
 	 *         otherwise.
-	 *         <p>
-	 * @throws net.sourceforge.waters.model.analysis.OverflowException
 	 */
 	public boolean synchronize() throws AnalysisException {
 		lowSynch();
@@ -119,12 +109,8 @@ public class EFASynchronizer {
 
 	/**
 	 * Run the synchronizer but does not construct the synchronized model.
-	 * <p>
-	 *
 	 * @return true if the synchronization is successfully finished, false
 	 *         otherwise.
-	 *         <p>
-	 * @throws AnalysisException
 	 */
 	public boolean lowSynch() throws AnalysisException {
 		mSize = mComponents.size();
@@ -277,11 +263,6 @@ public class EFASynchronizer {
 
 	/**
 	 * Performing IPL synchronization (mode 1).
-	 * <p>
-	 *
-	 * @param initialSet
-	 *            <p>
-	 * @throws AnalysisException
 	 */
 	private void synch(final TIntArrayList initialSet) throws AnalysisException {
 		final Stack<TIntArrayList> stack = new Stack<>();

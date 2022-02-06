@@ -2626,8 +2626,8 @@ public class AutomatonMinimizer
 
     /**
      * Add tau-transitions to cover for the epsilon events (aka "saturate"). More formally, each
-     * time there is a transition "p =epsilon=> q", after completing the transitive closure (or
-     * "saturation"), there is also a transition "p -epsilon-> q".
+     * time there is a transition "p =epsilon=&gt; q", after completing the transitive closure (or
+     * "saturation"), there is also a transition "p -epsilon-&gt; q".
      */
     public static int epsilonSaturate(final Automaton aut, final boolean addSelfloops)
     throws SupremicaException
@@ -2673,9 +2673,9 @@ public class AutomatonMinimizer
     }
 
     /**
-     * Each time there is a transition "p -tau_u^*sigma-> q", after
+     * Each time there is a transition "p -tau_u^*sigma-&gt; q", after
      * completing the saturation, there is also a transition "p
-     * -sigma-> q".
+     * -sigma-&gt; q".
      */
 
     public static int supervisionEquivalenceSaturate(final Automaton aut)

@@ -44,8 +44,9 @@ import java.util.EventObject;
  * #getKind()} method. Each kind of event is implemented by a separate
  * subclass that may provide additional detail.</P>
  *
- * <TABLE>
- * <TR><TH>Enumeration value</TH> <TH>Subclass</TH> <TH>Description</TH></TR>
+ * <TABLE SUMMARY="Overview of event kinds">
+ * <TR><TH ALIGN="left">Enumeration value</TH>
+ * <TH ALIGN="left">Subclass</TH> <TH ALIGN="left">Description</TH></TR>
  * <TR><TD>CONTAINER_SWITCH</TD> <TD>{@link MainPanelSwitchEvent}</TD>
  * <TD>The user has switched document containers, e.g., opened or closed a
  * file.</TD></TR>

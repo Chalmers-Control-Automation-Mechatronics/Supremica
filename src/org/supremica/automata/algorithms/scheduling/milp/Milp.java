@@ -3221,8 +3221,6 @@ public class Milp
      *  Removes epsilons from the supplied time variable, by returning closest
      *  value that is smaller than time and cannot be affected by the sum of
      *  epsilons.
-     *
-     *  @param time
      *  @return the time without epsilons
      */
     public double removeEpsilons(final double time)

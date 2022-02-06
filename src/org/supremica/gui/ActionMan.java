@@ -47,7 +47,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -55,6 +54,7 @@ import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.options.OptionFileManager;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.apache.logging.log4j.LogManager;
@@ -479,7 +479,8 @@ public class ActionMan
     /**
      * Moves selected automata one step up or down in the list
      *
-     * @param directionIsUp Boolean deciding the direction of the move, true->up false->down.
+     * @param directionIsUp Boolean deciding the direction of the move,
+     *                      true means up and false means down.
      * @param allTheWay Boolean deciding is the move is all the way to the top or bottom.
      */
     public static void automataMove_actionPerformed(final Gui gui, final boolean directionIsUp, final boolean allTheWay)

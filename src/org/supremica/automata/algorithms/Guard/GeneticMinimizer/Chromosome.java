@@ -10,13 +10,14 @@ import java.util.List;
 
 /**
  *
- * @author Sajed & Alexey
+ * @author Sajed
+ * @author Alexey
  */
 public class Chromosome
 {
-    private List<String> genes;
+    private final List<String> genes;
 
-    public Chromosome(List<String> genes)
+    public Chromosome(final List<String> genes)
     {
         this.genes = new ArrayList<String>(genes);
     }
@@ -26,7 +27,7 @@ public class Chromosome
         return genes;
     }
 
-    public void setGene(int index, String gene)
+    public void setGene(final int index, final String gene)
     {
         genes.set(index, gene);
     }

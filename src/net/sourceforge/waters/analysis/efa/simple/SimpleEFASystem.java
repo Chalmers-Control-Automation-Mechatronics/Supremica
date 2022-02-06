@@ -47,7 +47,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 /**
  * A simple implementation of the abstract system {@link AbstractEFASystem}.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFASystem

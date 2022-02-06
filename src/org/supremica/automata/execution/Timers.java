@@ -49,38 +49,42 @@
  */
 package org.supremica.automata.execution;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.TreeMap;
+
 import org.supremica.automata.LabeledEvent;
 
 public class Timers
 {
-	private Map<String, EventTimer> labelToTimerMap = new TreeMap<String, EventTimer>();
+	private final Map<String, EventTimer> labelToTimerMap = new TreeMap<String, EventTimer>();
 
 	public Timers() {}
 
-	public Timers(Timers otherTimers)
+	public Timers(final Timers otherTimers)
 	{
-		for (Iterator<EventTimer> actIt = otherTimers.iterator(); actIt.hasNext(); )
+		for (final Iterator<EventTimer> actIt = otherTimers.iterator(); actIt.hasNext(); )
 		{
-			EventTimer currTimer = actIt.next();
-			EventTimer newTimer = new EventTimer(currTimer);
+			final EventTimer currTimer = actIt.next();
+			final EventTimer newTimer = new EventTimer(currTimer);
 
 			addTimer(newTimer);
 		}
 	}
 
-	public void addTimers(Timers otherTimers)
+	public void addTimers(final Timers otherTimers)
 	{
-		for (Iterator<EventTimer> actIt = otherTimers.iterator(); actIt.hasNext(); )
+		for (final Iterator<EventTimer> actIt = otherTimers.iterator(); actIt.hasNext(); )
 		{
-			EventTimer currTimer = actIt.next();
-			EventTimer newTimer = new EventTimer(currTimer);
+			final EventTimer currTimer = actIt.next();
+			final EventTimer newTimer = new EventTimer(currTimer);
 
 			addTimer(newTimer);
 		}
 	}
 
-	public boolean addTimer(EventTimer theTimer)
+	public boolean addTimer(final EventTimer theTimer)
 	{
 		if (theTimer == null)
 		{
@@ -97,17 +101,17 @@ public class Timers
 		return true;
 	}
 
-	public void removeTimer(EventTimer theTimer)
+	public void removeTimer(final EventTimer theTimer)
 	{
 		labelToTimerMap.remove(theTimer.getName());
 	}
 
-	public boolean hasTimer(String label)
+	public boolean hasTimer(final String label)
 	{
 		return labelToTimerMap.containsKey(label);
 	}
 
-	public EventTimer getTimer(String label)
+	public EventTimer getTimer(final String label)
 	{
 		return labelToTimerMap.get(label);
 	}
@@ -118,11 +122,11 @@ public class Timers
 	 * be a timeout event to more than one timer.
 	 * @param event The timeout event
 	 */
-	public EventTimer getTimerWithTimeoutEvent(LabeledEvent event)
+	public EventTimer getTimerWithTimeoutEvent(final LabeledEvent event)
 	{
 		EventTimer timer;
 
-		for (Iterator<EventTimer> it = iterator(); it.hasNext(); )
+		for (final Iterator<EventTimer> it = iterator(); it.hasNext(); )
 		{
 			timer = it.next();
 
@@ -144,9 +148,8 @@ public class Timers
 	 * Returns an iterator to the timers that has
 	 * this event as start event. An event can be
 	 * startevent to more than one timer.
-	 * @param theEvent
 	 */
-	public Iterator<?> iteratorWithStartEvent(LabeledEvent theEvent)
+	public Iterator<?> iteratorWithStartEvent(final LabeledEvent theEvent)
 	{
 		return new TimerIterator(iterator(), theEvent);
 	}
@@ -165,9 +168,9 @@ public class Timers
 	{
 		int i = 0;
 
-		for (Iterator<EventTimer> theIt = iterator(); theIt.hasNext(); )
+		for (final Iterator<EventTimer> theIt = iterator(); theIt.hasNext(); )
 		{
-			EventTimer currTimer = theIt.next();
+			final EventTimer currTimer = theIt.next();
 
 			currTimer.setSynchIndex(i++);
 		}
@@ -178,13 +181,13 @@ public class Timers
 	{
 		private final Iterator<EventTimer> theIterator;
 		@SuppressWarnings("unused")
-		private LabeledEvent theStartEvent;
-		private String label;
+		private final LabeledEvent theStartEvent;
+		private final String label;
 		private Object nextObject = null;
 		@SuppressWarnings("unused")
 		private boolean startEvent;
 
-		public TimerIterator(Iterator<EventTimer> theIterator, LabeledEvent theStartEvent)
+		public TimerIterator(final Iterator<EventTimer> theIterator, final LabeledEvent theStartEvent)
 		{
 			this.theIterator = theIterator;
 			this.theStartEvent = theStartEvent;
@@ -193,17 +196,19 @@ public class Timers
 			findNextObject();
 		}
 
-		public boolean hasNext()
+		@Override
+    public boolean hasNext()
 		{
 			return nextObject != null;
 		}
 
-		public Object next()
+		@Override
+    public Object next()
 			throws NoSuchElementException
 		{
 			if (nextObject != null)
 			{
-				Object oldObject = nextObject;
+				final Object oldObject = nextObject;
 
 				findNextObject();
 
@@ -215,7 +220,8 @@ public class Timers
 			}
 		}
 
-		public void remove()
+		@Override
+    public void remove()
 			throws UnsupportedOperationException, IllegalStateException
 		{
 			throw new UnsupportedOperationException();
@@ -225,7 +231,7 @@ public class Timers
 		{
 			while (theIterator.hasNext())
 			{
-				EventTimer currTimer = theIterator.next();
+				final EventTimer currTimer = theIterator.next();
 
 				if (label.equals(currTimer.getStartEvent()))
 				{

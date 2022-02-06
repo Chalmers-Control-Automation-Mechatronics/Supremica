@@ -2,24 +2,20 @@
 
 package org.supremica.util.BDD.graph;
 
-import java.util.*;
+import java.util.Vector;
 
 /**
- * <pre>
- * simple implementation of a graph: G = < V, E>
+ * <P>Simple implementation of a graph: G = &lt;V, E&gt;</P>
  *
- * to save memory, the adjacency list is inside each node.
+ * <P>To save memory, the adjacency list is inside each node.
  * Note that this gives a "directed" feel to the graph even if its is undirected.
- * the Vector "edges" contains all edges in case the the adjacency list is not enough
+ * the Vector "edges" contains all edges in case the the adjacency list is not enough.</P>
  *
+ * <P>Note 1: if you remove a node in custom code, you must update "edges" and the adjacency lists!!</P>
+ * <P>Note 2: duplicate nodes/edges are not allowed, and automatically removed by Graph</P>
+ * <P>Note 3: self-loops are currently allowed, I dont know if they should be removed</P>
  *
- * Note 1: if you remove a node in custom code, you must update "edges" and the adjacency lists!!
- * Note 2: duplicate nodes/edges are not allowed, and automatically removed by Graph
- * Note 3: self-loops are currently allowed, I dont know if they should be removed
- *
- * </pre>
- *
- * (stolen from JDD)
+ * @author (stolen from JDD)
  */
 
 public class Graph {
@@ -28,7 +24,7 @@ public class Graph {
 	protected int count_nodes, count_edges; /** used to create unique ID:s for each element */
 	/* package */ boolean directed; /** G is a digraph */
 
-	public Graph(boolean directed) {
+	public Graph(final boolean directed) {
 		this.directed = directed;
 		this.nodes = new Vector<Node> ();
 		this.edges = new Vector<Edge>();
@@ -50,8 +46,8 @@ public class Graph {
 
 	// ----------------------------------------------------------------
 
-	public Node addNode(Node n) {
-		Node n2 = findNode(n);
+	public Node addNode(final Node n) {
+		final Node n2 = findNode(n);
 		if(n2 == null) {
 			n.id = count_nodes++;
 			nodes.add(n);
@@ -60,7 +56,7 @@ public class Graph {
 	}
 
 	public Node addNode() {
-		Node n = new Node(count_nodes++);
+		final Node n = new Node(count_nodes++);
 		nodes.add(n);
 		return n;
 	}
@@ -68,7 +64,7 @@ public class Graph {
 
 	// ----------------------------------------------------
 
-	public Edge addEdge(Node n1, Node n2) {
+	public Edge addEdge(final Node n1, final Node n2) {
 		Edge e = findEdge(n1,n2);
 		if(e == null) {
 			e = new Edge(n1,n2, count_edges++);
@@ -81,14 +77,14 @@ public class Graph {
 
 
 	// ----------------------------------------------------
-	public void removeEdge(Edge e) {
+	public void removeEdge(final Edge e) {
 		edges.remove(e);
 		removeForwardList(e, e.n1);
 		removeBackwardList(e, e.n2);
 	}
 
 	/** remove edge "ed" from the forward chain of "n" */
-	protected void removeForwardList(Edge ed, Node n) {
+	protected void removeForwardList(final Edge ed, final Node n) {
 		while(n.firstOut != null && (n.firstOut == ed))	n.firstOut = n.firstOut.next;
 		Edge e = n.firstOut, last = null;
 		while(e != null) {
@@ -100,7 +96,7 @@ public class Graph {
 	}
 
 	/** remove edge "ed" from the backward chain of "n" */
-	protected void removeBackwardList(Edge ed, Node n) {
+	protected void removeBackwardList(final Edge ed, final Node n) {
 		while(n.firstIn != null && (n.firstIn == ed))	n.firstIn = n.firstIn.prev;
 		Edge e = n.firstIn, last = null;
 		while(e != null) {
@@ -110,7 +106,7 @@ public class Graph {
 			e = e.prev;
 		}
 	}
-	public void removeNode(Node n) {
+	public void removeNode(final Node n) {
 		nodes.remove(n);
 
 		Edge e = n.firstOut;
@@ -126,7 +122,7 @@ public class Graph {
 
 	public void removeAllEdges()  {
 		edges.removeAllElements();
-		for (Node n : nodes) {
+		for (final Node n : nodes) {
 			n.firstIn = n.firstOut = null;
 		}
 	}
@@ -137,8 +133,8 @@ public class Graph {
 	}
 
 	// ----------------------------------------------------
-	protected Edge findEdge(Node n1, Node n2) {
-		for (Edge edge : edges) {
+	protected Edge findEdge(final Node n1, final Node n2) {
+		for (final Edge edge : edges) {
 			if(edge.n1 == n1 && edge.n2 == n2) return edge;
 			if(! directed) {
 				if(edge.n1 == n2 && edge.n2 == n1) return edge;
@@ -146,15 +142,15 @@ public class Graph {
 		}
 		return null;
 	}
-	protected Node findNode(Node n) {
-		for (Node n2 : nodes) {
+	protected Node findNode(final Node n) {
+		for (final Node n2 : nodes) {
 			if(n == n2) return n;
 		}
 		return null;
 	}
 
-	public Node findNode(String label) {
-		for (Node n : nodes) {
+	public Node findNode(final String label) {
+		for (final Node n : nodes) {
 			if(label.equals( n.label)) return n;
 		}
 		return null;
@@ -162,7 +158,7 @@ public class Graph {
 
 	// DEBUG
 	public void dump() {
-		for (Node n : nodes) {
+		for (final Node n : nodes) {
 			System.out.println("\nNode " + n.label+ ", extras= " + n.extra1 +" " + n.extra2 + " " +
 				n.extra3 + " " + n.extra4 + ", weight= " + n.weight);
 

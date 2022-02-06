@@ -92,7 +92,6 @@ public class Z3Solver extends AbstractSolver {
 	@SuppressWarnings("unused")
 	/**
 	 * For internal tests only. Do not call otherwise.
-	 * @throws SolverException
 	 */
 	public void run() throws SolverException {
 		try {
@@ -293,10 +292,10 @@ public class Z3Solver extends AbstractSolver {
 
 	/**
 	 * Computes the preimage of the given formula w.r.t. the given variable
-	 * index. That is, QE(EXITS Y. F(X)) for some Y <= X where Y is the set of
+	 * index. That is, QE(EXITS Y. F(X)) for some Y &lt;= X where Y is the set of
 	 * bounded variables and QE is the quantify elimination function. For
-	 * example, for two integer variables x0 and x1 we have: <br/>
-	 * getPreImage(x1=x0+1 & x1<2, 1) = {x0<1}.
+	 * example, for two integer variables x0 and x1 we have:
+	 * <PRE>getPreImage(x1=x0+1 &amp; x1&lt;2, 1) = {x0&lt;1}.</PRE>
 	 *
 	 * @param formula
 	 *            The formula to perform the preimage
@@ -306,7 +305,6 @@ public class Z3Solver extends AbstractSolver {
 	 *            Any assumption like range (domain) of the variable
 	 * @return A set Im := {F1, F2, ..., Fn} of quantified free formulas.
 	 *         Semantically Im equivalent to the formula F1 | F2 | ... | Fn.
-	 * @throws SolverException
 	 */
 	public List<BoolExpr> getPreImage(final BoolExpr formula, final int boundindex,
 			final BoolExpr... assumption) throws SolverException {

@@ -86,7 +86,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 /**
  * A compiler to convert an instantiated module ({@link ModuleProxy}) into an
  * EFA system ({@link SimpleEFASystem}).
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFASystemBuilder implements Abortable
@@ -205,7 +205,6 @@ public class SimpleEFASystemBuilder implements Abortable
    * Setting a collection of passes to check before constructing the system.
    * These passes can be used to verify any condition on the structure of the
    * system.
-   * <p/>
    * @param passes A collection of passes ({@link DefaultModuleProxyVisitor}) to
    *               be checked.
    */

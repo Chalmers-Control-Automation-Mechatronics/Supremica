@@ -85,8 +85,6 @@ public abstract class BDDPartitionAlgoWorker
 
   /**
    * Returns the BDD for the component.
-   *
-   * @param compIndex
    * @return the partitioning BDD corresponding to the component index
    */
   public BDD getCompBDD(final int compIndex)

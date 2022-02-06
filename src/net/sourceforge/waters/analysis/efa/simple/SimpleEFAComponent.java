@@ -50,7 +50,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 /**
  * An implementation of the {@link AbstractEFATransitionRelation}.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAComponent
@@ -138,9 +138,9 @@ public class SimpleEFAComponent
       mVarContext.getVariable(var).addUseInState(this);
     }
 
-    SimpleEFAEventEncoding eventEncoding = getEventEncoding();
-    for (int e : getEvents()) {
-      SimpleEFAEventDecl event = eventEncoding.getEventDecl(e);
+    final SimpleEFAEventEncoding eventEncoding = getEventEncoding();
+    for (final int e : getEvents()) {
+      final SimpleEFAEventDecl event = eventEncoding.getEventDecl(e);
       event.addComponent(this);
       eventEncoding.resetEventStatus(event);
     }
@@ -167,13 +167,13 @@ public class SimpleEFAComponent
         mVarContext.getVariable(var).removeUseInState(this);
       }
 
-      SimpleEFAEventEncoding eventEncoding = getEventEncoding();
-      for (int e : getEvents()) {
-        SimpleEFAEventDecl event = eventEncoding.getEventDecl(e);
+      final SimpleEFAEventEncoding eventEncoding = getEventEncoding();
+      for (final int e : getEvents()) {
+        final SimpleEFAEventDecl event = eventEncoding.getEventDecl(e);
         event.removeComponent(this);
         eventEncoding.resetEventStatus(event);
       }
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
     } finally {
       mVariables = null;
       mUnprimedVars = null;
@@ -361,7 +361,7 @@ public class SimpleEFAComponent
     return mVariables;
   }
 
-  private TIntArrayList findStateVariables(int stateId)
+  private TIntArrayList findStateVariables(final int stateId)
   {
     return mVarContext.getVariablesId(SimpleEFAHelper.getStateVariables(mStateEncoding.getAttribute(
      stateId, SimpleEFAHelper.DEFAULT_STATEVALUE_KEY), mVarContext.getVariables()));
@@ -373,7 +373,7 @@ public class SimpleEFAComponent
    = new Comparator<SimpleEFAComponent>()
    {
      @Override
-     public int compare(SimpleEFAComponent e1, SimpleEFAComponent e2)
+     public int compare(final SimpleEFAComponent e1, final SimpleEFAComponent e2)
      {
        if (e1.getKind() == ComponentKind.PLANT && e2.getKind() == ComponentKind.SPEC) {
          return -1;

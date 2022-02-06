@@ -10,43 +10,45 @@
 package org.supremica.automata.SAT;
 
 import java.io.File;
+
 import net.sourceforge.fsa2sat.BlackBox;
-import org.sat4j.specs.TimeoutException;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.ProjectBuildFromXML;
+
+import org.sat4j.specs.TimeoutException;
 /**
  *
  * @author voronov
  */
 public class SATAutomata {
 
-    Automata automata; 
+    Automata automata;
     BlackBox bb = new BlackBox();
-    
+
     /** Creates a new instance of SATAutomata
-     * @param theAutomata 
      */
-    public SATAutomata(Automata theAutomata)
+    public SATAutomata(final Automata theAutomata)
     {
-        automata = theAutomata;        
+        automata = theAutomata;
     }
 
-    public boolean isControllable(int steps) throws TimeoutException{
+    public boolean isControllable(final int steps) throws TimeoutException{
         return bb.isControllable(convertAts(automata), steps);
     }
     public boolean isControllableByInduction() throws TimeoutException{
         return bb.isControllableByInduction(convertAts(automata));
     }
-    public boolean markedStateIsReachable(int steps) throws TimeoutException{
+    public boolean markedStateIsReachable(final int steps) throws TimeoutException{
         return bb.markedStateIsReachable(convertAts(automata), steps);
     }
-    
-    
-    private net.sourceforge.fsa2sat.fsa.Automata convertAts(Automata ats){
+
+
+    private net.sourceforge.fsa2sat.fsa.Automata convertAts(final Automata ats){
         return (new ConverterSupToSatFsa()).convert(ats);
     }
-    
-    public static void main(String[] args) throws Exception {
+
+    public static void main(final String[] args) throws Exception {
         check((new SATAutomata(atsFromFilename("agv.xml"))).isControllable(5), false);
         check((new SATAutomata(atsFromFilename("toaster.xml"))).isControllable(5), false);
         check((new SATAutomata(atsFromFilename("two_contr.xml"))).isControllable(5), true);
@@ -62,12 +64,12 @@ public class SATAutomata {
         check((new SATAutomata(atsFromFilename("one-long.xml"))).markedStateIsReachable(8), true);
         check((new SATAutomata(atsFromFilename("one-long.xml"))).markedStateIsReachable(2), false);
     }
-    
-    private static void check(boolean actual, boolean expected){
-        System.out.println((expected==actual)?"OK":"FAIL");            
+
+    private static void check(final boolean actual, final boolean expected){
+        System.out.println((expected==actual)?"OK":"FAIL");
     }
-    
-    private static Automata atsFromFilename(String fileName) throws Exception{
-        return (new ProjectBuildFromXML()).build(new File(fileName));        
-    }    
+
+    private static Automata atsFromFilename(final String fileName) throws Exception{
+        return (new ProjectBuildFromXML()).build(new File(fileName));
+    }
 }

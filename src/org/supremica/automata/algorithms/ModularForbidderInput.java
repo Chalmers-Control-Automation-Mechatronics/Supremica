@@ -118,9 +118,6 @@ public class ModularForbidderInput
     /**
      * Adds a new local-state to subState with index subStateIndex
      * The local-state is based on an automaton and a stateIndex
-     * @param automaton
-     * @param stateIndex
-     * @param subStateIndex
      * @return true if all indexes are ok, else false
      */
     public boolean addLocalStateIn(final Automaton automaton, final int stateIndex, final int subStateIndex)
@@ -175,8 +172,6 @@ public class ModularForbidderInput
         /**
          * Creates a new local-state based on an automaton and a state
          * The local-state is added to the ArrayList
-         * @param automaton
-         * @param state
          */
         public void addLocalState(final Automaton automaton, final State state)
         {

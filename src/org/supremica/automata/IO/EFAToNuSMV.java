@@ -75,9 +75,9 @@ import org.xml.sax.SAXException;
  *   and for all variables their initial states (their initial predicates in case of
  *     waters' non-deterministic variables)
  * TRANS
- *   conjunction [ disjunction [ conjunction [stVar a `eq` sou, event `eq` ev, (next stVar a) `eq` des, guard, next varInAction `eq` action] | (sou, dest, ev, guard, action) <- arcs a] | a <- ats]
+ *   conjunction [ disjunction [ conjunction [stVar a `eq` sou, event `eq` ev, (next stVar a) `eq` des, guard, next varInAction `eq` action] | (sou, dest, ev, guard, action) &lt;- arcs a] | a &lt;- ats]
  *
- * CTLSPEC AG EF ( conjunction [ disjunction [ stVar a `eq` s | s <- markedStates a] | a <- ats] )
+ * CTLSPEC AG EF ( conjunction [ disjunction [ stVar a `eq` s | s &lt;- markedStates a] | a &lt;- ats] )
  *
  *
  * </pre>

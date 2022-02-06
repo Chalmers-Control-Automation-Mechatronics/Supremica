@@ -44,7 +44,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 /**
  * An implementation of {@link AbstractEFATransitionLabelEncoding}.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFALabelEncoding

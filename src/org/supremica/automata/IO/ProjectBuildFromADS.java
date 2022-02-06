@@ -70,6 +70,7 @@ import org.supremica.automata.State;
  * Import TCT ADS files
  * From the http://se.wtb.tue.nl/sewiki/wonham/creating_and_editing_state_machines
  *
+ * <PRE>
  * Controllable events are odd, uncontrollable are even
  *
  * # Generated CTCT ADS file
@@ -77,25 +78,25 @@ import org.supremica.automata.State;
  * pq
  *
  * State size (State set will be (0,1....,size-1)):
- * # <-- Enter state size, in range 0 to 2000000, on line below.
+ * # &lt;-- Enter state size, in range 0 to 2000000, on line below.
  * 2
  *
  * Marker states:
- * # <-- Enter marker states, one per line.
+ * # &lt;-- Enter marker states, one per line.
  * # To mark all states, enter *.
  * # If no marker states, leave line blank.
  * # End marker list with blank line.
  * 1
  *
  * Vocal states:
- * # <-- Enter vocal output states, one per line.
+ * # &lt;-- Enter vocal output states, one per line.
  * # Format: State  Vocal_Output.  Vocal_Output in range 10 to 99.
  * # Example: 0 10
  * # If no vocal states, leave line blank.
  * # End vocal list with blank line.
  *
  * Transitions:
- * # <-- Enter transition triple, one per line.
+ * # &lt;-- Enter transition triple, one per line.
  * # Format: Exit_(Source)_State  Transition_Label  Entrance_(Target)_State.
  * # Transition_Label in range 0 to 999.
  * # Example: 2 0 1 (for transition labeled 0 from state 2 to state 1).
@@ -108,32 +109,32 @@ import org.supremica.automata.State;
  * example
  *
  * State size (State set will be (0,1....,size-1)):
- * # <-- Enter state size, in range 0 to 2000000, on line below.
+ * # &lt;-- Enter state size, in range 0 to 2000000, on line below.
  * 3
  *
  * Marker states:
- * # <-- Enter marker states, one per line.
+ * # &lt;-- Enter marker states, one per line.
  * # To mark all states, enter *.
  * # If no marker states, leave line blank.
  * # End marker list with blank line.
  * 0
  *
  * Vocal states:
- * # <-- Enter vocal output states, one per line.
+ * # &lt;-- Enter vocal output states, one per line.
  * # Format: State  Vocal_Output.  Vocal_Output in range 10 to 99.
  * # Example: 0 10
  * # If no vocal states, leave line blank.
  * # End vocal list with blank line.
  *
  * Transitions:
- * # <-- Enter transition triple, one per line.
+ * # &lt;-- Enter transition triple, one per line.
  * # Format: Exit_(Source)_State  Transition_Label  Entrance_(Target)_State.
  * # Transition_Label in range 0 to 999.
  * # Example: 2 0 1 (for transition labeled 0 from state 2 to state 1).
  * 0 0 1
  * 0 1 2
  * 1 3 2
- * 2 2 0
+ * 2 2 0</PRE>
  */
 public class ProjectBuildFromADS
 {
@@ -149,33 +150,33 @@ public class ProjectBuildFromADS
     private static int STATE_READ_MARKED_STATES = 3;
     private static int STATE_READ_VOCAL_STATES = 4;
     private static int STATE_READ_TRANSITIONS = 5;
-    
+
     public ProjectBuildFromADS()
     {
         this.theProjectFactory = new DefaultProjectFactory();
     }
-    
-    public ProjectBuildFromADS(ProjectFactory theProjectFactory)
+
+    public ProjectBuildFromADS(final ProjectFactory theProjectFactory)
     {
         this.theProjectFactory = theProjectFactory;
     }
-    
-    public Project build(URL url)
+
+    public Project build(final URL url)
     throws Exception
     {
-        String protocol = url.getProtocol();
-        
+        final String protocol = url.getProtocol();
+
         if (protocol.equals("file"))
         {
             //inputProtocol = InputProtocol.FileProtocol;
-            
-            String fileName = url.getFile();
-            
+
+            final String fileName = url.getFile();
+
             thisFile = new File(fileName);
             automatonName = thisFile.getName();
-            
-            int lastdot = automatonName.lastIndexOf(".");
-            
+
+            final int lastdot = automatonName.lastIndexOf(".");
+
             if (lastdot > 0)
             {
                 automatonName = automatonName.substring(0, lastdot);
@@ -188,39 +189,39 @@ public class ProjectBuildFromADS
         else
         {
             //inputProtocol = InputProtocol.UnknownProtocol;
-            
+
             System.err.println("Unknown protocol: " + protocol);
-            
+
             return null;
         }
-        
-        InputStream stream = url.openStream();
-        
+
+        final InputStream stream = url.openStream();
+
         return build(stream);
     }
-    
-    private Project build(InputStream is)
+
+    private Project build(final InputStream is)
     throws Exception
     {
         //System.err.println("build");
-        InputStreamReader isReader = new InputStreamReader(is);
-        BufferedReader reader = new BufferedReader(isReader);
-        Project currProject = theProjectFactory.getProject();
-        Automaton currAutomaton = new Automaton(automatonName);
-        
+        final InputStreamReader isReader = new InputStreamReader(is);
+        final BufferedReader reader = new BufferedReader(isReader);
+        final Project currProject = theProjectFactory.getProject();
+        final Automaton currAutomaton = new Automaton(automatonName);
+
         currAlphabet = currAutomaton.getAlphabet();
-        
+
         currProject.addAutomaton(currAutomaton);
-        
+
         int currParserState = READ_AUTOMATON_NAME;
         int numberOfStates = 0;
         String currLine = reader.readLine();
-        
+
         while (currLine != null)
         {
             //System.err.println("reading: " + currLine);
             boolean skip = false;
-            
+
             if (isComment(currLine))
             {
                 skip = true;
@@ -245,24 +246,24 @@ public class ProjectBuildFromADS
                 currParserState = STATE_READ_TRANSITIONS;
                 skip = true;
             }
-            
-            StringTokenizer tokenizer = new StringTokenizer(currLine);
-            
+
+            final StringTokenizer tokenizer = new StringTokenizer(currLine);
+
             while (tokenizer.hasMoreTokens() && !skip)
             {
-                String currToken = tokenizer.nextToken();
-                
+                final String currToken = tokenizer.nextToken();
+
                 if (currParserState == READ_AUTOMATON_NAME)
                 {
-                    String automatonName = currToken;
-                    
+                    final String automatonName = currToken;
+
                     if (automatonName == null)
                     {
                         System.err.println("Expected an automaton name");
                     }
-                    
+
                     currAutomaton.setName(automatonName);
-                    
+
                     currParserState = STATE_READ_NUMBER_OF_STATES;
                 }
                 //System.err.println("umdes: \"" + currToken + "\"");
@@ -272,32 +273,32 @@ public class ProjectBuildFromADS
                     {
                         numberOfStates = Integer.parseInt(currToken);
                     }
-                    catch (NumberFormatException ex)
+                    catch (final NumberFormatException ex)
                     {
                         System.err.println("Expected the number of states. Read: " + currToken);
-                        
+
                         throw ex;
                     }
-                    
+
                     if (numberOfStates < 1)
                     {
                         System.err.println("The automaton must have at least one state (the initial state)");
                     }
-                    
+
                     // Create all states
                     for (int i = 0; i < numberOfStates; i++)
                     {
                         // Create and add the state
-                        State newState = new State(String.valueOf(i));
-                        
+                        final State newState = new State(String.valueOf(i));
+
                         if (i==0)
                         {
                             newState.setInitial(true);
                         }
-                        
+
                         currAutomaton.addState(newState);
                     }
-                    
+
                     currParserState = STATE_READ_MARKED_STATES;
                 }
                 else if (currParserState == STATE_READ_MARKED_STATES)
@@ -307,18 +308,18 @@ public class ProjectBuildFromADS
                     {
                         currMarkedState = Integer.parseInt(currToken);
                     }
-                    catch (NumberFormatException ex)
+                    catch (final NumberFormatException ex)
                     {
                         System.err.println("Expected a state number. Read: " + currToken);
                         throw ex;
                     }
-                    
-                    State theState = currAutomaton.getStateWithName(String.valueOf(currMarkedState));
+
+                    final State theState = currAutomaton.getStateWithName(String.valueOf(currMarkedState));
                     if (theState != null)
                     {
                         theState.setAccepting(true);
                     }
-                    
+
                 }
                 else if (currParserState == STATE_READ_VOCAL_STATES)
                 {
@@ -327,29 +328,29 @@ public class ProjectBuildFromADS
                 }
                 else if (currParserState == STATE_READ_TRANSITIONS)
                 {
-                    
-                    String sourceStateName = currToken;
+
+                    final String sourceStateName = currToken;
                     //System.err.println("source: " + sourceStateName);
-                    String eventLabel = tokenizer.nextToken();
+                    final String eventLabel = tokenizer.nextToken();
                     //System.err.println("label: " + eventLabel);
-                    String destStateName = tokenizer.nextToken();
+                    final String destStateName = tokenizer.nextToken();
                     //System.err.println("dest: " + destStateName);
-                    
+
                     if (sourceStateName == null)
                     {
                         System.err.println("No source state name");
                     }
-                    
+
                     if (eventLabel == null)
                     {
                         System.err.println("No dest state name");
                     }
-                    
+
                     if (destStateName == null)
                     {
                         System.err.println("No dest state name");
                     }
-                    
+
                     int sourceStateNumber = -1;
                     int destStateNumber = -1;
                     int eventLabelNumber = -1;
@@ -359,12 +360,12 @@ public class ProjectBuildFromADS
                         eventLabelNumber = Integer.parseInt(eventLabel);
                         destStateNumber = Integer.parseInt(destStateName);
                     }
-                    catch (NumberFormatException ex)
+                    catch (final NumberFormatException ex)
                     {
                         System.err.println("Expected an integer. Read: " + currToken);
                         throw ex;
                     }
-                    
+
                     LabeledEvent currLabeledEvent = null;
                     if (currAlphabet.contains(eventLabel))
                     {
@@ -383,25 +384,25 @@ public class ProjectBuildFromADS
                         }
                         currAlphabet.addEvent(currLabeledEvent);
                     }
-                    
-                    State sourceState = currAutomaton.getStateWithName(String.valueOf(sourceStateNumber));
-                    State destState = currAutomaton.getStateWithName(String.valueOf(destStateNumber));
-                    Arc currArc = new Arc(sourceState, destState, currLabeledEvent);
+
+                    final State sourceState = currAutomaton.getStateWithName(String.valueOf(sourceStateNumber));
+                    final State destState = currAutomaton.getStateWithName(String.valueOf(destStateNumber));
+                    final Arc currArc = new Arc(sourceState, destState, currLabeledEvent);
                     currAutomaton.addArc(currArc);
-                    
+
                 }
-                
+
             }
             //System.err.println("readline");
             currLine = reader.readLine();
         }
-        
+
         //System.err.println("return project");
-        
+
         return currProject;
     }
-    
-    public boolean isComment(String line)
+
+    public boolean isComment(final String line)
     {
         return line.startsWith("#");
     }

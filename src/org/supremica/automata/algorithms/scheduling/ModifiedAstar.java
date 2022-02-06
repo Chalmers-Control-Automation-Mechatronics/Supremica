@@ -1580,9 +1580,6 @@ public class ModifiedAstar
 
     /**
      * 	Calculates an index to Hashtable[] twoProdRelax.
-     *
-     * @param i
-     * @param j
      * @return index of the 2-prod-relax-hashtable corresponing to robot_i and robot_j.
      */
     protected int calcHashtableIndex(final int i, final int j)

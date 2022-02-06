@@ -77,8 +77,8 @@ public class InsertCommand
    * @param  panel             The panel that receives the item
    *                           and controls the insertion.
    * @param  root              The module editor containing the panel.
-   *                           Used to display an inserted automaton&nbsp-
-   *                           disable this feature by
+   *                           Used to display an inserted
+   *                           automaton&mdash;disable this feature by
    *                           passing&nbsp;<CODE>null</CODE>.
    */
   public InsertCommand(final Proxy proxy,
@@ -94,8 +94,8 @@ public class InsertCommand
    * @param  panel             The panel that receives the item
    *                           and controls the insertion.
    * @param  root              The module editor containing the panel.
-   *                           Used to display an inserted automaton&nbsp-
-   *                           disable this feature by
+   *                           Used to display an inserted
+   *                           automaton&mdash;disable this feature by
    *                           passing&nbsp;<CODE>null</CODE>.
    * @param  updatesSelection  A flag, indicating whether this command should
    *                           update the selection of the panel when
@@ -114,8 +114,8 @@ public class InsertCommand
    * @param  inserts           A list items to be inserted.
    * @param  panel             The panel that receives the items
    * @param  root              The module editor containing the panel.
-   *                           Used to display an inserted automaton&nbsp-
-   *                           disable this feature by
+   *                           Used to display an inserted
+   *                           automaton&mdash;disable this feature by
    *                           passing&nbsp;<CODE>null</CODE>.
    *                           and controls the insertion.
    */
@@ -132,8 +132,8 @@ public class InsertCommand
    * @param  panel             The panel that receives the items
    *                           and controls the insertion.
    * @param  root              The module editor containing the panel.
-   *                           Used to display an inserted automaton&nbsp-
-   *                           disable this feature by
+   *                           Used to display an inserted
+   *                           automaton&mdash;disable this feature by
    *                           passing&nbsp;<CODE>null</CODE>.
    * @param  updatesSelection  A flag, indicating whether this command should
    *                           update the selection of the panel when

@@ -9,6 +9,13 @@
 
 package org.supremica.automata.algorithms.IISCT;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntLongHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.queue.TIntQueue;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,13 +51,6 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntLongHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.queue.TIntQueue;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 /**
  * A not efficient and hairy, yet working, implementation of partial evaluation
  * for EFAs
@@ -63,11 +63,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 	/**
 	 * A utility to partially evaluates given variables. The obtained values at
 	 * each state will be stored as an attribute.
-	 * <p/>
-	 *
-	 * @param op
-	 * @param varContext
-	 * @param encoding
 	 */
 	public EFAPartialEvaluator(final CompilerOperatorTable op,
 			final SimpleEFAVariableContext varContext, final SimpleEFAEventEncoding encoding) {
@@ -84,10 +79,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 	/**
 	 * A utility to partially evaluates given variables. The obtained values at
 	 * each state will be stored as an attribute.
-	 * <p/>
-	 *
-	 * @param varContext
-	 * @param encoding
 	 */
 	public EFAPartialEvaluator(final SimpleEFAVariableContext varContext,
 			final SimpleEFAEventEncoding encoding) {
@@ -96,8 +87,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Initialize the PE with given component.
-	 * <p/>
-	 *
 	 * @param component
 	 *            EFA component
 	 */
@@ -110,8 +99,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Initialize the PE with given components.
-	 * <p/>
-	 *
 	 * @param components
 	 *            EFA components
 	 */
@@ -124,8 +111,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Initialize the PE with a map of component-variables for evaluation.
-	 * <p/>
-	 *
 	 * @param componentVariablesMap
 	 *            A map with key component and set of variables as value
 	 */
@@ -137,9 +122,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 	/**
 	 * If enabled, obtained values will be appended to the state names. This can
 	 * be used for transferring the values.
-	 * <p/>
-	 *
-	 * @param enable
 	 */
 	public void setAppendValueToStateName(final boolean enable) {
 		mAppendValueToStateName = enable;
@@ -147,8 +129,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Returning the residual components.
-	 * <p/>
-	 *
 	 * @return Set of residual components
 	 */
 	public Collection<SimpleEFAComponent> getResidualComponents() {
@@ -157,8 +137,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Returning the set of given variables for evaluation.
-	 * <p/>
-	 *
 	 * @return A set of given variables for evaluation
 	 */
 	public Collection<SimpleEFAVariable> getEvaluatedVariables() {
@@ -171,9 +149,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Setting a suffix to be used to name the residual components.
-	 * <p/>
-	 *
-	 * @param suffix
 	 */
 	public void setSuffixName(final String suffix) {
 		mSuffixName = suffix;
@@ -181,12 +156,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor {
 
 	/**
 	 * Evaluating given components w.r.t. input variables
-	 * <p/>
-	 *
 	 * @return true if at least one component is evaluated; otherwise false
-	 *         <p>
-	 * @throws EvalException
-	 * @throws AnalysisException
 	 */
 	public boolean evaluate() throws EvalException, AnalysisException {
 		boolean successful = false;

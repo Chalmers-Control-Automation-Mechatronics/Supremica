@@ -53,7 +53,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 /**
  * An implementation of {@link AbstractEFAVariable}.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
@@ -85,7 +85,6 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
 
   /**
    * Add this component to the list of this variable modifiers.
-   * <p/>
    * @param component An EFA component.
    */
   public void addModifier(final SimpleEFAComponent component)
@@ -109,8 +108,6 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
 
   /**
    * Add this component to the list of this variable visitors.
-   * <p/>
-   * @param comopnent
    */
   public void addVisitor(final SimpleEFAComponent comopnent)
   {
@@ -169,7 +166,6 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
   }
 
   /**
-   *
    * @return Marking propositions of this variable.
    */
   public Collection<VariableMarkingProxy> getVariableMarkings()
@@ -202,9 +198,6 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
 
   /**
    * Return whether this variable is local.
-   * <p/>
-   * @param component
-   * <p>
    * @return <CODE>true</CODE> if the variable is modifies by at most one
    *         component but may visit (appears in guards) by others.
    */
@@ -224,9 +217,6 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
 
   /**
    * Return whether this variable is local in given component.
-   * <p/>
-   * @param component
-   * <p/>
    * @return <CODE>true</CODE> if the variable is only modified by this
    *         component but may visit (appears in guards) by others or it does
    *         not have any modifier and only checked here.

@@ -55,7 +55,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 /**
  * An implementation of the {@link AbstractEFAVariableContext}.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer, SimpleEFAVariable>
@@ -88,7 +88,7 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
       throw new DuplicateIdentifierException(ident);
     }
     mGlobalVariableMap.put(key, var);
-    int varId = mVariableEncoding.encode(var);
+    final int varId = mVariableEncoding.encode(var);
     return varId;
   }
 

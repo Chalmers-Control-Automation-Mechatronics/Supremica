@@ -93,7 +93,6 @@ import org.supremica.util.SupremicaException;
 
 /**
  * Contains information that is common to all synchronisation threads.
- * <p/>
  * @author Knut &Aring;kesson
  * @author Mohammad Reza Shoaei (EFA synchronisation)
  * @since November 28, 2001
@@ -208,7 +207,6 @@ public class AutomataSynchronizerHelper
 	/**
 	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-,
 	 * HelperData and Automaton-Objects.
-	 * <p/>
 	 * @param orgHelper The old helper to collect information from
 	 */
 	public AutomataSynchronizerHelper(final AutomataSynchronizerHelper orgHelper)
@@ -406,11 +404,8 @@ public class AutomataSynchronizerHelper
 	 * If the toState does not exist then make a copy of this state and add it
 	 * to the set of states and to the set of states waiting for processing. If
 	 * it exists then find it. Insert the arc.
-	 * <p/>
 	 * @param fromState The feature to be added to the State attribute
 	 * @param toState The feature to be added to the State attribute
-	 * <p/>
-	 * @exception Exception Description of the Exception
 	 */
 	public void addState(final int[] fromState, final int[] toState)
 		throws Exception
@@ -480,7 +475,6 @@ public class AutomataSynchronizerHelper
 	/**
 	 * Add a state to the queue of states waiting for being processed. This is
 	 * only called by the addInitialState and addState methods.
-	 * <p/>
 	 * @param state The feature to be added to the StateToProcess attribute
 	 */
 	public void addStateToProcess(final int[] state)
@@ -615,9 +609,7 @@ public class AutomataSynchronizerHelper
 
 	/**
 	 * Used for getting the synchronization result to the worker-class.
-	 * <p/>
 	 * @param isControllable The new automataIsControllable value
-	 * <p/>
 	 * @see AutomataSynchronizerExecuter
 	 */
 	public void setAutomataIsControllable(final boolean isControllable)
@@ -807,8 +799,7 @@ public class AutomataSynchronizerHelper
 	 }
 	 */
 	/**
-	 * Returns a string with events from the initial state to currState "a" ->
-	 * "b" -> "c"
+	 * Returns a string with events from the initial state to currState.
 	 */
 	public String displayTrace(final int[] currState)
 	{

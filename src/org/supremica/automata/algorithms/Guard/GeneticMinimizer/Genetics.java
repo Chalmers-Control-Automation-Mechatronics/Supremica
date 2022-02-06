@@ -13,7 +13,8 @@ import java.util.TreeSet;
 
 /**
  *
- * @author Sajed & Alexey
+ * @author Sajed
+ * @author Alexey
  */
 public class Genetics
 {
@@ -23,9 +24,9 @@ public class Genetics
     Comparator<Chromosome> comparator;
     Random random;
 
-    public Genetics(final FitnessEvaluation fitnessEval, 
-                    Set<String> genes,
-                    GeneticOptions options)
+    public Genetics(final FitnessEvaluation fitnessEval,
+                    final Set<String> genes,
+                    final GeneticOptions options)
     {
         this.fitnessEval = fitnessEval;
         this.genes = genes;
@@ -34,9 +35,10 @@ public class Genetics
 
         comparator = new Comparator<Chromosome>() {
 
-            public int compare(Chromosome o1, Chromosome o2) {
-                double eval1 = fitnessEval.eval(o1);
-                double eval2 = fitnessEval.eval(o2);
+            @Override
+            public int compare(final Chromosome o1, final Chromosome o2) {
+                final double eval1 = fitnessEval.eval(o1);
+                final double eval2 = fitnessEval.eval(o2);
 
                 if(o1.equals(o2))
                     return 0;
@@ -53,9 +55,9 @@ public class Genetics
         };
     }
 
-    Population initializePopulation(int randomMethod)
+    Population initializePopulation(final int randomMethod)
     {
-        TreeSet<Chromosome> chromosomes = new TreeSet<Chromosome>(comparator);
+        final TreeSet<Chromosome> chromosomes = new TreeSet<Chromosome>(comparator);
 
         System.err.println("Start initializing population...");
         for(int i = 0; i < options.sizeOfPopulation; i++)
@@ -66,7 +68,7 @@ public class Genetics
                     chromosomes.add(getRandomChromosome());
                     break;
                 case 1:
-                    Chromosome c = new Chromosome(new ArrayList<String>(genes));
+                    final Chromosome c = new Chromosome(new ArrayList<String>(genes));
                     swapChromosome(c);
                     chromosomes.add(c);
             }
@@ -77,7 +79,7 @@ public class Genetics
         return new Population(chromosomes);
     }
 
-    void swapChromosome(Chromosome chromosome)
+    void swapChromosome(final Chromosome chromosome)
     {
         for(int i = 0; i < chromosome.getGenes().size() / 2 ; i++)
         {
@@ -87,11 +89,11 @@ public class Genetics
 
     Chromosome getRandomChromosome()
     {
-        List<String> localGenes = new ArrayList<String>(this.genes);
-        Set<String>  randomChromosome = new HashSet<String>();
+        final List<String> localGenes = new ArrayList<String>(this.genes);
+        final Set<String>  randomChromosome = new HashSet<String>();
         while(!localGenes.isEmpty())
         {
-            int randomIndex = random.nextInt(localGenes.size());
+            final int randomIndex = random.nextInt(localGenes.size());
             randomChromosome.add(localGenes.get(randomIndex));
             localGenes.remove(randomIndex);
         }
@@ -99,27 +101,27 @@ public class Genetics
         return new Chromosome(new ArrayList<String>(randomChromosome));
     }
 
-    TreeSet<Chromosome> selectParents(Population population)
+    TreeSet<Chromosome> selectParents(final Population population)
     {
-        TreeSet<Chromosome> parents = new TreeSet<Chromosome>(comparator);
+        final TreeSet<Chromosome> parents = new TreeSet<Chromosome>(comparator);
         int soFar = 0;
 
-        int top = (int)(population.getChromosomes().size()*
+        final int top = (int)(population.getChromosomes().size()*
                                     options.percentageOfTopChromosomes);
 
-        Iterator<Chromosome> iterator = population.getChromosomes().iterator();
+        final Iterator<Chromosome> iterator = population.getChromosomes().iterator();
         while(iterator.hasNext() && soFar < top)
         {
             parents.add(iterator.next());
             soFar++;
         }
-        
+
         return parents;
     }
 
-    Set<Chromosome> mating(TreeSet<Chromosome> parents)
+    Set<Chromosome> mating(final TreeSet<Chromosome> parents)
     {
-        Set<Chromosome> children = new HashSet<Chromosome>();
+        final Set<Chromosome> children = new HashSet<Chromosome>();
 
         if(parents.size() % 2 != 0)
             parents.remove(parents.last());
@@ -130,7 +132,7 @@ public class Genetics
         return children;
     }
 
-    void reinsertion(Population population, Set<Chromosome> newChromosomes)
+    void reinsertion(final Population population, final Set<Chromosome> newChromosomes)
     {
         int soFar = 0;
 
@@ -145,11 +147,11 @@ public class Genetics
 
     }
 
-    Set<Chromosome> crossOver(Chromosome parent1, Chromosome parent2)
+    Set<Chromosome> crossOver(final Chromosome parent1, final Chromosome parent2)
     {
-        int randomIndex = random.nextInt(parent1.getGenes().size());
-        List<String>  child1 = new ArrayList<String>();
-        List<String>  child2 = new ArrayList<String>();
+        final int randomIndex = random.nextInt(parent1.getGenes().size());
+        final List<String>  child1 = new ArrayList<String>();
+        final List<String>  child2 = new ArrayList<String>();
 
 
         for(int i = 0; i < randomIndex; i++)
@@ -158,48 +160,48 @@ public class Genetics
             child2.add(parent2.getGenes().get(i));
         }
 
-        List<String> remainingGenes1 = new ArrayList<String>(parent2.getGenes());
+        final List<String> remainingGenes1 = new ArrayList<String>(parent2.getGenes());
         remainingGenes1.removeAll(child1);
         child1.addAll(remainingGenes1);
 
-        List<String> remainingGenes2 = new ArrayList<String>(parent1.getGenes());
+        final List<String> remainingGenes2 = new ArrayList<String>(parent1.getGenes());
         remainingGenes2.removeAll(child2);
         child2.addAll(remainingGenes2);
 
-        Set<Chromosome> children = new HashSet<Chromosome>();
+        final Set<Chromosome> children = new HashSet<Chromosome>();
         children.add(new Chromosome(child1));
         children.add(new Chromosome(child2));
 
         return children;
     }
 
-    void mutationByReference(Chromosome chromosome)
+    void mutationByReference(final Chromosome chromosome)
     {
-        int firstRandomIndex = random.nextInt(chromosome.getGenes().size());
-        int secondRandomIndex = random.nextInt(chromosome.getGenes().size());
-        String firstRandomGene = chromosome.getGenes().get(firstRandomIndex);
+        final int firstRandomIndex = random.nextInt(chromosome.getGenes().size());
+        final int secondRandomIndex = random.nextInt(chromosome.getGenes().size());
+        final String firstRandomGene = chromosome.getGenes().get(firstRandomIndex);
         chromosome.setGene(firstRandomIndex,
                             chromosome.getGenes().get(secondRandomIndex));
         chromosome.setGene(secondRandomIndex, firstRandomGene);
     }
 
-    Chromosome mutation(Chromosome chromosome)
+    Chromosome mutation(final Chromosome chromosome)
     {
-        Chromosome mutatedChromosome = new Chromosome(chromosome.getGenes());
+        final Chromosome mutatedChromosome = new Chromosome(chromosome.getGenes());
         mutationByReference(mutatedChromosome);
         return mutatedChromosome;
     }
 
-    void nextPopulation(Population population)
-    {        
-        int numberOfMutations = (int) (population.getChromosomes().size() *
+    void nextPopulation(final Population population)
+    {
+        final int numberOfMutations = (int) (population.getChromosomes().size() *
                                         options.percentageOfMutatedChromosomes);
-        List<Chromosome> populationList =
+        final List<Chromosome> populationList =
                         new ArrayList<Chromosome>(population.getChromosomes());
         for(int i = 0 ; i < numberOfMutations; i++)
         {
-            int randomIndex = random.nextInt(populationList.size());
-            Chromosome goingToGetMutated = populationList.get(randomIndex);
+            final int randomIndex = random.nextInt(populationList.size());
+            final Chromosome goingToGetMutated = populationList.get(randomIndex);
             population.getChromosomes().remove(goingToGetMutated);
             population.getChromosomes().add(mutation(goingToGetMutated));
         }
@@ -209,20 +211,20 @@ public class Genetics
 
     public Chromosome runGenetics()
     {
-        Population population = initializePopulation(1);
+        final Population population = initializePopulation(1);
 
         for(int i = 0 ; i < options.maxIterations ; i++)
         {
             if(fitnessEval.eval(population.getChromosomes().first()) == 1)
                 break;
-            
+
             System.err.println("Index of current population: "+i);
             System.err.println("Best chromosome is "+
                                 population.getChromosomes().first().getGenes()+
                                 " with fitness value "+
                     fitnessEval.eval(population.getChromosomes().first()));
             System.err.println("Individs: ");
-            for(Chromosome chromosome: population.getChromosomes())
+            for(final Chromosome chromosome: population.getChromosomes())
             {
                 System.err.print(fitnessEval.eval(chromosome)+ " ");
             }

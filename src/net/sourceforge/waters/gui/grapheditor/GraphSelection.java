@@ -215,7 +215,7 @@ public class GraphSelection implements Iterable<ProxySubject>
    * Resets the selection of labels within a label block.
    * If the selection consists of event labels within a label block
    * (mode {@link SelectionMode#EVENT_LABELS}), then the selection
-   * is changed to consist of only the label block ({@mode
+   * is changed to consist of only the label block ({@link
    * SelectionMode#SUBGRAPH_SINGLE}). Otherwise this method clears the
    * selection.
    * @see #clear()

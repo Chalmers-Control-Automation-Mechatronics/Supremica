@@ -238,7 +238,6 @@ public class Automata
      * If an automaton with the same name is not in the current
      * automata then the automata is added. If there already is an automaton
      * then that automaton is replaced with the new one.
-     * @param automata
      */
     public void updateAutomata(final Automata automata)
     {
@@ -852,7 +851,8 @@ public class Automata
 
     /**
      * When exporting to files some automata names may be illegal.
-     * In Windows the following characters are illegal in file names: \/:*?"<>|
+     * In Windows the following characters are illegal in file names:
+     * <CODE>\/:*?&quot;&lt;&gt;|</CODE>
      */
     public void normalizeAutomataNames()
     {

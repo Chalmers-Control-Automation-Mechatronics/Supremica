@@ -91,8 +91,6 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
  * <P>This class only has static public methods. This may be changed
  * if support for different locales is needed.</P>
  *
- * @see ProxyNamerTest
- *
  * @author Robi Malik
  */
 
