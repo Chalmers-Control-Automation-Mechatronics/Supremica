@@ -24,6 +24,8 @@ SupremicaProperties.cfg
 *.swp
 *.out
 *.bak
+*.wdes
+*.wodes
 desktop.ini
 junit*.properties
 Thumbs.db
@@ -36,3 +38,6 @@ Thumbs.db
 
 # Specific dist folders with different (temporary) versions, used for testing
 /dist_*
+
+# No idea what this is but anyway...
+/platform/detect/
