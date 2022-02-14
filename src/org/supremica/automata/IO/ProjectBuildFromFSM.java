@@ -60,6 +60,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.AbstractMap.SimpleEntry;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -69,7 +70,6 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.ProjectFactory;
 import org.supremica.automata.State;
-
 
 /**
  * Import UMDES files, http://www.eecs.umich.edu/umdes/
@@ -115,48 +115,45 @@ import org.supremica.automata.State;
  * EVENTS
  * a uc uo
  *
- */
+ *//*
+ * The extended fsm-file format looks like the above, only that the
+ * file can have multiple such fsm definitions (including optional EVENTS)
+ * one after the other. A positive integer while reading additional events
+ * signifes the start of a new automaton (MF Feb 2022)
+ ***/
 public class ProjectBuildFromFSM
 {
-    private ProjectFactory theProjectFactory = null;
-//	private Project currProject = null;
-//	private Automaton currAutomaton = null;
-    private Alphabet currAlphabet = null;
+    private final ProjectFactory theProjectFactory;
+    private final Project currProject;
     protected String automatonName = "Imported from UMDES";
 //	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
-    private File thisFile = null;
-    private TransitionMap transitionMap = new TransitionMap();
-    private static int STATE_READ_NUMBER_OF_STATES = 1;
-    private static int STATE_READ_STATE = 2;
-    private static int STATE_READ_TRANSITION = 3;
-    private static int STATE_READ_ADDITIONAL_EVENTS = 4;
-    
+
     public ProjectBuildFromFSM()
     {
         this.theProjectFactory = new DefaultProjectFactory();
+        this.currProject = theProjectFactory.getProject();
     }
-    
-    public ProjectBuildFromFSM(ProjectFactory theProjectFactory)
+
+    public ProjectBuildFromFSM(final ProjectFactory theProjectFactory)
     {
         this.theProjectFactory = theProjectFactory;
+        this.currProject = theProjectFactory.getProject();        
     }
-    
-    public Project build(URL url)
+
+    public Project build(final URL url)
     throws Exception
     {
-        String protocol = url.getProtocol();
-        
+        final String protocol = url.getProtocol();
+
         if (protocol.equals("file"))
         {
             //inputProtocol = InputProtocol.FileProtocol;
-            
-            String fileName = url.getFile();
-            
-            thisFile = new File(fileName);
+
+            final String fileName = url.getFile();
+            final File thisFile = new File(fileName);
             automatonName = thisFile.getName();
-            
-            int lastdot = automatonName.lastIndexOf(".");
-            
+
+            final int lastdot = automatonName.lastIndexOf(".");
             if (lastdot > 0)
             {
                 automatonName = automatonName.substring(0, lastdot);
@@ -169,338 +166,495 @@ public class ProjectBuildFromFSM
         else
         {
             //inputProtocol = InputProtocol.UnknownProtocol;
-            
+
             System.err.println("Unknown protocol: " + protocol);
-            
             return null;
         }
-        
-        InputStream stream = url.openStream();
-        
-        return build(stream);
+
+        final InputStream stream = url.openStream();
+        build(stream);
+        stream.close(); // Was the stream never closed?
+        return this.currProject;
     }
-    
-    private Project build(InputStream is)
+
+    private Project build(final InputStream is)
     throws Exception
     {
-        InputStreamReader isReader = new InputStreamReader(is);
-        BufferedReader reader = new BufferedReader(isReader);
-        Project currProject = theProjectFactory.getProject();
-        Automaton currAutomaton = new Automaton(automatonName);
-        
-        currAlphabet = currAutomaton.getAlphabet();
-        
-        currProject.addAutomaton(currAutomaton);
-        
-        int currParserState = STATE_READ_NUMBER_OF_STATES;
-        int numberOfRemainingStates = 0;
-        int numberOfRemainingTransitions = 0;
-        State currState = null;
-        boolean initialState = true;
-        String currLine = reader.readLine();
-        
-        while (currLine != null)
-        {
-            StringTokenizer tokenizer = new StringTokenizer(currLine);
-            
-            while (tokenizer.hasMoreTokens())
-            {
-                String currToken = tokenizer.nextToken();
-                
-                //System.err.println("umdes: \"" + currToken + "\"");
-                if (currParserState == STATE_READ_NUMBER_OF_STATES)
-                {
-                    try
-                    {
-                        numberOfRemainingStates = Integer.parseInt(currToken);
-                    }
-                    catch (NumberFormatException ex)
-                    {
-                        System.err.println("Expected the number of states. Read: " + currToken);
-                        
-                        throw ex;
-                    }
-                    
-                    if (numberOfRemainingStates < 1)
-                    {
-                        System.err.println("The automaton must have at least one state (the initial state)");
-                    }
-                    
-                    currParserState = STATE_READ_STATE;
-                }
-                else if (currParserState == STATE_READ_STATE)
-                {
-                    String stateName = currToken;
-                    String markedString = tokenizer.nextToken();
-                    String nbrOfTransitionsString = tokenizer.nextToken();
-                    
-                    if (stateName == null)
-                    {
-                        System.err.println("Expected a state name");
-                    }
-                    
-                    if (markedString == null)
-                    {
-                        System.err.println("Expected the marking of the state: 0 or 1");
-                    }
-                    
-                    if (nbrOfTransitionsString == null)
-                    {
-                        System.err.println("Expected the number of transitions");
-                    }
-                    
-                    int marked = -1;
-                    
-                    try
-                    {
-                        marked = Integer.parseInt(markedString);
-                    }
-                    catch (NumberFormatException ex)
-                    {
-                        System.err.println("Expected the marking of the state");
-                    }
-                    
-                    if ((marked < 0) || (marked > 1))
-                    {
-                        System.err.println("Marked must be 0 (unmarked) or 1 (marked)");
-                    }
-                    
-                    try
-                    {
-                        numberOfRemainingTransitions = Integer.parseInt(nbrOfTransitionsString);
-                    }
-                    catch (NumberFormatException ex)
-                    {
-                        System.err.println("Expected the number of transitions");
-                    }
-                    
-                    if (numberOfRemainingTransitions < 0)
-                    {
-                        System.err.println("The automaton must have a non negative number of transitions");
-                    }
-                    
-                    // Create and add the state
-                    currState = currAutomaton.createUniqueState(stateName);
-                    
-                    if (initialState)
-                    {
-                        currState.setInitial(true);
-                        
-                        initialState = false;
-                    }
-                    
-                    if (marked == 1)
-                    {
-                        currState.setAccepting(true);
-                        currState.setForbidden(false);
-                    }
-                    else
-                    {
-                        currState.setAccepting(false);
-                        currState.setForbidden(false);
-                    }
-                    
-                    currAutomaton.addState(currState);
-                    
-                    numberOfRemainingStates--;
-                    
-                    if (numberOfRemainingTransitions > 0)
-                    {
-                        currParserState = STATE_READ_TRANSITION;
-                    }
-                    else
-                    {
-                        if (numberOfRemainingStates > 0)
-                        {
-                            currParserState = STATE_READ_STATE;
-                        }
-                        else
-                        {
-                            currParserState = STATE_READ_ADDITIONAL_EVENTS;
-                        }
-                    }
-                }
-                else if (currParserState == STATE_READ_TRANSITION)
-                {
-                    String currEvent = currToken;
-                    String destStateName = tokenizer.nextToken();
-                    
-                    if (currEvent == null)
-                    {
-                        System.err.println("Expected an event");
-                    }
-                    
-                    if (destStateName == null)
-                    {
-                        System.err.println("Expected a destination state");
-                    }
-                    
-                    boolean currEventControllable = true;
-                    boolean currEventObservable = true;
-                    
-                    while (tokenizer.hasMoreTokens())
-                    {
-                        String optionalParameter = tokenizer.nextToken();
-                        
-                        //System.err.println(currEvent + " " + destStateName + " " + optionalParameter);
-                        if (optionalParameter.equalsIgnoreCase("c"))
-                        {
-                            currEventControllable = true;
-                        }
-                        else if (optionalParameter.equalsIgnoreCase("uc"))
-                        {
-                            currEventControllable = false;
-                        }
-                        else if (optionalParameter.equalsIgnoreCase("o"))
-                        {
-                            currEventObservable = true;
-                        }
-                        else if (optionalParameter.equalsIgnoreCase("uo"))
-                        {
-                            currEventObservable = false;
-                        }
-                        else
-                        {
-                            System.err.println("Unknown event attribute: " + optionalParameter);
-                        }
-                    }
-                    
-                    LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
-                    
-                    currLabeledEvent.setControllable(currEventControllable);
-                    currLabeledEvent.setObservable(currEventObservable);
-                    currLabeledEvent.setPrioritized(true);
-                    transitionMap.addArc(currState.getName(), destStateName, currLabeledEvent);
-                    
-                    numberOfRemainingTransitions--;
-                    
-                    if (numberOfRemainingTransitions > 0)
-                    {
-                        currParserState = STATE_READ_TRANSITION;
-                    }
-                    else
-                    {
-                        if (numberOfRemainingStates > 0)
-                        {
-                            currParserState = STATE_READ_STATE;
-                        }
-                        else
-                        {
-                            currParserState = STATE_READ_ADDITIONAL_EVENTS;
-                        }
-                    }
-                }
-                else if (currParserState == STATE_READ_ADDITIONAL_EVENTS)
-                {
-                    
-                    //System.err.println("State_read_additional_events: currLine: :" +currLine + ": currToken :"+ currToken + ":");
-                    if (currToken.equalsIgnoreCase("EVENTS"))
-                    {    // Do nothing
-                        
-                        //System.err.println("Read EVENTS - do nothing");
-                    }
-                    else
-                    {
-                        String currEvent = currToken;
-                        
-                        if (currAlphabet.contains(currEvent))
-                        {
-                            System.err.println("Alphabet alredy contains: " + currEvent);
-                            System.err.println(currEvent + " is already defined");
-                        }
-                        
-                        //System.err.println("extra events - read: " + currEvent);
-                        boolean currEventControllable = true;
-                        boolean currEventObservable = true;
-                        
-                        while (tokenizer.hasMoreTokens())
-                        {
-                            String optionalParameter = tokenizer.nextToken();
-                            
-                            //System.err.println("extra events - more tokens: " + optionalParameter);
-                            if (optionalParameter.equalsIgnoreCase("c"))
-                            {
-                                currEventControllable = true;
-                            }
-                            else if (optionalParameter.equalsIgnoreCase("uc"))
-                            {
-                                currEventControllable = false;
-                            }
-                            else if (optionalParameter.equalsIgnoreCase("o"))
-                            {
-                                currEventObservable = true;
-                            }
-                            else if (optionalParameter.equalsIgnoreCase("uo"))
-                            {
-                                currEventObservable = false;
-                            }
-                            else
-                            {
-                                System.err.println("Unknown event attribute: " + optionalParameter);
-                            }
-                        }
-                        
-                        LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
-                        
-                        currLabeledEvent.setControllable(currEventControllable);
-                        currLabeledEvent.setObservable(currEventObservable);
-                        currLabeledEvent.setPrioritized(true);
-                        currAlphabet.addEvent(currLabeledEvent);
-                    }
-                }
-            }
-            
-            currLine = reader.readLine();
-        }
-        
-        // Add all transitions and events
-        for (Iterator<LabeledEvent> labelIt = transitionMap.labelIterator();
-        labelIt.hasNext(); )
-        {
-            LabeledEvent currEvent = labelIt.next();
-            List<?> currList = transitionMap.getTransitions(currEvent);
-            
-            // Add the event
-            if (currAlphabet.contains(currEvent))
-            {
-                System.err.println(currEvent.getLabel() + " is already defined");
-            }
-            
-            currAlphabet.addEvent(currEvent);
-            
-            // Add the transition
-            for (Iterator<?> transIt = currList.iterator(); transIt.hasNext(); )
-            {
-                TransitionMap.Transition currTransition = (TransitionMap.Transition) transIt.next();
-                String sourceStateName = currTransition.getSourceStateName();
-                String destStateName = currTransition.getDestStateName();
-                State currSourceState = currAutomaton.getStateWithName(sourceStateName);
-                State currDestState = currAutomaton.getStateWithName(destStateName);
-                
-                // Create and add the arc
-                Arc currArc = new Arc(currSourceState, currDestState, currEvent);
-                
-                currAutomaton.addArc(currArc);
-            }
-        }
-        
-        return currProject;
+      final FSMbuildHelper builder = new FSMbuildHelper(is);
+      int index = 1; 
+      do
+      {
+        final Automaton automaton = builder.build();
+        automaton.setName(automatonName + "_" + index);
+        currProject.addAutomaton(automaton);
+        index += 1;
+      } while(builder.hasMore());
+      
+      return currProject;
     }
 }
 
+/*
+ * Two reasons for this class:
+ * 1. I need to push back a line to manage the extended fsm file format
+ * 2. StringTokenizer is depreceated, and when it eventualky disappears, you
+ *    dear future programmer, have an easier time fixing this using String.split
+ *    with all of its quirks.
+**/
+class Tokenizer
+{
+  private final BufferedReader reader;
+  private String currLine;
+  private String currToken;
+  private String pushedLine;
+  private String pushedToken;
+  private StringTokenizer tokenizer;
+  
+  public Tokenizer(final InputStream is)
+  {
+    this.reader = new BufferedReader(new InputStreamReader(is));
+  }
+  
+  public String readLine()
+  throws java.io.IOException
+  {
+    if (this.pushedLine != null)
+    {
+      this.currLine = this.pushedLine;
+      this.pushedLine = null;
+    }
+    else
+      this.currLine = this.reader.readLine();
+    
+    if (this.currLine != null)
+      this.tokenizer = new StringTokenizer(currLine);
+      
+    return this.currLine;
+  }
+  
+  public void pushLine()
+  {
+    this.pushedLine = this.currLine;
+  }
+  
+  public void pushToken()
+  {
+    this.pushedToken = this.currToken;
+  }
+  
+  public boolean hasMoreTokens()
+  {
+    return this.tokenizer.hasMoreTokens() || this.pushedToken != null;
+  }
+  
+  public String nextToken()
+  {
+    if (this.pushedToken != null)
+    {
+      this.currToken = this.pushedToken;
+      this.pushedToken = null;
+    }
+    else
+      this.currToken = tokenizer.nextToken();
+  
+    return this.currToken;
+  }
+  // Debug only!
+  public String getCurrLine()
+  {
+    return this.currLine;
+  }
+}
+
+class FSMbuildHelper
+{
+    private final Tokenizer tokenizer;
+		private Automaton currAutomaton;
+		private Alphabet currAlphabet;
+    private TransitionMap transitionMap;
+		private enum ParserState
+		{
+			READ_NUMBER_OF_STATES,
+			READ_STATES,
+			READ_TRANSITIONS,
+			READ_ADDITIONAL_EVENTS,
+      READ_THIS_AUTOMATON, // MF added to allow multiple FSMs in a *.fsm file
+		}
+		private ParserState currParserState = ParserState.READ_NUMBER_OF_STATES;
+		private int numberOfRemainingStates = 0;
+		private int numberOfRemainingTransitions = 0;
+    private boolean weHaveMore = false; // Records whether there is another fsm to read
+		private State currState = null;
+		private boolean initialState;
+
+    public FSMbuildHelper(InputStream is)
+    throws java.io.IOException
+    {
+        this.tokenizer = new Tokenizer(is); // new FSMReader(is);
+        this.init();
+		}
+
+    private void init()
+    {
+      this.currAutomaton = new Automaton(""); // Cannt have empty name?
+      this.currAlphabet = this.currAutomaton.getAlphabet();
+      this.initialState = true; // The first one we read is the initial state
+      this.transitionMap = new TransitionMap();
+    }
+    
+		public Automaton build()
+    throws Exception
+		{
+			String currLine = tokenizer.readLine();
+			while (currLine != null)
+			{
+				while (tokenizer.hasMoreTokens())
+				{
+          // This is a bit of legacy, could be removed, but it is keept as Iäm lazy
+					final String currToken = tokenizer.nextToken();
+
+          // Could replace all of this by currParserState.method(tokenizer, currToken);
+					if (currParserState == ParserState.READ_NUMBER_OF_STATES)
+					{
+            this.weHaveMore = false;
+            readNumberStates(tokenizer, currToken);
+					}
+					else if (currParserState == ParserState.READ_STATES)
+					{
+            readStates(tokenizer, currToken);
+					}
+					else if (currParserState == ParserState.READ_TRANSITIONS)
+					{
+            readTransitions(tokenizer, currToken);
+					}
+					else if (currParserState == ParserState.READ_ADDITIONAL_EVENTS)
+					{
+              readAdditionalEvents(tokenizer, currToken);
+					}
+          else if (currParserState == ParserState.READ_THIS_AUTOMATON)
+          { // In a multi-fsm file, we just finished reading this automaton
+            // We return the just read automaton here, and set up for reading 
+            // the next one. After this call, currParserState == READ_NUMBER_OF_STATES
+              return prepareToReadNext(tokenizer);
+          }
+				}
+
+				currLine = tokenizer.readLine();
+			}
+      
+			// Add all transitions and events
+      handleTransitions();
+
+			return currAutomaton;
+		}
+    
+    //------------------------------------------------------------------------------
+    // Return java.util.AbstractMap.SimpleEntry as pair that holds the c/uc and o/uo attributes
+    private SimpleEntry<Boolean, Boolean> handleEventAttributes(final Tokenizer tokenizer)
+    throws java.io.IOException
+    {
+      boolean eventControllable = true; // default controllable
+      boolean eventObservable = true;   // default observable
+      
+      while(tokenizer.hasMoreTokens())
+      {
+        final String optionalParameter = tokenizer.nextToken();
+        
+        if (optionalParameter.equalsIgnoreCase("uc"))
+        {
+          eventControllable = false;
+        }
+        else if (optionalParameter.equalsIgnoreCase("uo"))
+        {
+          eventObservable = false;
+        }
+        else if (optionalParameter.equalsIgnoreCase("c") || optionalParameter.equalsIgnoreCase("o"))
+        {
+          // All is fine, already set up, do nothing
+        }
+        else // Something's not right
+        {
+          System.err.println("Unknown event attribute: " + optionalParameter);
+        }
+      }
+      
+      return new SimpleEntry<Boolean, Boolean>(eventControllable, eventObservable);
+    }
+    //------------------------------------------------------------------------------
+    private void readNumberStates(final Tokenizer tokenizer, final String currToken)
+    {
+      try
+      {
+        numberOfRemainingStates = Integer.parseInt(currToken);
+      }
+      catch (NumberFormatException ex)
+      {
+        System.err.println("Expected the number of states. Read: " + currToken);
+        throw ex;
+      }
+
+      if (numberOfRemainingStates < 1)
+        System.err.println("The automaton must have at least one state (the initial state)");
+
+      currParserState = ParserState.READ_STATES;
+    }
+    //------------------------------------------------------------------------
+    private void readStates(final Tokenizer tokenizer, final String currToken)
+    {
+      final String stateName = currToken;
+      final String markedString = tokenizer.nextToken();
+      final String nbrOfTransitionsString = tokenizer.nextToken();
+      
+      if (stateName == null)
+      {
+        System.err.println("Expected a state name");
+      }
+
+      if (markedString == null)
+      {
+        System.err.println("Expected the marking of the state: 0 or 1");
+      }
+
+      if (nbrOfTransitionsString == null)
+      {
+        System.err.println("Expected the number of transitions");
+      }
+
+      int marked = -1;
+      String errstring = "Expected the marking of the state";
+      
+      try
+      {
+        errstring = "Expected the marking of the state";
+        marked = Integer.parseInt(markedString);
+
+        if ((marked < 0) || (marked > 1))
+        {
+          errstring = "Marked must be 0 (unmarked) or 1 (marked)";
+          throw new NumberFormatException();
+        }
+        
+        errstring = "Expected the number of transitions";
+        numberOfRemainingTransitions = Integer.parseInt(nbrOfTransitionsString);
+
+        if (numberOfRemainingTransitions < 0)
+        {
+          errstring = "The automaton must have a non negative number of transitions";
+          throw new NumberFormatException();
+        }
+      }
+      catch(final NumberFormatException excp)
+      {
+        System.err.println(errstring);
+        throw excp;
+      }
+      
+      // Create and add the state
+      currState = currAutomaton.createUniqueState(stateName);
+
+      if (initialState)
+      {
+        currState.setInitial(true);
+        initialState = false;
+      }
+      
+      final boolean ismarked = (marked == 1) ? true : false;
+      
+      currState.setAccepting(ismarked);
+      currState.setForbidden(false);
+
+      currAutomaton.addState(currState);
+
+      numberOfRemainingStates--;
+
+      if (numberOfRemainingTransitions > 0)
+        currParserState = ParserState.READ_TRANSITIONS;
+      else
+      {
+        if (numberOfRemainingStates > 0)
+          currParserState = ParserState.READ_STATES;
+        else
+          currParserState = ParserState.READ_ADDITIONAL_EVENTS;
+      }
+    }
+    //-----------------------------------------------------------------------------
+    private void readTransitions(final Tokenizer tokenizer, final String currToken)
+    throws java.io.IOException
+    {
+      final String currEvent = currToken;
+      final String destStateName = tokenizer.nextToken();
+      
+      if (currEvent == null)
+      {
+        System.err.println("Expected an event");
+      }
+
+      if (destStateName == null)
+      {
+        System.err.println("Expected a destination state");
+      }
+
+      final SimpleEntry<Boolean, Boolean> attr = handleEventAttributes(tokenizer);
+      final boolean currEventControllable = attr.getKey();
+      final boolean currEventObservable = attr.getValue();
+      
+      final LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
+
+      currLabeledEvent.setControllable(currEventControllable);
+      currLabeledEvent.setObservable(currEventObservable);
+      currLabeledEvent.setPrioritized(true);
+      transitionMap.addArc(currState.getName(), destStateName, currLabeledEvent);
+
+      numberOfRemainingTransitions--;
+
+      if (numberOfRemainingTransitions > 0)
+      {
+        currParserState = ParserState.READ_TRANSITIONS;
+      }
+      else
+      {
+        if (numberOfRemainingStates > 0)
+        {
+          currParserState = ParserState.READ_STATES;
+        }
+        else
+        {
+          currParserState = ParserState.READ_ADDITIONAL_EVENTS;
+        }
+      }
+    }
+    //-------------------------------------------------------------------------
+    /* Here, all the states and transitions have been read, and what follows is
+     * either a set on extra events, preceeded by the token "EVENTS", or a positive
+     * integer that signasl the start of a new automaton. Note that id there is an 
+     * named "events" (highly unlikely, but still) this event will be confused
+     * with the token "EVENTS" and discraded.
+    **/
+    private void readAdditionalEvents(final Tokenizer tokenizer, final String currToken)
+    throws java.io.IOException
+    {
+      if (currToken.equalsIgnoreCase("EVENTS"))
+      {    
+        // Next follows one or more events, remain in teh same parser state and keep reading
+        currParserState = ParserState.READ_ADDITIONAL_EVENTS;
+        return; // If there is an additional event named "events", we will miss it!
+      }
+      else if (0 <= isPosInteger(currToken)) // if a number then it is start of next automaton
+      {
+        // Need to push back the current line for next call of build
+        tokenizer.pushLine();
+        currParserState = ParserState.READ_THIS_AUTOMATON; // Just finished reading this one
+      }
+      else // this is an event supposedly not already defined on a transition
+      {
+        final String currEvent = currToken;
+
+        if (currAlphabet.contains(currEvent))
+        {
+          System.err.println("Alphabet alredy contains: " + currEvent);
+        }
+
+        final SimpleEntry<Boolean, Boolean> attr = handleEventAttributes(tokenizer);
+        final boolean currEventControllable = attr.getKey();
+        final boolean currEventObservable = attr.getValue();
+
+        final LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
+        currLabeledEvent.setControllable(currEventControllable);
+        currLabeledEvent.setObservable(currEventObservable);
+        currLabeledEvent.setPrioritized(true);
+        currAlphabet.addEvent(currLabeledEvent);
+      }
+    }
+    //-------------------------------------------------------------
+    /* Finalize reading the current automaton and set up to read the 
+     * next, this is for extended fsm-file format. Returns teh just 
+     * now finished automaton.
+    **/
+    private Automaton prepareToReadNext(final Tokenizer tokenizer)
+    throws java.io.IOException
+    {
+        // Finalize the current automaton, and cache it
+        handleTransitions();
+        Automaton cache = this.currAutomaton;  
+        
+        this.tokenizer.pushLine(); // Push back the current line to be read next time
+        this.weHaveMore = true;    // Signal that there's more to read
+
+        // Re-nitialize
+        this.init();
+        this.currParserState = ParserState.READ_NUMBER_OF_STATES;
+        
+        return cache; 
+    }
+    //-----------------------------------------------
+    /* Returns a positive integer if this string
+     * represents a positive integer, else a negative
+     * integer is returned. Only straight sequence of 
+     * digits is handled, nothing else.     
+    **/
+    private int isPosInteger(final String str)
+    {
+      int val = 0;
+      for (int i = 0; i < str.length(); i++)
+      {
+        final char ch = str.charAt(i);
+        if (ch < '0' || '9' < ch) return -1;
+          
+        val = 10 * val + (ch - '0');
+      }
+      return val;
+    }
+    
+    public boolean hasMore()
+    {
+      return this.weHaveMore;
+    }
+    
+    private void handleTransitions()
+    {
+      for (Iterator<LabeledEvent> labelIt = this.transitionMap.labelIterator(); labelIt.hasNext(); )
+			{
+				final LabeledEvent currEvent = labelIt.next();
+				final List<?> currList = this.transitionMap.getTransitions(currEvent);
+
+				// Add the event
+				if (this.currAlphabet.contains(currEvent))
+				{
+					System.err.println(currEvent.getLabel() + " is already defined!");
+				}
+
+				this.currAlphabet.addEvent(currEvent);
+
+				// Add the transition
+				for (Iterator<?> transIt = currList.iterator(); transIt.hasNext(); )
+				{
+					final TransitionMap.Transition currTransition = (TransitionMap.Transition) transIt.next();
+					final String sourceStateName = currTransition.getSourceStateName();
+					final String destStateName = currTransition.getDestStateName();
+					final State currSourceState = currAutomaton.getStateWithName(sourceStateName);
+					final State currDestState = currAutomaton.getStateWithName(destStateName);
+
+					// Create and add the arc
+					final Arc currArc = new Arc(currSourceState, currDestState, currEvent);
+					currAutomaton.addArc(currArc);
+				}
+			}
+    }
+  }
+  
 class TransitionMap
 {
-    private HashMap<LabeledEvent, List<Transition>> theMap =
+    private final HashMap<LabeledEvent, List<Transition>> theMap =
         new HashMap<LabeledEvent, List<Transition>>();
-    
+
     public TransitionMap()
     {}
-    
-    public void addArc(String sourceState, String destState, LabeledEvent event)
+
+    public void addArc(final String sourceState, final String destState, final LabeledEvent event)
     {
-        Transition newTransition = new Transition(sourceState, destState);
-        List<Transition> transitions;
-        
+        final Transition newTransition = new Transition(sourceState, destState);
+        final List<Transition> transitions;
+
         if (theMap.containsKey(event))
         {
             transitions = theMap.get(event);
@@ -508,21 +662,20 @@ class TransitionMap
         else
         {
             transitions = new LinkedList<Transition>();
-            
+
             theMap.put(event, transitions);
         }
-        
+
         transitions.add(newTransition);
     }
-    
+
     public Iterator<LabeledEvent> labelIterator()
     {
-        Set<LabeledEvent> currSet = theMap.keySet();
-        
+        final Set<LabeledEvent> currSet = theMap.keySet();
         return currSet.iterator();
     }
-    
-    public List<?> getTransitions(LabeledEvent event)
+
+    public List<?> getTransitions(final LabeledEvent event)
     {
         if (theMap.containsKey(event))
         {
@@ -533,7 +686,8 @@ class TransitionMap
             return null;
         }
     }
-    
+
+
 /*
                 public boolean containsEvent(String label)
                 {
@@ -543,20 +697,20 @@ class TransitionMap
  */
     class Transition
     {
-        private String sourceState = null;
-        private String destState = null;
-        
-        public Transition(String sourceState, String destState)
+        private final String sourceState;
+        private final String destState;
+
+        public Transition(final String sourceState, final String destState)
         {
             this.sourceState = sourceState;
             this.destState = destState;
         }
-        
+
         public String getSourceStateName()
         {
             return sourceState;
         }
-        
+
         public String getDestStateName()
         {
             return destState;
