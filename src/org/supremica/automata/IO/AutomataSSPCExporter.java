@@ -1,9 +1,17 @@
 package org.supremica.automata.IO;
 
-import org.supremica.automata.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import java.io.*;
-import java.util.*;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 
 /**
  * <pre>
@@ -59,7 +67,7 @@ public class AutomataSSPCExporter
 		system.close();
 	}
 
-	/** map event-label -> unique-integer */
+	/** map event-label &rarr; unique-integer */
 	private int getEvent(final String name)
 	{
 		Integer ret = (Integer) eventMap.get(name);
@@ -74,7 +82,7 @@ public class AutomataSSPCExporter
 		return ret.intValue();
 	}
 
-	/** map Automaton -> filename */
+	/** map Automaton &rarr; filename */
 	private String getName(final Automaton a)
 	{
 		final String ret = (String) fileMap.get(a);

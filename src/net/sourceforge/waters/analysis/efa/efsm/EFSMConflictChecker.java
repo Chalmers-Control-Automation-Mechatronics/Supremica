@@ -638,7 +638,6 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
    * and cleans up references to its selfloops mentioned in other variables.
    * This method is called after partial unfolding.
    * Any selfloops will be added back in after simplification.
-   * @param var
    */
   private void removeVariable(final EFSMVariable var)
   {

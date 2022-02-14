@@ -722,11 +722,9 @@ Class-Path: ${manifest.pathlist}</echo>
             author="true"
             version="true"
             use="true"
-            maxmemory="512m"
-            windowtitle="Supremica API"
-            additionalparam="-Xdoclint:all,-missing"
-            bottom="Copyright &#169; 2001 - 2022 Supremica and Knut Åkesson, Martin Fabian, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
-            <doctitle><![CDATA[<h1>Supremica and Waters API Documentation</h1>]]></doctitle>
+            windowtitle="Waters/Supremica API"
+            additionalparam="-Xdoclint:all,-missing">
+            <doctitle><![CDATA[<h1>Waters/Supremica API Documentation</h1>]]></doctitle>
             <packageset dir="${src}">
                 <include name="org/supremica/**/*"/>
                 <include name="net/sourceforge/waters/**/*"/>
@@ -745,8 +743,9 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
         </javadoc>
     </target>
-    <!--        THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
-    <!--        overview="${templates}/Overview.html"      -->
+    <!-- THESE WERE PREVIOUSLY INCLUDED ABOVE... -->
+    <!-- overview="${templates}/Overview.html"   -->
+    <!-- private="true"                          -->
 
     <target name="run">
         <java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">

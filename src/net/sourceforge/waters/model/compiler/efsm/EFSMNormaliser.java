@@ -1593,7 +1593,7 @@ public class EFSMNormaliser extends AbortableCompiler
     }
 
     /**
-     * Determines whether the disjoint operation should be carried for an
+     * <P>Determines whether the disjoint operation should be carried for an
      * event in a particular automaton. The disjoint operation should be
      * carried out only in the following cases:</P>
      * <OL>
@@ -1606,9 +1606,9 @@ public class EFSMNormaliser extends AbortableCompiler
      *         <LI>Condition: No primed variables</LI>
      *         </UL>
      * </OL>
-     * If the type of automaton and event matches one of the above conditions,
+     * <P>If the type of automaton and event matches one of the above conditions,
      * but the associated updates contain prime variables, then exceptions
-     * would be thrown.
+     * would be thrown.</P>
      * @param  event The {@link EventDeclProxy} of interest.
      * @param  eventIdent This is required for location identification
      *               if an exception is thrown.

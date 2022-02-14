@@ -127,7 +127,7 @@ public class Milp
      * sigma_c or sigma_d. Then two variables are needed, namely
      * 'sigma_a_before_sigma_b' and 'sigma_c_before_sigma_d'. These are stored
      * as ordered eventIndices, e.g. [sigma_a, sigma_b] where
-     * indexMap.getEventIndex(sigma_a) < indexMap.getEventIndex(sigma_b).
+     * indexMap.getEventIndex(sigma_a) &lt; indexMap.getEventIndex(sigma_b).
      * (IntArrayTreeSet is used to avoid variable repetition).
      **/
     private IntArrayTreeSet externalPrecVariables = null;
@@ -151,12 +151,14 @@ public class Milp
     private ArrayList<int[]> precConstraints = null;
 
     /**
-     * The ArrayList containg alternative paths constraints.
+     * <P>The ArrayList containing alternative paths constraints.
      * Each constraint has a body and an id. The body is a string describing
      * the mathematical formulation of the constraint, while the id is an int-array
-     * containing either:
-     * [plant_time_index, from_state_index, to_state_index] - normal alt.paths inequality;
-     * [plant_time_index, from_state_index] - sum of alt.paths constraints <= 1.
+     * containing either:</P>
+     * <UL>
+     * <LI>[plant_time_index, from_state_index, to_state_index] - normal alt.paths inequality;</LI>
+     * <LI>[plant_time_index, from_state_index] - sum of alt.paths constraints &lt;= 1.</LI>
+     * </UL>
      */
     private ArrayList<Constraint> altPathsConstraints = null;
     private ArrayList<ArrayList<int[]>> newAltPathsConstraints = null;
@@ -192,7 +194,7 @@ public class Milp
     /**
      * The constraints preventing circular wait situations due to cross-booking of
      * zones. A simple example of this is when R_i first books Z_k and then Z_l
-     * (without unbooking Z_k), while R_j does the reverse (Z_l -> Z_k),
+     * (without unbooking Z_k), while R_j does the reverse (Z_l &rarr; Z_k),
      * the robot robot ordering should then be the same for Z_k and
      * Z_l to avoid deadlock. This is taken care of during the optimisation, but
      * with the help of these constraints, the search field is narrowed, which
@@ -2020,10 +2022,10 @@ public class Milp
      * These constraints prevent two plants from booking two zones in different order if
      * there is no possibility to unbook the zones between their bookings. For example,
      * suppose that R1 first enters Z1 and then directly books Z2 (without unbooking Z1),
-     * while R2 moves in the same manner from the other direction (Z2 -> Z1). Then if
+     * while R2 moves in the same manner from the other direction (Z2 &rarr; Z1). Then if
      * R1 book Z2 before R2, then it must also book Z1 before R2, and vice versa.
      * This poses additional constraint on the boolean variables:
-     * R1_books_Z1_before_R2 >= R1_books_Z2_before_R2 - M*(4 - Z1_reached_by_R1 - Z2_reached_by_R1 -
+     * R1_books_Z1_before_R2 &gt;= R1_books_Z2_before_R2 - M*(4 - Z1_reached_by_R1 - Z2_reached_by_R1 -
      * Z1_reached_by_R2 - Z2_reached_by_R2).
      * Of course, the situation is identical if the robots book the zones in the same order,
      * the important thing here is that there is no unbooking between the zones.

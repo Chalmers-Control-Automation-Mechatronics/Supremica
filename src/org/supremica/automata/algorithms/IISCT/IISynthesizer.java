@@ -341,14 +341,13 @@ public class IISynthesizer {
 	 * @param assumption
 	 *            An assumption formula (A) representing the value of variables
 	 *            at node v_n. Namely, the incoming transition formula related
-	 *            to v_n, say T_n, will become a new formula T_n & A'. Note
+	 *            to v_n, say T_n, will become a new formula T_n &amp; A'. Note
 	 *            that, it is assumed the index of variables in T_n and A are in
 	 *            the right order.<br>
 	 *            {@code Null}: The assumption will be ignored.
-	 * @return Return {STATUS, F}: STATUS is an integer: 0 -> CTI, 1 -> Reaching
-	 *         initial state but not a CTI, and 2 -> Not reachable from initial
+	 * @return Return {STATUS, F}: STATUS is an integer: 0 &rarr; CTI, 1 &rarr; Reaching
+	 *         initial state but not a CTI, and 2 &rarr; Not reachable from initial
 	 *         state; and F is the trace for nodes v_0 ... v_(n-1).
-	 * @throws AnalysisException
 	 */
 	private Object[] IC3BlockPath(final List<TreeNode> path, final BoolExpr assumption)
 			throws AnalysisException {

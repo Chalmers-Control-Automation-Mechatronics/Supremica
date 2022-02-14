@@ -213,9 +213,9 @@ public class MakeDeterministicAction
     /**
      * For arc, insert epsilon transition to a unique intermediate state
      * The result is that
-     *    fromState ---arcevent---> toState
+     *    fromState ---arcevent---&gt; toState
      * is replaced by
-     *    fromState ---epsilon---> newState ---arcevent---> toState
+     *    fromState ---epsilon---&gt; newState ---arcevent---&gt; toState
      */
     private void epsilonize(final Arc arc, final Automaton automaton)
     {

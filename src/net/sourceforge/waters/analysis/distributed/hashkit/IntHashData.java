@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.distributed.hashkit;
 
+import net.sourceforge.waters.analysis.tr.PrimeFinder;
+
+
 /**
  * The actual data for the hash table. This uses open addressing,
  * using a separate array of bytes to store the slot state.
@@ -45,15 +48,15 @@ package net.sourceforge.waters.analysis.distributed.hashkit;
 public class IntHashData
 {
   /**
-   * Construct a hashtable using the supplied capacity and hashing
+   * Construct a hash table using the supplied capacity and hashing
    * strategy. For good performance, the capacity should be a prime
-   * number. The <code>hashkit.PrimeFinder</code> class can be used to
+   * number. The {@link PrimeFinder} class can be used to
    * find a suitable size.
    * @param capacity  Exact capacity to allocate
    * @param strategy  Strategy for accessing data to compute equality and hash
    *                  functions.
    */
-  public IntHashData(int capacity, HashStrategy strategy)
+  public IntHashData(final int capacity, final HashStrategy strategy)
   {
     mStrategy = strategy;
     mData = new int[capacity];
@@ -78,7 +81,7 @@ public class IntHashData
    * the same hash code.
    * @param index to remove.
    */
-  public void delete(int index)
+  public void delete(final int index)
   {
     mState[index] = DELETED;
   }
@@ -90,7 +93,7 @@ public class IntHashData
    * @param index of slot to get data for
    * @return The data at this position in the hash table.
    */
-  public int getData(int index)
+  public int getData(final int index)
   {
     return mData[index];
   }
@@ -103,7 +106,7 @@ public class IntHashData
    * @param index of slot to get state for
    * @return state of the slot
    */
-  public byte getState(int index)
+  public byte getState(final int index)
   {
     return mState[index];
   }
@@ -116,7 +119,7 @@ public class IntHashData
    * @param index of slot to set state for
    * @param state value to set
    */
-  public void setState(int index, byte state)
+  public void setState(final int index, final byte state)
   {
     mState[index] = state;
   }
@@ -126,7 +129,7 @@ public class IntHashData
    * @param index of slot to set data for
    * @param data value to set.
    */
-  public void setData(int index, int data)
+  public void setData(final int index, final int data)
   {
     mData[index] = data;
   }
@@ -137,7 +140,7 @@ public class IntHashData
    * @param index of the slot to set data for
    * @param data to store in slot
    */
-  public void store(int index, int data)
+  public void store(final int index, final int data)
   {
     mData[index] = data;
     mState[index] = OCCUPIED;
@@ -150,7 +153,7 @@ public class IntHashData
    * @param value to look up in the hash.
    * @return The index the value is located at.
    */
-  public int index(Object value)
+  public int index(final Object value)
   {
     final byte[] state = mState;
     final int length = state.length;
@@ -189,7 +192,7 @@ public class IntHashData
    * @return The index to insert at if not found, or the negated
    * index.
    */
-  public int getInsertionIndex(Object value)
+  public int getInsertionIndex(final Object value)
   {
     final byte[] state = mState;
     final int[] data = mData;
@@ -223,7 +226,7 @@ public class IntHashData
 	//index of the first removed item.
 	if (state[index] == DELETED)
 	  {
-	    int firstRemoved = index;
+	    final int firstRemoved = index;
 	    while (state[index] != EMPTY &&
 		   (state[index] == DELETED || !mStrategy.equal(value, data[index])))
 	      {
@@ -252,7 +255,7 @@ public class IntHashData
    * @return The index to insert at if not found, or the negated
    * index.
    */
-  public int getIndirectInsertionIndex(int value)
+  public int getIndirectInsertionIndex(final int value)
   {
     final byte[] state = mState;
     final int[] data = mData;
@@ -285,7 +288,7 @@ public class IntHashData
 	//index of the first removed item.
 	if (state[index] == DELETED)
 	  {
-	    int firstRemoved = index;
+	    final int firstRemoved = index;
 	    while (state[index] != EMPTY &&
 		   (state[index] == DELETED || !mStrategy.equalIndirect(value, data[index])))
 	      {
@@ -301,7 +304,7 @@ public class IntHashData
       }
   }
 
-  public void rehash(int newCapacity)
+  public void rehash(final int newCapacity)
   {
     final int[] oldData = mData;
     final byte[] oldState = mState;

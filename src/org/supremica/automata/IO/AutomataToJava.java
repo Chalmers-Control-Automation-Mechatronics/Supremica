@@ -72,9 +72,9 @@ import org.supremica.automata.execution.Signal;
 import org.supremica.util.SupremicaException;
 
 /**
- * @author torda
- *
  * This class generates a java source file from a bunch of automata.
+ *
+ * @author torda
  */
 public class AutomataToJava
 {
@@ -293,9 +293,6 @@ public class AutomataToJava
         pw.flush();
     }
 
-    /**
-     * @param pw
-     */
     private void printClassFooter(final PrintWriter pw)
     {
         pw.println("}");
@@ -310,9 +307,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printExecuteFunction(final PrintWriter pw)
     {
         pw.println();
@@ -385,9 +379,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printUpdateOutputVariables(final PrintWriter pw)
     {
         pw.println();
@@ -438,9 +429,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printUpdateCurrentState(final PrintWriter pw)
     throws GenerationException
     {
@@ -524,9 +512,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printStartTimers(final PrintWriter pw)
     {
         pw.println();
@@ -576,9 +561,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printEventIsEnabledByInputVariables(final PrintWriter pw)
     {
         pw.println();
@@ -650,9 +632,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printEventIsEnabledByTimers(final PrintWriter pw)
     {
         pw.println();
@@ -690,9 +669,6 @@ public class AutomataToJava
         pw.println("\t}");
     }
 
-    /**
-     * @param pw
-     */
     private void printEventIsEnabledInCurrentState(final PrintWriter pw)
     {
         pw.println();
@@ -790,8 +766,7 @@ public class AutomataToJava
     }
 
     /**
-     * Prints out fields
-     * @param pw
+     * Prints out fields.
      */
     private void printFields(final PrintWriter pw)
     {

@@ -33,7 +33,10 @@
 
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import net.sourceforge.waters.analysis.distributed.hashkit.*;
+import net.sourceforge.waters.analysis.distributed.hashkit.HashStrategy;
+import net.sourceforge.waters.analysis.distributed.hashkit.IntHashData;
+import net.sourceforge.waters.analysis.tr.PrimeFinder;
+
 
 /**
  * A set of state tuples. This stores the data into big arrays, so
@@ -52,9 +55,9 @@ import net.sourceforge.waters.analysis.distributed.hashkit.*;
  */
 public class StateTupleSet
 {
-  public StateTupleSet(int statelength, int initialcapacity)
+  public StateTupleSet(final int statelength, final int initialcapacity)
   {
-    int initialcap = PrimeFinder.nextPrime(initialcapacity);
+    final int initialcap = PrimeFinder.nextPrime(initialcapacity);
     mStateLength = statelength;
 
     mStrategy = new DirectHashStrategy();
@@ -73,7 +76,7 @@ public class StateTupleSet
    * index that can be used to access the state later.
    * @param state to add to the set.
    */
-  public int add(StateTuple state)
+  public int add(final StateTuple state)
   {
     final int size = mSize;
     final int capacity = mHash.getCapacity();
@@ -112,7 +115,7 @@ public class StateTupleSet
    * @param state to search for.
    * @return true if state is in the set.
    */
-  public boolean contains(StateTuple state)
+  public boolean contains(final StateTuple state)
   {
     return mHash.index(state) >= 0;
   }
@@ -124,11 +127,11 @@ public class StateTupleSet
    * @param ptr Pointer to the state to get.
    * @return The extracted state tuple
    */
-  public StateTuple get(int ptr)
+  public StateTuple get(final int ptr)
   {
-    int[] statedata = new int[mStateLength];
+    final int[] statedata = new int[mStateLength];
     mData.retrieve(ptr, statedata, mStateLength);
-    int depth = mData.read(ptr + mStateLength);
+    final int depth = mData.read(ptr + mStateLength);
     return new StateTuple(statedata, depth);
   }
 
@@ -138,7 +141,7 @@ public class StateTupleSet
    * @param state to lookup pointer for.
    * @return Pointer to state, or -1 if not present.
    */
-  public int lookup(StateTuple state)
+  public int lookup(final StateTuple state)
   {
     final int index = mHash.index(state);
     if (index < 0)
@@ -154,7 +157,7 @@ public class StateTupleSet
    * @param ptr the state to get the depth for
    * @return The depth for the state
    */
-  public int getDepth(int ptr)
+  public int getDepth(final int ptr)
   {
     return mData.read(ptr + mStateLength);
   }
@@ -171,7 +174,8 @@ public class StateTupleSet
 
   private class DirectHashStrategy implements HashStrategy
   {
-    public boolean equal(Object obj, int x)
+    @Override
+    public boolean equal(final Object obj, final int x)
     {
       final int[] chunk = mData.getChunk(x);
       final int pos = mData.getChunkPosition(x);
@@ -186,7 +190,8 @@ public class StateTupleSet
       return true;
     }
 
-    public boolean equalIndirect(int x, int y)
+    @Override
+    public boolean equalIndirect(final int x, final int y)
     {
       final int[] chunkx = mData.getChunk(x);
       final int[] chunky = mData.getChunk(y);
@@ -204,13 +209,15 @@ public class StateTupleSet
       return true;
     }
 
-    public int computeHash(Object obj)
+    @Override
+    public int computeHash(final Object obj)
     {
-      StateTuple state = (StateTuple)obj;
+      final StateTuple state = (StateTuple)obj;
       return computeHash_sdbm(state.getStateArray(), 0, mStateLength);
     }
 
-    public int computeIndirectHash(int ptr)
+    @Override
+    public int computeIndirectHash(final int ptr)
     {
       final int[] chunk = mData.getChunk(ptr);
       final int pos = mData.getChunkPosition(ptr);

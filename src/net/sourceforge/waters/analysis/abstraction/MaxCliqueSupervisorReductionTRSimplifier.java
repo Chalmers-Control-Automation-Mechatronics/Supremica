@@ -504,7 +504,6 @@ public class MaxCliqueSupervisorReductionTRSimplifier
      * @param dependentIds
      *          The initial set of compatibles we know we need to cover in our
      *          solution.
-     * @throws AnalysisAbortException
      */
     @Override
     public void processNewDependencies(final Candidate candidate,

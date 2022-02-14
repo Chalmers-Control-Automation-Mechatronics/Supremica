@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import net.sourceforge.waters.analysis.tr.PrimeFinder;
+
 /**
  * Base class for hashtables that use open addressing to resolve
  * collisions.

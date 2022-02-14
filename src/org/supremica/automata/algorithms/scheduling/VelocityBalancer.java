@@ -1732,9 +1732,6 @@ public class VelocityBalancer
   /**
    * Checks if there is a straight line between two points, that does not cross
    * any zone.
-   *
-   * @param startPoint
-   * @param endPoint
    * @return true if there is no obstacle on the straight line between the
    *         points.
    */

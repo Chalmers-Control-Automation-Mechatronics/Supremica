@@ -225,7 +225,7 @@ class SDCTwoPropertyBuilder
   /**
    * Builds a model for checking SD Controllability Property II.a.
    * @param  hibEvents  Prohibitable events to be used in the test.
-   * @String hibName    Name of a prohibitable event added to model name,
+   * @param  hibName    Name of a prohibitable event added to model name,
    *                    or <CODE>null</CODE>.
    */
   private ProductDESProxy createSDCTwoAModel

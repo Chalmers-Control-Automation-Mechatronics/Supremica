@@ -177,20 +177,18 @@ public class AutomataToC
 	}
 
 	/**
-	 * Compute which events that are enabled
+	 * <P>Computes which events are enabled.</P>
 	 *
-	 * The logic will be something like the following
-	 *
-	 * e_0 = (q_1_0 || q_1_1) && (q_2_3)
-	 * e_1 = (q_1_2) && (q_2_1 || q_2_3)
-	 *
-	 * In Structured Text this will look like:
-	 *
+	 * <P>The logic will be something like the following:</P>
+	 * <PRE>
+	 * e_0 = (q_1_0 || q_1_1) &amp;&amp; (q_2_3)
+	 * e_1 = (q_1_2) &amp;&amp; (q_2_1 || q_2_3)</PRE>
+	 * <P>In Structured Text this will look like:</P>
+	 * <PRE>
 	 * e_0 := (q_1_0 OR q_1_1) AND (q_2_3);
-	 * e_1 := (q_1_2) AND (q_2_1 OR q_2_3);
-	 *
-	 * In Instruction List this will look like:
-	 *
+	 * e_1 := (q_1_2) AND (q_2_1 OR q_2_3);</PRE>
+	 * <P>In Instruction List this will look like:</P>
+	 * <PRE>
 	 * LD q_1_0
 	 * OR q_1_1
 	 * AND q_2_3
@@ -199,7 +197,7 @@ public class AutomataToC
 	 * AND( q_2_1
 	 * OR q_2_3
 	 * )
-	 * ST e_1
+	 * ST e_1</PRE>
 	 */
 	void printComputeEnabledEvents(final PrintWriter pw)
 		throws Exception

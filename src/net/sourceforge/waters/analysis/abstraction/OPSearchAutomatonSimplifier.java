@@ -58,11 +58,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.EventSetOption;
-import net.sourceforge.waters.model.options.FileOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -91,6 +86,11 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.EventSetOption;
+import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -909,7 +909,8 @@ public class OPSearchAutomatonSimplifier
 
 
   /**
-   * @return Found transition encoded as <CODE>source | (target << 32)</CODE>.
+   * @return Found transition encoded as
+   *         <CODE>source | (target &lt;&lt; 32)</CODE>.
    */
   private long findOPSearchTransition()
   {
@@ -1036,8 +1037,8 @@ public class OPSearchAutomatonSimplifier
   }
 
   /**
-   * @return Found transition encoded as <CODE>source | (target << 32)</CODE>,
-   *         or <CODE>0</CODE>.
+   * @return Found transition encoded as
+   *         <CODE>source | (target &lt;&lt; 32)</CODE>, or <CODE>0</CODE>.
    */
   private long searchTauSuccessors(final int startroot,
                                    final int current1,

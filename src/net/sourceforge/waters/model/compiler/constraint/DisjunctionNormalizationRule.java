@@ -73,7 +73,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <P><U>Negative:</U></P>
  *
  * <PRE>
- *   !(A1 & A2 & ... & An)
+ *   !(A1 &amp; A2 &amp; ... &amp; An)
  *   ---------------------
  *   !A1 | !A2 | ... | !An
  * </PRE>

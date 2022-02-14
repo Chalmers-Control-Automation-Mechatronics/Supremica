@@ -840,7 +840,6 @@ public abstract class BDDAbstractManager {
        * @param leftVarName The string representation of the left hand sub
        * expression.
        * @return A BDD representing the result.
-       * @throws VisitorException
        */
       private BDDOverflows binaryEqualityOperator(final BinaryExpressionProxy binExpr,
                                                   final SupremicaBDDBitVector.BitVectorOp bitVectorOp,
@@ -895,7 +894,6 @@ public abstract class BDDAbstractManager {
        * @param binExpr A binary expression
        * @param op A BDD operator on boolean values (and, or, etc.)
        * @return A BDD representing the operation.
-       * @throws VisitorException
        */
       private BDDOverflows binaryBooleanExpression(final BinaryExpressionProxy binExpr,
                                                    final BDDFactory.BDDOp op)
@@ -921,7 +919,6 @@ public abstract class BDDAbstractManager {
        * @param binExpr A binary expression
        * @param op A comparison operator (less than, greater or equal, etc.).
        * @return A BDD representing the operation.
-       * @throws VisitorException
        */
       private BDDOverflows binaryInequalityOperator(final BinaryExpressionProxy binExpr,
                                                     final SupremicaBDDBitVector.BitVectorOp op)

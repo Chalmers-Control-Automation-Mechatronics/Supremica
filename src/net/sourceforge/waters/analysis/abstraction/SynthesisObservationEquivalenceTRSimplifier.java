@@ -49,9 +49,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -62,6 +59,9 @@ import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
@@ -1203,7 +1203,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
     /**
      * Initialises the cache used by the {@link
-     * #getUniqueSuccessorClass(int, EquivalenceClass) getUniqueSuccessorClass()}
+     * #getUniqueSuccessorClass(int,SynthesisObservationEquivalenceTRSimplifier.EquivalenceClass) getUniqueSuccessorClass()}
      * method if not yet initialised. This method is called automatically.
      */
     private void initCache()
@@ -1283,7 +1283,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
     /**
      * Clears the cache used by the {@link
-     * #getUniqueSuccessorClass(int,EquivalenceClass) getUniqueSuccessorClass()}
+     * #getUniqueSuccessorClass(int,SynthesisObservationEquivalenceTRSimplifier.EquivalenceClass) getUniqueSuccessorClass()}
      * method. The cache needs to be cleared when starting to split on a
      * new end class.
      */
@@ -1307,7 +1307,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     //# Class Constants
     /**
      * Dummy equivalence class used as a result from {@link
-     * #getUniqueSuccessorClass(int, EquivalenceClass)
+     * #getUniqueSuccessorClass(int,SynthesisObservationEquivalenceTRSimplifier.EquivalenceClass)
      * getUniqueSuccessorClass()} to indicate that a state has no
      * local uncontrollable successors outside of its own class or the
      * class currently being split on.
@@ -1315,7 +1315,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     private final EquivalenceClass NO_CLASS = new EquivalenceClass(this);
     /**
      * Dummy equivalence class used as a result from {@link
-     * #getUniqueSuccessorClass(int, EquivalenceClass)
+     * #getUniqueSuccessorClass(int,SynthesisObservationEquivalenceTRSimplifier.EquivalenceClass)
      * getUniqueSuccessorClass()} to indicate that a state has shared
      * uncontrollable transitions outgoing that do not match the class
      * currently being split on, or local uncontrollable successors in

@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
  * Converts Waters modules to NuSMV files
  *
  * Precondition: all automata should be flattened out, no complex nodes, foreach
- * events etc. Otherwise result will symply be nonsense (e.g. there is filter for
+ * events etc. Otherwise result will simply be nonsense (e.g. there is filter for
  * SimpleIdentifierProxy, that silently discard all the rest)
  *
  * This code is no more than a hack to convert Waters modules to NuSMV files.
@@ -59,8 +59,6 @@ import org.xml.sax.SAXException;
  * consistent with the rest of the code. I will probably clean it up after reading some
  * "functional programming in java" resources. The reason for all this mess is that
  * I wrote conversion specification in the functional style
- *
- *
  *
  * <pre>
  * MODULE main
@@ -77,17 +75,12 @@ import org.xml.sax.SAXException;
  * TRANS
  *   conjunction [ disjunction [ conjunction [stVar a `eq` sou, event `eq` ev, (next stVar a) `eq` des, guard, next varInAction `eq` action] | (sou, dest, ev, guard, action) &lt;- arcs a] | a &lt;- ats]
  *
- * CTLSPEC AG EF ( conjunction [ disjunction [ stVar a `eq` s | s &lt;- markedStates a] | a &lt;- ats] )
- *
- *
- * </pre>
+ * CTLSPEC AG EF ( conjunction [ disjunction [ stVar a `eq` s | s &lt;- markedStates a] | a &lt;- ats] )</pre>
  *
  * Since there are no marked states, but there are only propositions like
  * :accepting and :forbidden, it is very difficult to find single right way to
  * encode all the properties we would like to express. For now we will limit it to
  * :accepting proposition only for verification of non-blocking, but it have to be reconsidered.
- *
- *
  *
  * @author voronov
  */
@@ -129,8 +122,6 @@ public class EFAToNuSMV {
      * Precondition: ComponentList of the ModuleSubject have to be flattened out,
      * i.e.  there should be only SimpleComponentProxy and VariableProxy, and no
      * InstanceProxy or ForeachComponentProxy
-     * @param m
-     * @param pw
      */
     private void printVars(final ModuleProxy m, final PrintWriter pw) {
         pw.println("VAR");
@@ -158,9 +149,8 @@ public class EFAToNuSMV {
     }
 
     /**
-     * this will only work if all arcs has their transitions as SimpleIndentifierProxy
-     * @param m
-     * @param pw
+     * This will only work if all arcs have their transitions as
+     * {@link SimpleIdentifierProxy}.
      */
     private void printTrans(final ModuleProxy m, final PrintWriter pw) {
         pw.println("TRANS");

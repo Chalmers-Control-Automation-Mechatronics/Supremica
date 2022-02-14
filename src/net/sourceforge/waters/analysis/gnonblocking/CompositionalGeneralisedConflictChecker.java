@@ -56,10 +56,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -85,6 +81,10 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1187,8 +1187,6 @@ public class CompositionalGeneralisedConflictChecker
   /**
    * Uses a heuristic to evaluate the set of candidates to select a suitable
    * candidate to compose next.
-   *
-   * @param candidates
    * @return null when there are no candidates, or else the selected candidate.
    */
   private Candidate evaluateCandidates(List<Candidate> candidates)
@@ -1514,8 +1512,6 @@ public class CompositionalGeneralisedConflictChecker
 
     /**
      * Returns true without searching for a local event.
-     *
-     * @param candidate
      * @return true, there is definitely a local event.
      */
     @Override

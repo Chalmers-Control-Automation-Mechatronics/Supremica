@@ -188,9 +188,6 @@ public class ModularForbidder
 
     /**
      * Handle difference between how plant and specification automaton should be extended with self-loops
-     * @param automaton
-     * @param state
-     * @param event
      */
     private void extendAutomaton(final Automaton automaton, final State state, final LabeledEvent event)
     {
@@ -229,7 +226,6 @@ public class ModularForbidder
     /**
      * Creates a new specification with one state and one event in alphabet
      * The event is blocked from occurring
-     * @param event
      */
     private void createSpecification(final LabeledEvent event)
     {
@@ -240,7 +236,6 @@ public class ModularForbidder
     /**
      * Creates a new plant with one state and one event in alphabet
      * The event is added to a self-loop in the one state
-     * @param event
      */
     private void createPlant(final LabeledEvent event)
     {
@@ -252,7 +247,6 @@ public class ModularForbidder
     /**
      * To create automaton with one state and one event in alphabet
      * The state is initial and accepting
-     * @param type
      * @param stateName Name of the one and only state
      * @param event The automaton will get this name
      * @return The created automaton

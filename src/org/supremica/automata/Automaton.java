@@ -2190,7 +2190,7 @@ public class Automaton
     }
 
     /**
-     * Add an arc <from_state, event, to-state> for each event in
+     * Add an arc &lt;from_state, event, to-state&gt; for each event in
      * alpha that is not defined in from_state. Returns true if
      * anything added.
      *
