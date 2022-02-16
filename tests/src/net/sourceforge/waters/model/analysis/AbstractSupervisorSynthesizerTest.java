@@ -767,6 +767,20 @@ public abstract class AbstractSupervisorSynthesizerTest
     return result;
   }
 
+  /**
+   * <P>Checks whether:</P>
+   * <UL>
+   * <LI>The synthesiser's Boolean analysis result is <CODE>true</CODE> or
+   *     <CODE>false</CODE> as expected;
+   * <LI>The synthesised supervisor is controllable with respect to the
+   *     plant;</LI>
+   * <LI>The synthesised supervisor is nonconflicting together with the
+   *     original plant and specification;</LI>
+   * <LI>The language of the supervisor in the test file composed with the
+   *     original plant and specification is contained in the language of
+   *     the synthesised supervisor.</LI>
+   * </UL>
+   */
   protected void checkResult(final ProductDESProxy des,
                              final ProductDESResult result,
                              final boolean expect)
@@ -888,10 +902,18 @@ public abstract class AbstractSupervisorSynthesizerTest
     }
   }
 
+  protected void verifySupervisor(final ProductDESProxy des,
+                                  final KindTranslator translator,
+                                  final String description)
+    throws Exception
+  {
+    verifySupervisor(des, mLanguageInclusionChecker, translator, description);
+  }
+
   private void verifySupervisor(final ProductDESProxy des,
                                 final ModelVerifier verifier,
                                 final KindTranslator translator,
-                                final String propname)
+                                final String description)
     throws Exception
   {
     verifier.setModel(des);
@@ -902,7 +924,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     if (!verifier.isSatisfied()) {
       final CounterExampleProxy counterexample = verifier.getCounterExample();
       final File file = saveCounterExample(counterexample);
-      fail("Synthesis result is not " + propname +
+      fail("Synthesis result is not " + description +
            "!\nCounterexample saved to " + file);
     }
   }

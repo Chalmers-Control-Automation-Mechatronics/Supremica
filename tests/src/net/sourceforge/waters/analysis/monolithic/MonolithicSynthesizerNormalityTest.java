@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -42,6 +43,9 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -83,17 +87,39 @@ public class MonolithicSynthesizerNormalityTest
   //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest
+  /**
+   * <P>In addition to standard synthesis results, for synthesis with
+   * unobservable events it is also checked whether:</P>
+   * <UL>
+   * <LI>The supervisor refrains from using unobservable events;</LI>
+   * <LI>The controlled behaviour is contained within the language defined
+   *     by the specifications.</LI>
+   * </UL>
+   */
   @Override
   protected void checkResult(final ProductDESProxy des,
                              final ProductDESResult result,
                              final boolean expect)
-                               throws Exception
+    throws Exception
   {
     super.checkResult(des, result, expect);
     if (result.isSatisfied()) {
+      final Collection<AutomatonProxy> desAutomata = des.getAutomata();
       final Collection<? extends AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
-      // Check whether any of the supervisors uses an unobservable event
+      final int numAutomata = desAutomata.size() + computedSupervisors.size();
+      final Collection<AutomatonProxy> testingAutomata =
+        new ArrayList<>(numAutomata);
+      for (final AutomatonProxy aut : desAutomata) {
+        switch (aut.getKind()) {
+        case PLANT:
+        case SPEC:
+          testingAutomata.add(aut);
+          break;
+        default:
+          break;
+        }
+      }
       for (final AutomatonProxy sup : computedSupervisors) {
         final Set<EventProxy> events = sup.getEvents();
         for (final EventProxy event : events){
@@ -102,7 +128,16 @@ public class MonolithicSynthesizerNormalityTest
                  "' uses the unobservable event '" + event.getName() + "'!");
           }
         }
+        testingAutomata.add(sup);
       }
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final String name = des.getName();
+      final Collection<EventProxy> events = des.getEvents();
+      final ProductDESProxy testingDES =
+        factory.createProductDESProxy(name, null, null, events, testingAutomata);
+      final KindTranslator translator =
+        new SpecInclusionKindTranslator();
+      verifySupervisor(testingDES, translator, "contained in the specification");
     }
   }
 
@@ -121,6 +156,20 @@ public class MonolithicSynthesizerNormalityTest
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "normality_02.wmod");
     runSynthesizer(des, false);
+  }
+
+  public void testNormality03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "normality_03.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testNormality04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "normality_04.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testParrowNormality() throws Exception
@@ -143,4 +192,42 @@ public class MonolithicSynthesizerNormalityTest
       getCompiledDES("tests", "synthesis", "traffic_lights.wmod");
     runSynthesizer(des, true);
   }
+
+
+  //#########################################################################
+  //# Inner Class SpecInclusionKindTranslator
+  private static class SpecInclusionKindTranslator
+    implements KindTranslator
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      switch (aut.getKind()) {
+      case PLANT:
+      case SUPERVISOR:
+        return ComponentKind.PLANT;
+      case SPEC:
+        return ComponentKind.SPEC;
+      default:
+        return null;
+      }
+    }
+
+    @Override
+    public EventKind getEventKind(final EventProxy event)
+    {
+      switch (event.getKind()) {
+      case CONTROLLABLE:
+      case UNCONTROLLABLE:
+        return EventKind.UNCONTROLLABLE;
+      case PROPOSITION:
+        return EventKind.PROPOSITION;
+      default:
+        return null;
+      }
+    }
+  }
+
 }

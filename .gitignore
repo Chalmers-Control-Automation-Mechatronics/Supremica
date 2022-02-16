@@ -24,7 +24,7 @@ SupremicaProperties.cfg
 *.swp
 *.out
 *.bak
-*.wdes
+#*.wdes (Waters DES files --- several committed in subfolders)
 *.wodes
 desktop.ini
 junit*.properties
