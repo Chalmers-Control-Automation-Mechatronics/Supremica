@@ -657,6 +657,8 @@ public class MonolithicSynthesizerNormality
 
       int numDeletions = 1;
       final int dumpStateIndex = mTransitionRelation.getDumpStateIndex();
+      final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
+      final int[] sourceTupleDash = new int[2];
       final int markedStateCode =
         mEventEncoding.getEventCode(getUsedDefaultMarking());
       while (numDeletions > 0) {
@@ -672,13 +674,11 @@ public class MonolithicSynthesizerNormality
           while(successorReadOnlyIter.advance()){
             if(successorReadOnlyIter.getCurrentTargetState() == dumpStateIndex){
               final int event = successorReadOnlyIter.getCurrentEvent();
-              final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
               resultMap.getOriginalState(source, sourceTuple);
               //Get sourceSet from pair
               final int[] sourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
               for(final int s : sourceSet){
                 if(s != sourceTuple[1]){
-                  final int[] sourceTupleDash = new int[2];
                   sourceTupleDash[0] = sourceTuple[0];
                   sourceTupleDash[1] = s;
                   final int newState = resultMap.getComposedState(sourceTupleDash);
@@ -780,40 +780,37 @@ public class MonolithicSynthesizerNormality
         mTransitionRelation.checkReachability();
       }
 
-      //Extract supervisor
-      final TransitionIterator iter = powersetRel.createAllTransitionsModifyingIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
+      // Disable transitions in powerset relation to build supervisor
       final int psDumpIndex = powersetRel.getDumpStateIndex();
-      while(iter.advance()){
-        if(iter.getCurrentTargetState() != psDumpIndex){
-          final int event = iter.getCurrentEvent();
-          final TransitionIterator spIter = mTransitionRelation.createAllTransitionsReadOnlyIterator(event);
-          final int spDumpIndex = mTransitionRelation.getDumpStateIndex();
-          while(spIter.advance()){
-            if(spIter.getCurrentTargetState() == spDumpIndex){
-              final int source = spIter.getCurrentSourceState();
-              final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
-              resultMap.getOriginalState(source, sourceTuple);
-              //Get sourceSet from pair
-              final int[] synthesisSourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
-              final int[] powersetSourceSet = subsetSimplifier.getSourceSet(iter.getCurrentSourceState());
-              if(Arrays.equals(synthesisSourceSet, powersetSourceSet)){
-                //Add new transition with same event pointing to dump
-                powersetRel.addTransition(iter.getCurrentSourceState(), event, psDumpIndex);
-                //Remove original transition from powerset
-                iter.remove();
-                break;
-              }
-            }
+      final int spDumpIndex = mTransitionRelation.getDumpStateIndex();
+      final TransitionIterator spIter =
+        mTransitionRelation.createAllTransitionsModifyingIteratorByStatus
+          (EventStatus.STATUS_CONTROLLABLE);
+      final TransitionIterator psIter =
+        powersetRel.createSuccessorsModifyingIterator();
+      while (spIter.advance()) {
+        if (spIter.getCurrentTargetState() == spDumpIndex) {
+          final int spState = spIter.getCurrentSourceState();
+          resultMap.getOriginalState(spState, sourceTuple);
+          final int psState = sourceTuple[0];
+          final int e = spIter.getCurrentEvent();
+          psIter.reset(psState, e);
+          if (psIter.advance() &&
+              psIter.getCurrentTargetState() != psDumpIndex) {
+            // redirect to psDumpIndex for supervisor reduction
+            psIter.remove();
           }
         }
       }
+
       mTransitionRelation = powersetRel;
       mEventEncoding = copy;
 
       // Return result
       if (isDetailedOutputEnabled()) {
-        mTransitionRelation.removeDeadlockStateTransitions(markedStateCode);
+        mTransitionRelation.removeDumpStateTransitions();
         mTransitionRelation.checkReachability();
+        mTransitionRelation.removeProperSelfLoopEvents();
         mTransitionRelation.removeRedundantPropositions();
         final ProductDESProxy result =
           createDESProxy(mTransitionRelation, mEventEncoding);
@@ -945,8 +942,8 @@ public class MonolithicSynthesizerNormality
   {
     //#######################################################################
     //# Constructor
-    public UncontrollableAutomatonEventInfo(final int aut,
-                                            final double probability)
+    private UncontrollableAutomatonEventInfo(final int aut,
+                                             final double probability)
     {
       super(aut, probability);
     }
@@ -974,8 +971,8 @@ public class MonolithicSynthesizerNormality
   {
     //#######################################################################
     //# Constructor
-    public ControllableAutomatonEventInfo(final int aut,
-                                          final double probability)
+    private ControllableAutomatonEventInfo(final int aut,
+                                           final double probability)
     {
       super(aut, probability);
     }
@@ -988,10 +985,10 @@ public class MonolithicSynthesizerNormality
   {
     //#########################################################################
     //# Constructor
-    public StateExplorer(final int[][] theEventAutomata,
-                         final int[][][][] theTransitions,
-                         final int[][] theNDTuple, final int theFirstEvent,
-                         final int theLastEvent)
+    StateExplorer(final int[][] theEventAutomata,
+                  final int[][][][] theTransitions,
+                  final int[][] theNDTuple, final int theFirstEvent,
+                  final int theLastEvent)
     {
       mmFirstEvent = theFirstEvent;
       mmLastEvent = theLastEvent;
@@ -1003,17 +1000,19 @@ public class MonolithicSynthesizerNormality
 
     //#########################################################################
     //# State Exploration
-    public boolean explore(final int[] encodedTuple)
+    boolean explore(final int[] encodedTuple)
       throws OverflowException, AnalysisAbortException
     {
       checkAbort();
       mSTEncoding.decode(encodedTuple, mmDecodedTuple);
-      events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
+      events:
+      for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
             final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
+              handleBlocked(mmDecodedTuple, e, a);
               continue events;
             }
             mmNDTuple[a] = succ;
@@ -1026,8 +1025,8 @@ public class MonolithicSynthesizerNormality
       return true;
     }
 
-    public boolean permutations(int a, final int[] decodedSource,
-                                final int event) throws OverflowException
+    boolean permutations(int a, final int[] decodedSource, final int event)
+      throws OverflowException
     {
       if (a == 0) {
         if (!processNewState(decodedSource, event, decodedSource == null)) {
@@ -1053,10 +1052,14 @@ public class MonolithicSynthesizerNormality
       return true;
     }
 
-    public abstract boolean processNewState(final int[] decodedSource,
-                                            final int event,
-                                            final boolean isInitial)
+    abstract boolean processNewState(final int[] decodedSource,
+                                     final int event,
+                                     final boolean isInitial)
       throws OverflowException;
+
+    void handleBlocked(final int[] decodedSource, final int e, final int a)
+    {
+    }
 
     //#########################################################################
     //# Data Members
@@ -1276,39 +1279,70 @@ public class MonolithicSynthesizerNormality
                                final int lastEvent)
     {
       super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+      mmEncodedBuffer = new int[mSTEncoding.getNumberOfWords()];
     }
 
     //#######################################################################
     //# State Exploration
     @Override
-    public boolean processNewState(final int[] decodedSource, final int e,
-                                   final boolean isInitial)
+    boolean processNewState(final int[] decodedSource,
+                            final int e,
+                            final boolean isInitial)
       throws OverflowException
     {
-      final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
       int source = 0;
       if (!isInitial) {
-        mSTEncoding.encode(decodedSource, encoded);
-        source = mGlobalVisited.get(encoded);
+        mSTEncoding.encode(decodedSource, mmEncodedBuffer);
+        source = mGlobalVisited.get(mmEncodedBuffer);
         source = mStateMap[source];
       }
-      mSTEncoding.encode(mTargetTuple, encoded);
-      int target = mGlobalVisited.get(encoded);
+      mSTEncoding.encode(mTargetTuple, mmEncodedBuffer);
+      int target = mGlobalVisited.get(mmEncodedBuffer);
       if (mReachableStates.get(target) && !mGoodStates.get(target)) {
         mGoodStates.set(target);
         mUnvisited.offer(mStateTuples.get(target));
       }
-      target = mStateMap[target];
       if (!isInitial) {
-        mTransitionRelation.addTransition(source, e, target);
+        target = mStateMap[target];
         if (target == mTransitionRelation.getDumpStateIndex()) {
-          mTransitionRelation.setReachable(target, true);
-          final EventProxy event = mEventEncoding.getProperEvent(e);
-          mDisabledEvents.add(event);
+          addDumpTransition(source, e);
+        } else {
+          mTransitionRelation.addTransition(source, e, target);
         }
       }
       return true;
     }
+
+    @Override
+    void handleBlocked(final int[] decodedSource, final int e, final int a)
+    {
+      if (a >= mNumPlants) {
+        addDumpTransition(decodedSource, e);
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void addDumpTransition(final int[] decodedSource,
+                                   final int e)
+    {
+      mSTEncoding.encode(decodedSource, mmEncodedBuffer);
+      final int source = mGlobalVisited.get(mmEncodedBuffer);
+      addDumpTransition(mStateMap[source], e);
+    }
+
+    private void addDumpTransition(final int source, final int e)
+    {
+      final int target = mTransitionRelation.getDumpStateIndex();
+      mTransitionRelation.addTransition(source, e, target);
+      mTransitionRelation.setReachable(target, true);
+      final EventProxy event = mEventEncoding.getProperEvent(e);
+      mDisabledEvents.add(event);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int[] mmEncodedBuffer;
   }
 
 
