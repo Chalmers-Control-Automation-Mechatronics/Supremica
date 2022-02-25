@@ -89,8 +89,8 @@ class LowestProbabilityFirst
 {
   public int compare(AutomatonProbability a1, AutomatonProbability a2)
   {
-    Double m1prob = new Double(a1.getProbability());
-    Double m2prob = new Double(a2.getProbability());
+    Double m1prob = Double.valueOf(a1.getProbability());
+    Double m2prob = Double.valueOf(a2.getProbability());
     return m1prob.compareTo(m2prob);
   }
 }
@@ -104,8 +104,8 @@ class ProbabilityOverStatesSquared
 { 
   public int compare(AutomatonProbability m1, AutomatonProbability m2)
   {
-    Double m1prob = new Double(m1.getProbability() * Math.pow(m1.getAutomaton().getStateCount(), 2));
-    Double m2prob = new Double(m2.getProbability() * Math.pow(m2.getAutomaton().getStateCount(), 2));
+    Double m1prob = Double.valueOf(m1.getProbability() * Math.pow(m1.getAutomaton().getStateCount(), 2));
+    Double m2prob = Double.valueOf(m2.getProbability() * Math.pow(m2.getAutomaton().getStateCount(), 2));
     return m1prob.compareTo(m2prob);
   }
 }

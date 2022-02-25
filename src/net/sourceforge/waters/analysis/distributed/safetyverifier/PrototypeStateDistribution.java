@@ -252,8 +252,8 @@ public class PrototypeStateDistribution extends HashStateDistribution
   {
     public int compare(MachineProbability m1, MachineProbability m2)
     {
-      Double m1prob = new Double(m1.probability);
-      Double m2prob = new Double(m2.probability);
+      Double m1prob = Double.valueOf(m1.probability);
+      Double m2prob = Double.valueOf(m2.probability);
       return m1prob.compareTo(m2prob);
     }
   }
@@ -270,8 +270,8 @@ public class PrototypeStateDistribution extends HashStateDistribution
 
     public int compare(MachineProbability m1, MachineProbability m2)
     {
-      Double m1prob = new Double(m1.probability * Math.pow(mModel.getAutomaton(m1.automaton).getStateCount(), 2));
-      Double m2prob = new Double(m2.probability * Math.pow(mModel.getAutomaton(m2.automaton).getStateCount(), 2));
+      Double m1prob = Double.valueOf(m1.probability * Math.pow(mModel.getAutomaton(m1.automaton).getStateCount(), 2));
+      Double m2prob = Double.valueOf(m2.probability * Math.pow(mModel.getAutomaton(m2.automaton).getStateCount(), 2));
       return m1prob.compareTo(m2prob);
     }
   }

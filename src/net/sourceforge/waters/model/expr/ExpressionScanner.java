@@ -209,7 +209,7 @@ public class ExpressionScanner {
    */
   boolean isSeparatorCharacter(final int ch)
   {
-    final Integer character = new Integer(ch);
+    final Integer character = Integer.valueOf(ch);
     return SEPARATORS.containsKey(character);
 
   }
@@ -514,7 +514,7 @@ public class ExpressionScanner {
   //# Token Creation
   private Token createSeparatorToken(final int ch)
   {
-    final Integer character = new Integer(ch);
+    final Integer character = Integer.valueOf(ch);
     final SeparatorTokenCreator creator = SEPARATORS.get(character);
     return creator.createToken(mTokenStart);
   }

@@ -135,7 +135,17 @@ public class DistributedServer
       throw new ClassCastException
 	(name + " is not a valid Controller class");
 
-    Controller controller = (Controller) c.newInstance();
+    Controller controller;
+    try
+    {
+      controller = (Controller) c.getDeclaredConstructor().newInstance();
+    }
+    // NoSuchMethodException thrown by Class.getConstructor() - JDK 17
+    // InvocationTargetException thrown by Class.getConstructor().newInstance() - JDK 17
+    catch(java.lang.NoSuchMethodException | java.lang.reflect.InvocationTargetException excp) 
+    {
+      throw new InstantiationException();
+    }
     return controller;
   }
 

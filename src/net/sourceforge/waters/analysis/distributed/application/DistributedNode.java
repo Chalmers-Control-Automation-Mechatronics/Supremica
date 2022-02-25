@@ -80,7 +80,17 @@ public class DistributedNode
       throw new ClassCastException
 	(classname + " is not a valid Worker class");
 
-    Worker w = (Worker) c.newInstance();
+    Worker w;
+    try
+    {
+      w = (Worker) c.getDeclaredConstructor().newInstance();
+    }
+    // NoSuchMethodException thrown by Class.getConstructor() - JDK 17
+    // InvocationTargetException thrown by Class.getConstructor().newInstance() - JDK 17
+    catch(java.lang.NoSuchMethodException | java.lang.reflect.InvocationTargetException excp) 
+    {
+      throw new InstantiationException();
+    }
     mWorkerCleanup.registerWorker(id, (WorkerLocal)w);
 
     //Export the worker as a remote object.
