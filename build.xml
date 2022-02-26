@@ -204,7 +204,7 @@
                verbose="false"
                nowarn="true"
                source="1.8"
-	       encoding="ISO-8859-15"
+           encoding="ISO-8859-15"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="512M">
@@ -268,8 +268,8 @@
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>
         </jar>
-	<copy file="${lib}/${log4j2.api.jar}" todir="${dist}"/>
-	<copy file="${lib}/${log4j2.core.jar}" todir="${dist}"/>
+    <copy file="${lib}/${log4j2.api.jar}" todir="${dist}"/>
+    <copy file="${lib}/${log4j2.core.jar}" todir="${dist}"/>
     </target>
     
     <target name="downloads_supremica">
@@ -289,7 +289,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy todir="${build}/net/sourceforge/waters/model/marshaller">
             <fileset dir="${waters.xsd}" includes="*.xsd"/>
         </copy>
-	<copy file="${templates}/log4j2.xml" todir="${build}"/>
+    <copy file="${templates}/log4j2.xml" todir="${build}"/>
         <copy todir="${build}/net/sourceforge/waters/samples/maze">
             <fileset dir="${waters.examples}/maze" includes="*.wmod"/>
         </copy>
@@ -459,7 +459,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>
         -->
     </target>
-	
+    
     <!-- 
       Copies the launch commands, the ST Code Converter and
       and the config properties files to /dist
@@ -495,9 +495,9 @@ Class-Path: ${manifest.pathlist}</echo>
                     <exclude name="**/TestPackage*.java"/>
                     <exclude name="**/Abstract*.java"/>
                     <exclude name="**/Large*.java"/>
-		    <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
-		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicCliqueBasedSupervisorReductionTest.java"/>
-		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
+            <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
+            <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicCliqueBasedSupervisorReductionTest.java"/>
+            <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
                     <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
                 </fileset>
             </batchtest>
@@ -689,7 +689,7 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
     
     <target name="test" depends="-run_tests,test_report"
-     description="Runs unit tests and produces a test report. This is a comprehensive test that takes several minutes."/>
+     description="Runs unit tests and produces a test report. This is a comprehensive test that takes hours."/>
 
     <target name="test_cli" depends="-run_test_cli,test_report"/>
     
@@ -839,20 +839,20 @@ Class-Path: ${manifest.pathlist}</echo>
             <jvmarg value="-Djava.library.path=${dist}"/>
         </java>
     </target>
-	
-	<target name="benchmark-ras-partition">
-		<foreach param="ras-path" target="-execute-one-ras-partition">
+    
+    <target name="benchmark-ras-partition">
+        <foreach param="ras-path" target="-execute-one-ras-partition">
             <path> 
                 <fileset dir="${examples}/ras-examples" casesensitive="no"/>
             </path>
-		</foreach>
-	</target>
-	
+        </foreach>
+    </target>
+    
     <target name="-execute-one-ras-partition">
         <echo message="executing the partitioned algo on ${ras-path}"/>
         <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
                       fork="yes" 
-  					  output="ras_partition_log.txt" append="true"> 
+                      output="ras_partition_log.txt" append="true"> 
             <arg value="${ras-path}"/> 
             <arg value="MINIMALITY_P"/>
             <arg value="5000000"/>
@@ -869,9 +869,9 @@ Class-Path: ${manifest.pathlist}</echo>
         </java>
     </target>
     
-	<!-- Package Supremica on Mac-->
-	<property environment="env" />
-	
+    <!-- Package Supremica on Mac-->
+    <property environment="env" />
+    
     <taskdef name="bundleapp"
              classname="com.oracle.appbundler.AppBundlerTask"   
              classpath="lib/appbundler-1.0.jar" />
@@ -880,13 +880,13 @@ Class-Path: ${manifest.pathlist}</echo>
         <bundleapp outputdirectory="${dist}"
             name="Supremica"
             displayname="Supremica"
-        	icon="${images}/icons/Supremica.icns"
-        	shortversion="0.1"	
+            icon="${images}/icons/Supremica.icns"
+            shortversion="0.1"  
             identifier="${supremica_basepackage}.gui.ide.IDE"
             mainclassname="${supremica_basepackage}.gui.ide.IDE">
-        	<runtime dir="${env.JAVA_HOME}" />
+            <runtime dir="${env.JAVA_HOME}" />
             <classpath file="${dist}/Supremica.jar"/>
-        	<classpath file="${dist}/SupremicaLib.jar"/>
+            <classpath file="${dist}/SupremicaLib.jar"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
         </bundleapp>
     </target>
