@@ -59,7 +59,6 @@ import org.supremica.gui.AutomataMinimizationWorker;
 import org.supremica.gui.AutomataSynchronizerWorker;
 import org.supremica.gui.ide.SupremicaAnalyzerPanel;
 
-
 /**
  * This is a first try of doing proper interleave.
  * It turns out that this can be done by using actions already available. It goes like this:
@@ -206,7 +205,34 @@ class AutomataInterleaveWorker implements AutomataListener
 	}
 }
 
+/*****************************************************************
+ * Experiment to see if I can get to run a Lua script from inside
+ * Supremica. LuaJ needs to be available. The code simply opens a
+ * FileChooser to allow selecting a *.lua script, and then runs it.
+ */
+class AnalyzerRunLuaScript
+{
+	public static void chooseAndRunScript() throws Exception
+	{
+		javax.swing.JFileChooser jfc =
+			new javax.swing.JFileChooser(javax.swing.filechooser.FileSystemView.getFileSystemView().getHomeDirectory());
 
+		int returnValue = jfc.showOpenDialog(null);
+
+		if (returnValue != javax.swing.JFileChooser.APPROVE_OPTION)
+			return;
+
+		java.io.File selectedFile = jfc.getSelectedFile();
+		String script = selectedFile.getPath();
+
+		// create an environment to run in
+		org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
+		// Use the convenience function on Globals to load a chunk.
+		org.luaj.vm2.LuaValue chunk = globals.loadfile(script);
+		// Use any of the "call()" or "invoke()" functions directly on the chunk.
+		chunk.call(org.luaj.vm2.LuaValue.valueOf(script));
+	}
+}
 /******************************************************************
  * A new action
  */
@@ -224,7 +250,8 @@ public class AnalyzerExperimentAction
         setAnalyzerActiveRequired(true);
 
         putValue(Action.NAME, "Experiment");
-        putValue(Action.SHORT_DESCRIPTION, "Test of new stuff - this time: interleave");
+        //putValue(Action.SHORT_DESCRIPTION, "Test of new stuff - this time: interleave");
+        putValue(Action.SHORT_DESCRIPTION, "Test of new stuff - Run Lua script");
         //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_D));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
@@ -247,11 +274,27 @@ public class AnalyzerExperimentAction
 		/*************************************/
 
 		// splitExperiment();	// not by MF, see below
-		interleaveExperiment(); // MF
+		// interleaveExperiment(); // MF
+		runLuaScript();
 
 		/*********************************/
         logger.info("Experiment finished.");
     }
+
+	/*
+	 *
+	 */
+	void runLuaScript()
+	{
+		try
+		{
+			AnalyzerRunLuaScript.chooseAndRunScript();
+		}
+		catch(Exception excp)
+		{
+			System.err.println("Soemthing went wrong, sorry!");
+		}
+	}
 
 	/*
 	 * Try to synch the selected automata and then check that the new automaton is there - does not work correctly
