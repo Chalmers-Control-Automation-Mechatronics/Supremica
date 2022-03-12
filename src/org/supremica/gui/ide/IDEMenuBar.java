@@ -143,6 +143,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
+import org.supremica.gui.ide.actions.RunScriptAction;
 import org.supremica.gui.ide.actions.OpenFTAction;
 import org.supremica.gui.ide.actions.OpenFTSpecAction;
 import org.supremica.gui.ide.actions.OpenRASAction;
@@ -253,7 +254,7 @@ import org.supremica.properties.Config;
 //# CTRL-o:
 //# CTRL-p: File/Print (not used at the moment)
 //# CTRL-q:
-//# CTRL-r:
+//# CTRL-r: Run script
 //# CTRL-s: File/Save
 //# CTRL-t: Examples/Dynamic examples
 //# CTRL-u:
@@ -662,6 +663,9 @@ public class IDEMenuBar
     menu.add(epsprint);
     final Action pdfprint = actions.getAction(GraphSavePDFAction.class);
     menu.add(pdfprint);
+    menu.addSeparator();
+    final Action runscript = actions.getAction(RunScriptAction.class);
+    menu.add(runscript);
     menu.addSeparator();
     final Action exit = actions.getAction(ExitAction.class);
     menu.add(exit);

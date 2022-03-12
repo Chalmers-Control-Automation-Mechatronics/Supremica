@@ -58,6 +58,22 @@ import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.AutomataMinimizationWorker;
 import org.supremica.gui.AutomataSynchronizerWorker;
 import org.supremica.gui.ide.SupremicaAnalyzerPanel;
+import org.supremica.gui.ide.IDE;
+
+import javax.tools.*;
+import java.io.*;
+import java.util.stream.*;
+import java.nio.file.*;
+import java.nio.charset.StandardCharsets;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.MalformedURLException;
+import java.lang.Class;
+import java.lang.ClassNotFoundException;
+import java.lang.IllegalAccessException;
+import java.lang.InstantiationException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * This is a first try of doing proper interleave.
@@ -210,9 +226,87 @@ class AutomataInterleaveWorker implements AutomataListener
  * Supremica. LuaJ needs to be available. The code simply opens a
  * FileChooser to allow selecting a *.lua script, and then runs it.
  */
+/* This class allows to runtime load, compile, and run java code
+ * https://blog.frankel.ch/compilation-java-code-on-the-fly/
+ */
+class JavaExecutor
+{
+  static String fileName = null;
+ 
+  static String getFilenameWithoutExt(String sourcePath) throws IOException
+  {
+    Path path = Paths.get(sourcePath);
+    String filename = path.getFileName().toString(); // includes .ext
+    
+    return filename.substring(0, filename.lastIndexOf(".")); // strip ext
+  } 
+  
+  static String readCode(String sourcePath) throws FileNotFoundException
+  {
+      InputStream stream = new FileInputStream(sourcePath);
+      String separator = System.getProperty("line.separator");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+      return reader.lines().collect(Collectors.joining(separator));
+  }
+
+  static Path saveSource(String source) throws IOException
+  {
+      String tmpProperty = "R:/"; // System.getProperty("java.io.tmpdir");
+      Path sourcePath = Paths.get(tmpProperty, JavaExecutor.fileName + ".java"); // "HelloWorld.java");
+      // System.out.println("saveSource: " + sourcePath);
+      Files.write(sourcePath, source.getBytes(StandardCharsets.UTF_8));
+      return sourcePath;
+  }
+
+  static Path compileSource(Path javaFile)
+  {
+      JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+      compiler.run(null, null, null, javaFile.toFile().getAbsolutePath());
+      return javaFile.getParent().resolve(JavaExecutor.fileName + ".class"); // "HelloWorld.class");
+  }
+
+	static void runClass(Path javaClass, IDE ide)
+		throws MalformedURLException, ClassNotFoundException,
+			IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
+  {
+      URL classUrl = javaClass.getParent().toFile().toURI().toURL();
+      // System.out.println("classUrl: " + classUrl);
+      URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{classUrl});
+      Class<?> clazz = Class.forName(JavaExecutor.fileName, true, classLoader);
+      // clazz.newInstance(); // Can only access zero argument constructor (not main()!)
+      Constructor<?> constr = clazz.getDeclaredConstructor(org.supremica.gui.ide.IDE.class);
+      constr.newInstance(ide);
+      
+  }
+  
+	public static void exeJava(String sourcePath, final IDE ide) throws Exception
+	{
+    JavaExecutor.fileName = getFilenameWithoutExt(sourcePath);
+    
+    // System.out.println(JavaExecutor.fileName);
+    
+    final String source = JavaExecutor.readCode(sourcePath);
+    final Path javaFile = JavaExecutor.saveSource(source);
+    final Path classFile = JavaExecutor.compileSource(javaFile);
+
+    // System.out.println("Exe java: "+ classFile);
+
+    JavaExecutor.runClass(classFile, ide);
+  }
+}
+// The idea with the class above is to see if I can run java code
+// to do the same thing that I expect the Lua code to do
 class AnalyzerRunLuaScript
 {
-	public static void chooseAndRunScript() throws Exception
+	// https://www.baeldung.com/java-file-extension
+	static java.util.Optional<String> getExtension(String filename)
+	{
+		return java.util.Optional.ofNullable(filename)
+		  .filter(f -> f.contains("."))
+		  .map(f -> f.substring(filename.lastIndexOf(".") + 1));
+	}
+
+	public static void chooseAndRunScript(final IDE ide) throws Exception
 	{
 		javax.swing.JFileChooser jfc =
 			new javax.swing.JFileChooser(javax.swing.filechooser.FileSystemView.getFileSystemView().getHomeDirectory());
@@ -222,8 +316,20 @@ class AnalyzerRunLuaScript
 		if (returnValue != javax.swing.JFileChooser.APPROVE_OPTION)
 			return;
 
-		java.io.File selectedFile = jfc.getSelectedFile();
-		String script = selectedFile.getPath();
+		final java.io.File selectedFile = jfc.getSelectedFile();
+		final String script = selectedFile.getPath();
+
+		// if extension is ".java" then compile and run it as java
+		// else if extension is ".lua", then compile and run it as lua
+		final String ext = getExtension(script).get();
+		if (ext.equals("java"))
+		{
+			System.out.println("Java file: " + script);
+			JavaExecutor.exeJava(script, ide);
+			return;
+		}
+
+		if(!ext.equals("lua")) return;
 
 		// create an environment to run in
 		org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
@@ -271,28 +377,29 @@ public class AnalyzerExperimentAction
     {
         logger.info("Experiment started...");
 
-		/*************************************/
+      /*************************************/
 
-		// splitExperiment();	// not by MF, see below
-		// interleaveExperiment(); // MF
-		runLuaScript();
+      // splitExperiment();	// not by MF, see below
+      // interleaveExperiment(); // MF
+      runLuaScript(null);
 
-		/*********************************/
+      /*********************************/
         logger.info("Experiment finished.");
     }
 
 	/*
 	 *
 	 */
-	void runLuaScript()
+	void runLuaScript(final IDE ide)
 	{
 		try
 		{
-			AnalyzerRunLuaScript.chooseAndRunScript();
+			AnalyzerRunLuaScript.chooseAndRunScript(ide);
 		}
 		catch(Exception excp)
 		{
 			System.err.println("Soemthing went wrong, sorry!");
+			System.err.println(excp.toString());
 		}
 	}
 
