@@ -130,7 +130,7 @@ public class EditorSynthesizerAction extends IDEAction
       if (sub instanceof ForeachProxy) {
         final String msg = "Module contains for-each blocks\n" +
                            "that need to be instantiated first.\n" +
-                           "Choose Edit -> Instantiate.";
+                           "Choose Tools > Instantiate.";
         JOptionPane.showMessageDialog(ide.getFrame(),
                                       msg,
                                       "Unable to handle...",
@@ -152,6 +152,7 @@ public class EditorSynthesizerAction extends IDEAction
       }
     }
 
+	// Fill in the "Optimize variable" dropdown list
     final Vector<String> variableNamesForBox = new Vector<String>();
     variableNamesForBox.add("No variable selected");
     for (final Proxy sub : module.getComponentList()) {
@@ -160,6 +161,7 @@ public class EditorSynthesizerAction extends IDEAction
       }
     }
 
+	// Set the list of events possible to generate guards for
     final Vector<String> eventNamesForBox = new Vector<String>(eventNames);
     eventNamesForBox.add(0, "Generate guards for ALL controllable events");
 
@@ -173,13 +175,14 @@ public class EditorSynthesizerAction extends IDEAction
     }
 
     final ExtendedAutomata exAutomata = options.getOptimization()
-      ? new ExtendedAutomata(module, (int) options.getGlobalClockDomain())
+      ? new ExtendedAutomata(module, (int) options.getGlobalClockDomain()) // "Global time domain" on the dialog
       : new ExtendedAutomata(module);
 
     BDDExtendedSynthesizer bddSynthesizer = null;
     RuntimeException synthesisException = null;
 
-    try {
+    try
+    {
       bddSynthesizer =
         new BDDExtendedSynthesizer(exAutomata, options);
 
@@ -217,8 +220,8 @@ public class EditorSynthesizerAction extends IDEAction
           " the initial state: " + optimalTime + ".");
       }
 
-      if (!options.getOptVaribale().isEmpty()) {
-        logger.info("The minimum value of variable " + options.getOptVaribale()
+      if (!options.getOptVariable().isEmpty()) {
+        logger.info("The minimum value of variable " + options.getOptVariable()
         + " among the reachable marked states is: "
         + bddSynthesizer.getBDDAutomata().getMinValueOfVar() + ".");
       }
@@ -241,14 +244,16 @@ public class EditorSynthesizerAction extends IDEAction
 
       // handle the guards
       if (!(options.getSaveInFile() || options.getSaveIDDInFile()
-        || options.getPrintGuard() || options.getAddGuards())) {
-        // no guard related option is set, quite silently
+        || options.getPrintGuard() || options.getAddGuards()))
+      {
+        // no guard related option is set, quit silently
         // Cleanup...
         bddSynthesizer.done();
         return;
       }
 
-      if (bddSynthesizer.nbrOfStates() == 0) {
+      if (bddSynthesizer.nbrOfStates() == 0)
+      {
         logger.info("No guard can be derived from empty supervisor.");
         if (Config.TUM_EXTERNAL_ON.getValue()) {
           JOptionPane.showMessageDialog(ide.getFrame(),
@@ -265,128 +270,14 @@ public class EditorSynthesizerAction extends IDEAction
       bddSynthesizer.generateGuard(eventNames, options);
       logger.info("The guards were generated in "
         + bddSynthesizer.getGuardTimer().toString() + ".");
+
       // print guards or save them in a excel file.
-      if (options.getSaveInFile() || options.getPrintGuard()) {
-        final Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap =
-          bddSynthesizer.getBDDAutomata().getEdge2ExAutomatonMap();
-        final Map<String,BDDExtendedGuardGenerator> event2GuardGen =
-          bddSynthesizer.getEvent2GuardGen();
-        final Map<String, List<Entry<EdgeProxy,ExtendedAutomaton>>>
-        eventGeoInfo = new HashMap<>();
-        // Make things deterministic...
-        for(final String event: eventNames) {
-          if (!event2GuardGen.containsKey(event))
-            continue;
-          final BDDExtendedGuardGenerator guardGen = event2GuardGen.get(event);
-          final Map<EdgeProxy, String> evensEdge2GuardMap =
-            guardGen.getEdge2GuardMap();
-          final ArrayList<Entry<EdgeProxy, ExtendedAutomaton>> entries =
-            new ArrayList<>();
-          for(final Entry<EdgeProxy, ExtendedAutomaton> e:
-            edge2ExAutomatonMap.entrySet()) {
-            final String edgesGuard = evensEdge2GuardMap.get(e.getKey());
-            if (evensEdge2GuardMap.containsKey(e.getKey()) &&
-              edgesGuard != BDDExtendedGuardGenerator.TRUE) {
-              entries.add(e);
-            }
-          }
-          Collections.sort(entries, // sort based on automaton and edges names
-                           new Comparator<Entry<EdgeProxy,ExtendedAutomaton>>() {
-            @Override
-            public int compare(final Entry<EdgeProxy,ExtendedAutomaton> o1,
-                               final Entry<EdgeProxy,ExtendedAutomaton> o2)
-            {
-              final String aut1 = o1.getValue().getName();
-              final String aut2 = o2.getValue().getName();
-              if (aut1.equals(aut2)) {
-                final String sourceName1 = o1.getKey().getSource().getName();
-                final String sourceName2 = o2.getKey().getSource().getName();
-                return sourceName1.compareTo(sourceName2);
-              }
-              else {
-                return aut1.compareTo(aut2);
-              }
-            }
-          });
-          eventGeoInfo.put(event, entries);
-        }
-        // Format strings...
-        final List<List<String>> guardInfoList = new ArrayList<>();
-        for(final String event: eventGeoInfo.keySet()) {
-          final List<Entry<EdgeProxy, ExtendedAutomaton>> edge2AutMap =
-            eventGeoInfo.get(event);
-          final Map<EdgeProxy, String> edge2guardMap =
-            event2GuardGen.get(event).getEdge2GuardMap();
-          for(final Entry<EdgeProxy, ExtendedAutomaton> e: edge2AutMap) {
-            final ArrayList<String> entry = new ArrayList<>(4);
-            final String edge =
-              String.format("<%s, %s, %s>",
-                            e.getKey().getSource().getName(),
-                            event,
-                            e.getKey().getTarget().getName());
-            entry.add(edge);
-            final String aut = e.getValue().getName();
-            entry.add(aut);
-            String guard = edge2guardMap.get(e.getKey());
-            final int nbrOfTerms =
-              event2GuardGen.get(event).getGuard2NbrOfTerms().get(guard);
-            if (guard.equals(BDDExtendedGuardGenerator.FALSE)) {
-              guard = "FALSE";
-            }
-            entry.add(guard);
-            entry.add("" + nbrOfTerms);
-            guardInfoList.add(entry);
-          }
-        }
-        // Save guards in a Excel file...
-        if (options.getSaveInFile()) {
-          final JFileChooser chooser = new JFileChooser();
-          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-          chooser.setAcceptAllFileFilterUsed(false);
-          final int returnVal = chooser.showOpenDialog(ide.getFrame());
-          if (returnVal == JFileChooser.APPROVE_OPTION) {
-            final String path = chooser.getSelectedFile().getAbsolutePath();
-            Config.FILE_SAVE_PATH.set(path);
-            String name = module.getName();
-            if (name.isEmpty())
-              name = "event_edge_guard_list";
-            final File file = new File(path + "/" + name + ".xls");
-            try {
-              final FileWriter fstream = new FileWriter(file);
-              final BufferedWriter out = new BufferedWriter(fstream);
-              out.write("Edge <source, event, target>" + "\t"
-                + "Automaton" + "\t"
-                + "Guard expression" + "\t"
-                + "Guard size");
-              out.newLine();
-              out.newLine();
-              for(final List<String> e: guardInfoList) {
-                out.write(String.join("\t", e));
-                out.newLine();
-              }
-              out.close();
-            }
-            catch (final Exception e) {
-              logger.error("Could not save the event-guard pairs in the file: "
-                + e.getMessage());
-            }
-          }
-        }
-        // print guards in the console...
-        if (options.getPrintGuard()) {
-          for (final List<String> e:guardInfoList) {
-            if (e.get(2).equals("FALSE")) {
-              logger.info("Edge " + e.get(0) + " in automaton \""
-                + e.get(1) + "\" is FORBIDDEN.");
-            }
-            else {
-              logger.info("Guard " + e.get(2) + " with the term size " + e.get(3)
-              + " is generated for edge " + e.get(0)
-              + " of automaton \"" + e.get(1) + "\".");
-            }
-          }
-        }
-      }
+      if (options.getSaveInFile() || options.getPrintGuard())
+      {
+		  saveOrPrintGuards(bddSynthesizer, eventNames,
+		  				options.getSaveInFile(), options.getPrintGuard(),
+		  				module.getName(), "");
+	  }
 
       // Add guards and variables generated from automaton to the model...
       if (options.getAddGuards()) {
@@ -458,5 +349,160 @@ public class EditorSynthesizerAction extends IDEAction
         }
       }
     }
+  }
+
+  public void saveOrPrintGuards(final BDDExtendedSynthesizer bddSynthesizer,
+  								final Vector<String> eventNames,
+  								final Boolean saveInFile,
+  								final Boolean printGuards,
+  								final String modName,
+  								final String fileName)
+  {
+	  final Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap =
+		bddSynthesizer.getBDDAutomata().getEdge2ExAutomatonMap();
+
+	  final Map<String,BDDExtendedGuardGenerator> event2GuardGen =
+		bddSynthesizer.getEvent2GuardGen();
+
+	  final Map<String, List<Entry<EdgeProxy,ExtendedAutomaton>>>
+		eventGeoInfo = new HashMap<>();
+
+	  // Make things deterministic...
+	  for(final String event: eventNames)
+	  {
+		if (!event2GuardGen.containsKey(event))
+		  continue;
+
+		final BDDExtendedGuardGenerator guardGen = event2GuardGen.get(event);
+
+		final Map<EdgeProxy, String> evensEdge2GuardMap =
+		  guardGen.getEdge2GuardMap();
+
+		final ArrayList<Entry<EdgeProxy, ExtendedAutomaton>> entries =
+		  new ArrayList<>();
+
+		for(final Entry<EdgeProxy, ExtendedAutomaton> e:
+		  edge2ExAutomatonMap.entrySet())
+		{
+
+		  final String edgesGuard = evensEdge2GuardMap.get(e.getKey());
+		  if (evensEdge2GuardMap.containsKey(e.getKey()) &&
+			edgesGuard != BDDExtendedGuardGenerator.TRUE)
+		  {
+			entries.add(e);
+		  }
+		}
+		Collections.sort(entries, // sort based on automaton and edges names
+						 new Comparator<Entry<EdgeProxy,ExtendedAutomaton>>() {
+		  @Override
+		  public int compare(final Entry<EdgeProxy,ExtendedAutomaton> o1,
+							 final Entry<EdgeProxy,ExtendedAutomaton> o2)
+		  {
+			final String aut1 = o1.getValue().getName();
+			final String aut2 = o2.getValue().getName();
+			if (aut1.equals(aut2)) {
+			  final String sourceName1 = o1.getKey().getSource().getName();
+			  final String sourceName2 = o2.getKey().getSource().getName();
+			  return sourceName1.compareTo(sourceName2);
+			}
+			else {
+			  return aut1.compareTo(aut2);
+			}
+		  }
+		});
+		eventGeoInfo.put(event, entries);
+	  }
+	  // Format strings...
+	  final List<List<String>> guardInfoList = new ArrayList<>();
+	  for(final String event: eventGeoInfo.keySet()) {
+		final List<Entry<EdgeProxy, ExtendedAutomaton>> edge2AutMap =
+		  eventGeoInfo.get(event);
+		final Map<EdgeProxy, String> edge2guardMap =
+		  event2GuardGen.get(event).getEdge2GuardMap();
+		for(final Entry<EdgeProxy, ExtendedAutomaton> e: edge2AutMap) {
+		  final ArrayList<String> entry = new ArrayList<>(4);
+		  final String edge =
+			String.format("<%s, %s, %s>",
+						  e.getKey().getSource().getName(),
+						  event,
+						  e.getKey().getTarget().getName());
+		  entry.add(edge);
+		  final String aut = e.getValue().getName();
+		  entry.add(aut);
+		  String guard = edge2guardMap.get(e.getKey());
+		  final int nbrOfTerms =
+			event2GuardGen.get(event).getGuard2NbrOfTerms().get(guard);
+		  if (guard.equals(BDDExtendedGuardGenerator.FALSE)) {
+			guard = "FALSE";
+		  }
+		  entry.add(guard);
+		  entry.add("" + nbrOfTerms);
+		  guardInfoList.add(entry);
+		}
+	  }
+	  // Save guards in a file...
+	  if (saveInFile)
+	  {
+		  File file = null;
+
+		  if(fileName.isEmpty())
+		  {
+			final JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooser.setAcceptAllFileFilterUsed(false);
+			final int returnVal = chooser.showOpenDialog(ide.getFrame());
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+			  final String path = chooser.getSelectedFile().getAbsolutePath();
+			  Config.FILE_SAVE_PATH.set(path);
+			  // String name = module.getName();
+			  if (modName.isEmpty() || modName.equalsIgnoreCase("Untitled")) // "Untitled" is essentially no-name
+				file = new File(path + "/event_edge_guard_list.xls");
+			  else
+			  	file = new File(path + "/" + modName + ".xls");
+		  }
+		  else
+		  {
+			file = new File(fileName);
+		  }
+
+		  try
+		  {
+			final FileWriter fstream = new FileWriter(file);
+			final BufferedWriter out = new BufferedWriter(fstream);
+			out.write("Edge <source, event, target>" + "\t"
+			  + "Automaton" + "\t"
+			  + "Guard expression" + "\t"
+			  + "Guard size");
+			out.newLine();
+			out.newLine();
+			for(final List<String> e: guardInfoList) {
+			  out.write(String.join("\t", e));
+			  out.newLine();
+			}
+			out.close();
+		  }
+		  catch (final Exception e)
+		  {
+			logger.error("Could not save the event-guard pairs in the file: "
+			  + e.getMessage());
+		  }
+		}
+	  }
+	  // print guards in the console...
+	  if (printGuards)
+	  {
+		for (final List<String> e : guardInfoList)
+		{
+		  if (e.get(2).equals("FALSE")) {
+			logger.info("Edge " + e.get(0) + " in automaton \""
+			  + e.get(1) + "\" is FORBIDDEN.");
+		  }
+		  else {
+			logger.info("Guard " + e.get(2) + " with the term size " + e.get(3)
+			+ " is generated for edge " + e.get(0)
+			+ " of automaton \"" + e.get(1) + "\".");
+		  }
+		}
+	  }
   }
 }
