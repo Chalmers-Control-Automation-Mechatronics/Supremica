@@ -35,6 +35,9 @@
 
 package org.supremica.gui.ide.actions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -45,7 +48,7 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
-
+import org.supremica.gui.ide.actions.AnalyzerRunScript;
 
 public class RunScriptAction
     extends net.sourceforge.waters.gui.actions.IDEAction
@@ -71,15 +74,21 @@ public class RunScriptAction
     public void actionPerformed(final ActionEvent event)
     {
         final IDE ide = getIDE();
-//        final DocumentContainerManager manager =
-//            ide.getDocumentContainerManager();
-//        manager.newModuleContainer();
-		System.out.println("Run script...");
-    }
 
+		try
+		{
+			AnalyzerRunScript.chooseAndRunScript(ide);
+		}
+		catch(Exception excp)
+		{
+			logger.info("Something went wrong, sorry!");
+			logger.debug(excp.toString());
+		}
+    }
 
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+	private static final Logger logger = LogManager.getLogger(RunScriptAction.class);
 
 }
