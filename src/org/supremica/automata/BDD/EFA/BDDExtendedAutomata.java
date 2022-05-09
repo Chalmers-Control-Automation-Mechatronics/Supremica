@@ -232,9 +232,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         this.plantUncontrollableEventIndexList = new TIntHashSet();
         this.specUncontrollableEventIndexList = new TIntHashSet();
 
-        if(!options.getOptVaribale().isEmpty())
+        if(!options.getOptVariable().isEmpty())
         {
-            optVarName = options.getOptVaribale();
+            optVarName = options.getOptVariable();
         }
 
         stageVar2BDDTempVarSetMap = new HashMap<VariableComponentProxy, BDDVarSet>();
