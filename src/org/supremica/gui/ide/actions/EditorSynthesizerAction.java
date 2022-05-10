@@ -445,13 +445,14 @@ public class EditorSynthesizerAction extends IDEAction
 	  {
 		  File file = null;
 
-		  if(fileName.isEmpty())
+		  if(fileName == null || fileName.isEmpty())
 		  {
 			final JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setAcceptAllFileFilterUsed(false);
 			final int returnVal = chooser.showOpenDialog(ide.getFrame());
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
 			  final String path = chooser.getSelectedFile().getAbsolutePath();
 			  Config.FILE_SAVE_PATH.set(path);
 			  // String name = module.getName();
@@ -459,11 +460,13 @@ public class EditorSynthesizerAction extends IDEAction
 				file = new File(path + "/event_edge_guard_list.xls");
 			  else
 			  	file = new File(path + "/" + modName + ".xls");
-		  }
-		  else
-		  {
+		  	}
+	  	}
+		else
+		{
+			logger.debug("Saving to " + fileName);
 			file = new File(fileName);
-		  }
+		}
 
 		  try
 		  {
@@ -486,7 +489,6 @@ public class EditorSynthesizerAction extends IDEAction
 			logger.error("Could not save the event-guard pairs in the file: "
 			  + e.getMessage());
 		  }
-		}
 	  }
 	  // print guards in the console...
 	  if (printGuards)

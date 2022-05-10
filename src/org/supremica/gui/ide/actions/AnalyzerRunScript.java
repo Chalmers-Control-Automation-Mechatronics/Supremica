@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.Config;
 
 import javax.tools.*;
 import java.io.*;
@@ -46,7 +47,7 @@ class JavaExecutor
 
   static Path saveSource(String source) throws IOException
   {
-      String tmpProperty = "R:/"; // System.getProperty("java.io.tmpdir");
+      String tmpProperty = Config.FILE_TEMP_PATH.getValue().getPath(); // "R:/"; // System.getProperty("java.io.tmpdir");
       Path sourcePath = Paths.get(tmpProperty, JavaExecutor.fileName + ".java");
       // System.out.println("saveSource: " + sourcePath);
       Files.write(sourcePath, source.getBytes(StandardCharsets.UTF_8));
@@ -93,6 +94,8 @@ class JavaExecutor
 // This class allows to run both java and Lua files as script
 public class AnalyzerRunScript
 {
+    private static java.io.File initDir = Config.FILE_SCRIPT_PATH.getValue(); // static, to save in-between calls
+    
     // https://www.baeldung.com/java-file-extension
     static java.util.Optional<String> getExtension(String filename)
     {
@@ -103,14 +106,20 @@ public class AnalyzerRunScript
 
     public static void chooseAndRunScript(final IDE ide) throws Exception
     {
+        if(AnalyzerRunScript.initDir == null)
+        {
+          AnalyzerRunScript.initDir = javax.swing.filechooser.FileSystemView.getFileSystemView().getHomeDirectory();
+        }
+        
         javax.swing.JFileChooser jfc =
-            new javax.swing.JFileChooser(javax.swing.filechooser.FileSystemView.getFileSystemView().getHomeDirectory());
-
+            new javax.swing.JFileChooser(AnalyzerRunScript.initDir);
+            
         int returnValue = jfc.showOpenDialog(null);
 
         if (returnValue != javax.swing.JFileChooser.APPROVE_OPTION)
             return;
-
+        
+        AnalyzerRunScript.initDir = jfc.getCurrentDirectory();
         final java.io.File selectedFile = jfc.getSelectedFile();
         final String script = selectedFile.getPath();
 
@@ -119,25 +128,35 @@ public class AnalyzerRunScript
         final String ext = getExtension(script).get();
         if (ext.equals("java"))
         {
-            logger.info("Java script: " + script);
-            JavaExecutor.exeJava(script, ide);
+            runJavaScript(script, ide);
             return;
         }
-/* Wait with Lua for now as it requires bundling with LuaJ
-        if(!ext.equals("lua")) return;
 
-        // create an environment to run in
-        org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
-        // Use the convenience function on Globals to load a chunk.
-        org.luaj.vm2.LuaValue chunk = globals.loadfile(script);
-        // Use any of the "call()" or "invoke()" functions directly on the chunk.
-        chunk.call(org.luaj.vm2.LuaValue.valueOf(script));
-*/
+        if(!ext.equals("lua")) return;
+        
+        runLuaScript(script, ide);
+
     }
 
+    public static void runJavaScript(final String script, final IDE ide) throws Exception
+    {
+      logger.info("Java script: " + script);
+      JavaExecutor.exeJava(script, ide);
+    }
+    
+    public static void runLuaScript(final String script, final IDE ide) throws Exception
+    {
+      logger.info("Lua script: " + script);
+      // create an environment to run in
+      org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
+      // Use the convenience function on Globals to load a chunk.
+      org.luaj.vm2.LuaValue chunk = globals.loadfile(script);
+      // Use any of the "call()" or "invoke()" functions directly on the chunk.
+      chunk.call(org.luaj.vm2.LuaValue.valueOf(script));
+    }
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
-	private static final Logger logger = LogManager.getLogger(AnalyzerRunScript.class);
+    private static final Logger logger = LogManager.getLogger(AnalyzerRunScript.class);
 
 }
