@@ -148,11 +148,13 @@ public class AnalyzerRunScript
     {
       logger.info("Lua script: " + script);
       // create an environment to run in
-      org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
+      final org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
       // Use the convenience function on Globals to load a chunk.
-      org.luaj.vm2.LuaValue chunk = globals.loadfile(script);
+      final org.luaj.vm2.LuaValue chunk = globals.loadfile(script);
       // Use any of the "call()" or "invoke()" functions directly on the chunk.
-      chunk.call(org.luaj.vm2.LuaValue.valueOf(script));
+      final org.luaj.vm2.LuaValue luaIDE = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(ide);
+      final org.luaj.vm2.LuaValue luaScript = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(script);
+      chunk.call(luaScript, luaIDE);
     }
     //#########################################################################
     //# Class Constants
