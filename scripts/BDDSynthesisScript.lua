@@ -6,12 +6,19 @@ local script, ide = ... -- grab the arguments passed from Java via LuaJ
 
 local actions = ide:getActions()
 local editorSynthesizerAction  = actions.editorSynthesizerAction
-
-local EventKind = luaj.bindClass("net.sourceforge.waters.model.base.EventKind")
-
 local module = ide:getActiveDocumentContainer():getEditorPanel():getModuleSubject()
 
-local options = luaj.newInstance("org.supremica.automata.algorithms.EditorSynthesizerOptions");
+-- bindClass is like Java's import
+local EventKind = luaj.bindClass("net.sourceforge.waters.model.base.EventKind")
+local SynthesisType = luaj.bindClass("org.supremica.automata.algorithms.SynthesisType")
+local SynthesisAlgorithm = luaj.bindClass("org.supremica.automata.algorithms.SynthesisAlgorithm")
+
+-- Set the options
+local options = luaj.newInstance("org.supremica.automata.algorithms.EditorSynthesizerOptions")
+options:setSaveInFile(true)
+options:setPrintGuard(true)
+options:setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE)
+options:setSynthesisAlgorithm(SynthesisAlgorithm.PARTITIONBDD)
 
 -- collect the controllable events
 local controllableEvents = luaj.newInstance("java.util.Vector")
@@ -27,9 +34,12 @@ local exAutomata = luaj.newInstance("org.supremica.automata.ExtendedAutomata", m
 local bddSynthesizer = luaj.newInstance("org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer", exAutomata, options)
 bddSynthesizer:synthesize(options)
 bddSynthesizer:generateGuard(controllableEvents, options)
+local saveFile = luaj.newInstance("java.io.File", "R:/BDDsynthOutput.txt")
 editorSynthesizerAction:saveOrPrintGuards(bddSynthesizer, controllableEvents,
                                     options:getSaveInFile(), options:getPrintGuard(),
-                                    module:getName(), "R:/BDDsynthOutput.txt")
+--                                    module:getName(), "E:/BDDsynthOutput.txt")
+                                    saveFile)
+                                  
 if options:getAddGuards() then
   bddSynthesizer:addGuardsToAutomata()
 end
