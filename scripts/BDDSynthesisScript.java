@@ -16,6 +16,8 @@ import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.model.base.EventKind;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 public class BDDSynthesisScript
 {
@@ -35,6 +37,10 @@ public class BDDSynthesisScript
 
     	// get the stored or default options
     	final EditorSynthesizerOptions options = new EditorSynthesizerOptions();
+		options.setSaveInFile(true);
+		options.setPrintGuard(true);
+		options.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
+		options.setSynthesisAlgorithm(SynthesisAlgorithm.PARTITIONBDD);
 
         // collect controllable event names from the module
         final Vector<String> controllableEventNames = new Vector<String>();
@@ -56,9 +62,10 @@ public class BDDSynthesisScript
             bddSynthesizer = new BDDExtendedSynthesizer(exAutomata, options);
             bddSynthesizer.synthesize(options);
             bddSynthesizer.generateGuard(controllableEventNames, options);
+            final java.io.File saveFile = new java.io.File("R:/BDDsynthOutput.txt");
             editorSynthesizerAction.saveOrPrintGuards(bddSynthesizer, controllableEventNames,
                                     options.getSaveInFile(), options.getPrintGuard(),
-                                    module.getName(), "R:/BDDsynthOutput.txt");
+                                    saveFile);
 
             if (options.getAddGuards())
                 bddSynthesizer.addGuardsToAutomata();
