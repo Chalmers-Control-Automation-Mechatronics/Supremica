@@ -95,7 +95,21 @@ class JavaExecutor
 public class AnalyzerRunScript
 {
     private static java.io.File initDir = Config.FILE_SCRIPT_PATH.getValue(); // static, to save in-between calls
-    
+
+	//** This is an ugly hack, but right now I cannot think of
+	//** another way to get access to the ide from outside
+	//** setIDE here is called from RunScriptAction when it is initialized
+    private static IDE ide;
+    static void setIDE(final IDE ide)
+    {
+		AnalyzerRunScript.ide = ide;
+	}
+	public static IDE getIDE()
+	{
+		return AnalyzerRunScript.ide;
+	}
+	//** end ugly hack
+
     // https://www.baeldung.com/java-file-extension
     static java.util.Optional<String> getExtension(String filename)
     {
@@ -110,15 +124,15 @@ public class AnalyzerRunScript
         {
           AnalyzerRunScript.initDir = javax.swing.filechooser.FileSystemView.getFileSystemView().getHomeDirectory();
         }
-        
+
         javax.swing.JFileChooser jfc =
             new javax.swing.JFileChooser(AnalyzerRunScript.initDir);
-            
+
         int returnValue = jfc.showOpenDialog(null);
 
         if (returnValue != javax.swing.JFileChooser.APPROVE_OPTION)
             return;
-        
+
         AnalyzerRunScript.initDir = jfc.getCurrentDirectory();
         final java.io.File selectedFile = jfc.getSelectedFile();
         final String script = selectedFile.getPath();
@@ -133,7 +147,7 @@ public class AnalyzerRunScript
         }
 
         if(!ext.equals("lua")) return;
-        
+
         runLuaScript(script, ide);
 
     }
@@ -143,7 +157,7 @@ public class AnalyzerRunScript
       logger.info("Java script: " + script);
       JavaExecutor.exeJava(script, ide);
     }
-    
+
     public static void runLuaScript(final String script, final IDE ide) throws Exception
     {
       logger.info("Lua script: " + script);

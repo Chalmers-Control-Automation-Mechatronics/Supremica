@@ -37,7 +37,6 @@ bddSynthesizer:generateGuard(controllableEvents, options)
 local saveFile = luaj.newInstance("java.io.File", "R:/BDDsynthOutput.txt")
 editorSynthesizerAction:saveOrPrintGuards(bddSynthesizer, controllableEvents,
                                     options:getSaveInFile(), options:getPrintGuard(),
---                                    module:getName(), "E:/BDDsynthOutput.txt")
                                     saveFile)
                                   
 if options:getAddGuards() then
