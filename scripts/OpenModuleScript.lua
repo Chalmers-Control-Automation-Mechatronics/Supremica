@@ -10,11 +10,11 @@ local function openModule(file, ide)
   manager:openContainer(file)
 end
 
--- local script, ide = ... -- grab the arguments passed from Java via LuaJ
+local script, ide = ... -- grab the arguments passed from Java via LuaJ
 
--- Or get the IDE reference this way (though the above is preferred)
-local AnalyzerRunScript = luaj.newInstance("org.supremica.gui.ide.actions.AnalyzerRunScript")
-local ide = AnalyzerRunScript:getIDE()
+-- Or get the IDE reference this way (the above is preferred, this will be depreceated)
+--local AnalyzerRunScript = luaj.newInstance("org.supremica.gui.ide.actions.AnalyzerRunScript")
+--local ide = AnalyzerRunScript:getIDE()
 
 local file = luaj.newInstance("java.io.File", fname)
 openModule(file, ide)
