@@ -421,6 +421,7 @@ public class IDE
     // Start the GUI
     final boolean hasFiles = (files != null && files.size() > 0);
     final IDE ide = new IDE();
+    IDE.theIDE = ide;
     // Open initial module(s)
     if (hasFiles) {
       ide.openFiles(files);
@@ -438,7 +439,12 @@ public class IDE
       }
     });
   }
+	private static IDE theIDE;
 
+	public static IDE getTheIDE()
+	{
+		return IDE.theIDE;
+	}
 
   //#########################################################################
   //# Auxiliary Methods
