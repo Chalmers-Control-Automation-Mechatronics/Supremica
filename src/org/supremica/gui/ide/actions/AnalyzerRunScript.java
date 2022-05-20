@@ -96,20 +96,6 @@ public class AnalyzerRunScript
 {
     private static java.io.File initDir = Config.FILE_SCRIPT_PATH.getValue(); // static, to save in-between calls
 
-	//** This is an ugly hack, but right now I cannot think of
-	//** another way to get access to the ide from outside
-	//** setIDE here is called from RunScriptAction when it is initialized
-    private static IDE ide;
-    static void setIDE(final IDE ide)
-    {
-		AnalyzerRunScript.ide = ide;
-	}
-	public static IDE getIDE()
-	{
-		return AnalyzerRunScript.ide;
-	}
-	//** end ugly hack
-
     // https://www.baeldung.com/java-file-extension
     static java.util.Optional<String> getExtension(String filename)
     {

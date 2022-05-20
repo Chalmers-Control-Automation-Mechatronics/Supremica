@@ -67,7 +67,7 @@ public class RunScriptAction
         putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_NEW);
 
 		logger.debug("Setting AnalyzerRunScript.setIDE(ide)");
-        AnalyzerRunScript.setIDE(ide);
+
     }
 
 
