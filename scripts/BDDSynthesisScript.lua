@@ -19,6 +19,7 @@ options:setSaveInFile(true)
 options:setPrintGuard(true)
 options:setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE)
 options:setSynthesisAlgorithm(SynthesisAlgorithm.PARTITIONBDD)
+options:setExpressionType(options.ExpressionType.ADAPTIVE)
 
 -- collect the controllable events
 local controllableEvents = luaj.newInstance("java.util.Vector")

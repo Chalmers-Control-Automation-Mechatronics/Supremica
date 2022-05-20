@@ -114,6 +114,10 @@ public class AnalyzerRunScript
         javax.swing.JFileChooser jfc =
             new javax.swing.JFileChooser(AnalyzerRunScript.initDir);
 
+        javax.swing.filechooser.FileNameExtensionFilter filter =
+        	new javax.swing.filechooser.FileNameExtensionFilter("Lua scripts (*.lua)", "lua");
+    	jfc.setFileFilter(filter);
+
         int returnValue = jfc.showOpenDialog(null);
 
         if (returnValue != javax.swing.JFileChooser.APPROVE_OPTION)
