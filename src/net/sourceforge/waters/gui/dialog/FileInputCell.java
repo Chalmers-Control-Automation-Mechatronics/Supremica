@@ -116,7 +116,7 @@ public class FileInputCell
     @Override
     public File parse(final String text) throws ParseException
     {
-      if (text.equals("")) {
+	  if (text.equals("")) {
         return null;
       }
       File file = new File(text);
@@ -125,13 +125,22 @@ public class FileInputCell
       }
       if (mWriting) {
         final File parent = file.getParentFile();
-        if (!parent.isDirectory()) {
+
+//		System.err.println("Parsing: \"" + text + "\"");
+//		System.err.println("File: \"" + file.toString() + "\"");
+//      if(parent != null) System.err.println("Parent: \"" + parent.toString() + "\"");
+//      else System.err.println("Parent is null!");
+
+        if (parent != null && !parent.isDirectory()) { // guard against root folder
           final StringBuilder builder = new StringBuilder();
           builder.append("The folder '");
           builder.append(parent.toString());
           builder.append("' does not exist.");
           throw new ParseException(builder.toString(), 0);
-        } else if (file.exists() && !file.canWrite()) {
+        }
+//        else if (file.exists() && java.nio.file.Files.isWritable(java.nio.file.Paths.get(file.toString())))
+        else if (file.exists() && !file.canWrite())
+        {
           final StringBuilder builder = new StringBuilder();
           builder.append("Cannot write to file '");
           builder.append(file.toString());
