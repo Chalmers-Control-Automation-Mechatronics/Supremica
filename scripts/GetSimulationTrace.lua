@@ -1,8 +1,11 @@
--- GetSimulationTrace.lua, retrieves and prints the currently active simulation trace
+-- GetSimulationTrace.lua, retrieves and saves the currently active simulation trace
 -- Works only if run when the Simulator is open and active
 local luaj = luajava
-
 local script, ide = ...
+
+-- Get convenience function to generate file name
+local Config = luaj.bindClass("org.supremica.properties.Config")
+local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
 
 local container = ide:getActiveDocumentContainer()
 local panel = container:getActivePanel()
@@ -17,15 +20,7 @@ for i = 1, events:size() do
 	table.insert(tab, event:getName())
 end
 
--- Get the configured TEMP directory, and write the file "trace.csv" to there
-local Config = luaj.bindClass("org.supremica.properties.Config")
-local tempdir = Config.FILE_TEMP_PATH:getValue():getPath()
-local lastch = tempdir:sub(-1) -- get last character
-local sep = "/"
-if lastch == '/' or lastch == '\\' then
-	sep = ""
-end
-local fname = tempdir..sep.."trace.csv"
+local fname = getFileName("trace.csv")
 local file = io.open(fname, "w")
 file:write(table.concat(tab, ", "))
 file:close()
