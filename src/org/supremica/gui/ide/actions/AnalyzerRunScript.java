@@ -154,15 +154,24 @@ public class AnalyzerRunScript
       // create an environment to run in
       final org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
       // Use the convenience function on Globals to load a chunk.
+      final org.luaj.vm2.LuaValue print = globals.load(printCode);
       final org.luaj.vm2.LuaValue chunk = globals.loadfile(script);
       // Use any of the "call()" or "invoke()" functions directly on the chunk.
       final org.luaj.vm2.LuaValue luaIDE = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(ide);
       final org.luaj.vm2.LuaValue luaScript = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(script);
-      chunk.call(luaScript, luaIDE);
+      final org.luaj.vm2.LuaValue luaLogger = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(logger);
+      print.call(luaLogger);
+      chunk.call(luaScript, luaIDE, luaLogger);
     }
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(AnalyzerRunScript.class);
-
+	private static final String printCode = // Lua code to redirect print to logger.info
+		"local log = ... " +
+		"print = function(...) " +
+			"local args = {...} " +
+			"local str = table.concat(args, \" \") " +
+			"log:info(str, 0) " +
+		"end\n";
 }
