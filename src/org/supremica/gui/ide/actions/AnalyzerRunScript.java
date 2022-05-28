@@ -159,7 +159,9 @@ public class AnalyzerRunScript
       // Use any of the "call()" or "invoke()" functions directly on the chunk.
       final org.luaj.vm2.LuaValue luaIDE = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(ide);
       final org.luaj.vm2.LuaValue luaScript = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(script);
-      final org.luaj.vm2.LuaValue luaLogger = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(logger);
+      // Get a logger named for this script specifically
+      final Logger log = LogManager.getLogger(script);
+      final org.luaj.vm2.LuaValue luaLogger = org.luaj.vm2.lib.jse.CoerceJavaToLua.coerce(log);
       print.call(luaLogger);
       chunk.call(luaScript, luaIDE, luaLogger);
     }
@@ -171,7 +173,7 @@ public class AnalyzerRunScript
 		"local log = ... " +
 		"print = function(...) " +
 			"local args = {...} " +
-			"local str = table.concat(args, \" \") " +
+			"local str = table.concat(args) " +
 			"log:info(str, 0) " +
 		"end\n";
 }
