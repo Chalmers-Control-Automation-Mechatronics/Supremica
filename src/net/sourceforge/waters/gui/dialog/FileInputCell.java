@@ -34,16 +34,21 @@
 package net.sourceforge.waters.gui.dialog;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 
 import javax.swing.text.DocumentFilter;
+
+import net.sourceforge.waters.model.options.FileOption;
 
 
 /**
  * <P>A text field to enter a file name.</P>
  *
- * <P>Performs validation checks to see whether file is readable or
- * writable.</P>
+ * <P>Performs validation checks to see whether file or directory is
+ * readable or writable.</P>
  *
  * @author Robi Malik
  */
@@ -55,9 +60,9 @@ public class FileInputCell
   //#########################################################################
   //# Constructors
   public FileInputCell(final File defaultDirectory,
-                       final boolean writing)
+                       final FileOption.Type type)
   {
-    super(new FileInputHandler(defaultDirectory, writing));
+    super(new FileInputHandler(defaultDirectory, type));
   }
 
 
@@ -87,10 +92,10 @@ public class FileInputCell
     //#######################################################################
     //# Constructors
     private FileInputHandler(final File defaultDirectory,
-                             final boolean writing)
+                             final FileOption.Type type)
     {
       mDefaultDirectory = defaultDirectory;
-      mWriting = writing;
+      mType = type;
     }
 
     //#######################################################################
@@ -119,50 +124,82 @@ public class FileInputCell
 	  if (text.equals("")) {
         return null;
       }
-      File file = new File(text);
-      if (!file.isAbsolute()) {
-        file = new File(mDefaultDirectory, text);
+      Path path = Paths.get(text);
+      if (!path.isAbsolute()) {
+        final Path defaultPath = mDefaultDirectory.toPath();
+        path = defaultPath.resolve(text);
       }
-      if (mWriting) {
-        final File parent = file.getParentFile();
-
-//		System.err.println("Parsing: \"" + text + "\"");
-//		System.err.println("File: \"" + file.toString() + "\"");
-//      if(parent != null) System.err.println("Parent: \"" + parent.toString() + "\"");
-//      else System.err.println("Parent is null!");
-
-        if (parent != null && !parent.isDirectory()) { // guard against root folder
-          final StringBuilder builder = new StringBuilder();
-          builder.append("The folder '");
-          builder.append(parent.toString());
-          builder.append("' does not exist.");
-          throw new ParseException(builder.toString(), 0);
-        }
-//        else if (file.exists() && java.nio.file.Files.isWritable(java.nio.file.Paths.get(file.toString())))
-        else if (file.exists() && !file.canWrite())
-        {
-          final StringBuilder builder = new StringBuilder();
-          builder.append("Cannot write to file '");
-          builder.append(file.toString());
-          builder.append("'.");
-          throw new ParseException(builder.toString(), 0);
-        }
-      } else {
-        if (!file.exists()) {
+      switch (mType) {
+      case INPUT_FILE:
+        if (!Files.exists(path)) {
           final StringBuilder builder = new StringBuilder();
           builder.append("The file '");
-          builder.append(file.toString());
+          builder.append(path.toString());
           builder.append("' does not exist.");
           throw new ParseException(builder.toString(), 0);
-        } else if (!file.canRead()) {
+        } else if (!Files.isDirectory(path)) {
+          final StringBuilder builder = new StringBuilder();
+          builder.append("The path '");
+          builder.append(path.toString());
+          builder.append("' is a directory and not a file.");
+          throw new ParseException(builder.toString(), 0);
+        } else if (!Files.isReadable(path)) {
           final StringBuilder builder = new StringBuilder();
           builder.append("Cannot read from file '");
-          builder.append(file.toString());
+          builder.append(path.toString());
           builder.append("'.");
           throw new ParseException(builder.toString(), 0);
         }
+        break;
+      case OUTPUT_FILE:
+        if (Files.isDirectory(path)) {
+          final StringBuilder builder = new StringBuilder();
+          builder.append("The path '");
+          builder.append(path.toString());
+          builder.append("' is a directory and not a file.");
+          throw new ParseException(builder.toString(), 0);
+        } else if (!Files.exists(path)) {
+          final Path parent = path.getParent();
+          if (parent == null) { // Non-existing drive, e.g., X: on Windows
+            final StringBuilder builder = new StringBuilder();
+            builder.append("The path '");
+            builder.append(path.toString());
+            builder.append("' is not a file.");
+            throw new ParseException(builder.toString(), 0);
+          } else if (!Files.isDirectory(parent)) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("The directory '");
+            builder.append(parent.toString());
+            builder.append("' does not exist.");
+            throw new ParseException(builder.toString(), 0);
+          }
+        } else if (!Files.isWritable(path)) {
+          final StringBuilder builder = new StringBuilder();
+          builder.append("Cannot write to file '");
+          builder.append(path.toString());
+          builder.append("'.");
+          throw new ParseException(builder.toString(), 0);
+        }
+        break;
+      case DIRECTORY:
+        if (!Files.exists(path)) {
+          final StringBuilder builder = new StringBuilder();
+          builder.append("The directory '");
+          builder.append(path.toString());
+          builder.append("' does not exist.");
+          throw new ParseException(builder.toString(), 0);
+        } else if (!Files.isDirectory(path)) {
+          final StringBuilder builder = new StringBuilder();
+          builder.append("The path '");
+          builder.append(path.toString());
+          builder.append("' is not a directory.");
+          throw new ParseException(builder.toString(), 0);
+        }
+        break;
+      default:
+        break;
       }
-      return file;
+      return path.toFile();
     }
 
     @Override
@@ -174,7 +211,7 @@ public class FileInputCell
     //#########################################################################
     //# Data Members
     private final File mDefaultDirectory;
-    private final boolean mWriting;
+    private final FileOption.Type mType;
   }
 
 
