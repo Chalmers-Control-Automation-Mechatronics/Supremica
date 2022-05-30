@@ -94,11 +94,11 @@ public class Config
 
   // GENERAL_FILE
   public static final FileOption FILE_OPEN_PATH = new FileOption
-    ("fileOpenPath", "Default File Open Path",
-     "Default directory when opening modules and other input files",
+    ("fileOpenPath", "Default Module Path",
+     "Default directory for modules and other documents",
      null, getHomeDirectory(), FileOption.Type.DIRECTORY);
   public static final FileOption FILE_SAVE_PATH = new FileOption
-    ("fileSavePath", "Default File Save Path",
+    ("fileSavePath", "Default Output File Path",
      "Default directory when creating log and other output files",
      null, getHomeDirectory(), FileOption.Type.DIRECTORY);
 
