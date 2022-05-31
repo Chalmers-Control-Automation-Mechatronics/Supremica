@@ -12,7 +12,6 @@ For complete functionality of the analyser, you also need to
 install GraphViz, available from
   http://www.graphviz.org/
 Just make sure the dot executable is in your search path.
-This version of Waters/Supremica supports dot versions up to 2.40.
 
 To run the IDE, please execute the script waters.vbs in this directory.
 These scripts cannot be copied to another place such as your desktop,
