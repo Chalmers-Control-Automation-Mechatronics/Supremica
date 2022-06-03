@@ -23,6 +23,19 @@ local function createEvent(name, kind)
   return event
 end
 
+local function createLocation(label, initial, marked)
+
+  if not marked then -- Create nonmarked location
+    return factory:createSimpleNodeProxy(label, nil, nil, initial, nil, nil, nil)
+  end
+  -- Create a marked location
+  local nodeLabelAccepting = factory:createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME)
+  local nodeLabelList = Collections:singletonList(nodeLabelAccepting)
+  local marking = factory:createPlainEventListProxy(nodeLabelList)
+  return factory:createSimpleNodeProxy(label, marking, nil, initial, nil, nil, nil)
+  
+end
+
 local function createIntegerVariable(name, min, max, init)
   
   local varName = factory:createSimpleIdentifierProxy(name)
@@ -58,18 +71,23 @@ local function createEnumeration(name, values, init)
   return var
 end
 
-local function createBinaryExpression(var, op, val)
-  local expVar = factory:createSimpleIdentifierProxy(var)
+local function createBinaryExpression(op1, op, op2)
   
-  if type(val) == "number" then
-    local expVal = factory:createIntConstantProxy(val)
-    return factory:createBinaryExpressionProxy(op, expVar, expVal)
-  elseif type(val) == "string" then
-    local expVal = factory:createSimpleIdentifierProxy(val)
-    return factory:createBinaryExpressionProxy(op, expVar, expVal)
+  local function getOperandType(operand)
+    if type(operand) == "number" then
+      return factory:createIntConstantProxy(tonumber(operand))
+    elseif type(operand) == "string" then
+      return factory:createSimpleIdentifierProxy(operand)
+    end
+    -- Type is neither number nor string, just return as is
+    return operand
   end
+
+  local operand1 = getOperandType(op1)
+  local operand2 = getOperandType(op2)
   
-  return nil
+  return factory:createBinaryExpressionProxy(op, operand1, operand2)
+  
 end
 
 local function createLabelBlock(events)
@@ -81,78 +99,75 @@ local function createLabelBlock(events)
   return factory:createLabelBlockProxy(labels, nil)
 end
 
+local function makeList(...)
+  local args = {...}
+  if #args == 1 then
+    return Collections:singletonList(args[1])
+  end
+  local list = luaj.newInstance("java.util.ArrayList", #args)
+  for i = 1, #args do
+    list:add(args[i])
+  end
+  return list
+end
+
 local function createEFSMmodule(name)
 
   -- Create three events
-  local events = luaj.newInstance("java.util.ArrayList", 3)
-  -- Controllable event c
   local eventC = createEvent("c", EventKind.CONTROLLABLE)
-  events:add(eventC)
-  -- uncontrollable event u
   local eventU = createEvent("u", EventKind.UNCONTROLLABLE)
-  events:add(eventU)
   -- Proposition :accepting (used for marking)
   local propAcc = createEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION)
-  events:add(propAcc)
+  local events = makeList(eventC, eventU, propAcc)
   
-  -- Create two variables and an EFSM
-  local components = luaj.newInstance("java.util.ArrayList", 3)
-  --Integer variable x with range 0..10, init 0
-  local varX = createIntegerVariable("x", 0, 10, 0)
-  components:add(varX)
-  -- Enumeration variable y with range a, b, c, init a
-  local varY = createEnumeration("y", {"a", "b", "c" }, "a")
-  components:add(varY)
+  -- Create two variables and an EFSM, these are the components
+  local varX = createIntegerVariable("x", 0, 10, 0) -- Integer variable x, range 0..10, init 0
+  local varY = createEnumeration("y", {"a", "b", "c" }, "a") -- Enumeration variable y, range a, b, c, init a
+  local components = makeList(varX, varY) -- the EFSM is created and added below
+  
   -- Create two locations for the EFSM
-  local states = luaj.newInstance("java.util.ArrayList", 2)
-  -- Location q0, initial and unmarked
-  local state0 = factory:createSimpleNodeProxy("q0", nil, nil, true, nil, nil, nil)
-  states:add(state0)
-  -- Location q1, not initial but marked
-  local nodeLabelAccepting = factory:createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME)
-  local nodeLabelList = Collections:singletonList(nodeLabelAccepting)
-  local nodeLabelExpression = factory:createPlainEventListProxy(nodeLabelList)
-  local state1 = factory:createSimpleNodeProxy("q1", nodeLabelExpression, nil, false, nil, nil, nil)
-  states:add(state1)
+  local loc0 = createLocation("q0", true, false) -- Location q0; initial, unmarked
+  local loc1 = createLocation("q1", false, true) -- Location q1; not initial, marked
+  local locations = makeList(loc0, loc1)
+  
   -- Create two edges for the EFSM
-  local edges = luaj.newInstance("java.util.ArrayList", 2)
   -- edge 1 ...
   -- ... with guard x > 2 && y != a
   local exp1 = createBinaryExpression("x", optable:getGreaterThanOperator(), 2)
   local exp2 = createBinaryExpression("y", optable:getNotEqualsOperator(), "a")
-  local guard1 = factory:createBinaryExpressionProxy(optable:getAndOperator(), exp1, exp2);
-	local guards1 = Collections:singletonList(guard1)
+  local guard1 = createBinaryExpression(exp1, optable:getAndOperator(), exp2)
+	local guards1 = makeList(guard1) 
   -- ... and actions x += 1 and y = c
   local act1 = createBinaryExpression("x", optable:getIncrementOperator(), 1)
   local act2 = createBinaryExpression("y", optable:getAssignmentOperator(), "c")
-  local actions1 = luaj.newInstance("java.util.ArrayList", 2)
-  actions1:add(act1)
-  actions1:add(act2)
+  local actions1 = makeList(act1, act2)
+  
   local gaBlock = factory:createGuardActionBlockProxy(guards1, actions1, nil)
   -- ... with two events c and u
   local labels1 = createLabelBlock({"c", "u"})
-  -- ... from s0 to s1
-  local edge1 = factory:createEdgeProxy(state0, state1, labels1, gaBlock, nil, nil, nil)
-  edges:add(edge1)
+  -- ... from q0 to q1
+  local edge1 = factory:createEdgeProxy(loc0, loc1, labels1, gaBlock, nil, nil, nil)
+  
   -- edge 2... (alternative, use conditional instead of guard/action block)
   -- ... with guard x > 2
   local cond1 = createBinaryExpression("x", optable:getGreaterThanOperator(), 2)
-  -- ... with action y = c
+  -- ... and action y = c
   local cond2 = createBinaryExpression("y", optable:getAssignmentOperator(), "c")
-  local guard2 = factory:createBinaryExpressionProxy(optable:getAndOperator(), cond1, cond2)
+  local guard2 = createBinaryExpression(cond1, optable:getAndOperator(), cond2)
   -- ... with event c
   local edge2LabelC = factory:createSimpleIdentifierProxy("c")
-  local condLabels2 = Collections:singletonList(edge2LabelC)
+  local condLabels2 = makeList(edge2LabelC) 
   local cond = factory:createConditionalProxy(condLabels2, guard2)
-  local labels2 = Collections:singletonList(cond)
+  local labels2 = makeList(cond) 
   local labelBlock2 = factory:createLabelBlockProxy(labels2, nil)
-  -- ... from s1 to s0
-  local edge2 = factory:createEdgeProxy(state1, state0, labelBlock2, nil, nil, nil, nil)
-  edges:add(edge2)
+  -- ... from q1 to q0
+  local edge2 = factory:createEdgeProxy(loc1, loc0, labelBlock2, nil, nil, nil, nil)
+  
+  local edges = makeList(edge1, edge2)
   
   -- Create the EFSM 
   local deterministic, blockedEvents = true, nil
-  local graph = factory:createGraphProxy(deterministic, blockedEvents, states, edges)
+  local graph = factory:createGraphProxy(deterministic, blockedEvents, locations, edges)
   local efsmName = factory:createSimpleIdentifierProxy(name)
   local efsm = factory:createSimpleComponentProxy(efsmName, ComponentKind.PLANT, graph);
   components:add(efsm)
@@ -180,5 +195,5 @@ local manager = ide:getDocumentContainerManager()
 local container = luaj.newInstance("org.supremica.gui.ide.ModuleContainer", ide, mod)
 manager:addContainer(container)
 
--- Save the wmod to teh default file save path
+-- Save the wmod to the default file save path
 saveModuleAsWMOD(mod)
