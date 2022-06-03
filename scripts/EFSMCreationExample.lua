@@ -182,8 +182,8 @@ end
 local function saveModuleAsWMOD(mod)
   
   local Config = luaj.bindClass("org.supremica.properties.Config")
-  
   local MarshallingTools = luaj.bindClass(waters.."model.marshaller.MarshallingTools")
+  
   local savePath = Config.FILE_SAVE_PATH:getValue():toString()
   local wmod = savePath.."/"..mod:getName()..".wmod"
   MarshallingTools:saveModule(mod, wmod)

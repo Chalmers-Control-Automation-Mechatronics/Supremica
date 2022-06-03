@@ -211,7 +211,7 @@ public class AboutPanel
     builder.append("of Waikato, New Zealand.</P>");
     builder.append("<P>Authors: Knut &Aring;kesson, Robi Malik, Martin Fabian, ");
     builder.append("Hugo Flordal, Sahar Mohajerani, Carly Hona, Tom Levy, ");
-    builder.append("Markus Sk&ouml;ldstam, Arash Vahidi, and many others.</P>");
+    builder.append("Zhennan Fei, Markus Sk&ouml;ldstam, and many others.</P>");
     builder.append("<P>Waters is released under the ");
     builder.append("<A HREF=\"gpl2.html\">GNU General Public License, version&nbsp;2</A>.<BR>");
     builder.append("Supremica is released using the ");
