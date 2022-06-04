@@ -36,9 +36,9 @@ package net.sourceforge.waters.gui.logging;
 import java.io.File;
 import java.io.Serializable;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.options.OptionChangeEvent;
 import net.sourceforge.waters.model.options.OptionChangeListener;
-import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
@@ -166,7 +166,9 @@ public class IDEAppender
 
   private void registerPropertyChangeListener()
   {
+    // Register listeners: optionChanged() will be called when options change
     Config.LOG_FILE.addOptionChangeListener(this);
+    Config.LOG_FILE_VERBOSITY.addOptionChangeListener(this);
   }
 
 
@@ -191,7 +193,7 @@ public class IDEAppender
         mStdErrAppender.append(event);
       }
       if (mFileAppender != null &&
-        Config.LOG_FILE_VERBOSITY.getValue().isLessSpecificThan(level)) {
+          Config.LOG_FILE_VERBOSITY.getValue().isLessSpecificThan(level)) {
         mFileAppender.append(event);
       }
     }
