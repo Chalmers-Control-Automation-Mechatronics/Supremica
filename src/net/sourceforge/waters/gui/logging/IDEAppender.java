@@ -149,7 +149,7 @@ public class IDEAppender
       mFileAppender = null;
     }
     final File file = Config.LOG_FILE.getValue();
-    if (file != null) {
+    if (file != null && Config.LOG_FILE_VERBOSITY.getValue() != IDELogLevel.NONE) {
       final FileAppender.Builder<?> builder = FileAppender.newBuilder();
       builder.setName("logFile");
       builder.withFileName(file.toString());
