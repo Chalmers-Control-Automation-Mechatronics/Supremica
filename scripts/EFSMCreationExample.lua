@@ -121,7 +121,7 @@ local function createEFSMmodule(name)
   local events = makeList(eventC, eventU, propAcc)
   
   -- Create two variables and an EFSM, these are the components
-  local varX = createIntegerVariable("x", 0, 10, 0) -- Integer variable x, range 0..10, init 0
+  local varX = createIntegerVariable("x", 0, 10, 10) -- Integer variable x, range 0..10, init 10
   local varY = createEnumeration("y", {"a", "b", "c" }, "a") -- Enumeration variable y, range a, b, c, init a
   local components = makeList(varX, varY) -- the EFSM is created and added below
   
@@ -132,13 +132,13 @@ local function createEFSMmodule(name)
   
   -- Create two edges for the EFSM
   -- edge 1 ...
-  -- ... with guard x > 2 && y != a
+  -- ... with guard x > 2 && y != c
   local exp1 = createBinaryExpression("x", optable:getGreaterThanOperator(), 2)
-  local exp2 = createBinaryExpression("y", optable:getNotEqualsOperator(), "a")
+  local exp2 = createBinaryExpression("y", optable:getNotEqualsOperator(), "c")
   local guard1 = createBinaryExpression(exp1, optable:getAndOperator(), exp2)
 	local guards1 = makeList(guard1) 
-  -- ... and actions x += 1 and y = c
-  local act1 = createBinaryExpression("x", optable:getIncrementOperator(), 1)
+  -- ... and actions x -= 1 and y = c
+  local act1 = createBinaryExpression("x", optable:getDecrementOperator(), 1)
   local act2 = createBinaryExpression("y", optable:getAssignmentOperator(), "c")
   local actions1 = makeList(act1, act2)
   
