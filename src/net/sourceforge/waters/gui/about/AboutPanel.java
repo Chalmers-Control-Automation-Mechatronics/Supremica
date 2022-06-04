@@ -338,22 +338,7 @@ public class AboutPanel
           final Matcher matcher = pattern.matcher(line);
           if (matcher.find()) {
             mVersionInfo = matcher.group(1);
-            final Pattern subPattern =
-              Pattern.compile("2\\.([0-9]+)(\\.[0-9]+)?");
-            final Matcher subMatcher = subPattern.matcher(mVersionInfo);
-            int minorVersion = 99;
-            if (subMatcher.matches()) {
-              final String group = subMatcher.group(1);
-              if (group.length() <= 2) {
-                minorVersion = Integer.parseInt(subMatcher.group(1));
-              }
-            }
-            if (minorVersion > 40) {
-              mVersionInfo +=
-                " - <span style=\"color: red;\">incompatible</span>";
-            } else {
-              mDotAvailable = true;
-            }
+            mDotAvailable = true;
           }
         }
       } catch (final IOException exception) {

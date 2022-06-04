@@ -96,6 +96,7 @@ class FileOptionPanel
   JPanel createEntryComponent()
   {
     final FileOption option = getOption();
+    final FileOption.Type type = option.getType();
     final File file = option.getValue();
 
     final JPanel panel = new JPanel();
@@ -109,12 +110,12 @@ class FileOptionPanel
     constraints.gridy = 0;
 
     final File defaultDirectory;
-    if (option.getType() == FileOption.Type.OUTPUT_FILE) {
+    if (type == FileOption.Type.OUTPUT_FILE) {
       defaultDirectory = Config.FILE_SAVE_PATH.getValue();
     } else {
       defaultDirectory = Config.FILE_OPEN_PATH.getValue();
     }
-    mCell = new FileInputCell(defaultDirectory, true);
+    mCell = new FileInputCell(defaultDirectory, type);
     mCell.setValue(file);
     mCell.setColumns(15);
     final GUIOptionContext context = getContext();
