@@ -13,4 +13,4 @@ log:info("This is just info (same as 'print')", 0)
 log:debug("Debug messages also work", 0) 
 log:trace("This is a trace message", 0)
 
-print(_VERSION)
+print(_VERSION) -- print LuaJ version

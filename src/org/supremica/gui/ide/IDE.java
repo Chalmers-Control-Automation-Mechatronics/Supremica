@@ -445,7 +445,10 @@ public class IDE
 	{
 		return IDE.theIDE;
 	}
-
+	public static Logger getTheLog()
+	{
+		return LogManager.getLogger();
+	}
   //#########################################################################
   //# Auxiliary Methods
   private boolean openFiles(final List<File> filesToOpen)

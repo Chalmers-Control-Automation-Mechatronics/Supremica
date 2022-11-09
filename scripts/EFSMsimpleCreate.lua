@@ -1,5 +1,6 @@
--- EFSMCreationExample.lua, Example showing how to create a Supremica module in Lua
+-- EFSMsimpleCreate.lua, Example showing how to create a Supremica module in Lua
 -- This is meant to be run as a script within Supremica
+-- This is the example given in the Lupremica paper (IFAC WC 2023)
 local luaj = luajava -- just shorthand
 local script, ide, log = ... -- parameters from Supremica
 
@@ -113,68 +114,38 @@ end
 
 local function createEFSMmodule(name)
 
-  -- Create three events
+  -- controllable event "c", stored in an alphabet
   local eventC = createEvent("c", EventKind.CONTROLLABLE)
-  local eventU = createEvent("u", EventKind.UNCONTROLLABLE)
-  -- Proposition :accepting (used for marking)
-  local propAcc = createEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION)
-  local events = makeList(eventC, eventU, propAcc)
-  
-  -- Create two variables and an EFSM, these are the components
-  local varX = createIntegerVariable("x", 0, 10, 10) -- Integer variable x, range 0..10, init 10
-  local varY = createEnumeration("y", {"a", "b", "c" }, "a") -- Enumeration variable y, range a, b, c, init a
-  local components = makeList(varX, varY) -- the EFSM is created and added below
-  
-  -- Create two locations for the EFSM
+  -- marking proposition
+  local mark = createEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION)
+  local alphabet = makeList(eventC, mark)
+  -- integer variable x, range 0..10, init 5
+  local varX = createIntegerVariable("x", 0, 10, 5)   
+  -- locations: q0, initial, unmarked; q1, marked
   local loc0 = createLocation("q0", true, false) -- Location q0; initial, unmarked
   local loc1 = createLocation("q1", false, true) -- Location q1; not initial, marked
   local locations = makeList(loc0, loc1)
-  
-  -- Create two edges for the EFSM
-  -- edge 1 ...
-  -- ... with guard x > 2 && y != c
-  local exp1 = createBinaryExpression("x", optable:getGreaterThanOperator(), 2)
-  local exp2 = createBinaryExpression("y", optable:getNotEqualsOperator(), "c")
-  local guard1 = createBinaryExpression(exp1, optable:getAndOperator(), exp2)
-	local guards1 = makeList(guard1) 
-  -- ... and actions x -= 1 and y = c
-  local act1 = createBinaryExpression("x", optable:getDecrementOperator(), 1)
-  local act2 = createBinaryExpression("y", optable:getAssignmentOperator(), "c")
-  local actions1 = makeList(act1, act2)
-  
-  local gaBlock = factory:createGuardActionBlockProxy(guards1, actions1, nil)
-  -- ... with two events c and u
-  local labels1 = createLabelBlock({"c", "u"})
-  -- ... from q0 to q1
-  local edge1 = factory:createEdgeProxy(loc0, loc1, labels1, gaBlock, nil, nil, nil)
-  
-  -- edge 2... (alternative, use conditional instead of guard/action block)
-  -- ... with guard x > 2
-  local cond1 = createBinaryExpression("x", optable:getGreaterThanOperator(), 2)
-  -- ... and action y = c
-  local cond2 = createBinaryExpression("y", optable:getAssignmentOperator(), "c")
-  local guard2 = createBinaryExpression(cond1, optable:getAndOperator(), cond2)
-  -- ... with event c
-  local edge2LabelC = factory:createSimpleIdentifierProxy("c")
-  local condLabels2 = makeList(edge2LabelC) 
-  local cond = factory:createConditionalProxy(condLabels2, guard2)
-  local labels2 = makeList(cond) 
-  local labelBlock2 = factory:createLabelBlockProxy(labels2, nil)
-  -- ... from q1 to q0
-  local edge2 = factory:createEdgeProxy(loc1, loc0, labelBlock2, nil, nil, nil, nil)
-  
-  local edges = makeList(edge1, edge2)
-  
-  -- Create the EFSM 
-  local deterministic, blockedEvents = true, nil
-  local graph = factory:createGraphProxy(deterministic, blockedEvents, locations, edges)
-  local efsmName = factory:createSimpleIdentifierProxy(name)
+  -- create guard x > 2
+  local guard = createBinaryExpression("x", optable:getGreaterThanOperator(), 2)
+  local guards = makeList(guard) 
+  -- create action x -= 1 
+  local action = createBinaryExpression("x", optable:getDecrementOperator(), 1)
+  local actions = makeList(action)
+  local label = createLabelBlock({"c"})
+  -- create guard/action block
+  local gaBlock = factory:createGuardActionBlockProxy(guards, actions, nil)
+  -- edge from q0 to q1
+  local edge = factory:createEdgeProxy(loc0, loc1, label, gaBlock, nil, nil, nil)
+  local edges = makeList(edge)
+  -- deterministic, no blocked events, locations and edges 
+  local graph = factory:createGraphProxy(true, nil, locations, edges)
+  local efsmName = factory:createSimpleIdentifierProxy("MyEFSM")
   local efsm = factory:createSimpleComponentProxy(efsmName, ComponentKind.PLANT, graph);
-  components:add(efsm)
+  
+  local components = makeList(varX, efsm) -- put the components together
   
   -- Combine events, variables, and EFSM to make module
-  local moduleName = name.."_module"
-  local mod = factory:createModuleProxy(moduleName, "Automatically created demo module.", nil, nil, events, nil, components);
+  local mod = factory:createModuleProxy("MyModule", "Module comment", nil, nil, alphabet, nil, components);
   print("Successfully created module: "..mod:getName())  
   return mod
 end
