@@ -82,10 +82,24 @@ public class RunScriptAction
 		{
 			AnalyzerRunScript.chooseAndRunScript(ide);
 		}
+		catch(java.lang.reflect.InvocationTargetException excp)
+		{
+			logger.error("Something went wrong, sorry");
+			logger.debug("Got an InvocationTargetException, wrapping: " + excp.getCause().getClass().getName());
+			logger.debug("With message: " + excp.getCause().getMessage());
+		}
 		catch(Exception excp)
 		{
 			logger.info("Something went wrong, sorry!");
-			logger.debug(excp.toString());
+			final String mess = excp.getMessage();
+			// logger.debug(excp.toString());
+			if(mess != null)
+				logger.debug(mess);
+			else
+			{
+				logger.debug("Got an exception of class: " + excp.getClass().getName() + " with no useful message");
+			}
+
 		}
     }
 
