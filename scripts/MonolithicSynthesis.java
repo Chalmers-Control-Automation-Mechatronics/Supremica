@@ -74,11 +74,19 @@ public class MonolithicSynthesis
 			final java.util.List<AbstractSubject> supervisorComponents =
 				supervisorModule.getComponentListModifiable();
 			// Add the synthesized compnents to the module
-		    for (final AutomatonProxy aut : supervisor.getAutomata()) {
+/*		    for (final AutomatonProxy aut : supervisor.getAutomata()) {
 				final SimpleComponentSubject comp =
 			  		(SimpleComponentSubject) importer.importComponent(aut);
 				module.getComponentListModifiable().add(comp);
-		    }
+		    }*/
+		    final java.util.Iterator<AutomatonProxy> it = supervisor.getAutomata().iterator();
+		    while(it.hasNext())
+		    {
+				final AutomatonProxy aut = it.next();
+				final SimpleComponentSubject comp =
+							  		(SimpleComponentSubject) importer.importComponent(aut);
+				module.getComponentListModifiable().add(comp);
+			}
 			logger.info("Synthesized supervisor(s) added to module");
           } else {
             logger.info("Synthesis result is empty.");

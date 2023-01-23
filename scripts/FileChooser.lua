@@ -8,11 +8,9 @@ local fc = luaj.newInstance("javax.swing.JFileChooser")
 fc:setDialogTitle("Lupremica file chooser")
 local retval = fc:showOpenDialog()
 if retval == fc.APPROVE_OPTION then
-	-- local fname = fc:getSelectedFile():getName() -- should work but seems Java bug!
-	local fname = fc:getName(fc:getSelectedFile()) -- this works
+	local fname = fc:getSelectedFile():getPath() -- does not work on Java > 8
+	-- local fname = fc:getName(fc:getSelectedFile()) -- this works for Java > 8
 	print("File: "..fname)
-	-- local cdir = fc:getCurrentDirectory()
-	-- print("cdir: "..cdir:getPath()) -- also bombs!
 else
 	print("User cancelled")
 end

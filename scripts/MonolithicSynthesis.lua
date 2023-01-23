@@ -36,8 +36,8 @@ if result:isSatisfied() then
 	local supervisor = result:getComputedProductDES()
 	local factory = ModuleSubjectFactory:getInstance()
 	local importer = luaj.newInstance(waters.."model.marshaller.ProductDESImporter", factory)
-	local supervisorModule = importer:importModule(supervisor)
-	local supervisorComponents = supervisorModule:getComponentListModifiable()
+--	local supervisorModule = importer:importModule(supervisor)
+--	local supervisorComponents = supervisorModule:getComponentListModifiable()
 	-- iterate over all components and add to the module one by one
 	local iterator = supervisor:getAutomata():iterator()
 	while iterator:hasNext() do
