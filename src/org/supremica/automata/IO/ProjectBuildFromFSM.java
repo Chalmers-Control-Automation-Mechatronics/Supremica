@@ -209,6 +209,7 @@ class Tokenizer
   private String pushedLine;
   private String pushedToken;
   private StringTokenizer tokenizer;
+  private int currLineNumber = 0;
   
   public Tokenizer(final InputStream is)
   {
@@ -224,10 +225,13 @@ class Tokenizer
       this.pushedLine = null;
     }
     else
+    {
       this.currLine = this.reader.readLine();
+      this.currLineNumber += 1;
+    }
     
     if (this.currLine != null)
-      this.tokenizer = new StringTokenizer(currLine);
+      this.tokenizer = new StringTokenizer(this.currLine);
       
     return this.currLine;
   }
@@ -264,6 +268,12 @@ class Tokenizer
   {
     return this.currLine;
   }
+  // For error reporting
+  public int getCurrLineNumber()
+  {
+    return this.currLineNumber;
+  }
+
 }
 
 class FSMbuildHelper
@@ -307,7 +317,8 @@ class FSMbuildHelper
 		{
 			String currLine = tokenizer.readLine();
 			while (currLine != null)
-			{
+			{ // System.err.println(tokenizer.getCurrLineNumber());
+
 				while (tokenizer.hasMoreTokens())
 				{
           // This is a bit of legacy, could be removed, but it is keept as Iäm lazy
@@ -350,8 +361,9 @@ class FSMbuildHelper
     
     //------------------------------------------------------------------------------
     // Return java.util.AbstractMap.SimpleEntry as pair that holds the c/uc and o/uo attributes
+    // There is no check that the same event is defined both as c and uc, or o and uo
     private SimpleEntry<Boolean, Boolean> handleEventAttributes(final Tokenizer tokenizer)
-    throws java.io.IOException
+    throws java.io.IOException, Exception
     {
       boolean eventControllable = true; // default controllable
       boolean eventObservable = true;   // default observable
@@ -374,7 +386,7 @@ class FSMbuildHelper
         }
         else // Something's not right
         {
-          System.err.println("Unknown event attribute: " + optionalParameter);
+          throw new Exception("Unknown event attribute: " + optionalParameter);
         }
       }
       
@@ -400,6 +412,7 @@ class FSMbuildHelper
     }
     //------------------------------------------------------------------------
     private void readStates(final Tokenizer tokenizer, final String currToken)
+    throws Exception
     {
       final String stateName = currToken;
       final String markedString = tokenizer.nextToken();
@@ -412,7 +425,7 @@ class FSMbuildHelper
 
       if (markedString == null)
       {
-        System.err.println("Expected the marking of the state: 0 or 1");
+        System.err.println("Expected the marking of the state, 0 (unmarked) or 1 (marked)");
       }
 
       if (nbrOfTransitionsString == null)
@@ -421,17 +434,17 @@ class FSMbuildHelper
       }
 
       int marked = -1;
-      String errstring = "Expected the marking of the state";
+      String errstring = "Expected the marking of the state, 0 (unmarked) or 1 (marked)";
       
       try
       {
-        errstring = "Expected the marking of the state";
+        errstring = "Expected the marking of the state, 0 (unmarked) or 1 (marked)";
         marked = Integer.parseInt(markedString);
 
         if ((marked < 0) || (marked > 1))
         {
-          errstring = "Marked must be 0 (unmarked) or 1 (marked)";
-          throw new NumberFormatException();
+          errstring = "Expected the marking of the state, 0 (unmarked) or 1 (marked)";
+          throw new NumberFormatException(errstring);
         }
         
         errstring = "Expected the number of transitions";
@@ -440,13 +453,13 @@ class FSMbuildHelper
         if (numberOfRemainingTransitions < 0)
         {
           errstring = "The automaton must have a non negative number of transitions";
-          throw new NumberFormatException();
+          throw new NumberFormatException(errstring);
         }
       }
       catch(final NumberFormatException excp)
       {
-        System.err.println(errstring);
-        throw excp;
+        System.err.println("line "+ tokenizer.getCurrLineNumber() + ": " + errstring);
+        throw new Exception("line "+ tokenizer.getCurrLineNumber() + ": " + errstring);
       }
       
       // Create and add the state
@@ -479,7 +492,7 @@ class FSMbuildHelper
     }
     //-----------------------------------------------------------------------------
     private void readTransitions(final Tokenizer tokenizer, final String currToken)
-    throws java.io.IOException
+    throws java.io.IOException, Exception
     {
       final String currEvent = currToken;
       final String destStateName = tokenizer.nextToken();
@@ -525,17 +538,17 @@ class FSMbuildHelper
     }
     //-------------------------------------------------------------------------
     /* Here, all the states and transitions have been read, and what follows is
-     * either a set on extra events, preceeded by the token "EVENTS", or a positive
-     * integer that signasl the start of a new automaton. Note that id there is an 
-     * named "events" (highly unlikely, but still) this event will be confused
-     * with the token "EVENTS" and discraded.
+     * either a set of extra events, preceeded by the token "EVENTS", or a positive
+     * integer that signals the start of a new automaton. Note that if there is an 
+     * event named "events" (highly unlikely, but still) this event will be confused
+     * with the token "EVENTS" and discarded.
     **/
     private void readAdditionalEvents(final Tokenizer tokenizer, final String currToken)
-    throws java.io.IOException
+    throws java.io.IOException, Exception
     {
       if (currToken.equalsIgnoreCase("EVENTS"))
       {    
-        // Next follows one or more events, remain in teh same parser state and keep reading
+        // Next follows one or more events, remain in the same parser state and keep reading
         currParserState = ParserState.READ_ADDITIONAL_EVENTS;
         return; // If there is an additional event named "events", we will miss it!
       }
@@ -549,9 +562,9 @@ class FSMbuildHelper
       {
         final String currEvent = currToken;
 
-        if (currAlphabet.contains(currEvent))
+        if (currAlphabet.contains(currEvent)) // If already defined, throw exception
         {
-          System.err.println("Alphabet alredy contains: " + currEvent);
+          throw new Exception("Alphabet alredy contains: " + currEvent);
         }
 
         final SimpleEntry<Boolean, Boolean> attr = handleEventAttributes(tokenizer);
@@ -571,7 +584,7 @@ class FSMbuildHelper
      * now finished automaton.
     **/
     private Automaton prepareToReadNext(final Tokenizer tokenizer)
-    throws java.io.IOException
+    throws java.io.IOException, Exception
     {
         // Finalize the current automaton, and cache it
         handleTransitions();
@@ -610,17 +623,17 @@ class FSMbuildHelper
       return this.weHaveMore;
     }
     
-    private void handleTransitions()
+    private void handleTransitions() throws Exception
     {
       for (Iterator<LabeledEvent> labelIt = this.transitionMap.labelIterator(); labelIt.hasNext(); )
 			{
 				final LabeledEvent currEvent = labelIt.next();
 				final List<?> currList = this.transitionMap.getTransitions(currEvent);
 
-				// Add the event
+				// This triggers if the same event is both on a transition and under the "EVENTS" tag
 				if (this.currAlphabet.contains(currEvent))
 				{
-					System.err.println(currEvent.getLabel() + " is already defined!");
+					throw new Exception(currEvent.getLabel() + " is already defined!");
 				}
 
 				this.currAlphabet.addEvent(currEvent);
@@ -633,7 +646,9 @@ class FSMbuildHelper
 					final String destStateName = currTransition.getDestStateName();
 					final State currSourceState = currAutomaton.getStateWithName(sourceStateName);
 					final State currDestState = currAutomaton.getStateWithName(destStateName);
-
+          if (currSourceState == null || currDestState == null)
+            throw new Exception("Error with state name: " + destStateName);
+            
 					// Create and add the arc
 					final Arc currArc = new Arc(currSourceState, currDestState, currEvent);
 					currAutomaton.addArc(currArc);
