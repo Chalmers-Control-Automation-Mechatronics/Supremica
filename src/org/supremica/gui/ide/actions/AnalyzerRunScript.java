@@ -28,49 +28,61 @@ import java.lang.reflect.InvocationTargetException;
 class JavaExecutor
 {
   static String fileName = null;
-
-  static String getFilenameWithoutExt(String sourcePath) throws IOException
+  
+  private static final String scriptPackage = "Lupremica"; // To not have script classes in the default package
+  // The compiled *.class file has to reside in classURL/Lupremica
+  
+  static String getFilenameWithoutExt(final String sourcePath) throws IOException
   {
-    Path path = Paths.get(sourcePath);
-    String filename = path.getFileName().toString(); // includes .ext
-
-    return filename.substring(0, filename.lastIndexOf(".")); // strip ext
+    final Path path = Paths.get(sourcePath);
+    final String filename = path.getFileName().toString(); 
+    return filename.substring(0, filename.lastIndexOf(".")); // strip .ext
   }
 
-  static String readCode(String sourcePath) throws FileNotFoundException
+  static String readCode(final String sourcePath) throws FileNotFoundException
   {
-      InputStream stream = new FileInputStream(sourcePath);
-      String separator = System.getProperty("line.separator");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+      final InputStream stream = new FileInputStream(sourcePath);
+      final String separator = System.getProperty("line.separator");
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
       return reader.lines().collect(Collectors.joining(separator));
   }
 
-  static Path saveSource(String source) throws IOException
+  static Path saveSource(final String source) throws IOException
   {
-      String tmpProperty = Config.FILE_TEMP_PATH.getValue().getPath();
-      Path sourcePath = Paths.get(tmpProperty, JavaExecutor.fileName + ".java");
-      // System.out.println("saveSource: " + sourcePath);
+      final String tmpProperty = Config.FILE_TEMP_PATH.getValue().getPath();
+      final Path lupremicaPackage = Paths.get(tmpProperty, scriptPackage);
+      Files.createDirectories(lupremicaPackage); // Check if the scriptPackage folder exists in the temp path, else create it
+      final Path sourcePath = Paths.get(tmpProperty, scriptPackage, JavaExecutor.fileName + ".java");
+      // System.out.println("sourcePath: " + sourcePath);
       Files.write(sourcePath, source.getBytes(StandardCharsets.UTF_8));
       return sourcePath;
   }
 
-  static Path compileSource(Path javaFile)
+  static Path compileSource(final Path javaFile)
   {
-      JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+      final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+      // System.out.println("javaFile.toFile().getAbsolutePath() == " + javaFile.toFile().getAbsolutePath());
       compiler.run(null, null, null, javaFile.toFile().getAbsolutePath());
       return javaFile.getParent().resolve(JavaExecutor.fileName + ".class");
   }
 
-    static void runClass(Path javaClass, IDE ide)
+    static void runClass(Path classFile, IDE ide)
         throws MalformedURLException, ClassNotFoundException,
             IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
   {
-      URL classUrl = javaClass.getParent().toFile().toURI().toURL();
+      // System.out.println("classFile == " + classFile);
+      final Path parent = classFile.getParent();
+      final Path grandParent = parent.getParent();
+      final URL classUrl = grandParent.toFile().toURI().toURL();
       // System.out.println("classUrl: " + classUrl);
-      URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{classUrl});
-      Class<?> clazz = Class.forName(JavaExecutor.fileName, true, classLoader);
-      // clazz.newInstance(); // Can only access zero argument constructor (not main()!)
-      Constructor<?> constr = clazz.getDeclaredConstructor(org.supremica.gui.ide.IDE.class);
+      
+      final URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{classUrl});
+      final String className = scriptPackage + "." + JavaExecutor.fileName;
+      // System.out.println("className == " + className);
+      final Class<?> clazz = Class.forName(className, true, classLoader);
+      // System.out.println("clazz == " + clazz.getName());
+      
+      final Constructor<?> constr = clazz.getDeclaredConstructor(org.supremica.gui.ide.IDE.class);
       constr.newInstance(ide);
 
   }

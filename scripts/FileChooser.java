@@ -5,6 +5,8 @@
  * of it, from working; an exception is thrown instead
  ** It works fine from Java, though
  */
+package Lupremica;
+
 import java.io.File;
 import javax.swing.JFileChooser;
 import org.supremica.gui.ide.IDE;

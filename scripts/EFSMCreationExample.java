@@ -36,6 +36,7 @@
 // %PORTABLE%\jdk-12.0.2\bin\javac -cp dist\Supremica.jar EFSMCreationExample.java
 // Run:
 // %PORTABLE%\jdk-12.0.2\bin\java -cp Z:\Lua;dist\Supremica.jar EFSMCreationExample
+package Lupremica;
 
 import java.util.ArrayList;
 import java.util.Collections;

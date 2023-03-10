@@ -2,6 +2,8 @@
 /* Java script for doing monolithic synthesis of the in Supremica
  * currently open module.
  */
+package Lupremica;
+
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;

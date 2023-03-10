@@ -2,6 +2,8 @@
 /* First try on java code to create or open a new module
  * in Supremica. Meant to be run as external script
 **//***** And it works! ************************************/
+package Lupremica;
+
 import java.io.File;
 import java.util.List;
 import org.supremica.gui.ide.DocumentContainerManager;

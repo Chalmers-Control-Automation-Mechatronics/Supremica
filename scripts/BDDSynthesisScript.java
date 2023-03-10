@@ -4,6 +4,7 @@
 // Code below is extracted from src\org\supremica\gui\ide\actions\EditorSynthesizerAction.java
 // This code can be run by the Editor > Run script...
 // Use CreateOpenModule.java as template
+package Lupremica;
 
 import java.util.Vector;
 
