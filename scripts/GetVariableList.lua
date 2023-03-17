@@ -9,6 +9,10 @@ local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFi
 local VariableComponentProxy = luaj.bindClass("net.sourceforge.waters.model.module.VariableComponentProxy")
 if not VariableComponentProxy then print("VariableComponentProxy not fond") return end
 
+local GetVariableList = luaj.bindClass("Lupremica.GetVariableList") 
+if not GetVariableList then print("Lupremica.GetVariableList not found") return end
+
+--[[
 local module = ide:getActiveDocumentContainer():getEditorPanel():getModuleSubject()
 local components = module:getComponentList() 
 -- Gets the component list of this module. This List<Proxy> does not only contain the 
@@ -27,6 +31,7 @@ for i = 1, components:size() do
 		logger.info("var.getInitialStatePredicate().toString(): " + proxy:getInitialStatePredicate().toString())
 	end
 end
+--]]
 
 local fname = getFileName("components.csv") -- print(fname)
 -- local file = io.open(fname, "w")
