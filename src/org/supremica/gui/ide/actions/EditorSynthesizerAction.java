@@ -377,7 +377,7 @@ public class EditorSynthesizerAction extends IDEAction
 
   private File getSaveFile(final String modName) // Get file to save the guards into, returns null on user cancel
   {
-    final JFileChooser chooser = new JFileChooser();
+    final JFileChooser chooser = new JFileChooser(Config.FILE_SAVE_PATH.getValue());
     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     chooser.setAcceptAllFileFilterUsed(false);
     final int returnVal = chooser.showOpenDialog(ide.getFrame());
@@ -387,9 +387,9 @@ public class EditorSynthesizerAction extends IDEAction
       Config.FILE_SAVE_PATH.set(path);
       // String modName = module.getName();
       if (modName.isEmpty() || modName.equalsIgnoreCase("Untitled")) // "Untitled" is essentially no-name
-        return new File(path + "/event_edge_guard_list.xls");
+        return new File(path + "/event_edge_guard_list.csv");
       else
-        return new File(path + "/" + modName + ".xls");
+        return new File(path + "/" + modName + ".csv");
     }
     return null;
   }
@@ -496,7 +496,6 @@ public class EditorSynthesizerAction extends IDEAction
       {
         List<List<String>> guardInfoList = getGuardInfoList(bddSynthesizer, eventNames);
 
-        // Save guards in a file...
         if (saveInFile)
         {
           logger.debug("Saving to " + saveFile.getPath());
@@ -505,16 +504,16 @@ public class EditorSynthesizerAction extends IDEAction
           {
             final FileWriter fstream = new FileWriter(saveFile);
             final BufferedWriter out = new BufferedWriter(fstream);
-            out.write("Edge <source, event, target>" + "\t"
-              + "Automaton" + "\t"
-              + "Guard expression" + "\t"
+            out.write("Edge <source, event, target>\t"
+              + "Automaton\t"
+              + "Guard expression\t"
               + "Guard size");
             out.newLine();
             out.newLine();
-              for(final List<String> e: guardInfoList) {
-                out.write(String.join("\t", e));
-                out.newLine();
-              }
+			  for(final List<String> e: guardInfoList) {
+				out.write(String.join("\t", e));
+				out.newLine();
+			  }
               out.close();
           }
           catch (final Exception e)
