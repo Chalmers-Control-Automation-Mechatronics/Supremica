@@ -29,8 +29,10 @@ class JavaExecutor
 {
   static String fileName = null;
   
-  private static final String scriptPackage = "Lupremica"; // To not have script classes in the default package
-  // The compiled *.class file has to reside in classURL/Lupremica
+  private static final String scriptPackage = "Lupremica"; 
+  // Java script classes in the default package cannot be accessed by other scripts
+  // So we put all java scripts in package Lupremica;
+  // The compiled *.class file then has to reside in classURL/Lupremica
   
   static String getFilenameWithoutExt(final String sourcePath) throws IOException
   {
@@ -66,7 +68,7 @@ class JavaExecutor
       return javaFile.getParent().resolve(JavaExecutor.fileName + ".class");
   }
 
-    static void runClass(Path classFile, IDE ide)
+    static void runClass(final Path classFile, final IDE ide)
         throws MalformedURLException, ClassNotFoundException,
             IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
   {
@@ -87,7 +89,7 @@ class JavaExecutor
 
   }
 
-    public static void exeJava(String sourcePath, final IDE ide) throws Exception
+    public static void exeJava(final String sourcePath, final IDE ide) throws Exception
     {
         JavaExecutor.fileName = getFilenameWithoutExt(sourcePath);
 

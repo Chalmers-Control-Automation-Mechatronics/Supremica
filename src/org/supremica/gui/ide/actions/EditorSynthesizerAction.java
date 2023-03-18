@@ -179,7 +179,7 @@ public class EditorSynthesizerAction extends IDEAction
       : new ExtendedAutomata(module);
 
     BDDExtendedSynthesizer bddSynthesizer = null;
-    RuntimeException synthesisException = null;
+    // RuntimeException synthesisException = null;
 
     try
     {
@@ -271,7 +271,7 @@ public class EditorSynthesizerAction extends IDEAction
       logger.info("The guards were generated in "
         + bddSynthesizer.getGuardTimer().toString() + ".");
 
-      // print guards or save them in a excel file.
+      // print guards or save them in an excel file.
       boolean saveInFile = options.getSaveInFile();
       File saveFile = null;
       if (saveInFile)
@@ -280,12 +280,12 @@ public class EditorSynthesizerAction extends IDEAction
         if (saveFile == null) // user canceled, don't save
           saveInFile = false;
       }
-      
+
 
       saveOrPrintGuards(bddSynthesizer, eventNames,
               saveInFile, options.getPrintGuard(),
               saveFile);
-  
+
 
       // Add guards and variables generated from automaton to the model...
       if (options.getAddGuards()) {
@@ -294,15 +294,26 @@ public class EditorSynthesizerAction extends IDEAction
 
       // Cleanup...
       bddSynthesizer.done();
-    } catch (final RuntimeException e) {
-      synthesisException = e;
-    } finally {
-      if (bddSynthesizer != null) {
+    }
+    // Could there really be any other exception except OutOfMemory?
+    catch (final RuntimeException e)
+    {
+		logger.error("Exception during BDD synthesis: " + e.getMessage());
+		e.printStackTrace();
+	}
+    catch(final java.lang.OutOfMemoryError e)
+    {
+      	logger.error("Out of memory during BDD synthesis "
+		  	+ " (" + Runtime.getRuntime().maxMemory()/(1024*1024) + " Mib)");
+		e.printStackTrace();
+    }
+    finally
+    {
+      if (bddSynthesizer != null)
+      {
         bddSynthesizer.done();
       }
-      if (synthesisException != null) {
-        throw synthesisException;
-      }
+      //TODO: If we are to write to file, we should write error message into that file
     }
 
     // Call TUM PLC Code generator
@@ -377,10 +388,10 @@ public class EditorSynthesizerAction extends IDEAction
     }
     return null;
   }
-  
+
 
   private List<List<String>> getGuardInfoList(final BDDExtendedSynthesizer bddSynthesizer,
-                final Vector<String> eventNames) 
+                final Vector<String> eventNames)
   {
 	  final Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap =
 		bddSynthesizer.getBDDAutomata().getEdge2ExAutomatonMap();
@@ -415,7 +426,7 @@ public class EditorSynthesizerAction extends IDEAction
         }
       }
       Collections.sort(entries, // sort based on automaton and edges names
-               new Comparator<Entry<EdgeProxy,ExtendedAutomaton>>() 
+               new Comparator<Entry<EdgeProxy,ExtendedAutomaton>>()
       {
         @Override
         public int compare(final Entry<EdgeProxy,ExtendedAutomaton> o1,
@@ -428,7 +439,7 @@ public class EditorSynthesizerAction extends IDEAction
             final String sourceName2 = o2.getKey().getSource().getName();
             return sourceName1.compareTo(sourceName2);
           }
-          else 
+          else
           {
             return aut1.compareTo(aut2);
           }
@@ -438,13 +449,13 @@ public class EditorSynthesizerAction extends IDEAction
     }
 	  // Format strings...
 	  final List<List<String>> guardInfoList = new ArrayList<>();
-	  for(final String event: eventGeoInfo.keySet()) 
+	  for(final String event: eventGeoInfo.keySet())
     {
       final List<Entry<EdgeProxy, ExtendedAutomaton>> edge2AutMap =
         eventGeoInfo.get(event);
       final Map<EdgeProxy, String> edge2guardMap =
         event2GuardGen.get(event).getEdge2GuardMap();
-      for(final Entry<EdgeProxy, ExtendedAutomaton> e: edge2AutMap) 
+      for(final Entry<EdgeProxy, ExtendedAutomaton> e: edge2AutMap)
       {
         final ArrayList<String> entry = new ArrayList<>(4);
         final String edge =
@@ -458,7 +469,7 @@ public class EditorSynthesizerAction extends IDEAction
         String guard = edge2guardMap.get(e.getKey());
         final int nbrOfTerms =
         event2GuardGen.get(event).getGuard2NbrOfTerms().get(guard);
-        if (guard.equals(BDDExtendedGuardGenerator.FALSE)) 
+        if (guard.equals(BDDExtendedGuardGenerator.FALSE))
         {
           guard = "FALSE";
         }
@@ -469,7 +480,7 @@ public class EditorSynthesizerAction extends IDEAction
 	  }
     return guardInfoList;
   }
-  
+
   public void saveOrPrintGuards(final BDDExtendedSynthesizer bddSynthesizer,
                 final Vector<String> eventNames,
                 final Boolean saveInFile,
@@ -479,12 +490,12 @@ public class EditorSynthesizerAction extends IDEAction
       if (saveInFile || printGuards)
       {
         List<List<String>> guardInfoList = getGuardInfoList(bddSynthesizer, eventNames);
-        
+
         // Save guards in a file...
         if (saveInFile)
         {
           logger.debug("Saving to " + saveFile.getPath());
-          
+
           try
           {
             final FileWriter fstream = new FileWriter(saveFile);
