@@ -179,7 +179,7 @@ public class EditorSynthesizerAction extends IDEAction
       : new ExtendedAutomata(module);
 
     BDDExtendedSynthesizer bddSynthesizer = null;
-    // RuntimeException synthesisException = null;
+    Throwable synthesisException = null;
 
     try
     {
@@ -298,14 +298,16 @@ public class EditorSynthesizerAction extends IDEAction
     // Could there really be any other exception except OutOfMemory?
     catch (final RuntimeException e)
     {
-		logger.error("Exception during BDD synthesis: " + e.getMessage());
-		e.printStackTrace();
-	}
+      synthesisException = e;
+      logger.error("Exception during BDD synthesis: " + e.getMessage());
+      e.printStackTrace();
+    }
     catch(final java.lang.OutOfMemoryError e)
     {
-      	logger.error("Out of memory during BDD synthesis "
-		  	+ " (" + Runtime.getRuntime().maxMemory()/(1024*1024) + " Mib)");
-		e.printStackTrace();
+      synthesisException = e;
+      logger.error("Out of memory during BDD synthesis "
+          + " (" + Runtime.getRuntime().maxMemory()/(1024*1024) + " Mib)");
+      e.printStackTrace();
     }
     finally
     {
@@ -313,7 +315,10 @@ public class EditorSynthesizerAction extends IDEAction
       {
         bddSynthesizer.done();
       }
-      //TODO: If we are to write to file, we should write error message into that file
+      if(synthesisException != null)
+      {
+        throw new RuntimeException("Exception during BDD synthesis", synthesisException.getCause());
+      }
     }
 
     // Call TUM PLC Code generator
@@ -483,8 +488,8 @@ public class EditorSynthesizerAction extends IDEAction
 
   public void saveOrPrintGuards(final BDDExtendedSynthesizer bddSynthesizer,
                 final Vector<String> eventNames,
-                final Boolean saveInFile,
-                final Boolean printGuards,
+                final boolean saveInFile,
+                final boolean printGuards,
                 final File saveFile)
     {
       if (saveInFile || printGuards)
