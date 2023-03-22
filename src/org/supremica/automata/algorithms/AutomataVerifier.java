@@ -836,7 +836,7 @@ public class AutomataVerifier
             return null;
         }
 
-        // Bubblesort the array according to arraySortValue... bubblesort? FIXA!
+ /*       // Bubblesort tempArray and arraySortValue according to arraySortValue... bubblesort? FIXA!
         double tempDouble = 0;
         int tempInt = 0;
         int changes = 1;
@@ -849,9 +849,12 @@ public class AutomataVerifier
             {
                 if (arraySortValue[i] < arraySortValue[i + 1])
                 {
+					// Swap tempArray[i] and tempArray[i+1]
                     tempInt = tempArray[i];
                     tempArray[i] = tempArray[i + 1];
                     tempArray[i + 1] = tempInt;
+
+                    // Swap arraySortValue[i] and arraySortValue[i+1]
                     tempDouble = arraySortValue[i];
                     arraySortValue[i] = arraySortValue[i + 1];
                     arraySortValue[i + 1] = tempDouble;
@@ -865,8 +868,16 @@ public class AutomataVerifier
         final int[] outArray = new int[count];
 
         System.arraycopy(tempArray, 0, outArray, 0, count);
-
         return outArray;
+
+*/ // See https://stackoverflow.com/questions/28556129/java-sort-one-array-based-on-values-of-another-array
+	// This sorts in n log n
+		final Integer[] sortedAutomataIndices = java.util.stream.IntStream.range(0, arraySortValue.length).boxed()
+			.sorted(java.util.Comparator.comparingDouble(i -> arraySortValue[i]))
+			.map(i -> tempArray[i])
+			.toArray(Integer[]::new);
+	// See https://stackoverflow.com/questions/31394715/how-to-convert-integer-to-int-array-in-java
+		return java.util.Arrays.stream(sortedAutomataIndices).mapToInt(Integer::intValue).toArray();
     }
 
     /**
@@ -886,12 +897,12 @@ public class AutomataVerifier
         //
         int amountOfCommon = 0;
         int amountOfUnique = 0;
-        final Iterator<?> eventIterator = rightAlphabet.iterator();
-        LabeledEvent currEvent;
+        //// LabeledEvent currEvent;
 
+        final Iterator<?> eventIterator = rightAlphabet.iterator();
         while (eventIterator.hasNext())
         {
-            currEvent = (LabeledEvent) eventIterator.next();
+            final LabeledEvent currEvent = (LabeledEvent) eventIterator.next();
 
             if (leftAlphabet.contains(currEvent.getLabel()))
             {
@@ -913,7 +924,7 @@ public class AutomataVerifier
             // return (double)amountOfCommon; // Another way of doing it...
             return (double) amountOfCommon / (double) amountOfUnique;
         }
-        else
+        else // amountOfUnique == 0
         {
             return Double.MAX_VALUE;
         }
