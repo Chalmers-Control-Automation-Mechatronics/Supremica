@@ -51,18 +51,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzerLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerCountStatesAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDiagnosabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerHideAction;
 import net.sourceforge.waters.gui.actions.AnalyzerLanguageInclusionCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSimplificationAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
@@ -77,6 +73,7 @@ import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEDeselectAllAction;
 import net.sourceforge.waters.gui.actions.IDEHelpAction;
+import net.sourceforge.waters.gui.actions.IDEOpenAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.IDESelectAllAction;
@@ -90,7 +87,6 @@ import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.InstantiateModuleAction;
-import net.sourceforge.waters.gui.actions.IDEOpenAction;
 import net.sourceforge.waters.gui.actions.OptionsAction;
 import net.sourceforge.waters.gui.actions.RecompileAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
@@ -104,6 +100,7 @@ import net.sourceforge.waters.gui.actions.SimulationResetAction;
 import net.sourceforge.waters.gui.actions.SimulationShowAllAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
+import net.sourceforge.waters.gui.actions.SynthesisTestAction;
 import net.sourceforge.waters.gui.actions.VerifyConflictAction;
 import net.sourceforge.waters.gui.actions.VerifyControlLoopAction;
 import net.sourceforge.waters.gui.actions.VerifyControllabilityAction;
@@ -134,6 +131,10 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.automata.templates.TemplateGroup;
@@ -449,6 +450,10 @@ public class IDEMenuBar
       final JMenu menu = new JMenu("Analyze");
       menu.setMnemonic(KeyEvent.VK_Z);  // ALT-A - create automaton?
       menu.add(actions.editorSynthesizerAction.getMenuItem());
+      final Action testAction =
+        actions.getAction(SynthesisTestAction.class);
+      menu.add(testAction);
+
       addOption(Config.TUM_EXTERNAL_ON);
       if (Config.TUM_EXTERNAL_ON.getValue()) {
         menu.add(actions.editorGenerateTextLabelAction.getMenuItem());
