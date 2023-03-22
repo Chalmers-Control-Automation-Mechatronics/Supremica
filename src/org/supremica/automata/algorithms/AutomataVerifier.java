@@ -871,13 +871,20 @@ public class AutomataVerifier
         return outArray;
 
 */ // See https://stackoverflow.com/questions/28556129/java-sort-one-array-based-on-values-of-another-array
-	// This sorts in n log n
-		final Integer[] sortedAutomataIndices = java.util.stream.IntStream.range(0, arraySortValue.length).boxed()
+    // This sorts in n log n
+    final int len = arraySortValue.length;
+		final Integer[] sortedAutomataIndices = java.util.stream.IntStream.range(0, len).boxed()
 			.sorted(java.util.Comparator.comparingDouble(i -> arraySortValue[i]))
-			.map(i -> tempArray[i])
+			// .map(i -> tempArray[i]) // Can't use this, want to pick in reverse order
 			.toArray(Integer[]::new);
-	// See https://stackoverflow.com/questions/31394715/how-to-convert-integer-to-int-array-in-java
-		return java.util.Arrays.stream(sortedAutomataIndices).mapToInt(Integer::intValue).toArray();
+    // See https://stackoverflow.com/questions/31394715/how-to-convert-integer-to-int-array-in-java
+		// return java.util.Arrays.stream(sortedAutomataIndices).mapToInt(Integer::intValue).toArray();
+    // Pick out in reverse order, is this slow?
+    final int[] result = new int[len];
+		for(int i = 0; i < len; i++)
+			result[len - i - 1] = tempArray[sortedAutomataIndices[i]]; 
+
+		return result;
     }
 
     /**
