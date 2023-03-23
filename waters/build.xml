@@ -3,6 +3,9 @@
 <project name="waters" default="waters">
   <description>
   </description>
+	
+  <property name="ant.build.javac.source" value="1.8"/>
+  <property name="ant.build.javac.target" value="1.8"/>
 
   <property file="build.properties"/>
   <property name="supremica.root" location=".."/>
@@ -41,10 +44,10 @@
   <property name="xsl" location="${xml}/xsl"/>
 
   <property name="javah.dir" location="${cpp}/src/waters/javah"/>
-  <property name="javah.file" location="${javah.dir}/Invocations.h"/>
   <property name="jniglue.indir" location="${cpp}/src/jni/templates"/>
   <property name="jniglue.outdir" location="${cpp}/src/jni/glue"/>
   <property name="jniglue.jar" location="${jar}/jniglue.jar"/>
+  <property name="javah.file" location="${jniglue.indir}/Invocations.h"/>
     
   <property name="test.jar" location="${jar}/waters_test.jar"/>
   <property name="test.classes" location="${classes}/test"/>
@@ -152,24 +155,40 @@
   <target name="javah" depends="waters-compile,test-compile"
           if="native.make" description="Create JNI headers.">
     <mkdir dir="${javah.dir}"/>
-    <javah outputFile="${javah.file}">
+    <mkdir dir="${javah.dir}.tmp"/>
+  	<javac srcdir="${supremica.src}" destdir="${javah.dir}.tmp"
+  		   nativeHeaderDir="${javah.dir}.tmp" includeantruntime="false">
+      <classpath> 
+        <pathelement location="${waters.classes}"/>
+      </classpath>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeConflictChecker.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeControlLoopChecker.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeDeadlockChecker.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeModelAnalyzer.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeSafetyVerifier.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeStateCounter.java"/>
+    </javac>
+    <copy todir="${javah.dir}">
+      <fileset dir="${javah.dir}.tmp" includes="*.h"/>
+    </copy>
+  	<javac srcdir="${supremica.testsrc}" destdir="${javah.dir}.tmp"
+  	       nativeHeaderDir="${javah.dir}" includeantruntime="false">
       <classpath> 
         <pathelement location="${waters.classes}"/>
         <pathelement location="${test.classes}"/>
         <pathelement location="${junit.jar}"/>
       </classpath>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeBitSet"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeConflictChecker"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeControlLoopChecker"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeDeadlockChecker"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeStateCounter"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeWordSizeTest"/>
-    </javah>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeBitSet.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeHashSet.java"/>
+      <include name="net/sourceforge/waters/cpp/analysis/NativeWordSizeTest.java"/>
+    </javac>
+    <copy todir="${javah.dir}">
+      <fileset dir="${javah.dir}.tmp" includes="*.h"/>
+    </copy>
+  	<copy file="${javah.file}" todir="${javah.dir}"/>
+  	<delete dir="${javah.dir}.tmp"/>
   </target>
-        
+
   <target name="xsd-constants-generate">
     <mkdir dir="${waters.classes}"/>
     <javac srcdir="${src}" destdir="${waters.classes}" 

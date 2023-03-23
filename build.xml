@@ -2,6 +2,9 @@
 
 <project name="Supremica" default="build" basedir=".">
     
+    <property name="ant.build.javac.source" value="1.8"/>
+    <property name="ant.build.javac.target" value="1.8"/>
+
     <property name="arch.properties" location="arch.properties"/>
 
     <property file="build.properties"/>
