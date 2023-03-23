@@ -799,8 +799,8 @@ public class AutomataVerifier
 
         // Do the work, compare the new automata with the already selected
         Automaton currAutomaton;
-        final int[] tempArray = new int[amountOfUnselected];
-        final double[] arraySortValue = new double[amountOfUnselected];
+        final int[] automataIndices = new int[amountOfUnselected];
+        final double[] similarityScores = new double[amountOfUnselected];
         int count = 0;
 
         final AutomataIndexMap indexMap = synchHelper.getIndexMap();
@@ -815,12 +815,12 @@ public class AutomataVerifier
             }
 
             // This line is the essence of it all...
-            arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
+            similarityScores[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
 
             // Did we get a value?
-            if (arraySortValue[count] > 0)
+            if (similarityScores[count] > 0)
             {
-                tempArray[count++] = indexMap.getAutomatonIndex(currAutomaton);
+                automataIndices[count++] = indexMap.getAutomatonIndex(currAutomaton);
 
                 // Have we found everything possible already?
                 if (count == amountOfUnselected)
@@ -836,30 +836,28 @@ public class AutomataVerifier
             return null;
         }
 
- /*       // Bubblesort tempArray and arraySortValue according to arraySortValue... bubblesort? FIXA!
-        double tempDouble = 0;
-        int tempInt = 0;
-        int changes = 1;
+ /*       // Bubblesort automataIndices according to similarityScores... bubblesort? FIXA!
+        boolean somethingChanged = true;
 
-        while (changes > 0)
+        while(somethingChanged)
         {
-            changes = 0;
+            somethingChanged = false;
 
             for (int i = 0; i < count - 1; i++)
             {
-                if (arraySortValue[i] < arraySortValue[i + 1])
+                if (similarityScores[i] < similarityScores[i + 1])
                 {
-					// Swap tempArray[i] and tempArray[i+1]
-                    tempInt = tempArray[i];
-                    tempArray[i] = tempArray[i + 1];
-                    tempArray[i + 1] = tempInt;
+					// Swap automataIndices[i] and automataIndices[i+1]
+                    final int tempInt = automataIndices[i];
+                    automataIndices[i] = automataIndices[i + 1];
+                    automataIndices[i + 1] = tempInt;
 
-                    // Swap arraySortValue[i] and arraySortValue[i+1]
-                    tempDouble = arraySortValue[i];
-                    arraySortValue[i] = arraySortValue[i + 1];
-                    arraySortValue[i + 1] = tempDouble;
+                    // Swap similarityScores[i] and similarityScores[i+1]
+                    final double tempDouble = similarityScores[i];
+                    similarityScores[i] = similarityScores[i + 1];
+                    similarityScores[i + 1] = tempDouble;
 
-                    changes++;
+                    somethingChanged = true;
                 }
             }
         }
@@ -867,24 +865,17 @@ public class AutomataVerifier
         // Return an array of appropriate length
         final int[] outArray = new int[count];
 
-        System.arraycopy(tempArray, 0, outArray, 0, count);
+        System.arraycopy(automataIndices, 0, outArray, 0, count);
         return outArray;
 
-*/ // See https://stackoverflow.com/questions/28556129/java-sort-one-array-based-on-values-of-another-array
-    // This sorts in n log n
-    final int len = arraySortValue.length;
-		final Integer[] sortedAutomataIndices = java.util.stream.IntStream.range(0, len).boxed()
-			.sorted(java.util.Comparator.comparingDouble(i -> arraySortValue[i]))
-			// .map(i -> tempArray[i]) // Can't use this, want to pick in reverse order
-			.toArray(Integer[]::new);
-    // See https://stackoverflow.com/questions/31394715/how-to-convert-integer-to-int-array-in-java
-		// return java.util.Arrays.stream(sortedAutomataIndices).mapToInt(Integer::intValue).toArray();
-    // Pick out in reverse order, is this slow?
-    final int[] result = new int[len];
-		for(int i = 0; i < len; i++)
-			result[len - i - 1] = tempArray[sortedAutomataIndices[i]]; 
-
-		return result;
+*/ 		// See https://stackoverflow.com/questions/28556129/java-sort-one-array-based-on-values-of-another-array
+    	// This sorts in n log n
+		return java.util.stream.IntStream.range(0, count)
+			.boxed()
+			.sorted(java.util.Comparator.comparingDouble(i -> -similarityScores[i])) // note minus sign for reverse order!
+			.map(i -> automataIndices[i])
+			.mapToInt(Integer::intValue)
+			.toArray();
     }
 
     /**
