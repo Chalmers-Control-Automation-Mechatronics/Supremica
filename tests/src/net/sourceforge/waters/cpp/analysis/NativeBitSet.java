@@ -58,11 +58,12 @@ public class NativeBitSet
     mNativeHandler = createNativeBitSet(initialSize, initialValue);
   }
 
-  @Override
+  /* Removed due to upcoming deprecation - memory leak may result.
   protected void finalize()
   {
     destroyNativeBitSet(mNativeHandler);
   }
+  */
 
 
   //#########################################################################

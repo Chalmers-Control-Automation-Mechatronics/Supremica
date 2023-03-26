@@ -54,6 +54,28 @@ class ExitException extends SecurityException
 
   //#######################################################################
   //# Class Constants
+  static void setTestMode(final boolean testMode)
+  {
+    mTestMode = testMode;
+  }
+
+  static void testFriendlyExit(final int code)
+  {
+    if (mTestMode) {
+      throw new ExitException(code);
+    } else {
+      System.exit(code);
+    }
+  }
+
+
+  //#######################################################################
+  //# Static Variables
+  private static boolean mTestMode = false;
+
+
+  //#######################################################################
+  //# Class Constants
   private static final long serialVersionUID = -840490238005753878L;
 
 }

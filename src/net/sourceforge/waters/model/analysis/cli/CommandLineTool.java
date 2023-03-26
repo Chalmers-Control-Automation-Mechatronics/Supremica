@@ -151,7 +151,7 @@ public class CommandLineTool implements Configurable
       if (args.length == firstOptionIndex + 1 &&
           args[firstOptionIndex].equals("-version")) {
         Version.printConsoleInfo(System.out);
-        System.exit(0);
+        ExitException.testFriendlyExit(0);
       } else if (args.length < firstOptionIndex + 2) {
         usage();
       }
@@ -424,7 +424,7 @@ public class CommandLineTool implements Configurable
           mCsv = new PrintWriter(stream);
         } catch (final FileNotFoundException exception) {
           LogManager.getLogger().error("Can't open output file {}.", file);
-          System.exit(1);
+          ExitException.testFriendlyExit(1);
         }
       }
     } else if (option.hasID(CommandLineOptionContext.
@@ -437,10 +437,10 @@ public class CommandLineTool implements Configurable
           WatersOptionPages.WATERS_ROOT.loadProperties(properties);
         } catch (final FileNotFoundException exception) {
           LogManager.getLogger().error("Properties file {} not found.", file);
-          System.exit(1);
+          ExitException.testFriendlyExit(1);
         } catch (final IOException exception) {
           LogManager.getLogger().error("Error reading properties file {}.", file);
-          System.exit(1);
+          ExitException.testFriendlyExit(1);
         }
       }
     } else  if (option.hasID(CommandLineOptionContext.
@@ -487,7 +487,7 @@ public class CommandLineTool implements Configurable
     } catch (final ParseException exception) {
       System.err.println(exception.getMessage());
       option.dumpEnumeration(System.err, 0);
-      System.exit(1);
+      ExitException.testFriendlyExit(1);
     }
     return option.getValue();
   }
@@ -523,7 +523,7 @@ public class CommandLineTool implements Configurable
       dumpEnumeration(System.err, 0, "algorithms", false);
     AnalysisOperation.getEnumFactory().
       dumpEnumeration(System.err, 0, "operations", false);
-    System.exit(1);
+    ExitException.testFriendlyExit(1);
   }
 
   private void failUnsupportedAlgorithm(final AnalysisOperation operation,
@@ -537,7 +537,7 @@ public class CommandLineTool implements Configurable
     final EnumOption<ModelAnalyzerFactoryLoader> selector =
       page.getCurrentPageSelectorOption();
     selector.dumpEnumeration(System.err, 0, "algorithms", false);
-    System.exit(1);
+    ExitException.testFriendlyExit(1);
   }
 
   private static void showSupportedException(final Throwable exception)

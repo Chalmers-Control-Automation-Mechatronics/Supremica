@@ -68,11 +68,12 @@ public class NativeHashSet<E> extends AbstractSet<E>
     addAll(collection);
   }
 
-  @Override
+  /* Removed due to upcoming deprecation - memory leak may result.
   protected void finalize()
   {
     destroyNativeHashSet(mNativeHandler);
   }
+  */
 
 
   //#########################################################################
@@ -147,11 +148,12 @@ public class NativeHashSet<E> extends AbstractSet<E>
       mNativeIter = createNativeIterator(mNativeHandler);
     }
 
-    @Override
+    /* Removed due to upcoming deprecation - memory leak may result.
     protected void finalize()
     {
       destroyNativeIterator(mNativeIter);
     }
+    */
 
     //#######################################################################
     //# Interface java.util.Iterator

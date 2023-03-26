@@ -37,7 +37,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -446,19 +445,12 @@ public class CommandLineToolTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    System.setSecurityManager(new NoExitSecurityManager());
+    ExitException.setTestMode(true);
     for (final AnalysisOperation operation : AnalysisOperation.values()) {
       final AnalysisOptionPage page = operation.getOptionPage();
       page.restoreDefaultValues();
     }
     WatersOptionPages.COMPILER.restoreDefaultValues();
-  }
-
-  @Override
-  protected void tearDown() throws Exception
-  {
-    System.setSecurityManager(null); // or save and restore original
-    super.tearDown();
   }
 
   @Override
@@ -629,33 +621,6 @@ public class CommandLineToolTest
     private final Pattern mPattern;
     private boolean mOneOff;
     private boolean mAnti;
-  }
-
-
-  //#########################################################################
-  //# Inner Class NoExitSecurityManager
-  private static class NoExitSecurityManager extends SecurityManager
-  {
-    //#######################################################################
-    //# Overrides for java.lang.SecurityManager
-    @Override
-    public void checkPermission(final Permission perm)
-    {
-      // allow anything.
-    }
-
-    @Override
-    public void checkPermission(final Permission perm, final Object context)
-    {
-      // allow anything.
-    }
-
-    @Override
-    public void checkExit(final int status)
-    {
-      super.checkExit(status);
-      throw new ExitException(status);
-    }
   }
 
 }

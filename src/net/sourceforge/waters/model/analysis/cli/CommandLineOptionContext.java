@@ -256,7 +256,7 @@ public class CommandLineOptionContext implements OptionContext
       } else if (name.startsWith("-")) {
         System.err.println("Unsupported option " + name +
                            ". Try -help to see available options.");
-        System.exit(1);
+        ExitException.testFriendlyExit(1);
       }
     }
   }
@@ -441,7 +441,7 @@ public class CommandLineOptionContext implements OptionContext
                       final ListIterator<String> iter)
     {
       showHelpMessage(System.out);
-      System.exit(0);
+      ExitException.testFriendlyExit(0);
     }
   }
 
@@ -470,7 +470,7 @@ public class CommandLineOptionContext implements OptionContext
                       final ListIterator<String> iter)
     {
       Version.printConsoleInfo(System.out);
-      System.exit(0);
+      ExitException.testFriendlyExit(0);
     }
   }
 

@@ -191,7 +191,7 @@ public abstract class CommandLineArgument
   public static void fail(final String msg)
   {
     System.err.println(msg);
-    System.exit(1);
+    ExitException.testFriendlyExit(1);
   }
 
   protected void failMissingValue()
