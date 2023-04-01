@@ -137,7 +137,7 @@ public class ProjectBuildFromFSM
     public ProjectBuildFromFSM(final ProjectFactory theProjectFactory)
     {
         this.theProjectFactory = theProjectFactory;
-        this.currProject = theProjectFactory.getProject();        
+        this.currProject = theProjectFactory.getProject();
     }
 
     public Project build(final URL url)
@@ -158,17 +158,17 @@ public class ProjectBuildFromFSM
             {
                 automatonName = automatonName.substring(0, lastdot);
             }
+            automatonName = automatonName.replaceAll("%20", "_"); // Remove all blanks
         }
-        else if (protocol.equals("jar"))
+/*        else if (protocol.equals("jar"))
         {
             //inputProtocol = InputProtocol.JarProtocol;
         }
-        else
+*/		else
         {
             //inputProtocol = InputProtocol.UnknownProtocol;
 
-            System.err.println("Unknown protocol: " + protocol);
-            return null;
+            throw new Exception("Unknown protocol: " + protocol);
         }
 
         final InputStream stream = url.openStream();
@@ -181,7 +181,7 @@ public class ProjectBuildFromFSM
     throws Exception
     {
       final FSMbuildHelper builder = new FSMbuildHelper(is);
-      int index = 1; 
+      int index = 1;
       do
       {
         final Automaton automaton = builder.build();
@@ -189,7 +189,7 @@ public class ProjectBuildFromFSM
         currProject.addAutomaton(automaton);
         index += 1;
       } while(builder.hasMore());
-      
+
       return currProject;
     }
 }
@@ -210,12 +210,12 @@ class Tokenizer
   private String pushedToken;
   private StringTokenizer tokenizer;
   private int currLineNumber = 0;
-  
+
   public Tokenizer(final InputStream is)
   {
     this.reader = new BufferedReader(new InputStreamReader(is));
   }
-  
+
   public String readLine()
   throws java.io.IOException
   {
@@ -229,28 +229,28 @@ class Tokenizer
       this.currLine = this.reader.readLine();
       this.currLineNumber += 1;
     }
-    
+
     if (this.currLine != null)
       this.tokenizer = new StringTokenizer(this.currLine);
-      
+
     return this.currLine;
   }
-  
+
   public void pushLine()
   {
     this.pushedLine = this.currLine;
   }
-  
+
   public void pushToken()
   {
     this.pushedToken = this.currToken;
   }
-  
+
   public boolean hasMoreTokens()
   {
     return this.tokenizer.hasMoreTokens() || this.pushedToken != null;
   }
-  
+
   public String nextToken()
   {
     if (this.pushedToken != null)
@@ -260,7 +260,7 @@ class Tokenizer
     }
     else
       this.currToken = tokenizer.nextToken();
-  
+
     return this.currToken;
   }
   // Debug only!
@@ -281,19 +281,19 @@ class FSMbuildHelper
     private final Tokenizer tokenizer;
 		private Automaton currAutomaton;
 		private Alphabet currAlphabet;
-    private TransitionMap transitionMap;
+    	private TransitionMap transitionMap;
 		private enum ParserState
 		{
 			READ_NUMBER_OF_STATES,
 			READ_STATES,
 			READ_TRANSITIONS,
 			READ_ADDITIONAL_EVENTS,
-      READ_THIS_AUTOMATON, // MF added to allow multiple FSMs in a *.fsm file
+      		READ_THIS_AUTOMATON, // MF added to allow multiple FSMs in a *.fsm file
 		}
 		private ParserState currParserState = ParserState.READ_NUMBER_OF_STATES;
 		private int numberOfRemainingStates = 0;
 		private int numberOfRemainingTransitions = 0;
-    private boolean weHaveMore = false; // Records whether there is another fsm to read
+    	private boolean weHaveMore = false; // Records whether there is another fsm to read
 		private State currState = null;
 		private boolean initialState;
 
@@ -302,7 +302,7 @@ class FSMbuildHelper
     {
         this.tokenizer = new Tokenizer(is); // new FSMReader(is);
         this.init();
-		}
+	}
 
     private void init()
     {
@@ -311,54 +311,54 @@ class FSMbuildHelper
       this.initialState = true; // The first one we read is the initial state
       this.transitionMap = new TransitionMap();
     }
-    
-		public Automaton build()
+
+	public Automaton build()
     throws Exception
-		{
-			String currLine = tokenizer.readLine();
-			while (currLine != null)
-			{ // System.err.println(tokenizer.getCurrLineNumber());
+	{
+		String currLine = tokenizer.readLine();
+		while (currLine != null)
+		{ // System.err.println(tokenizer.getCurrLineNumber());
 
-				while (tokenizer.hasMoreTokens())
+			while (tokenizer.hasMoreTokens())
+			{
+	  			// This is a bit of legacy, could be removed, but it is keept as I'm lazy
+				final String currToken = tokenizer.nextToken();
+
+	  			// Could replace all of this by currParserState.method(tokenizer, currToken);
+				if (currParserState == ParserState.READ_NUMBER_OF_STATES)
 				{
-          // This is a bit of legacy, could be removed, but it is keept as Iäm lazy
-					final String currToken = tokenizer.nextToken();
-
-          // Could replace all of this by currParserState.method(tokenizer, currToken);
-					if (currParserState == ParserState.READ_NUMBER_OF_STATES)
-					{
-            this.weHaveMore = false;
-            readNumberStates(tokenizer, currToken);
-					}
-					else if (currParserState == ParserState.READ_STATES)
-					{
-            readStates(tokenizer, currToken);
-					}
-					else if (currParserState == ParserState.READ_TRANSITIONS)
-					{
-            readTransitions(tokenizer, currToken);
-					}
-					else if (currParserState == ParserState.READ_ADDITIONAL_EVENTS)
-					{
-              readAdditionalEvents(tokenizer, currToken);
-					}
-          else if (currParserState == ParserState.READ_THIS_AUTOMATON)
-          { // In a multi-fsm file, we just finished reading this automaton
-            // We return the just read automaton here, and set up for reading 
-            // the next one. After this call, currParserState == READ_NUMBER_OF_STATES
-              return prepareToReadNext(tokenizer);
-          }
+					this.weHaveMore = false;
+					readNumberStates(tokenizer, currToken);
 				}
-
-				currLine = tokenizer.readLine();
+				else if (currParserState == ParserState.READ_STATES)
+				{
+					readStates(tokenizer, currToken);
+				}
+				else if (currParserState == ParserState.READ_TRANSITIONS)
+				{
+					readTransitions(tokenizer, currToken);
+				}
+				else if (currParserState == ParserState.READ_ADDITIONAL_EVENTS)
+				{
+		  			readAdditionalEvents(tokenizer, currToken);
+				}
+				  else if (currParserState == ParserState.READ_THIS_AUTOMATON)
+				  { // In a multi-fsm file, we just finished reading this automaton
+					// We return the just read automaton here, and set up for reading
+					// the next one. After this call, currParserState == READ_NUMBER_OF_STATES
+					  return prepareToReadNext(tokenizer);
+				  }
 			}
-      
-			// Add all transitions and events
-      handleTransitions();
 
-			return currAutomaton;
+			currLine = tokenizer.readLine();
 		}
-    
+
+		// Add all transitions and events
+  		handleTransitions();
+
+		return currAutomaton;
+	}
+
     //------------------------------------------------------------------------------
     // Return java.util.AbstractMap.SimpleEntry as pair that holds the c/uc and o/uo attributes
     // There is no check that the same event is defined both as c and uc, or o and uo
@@ -367,11 +367,11 @@ class FSMbuildHelper
     {
       boolean eventControllable = true; // default controllable
       boolean eventObservable = true;   // default observable
-      
+
       while(tokenizer.hasMoreTokens())
       {
         final String optionalParameter = tokenizer.nextToken();
-        
+
         if (optionalParameter.equalsIgnoreCase("uc"))
         {
           eventControllable = false;
@@ -389,7 +389,7 @@ class FSMbuildHelper
           throw new Exception("Unknown event attribute: " + optionalParameter);
         }
       }
-      
+
       return new SimpleEntry<Boolean, Boolean>(eventControllable, eventObservable);
     }
     //------------------------------------------------------------------------------
@@ -417,7 +417,7 @@ class FSMbuildHelper
       final String stateName = currToken;
       final String markedString = tokenizer.nextToken();
       final String nbrOfTransitionsString = tokenizer.nextToken();
-      
+
       if (stateName == null)
       {
         System.err.println("Expected a state name");
@@ -435,7 +435,7 @@ class FSMbuildHelper
 
       int marked = -1;
       String errstring = "Expected the marking of the state, 0 (unmarked) or 1 (marked)";
-      
+
       try
       {
         errstring = "Expected the marking of the state, 0 (unmarked) or 1 (marked)";
@@ -446,7 +446,7 @@ class FSMbuildHelper
           errstring = "Expected the marking of the state, 0 (unmarked) or 1 (marked)";
           throw new NumberFormatException(errstring);
         }
-        
+
         errstring = "Expected the number of transitions";
         numberOfRemainingTransitions = Integer.parseInt(nbrOfTransitionsString);
 
@@ -461,7 +461,7 @@ class FSMbuildHelper
         System.err.println("line "+ tokenizer.getCurrLineNumber() + ": " + errstring);
         throw new Exception("line "+ tokenizer.getCurrLineNumber() + ": " + errstring);
       }
-      
+
       // Create and add the state
       currState = currAutomaton.createUniqueState(stateName);
 
@@ -470,9 +470,9 @@ class FSMbuildHelper
         currState.setInitial(true);
         initialState = false;
       }
-      
+
       final boolean ismarked = (marked == 1) ? true : false;
-      
+
       currState.setAccepting(ismarked);
       currState.setForbidden(false);
 
@@ -496,7 +496,7 @@ class FSMbuildHelper
     {
       final String currEvent = currToken;
       final String destStateName = tokenizer.nextToken();
-      
+
       if (currEvent == null)
       {
         System.err.println("Expected an event");
@@ -510,7 +510,7 @@ class FSMbuildHelper
       final SimpleEntry<Boolean, Boolean> attr = handleEventAttributes(tokenizer);
       final boolean currEventControllable = attr.getKey();
       final boolean currEventObservable = attr.getValue();
-      
+
       final LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
 
       currLabeledEvent.setControllable(currEventControllable);
@@ -539,7 +539,7 @@ class FSMbuildHelper
     //-------------------------------------------------------------------------
     /* Here, all the states and transitions have been read, and what follows is
      * either a set of extra events, preceeded by the token "EVENTS", or a positive
-     * integer that signals the start of a new automaton. Note that if there is an 
+     * integer that signals the start of a new automaton. Note that if there is an
      * event named "events" (highly unlikely, but still) this event will be confused
      * with the token "EVENTS" and discarded.
     **/
@@ -547,7 +547,7 @@ class FSMbuildHelper
     throws java.io.IOException, Exception
     {
       if (currToken.equalsIgnoreCase("EVENTS"))
-      {    
+      {
         // Next follows one or more events, remain in the same parser state and keep reading
         currParserState = ParserState.READ_ADDITIONAL_EVENTS;
         return; // If there is an additional event named "events", we will miss it!
@@ -579,8 +579,8 @@ class FSMbuildHelper
       }
     }
     //-------------------------------------------------------------
-    /* Finalize reading the current automaton and set up to read the 
-     * next, this is for extended fsm-file format. Returns teh just 
+    /* Finalize reading the current automaton and set up to read the
+     * next, this is for extended fsm-file format. Returns teh just
      * now finished automaton.
     **/
     private Automaton prepareToReadNext(final Tokenizer tokenizer)
@@ -588,22 +588,22 @@ class FSMbuildHelper
     {
         // Finalize the current automaton, and cache it
         handleTransitions();
-        Automaton cache = this.currAutomaton;  
-        
+        Automaton cache = this.currAutomaton;
+
         this.tokenizer.pushLine(); // Push back the current line to be read next time
         this.weHaveMore = true;    // Signal that there's more to read
 
         // Re-nitialize
         this.init();
         this.currParserState = ParserState.READ_NUMBER_OF_STATES;
-        
-        return cache; 
+
+        return cache;
     }
     //-----------------------------------------------
     /* Returns a positive integer if this string
      * represents a positive integer, else a negative
-     * integer is returned. Only straight sequence of 
-     * digits is handled, nothing else.     
+     * integer is returned. Only straight sequence of
+     * digits is handled, nothing else.
     **/
     private int isPosInteger(final String str)
     {
@@ -612,17 +612,17 @@ class FSMbuildHelper
       {
         final char ch = str.charAt(i);
         if (ch < '0' || '9' < ch) return -1;
-          
+
         val = 10 * val + (ch - '0');
       }
       return val;
     }
-    
+
     public boolean hasMore()
     {
       return this.weHaveMore;
     }
-    
+
     private void handleTransitions() throws Exception
     {
       for (Iterator<LabeledEvent> labelIt = this.transitionMap.labelIterator(); labelIt.hasNext(); )
@@ -648,7 +648,7 @@ class FSMbuildHelper
 					final State currDestState = currAutomaton.getStateWithName(destStateName);
           if (currSourceState == null || currDestState == null)
             throw new Exception("Error with state name: " + destStateName);
-            
+
 					// Create and add the arc
 					final Arc currArc = new Arc(currSourceState, currDestState, currEvent);
 					currAutomaton.addArc(currArc);
@@ -656,7 +656,7 @@ class FSMbuildHelper
 			}
     }
   }
-  
+
 class TransitionMap
 {
     private final HashMap<LabeledEvent, List<Transition>> theMap =
