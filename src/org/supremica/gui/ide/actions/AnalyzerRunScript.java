@@ -28,16 +28,16 @@ import java.lang.reflect.InvocationTargetException;
 class JavaExecutor
 {
   static String fileName = null;
-  
-  private static final String scriptPackage = "Lupremica"; 
+
+  private static final String scriptPackage = "Lupremica";
   // Java script classes in the default package cannot be accessed by other scripts
   // So we put all java scripts in package Lupremica;
   // The compiled *.class file then has to reside in classURL/Lupremica
-  
+
   static String getFilenameWithoutExt(final String sourcePath) throws IOException
   {
     final Path path = Paths.get(sourcePath);
-    final String filename = path.getFileName().toString(); 
+    final String filename = path.getFileName().toString();
     return filename.substring(0, filename.lastIndexOf(".")); // strip .ext
   }
 
@@ -77,13 +77,13 @@ class JavaExecutor
       final Path grandParent = parent.getParent();
       final URL classUrl = grandParent.toFile().toURI().toURL();
       // System.out.println("classUrl: " + classUrl);
-      
+
       final URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{classUrl});
       final String className = scriptPackage + "." + JavaExecutor.fileName;
       // System.out.println("className == " + className);
       final Class<?> clazz = Class.forName(className, true, classLoader);
       // System.out.println("clazz == " + clazz.getName());
-      
+
       final Constructor<?> constr = clazz.getDeclaredConstructor(org.supremica.gui.ide.IDE.class);
       constr.newInstance(ide);
 
@@ -132,7 +132,8 @@ public class AnalyzerRunScript
         	new javax.swing.filechooser.FileNameExtensionFilter("Lua scripts (*.lua)", "lua");
     	jfc.setFileFilter(filter);
 
-        int returnValue = jfc.showOpenDialog(null);
+        // int returnValue = jfc.showOpenDialog(null);
+        int returnValue = jfc.showOpenDialog(ide);
 
         if (returnValue != javax.swing.JFileChooser.APPROVE_OPTION)
             return;
