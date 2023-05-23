@@ -133,12 +133,13 @@ public class Simulation implements ModelObserver, Observer
     return mStateHistory.size();
   }
 
-  public void setTrace(final TraceProxy trace)
-  {
-    mTrace = trace;
-    mTraceInvalidated = false;
-  }
-
+  /**
+   * Returns the counterexample trace being displayed in the simulator.
+   * @return The counterexample trace that was used to initialise the
+   *         simulation, or <CODE>null</CODE> if the simulator was launched
+   *         without a counterexample or the trace was invalidated by the
+   *         user executing other events.
+   */
   public TraceProxy getTrace()
   {
     if (mTraceInvalidated) {
@@ -1010,11 +1011,11 @@ public class Simulation implements ModelObserver, Observer
     while (iter.hasNext()) {
       final TraceStepProxy traceStep = iter.next();
       if (iter.hasNext() || mAllowLastStep) {
-        final EventProxy event = traceStep.getEvent();
         if (state == null) {
           state = SimulatorState.createInitialState
             (mOrderedAutomata, traceStep);
         } else {
+          final EventProxy event = traceStep.getEvent();
           state = SimulatorState.createSuccessorState(state, event, traceStep);
         }
         mStateHistory.add(state);
