@@ -24,3 +24,5 @@ local fname = getFileName("trace.csv")
 local file = io.open(fname, "w")
 file:write(table.concat(tab, ", "))
 file:close()
+
+print(fname.." saved")
