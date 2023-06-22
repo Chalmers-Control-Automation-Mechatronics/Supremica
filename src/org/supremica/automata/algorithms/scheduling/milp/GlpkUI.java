@@ -7,9 +7,18 @@
 
 package org.supremica.automata.algorithms.scheduling.milp;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
 
 /**
@@ -44,6 +53,7 @@ public class GlpkUI
         this.milpConstructor = milpConstructor;
     }
 
+    @Override
     public void initialize()
         throws MilpException, IOException
     {
@@ -63,6 +73,7 @@ public class GlpkUI
      * Creates the *.mod-file that contains the MILP-formulation used as an input
      * to the GLPK-solver.
      */
+    @Override
     public void createModelFile()
         throws MilpException, IOException
     {
@@ -492,6 +503,7 @@ public class GlpkUI
     /**
      * Launches the GLPK-solver (glpsol.exe must be included in the path).
      */
+    @Override
     public void launchMilpSolver()
         throws MilpException, IOException
     {
@@ -583,6 +595,7 @@ public class GlpkUI
      * Processes the output from the GLPK-solver, transforming it into a sequence
      * of event firing times.
      */
+    @Override
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
     {
@@ -633,8 +646,8 @@ public class GlpkUI
               }
               //                String strCost = str.substring(str.indexOf("]") + 1).trim();
 
-              final int plantIndex = (new Integer(strPlantIndex)).intValue();
-              final int stateIndex = (new Integer(strStateIndex)).intValue();
+              final int plantIndex = Integer.parseInt(strPlantIndex);
+              final int stateIndex = Integer.parseInt(strStateIndex);
               //                double cost = (new Double(strCost)).doubleValue();
 
               optimalTimes[plantIndex][stateIndex] = cost;
@@ -691,9 +704,9 @@ public class GlpkUI
               {
                 strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));
               }
-              final int plantIndex = (new Integer(strplantIndex)).intValue();
-              final int startStateIndex = (new Integer(strStartStateIndex)).intValue();
-              final int endStateIndex = (new Integer(strEndStateIndex)).intValue();
+              final int plantIndex = Integer.parseInt(strplantIndex);
+              final int startStateIndex = Integer.parseInt(strStartStateIndex);
+              final int endStateIndex = Integer.parseInt(strEndStateIndex);
               if (str.indexOf(" 1") < 0)
               {
                 str = r.readLine();
@@ -715,6 +728,7 @@ public class GlpkUI
      * Called by the main class in case of emergency (e.g. undeleted temporary files
      * in case of exception).
      */
+    @Override
     public void cleanUp()
     {
         try
@@ -741,12 +755,14 @@ public class GlpkUI
     }
 
     /** Returns the optimal event occurrence times for each plant-state. */
+    @Override
     public double[][] getOptimalTimes()
     {
         return optimalTimes;
     }
 
     /** Returns the optimal alt. path variable choices. */
+    @Override
     public boolean[][][] getOptimalAltPathVariables()
     {
         return optimalAltPathVariables;

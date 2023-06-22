@@ -66,7 +66,7 @@ public class WorkbenchAction
 
         putValue(Action.NAME, "Workbench...");
         putValue(Action.SHORT_DESCRIPTION, "Launch workbench");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_W));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/supremica/workbench16.gif")));
     }

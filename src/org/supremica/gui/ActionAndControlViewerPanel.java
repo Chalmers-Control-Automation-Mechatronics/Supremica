@@ -124,7 +124,7 @@ public class ActionAndControlViewerPanel
 
 			currSignalNode.add(currPortNode);
 
-			final DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			final DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(currSignal.getPort());
 
 			currPortNode.add(currPortNodeAttribute);
 		}
@@ -141,7 +141,7 @@ public class ActionAndControlViewerPanel
 
 			currSignalNode.add(currPortNode);
 
-			final DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			final DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(currSignal.getPort());
 
 			currPortNode.add(currPortNodeAttribute);
 		}
@@ -220,7 +220,7 @@ public class ActionAndControlViewerPanel
 
 			currTimerNode.add(currDelayNode);
 
-			final DefaultMutableTreeNode currDelayNodeAttribute = new DefaultMutableTreeNode(new Integer(currTimer.getDelay()));
+			final DefaultMutableTreeNode currDelayNodeAttribute = new DefaultMutableTreeNode(currTimer.getDelay());
 
 			currDelayNode.add(currDelayNodeAttribute);
 		}

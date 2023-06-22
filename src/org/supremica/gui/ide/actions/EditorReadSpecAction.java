@@ -83,7 +83,7 @@ public class EditorReadSpecAction
         setEditorActiveRequired(true);
 
         putValue(Action.NAME, "Read specification from file...");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Read specification from file in form of guards");
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));

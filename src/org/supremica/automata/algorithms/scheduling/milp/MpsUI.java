@@ -122,7 +122,7 @@ public abstract class MpsUI
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]")].
                     add(new double[]{constraintCounter, 1});
             varCoeffs[binVarIndexMap.size()].add(new double[]{constraintCounter++, -1});
-            bUpper.add(new Double(0));
+            bUpper.add(0.0);
         }
 
         // The initial (precedence) constraints
@@ -130,7 +130,7 @@ public abstract class MpsUI
         {
             varCoeffs[timeVarIndexMap.get("time[" + constr[0] + ", " + constr[1] + "]")].
                     add(new double[]{constraintCounter++, -1});
-            bUpper.add(new Double(-1 * milpConstructor.getDeltaTimes()[constr[0]][constr[1]]));
+            bUpper.add(-1 * milpConstructor.getDeltaTimes()[constr[0]][constr[1]]);
         }
 
         // The precedence constraints
@@ -153,7 +153,7 @@ public abstract class MpsUI
                     varCoeffs[followingVarIndex].add(new double[]{constraintCounter, -1});
                     varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(altPathVar[0], altPathVar[1], altPathVar[2]))].
                             add(new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
-                    bUpper.add(new Double(rhs));
+                    bUpper.add(rhs);
 
                     constraintCounter++;
                 }
@@ -162,7 +162,7 @@ public abstract class MpsUI
             {
                 varCoeffs[precedingVarIndex].add(new double[]{constraintCounter, 1});
                 varCoeffs[followingVarIndex].add(new double[]{constraintCounter, -1});
-                bUpper.add(new Double(rhs));
+                bUpper.add(rhs);
 
                 constraintCounter++;
             }
@@ -196,8 +196,8 @@ public abstract class MpsUI
                 varCoeffs[binVarIndexMap.get(milpConstructor.makeAltPathsVariable(
                         constr[0], constr[1], constr[2]))].add(
                         new double[]{constraintCounter, SchedulingConstants.BIG_M_VALUE});
-                bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON -
-                        milpConstructor.getDeltaTimes()[constr[0]][constr[2]]));
+                bUpper.add(SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON -
+                           milpConstructor.getDeltaTimes()[constr[0]][constr[2]]);
                 constraintCounter++;
             }
             for (final int[] constr : constrBlock)
@@ -206,7 +206,7 @@ public abstract class MpsUI
                         constr[0], constr[1], constr[2]))].add(
                         new double[]{constraintCounter, 1});
             }
-            bUpper.add(new Double(1));
+            bUpper.add(1.0);
             equalityRowIndices.add(constraintCounter++);
         }
 
@@ -260,7 +260,7 @@ public abstract class MpsUI
                 varCoeffs[altPathVarIndex].add(new double[]{
                     constraintCounter, allActiveAltBinVars.get(altPathVarIndex) * SchedulingConstants.BIG_M_VALUE});
             }
-            bUpper.add(new Double(convergingStatesCounter * SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON));
+            bUpper.add(convergingStatesCounter * SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON);
             constraintCounter++;
 
             // The dual constraint
@@ -274,7 +274,7 @@ public abstract class MpsUI
                 varCoeffs[altPathVarIndex].add(new double[]{
                     constraintCounter, allActiveAltBinVars.get(altPathVarIndex) * SchedulingConstants.BIG_M_VALUE});
             }
-            bUpper.add(new Double((1 + convergingStatesCounter) * SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON));
+            bUpper.add((1 + convergingStatesCounter) * SchedulingConstants.BIG_M_VALUE - SchedulingConstants.EPSILON);
             constraintCounter++;
 
             // Set mutexVar := 0 if any state involved in the current b/u-choice is unreached
@@ -286,7 +286,7 @@ public abstract class MpsUI
                     varCoeffs[altPathVarIndex].add(new double[]{
                         constraintCounter, -1.0 / convergingStatesCounter});
                 }
-                bUpper.add(new Double(0));
+                bUpper.add(0.0);
                 constraintCounter++;
             }
         }
@@ -310,7 +310,7 @@ public abstract class MpsUI
             }
             constraintCounter++;
 
-            bUpper.add(new Double(rhs));
+            bUpper.add((double) rhs);
         }
 
         // The circular wait constraints
@@ -408,10 +408,10 @@ public abstract class MpsUI
                     }
 
                     final double uBound = currUFPair.get(0)[1] + currUFPair.get(1)[1] - 1;
-                    bUpper.add(new Double(uBound));
+                    bUpper.add(uBound);
                     if (!constraint.hasBuffer())
                     {
-                        bUpper.add(new Double(-1*uBound));
+                        bUpper.add(-uBound);
                         constraintCounter++;
                     }
                 }
@@ -419,10 +419,10 @@ public abstract class MpsUI
             else
             {
                 // Add the upper bounds for the new constraints
-                bUpper.add(new Double(uBoundUF));
+                bUpper.add((double) uBoundUF);
                 if (!constraint.hasBuffer())
                 {
-                    bUpper.add(new Double(uBoundCW));
+                    bUpper.add((double) uBoundCW);
                     constraintCounter++;
                 }
             }
@@ -492,17 +492,17 @@ public abstract class MpsUI
                                 final int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
                                         currSharedTimeVarsInFirstPlant.get(k1)));
 
-                                Integer currFrequency = currFrequencyMap.get(new Integer(altPathIndex));
+                                Integer currFrequency = currFrequencyMap.get(altPathIndex);
                                 if (currFrequency == null)
                                 {
-                                    currFrequency = new Integer(0);
+                                    currFrequency = 0;
                                 }
                                 currFrequencyMap.put(altPathIndex, currFrequency.intValue() + 1);
 
-                                Integer firstPlantFrequency = firstPlantFrequencyMap.get(new Integer(altPathIndex));
+                                Integer firstPlantFrequency = firstPlantFrequencyMap.get(altPathIndex);
                                 if (firstPlantFrequency == null)
                                 {
-                                    firstPlantFrequency = new Integer(0);
+                                    firstPlantFrequency = 0;
                                 }
                                 firstPlantFrequencyMap.put(altPathIndex, firstPlantFrequency.intValue() + 1);
 
@@ -513,24 +513,24 @@ public abstract class MpsUI
                                 final int altPathIndex = binVarIndexMap.get(makeAltPathsVariableStr(
                                         currSharedTimeVarsInSecondPlant.get(k2)));
 
-                                Integer currFrequency = currFrequencyMap.get(new Integer(altPathIndex));
+                                Integer currFrequency = currFrequencyMap.get(altPathIndex);
                                 if (currFrequency == null)
                                 {
-                                    currFrequency = new Integer(0);
+                                    currFrequency = 0;
                                 }
                                 currFrequencyMap.put(altPathIndex, currFrequency.intValue() + 1);
 
-                                Integer secondPlantFrequency = secondPlantFrequencyMap.get(new Integer(altPathIndex));
+                                Integer secondPlantFrequency = secondPlantFrequencyMap.get(altPathIndex);
                                 if (secondPlantFrequency == null)
                                 {
-                                    secondPlantFrequency = new Integer(0);
+                                    secondPlantFrequency = 0;
                                 }
                                 secondPlantFrequencyMap.put(altPathIndex, secondPlantFrequency.intValue() + 1);
 
                                 altPathCounter++;
                             }
 
-                            // The occurrence frequencys are added to the coefficients of current row for each variable
+                            // The occurrence frequencies are added to the coefficients of current row for each variable
                             for (final Integer altPathIndex : currFrequencyMap.keySet())
                             {
                                 varCoeffs[altPathIndex].add(new double[]{constraintCounter,
@@ -540,8 +540,8 @@ public abstract class MpsUI
                             }
 
                             // Two right-hand-side-expressions are needed
-                            bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE * altPathCounter));
-                            bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE * altPathCounter));
+                            bUpper.add((double) SchedulingConstants.BIG_M_VALUE * altPathCounter);
+                            bUpper.add((double) SchedulingConstants.BIG_M_VALUE * altPathCounter);
 
                             constraintCounter += 2;
                         }
@@ -566,7 +566,7 @@ public abstract class MpsUI
                     }
                     // The right-hand-side is generally = 0, but here it contains the numbers of
                     // forces event occurrences (no alt. paths upstreams)
-                    bUpper.add(new Double(firstPlantFrequencyMap.get(-1) - secondPlantFrequencyMap.get(-1)));
+                    bUpper.add((double) firstPlantFrequencyMap.get(-1) - secondPlantFrequencyMap.get(-1));
 
                     // The list of equality row indices is updated
                     equalityRowIndices.add(constraintCounter);
@@ -749,10 +749,10 @@ public abstract class MpsUI
 
                 if (varToken.contains("delta"))
                 {
-                    final int plantIndex = (new Integer(varToken.substring(
-                            varToken.indexOf("[") + 1, varToken.indexOf(",")).trim())).intValue();
-                    final int stateIndex = (new Integer(varToken.substring(
-                            varToken.indexOf(",") + 1, varToken.indexOf("]")).trim())).intValue();
+                    final int plantIndex = Integer.parseInt(varToken.substring(
+                            varToken.indexOf("[") + 1, varToken.indexOf(",")).trim());
+                    final int stateIndex = Integer.parseInt(varToken.substring(
+                            varToken.indexOf(",") + 1, varToken.indexOf("]")).trim());
                     currBUpper += -1 * multiplier * tokenSign * milpConstructor.getDeltaTimes()[plantIndex][stateIndex];
                 }
                 else
@@ -804,7 +804,7 @@ public abstract class MpsUI
                     }
                     else
                     {
-                        final Double constVal = new Double(currToken);
+                        final Double constVal = Double.parseDouble(currToken);
                         currBUpper += -1 * tokenSign * multiplier * constVal;
                     }
                 }
@@ -835,8 +835,8 @@ public abstract class MpsUI
         // Fill the arrays of optimal times with appropriate values
         for (final String varKey : timeVarIndexMap.keySet())
         {
-            final int plantIndex = (new Integer(varKey.substring(varKey.indexOf("[") + 1, varKey.indexOf(",")).trim())).intValue();
-            final int stateIndex = (new Integer(varKey.substring(varKey.indexOf(",") + 1, varKey.indexOf("]")).trim())).intValue();
+            final int plantIndex = Integer.parseInt(varKey.substring(varKey.indexOf("[") + 1, varKey.indexOf(",")).trim());
+            final int stateIndex = Integer.parseInt(varKey.substring(varKey.indexOf(",") + 1, varKey.indexOf("]")).trim());
 
             final Double optimalVarValue = optimalTimeVarValues.get(timeVarIndexMap.get(varKey));
             if (optimalVarValue != null)
@@ -980,9 +980,9 @@ public abstract class MpsUI
     {
         final int[] varIndices = new int[3];
 
-        varIndices[0] = (new Integer(varStr.substring(1, varStr.indexOf("_")))).intValue();
-        varIndices[1] = (new Integer(varStr.substring(varStr.indexOf("om_") + 3, varStr.indexOf("_to")))).intValue();
-        varIndices[2] = (new Integer(varStr.substring(varStr.indexOf("to_") + 3, varStr.length()))).intValue();
+        varIndices[0] = Integer.parseInt(varStr.substring(1, varStr.indexOf("_")));
+        varIndices[1] = Integer.parseInt(varStr.substring(varStr.indexOf("om_") + 3, varStr.indexOf("_to")));
+        varIndices[2] = Integer.parseInt(varStr.substring(varStr.indexOf("to_") + 3, varStr.length()));
 
         return varIndices;
     }
@@ -1013,8 +1013,8 @@ public abstract class MpsUI
                             uAltPathVar[0], uAltPathVar[1], uAltPathVar[2]))].
                             add(new double[]{constraintCounter++, SchedulingConstants.BIG_M_VALUE});
 
-                    bUpper.add(new Double(SchedulingConstants.BIG_M_VALUE *
-                            (bookingAltPaths.size() + unbookingAltPaths.size()) - SchedulingConstants.EPSILON));
+                    bUpper.add(SchedulingConstants.BIG_M_VALUE *
+                               (bookingAltPaths.size() + unbookingAltPaths.size()) - SchedulingConstants.EPSILON);
                 }
             }
         }

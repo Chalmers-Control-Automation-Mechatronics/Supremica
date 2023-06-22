@@ -960,7 +960,7 @@ class EditorGraph
 
     public void addEdge(final EdgeSubject edge)
     {
-      if (mEdges.put(edge, new Boolean(true)) != null) {
+      if (mEdges.put(edge, true) != null) {
         edge.addModelObserver(this);
       }
     }

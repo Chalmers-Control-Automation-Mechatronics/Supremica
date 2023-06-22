@@ -37,6 +37,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -133,6 +134,7 @@ public class NonTypingTable
 
   //#########################################################################
   //# Overrides for Base Class javax.swing.JTable
+  @Override
   protected boolean processKeyBinding(final KeyStroke stroke,
                                       final KeyEvent event,
                                       final int cond,
@@ -227,6 +229,7 @@ public class NonTypingTable
 
     //#######################################################################
     //# Interface javax.swing.Action
+    @Override
     public boolean isEnabled()
     {
       return getSelectedRowCount() > 0;
@@ -234,6 +237,7 @@ public class NonTypingTable
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       clearSelection();
@@ -263,6 +267,7 @@ public class NonTypingTable
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       if (!isEditing()) {
@@ -289,7 +294,7 @@ public class NonTypingTable
   private static final KeyStroke STROKE_TAB =
     KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0);
   private static final KeyStroke STROKE_SHIFT_TAB =
-    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
+    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK);
 
   private static final String CYCLE_DOWN = "Cycle Down";
   private static final String CYCLE_UP = "Cycle Up";

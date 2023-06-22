@@ -1,22 +1,22 @@
 package org.supremica.automata.algorithms.scheduling;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class VisibilityChecker {
 
-    private ArrayList<double[]> intersectionEdges;
-    private double[] start, goal;
+    private final ArrayList<double[]> intersectionEdges;
+    private final double[] start, goal;
 
-	public VisibilityChecker(ArrayList<double[]> intersectionEdges)
+	public VisibilityChecker(final ArrayList<double[]> intersectionEdges)
 	{
 		this(intersectionEdges, new double[]{0, 0});
 	}
 
-    public VisibilityChecker(ArrayList<double[]> intersectionEdges, double[] goal) {
+    public VisibilityChecker(final ArrayList<double[]> intersectionEdges, final double[] goal) {
 	this(intersectionEdges, new double[]{0, 0}, goal);
     }
 
-    public VisibilityChecker(ArrayList<double[]> intersectionEdges, double[] start, double[] goal) {
+    public VisibilityChecker(final ArrayList<double[]> intersectionEdges, final double[] start, final double[] goal) {
 	this.start = start;
 	this.goal = goal;
 
@@ -27,10 +27,10 @@ public class VisibilityChecker {
      * This method returns true if the points (a, b, c) are ordered clockwise.
      * This is useful in intersection detection.
      */
-    private boolean clockwisePts(double[] a, double[] b, double[] c)
+    private boolean clockwisePts(final double[] a, final double[] b, final double[] c)
 	{
-		double leftSide = (c[1]-a[1])*(b[0]-a[0]);
-		double rightSide = (b[1]-a[1])*(c[0]-a[0]);
+		final double leftSide = (c[1]-a[1])*(b[0]-a[0]);
+		final double rightSide = (b[1]-a[1])*(c[0]-a[0]);
 
 		if (leftSide < rightSide)
 			return true;
@@ -41,7 +41,7 @@ public class VisibilityChecker {
     /**
      * Loops through all edges and checks if any of them intersects the start-goal-line.
      */
-    public boolean isVisible(boolean backwardTimeAllowed)
+    public boolean isVisible(final boolean backwardTimeAllowed)
 	{
 		if (!backwardTimeAllowed)
 		{
@@ -67,8 +67,8 @@ public class VisibilityChecker {
 			}
 			else
  			{
-				double[] firstVertice = new double[]{intersectionEdges.get(i)[0], intersectionEdges.get(i)[1]};
-				double[] secondVertice = new double[]{intersectionEdges.get(i)[2], intersectionEdges.get(i)[3]};
+				final double[] firstVertice = new double[]{intersectionEdges.get(i)[0], intersectionEdges.get(i)[1]};
+				final double[] secondVertice = new double[]{intersectionEdges.get(i)[2], intersectionEdges.get(i)[3]};
 
 				if (intersect(start, goal, firstVertice, secondVertice))
 				{
@@ -88,9 +88,9 @@ public class VisibilityChecker {
 		return isVisible(false);
 	}
 
-	public ArrayList<Integer> getVisibleIndices(double[] start, ArrayList<double[]> vertices)
+	public ArrayList<Integer> getVisibleIndices(final double[] start, final ArrayList<double[]> vertices)
 	{
-		ArrayList<Integer> visibleIndices = new ArrayList<Integer>();
+		final ArrayList<Integer> visibleIndices = new ArrayList<Integer>();
 
 		setStart(start);
 
@@ -100,7 +100,7 @@ public class VisibilityChecker {
 
 			if (isVisible())
 			{
-				visibleIndices.add(new Integer(i));
+				visibleIndices.add(i);
 			}
 		}
 
@@ -110,7 +110,7 @@ public class VisibilityChecker {
     /**
      * Returns true if the two edges ab and cd intersect.
      */
-    private boolean intersect(double[] a, double[] b, double[] c, double[] d)
+    private boolean intersect(final double[] a, final double[] b, final double[] c, final double[] d)
 	{
 		if (clockwisePts(a, c, d) == clockwisePts(b, c, d))
 		{
@@ -127,10 +127,10 @@ public class VisibilityChecker {
     /**
      * Returns true if the start point lies somewhere on the supplied edge (including the vertices).
      */
-    private boolean pointOnTheEdge(double[] start, double[] edge)
+    private boolean pointOnTheEdge(final double[] start, final double[] edge)
 	{
-		double[] a = new double[]{edge[0], edge[1]};
-		double[] b = new double[]{edge[2], edge[3]};
+		final double[] a = new double[]{edge[0], edge[1]};
+		final double[] b = new double[]{edge[2], edge[3]};
 
 		if (!clockwisePts(start, a, b) && !clockwisePts(start, b, a))
 		{
@@ -157,7 +157,7 @@ public class VisibilityChecker {
 		return false;
     }
 
-    public void setStart(double[] start)
+    public void setStart(final double[] start)
 	{
 		for (int i=0; i<this.start.length; i++)
 		{
@@ -165,7 +165,7 @@ public class VisibilityChecker {
 		}
     }
 
-    public void setGoal(double[] goal)
+    public void setGoal(final double[] goal)
 	{
 		for (int i=0; i<this.goal.length; i++)
 		{
@@ -173,7 +173,7 @@ public class VisibilityChecker {
 		}
     }
 
-    public double getDistanceToDiag(double[] point)
+    public double getDistanceToDiag(final double[] point)
 	{
 		double s1 = 0;
 		double s2 = 0;

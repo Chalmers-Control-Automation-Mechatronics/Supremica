@@ -1549,10 +1549,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
       generateDOT(generateIDD(bdd, validStatesBDD), absPathDot);
       final Runtime rt = Runtime.getRuntime();
       try {
-          final Process proc1 = rt.exec("dot -T" + fileExtension + " " + absPathDot + " -o " + absPathPs);
+          final Process proc1 = rt.exec(new String[] {"dot", "-T" + fileExtension, absPathDot, "-o", absPathPs});
           proc1.waitFor();
           proc1.exitValue();
-          final Process proc2 = rt.exec("cmd /C del " + absPathDot);
+          final Process proc2 = rt.exec(new String[] {"cmd", "/C", "del", absPathDot});
           proc2.waitFor();
           proc2.exitValue();
       } catch (final Exception e) {

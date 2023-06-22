@@ -59,7 +59,7 @@ public class FocusPreservingTrigger
                                     final char accelerator)
   {
     final int code = KeyEvent.getExtendedKeyCodeForChar(accelerator);
-    final KeyStroke stroke = KeyStroke.getKeyStroke(code, KeyEvent.ALT_MASK);
+    final KeyStroke stroke = KeyStroke.getKeyStroke(code, KeyEvent.ALT_DOWN_MASK);
     final Action action = new FocusPreservingTrigger(button, stroke);
     final String text = button.getText();
     final int mnemonicIndex =

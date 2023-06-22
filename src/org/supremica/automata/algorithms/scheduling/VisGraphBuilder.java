@@ -190,11 +190,11 @@ public class VisGraphBuilder
 
 					if (label.contains("b"))
 					{
-						zoneNr = (new Integer(label.substring(label.indexOf("b")+1).trim())).intValue();
+						zoneNr = Integer.parseInt(label.substring(label.indexOf("b")+1).trim());
 					}
 					else if (label.contains("u"))
 					{
-						zoneNr = (new Integer(label.substring(label.indexOf("u")+1).trim())).intValue();
+						zoneNr = Integer.parseInt(label.substring(label.indexOf("u")+1).trim());
 					}
 
 					ArrayList<Integer> localZoneIndices = zoneIndices.get(zoneNr);

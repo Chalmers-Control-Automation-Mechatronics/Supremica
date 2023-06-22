@@ -536,7 +536,7 @@ public class ProjectBuildFromWaters
       if (label.contains("prob_")) {
         Double percentage = null;
         try {
-          percentage = new Double(label
+          percentage = Double.parseDouble(label
             .substring(label.lastIndexOf("prob_") + 5).trim());
         } catch (final NumberFormatException e) {
           logger.error("Parsing of transition named " + label + " failed.");

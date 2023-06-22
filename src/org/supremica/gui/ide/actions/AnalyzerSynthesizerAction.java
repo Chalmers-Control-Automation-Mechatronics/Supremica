@@ -61,7 +61,7 @@ public class AnalyzerSynthesizerAction
         setAnalyzerActiveRequired(true);
 
         putValue(Action.NAME, "Synthesize...");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a supervisor for the selected automata");
         putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);

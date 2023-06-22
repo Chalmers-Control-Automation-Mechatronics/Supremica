@@ -570,7 +570,7 @@ public class ScheduleDialog
 
     void readMemoryCapacity()
     {
-        memoryCapacity = (new Integer(memoryCapacityField.getText()));
+        memoryCapacity = Integer.parseInt(memoryCapacityField.getText());
     }
 
     /**
@@ -847,8 +847,8 @@ class ApproxWeightsDialog
     {
         try
         {
-            xWeight = new Double(xField.getText()).doubleValue();
-            yWeight = new Double(yField.getText()).doubleValue();
+            xWeight = Double.parseDouble(xField.getText());
+            yWeight = Double.parseDouble(yField.getText());
 
             if (xWeight < 0 || yWeight < 0)
             {

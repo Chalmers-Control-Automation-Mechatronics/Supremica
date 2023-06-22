@@ -740,13 +740,13 @@ public class ModifiedAstar
     {
         // The nodes corresponding to the same logical state (but different paths from the initial state)
         // as the new node. They are stored as one double[]-variable in the closedTree.
-        final Node correspondingClosedNodes = closedTree.remove(new Integer(getKey(node)));
+        final Node correspondingClosedNodes = closedTree.remove(getKey(node));
 
         // If the node (or its logical state collegues) has not yet been put on the closedTree,
         // then it is simply added to CLOSED.
         if (correspondingClosedNodes == null)
         {
-            closedTree.put(new Integer(getKey(node)), node);
+            closedTree.put(getKey(node), node);
         }
         else
         {
@@ -783,13 +783,13 @@ public class ModifiedAstar
                 // it is thrown away;
                 if (newNodeIsAlwaysWorse)
                 {
-                    closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
+                    closedTree.put(getKey(node), correspondingClosedNodes);
                     return false;
                 }
                 // else if the examined node is neither worse nor better, its index is added to the tieIndices
                 else if (! newNodeIsAlwaysWorse && ! newNodeIsAlwaysBetter)
                 {
-                    tieIndices.add(new Integer(i));
+                    tieIndices.add(i);
                 }
             }
 
@@ -814,7 +814,7 @@ public class ModifiedAstar
 
 			correspondingClosedNodes.setBasis(newClosedNodeBasis);
 
-            closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
+            closedTree.put(getKey(node), correspondingClosedNodes);
         }
 
         return true;
@@ -1179,7 +1179,7 @@ public class ModifiedAstar
     {
         // one object of the closedTree may contain several nodes (that all correspond
         // to the same logical state but different paths).
-        final Node parentCandidates = closedTree.get(new Integer((int)node.getValueAt(PARENT_INDEX)));
+        final Node parentCandidates = closedTree.get((int) node.getValueAt(PARENT_INDEX));
         if (parentCandidates == null)
         {
             return null;

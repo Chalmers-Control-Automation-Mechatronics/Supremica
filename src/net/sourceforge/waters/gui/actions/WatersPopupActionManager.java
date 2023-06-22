@@ -92,7 +92,7 @@ public class WatersPopupActionManager
   {
     if (action.isEnabled()) {
       final String key = (String) action.getValue(Action.ACTION_COMMAND_KEY);
-      final int mods = event == null ? 0 : event.getModifiers();
+      final int mods = event == null ? 0 : event.getModifiersEx();
       final ActionEvent newevent =
         new ActionEvent(this, ActionEvent.ACTION_PERFORMED, key, mods);
       action.actionPerformed(newevent);

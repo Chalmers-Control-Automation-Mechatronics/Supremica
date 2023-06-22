@@ -35,11 +35,12 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.KeyStroke;
 
 import org.supremica.gui.examplegenerator.TestCasesDialog;
 
@@ -54,7 +55,7 @@ public class ToolsTestCasesAction
     /**
      * Constructor.
      */
-    public ToolsTestCasesAction(List<IDEAction> actionList)
+    public ToolsTestCasesAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -63,12 +64,13 @@ public class ToolsTestCasesAction
 
         putValue(Action.NAME, "Dynamic examples...");
         putValue(Action.SHORT_DESCRIPTION, "Generate test case");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_T));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -76,9 +78,10 @@ public class ToolsTestCasesAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        TestCasesDialog testCasesDialog = new TestCasesDialog(ide.getIDE(), ide.getIDE());
+        final TestCasesDialog testCasesDialog = new TestCasesDialog(ide.getIDE(), ide.getIDE());
         testCasesDialog.setVisible(true);
     }
 }

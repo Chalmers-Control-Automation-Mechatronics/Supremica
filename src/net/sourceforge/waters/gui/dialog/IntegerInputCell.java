@@ -126,7 +126,7 @@ public class IntegerInputCell
     {
       mMinValue = minValue;
       mMaxValue = maxValue;
-      mNullValue = new Integer(nullValue);
+      mNullValue = nullValue;
     }
 
 

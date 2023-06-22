@@ -128,7 +128,7 @@ public class DoubleInputCell
     {
       mMinValue = minValue;
       mMaxValue = maxValue;
-      mNullValue = new Double(nullValue);
+      mNullValue = nullValue;
     }
 
 

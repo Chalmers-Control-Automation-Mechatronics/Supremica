@@ -184,7 +184,7 @@ public class VisGraphScheduler
                                 " in time " + timer.elapsedTime() + "ms\n";
                     }
 
-                    closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
+                    closedTree.put(currNode[SELF_INDEX], currNode);
                     break;
                 }
 
@@ -267,7 +267,7 @@ public class VisGraphScheduler
         // The optimal solution is returned
         // (when (if) building the schedule automaton, remember that the indices
         // of closed states are shifted by 1 due to the removal of the first vertice (above))
-        return closedTree.get(new Double(vertices.size()))[G_INDEX];
+        return closedTree.get((double) vertices.size())[G_INDEX];
     }
 
 
@@ -354,9 +354,9 @@ public class VisGraphScheduler
 
     private void branch(final double[] currNode)
     {
-        final double[] correspondingClosedNode = closedTree.get(new Double(currNode[SELF_INDEX]));
+        final double[] correspondingClosedNode = closedTree.get(currNode[SELF_INDEX]);
 
-        // If the current vertice has not been examined yet OR previous examination was more expensive...
+        // If the current vertex has not been examined yet OR previous examination was more expensive...
         if (correspondingClosedNode == null || currNode[F_INDEX] < correspondingClosedNode[F_INDEX])
         {
             // ... then add the children of the current vertice to the open list
@@ -376,8 +376,8 @@ public class VisGraphScheduler
                 openTree.add(newNode);
             }
 
-            // ... and place a better vertice-instance on the closed list
-            closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
+            // ... and place a better vertex-instance on the closed list
+            closedTree.put(currNode[SELF_INDEX], currNode);
         }
     }
 
@@ -430,15 +430,15 @@ public class VisGraphScheduler
                             // If the current event is a booking event...
                             if (currZone.getInitialState().activeEvents(false).contains(currEvent))
                             {
-                                zoneBoundaryTimes[i].put(new Integer(j), new double[]{currTime, -1});
+                                zoneBoundaryTimes[i].put(j, new double[]{currTime, -1});
                                 additionalTimes[i]++;
                             }
                             // If the current event is an unbooking event...
                             else
                             {
-                                final double[] currTimePair = zoneBoundaryTimes[i].get(new Integer(j));
+                                final double[] currTimePair = zoneBoundaryTimes[i].get(j);
                                 currTimePair[1] = currTime;
-                                zoneBoundaryTimes[i].put(new Integer(j), currTimePair);
+                                zoneBoundaryTimes[i].put(j, currTimePair);
                             }
                         }
                     }
@@ -540,10 +540,10 @@ public class VisGraphScheduler
         for (int j=0; j<zones.size(); j++)
         {
             // The zone boundaries of the first robot
-            final double[] firstBoundaryTimes = zoneBoundaryTimes[0].get(new Integer(j));
+            final double[] firstBoundaryTimes = zoneBoundaryTimes[0].get(j);
 
             // The zone boundaries of the second robot
-            final double[] secondBoundaryTimes = zoneBoundaryTimes[1].get(new Integer(j));
+            final double[] secondBoundaryTimes = zoneBoundaryTimes[1].get(j);
 
             // Two vertices (NW and SE) are added to the graph. But this is done only if
             // both boundary times are non-null, i.e. if both robots use the current zone.
@@ -636,7 +636,7 @@ public class VisGraphScheduler
         {
             if (isRunning)
             {
-                drawer.addZone(zoneBoundaryTimes[0].get(new Integer(j)), zoneBoundaryTimes[1].get(new Integer(j)), zones.getAutomatonAt(j).getName());
+                drawer.addZone(zoneBoundaryTimes[0].get(j), zoneBoundaryTimes[1].get(j), zones.getAutomatonAt(j).getName());
             }
             else
             {
@@ -644,7 +644,7 @@ public class VisGraphScheduler
             }
         }
 
-        double[] currNode = closedTree.get(new Double(vertices.size() - 1));
+        double[] currNode = closedTree.get(vertices.size() - 1.0);
         while (! isInitialNode(currNode))
         {
             if (isRunning)
@@ -652,7 +652,7 @@ public class VisGraphScheduler
                 // The drawing of the optimal solution
                 final double[] pathEndVertex = vertices.get((int) currNode[SELF_INDEX]);
 
-                currNode = closedTree.get(new Double(currNode[PARENT_INDEX]));
+                currNode = closedTree.get(currNode[PARENT_INDEX]);
                 final double[] pathStartVertex = vertices.get((int) currNode[SELF_INDEX]);
 
                 drawer.addPath(pathStartVertex, pathEndVertex);

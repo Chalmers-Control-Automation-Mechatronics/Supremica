@@ -94,7 +94,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
     setAnalyzerActiveRequired(true);
     putValue(Action.NAME, "To editor");
     putValue(Action.SHORT_DESCRIPTION, "Send selected automata to editor");
-    putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_E);
     //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
     putValue(Action.SMALL_ICON,
              new ImageIcon(IDE.class.getResource

@@ -35,6 +35,9 @@
 
 package org.supremica.gui.ide;
 
+import att.grappa.Graph;
+import att.grappa.GrappaPanel;
+
 import java.awt.Dimension;
 
 import org.supremica.automata.Automaton;
@@ -42,9 +45,6 @@ import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.gui.DotBuilder;
 import org.supremica.gui.DotBuilderGraphObserver;
 import org.supremica.gui.WhiteScrollPane;
-
-import att.grappa.Graph;
-import att.grappa.GrappaPanel;
 
 class AnalyzerAutomatonViewerPanel
     extends WhiteScrollPane
@@ -91,7 +91,7 @@ class AnalyzerAutomatonViewerPanel
 
     private void build()
     {
-        DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
+        DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton));
     }
 
     @Override

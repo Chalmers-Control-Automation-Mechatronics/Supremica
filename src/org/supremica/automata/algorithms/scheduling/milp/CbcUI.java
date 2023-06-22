@@ -5,8 +5,18 @@
 
 package org.supremica.automata.algorithms.scheduling.milp;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Hashtable;
+
 import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
 
 /**
@@ -22,6 +32,7 @@ public class CbcUI
         super(milpConstructor);
     }
 
+    @Override
     public void launchMilpSolver(final File mpsFile)
             throws MilpException, IOException
     {
@@ -89,6 +100,7 @@ public class CbcUI
         }
     }
 
+    @Override
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
     {
@@ -105,13 +117,13 @@ public class CbcUI
             {
                 str = str.substring(cutIndex + 1);
                 cutIndex = str.indexOf(" ");
-                final Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
+                final Integer varIndex = Integer.parseInt(str.substring(0, cutIndex).trim());
 
                 str = str.substring(cutIndex).trim();
                 cutIndex = str.indexOf(" ");
-                final Integer varValue = new Integer(str.substring(0, cutIndex).trim());
+                final Integer varValue = Integer.parseInt(str.substring(0, cutIndex).trim());
 
-                optimalBinVarValues.put(new Integer(varIndex), varValue);
+                optimalBinVarValues.put(varIndex, varValue);
             }
             else
             {
@@ -120,11 +132,11 @@ public class CbcUI
                 {
                     str = str.substring(cutIndex + 1);
                     cutIndex = str.indexOf(" ");
-                    final Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
+                    final Integer varIndex = Integer.parseInt(str.substring(0, cutIndex).trim());
 
                     str = str.substring(cutIndex).trim();
                     cutIndex = str.indexOf(" ");
-                    final Double varValue = new Double(str.substring(0, cutIndex).trim());
+                    final Double varValue = Double.parseDouble(str.substring(0, cutIndex).trim());
 
                     optimalTimeVarValues.put(varIndex, varValue);
                 }

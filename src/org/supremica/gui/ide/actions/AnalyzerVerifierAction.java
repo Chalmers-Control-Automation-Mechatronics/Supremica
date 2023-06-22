@@ -73,7 +73,7 @@ public class AnalyzerVerifierAction
 
         putValue(Action.NAME, "Verify...");
         putValue(Action.SHORT_DESCRIPTION, "Run verification on the selected automata");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_V));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_V);
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_VERIFY);
     }

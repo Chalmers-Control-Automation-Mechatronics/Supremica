@@ -538,11 +538,11 @@ public class Milp
 
                                         if (currSynchTime == null)
                                         {
-                                            synchArcsInfo.put(currEvent, new Double(currTime));
+                                            synchArcsInfo.put(currEvent, currTime);
                                         }
                                         else if (currSynchTime.intValue() < currTime)
                                         {
-                                            synchArcsInfo.put(currEvent, new Double(currTime));
+                                            synchArcsInfo.put(currEvent, currTime);
                                         }
                                     }
                                 }
@@ -2592,7 +2592,7 @@ public class Milp
         final Hashtable<Integer, Integer> pBStateIndicesTable = new Hashtable<Integer, Integer>();
         for (int i = 0; i < bookingTics[pZoneIndex][plantIndex][STATE_SWITCH].length; i++)
         {
-            pBStateIndicesTable.put(new Integer(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i]), new Integer(i));
+            pBStateIndicesTable.put(bookingTics[pZoneIndex][plantIndex][STATE_SWITCH][i], i);
         }
 
         // Find the events that are common to the current plant and pZone
@@ -2655,7 +2655,7 @@ public class Milp
                         {
                             // Adding a pair of consecutive booking states (with or without a buffer in between)
                             bookingStateSequences.add(new int[]{
-                                pBStateIndicesTable.get(new Integer(currStateIndex)).intValue(), i,
+                                pBStateIndicesTable.get(currStateIndex), i,
                                 uEventFoundDownstreams[currStateIndex]});
                         }
                         // Otherwise, if we neither find unbooking of pZone nor booking of any other zone,
@@ -2985,7 +2985,7 @@ public class Milp
                                 repeatedBooking++;
 
                                 // Fills the map, that is used in restiction of cross-booking
-                                mutexVarCounterMap.put(new int[]{i, j1, j2, k1, k2}, new Integer(repeatedBooking));
+                                mutexVarCounterMap.put(new int[]{i, j1, j2, k1, k2}, repeatedBooking);
                                 mutexVariables.add(makeMutexVariable(j1, j2, i, repeatedBooking));
 
 //                                //test

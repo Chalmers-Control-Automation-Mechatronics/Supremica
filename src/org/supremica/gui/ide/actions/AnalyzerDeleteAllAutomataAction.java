@@ -35,11 +35,13 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
 import org.supremica.automata.Automata;
 import org.supremica.gui.ide.IDE;
 
@@ -54,7 +56,7 @@ public class AnalyzerDeleteAllAutomataAction
     /**
      * Constructor.
      */
-    public AnalyzerDeleteAllAutomataAction(List<IDEAction> actionList)
+    public AnalyzerDeleteAllAutomataAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -63,12 +65,13 @@ public class AnalyzerDeleteAllAutomataAction
 
         putValue(Action.NAME, "Delete all");
         putValue(Action.SHORT_DESCRIPTION, "Delete all automata");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -76,6 +79,7 @@ public class AnalyzerDeleteAllAutomataAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
         ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata().removeAutomata(new Automata(ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata()));

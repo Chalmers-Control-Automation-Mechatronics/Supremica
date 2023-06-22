@@ -54,6 +54,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -471,7 +473,7 @@ public abstract class DotViewer
 	{
 		@SuppressWarnings("unused")
     final
-		DotBuilder builder = DotBuilder.getDotBuilder(null, this, getSerializer(), "");
+		DotBuilder builder = DotBuilder.getDotBuilder(null, this, getSerializer());
 		//builder = new DotBuilder(this);
 		//builder.start();
 	}
@@ -850,9 +852,13 @@ public abstract class DotViewer
 			return checkbox.isSelected();
 		}
 
-		public String getDotArgument()
+		public List<String> getDotArgument()
 		{
-			return dotArgument;
+			if (dotArgument == null || dotArgument.equals("")) {
+			  return null;
+			} else {
+			  return Collections.singletonList(dotArgument);
+			}
 		}
 
 		public JFileChooser getFileExporter()

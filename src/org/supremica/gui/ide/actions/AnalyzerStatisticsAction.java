@@ -142,7 +142,7 @@ public class AnalyzerStatisticsAction
                 potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
             }
 
-            logger.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
+            logger.info("Number of potential states: " + ((long) potentialNumberOfStates));
         }
     }
 }

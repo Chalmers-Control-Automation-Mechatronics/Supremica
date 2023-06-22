@@ -152,7 +152,7 @@ class CplexSolutionParser extends DefaultHandler
         if (qName.equals("header"))
         {
             milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " +
-                    milpConstructor.removeEpsilons((new Double(attr.getValue("objectiveValue"))).doubleValue()),
+                    milpConstructor.removeEpsilons(Double.parseDouble(attr.getValue("objectiveValue"))),
                         SchedulingConstants.MESSAGE_TYPE_INFO);
             milpConstructor.addToMessages("\tNr of nodes = " + attr.getValue("MIPNodes") +
                     "; nr of iterations = " + attr.getValue("MIPIterations"),
@@ -164,12 +164,12 @@ class CplexSolutionParser extends DefaultHandler
             if (varName.contains("X")) // This is a boolean variable
             {
                 varName = varName.substring(1); //Remove X from the name (which leaves only the index of X in the optimalBinVarValues-map)
-                optimalBinVarValues.put(new Integer(varName), new Integer((int)Math.round(new Double(attr.getValue("value"))))); // The rounding is added due to numerical precission errors (for example when 0 is represented by 1e-17)
+                optimalBinVarValues.put(Integer.parseInt(varName), (int) Math.round(Double.parseDouble(attr.getValue("value")))); // The rounding is added due to numerical precision errors (for example when 0 is represented by 1e-17)
             }
             else if (varName.contains("T")) // This is a continuous time variable
             {
                 varName = varName.substring(1); //Remove T from the name (which leaves only the index of T in the optimalTimeVarValues-map)
-                optimalTimeVarValues.put(new Integer(varName), new Double(attr.getValue("value")));
+                optimalTimeVarValues.put(Integer.parseInt(varName), Double.parseDouble(attr.getValue("value")));
             }
         }
     }
