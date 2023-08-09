@@ -71,6 +71,13 @@ public interface ModelAnalyzerFactory
     throws AnalysisConfigurationException;
 
   /**
+   * Creates a coobservability checker.
+   */
+  public CoobservabilityChecker createCoobservabilityChecker
+    (ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException;
+
+  /**
    * Creates a deadlock checker.
    */
   public DeadlockChecker createDeadlockChecker
@@ -113,8 +120,6 @@ public interface ModelAnalyzerFactory
     throws AnalysisConfigurationException;
 
 
-  //#########################################################################
-  //# Options
   public void registerOptions(AnalysisOptionPage db);
 
 }

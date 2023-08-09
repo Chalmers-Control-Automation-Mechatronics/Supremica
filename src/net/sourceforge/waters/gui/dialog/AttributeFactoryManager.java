@@ -39,14 +39,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
@@ -148,6 +149,9 @@ public class AttributeFactoryManager implements OptionChangeListener
   //# Auxiliary Methods
   private void register()
   {
+    final EnumOption<ModelAnalyzerFactoryLoader> coobservabilityOption =
+      WatersOptionPages.COOBSERVABILITY.getTopSelectorOption();
+    coobservabilityOption.addOptionChangeListener(this);
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     diagnosabilityOption.addOptionChangeListener(this);
@@ -160,6 +164,11 @@ public class AttributeFactoryManager implements OptionChangeListener
     mAttributeFactories.clear();
     mAttributeInfoMap.clear();
     mAttributeFactories.add(DefaultAttributeFactory.getInstance());
+    final EnumOption<ModelAnalyzerFactoryLoader> coobservabilityOption =
+      WatersOptionPages.COOBSERVABILITY.getTopSelectorOption();
+    if (coobservabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
+      mAttributeFactories.add(CoobservabilityAttributeFactory.getInstance());
+    }
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     if (diagnosabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {

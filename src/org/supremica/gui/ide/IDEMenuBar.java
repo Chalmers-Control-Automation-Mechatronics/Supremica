@@ -104,6 +104,7 @@ import net.sourceforge.waters.gui.actions.SynthesisTestAction;
 import net.sourceforge.waters.gui.actions.VerifyConflictAction;
 import net.sourceforge.waters.gui.actions.VerifyControlLoopAction;
 import net.sourceforge.waters.gui.actions.VerifyControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifyCoobservabilityAction;
 import net.sourceforge.waters.gui.actions.VerifyDeadlockAction;
 import net.sourceforge.waters.gui.actions.VerifyDiagnosabilityAction;
 import net.sourceforge.waters.gui.actions.VerifyHISCCPControllabilityAction;
@@ -377,6 +378,14 @@ public class IDEMenuBar
     final Action languageInclusion =
         actions.getAction(VerifyLanguageInclusionAction.class);
     menu.add(languageInclusion);
+    final EnumOption<ModelAnalyzerFactoryLoader> coobservabilityOption =
+      WatersOptionPages.COOBSERVABILITY.getTopSelectorOption();
+    addOption(coobservabilityOption);
+    if (coobservabilityOption.getValue() != ModelAnalyzerFactoryLoader.Disabled) {
+      final Action coobservability =
+        actions.getAction(VerifyCoobservabilityAction.class);
+      menu.add(coobservability);
+    }
     final EnumOption<ModelAnalyzerFactoryLoader> diagnosabilityOption =
       WatersOptionPages.DIAGNOSABILITY.getTopSelectorOption();
     addOption(diagnosabilityOption);

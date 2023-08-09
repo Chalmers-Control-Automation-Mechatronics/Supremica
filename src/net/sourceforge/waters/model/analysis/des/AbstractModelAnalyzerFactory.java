@@ -96,6 +96,14 @@ public abstract class AbstractModelAnalyzerFactory
   }
 
   @Override
+  public CoobservabilityChecker createCoobservabilityChecker
+    (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
+  {
+    throw createUnsupportedOperationException("coobservability check");
+  }
+
+  @Override
   public DeadlockChecker createDeadlockChecker
     (final ProductDESProxyFactory factory)
     throws AnalysisConfigurationException

@@ -119,6 +119,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new VerifyConflictAction(ide));
     addAction(new VerifyControllabilityAction(ide));
     addAction(new VerifyControlLoopAction(ide));
+    addAction(new VerifyCoobservabilityAction(ide));
     addAction(new VerifyDeadlockAction(ide));
     addAction(new VerifyDiagnosabilityAction(ide));
     addAction(new VerifyHISCCPControllabilityAction(ide));

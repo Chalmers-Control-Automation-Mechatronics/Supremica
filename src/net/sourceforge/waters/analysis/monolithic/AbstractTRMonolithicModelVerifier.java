@@ -65,20 +65,20 @@ import net.sourceforge.waters.model.options.Option;
  * @author Robi Malik
  */
 
-public abstract class TRAbstractModelVerifier
+public abstract class AbstractTRMonolithicModelVerifier
   extends AbstractTRMonolithicModelAnalyzer
   implements ModelVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public TRAbstractModelVerifier(final KindTranslator translator)
+  public AbstractTRMonolithicModelVerifier(final KindTranslator translator)
   {
     this(null, translator);
   }
 
-  public TRAbstractModelVerifier(final ProductDESProxy model,
-                                 final KindTranslator translator)
+  public AbstractTRMonolithicModelVerifier(final ProductDESProxy model,
+                                           final KindTranslator translator)
   {
     super(model, translator);
   }

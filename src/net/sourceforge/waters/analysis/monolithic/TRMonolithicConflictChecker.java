@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  */
 
 public class TRMonolithicConflictChecker
-  extends TRAbstractModelVerifier implements ConflictChecker
+  extends AbstractTRMonolithicModelVerifier implements ConflictChecker
 {
 
   //#########################################################################

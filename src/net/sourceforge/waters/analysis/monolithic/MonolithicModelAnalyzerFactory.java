@@ -33,14 +33,15 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import net.sourceforge.waters.analysis.coobs.TRMonolithicCoobservabilityVerifier;
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
-import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
 
 
 /**
@@ -95,6 +96,13 @@ public class MonolithicModelAnalyzerFactory
     (final ProductDESProxyFactory factory)
   {
     return new MonolithicControlLoopChecker(factory);
+  }
+
+  @Override
+  public TRMonolithicCoobservabilityVerifier createCoobservabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRMonolithicCoobservabilityVerifier();
   }
 
   @Override

@@ -68,6 +68,8 @@ public class WatersOptionPages
     new AnalysisOptionPage(AnalysisOperation.CONTROLLABILITY_CHECK);
   public static final AnalysisOptionPage CONTROL_LOOP =
     new AnalysisOptionPage(AnalysisOperation.CONTROL_LOOP_CHECK);
+  public static final AnalysisOptionPage COOBSERVABILITY =
+    new AnalysisOptionPage(AnalysisOperation.COOBSERVABILITY_CHECK, true);
   public static final AnalysisOptionPage DEADLOCK =
     new AnalysisOptionPage(AnalysisOperation.DEADLOCK_CHECK);
   public static final AnalysisOptionPage DIAGNOSABILITY =
@@ -92,7 +94,7 @@ public class WatersOptionPages
   public static final AggregatorOptionPage ANALYSIS =
     new AggregatorOptionPage("Analysis", CONFLICT,
                              CONTROLLABILITY, CONTROL_LOOP,
-                             DEADLOCK, DIAGNOSABILITY,
+                             COOBSERVABILITY, DEADLOCK, DIAGNOSABILITY,
                              LANGUAGE_INCLUSION, STATE_COUNT,
                              SYNCHRONOUS_PRODUCT, SYNTHESIS,
                              SIMPLIFICATION);

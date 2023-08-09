@@ -100,6 +100,19 @@ public enum AnalysisOperation
     }
   },
 
+  COOBSERVABILITY_CHECK("waters.analysis.coobservability",
+                        "coobservability", "-coobs",
+                        "is not coobservable", "is coobservable")
+  {
+    @Override
+    public CoobservabilityChecker createModelAnalyzer
+      (final ModelAnalyzerFactory factory, final ProductDESProxyFactory desFactory)
+        throws AnalysisConfigurationException
+    {
+      return factory.createCoobservabilityChecker(desFactory);
+    }
+  },
+
   DEADLOCK_CHECK("waters.analysis.deadlock", "deadlock", "-dl",
                  "has a deadlock", "is deadlock free")
   {

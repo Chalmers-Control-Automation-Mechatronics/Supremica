@@ -329,13 +329,14 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   {
     super.setUp();
     final AnalysisResult result = getAnalysisResult();
-    // Set up input automata and state encoding
+    // Set up input automata
     setUpAutomata();
     if (result.isFinished()) {
       return;
     }
     // Set up output event encoding
-    final Map<EventProxy,EventInfo> eventInfoMap = setUpEventEncoding();
+    createEventEncoding();
+    final Map<EventProxy,? extends EventInfo> eventInfoMap = setUpEventEncoding();
     checkEventsInAutomta(eventInfoMap);
     if (result.isFinished()) {
       return;
@@ -353,12 +354,13 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
     // Sort event info and merge local events
     postProcessEventInfo(eventInfoList);
+    // Set up state encoding and deadlock state
+    setUpStateTupleEncoding();
   }
 
   protected void setUpAutomata()
     throws AnalysisException
   {
-    // Set up input automata and find their sizes
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
     final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -370,36 +372,52 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
     mInputAutomata = new AutomatonProxy[numAutomata];
     mTRAutomata = new TRAutomatonProxy[numAutomata];
-    mDecodedDeadlockState = new int[numAutomata];
-    final int[] sizes = new int[numAutomata];
     int a = 0;
-    boolean gotDump = false;
     for (final AutomatonProxy aut : automata) {
-      checkAbort();
       if (translator.getComponentKind(aut) != null) {
+        checkAbort();
         mInputAutomata[a] = aut;
         final int config = getDefaultConfig();
         final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy
           (aut, translator, config);
         mTRAutomata[a] = tr;
-        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-        int numStates = getLastReachableState(rel) + 1;
-        final int dumpIndex = getAlternativeDumpState(rel, numStates);
-        if (dumpIndex >= 0) {
-          gotDump = true;
-          mDecodedDeadlockState[a] = dumpIndex;
-          if (dumpIndex >= numStates) {
-            numStates = dumpIndex + 1;
-          }
-        }
-        sizes[a++] = numStates;
+        a++;
       }
+    }
+  }
+
+  protected void setUpStateTupleEncoding()
+    throws AnalysisAbortException, OverflowException
+  {
+    setUpStateTupleEncoding(mTRAutomata);
+  }
+
+  protected void setUpStateTupleEncoding(final TRAutomatonProxy[] trs)
+    throws AnalysisAbortException, OverflowException
+  {
+    final int numAutomata = trs.length;
+    mDecodedDeadlockState = new int[numAutomata];
+    final int[] sizes = new int[numAutomata];
+    boolean gotDump = false;
+    for (int a = 0; a < numAutomata; a++) {
+      checkAbort();
+      final TRAutomatonProxy tr = trs[a];
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      int numStates = getLastReachableState(rel) + 1;
+      final int dumpIndex = getAlternativeDumpState(rel, numStates);
+      if (dumpIndex >= 0) {
+        gotDump = true;
+        mDecodedDeadlockState[a] = dumpIndex;
+        if (dumpIndex >= numStates) {
+          numStates = dumpIndex + 1;
+        }
+      }
+      sizes[a] = numStates;
     }
     if (numAutomata > 0 && !gotDump) {
       mDecodedDeadlockState[0] = sizes[0]++;
     }
 
-    // Set up state encoding
     mStateTupleEncoding = new StateTupleEncoding(sizes);
     final int numWords = mStateTupleEncoding.getNumberOfWords();
     final int stateLimit = getNodeLimit();
@@ -411,24 +429,32 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     mEncodedTarget = new int[numWords];
   }
 
-  protected Map<EventProxy,EventInfo> setUpEventEncoding()
+  private void createEventEncoding()
+  {
+    if (mConfiguredEventEncoding == null) {
+      mOutputEventEncoding = new EventEncoding();
+    } else {
+      mOutputEventEncoding = new EventEncoding(mConfiguredEventEncoding);
+    }
+  }
+
+  protected Map<EventProxy,? extends EventInfo> setUpEventEncoding()
     throws OverflowException, AnalysisAbortException
   {
     final ProductDESProxy des = getModel();
 
-    // Set up output event encoding
+    // Prepare collection of used events
     final Collection<EventProxy> events = des.getEvents();
     final int numEvents = events.size();
     final Set<EventProxy> outputEvents;
     if (mConfiguredEventEncoding == null) {
-      mOutputEventEncoding = new EventEncoding();
       outputEvents = null;
     } else {
-      mOutputEventEncoding = new EventEncoding(mConfiguredEventEncoding);
       outputEvents = new THashSet<>(numEvents);
     }
 
     // Add propositions to output event encoding ...
+    final KindTranslator translator = getKindTranslator();
     final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
     final int numAutomata = mTRAutomata.length;
     for (int a = 0; a < numAutomata; a++) {
@@ -450,7 +476,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           }
         }
       }
-      final KindTranslator translator = getKindTranslator();
       for (int e = EventEncoding.TAU; e < enc.getNumberOfProperEvents(); e++) {
         if ((enc.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
           // For any used event: create event info if not yet present
@@ -550,7 +575,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
   protected List<EventInfo> setUpTransitions
     (final TRAutomatonProxy[] automata,
-     final Map<EventProxy,EventInfo> eventInfoMap,
+     final Map<EventProxy,? extends EventInfo> eventInfoMap,
      final boolean reverse)
     throws AnalysisException
   {
@@ -931,9 +956,15 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   protected int storeInitialStates()
     throws AnalysisException
   {
+    return storeInitialStates(mTRAutomata);
+  }
+
+  protected int storeInitialStates(final TRAutomatonProxy[] trs)
+    throws AnalysisException
+  {
     final TIntArrayList nondeterministicIndices = new TIntArrayList();
-    for (int a = 0; a < mTRAutomata.length; a++) {
-      final TRAutomatonProxy aut = mTRAutomata[a];
+    for (int a = 0; a < trs.length; a++) {
+      final TRAutomatonProxy aut = trs[a];
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       boolean found = false;
       final int numStates = rel.getNumberOfStates();
@@ -1218,7 +1249,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
    * @throws EventNotFoundException to indicate that some input automaton
    *                       uses an event not mapped to anything in the map.
    */
-  private void checkEventsInAutomta(final Map<EventProxy,EventInfo> eventInfoMap)
+  private void checkEventsInAutomta
+      (final Map<EventProxy,? extends EventInfo> eventInfoMap)
     throws EventNotFoundException
   {
     for (final TRAutomatonProxy aut : mTRAutomata) {
@@ -1471,7 +1503,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   {
     //#######################################################################
     //# Constructor
-    private EventInfo(final EventProxy event, final boolean controllable)
+    protected EventInfo(final EventProxy event, final boolean controllable)
     {
       mEvent = event;
       mOutputCode = -1;
@@ -2069,7 +2101,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         return -1;
       }
     }
-
 
     //#######################################################################
     //# Interface java.util.Comparable<AutomatonEventInfo>

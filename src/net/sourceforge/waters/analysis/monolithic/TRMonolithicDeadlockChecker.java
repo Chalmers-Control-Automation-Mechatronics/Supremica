@@ -66,7 +66,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class TRMonolithicDeadlockChecker
-  extends TRAbstractModelVerifier
+  extends AbstractTRMonolithicModelVerifier
   implements DeadlockChecker
 {
 
