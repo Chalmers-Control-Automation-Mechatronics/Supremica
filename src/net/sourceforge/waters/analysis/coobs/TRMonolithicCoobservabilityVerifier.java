@@ -33,12 +33,15 @@
 
 package net.sourceforge.waters.analysis.coobs;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,15 +55,15 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
@@ -93,53 +96,37 @@ public class TRMonolithicCoobservabilityVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
+  //# Configuration
+  public void setDefaultSite(final String name)
   {
-    super.requestAbort();
+    mDefaultSite = "".equals(name) ? null : name;
   }
 
-  @Override
-  public void resetAbort()
+  public String getDefaultSite()
   {
-    super.resetAbort();
+    return mDefaultSite == null ? "" : mDefaultSite;
   }
 
 
   //#########################################################################
-  //# Invocation
+  //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
-  public boolean run() throws AnalysisException
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
-    try {
-      setUp();
-
-      return setSatisfiedResult();
-    } catch (final OutOfMemoryError error) {
-      tearDown();
-      final Logger logger = LogManager.getLogger();
-      logger.debug("<out of memory>");
-      final OverflowException exception = new OverflowException(error);
-      throw setExceptionResult(exception);
-    } catch (final StackOverflowError error) {
-      final OverflowException exception = new OverflowException(error);
-      throw setExceptionResult(exception);
-    } catch (final AnalysisException exception) {
-      throw setExceptionResult(exception);
-    } finally {
-      tearDown();
-    }
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_CoobservabilityChecker_DefaultSite);
+    return options;
   }
 
   @Override
-  protected void tearDown()
+  public void setOption(final Option<?> option)
   {
-    super.tearDown();
-    mSiteMap = null;
-    mCoobservabilityEventInfoMap = null;
-    mComponentInfoList = null;
-    mTRAutomataExtended = null;
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_CoobservabilityChecker_DefaultSite)) {
+      final String value = (String) option.getValue();
+      setDefaultSite(value);
+    }
   }
 
 
@@ -176,9 +163,11 @@ public class TRMonolithicCoobservabilityVerifier
           final EventProxy event = enc.getProperEvent(e);
           if (!mCoobservabilityEventInfoMap.containsKey(event)) {
             final CoobservabilityEventInfo info =
-              new CoobservabilityEventInfo(event);
+              new CoobservabilityEventInfo(this, event);
             mCoobservabilityEventInfoMap.put(event, info);
             final Map<String,String> attribs = event.getAttributes();
+            boolean controlled = false;
+            boolean observed = false;
             for (final Map.Entry<String,String> entry : attribs.entrySet()) {
               final String attrib = entry.getKey();
               if (attrib.startsWith
@@ -186,10 +175,24 @@ public class TRMonolithicCoobservabilityVerifier
                 final String value = entry.getValue();
                 final SiteInfo site = getSite(value);
                 info.addController(site);
+                controlled = true;
               } else if (attrib.startsWith
                            (CoobservabilityAttributeFactory.OBSERVABITY_KEY)) {
                 final String value = entry.getValue();
                 final SiteInfo site = getSite(value);
+                info.addObserver(site);
+                observed = true;
+              }
+            }
+            if (mDefaultSite != null) {
+              if (!controlled &&
+                  (enc.getProperEventStatus(e) &
+                   EventStatus.STATUS_CONTROLLABLE) != 0) {
+                final SiteInfo site = getSite(mDefaultSite);
+                info.addController(site);
+              }
+              if (!observed && event.isObservable()) {
+                final SiteInfo site = getSite(mDefaultSite);
                 info.addObserver(site);
               }
             }
@@ -206,7 +209,9 @@ public class TRMonolithicCoobservabilityVerifier
         final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         final boolean det = rel.isDeterministic();
         for (final SiteInfo site : mSiteMap.values()) {
-          if (!det || hasUnobservableTransition(tr, site)) {
+          if (det && !hasUnobservableTransition(tr, site)) {
+            info0.addShadowingSite(site);
+          } else {
             final ComponentInfo info1 = new ComponentInfo(tr, site);
             mComponentInfoList.add(info1);
           }
@@ -218,8 +223,11 @@ public class TRMonolithicCoobservabilityVerifier
   }
 
   @Override
-  protected void setUpStateTupleEncoding()
-    throws AnalysisAbortException, OverflowException
+  protected List<EventInfo> setUpTransitions
+    (final TRAutomatonProxy[] automata,
+     final Map<EventProxy,? extends EventInfo> eventInfoMap,
+     final boolean reverse)
+    throws AnalysisException
   {
     final int numComponents = mComponentInfoList.size();
     mTRAutomataExtended = new TRAutomatonProxy[numComponents];
@@ -227,7 +235,26 @@ public class TRMonolithicCoobservabilityVerifier
     for (final ComponentInfo info : mComponentInfoList) {
       mTRAutomataExtended[a++] = info.getTRAutomaton();
     }
+    return super.setUpTransitions(mTRAutomataExtended, eventInfoMap, reverse);
+  }
+
+  @Override
+  protected void setUpStateTupleEncoding()
+    throws AnalysisAbortException, OverflowException
+  {
     setUpStateTupleEncoding(mTRAutomataExtended);
+  }
+
+  @Override
+  protected void postProcessEventInfo(final List<EventInfo> eventInfoList)
+    throws AnalysisException
+  {
+    super.postProcessEventInfo(eventInfoList);
+    for (final CoobservabilityEventInfo info :
+         mCoobservabilityEventInfoMap.values()) {
+      checkAbort();
+      info.computeSiteIndices(this);
+    }
   }
 
   @Override
@@ -243,32 +270,95 @@ public class TRMonolithicCoobservabilityVerifier
                                 final EventInfo event)
     throws AnalysisException
   {
-    final AutomatonEventInfo disablingAut = event.findDisabling(decoded);
-    final int a;
-    if (disablingAut == null) {
-      a = Integer.MAX_VALUE;
-    } else if (disablingAut.isPlant()) {
-      return true;
-    } else {
-      a = disablingAut.getAutomatonIndex();
-    }
-    if (a < mNumAutomata) {
-      // enabled by plant, disabled by spec
-      // check controllability condition
-    } else {
-      // enabled by plant and spec
-      // expand transition for plant. spec, and observing sites; may yet fail
-      final CoobservabilityEventInfo info = (CoobservabilityEventInfo) event;
-      expandState(encoded, decoded, info, null);
-    }
-    // separately expand transitions for plant and each not observing site
-    final CoobservabilityEventInfo info = (CoobservabilityEventInfo) event;
-    for (final SiteInfo site : mSiteMap.values()) {
-      if (!info.isObservable(site)) {
-        expandState(encoded, decoded, info, site);
+    final CoobservabilityEventInfo eventInfo =
+      (CoobservabilityEventInfo) event;
+    final int endGroupIndex = eventInfo.getNumberOfSiteIndices();
+    int siteEnd = eventInfo.getSiteGroupIndex(0);
+    int d = eventInfo.findDisabling(decoded, 0, siteEnd);
+    if (d >= 0) {
+      final List<AutomatonEventInfo> disabling =
+        eventInfo.getDisablingAutomata();
+      final AutomatonEventInfo disablingAutInfo = disabling.get(d);
+      if (disablingAutInfo.isPlant()) {
+        return true;
+      } else {
+        // enabled by reference plant, disabled by reference spec
+        // check controllability condition
+        if (isControlledByShadowingSite(eventInfo, disablingAutInfo)) {
+          return true;
+        }
+        for (int i = d + 1; i < siteEnd; i++) {
+          final AutomatonEventInfo autInfo = disabling.get(i);
+          if (!autInfo.isEnabled(decoded) &&
+              isControlledByShadowingSite(eventInfo, autInfo)) {
+            return true;
+          }
+        }
+        for (int i = siteEnd; i < endGroupIndex; i++) {
+          final AutomatonEventInfo autInfo = disabling.get(i);
+          final int a = autInfo.getAutomatonIndex();
+          final SiteInfo site = mComponentInfoList.get(a).getSite();
+          if (eventInfo.isControllable(site) && !autInfo.isEnabled(decoded)) {
+            return true;
+          }
+        }
+        // not coobservable
+        // if (!handleUncontrollableState(e, a)) ...
+        // TODO Counterexample ...
+        setFailedResult(null);
+        return false;
       }
     }
+    int siteStart = 0;
+    int groupIndex = 1;
+    if (eventInfo.hasObservingSpec()) {
+      siteStart = siteEnd;
+      siteEnd = eventInfo.getSiteGroupIndex(1);
+      groupIndex++;
+      d = eventInfo.findDisabling(decoded, siteStart, siteEnd);
+    }
+    if (d < 0) {
+      eventInfo.createSuccessorStatesEncoded(encoded, 1, this);
+    }
+    while (groupIndex < endGroupIndex) {
+      siteStart = siteEnd;
+      siteEnd = eventInfo.getSiteGroupIndex(groupIndex);
+      if (eventInfo.findDisabling(decoded, siteStart, siteEnd) < 0) {
+        eventInfo.createSuccessorStatesEncoded(encoded, groupIndex, this);
+      }
+      groupIndex++;
+    }
     return true;
+  }
+
+  private boolean isControlledByShadowingSite
+    (final CoobservabilityEventInfo eventInfo,
+     final AutomatonEventInfo autInfo)
+  {
+    final int a = autInfo.getAutomatonIndex();
+    final ComponentInfo compInfo = mComponentInfoList.get(a);
+    final List<SiteInfo> shadowingSites = compInfo.getShadowingSites();
+    if (shadowingSites != null) {
+      for (final SiteInfo site : shadowingSites) {
+        if (eventInfo.isControllable(site)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mSiteMap = null;
+    mCoobservabilityEventInfoMap = null;
+    mComponentInfoList = null;
+    mTRAutomataExtended = null;
   }
 
 
@@ -302,13 +392,6 @@ public class TRMonolithicCoobservabilityVerifier
     return false;
   }
 
-  private void expandState(final int[] encoded,
-                           final int[] decoded,
-                           final CoobservabilityEventInfo event,
-                           final SiteInfo site)
-  {
-  }
-
 
   //#########################################################################
   //# Inner Class SiteInfo
@@ -323,16 +406,9 @@ public class TRMonolithicCoobservabilityVerifier
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
     private String getName()
     {
       return mName;
-    }
-
-    @SuppressWarnings("unused")
-    private int getIndex()
-    {
-      return mIndex;
     }
 
     //#######################################################################
@@ -341,6 +417,14 @@ public class TRMonolithicCoobservabilityVerifier
     public int compareTo(final SiteInfo site)
     {
       return mIndex - site.mIndex;
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mName;
     }
 
     //#######################################################################
@@ -357,14 +441,17 @@ public class TRMonolithicCoobservabilityVerifier
   {
     //#######################################################################
     //# Constructor
-    private CoobservabilityEventInfo(final EventProxy event)
+    private CoobservabilityEventInfo
+      (final TRMonolithicCoobservabilityVerifier verifier,
+       final EventProxy event)
     {
       super(event, false);
+      mComparator =
+        verifier.new CoobservabilityAutomatonEventInfoCamparator(this);
     }
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
     private boolean isControllable(final SiteInfo site)
     {
       return mControllers != null && mControllers.contains(site);
@@ -381,13 +468,27 @@ public class TRMonolithicCoobservabilityVerifier
       return mObservers != null && mObservers.contains(site);
     }
 
+    private boolean hasObservingSpec()
+    {
+      return mHasObservingSpec;
+    }
+
+    private int getSiteGroupIndex(final int groupIndex)
+    {
+      return mSiteIndices[groupIndex];
+    }
+
+    private int getNumberOfSiteIndices()
+    {
+      return mSiteIndices.length;
+    }
+
     //#######################################################################
     //# Initialisation
     private void addController(final SiteInfo site)
     {
       if (mControllers == null) {
         mControllers = new THashSet<>();
-        setControllable();
       }
       mControllers.add(site);
     }
@@ -400,10 +501,104 @@ public class TRMonolithicCoobservabilityVerifier
       mObservers.add(site);
     }
 
+    private void computeSiteIndices
+      (final TRMonolithicCoobservabilityVerifier verifier)
+    {
+      final TIntArrayList indices =
+        new TIntArrayList(verifier.mSiteMap.size() + 1);
+      int index = 0;
+      int prevGroup = 0;
+      SiteInfo prevSite = null;
+      for (final AutomatonEventInfo info : getDisablingAutomata()) {
+        final int a = info.getAutomatonIndex();
+        final SiteInfo site = verifier.mComponentInfoList.get(a).getSite();
+        final int group = getSiteGroup(site);
+        mHasObservingSpec |= group == 1;
+        if (group != prevGroup || group == 2 && site != prevSite) {
+          if (group == 2 && prevGroup == 0) {
+            indices.add(index);
+          }
+          indices.add(index);
+          prevGroup = group;
+          prevSite = site;
+        }
+        index++;
+      }
+      if (prevGroup == 0) {
+        indices.add(index);
+      }
+      indices.add(index);
+      mSiteIndices = indices.toArray();
+      mSiteUpdates = new AutomatonEventInfo[indices.size()];
+      collectSiteUpdates(false);
+      collectSiteUpdates(true);
+    }
+
+    private void collectSiteUpdates(final boolean det)
+    {
+      int index = 0;
+      // Index group 0 (reference) merged into group 1 (observers)
+      int s = 1;
+      // TODO This assumes always enabling components are listed as 'disabling'
+      for (final AutomatonEventInfo info : getDisablingAutomata()) {
+        while (mSiteIndices[s] <= index) {
+          s++;
+        }
+        if (!info.isSelfloopOnly() && info.isDetermistic() == det) {
+          info.setNextUpdate(mSiteUpdates[s]);
+          mSiteUpdates[s] = info;
+        }
+        index++;
+      }
+    }
+
+    // group == 0 : site == null : plant before spec
+    // group == 1 : site observing event : order by site
+    // group == 2 : site not observing event : order by site
+    private int getSiteGroup(final SiteInfo site)
+    {
+      if (site == null) {
+        return 0;
+      } else if (isObservable(site)) {
+        return 1;
+      } else {
+        return 2;
+      }
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.monolithic.
+    //# AbstractTRMonolithicModelAnalyzer.EventInfo
+    @Override
+    protected Comparator<AutomatonEventInfo> getAutomatonEventInfoComparator()
+    {
+      return mComparator;
+    }
+
+    //#######################################################################
+    //# State Expansion
+    private void createSuccessorStatesEncoded
+      (final int[] encoded,
+       final int groupIndex,
+       final TRMonolithicCoobservabilityVerifier verifier)
+      throws OverflowException
+    {
+      final AutomatonEventInfo update = mSiteUpdates[groupIndex];
+      if (update != null) {
+        final int code = getOutputCode();
+        final int[] encodedTarget = verifier.getEncodedTargetBuffer(encoded);
+        update.createSuccessorStatesEncoded(code, encodedTarget, true, verifier);
+      }
+    }
+
     //#######################################################################
     //# Instance Variables
+    private final CoobservabilityAutomatonEventInfoCamparator mComparator;
     private Set<SiteInfo> mControllers;
     private Set<SiteInfo> mObservers;
+    private boolean mHasObservingSpec;
+    private int[] mSiteIndices;
+    private AutomatonEventInfo[] mSiteUpdates;
   }
 
 
@@ -422,6 +617,7 @@ public class TRMonolithicCoobservabilityVerifier
     {
       mTRAutomaton = tr;
       mSite = site;
+      mShadowingSites = null;
     }
 
     //#######################################################################
@@ -431,21 +627,90 @@ public class TRMonolithicCoobservabilityVerifier
       return mTRAutomaton;
     }
 
-    @SuppressWarnings("unused")
     private SiteInfo getSite()
     {
       return mSite;
+    }
+
+    private List<SiteInfo> getShadowingSites()
+    {
+      return mShadowingSites;
+    }
+
+    private void addShadowingSite(final SiteInfo site)
+    {
+      if (mShadowingSites == null) {
+        mShadowingSites = new LinkedList<>();
+      }
+      mShadowingSites.add(site);
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      if (mSite == null) {
+        return mTRAutomaton.getName() + " (reference)";
+      } else {
+        return mTRAutomaton.getName() + " @ " + mSite.getName();
+      }
     }
 
     //#######################################################################
     //# Instance Variables
     private final TRAutomatonProxy mTRAutomaton;
     private final SiteInfo mSite;
+    private List<SiteInfo> mShadowingSites;
+  }
+
+
+  //#########################################################################
+  //# Inner Class CoobservabilityAutomatonEventInfoCamparator
+  private class CoobservabilityAutomatonEventInfoCamparator
+    extends DefaultAutomatonEventInfoCamparator
+  {
+    //#######################################################################
+    //# Constructor
+    private CoobservabilityAutomatonEventInfoCamparator
+      (final CoobservabilityEventInfo info)
+    {
+      mEventInfo = info;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparator<AutomatonEventInfo>
+    @Override
+    public int compare(final AutomatonEventInfo info1,
+                       final AutomatonEventInfo info2)
+    {
+      final int index1 = info1.getAutomatonIndex();
+      final SiteInfo site1 = mComponentInfoList.get(index1).getSite();
+      final int group1 = mEventInfo.getSiteGroup(site1);
+      final int index2 = info2.getAutomatonIndex();
+      final SiteInfo site2 = mComponentInfoList.get(index2).getSite();
+      final int group2 = mEventInfo.getSiteGroup(site2);
+      if (group1 != group2) {
+        return group1 - group2;
+      } else if (site1 != null) {
+        final int result = site1.compareTo(site2);
+        if (result != 0) {
+          return result;
+        }
+      }
+      return super.compare(info1, info2);
+    }
+
+    //#######################################################################
+    //# Instance Variables
+    private final CoobservabilityEventInfo mEventInfo;
   }
 
 
   //#########################################################################
   //# Instance Variables
+  private String mDefaultSite;
+
   private int mNumAutomata;
   private Map<String,SiteInfo> mSiteMap;
   private Map<EventProxy,CoobservabilityEventInfo> mCoobservabilityEventInfoMap;
@@ -455,5 +720,6 @@ public class TRMonolithicCoobservabilityVerifier
 
   //#########################################################################
   //# Class Constants
+  public static final String DEFAULT_SITE_NAME = ":default";
 
 }

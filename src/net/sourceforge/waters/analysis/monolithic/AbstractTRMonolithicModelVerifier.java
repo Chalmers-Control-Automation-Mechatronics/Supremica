@@ -57,6 +57,9 @@ import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * The abstract base class for all model verifiers that use
@@ -157,6 +160,36 @@ public abstract class AbstractTRMonolithicModelVerifier
   public VerificationResult createAnalysisResult()
   {
     return new DefaultVerificationResult(this);
+  }
+
+  @Override
+  public boolean run()
+    throws AnalysisException
+  {
+    try {
+      setUp();
+      final VerificationResult result = getAnalysisResult();
+      if (!result.isFinished()) {
+        exploreStateSpace();
+        if (!result.isFinished()) {
+          result.setSatisfied(true);
+        }
+      }
+      return result.isSatisfied();
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = LogManager.getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } finally {
+      tearDown();
+    }
   }
 
 

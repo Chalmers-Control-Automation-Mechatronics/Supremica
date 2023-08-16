@@ -40,6 +40,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -996,12 +997,24 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     throws OverflowException
   {
     if (mStateCallback == null) {
-      System.arraycopy(encoded, 0, mEncodedTarget, 0, encoded.length);
-      event.createSuccessorStatesEncoded(mEncodedTarget, this);
+      final int[] encodedTarget = getEncodedTargetBuffer(encoded);
+      event.createSuccessorStatesEncoded(encodedTarget, this);
     } else {
-      System.arraycopy(decoded, 0, mDecodedTarget, 0, decoded.length);
-      event.createSuccessorStatesDecoded(mDecodedTarget, this);
+      final int[] decodedTarget = getDecodedTargetBuffer(decoded);
+      event.createSuccessorStatesDecoded(decodedTarget, this);
     }
+  }
+
+  protected int[] getEncodedTargetBuffer(final int[] encoded)
+  {
+    System.arraycopy(encoded, 0, mEncodedTarget, 0, encoded.length);
+    return mEncodedTarget;
+  }
+
+  protected int[] getDecodedTargetBuffer(final int[] decoded)
+  {
+    System.arraycopy(decoded, 0, mDecodedTarget, 0, decoded.length);
+    return mDecodedTarget;
   }
 
   public MarkingInfo getMarkingInfo(final EventProxy prop)
@@ -1327,7 +1340,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
           if (localP >= 0) {
             final ListBufferTransitionRelation localRel =
               localAut.getTransitionRelation();
-            final AutomatonMarkingInfo info = new AutomatonMarkingInfo(a, localRel, localP);
+            final AutomatonMarkingInfo info =
+              new AutomatonMarkingInfo(a, localRel, localP);
             mMarkingInfo.add(info);
           }
           a++;
@@ -1591,6 +1605,16 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       return EventStatus.isAlwaysEnabledEvent(mStatus);
     }
 
+    public List<AutomatonEventInfo> getDisablingAutomata()
+    {
+      return mDisablingAutomata;
+    }
+
+    public List<AutomatonEventInfo> getUpdatingAutomata()
+    {
+      return mUpdatingAutomata;
+    }
+
     //#######################################################################
     //# Strongly Local and Strongly Forbidden
     public boolean isStronglyForbidden()
@@ -1651,11 +1675,28 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         for (final AutomatonEventInfo info : mDisablingAutomata) {
           info.setControllable(true);
         }
-        Collections.sort(mDisablingAutomata);
+        Collections.sort(mDisablingAutomata, getAutomatonEventInfoComparator());
         for (final AutomatonEventInfo info : mUpdatingAutomata) {
           info.setControllable(true);
         }
       }
+    }
+
+    //#######################################################################
+    //# Hooks
+    /**
+     * Get the comparator used to determine the order in which automata
+     * are processed when trying to expand a state fpr this event. This
+     * is the order in which {@link AutomatonEventInfo} records are stored
+     * within this {@link EventInfo} record.
+     */
+    protected Comparator<AutomatonEventInfo> getAutomatonEventInfoComparator()
+    {
+      if (mDefaultAutomatonEventInfoComparator == null) {
+        mDefaultAutomatonEventInfoComparator =
+          new DefaultAutomatonEventInfoCamparator();
+      }
+      return mDefaultAutomatonEventInfoComparator;
     }
 
     //#######################################################################
@@ -1711,7 +1752,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
     private void sort()
     {
-      Collections.sort(mDisablingAutomata);
+      Collections.sort(mDisablingAutomata, getAutomatonEventInfoComparator());
       final int numUpdates = mUpdatingAutomata.size();
       final List<AutomatonEventInfo> deterministicUpdates =
         new ArrayList<>(numUpdates);
@@ -1749,6 +1790,19 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         }
       }
       return null;
+    }
+
+    public int findDisabling(final int[] decoded,
+                             final int start,
+                             final int end)
+    {
+      for (int i = start; i < end; i++) {
+        final AutomatonEventInfo info = mDisablingAutomata.get(i);
+        if (!info.isEnabled(decoded)) {
+          return i;
+        }
+      }
+      return -1;
     }
 
     public void createSuccessorStatesEncoded
@@ -1856,7 +1910,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   //#########################################################################
   //# Inner Class AutomatonEventInfo
   public static class AutomatonEventInfo
-    implements Comparable<AutomatonEventInfo>
   {
     //#######################################################################
     //# Constructor
@@ -2006,7 +2059,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       return mTransitionIterator;
     }
 
-    private void setNextUpdate(final AutomatonEventInfo next)
+    public void setNextUpdate(final AutomatonEventInfo next)
     {
       mNextUpdate = next;
     }
@@ -2103,29 +2156,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
 
     //#######################################################################
-    //# Interface java.util.Comparable<AutomatonEventInfo>
-    @Override
-    public int compareTo(final AutomatonEventInfo info)
-    {
-      if (!mControllable) {
-        final boolean prioritised1 = mPlant && mProbability < 1.0f;
-        final boolean prioritised2 = info.mPlant && info.mProbability < 1.0f;
-        if (prioritised1 && !prioritised2) {
-          return -1;
-        } else if (prioritised2 && !prioritised1) {
-          return 1;
-        }
-      }
-      if (mProbability < info.mProbability) {
-        return -1;
-      } else if (mProbability > info.mProbability) {
-        return 1;
-      } else {
-        return mAutomatonIndex - info.mAutomatonIndex;
-      }
-    }
-
-    //#######################################################################
     //# Data Members
     private final int mAutomatonIndex;
     private final boolean mPlant;
@@ -2136,6 +2166,49 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     private float mProbability;
     private final TransitionIterator mTransitionIterator;
     private AutomatonEventInfo mNextUpdate;
+  }
+
+
+  //#########################################################################
+  //# Inner Class DefaultAutomatonEventInfoCamparator
+  /**
+   * A comparator that defines the default ordering of automata during state
+   * expansion for an event.
+   * This is the order in which {@link AutomatonEventInfo} records are stored
+   * within each {@link EventInfo} record. This default comparator gives
+   * preference to uncontrollable events (unless always enabled in a plant).
+   * Within events of the same controllability status, automata are ordered
+   * by event probability, so that automata with lower probability of the
+   * event occurring are processed first.
+   */
+  protected static class DefaultAutomatonEventInfoCamparator
+    implements Comparator<AutomatonEventInfo>
+  {
+    //#######################################################################
+    //# Interface java.util.Comparator<AutomatonEventInfo>
+    @Override
+    public int compare(final AutomatonEventInfo info1,
+                       final AutomatonEventInfo info2)
+    {
+      final float prob1 = info1.getProbability();
+      final float prob2 = info2.getProbability();
+      if (!info1.isControllable()) {
+        final boolean prioritised1 = info1.isPlant() && prob1 < 1.0f;
+        final boolean prioritised2 = info2.isPlant() && prob2 < 1.0f;
+        if (prioritised1 && !prioritised2) {
+          return -1;
+        } else if (prioritised2 && !prioritised1) {
+          return 1;
+        }
+      }
+      if (prob1 < prob2) {
+        return -1;
+      } else if (prob1 > prob2) {
+        return 1;
+      } else {
+        return info1.getAutomatonIndex() - info2.getAutomatonIndex();
+      }
+    }
   }
 
 
@@ -2205,5 +2278,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
+
+  private static DefaultAutomatonEventInfoCamparator
+    mDefaultAutomatonEventInfoComparator = null;
 
 }

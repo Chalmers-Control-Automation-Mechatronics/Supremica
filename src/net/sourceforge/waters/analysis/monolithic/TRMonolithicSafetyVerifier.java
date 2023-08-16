@@ -44,8 +44,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -57,9 +55,6 @@ import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -119,39 +114,6 @@ public abstract class TRMonolithicSafetyVerifier
   public SafetyCounterExampleProxy getCounterExample()
   {
     return (SafetyCounterExampleProxy) super.getCounterExample();
-  }
-
-
-  //#########################################################################
-  //# Invocation
-  @Override
-  public boolean run()
-    throws AnalysisException
-  {
-    try {
-      setUp();
-      final VerificationResult result = getAnalysisResult();
-      if (!result.isFinished()) {
-        exploreStateSpace();
-        if (!result.isFinished()) {
-          result.setSatisfied(true);
-        }
-      }
-      return result.isSatisfied();
-    } catch (final AnalysisException exception) {
-      throw setExceptionResult(exception);
-    } catch (final OutOfMemoryError error) {
-      tearDown();
-      final Logger logger = LogManager.getLogger();
-      logger.debug("<out of memory>");
-      final OverflowException exception = new OverflowException(error);
-      throw setExceptionResult(exception);
-    } catch (final StackOverflowError error) {
-      final OverflowException exception = new OverflowException(error);
-      throw setExceptionResult(exception);
-    } finally {
-      tearDown();
-    }
   }
 
 
