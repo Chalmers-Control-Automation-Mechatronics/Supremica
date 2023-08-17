@@ -34,7 +34,6 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
-import net.sourceforge.waters.model.base.ComponentKind;
 
 
 /**
@@ -46,24 +45,25 @@ import net.sourceforge.waters.model.base.ComponentKind;
  * {@link CoobservabilityAttributeFactory#CONTROLLABITY_KEY} and
  * {@link CoobservabilityAttributeFactory#OBSERVABITY_KEY} defined in class
  * {@link CoobservabilityAttributeFactory}. Any attribute whose name starts
- * with one of these prefixes carries the name of a site or controller that
+ * with one of these prefixes carries the name of a site or supervisor that
  * can disable or observe all instances of the event.</P>
  *
- * <P>Thus the coobservability checker ignores the event kind information
- * and uses the attributes to determine controllability and observability.
- * It does however use {@link ComponentKind} information of automata to
- * distinguish plants and specifications.</P>
+ * <P>For controllable and observable events without these attributes
+ * declared, the coobservability checker may be configured to assign
+ * as default supervisor site using {@link #setDefaultSite(String)
+ * setDefaultSite()}. Using the default site, coobservability is equivalent to
+ * controllability for models without any supervisor site attributes.</P>
  *
- * <P>A model is coobservable with respect to a group of sites if it
- * satisfies the following controllability: If in the synchronous composition
- * of all plants and specification a state can be reached by some
- * trace&nbsp;<I>s</I> and in that state an event&nbsp;<I>e</I> is enabled
- * by all plant components  and disabled by some specification component,
- * then there is a site&nbsp;<I>C</I> that can disable the event&nbsp;<I>e</I>
- * and that has sufficient observation capability to make this disablement,
- * i.e., any trace accepted by the system that is indistinguishable
- * from&nbsp;<I>s</I> by&nbsp;<I>C</I> leads to a state where <I>e</I> is
- * disabled by at least one plant or specification component.</P>
+ * <P>A model is coobservable with respect to a group of supervisor sites if it
+ * satisfies the following controllability condition: If in the synchronous
+ * composition of all plants and specifications a state can be reached by some
+ * trace&nbsp;<I>t</I> and in that state an event&nbsp;<I>e</I> is enabled
+ * by all plant components and disabled by some specification component,
+ * then there is a supervisor site&nbsp;<I>S</I> that can disable the
+ * event&nbsp;<I>e</I> and that has sufficient observation capability to make
+ * this disablement, i.e., any trace accepted by the system that is
+ * indistinguishable from&nbsp;<I>t</I> by&nbsp;<I>S</I> leads to a state where
+ * <I>e</I> is disabled by at least one specification component.</P>
  *
  * @see CoobservabilityAttributeFactory
  *
@@ -75,6 +75,26 @@ public interface CoobservabilityChecker extends ModelVerifier
 
   //#########################################################################
   //# Configuration
+  /**
+   * <P>Sets the name of the default supervisor site.</P>
+   * <P>If specified, controllable or observable events with no explicit
+   * supervisor declared through attributes are assigned to be controlled or
+   * observed by the default supervisor site.</P>
+   * <P>The default supervisor site is enabled by default, using the name
+   * {@link CoobservabilityAttributeFactory#DEFAULT_SITE_NAME}.</P>
+   * @param  name  Name of default supervisor, or <CODE>null</CODE> or
+   *               empty string if no default supervisor is used.
+   * @see AbstractModelAnalyzerFactory#OPTION_CoobservabilityChecker_DefaultSite
+   */
+  public void setDefaultSite(final String name);
+
+  /**
+   * Gets the name of the default supervisor site.
+   * @return Name of default supervisor, or empty string if no default
+   *         supervisor is used.
+   * @see #setDefaultSite(String) setDefaultSite()
+   */
+  public String getDefaultSite();
 
 
   //#########################################################################

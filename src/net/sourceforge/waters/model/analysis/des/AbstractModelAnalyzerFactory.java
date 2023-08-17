@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.analysis.des;
 import net.sourceforge.waters.analysis.abstraction.StateReorderingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
-import net.sourceforge.waters.analysis.coobs.TRMonolithicCoobservabilityVerifier;
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
@@ -217,12 +217,12 @@ public abstract class AbstractModelAnalyzerFactory
 
     db.register(new StringOption
              (OPTION_CoobservabilityChecker_DefaultSite,
-              "Default site",
+              "Default supervisor site",
               "Name of supervisor site assigned to controllable or " +
               "observable events without a site given as an attribute. " +
               "Leave blank to assign no controlling or observing site.",
               "-defaultSite",
-              TRMonolithicCoobservabilityVerifier.DEFAULT_SITE_NAME));
+              CoobservabilityAttributeFactory.DEFAULT_SITE_NAME));
 
     db.register(new StringListOption
       (OPTION_DiagnosabilityChecker_FaultClasses,

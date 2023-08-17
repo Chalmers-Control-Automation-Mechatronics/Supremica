@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="abp2">
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="abp3">
 <B:Comment>Model of alternating bit protocol (or data transmission protocol) as test case for coobservability verification.
 
-This is a variation of a model from the paper below, with separate channels for messages and acknowledgements and with unobservable loss events. Despite the unobservable message loss, the model remains coobservable because the plant prevents resending of messages until the previous message is lost or received.
+This is a variation of a model from the paper below, with unobservable loss events, with separate channels for messages and acknowledgements that allow for resending of messages, and with the plants for sender and receiver removed. The model is not coobservable, for example because states S2 and S3 of specification2 are indistinguisable due to the unobservable event loss, but the controllable event send[0] must be enabled at S2 and disabled at S3.
 
 Reference:
 Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verification of co-observability in discrete-event Systems. 2014 American Control Conference (ACC'14), 5446-5452, Portland, OR, USA, 4-6 June 2014.</B:Comment>
@@ -70,238 +70,10 @@ Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verificatio
 <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="lossAck"/>
 </EventDeclList>
 <ComponentList>
-<SimpleComponent Kind="PLANT" Name="sender">
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="S1">
-<PointGeometry>
-<Point X="96" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S2">
-<PointGeometry>
-<Point X="176" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S3">
-<PointGeometry>
-<Point X="256" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S4">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="336" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="S1" Target="S2">
-<LabelBlock>
-<SimpleIdentifier Name="getFrame"/>
-<LabelGeometry Anchor="NW">
-<Point X="-29" Y="-22"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="S2" Target="S3">
-<LabelBlock>
-<SimpleIdentifier Name="send"/>
-<LabelGeometry Anchor="NW">
-<Point X="-21" Y="-20"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="216" Y="96"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S3" Target="S2">
-<LabelBlock>
-<SimpleIdentifier Name="loss"/>
-<LabelGeometry Anchor="NW">
-<Point X="-15" Y="-21"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="216" Y="128"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S3" Target="S4">
-<LabelBlock>
-<SimpleIdentifier Name="rcvAck"/>
-<LabelGeometry Anchor="NW">
-<Point X="-25" Y="-21"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="296" Y="96"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S4" Target="S3">
-<LabelBlock>
-<SimpleIdentifier Name="send"/>
-<LabelGeometry Anchor="NW">
-<Point X="-16" Y="-22"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="296" Y="128"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S4" Target="S2">
-<LabelBlock>
-<SimpleIdentifier Name="getFrame"/>
-<LabelGeometry Anchor="NW">
-<Point X="-25" Y="2"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="255" Y="181"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="receiver">
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="S1">
-<PointGeometry>
-<Point X="64" Y="128"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S2">
-<PointGeometry>
-<Point X="160" Y="128"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S3">
-<PointGeometry>
-<Point X="256" Y="128"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S4">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point X="352" Y="128"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S5">
-<PointGeometry>
-<Point X="448" Y="128"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="0" Y="10"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="S1" Target="S2">
-<LabelBlock>
-<SimpleIdentifier Name="rcv"/>
-<LabelGeometry Anchor="NW">
-<Point X="-15" Y="-21"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="S2" Target="S3">
-<LabelBlock>
-<SimpleIdentifier Name="passToHost"/>
-<LabelGeometry Anchor="NW">
-<Point X="-36" Y="-20"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="S3" Target="S4">
-<LabelBlock>
-<SimpleIdentifier Name="sendAck"/>
-<LabelGeometry Anchor="NW">
-<Point X="-30" Y="-21"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="304" Y="112"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S4" Target="S5">
-<LabelBlock>
-<SimpleIdentifier Name="rcv"/>
-<LabelGeometry Anchor="NW">
-<Point X="-17" Y="-22"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="400" Y="112"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S5" Target="S4">
-<LabelBlock>
-<SimpleIdentifier Name="sendAck"/>
-<LabelGeometry Anchor="NW">
-<Point X="-30" Y="2"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="400" Y="144"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S5" Target="S3">
-<LabelBlock>
-<SimpleIdentifier Name="passToHost"/>
-<LabelGeometry Anchor="NW">
-<Point X="-34" Y="6"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="354" Y="205"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S4" Target="S3">
-<LabelBlock>
-<SimpleIdentifier Name="lossAck"/>
-<LabelGeometry Anchor="NW">
-<Point X="-20" Y="4"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="304" Y="144"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="channel">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="S1">
+<SimpleNode Initial="true" Name="idle">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
@@ -315,77 +87,79 @@ Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verificatio
 <Point X="-8" Y="9"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="S2">
+<SimpleNode Name="S0">
 <PointGeometry>
 <Point X="272" Y="192"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="6" Y="6"/>
+<Point X="-4" Y="10"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="S4">
+<SimpleNode Name="S1">
 <PointGeometry>
 <Point X="80" Y="192"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="-28" Y="-19"/>
+<Point X="-11" Y="7"/>
 </LabelGeometry>
 </SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="idle"/>
+<NodeRef Name="S0"/>
+<NodeRef Name="S1"/>
+<BoxGeometry>
+<Box X="48" Y="128" Width="256" Height="128"/>
+</BoxGeometry>
+</GroupNode>
 </NodeList>
 <EdgeList>
-<Edge Source="S1" Target="S4">
+<Edge Source="G0" Target="S1">
 <LabelBlock>
 <IndexedIdentifier Name="send">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-28" Y="10"/>
+<Point X="2" Y="-19"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="128" Y="205"/>
-</SplineGeometry>
+<StartPointGeometry>
+<Point X="80" Y="128"/>
+</StartPointGeometry>
 </Edge>
-<Edge Source="S4" Target="S1">
+<Edge Source="S1" Target="idle">
 <LabelBlock>
 <IndexedIdentifier Name="rcv">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
 <SimpleIdentifier Name="loss"/>
 <LabelGeometry Anchor="NW">
-<Point X="-18" Y="-39"/>
+<Point X="-18" Y="4"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="128" Y="179"/>
-</SplineGeometry>
 </Edge>
-<Edge Source="S1" Target="S2">
+<Edge Source="G0" Target="S0">
 <LabelBlock>
 <IndexedIdentifier Name="send">
 <IntConstant Value="0"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-26" Y="-25"/>
+<Point X="-50" Y="-19"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="224" Y="179"/>
-</SplineGeometry>
+<StartPointGeometry>
+<Point X="272" Y="128"/>
+</StartPointGeometry>
 </Edge>
-<Edge Source="S2" Target="S1">
+<Edge Source="S0" Target="idle">
 <LabelBlock>
 <IndexedIdentifier Name="rcv">
 <IntConstant Value="0"/>
 </IndexedIdentifier>
 <SimpleIdentifier Name="loss"/>
 <LabelGeometry Anchor="NW">
-<Point X="-17" Y="5"/>
+<Point X="-21" Y="3"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="224" Y="205"/>
-</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -393,7 +167,7 @@ Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verificatio
 <SimpleComponent Kind="PLANT" Name="channelAck">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="S1">
+<SimpleNode Initial="true" Name="idle">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
@@ -407,77 +181,79 @@ Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verificatio
 <Point X="-8" Y="9"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="S3">
-<PointGeometry>
-<Point X="80" Y="192"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-21" Y="9"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="S5">
+<SimpleNode Name="S0">
 <PointGeometry>
 <Point X="272" Y="192"/>
 </PointGeometry>
 <LabelGeometry Anchor="NW">
-<Point X="2" Y="9"/>
+<Point X="-4" Y="10"/>
 </LabelGeometry>
 </SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="80" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name="G0">
+<NodeRef Name="S1"/>
+<NodeRef Name="idle"/>
+<NodeRef Name="S0"/>
+<BoxGeometry>
+<Box X="48" Y="128" Width="256" Height="128"/>
+</BoxGeometry>
+</GroupNode>
 </NodeList>
 <EdgeList>
-<Edge Source="S5" Target="S1">
-<LabelBlock>
-<IndexedIdentifier Name="rcvAck">
-<IntConstant Value="0"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="lossAck"/>
-<LabelGeometry Anchor="NW">
-<Point X="-27" Y="10"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="224" Y="205"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S1" Target="S5">
-<LabelBlock>
-<IndexedIdentifier Name="sendAck">
-<IntConstant Value="0"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point X="-36" Y="-21"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point X="224" Y="179"/>
-</SplineGeometry>
-</Edge>
-<Edge Source="S1" Target="S3">
+<Edge Source="G0" Target="S1">
 <LabelBlock>
 <IndexedIdentifier Name="sendAck">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point X="-38" Y="6"/>
+<Point X="2" Y="-19"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="128" Y="205"/>
-</SplineGeometry>
+<StartPointGeometry>
+<Point X="80" Y="128"/>
+</StartPointGeometry>
 </Edge>
-<Edge Source="S3" Target="S1">
+<Edge Source="S1" Target="idle">
 <LabelBlock>
 <IndexedIdentifier Name="rcvAck">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
 <SimpleIdentifier Name="lossAck"/>
 <LabelGeometry Anchor="NW">
-<Point X="-26" Y="-37"/>
+<Point X="-30" Y="3"/>
 </LabelGeometry>
 </LabelBlock>
-<SplineGeometry>
-<Point X="128" Y="179"/>
-</SplineGeometry>
+</Edge>
+<Edge Source="G0" Target="S0">
+<LabelBlock>
+<IndexedIdentifier Name="sendAck">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-74" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="272" Y="128"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="S0" Target="idle">
+<LabelBlock>
+<IndexedIdentifier Name="rcvAck">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="lossAck"/>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
 </Edge>
 </EdgeList>
 </Graph>
@@ -534,7 +310,7 @@ Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verificatio
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC" Name="specification2">
+<SimpleComponent Kind="SPEC" Name="sender">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="S1">
@@ -680,7 +456,7 @@ Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verificatio
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC" Name="specification3">
+<SimpleComponent Kind="SPEC" Name="receiver">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="S1">

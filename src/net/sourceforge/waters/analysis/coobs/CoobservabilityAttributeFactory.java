@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -109,6 +110,14 @@ public class CoobservabilityAttributeFactory implements AttributeFactory
    * observe an event.
    */
   public static final String OBSERVABITY_KEY = "COOBS:observer";
+
+  /**
+   * The default value for the default site name, which may be used to assign
+   * a controlling or observing supervisor to controllable or observable
+   * events without the corresponding attribute.
+   * @see CoobservabilityChecker#setDefaultSite(String)
+   */
+  public static final String DEFAULT_SITE_NAME = ":main";
 
 
   //#########################################################################

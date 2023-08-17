@@ -71,37 +71,39 @@ import net.sourceforge.waters.model.options.Option;
  *
  * @author Robi Malik
  */
-public class TRMonolithicCoobservabilityVerifier
+public class TRMonolithicCoobservabilityChecker
   extends AbstractTRMonolithicModelVerifier
   implements CoobservabilityChecker
 {
 
   //#########################################################################
   //# Constructors
-  public TRMonolithicCoobservabilityVerifier()
+  public TRMonolithicCoobservabilityChecker()
   {
     this(ControllabilityKindTranslator.getInstance());
   }
 
-  public TRMonolithicCoobservabilityVerifier(final KindTranslator translator)
+  public TRMonolithicCoobservabilityChecker(final KindTranslator translator)
   {
     super(translator);
   }
 
-  public TRMonolithicCoobservabilityVerifier(final ProductDESProxy model,
-                                             final KindTranslator translator)
+  public TRMonolithicCoobservabilityChecker(final ProductDESProxy model,
+                                            final KindTranslator translator)
   {
     super(model, translator);
   }
 
 
   //#########################################################################
-  //# Configuration
+  //# Interface net.sourceforge.waters.analysis.coobs.CoobservabilityChecker
+  @Override
   public void setDefaultSite(final String name)
   {
     mDefaultSite = "".equals(name) ? null : name;
   }
 
+  @Override
   public String getDefaultSite()
   {
     return mDefaultSite == null ? "" : mDefaultSite;
@@ -272,7 +274,6 @@ public class TRMonolithicCoobservabilityVerifier
   {
     final CoobservabilityEventInfo eventInfo =
       (CoobservabilityEventInfo) event;
-    final int endGroupIndex = eventInfo.getNumberOfSiteIndices();
     int siteEnd = eventInfo.getSiteGroupIndex(0);
     int d = eventInfo.findDisabling(decoded, 0, siteEnd);
     if (d >= 0) {
@@ -294,7 +295,8 @@ public class TRMonolithicCoobservabilityVerifier
             return true;
           }
         }
-        for (int i = siteEnd; i < endGroupIndex; i++) {
+        final int end = disabling.size();
+        for (int i = siteEnd; i < end; i++) {
           final AutomatonEventInfo autInfo = disabling.get(i);
           final int a = autInfo.getAutomatonIndex();
           final SiteInfo site = mComponentInfoList.get(a).getSite();
@@ -311,6 +313,7 @@ public class TRMonolithicCoobservabilityVerifier
     }
     int siteStart = 0;
     int groupIndex = 1;
+    final int endGroupIndex = eventInfo.getNumberOfSiteIndices();
     if (eventInfo.hasObservingSpec()) {
       siteStart = siteEnd;
       siteEnd = eventInfo.getSiteGroupIndex(1);
@@ -442,7 +445,7 @@ public class TRMonolithicCoobservabilityVerifier
     //#######################################################################
     //# Constructor
     private CoobservabilityEventInfo
-      (final TRMonolithicCoobservabilityVerifier verifier,
+      (final TRMonolithicCoobservabilityChecker verifier,
        final EventProxy event)
     {
       super(event, false);
@@ -502,7 +505,7 @@ public class TRMonolithicCoobservabilityVerifier
     }
 
     private void computeSiteIndices
-      (final TRMonolithicCoobservabilityVerifier verifier)
+      (final TRMonolithicCoobservabilityChecker verifier)
     {
       final TIntArrayList indices =
         new TIntArrayList(verifier.mSiteMap.size() + 1);
@@ -580,7 +583,7 @@ public class TRMonolithicCoobservabilityVerifier
     private void createSuccessorStatesEncoded
       (final int[] encoded,
        final int groupIndex,
-       final TRMonolithicCoobservabilityVerifier verifier)
+       final TRMonolithicCoobservabilityChecker verifier)
       throws OverflowException
     {
       final AutomatonEventInfo update = mSiteUpdates[groupIndex];
@@ -709,17 +712,12 @@ public class TRMonolithicCoobservabilityVerifier
 
   //#########################################################################
   //# Instance Variables
-  private String mDefaultSite;
+  private String mDefaultSite = CoobservabilityAttributeFactory.DEFAULT_SITE_NAME;
 
   private int mNumAutomata;
   private Map<String,SiteInfo> mSiteMap;
   private Map<EventProxy,CoobservabilityEventInfo> mCoobservabilityEventInfoMap;
   private List<ComponentInfo> mComponentInfoList;
   private TRAutomatonProxy[] mTRAutomataExtended;
-
-
-  //#########################################################################
-  //# Class Constants
-  public static final String DEFAULT_SITE_NAME = ":default";
 
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="abp1">
-<B:Comment>Model of alternating bit protocol (or data transmission protocol) as test case for coobservability verification.
+<B:Comment>Model of alternating bit protocol (or data transmission protocol) as test case for coobservability verification. This is the original model based on the paper below, which is coosbervable.
 
-This model appears in the following paper:
+Reference:
 Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker. Incremental verification of co-observability in discrete-event Systems. 2014 American Control Conference (ACC'14), 5446-5452, Portland, OR, USA, 4-6 June 2014.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="getFrame">
