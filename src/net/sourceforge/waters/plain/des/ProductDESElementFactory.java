@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
+import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -167,9 +168,9 @@ public class ProductDESElementFactory
     (final String name,
      final EventKind kind,
      final boolean observable)
-{
-  return new EventElement(name, kind, observable);
-}
+  {
+    return new EventElement(name, kind, observable);
+  }
 
   @Override
   public EventProxy createEventProxy(final String name, final EventKind kind)
@@ -202,6 +203,19 @@ public class ProductDESElementFactory
     return new LoopCounterExampleElement(name, des, trace);
   }
 
+
+  @Override
+  public MultipleCounterExampleProxy createMultipleCounterExampleProxy
+    (final String name,
+     final String comment,
+     final URI location,
+     final ProductDESProxy des,
+     final Collection<? extends AutomatonProxy> automata,
+     final List<TraceProxy> traces)
+  {
+    return new MultipleCounterExampleElement(name, comment, location, des,
+                                             automata, traces);
+  }
 
   @Override
   public ProductDESProxy createProductDESProxy

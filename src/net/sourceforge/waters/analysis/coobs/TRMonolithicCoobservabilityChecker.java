@@ -61,6 +61,7 @@ import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindT
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
@@ -107,6 +108,12 @@ public class TRMonolithicCoobservabilityChecker
   public String getDefaultSite()
   {
     return mDefaultSite == null ? "" : mDefaultSite;
+  }
+
+  @Override
+  public MultipleCounterExampleProxy getCounterExample()
+  {
+    return (MultipleCounterExampleProxy) super.getCounterExample();
   }
 
 

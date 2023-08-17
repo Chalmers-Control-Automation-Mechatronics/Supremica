@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
+import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -162,6 +163,16 @@ public class ProductDESProxyPrinter
     printCounterExampleHeader(counter);
     final TraceProxy trace = counter.getTrace();
     return printTraceProxy(trace, 0);
+  }
+
+  @Override
+  public Object visitMultipleCounterExampleProxy
+    (final MultipleCounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("MULTIPLE COUNTEREXAMPLE ");
+    print(counter.getName());
+    return printCounterExample(counter);
   }
 
   @Override

@@ -263,6 +263,31 @@ public interface ProductDESProxyFactory
 
 
   /**
+   * Creates a new multiple counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
+   *                      or <CODE>null</CODE>.
+   * @param  location     The URI to be associated with the new
+   *                      document, or <CODE>null</CODE>.
+   * @param  des          The product DES for which this counterexample is
+   *                      generated.
+   * @param  automata     The set of automata for the new counterexample,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  traces       The list of traces constituting the new counterexample.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      automata, events, or states cannot be found
+   *                      in the product DES.
+   */
+  public MultipleCounterExampleProxy createMultipleCounterExampleProxy
+    (String name,
+     String comment,
+     URI location,
+     ProductDESProxy des,
+     Collection<? extends AutomatonProxy> automata,
+     List<TraceProxy> traces);
+
+
+  /**
    * Creates a new product DES.
    * @param name         The name of the new product DES.
    * @param comment      The comment to be associated with the new product DES,

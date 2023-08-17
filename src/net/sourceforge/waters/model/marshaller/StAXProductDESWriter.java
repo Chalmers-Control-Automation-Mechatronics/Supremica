@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
+import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -136,6 +137,17 @@ public class StAXProductDESWriter
     throws VisitorException
   {
     writeStartElement(NAMESPACE, SchemaDES.ELEMENT_LoopCounterExample);
+    visitCounterExampleProxy(cex);
+    writeEndElement();
+    return null;
+  }
+
+  @Override
+  public Object visitMultipleCounterExampleProxy
+    (final MultipleCounterExampleProxy cex)
+    throws VisitorException
+  {
+    writeStartElement(NAMESPACE, SchemaDES.ELEMENT_MultipleCounterExample);
     visitCounterExampleProxy(cex);
     writeEndElement();
     return null;

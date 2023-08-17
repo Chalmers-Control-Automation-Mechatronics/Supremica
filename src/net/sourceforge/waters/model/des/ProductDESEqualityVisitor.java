@@ -275,6 +275,14 @@ public class ProductDESEqualityVisitor
   }
 
   @Override
+  public Object visitMultipleCounterExampleProxy
+    (final MultipleCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Boolean visitSafetyCounterExampleProxy
     (final SafetyCounterExampleProxy counter)
     throws VisitorException

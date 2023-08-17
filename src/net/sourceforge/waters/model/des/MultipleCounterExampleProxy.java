@@ -33,52 +33,34 @@
 
 package net.sourceforge.waters.model.des;
 
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 
+/**
+ * <P>A counterexample consisting of two traces.</P>
+ *
+ * <P>This class is used by model verifiers for several properties of discrete
+ * event system, particularly does concerned with observability of events,
+ * that are refuted by a combination of several traces.</P>
+ *
+ * <UL>
+ * <LI>A <I>coobservability</I> counterexample consists of a first trace
+ * representing the system behaviour followed by further traces representing
+ * supervisor sites. The system behaviour trace takes the plant and specification
+ * to a state where some event is enabled by the plant but disabled by the
+ * specification, with that last event included in the trace. Each of the
+ * supervisor site traces is labelled by the name of a supervisor (through
+ * {@link TraceProxy#getName()}) that can disable the last event of the system
+ * trace and contains a sequence of events that is indistinguishable from the
+ * system behaviour trace based on the event observability of its supervisor
+ * site. It takes the specification to a state where the last event of the
+ * system behaviour trace (also included in the trace) is enabled.</LI>
+ * </UL>
+ *
+ * @author Robi Malik
+ * @see CoobservabilityChecker
+ */
 
-public interface ProductDESProxyVisitor
-  extends ProxyVisitor
+public interface MultipleCounterExampleProxy
+extends CounterExampleProxy
 {
-
-  public Object visitAutomatonProxy(AutomatonProxy proxy)
-    throws VisitorException;
-
-  public Object visitConflictCounterExampleProxy
-    (ConflictCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitCounterExampleProxy(CounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitDualCounterExampleProxy(DualCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitEventProxy(EventProxy proxy)
-    throws VisitorException;
-
-  public Object visitLoopCounterExampleProxy(LoopCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitMultipleCounterExampleProxy(MultipleCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitProductDESProxy(ProductDESProxy proxy)
-    throws VisitorException;
-
-  public Object visitSafetyCounterExampleProxy(SafetyCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitStateProxy(StateProxy proxy)
-    throws VisitorException;
-
-  public Object visitTraceProxy(TraceProxy proxy)
-    throws VisitorException;
-
-  public Object visitTraceStepProxy(TraceStepProxy proxy)
-    throws VisitorException;
-
-  public Object visitTransitionProxy(TransitionProxy proxy)
-    throws VisitorException;
-
 }

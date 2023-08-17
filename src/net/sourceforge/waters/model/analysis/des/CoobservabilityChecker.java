@@ -34,6 +34,8 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
+import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -99,5 +101,28 @@ public interface CoobservabilityChecker extends ModelVerifier
 
   //#########################################################################
   //# More Specific Access to the Results
+  /**
+   * Gets a counterexample if the model was found to be not coobservable.
+   * A coobservability counterexample consists of a first trace representing the
+   * system behaviour followed by further traces representing supervisor sites.
+   * The system behaviour trace takes the plant and specification
+   * to a state where some event is enabled by the plant but disabled by the
+   * specification, with that last event included in the trace. Each of the
+   * supervisor site traces is labelled by the name of a supervisor (through
+   * {@link TraceProxy#getName()}) that can disable the last event of the system
+   * trace and contains a sequence of events that is indistinguishable from the
+   * system behaviour trace based on the event observability of its supervisor
+   * site. It takes the specification to a state where the last event of the
+   * system behaviour trace (also included in the trace) is enabled.
+   * @return A counterexample object constructed for the input product DES
+   *         of this coobservability checker that shares its automata and
+   *         event objects.
+   * @throws IllegalStateException if this method is called before
+   *         model checking has completed, i.e., before {@link #run()}
+   *         has been called, or model checking has found that the
+   *         property is satisfied and there is no counterexample.
+   */
+  @Override
+  public MultipleCounterExampleProxy getCounterExample();
 
 }

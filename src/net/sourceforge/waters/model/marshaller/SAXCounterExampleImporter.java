@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
+import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -99,6 +100,15 @@ public class SAXCounterExampleImporter
           (final AbstractContentHandler<?> parent)
         {
           return new LoopCounterExampleProxyHandler(parent);
+        }
+      });
+    registerHandler(SchemaDES.ELEMENT_MultipleCounterExample,
+      new SAXHandlerCreator<MultipleCounterExampleProxy>() {
+        @Override
+        AbstractContentHandler<MultipleCounterExampleProxy> createHandler
+          (final AbstractContentHandler<?> parent)
+        {
+          return new MultipleCounterExampleProxyHandler(parent);
         }
       });
     registerHandler(SchemaDES.ELEMENT_SafetyCounterExample,
@@ -535,6 +545,34 @@ public class SAXCounterExampleImporter
       final TraceProxy trace = getTrace();
       return mFactory.createLoopCounterExampleProxy
         (name, comment, uri, mProductDES, automata, trace);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class MultipleCounterExampleProxyHandler
+  private class MultipleCounterExampleProxyHandler
+    extends CounterExampleProxyHandler<MultipleCounterExampleProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private MultipleCounterExampleProxyHandler(final AbstractContentHandler<?> parent)
+    {
+      super(parent);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<ConflictCounterExampleProxy>
+    @Override
+    MultipleCounterExampleProxy getResult() throws SAXParseException
+    {
+      final String name = getName();
+      final String comment = getComment();
+      final URI uri = getURI();
+      final List<AutomatonProxy> automata = getAutomata();
+      final List<TraceProxy> traces = getTraces();
+      return mFactory.createMultipleCounterExampleProxy
+        (name, comment, uri, mProductDES, automata, traces);
     }
   }
 
