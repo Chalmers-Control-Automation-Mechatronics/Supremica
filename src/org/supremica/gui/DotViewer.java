@@ -624,6 +624,11 @@ public abstract class DotViewer
 			final JFileChooser fileExporter = dlg.getFileExporter();
 
 			// Suggest a reasonable filename based on the name of the automaton...
+
+			// Need to sanitize the objectName, as it may contain invalid characters!
+			objectName = objectName.replaceAll("[^a-zA-Z0-9.-]", "_");
+			// This replaces everything that is not char, digit, dot or dash by underscore
+			// Should maybe have a better and global way to deal with this
 			fileExporter.setSelectedFile(new File(Config.FILE_SAVE_PATH.getValue() + "/" + objectName + "." + dlg.getSelectedValue()));
 
 			if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
@@ -634,11 +639,14 @@ public abstract class DotViewer
 				{
 					if (!currFile.isDirectory())
 					{
+						logger.debug("Saving to: " + currFile);
+
 						try
 						{
 							final AutomataSerializer serializer = getSerializer();
+							final DotFileViewer dotfw = new DotFileViewer(currFile);
 
-							DotBuilder.getDotBuilder(new DotFileViewer(currFile), null, serializer, dlg.getDotArgument());
+							DotBuilder.getDotBuilder(dotfw, null, serializer, dlg.getDotArgument());
 							Config.FILE_SAVE_PATH.set(currFile.getParentFile().getAbsolutePath());
 
 						}
@@ -720,7 +728,7 @@ public abstract class DotViewer
 			{
 				// Send the response to a file
 				buffInStream = new BufferedInputStream(theInputStream);
-				final FileOutputStream fw = new FileOutputStream(theFile);
+				final FileOutputStream fw = new FileOutputStream(this.theFile);
 				buffOutStream = new BufferedOutputStream(fw);
 				int currChar = buffInStream.read();
 
@@ -745,6 +753,7 @@ public abstract class DotViewer
 			catch (final IOException ex)
 			{
 				logger.error(ex);
+				logger.error(this.theFile);
 			}
 			finally
 			{
