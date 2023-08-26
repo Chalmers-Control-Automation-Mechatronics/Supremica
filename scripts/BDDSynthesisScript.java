@@ -19,6 +19,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.model.base.EventKind;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.apache.logging.log4j.Logger;
 
 public class BDDSynthesisScript
 {
@@ -27,6 +28,8 @@ public class BDDSynthesisScript
     public BDDSynthesisScript(final IDE ide)
     {
         this.ide = ide;
+
+		final Logger logger = ide.getTheLog();
 
 		// Look up the editorSynthesizerAction
 		final Actions actions = ide.getActions();
@@ -73,12 +76,20 @@ public class BDDSynthesisScript
 
             // Cleanup...
             bddSynthesizer.done();
+            bddSynthesizer = null;
         }
         catch (final RuntimeException e)
         {
             synthesisException = e;
         }
-        finally
+        catch(final OutOfMemoryError e)
+        {
+			synthesisException = new RuntimeException(e.getCause());
+			logger.error("BDDSynthesisScript out of memory during BDD synthesis "
+			          + " (" + Runtime.getRuntime().maxMemory()/(1024*1024) + " Mib)");
+      		e.printStackTrace();
+		}
+		finally
         {
             if (bddSynthesizer != null)
                 bddSynthesizer.done();

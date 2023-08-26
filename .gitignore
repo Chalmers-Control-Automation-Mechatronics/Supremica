@@ -33,7 +33,7 @@ Thumbs.db
 # IntelliJ IDEA
 .idea
 *.iml
-*TEST.*
+*TEST*
 *XX
 
 # Don't ignore .settings - shared run configurations for Eclipse.
