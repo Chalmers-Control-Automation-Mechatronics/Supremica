@@ -46,8 +46,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -71,6 +69,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,7 +93,7 @@ import org.apache.logging.log4j.Logger;
  * <P><I>Reference:</I><BR>
  * Simon Ware, Robi Malik. The use of language projection for compositional
  * verification of discrete event systems. Proc. 9th International Workshop
- * on Discrete Event Systems (WODES'08), 322-327, G&ouml;teborg, Sweden,
+ * on Discrete Event Systems (WODES'08), 322&ndash;327, G&ouml;teborg, Sweden,
  * 2008.</P>
  *
  * @author Robi Malik

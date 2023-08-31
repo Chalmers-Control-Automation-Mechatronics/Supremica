@@ -170,6 +170,7 @@ public abstract class TRMonolithicSafetyVerifier
     final List<TraceStepProxy> steps;
     final String comment;
     if (e < 0) {
+      // failed property due to missing initial state
       final int numAut = getInputAutomata().length;
       final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
       for (int a = 0; a < numAut; a++) {
@@ -186,6 +187,7 @@ public abstract class TRMonolithicSafetyVerifier
       steps = Collections.singletonList(step);
       comment = null;
     } else {
+      // failed property due to disabled event
       TraceStepProxy finalStep = null;
       for (final EventInfo info : getEventInfo()) {
         if (info.getOutputCode() == e) {

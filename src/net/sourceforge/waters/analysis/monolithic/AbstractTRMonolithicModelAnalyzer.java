@@ -697,7 +697,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     final int numEvents = mEventInfo.size();
     final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
     for (final EventInfo info : mEventInfo) {
-      info.reset();
+      info.resetForReverse();
       final EventProxy event = info.getEvent();
       eventInfoMap.put(event, info);
     }
@@ -944,6 +944,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       }
     } else if (isSensitiveToControllability() &&
                !event.isControllable() &&
+               // Note: events are controllable in reverse mode
                !disablingAut.isPlant()) {
       final int e = event.getOutputCode();
       final int a = disablingAut.getAutomatonIndex();
@@ -1682,6 +1683,15 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       }
     }
 
+    public void resetForReverse()
+    {
+      mStatus = EventStatus.STATUS_CONTROLLABLE; // for reverse
+      mBlocked = false;
+      mDisablingAutomata.clear();
+      mUpdatingAutomata.clear();
+      mUpdateSequence = null;
+    }
+
     //#######################################################################
     //# Hooks
     /**
@@ -1714,15 +1724,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
     //#######################################################################
     //# Setup
-    private void reset()
-    {
-      mStatus = EventStatus.STATUS_CONTROLLABLE; // for reverse
-      mBlocked = false;
-      mDisablingAutomata.clear();
-      mUpdatingAutomata.clear();
-      mUpdateSequence = null;
-    }
-
     private void setOutputCode(final int e)
     {
       mOutputCode = e;

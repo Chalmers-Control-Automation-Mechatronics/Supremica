@@ -228,12 +228,19 @@ public abstract class AbstractTRMonolithicModelVerifier
     super.tearDown();
   }
 
-  protected List<TraceStepProxy> buildTraceToBadState(int target)
+  protected CounterExampleCallback prepareForCounterExample()
     throws AnalysisException
   {
     setUpReverseTransitions();
     final CounterExampleCallback callback = new CounterExampleCallback();
     setStateCallback(callback);
+    return callback;
+  }
+
+  protected List<TraceStepProxy> buildTraceToBadState(int target)
+    throws AnalysisException
+  {
+    final CounterExampleCallback callback = prepareForCounterExample();
     final AutomatonProxy[] automataArray= getTRAutomata();
     final int numAut = automataArray.length;
     final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
@@ -248,12 +255,7 @@ public abstract class AbstractTRMonolithicModelVerifier
     do {
       getStateSpace().getContents(target, encodedSource);
       getStateTupleEncoding().decode(encodedSource, decodedSource);
-      for (final EventInfo event : getEventInfo()) {
-        if (event.findDisabling(decodedSource) == null) {
-          callback.setEvent(event.getEvent());
-          createSuccessorStates(encodedSource, decodedSource, event);
-        }
-      }
+      expandState(encodedSource, decodedSource, callback);
       final int next = callback.getSmallestStateIndex();
       for (int i = 0; i < automataArray.length; i++) {
         final AutomatonProxy aut = getInputAutomaton(i);
@@ -276,10 +278,33 @@ public abstract class AbstractTRMonolithicModelVerifier
     return steps;
   }
 
+  /**
+   * Expands the given state for counterexample search.
+   * This method calculates all transitions originating from the given state
+   * recording the reached state with the smallest index and the associated
+   * event using a {@link CounterExampleCallback}.
+   * @param  encoded  Compressed state tuple to be expanded.
+   * @param  decoded  Decompressed version of the same state tuple.
+   * @param  callback Counterexample callback in use.
+   */
+  protected void expandState(final int[] encoded,
+                             final int[] decoded,
+                             final CounterExampleCallback callback)
+    throws AnalysisException
+  {
+    for (final EventInfo info : getEventInfo()) {
+      final EventProxy event = info.getEvent();
+      callback.setEvent(event);
+      if (!expandState(encoded, decoded, info)) {
+        break;
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class CounterExampleCallback
-  private class CounterExampleCallback implements StateCallback
+  protected class CounterExampleCallback implements StateCallback
   {
 
     //#######################################################################
@@ -301,29 +326,27 @@ public abstract class AbstractTRMonolithicModelVerifier
       getStateTupleEncoding().encode(tuple, mEncoded);
       final int currentStateIndex = getStateSpace().getIndex(mEncoded);
       // if -1; then not visited, so skip
-      if (currentStateIndex != -1) {
-        if (currentStateIndex < mSmallestStateIndex) {
-          mSmallestStateIndex = currentStateIndex;
-          mSmallestStateEvent = mCurrentEvent;
-          return true;
-        }
+      if (currentStateIndex != -1 &&
+          currentStateIndex < mSmallestStateIndex) {
+        mSmallestStateIndex = currentStateIndex;
+        mSmallestStateEvent = mCurrentEvent;
       }
       return false;
     }
 
     //#######################################################################
     //# Simple Access
-    private void setEvent(final EventProxy event)
+    public void setEvent(final EventProxy event)
     {
       mCurrentEvent = event;
     }
 
-    private int getSmallestStateIndex()
+    public int getSmallestStateIndex()
     {
       return mSmallestStateIndex;
     }
 
-    private EventProxy getSmallestStateEvent()
+    public EventProxy getSmallestStateEvent()
     {
       return mSmallestStateEvent;
     }
