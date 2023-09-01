@@ -31,48 +31,31 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.coobs;
+package net.sourceforge.waters.model.des;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import net.sourceforge.waters.model.analysis.AbstractCoobservabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
 
 /**
- * A test class for the {@link TRMonolithicCoobservabilityChecker}.
+ * <P>A counterexample consisting of several traces to show that
+ * a system is not coobservable.</P>
+ *
+ * <P>A <I>coobservability</I> counterexample consists of a first trace
+ * representing the system behaviour followed by further traces representing
+ * supervisor sites. The system behaviour trace takes the plant and specification
+ * to a state where some event is enabled by the plant but disabled by the
+ * specification, with that last event included in the trace. Each of the
+ * supervisor site traces is labelled by the name of a supervisor (through
+ * {@link TraceProxy#getName()}) that can disable the last event of the system
+ * trace and contains a sequence of events that is indistinguishable from the
+ * system behaviour trace based on the event observability of its supervisor
+ * site. It takes the specification to a state where the last event of the
+ * system behaviour trace (also included in the trace) is enabled.</P>
  *
  * @author Robi Malik
+ * @see CoobservabilityChecker
  */
 
-public class TRMonolithicCoobservabilityCheckerTest
-  extends AbstractCoobservabilityCheckerTest
+public interface CoobservabilityCounterExampleProxy
+  extends CounterExampleProxy
 {
-
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite() {
-    final TestSuite testSuite =
-      new TestSuite(TRMonolithicCoobservabilityCheckerTest.class);
-    return testSuite;
-  }
-
-  public static void main(final String[] args)
-  {
-    junit.textui.TestRunner.run(suite());
-  }
-
-
-  //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  @Override
-  protected CoobservabilityChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
-  {
-    return new TRMonolithicCoobservabilityChecker();
-  }
-
 }

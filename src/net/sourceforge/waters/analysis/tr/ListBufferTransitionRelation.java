@@ -786,6 +786,24 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
+   * Returns whether this transition relation has more than one initial state.
+   */
+  public boolean hasNondeterministicInitialStates()
+  {
+    boolean found = false;
+    for (int s = 0; s < getNumberOfStates(); s++) {
+      if (isInitial(s)) {
+        if (found) {
+          return true;
+        } else {
+          found = true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
    * Gets the reachability status of the given state. Each state has a
    * reachability flag associated with it, which is used to suppress
    * unreachable states when creating an automaton from the transition

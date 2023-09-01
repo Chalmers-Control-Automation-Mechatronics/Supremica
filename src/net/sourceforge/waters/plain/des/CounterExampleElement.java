@@ -142,6 +142,12 @@ public abstract class CounterExampleElement
     return mTraces;
   }
 
+  @Override
+  public boolean includesFailingStep()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Local Class AutomataSet

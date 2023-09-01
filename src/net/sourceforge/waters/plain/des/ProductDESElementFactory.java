@@ -49,7 +49,7 @@ import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
-import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -205,7 +205,7 @@ public class ProductDESElementFactory
 
 
   @Override
-  public MultipleCounterExampleProxy createMultipleCounterExampleProxy
+  public CoobservabilityCounterExampleProxy createCoobservabilityCounterExampleProxy
     (final String name,
      final String comment,
      final URI location,
@@ -213,7 +213,7 @@ public class ProductDESElementFactory
      final Collection<? extends AutomatonProxy> automata,
      final List<TraceProxy> traces)
   {
-    return new MultipleCounterExampleElement(name, comment, location, des,
+    return new CoobservabilityCounterExampleElement(name, comment, location, des,
                                              automata, traces);
   }
 

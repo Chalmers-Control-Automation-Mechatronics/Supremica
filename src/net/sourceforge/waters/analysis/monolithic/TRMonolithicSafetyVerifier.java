@@ -188,13 +188,8 @@ public abstract class TRMonolithicSafetyVerifier
       comment = null;
     } else {
       // failed property due to disabled event
-      TraceStepProxy finalStep = null;
-      for (final EventInfo info : getEventInfo()) {
-        if (info.getOutputCode() == e) {
-          finalStep = info.buildFinalTraceStep(this, target);
-          break;
-        }
-      }
+      final EventInfo info = getEventInfo(e);
+      final TraceStepProxy finalStep = info.buildFinalTraceStep(this, target);
       steps = buildTraceToBadState(target);
       steps.add(finalStep);
       final EventEncoding eventEnc = getOutputEventEncoding();

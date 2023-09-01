@@ -60,7 +60,7 @@ public interface ProductDESProxyVisitor
   public Object visitLoopCounterExampleProxy(LoopCounterExampleProxy proxy)
     throws VisitorException;
 
-  public Object visitMultipleCounterExampleProxy(MultipleCounterExampleProxy proxy)
+  public Object visitCoobservabilityCounterExampleProxy(CoobservabilityCounterExampleProxy proxy)
     throws VisitorException;
 
   public Object visitProductDESProxy(ProductDESProxy proxy)

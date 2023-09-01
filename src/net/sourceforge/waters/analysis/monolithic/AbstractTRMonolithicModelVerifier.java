@@ -265,7 +265,8 @@ public abstract class AbstractTRMonolithicModelVerifier
       }
       final TraceStepProxy step;
       if (target >= numInit) {
-        final EventProxy event = callback.getSmallestStateEvent();
+        final EventInfo eventInfo = callback.getSmallestStateEvent();
+        final EventProxy event = eventInfo.getEvent();
         step = factory.createTraceStepProxy(event, stateMap);
         stateMap.clear();
         target = next;
@@ -293,8 +294,7 @@ public abstract class AbstractTRMonolithicModelVerifier
     throws AnalysisException
   {
     for (final EventInfo info : getEventInfo()) {
-      final EventProxy event = info.getEvent();
-      callback.setEvent(event);
+      callback.setEvent(info);
       if (!expandState(encoded, decoded, info)) {
         break;
       }
@@ -336,9 +336,9 @@ public abstract class AbstractTRMonolithicModelVerifier
 
     //#######################################################################
     //# Simple Access
-    public void setEvent(final EventProxy event)
+    public void setEvent(final EventInfo info)
     {
-      mCurrentEvent = event;
+      mCurrentEvent = info;
     }
 
     public int getSmallestStateIndex()
@@ -346,7 +346,7 @@ public abstract class AbstractTRMonolithicModelVerifier
       return mSmallestStateIndex;
     }
 
-    public EventProxy getSmallestStateEvent()
+    public EventInfo getSmallestStateEvent()
     {
       return mSmallestStateEvent;
     }
@@ -355,8 +355,8 @@ public abstract class AbstractTRMonolithicModelVerifier
     //# Data Members
     private final int[] mEncoded;
     private int mSmallestStateIndex;
-    private EventProxy mCurrentEvent;
-    private EventProxy mSmallestStateEvent;
+    private EventInfo mCurrentEvent;
+    private EventInfo mSmallestStateEvent;
   }
 
 }

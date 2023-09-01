@@ -34,7 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
-import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -123,6 +123,6 @@ public interface CoobservabilityChecker extends ModelVerifier
    *         property is satisfied and there is no counterexample.
    */
   @Override
-  public MultipleCounterExampleProxy getCounterExample();
+  public CoobservabilityCounterExampleProxy getCounterExample();
 
 }

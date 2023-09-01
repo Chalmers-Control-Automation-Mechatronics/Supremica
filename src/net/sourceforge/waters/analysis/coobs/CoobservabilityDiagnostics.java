@@ -31,10 +31,12 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.analysis.coobs;
 
 import java.io.Serializable;
+import java.util.List;
 
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -42,29 +44,20 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
- * <P>A diagnostics generator used for controllability checking.</P>
+ * <P>A diagnostics generator used for coobservability checking.</P>
  *
  * @author Robi Malik
  */
 
-public class ControllabilityDiagnostics
+public class CoobservabilityDiagnostics
   implements SafetyDiagnostics, Serializable
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static ControllabilityDiagnostics getInstance()
+  //# Constructor
+  public CoobservabilityDiagnostics(final List<SupervisorSite> controllers)
   {
-    return SingletonHolder.theInstance;
-  }
-
-  private static class SingletonHolder {
-    private static final ControllabilityDiagnostics theInstance =
-      new ControllabilityDiagnostics();
-  }
-
-  private ControllabilityDiagnostics()
-  {
+    mControllers = controllers;
   }
 
 
@@ -74,7 +67,7 @@ public class ControllabilityDiagnostics
   public String getTraceName(final ProductDESProxy des)
   {
     final String desname = des.getName();
-    return desname + "-uncontrollable";
+    return desname + "-noncoobs";
   }
 
   @Override
@@ -86,19 +79,41 @@ public class ControllabilityDiagnostics
     final StringBuilder buffer = new StringBuilder();
     buffer.append("The model '");
     buffer.append(des.getName());
-    buffer.append("' is not controllable: specification ");
+    buffer.append("' is not coobservable: specification ");
     buffer.append(aut.getName());
-    buffer.append(" disables the uncontrollable event ");
+    buffer.append(" disables the event ");
     buffer.append(event.getName());
     buffer.append(" in state ");
     buffer.append(state.getName());
-    buffer.append(", but it is possible according to the plant model.");
+    buffer.append(", which is possible according to the plant model while ");
+    switch (mControllers.size()) {
+    case 0:
+      buffer.append("there is no supervisor that can disable this event.");
+      break;
+    case 1:
+      buffer.append("the only supervisor that could disable this event, ");
+      final SupervisorSite site = mControllers.get(0);
+      buffer.append(site.getName());
+      buffer.append(", cannot do so unambiguously.");
+      break;
+    default:
+      buffer.append("none of the supervisors that could disable this event " +
+                    "can do so unambiguously.");
+      break;
+    }
     return buffer.toString();
   }
 
 
   //#########################################################################
+  //# Data Members
+  private final List<SupervisorSite> mControllers;
+
+
+  //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -7274416029301492184L;
+  public static String REFERENCE_SITE_NAME = "(reference)";
+
+  private static final long serialVersionUID = -92062777659933733L;
 
 }

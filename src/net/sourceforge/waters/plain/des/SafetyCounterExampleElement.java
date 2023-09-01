@@ -150,6 +150,15 @@ public class SafetyCounterExampleElement
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.CounterExampleProxy
+  @Override
+  public boolean includesFailingStep()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.des.SafetyCounterExampleProxy
   @Override
   public TraceProxy getTrace()

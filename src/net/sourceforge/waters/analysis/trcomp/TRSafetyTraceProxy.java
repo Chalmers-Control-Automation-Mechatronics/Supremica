@@ -102,6 +102,15 @@ public class TRSafetyTraceProxy
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.CounterExampleProxy
+  @Override
+  public boolean includesFailingStep()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
   //# Interface java.lang.Cloneable
   @Override
   public TRSafetyTraceProxy clone()

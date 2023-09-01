@@ -67,7 +67,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -398,7 +397,7 @@ public class Simulation implements ModelObserver, Observer
 
   public void switchToTraceMode(final CounterExampleProxy counter)
   {
-    final boolean allowLast = !(counter instanceof SafetyCounterExampleProxy);
+    final boolean allowLast = !counter.includesFailingStep();
     final TraceProxy trace = counter.getTraces().get(0);
     executeTrace(trace, allowLast);
     final SimulationChangeEvent simEvent = new SimulationChangeEvent

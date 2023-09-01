@@ -31,36 +31,79 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.des;
+package net.sourceforge.waters.analysis.coobs;
 
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 
+
 /**
- * <P>A counterexample consisting of two traces.</P>
+ * <P>A record about a supervisor site for the purpose of verifying
+ * coobservability.</P>
  *
- * <P>This class is used by model verifiers for several properties of discrete
- * event system, particularly does concerned with observability of events,
- * that are refuted by a combination of several traces.</P>
- *
- * <UL>
- * <LI>A <I>coobservability</I> counterexample consists of a first trace
- * representing the system behaviour followed by further traces representing
- * supervisor sites. The system behaviour trace takes the plant and specification
- * to a state where some event is enabled by the plant but disabled by the
- * specification, with that last event included in the trace. Each of the
- * supervisor site traces is labelled by the name of a supervisor (through
- * {@link TraceProxy#getName()}) that can disable the last event of the system
- * trace and contains a sequence of events that is indistinguishable from the
- * system behaviour trace based on the event observability of its supervisor
- * site. It takes the specification to a state where the last event of the
- * system behaviour trace (also included in the trace) is enabled.</LI>
- * </UL>
+ * <P>A supervisor site represents a set of events that can be
+ * controlled and/or observed by a particular supervisor. This class
+ * only contains the site name as defined through the event attributes
+ * and some index details needed by the algorithm in class
+ * {@link TRMonolithicCoobservabilityChecker}.</P>
  *
  * @author Robi Malik
  * @see CoobservabilityChecker
  */
 
-public interface MultipleCounterExampleProxy
-extends CounterExampleProxy
+public class SupervisorSite implements Comparable<SupervisorSite>
 {
+  //#########################################################################
+  //# Constructor
+  public SupervisorSite(final String name,
+                        final int index,
+                        final int numAutomata)
+  {
+    mName = name;
+    mIndex = index;
+    mComponentIndices = new int[numAutomata];
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public String getName()
+  {
+    return mName;
+  }
+
+  public int getComponentIndex(final int autIndex)
+  {
+    return mComponentIndices[autIndex];
+  }
+
+  public void setComponentIndex(final int autIndex, final int compIndex)
+  {
+    mComponentIndices[autIndex] = compIndex;
+  }
+
+
+  //#########################################################################
+  //# Interface java.util.Comparable<SupervisorSite>
+  @Override
+  public int compareTo(final SupervisorSite site)
+  {
+    return mIndex - site.mIndex;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return mName;
+  }
+
+
+  //#########################################################################
+  //# Instance Variables
+  private final String mName;
+  private final int mIndex;
+  private final int[] mComponentIndices;
+
 }

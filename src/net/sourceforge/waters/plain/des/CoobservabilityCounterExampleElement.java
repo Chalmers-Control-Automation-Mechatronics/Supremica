@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -50,20 +50,20 @@ import net.sourceforge.waters.model.des.TraceProxy;
 /**
  * A counterexample consisting of several traces.
  * This is a simple immutable implementation of the {@link
- * MultipleCounterExampleProxy} interface.
+ * CoobservabilityCounterExampleProxy} interface.
  *
  * @author Robi Malik
  */
 
-public class MultipleCounterExampleElement
+public class CoobservabilityCounterExampleElement
   extends CounterExampleElement
-  implements MultipleCounterExampleProxy
+  implements CoobservabilityCounterExampleProxy
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new multiple counterexample.
+   * Creates a new coobservability counterexample.
    * @param  name         The name to be given to the new counterexample.
    * @param  comment      A comment describing the new counterexample,
    *                      or <CODE>null</CODE>.
@@ -78,12 +78,12 @@ public class MultipleCounterExampleElement
    *                      automata, events, or states cannot be found
    *                      in the product DES.
    */
-  public MultipleCounterExampleElement(final String name,
-                                       final String comment,
-                                       final URI location,
-                                       final ProductDESProxy des,
-                                       final Collection<? extends AutomatonProxy> automata,
-                                       final List<TraceProxy> traces)
+  public CoobservabilityCounterExampleElement(final String name,
+                                              final String comment,
+                                              final URI location,
+                                              final ProductDESProxy des,
+                                              final Collection<? extends AutomatonProxy> automata,
+                                              final List<TraceProxy> traces)
   {
     super(name, comment, location, des, automata, traces);
   }
@@ -95,18 +95,18 @@ public class MultipleCounterExampleElement
    * Returns a copy of this loop counterexample.
    */
   @Override
-  public MultipleCounterExampleElement clone()
+  public CoobservabilityCounterExampleElement clone()
   {
-    return (MultipleCounterExampleElement) super.clone();
+    return (CoobservabilityCounterExampleElement) super.clone();
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
   @Override
-  public Class<MultipleCounterExampleProxy> getProxyInterface()
+  public Class<CoobservabilityCounterExampleProxy> getProxyInterface()
   {
-    return MultipleCounterExampleProxy.class;
+    return CoobservabilityCounterExampleProxy.class;
   }
 
   @Override
@@ -114,7 +114,16 @@ public class MultipleCounterExampleElement
     throws VisitorException
   {
     final ProductDESProxyVisitor desVisitor = (ProductDESProxyVisitor) visitor;
-    return desVisitor.visitMultipleCounterExampleProxy(this);
+    return desVisitor.visitCoobservabilityCounterExampleProxy(this);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.CounterExampleProxy
+  @Override
+  public boolean includesFailingStep()
+  {
+    return true;
   }
 
 

@@ -230,6 +230,14 @@
   </xs:complexType>
 </xs:element>
 
+<xs:element name="CoobservabilityCounterExample">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:CounterExampleType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="LoopCounterExample">
   <xs:complexType>
     <xs:complexContent>
@@ -239,14 +247,6 @@
 </xs:element>
 
 <xs:element name="DualCounterExample">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="D:CounterExampleType"/>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="MultipleCounterExample">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="D:CounterExampleType"/>

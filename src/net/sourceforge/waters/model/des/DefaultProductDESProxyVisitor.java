@@ -101,8 +101,8 @@ public class DefaultProductDESProxyVisitor
   }
 
   @Override
-  public Object visitMultipleCounterExampleProxy
-    (final MultipleCounterExampleProxy proxy)
+  public Object visitCoobservabilityCounterExampleProxy
+    (final CoobservabilityCounterExampleProxy proxy)
     throws VisitorException
   {
     return visitCounterExampleProxy(proxy);

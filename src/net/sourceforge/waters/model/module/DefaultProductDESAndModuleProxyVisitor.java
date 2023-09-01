@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
-import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -118,8 +118,8 @@ public class DefaultProductDESAndModuleProxyVisitor
   }
 
   @Override
-  public Object visitMultipleCounterExampleProxy
-    (final MultipleCounterExampleProxy proxy)
+  public Object visitCoobservabilityCounterExampleProxy
+    (final CoobservabilityCounterExampleProxy proxy)
     throws VisitorException
   {
     return visitCounterExampleProxy(proxy);

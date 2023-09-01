@@ -117,6 +117,15 @@ public class TRConflictTraceProxy
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.CounterExampleProxy
+  @Override
+  public boolean includesFailingStep()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
   @Override
   public ConflictKind getKind()

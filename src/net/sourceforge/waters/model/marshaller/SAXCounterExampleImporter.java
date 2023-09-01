@@ -46,11 +46,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ConflictKind;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
-import net.sourceforge.waters.model.des.MultipleCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -84,6 +84,15 @@ public class SAXCounterExampleImporter
           return new ConflictCounterExampleProxyHandler(parent);
         }
       });
+    registerHandler(SchemaDES.ELEMENT_CoobservabilityCounterExample,
+      new SAXHandlerCreator<CoobservabilityCounterExampleProxy>() {
+        @Override
+        AbstractContentHandler<CoobservabilityCounterExampleProxy> createHandler
+        (final AbstractContentHandler<?> parent)
+        {
+          return new MultipleCounterExampleProxyHandler(parent);
+        }
+      });
     registerHandler(SchemaDES.ELEMENT_DualCounterExample,
       new SAXHandlerCreator<DualCounterExampleProxy>() {
         @Override
@@ -100,15 +109,6 @@ public class SAXCounterExampleImporter
           (final AbstractContentHandler<?> parent)
         {
           return new LoopCounterExampleProxyHandler(parent);
-        }
-      });
-    registerHandler(SchemaDES.ELEMENT_MultipleCounterExample,
-      new SAXHandlerCreator<MultipleCounterExampleProxy>() {
-        @Override
-        AbstractContentHandler<MultipleCounterExampleProxy> createHandler
-          (final AbstractContentHandler<?> parent)
-        {
-          return new MultipleCounterExampleProxyHandler(parent);
         }
       });
     registerHandler(SchemaDES.ELEMENT_SafetyCounterExample,
@@ -552,7 +552,7 @@ public class SAXCounterExampleImporter
   //#########################################################################
   //# Inner Class MultipleCounterExampleProxyHandler
   private class MultipleCounterExampleProxyHandler
-    extends CounterExampleProxyHandler<MultipleCounterExampleProxy>
+    extends CounterExampleProxyHandler<CoobservabilityCounterExampleProxy>
   {
     //#######################################################################
     //# Constructor
@@ -564,14 +564,14 @@ public class SAXCounterExampleImporter
     //#######################################################################
     //# Overrides for AbstractContentHandler<ConflictCounterExampleProxy>
     @Override
-    MultipleCounterExampleProxy getResult() throws SAXParseException
+    CoobservabilityCounterExampleProxy getResult() throws SAXParseException
     {
       final String name = getName();
       final String comment = getComment();
       final URI uri = getURI();
       final List<AutomatonProxy> automata = getAutomata();
       final List<TraceProxy> traces = getTraces();
-      return mFactory.createMultipleCounterExampleProxy
+      return mFactory.createCoobservabilityCounterExampleProxy
         (name, comment, uri, mProductDES, automata, traces);
     }
   }

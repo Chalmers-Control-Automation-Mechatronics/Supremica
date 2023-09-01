@@ -195,7 +195,8 @@ public abstract class AbstractCoobservabilityCheckerTest
                                      final CounterExampleProxy counter)
     throws Exception
   {
-    // TODO implement this
+    super.checkCounterExample(des, counter);
+    // TODO implement fully
   }
 
 }

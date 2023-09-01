@@ -817,6 +817,21 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     return mEventInfo;
   }
 
+  /**
+   * Returns the event information record ({@link EventInfo}) for the given
+   * event code. This method performs a sequential search through all events.
+   * @return {@link EventInfo} object or <CODE>null</CODE>.
+   */
+  protected EventInfo getEventInfo(final int e)
+  {
+    for (final EventInfo info : getEventInfo()) {
+      if (info.getOutputCode() == e) {
+        return info;
+      }
+    }
+    return null;
+  }
+
   protected StateTupleEncoding getStateTupleEncoding()
   {
     return mStateTupleEncoding;
@@ -1837,20 +1852,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       analyzer.mStateTupleEncoding.decode(encoded, decoded);
       final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
       for (final AutomatonEventInfo info : mDisablingAutomata) {
-        if (!info.isDetermistic()) {
-          final int t = info.getFirstSuccessorState(s);
-          if (t >= 0) {
-            final int a = info.getAutomatonIndex();
-            final AutomatonProxy aut = analyzer.getInputAutomaton(a);
-            final StateProxy state = analyzer.getInputState(a, t);
-            stateMap.put(aut, state);
-          }
-        }
+        info.putTargetInStateMap(stateMap, s, analyzer);
       }
       final ProductDESProxyFactory factory = analyzer.getFactory();
       return factory.createTraceStepProxy(mEvent, stateMap);
     }
-
 
     //#######################################################################
     //# Interface java.util.Comparable<EventInfo>
@@ -2142,6 +2148,21 @@ public abstract class AbstractTRMonolithicModelAnalyzer
               (mNextUpdate, event, decodedTarget,
                suppressedSelfloop && source == target, builder);
           }
+        }
+      }
+    }
+
+    public void putTargetInStateMap
+      (final Map<AutomatonProxy,StateProxy> stateMap,
+       final int source,
+       final AbstractTRMonolithicModelAnalyzer analyzer)
+    {
+      if (!isDetermistic()) {
+        final int t = getFirstSuccessorState(source);
+        if (t >= 0) {
+          final AutomatonProxy aut = analyzer.getInputAutomaton(mAutomatonIndex);
+          final StateProxy target = analyzer.getInputState(mAutomatonIndex, t);
+          stateMap.put(aut, target);
         }
       }
     }
