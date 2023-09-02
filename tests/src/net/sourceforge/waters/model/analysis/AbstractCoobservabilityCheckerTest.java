@@ -33,15 +33,28 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
+import net.sourceforge.waters.analysis.coobs.CoobservabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
 /**
@@ -196,7 +209,142 @@ public abstract class AbstractCoobservabilityCheckerTest
     throws Exception
   {
     super.checkCounterExample(des, counter);
-    // TODO implement fully
+    final List<TraceProxy> traces = counter.getTraces();
+    final Iterator<TraceProxy> iter = traces.iterator();
+    final TraceProxy referenceTrace = iter.next();
+    assertEquals("The first trace of the counterexample is not labelled " +
+                 "as reference trace!",
+                 CoobservabilityDiagnostics.REFERENCE_SITE_NAME,
+                 referenceTrace.getName());
+    final Map<String,TraceProxy> traceMap = new LinkedHashMap<>(traces.size() - 1);
+    final Set<String> remainingNames = new THashSet<>(traces.size() - 1);
+    while (iter.hasNext()) {
+      final TraceProxy trace = iter.next();
+      final String name = trace.getName();
+      traceMap.put(name, trace);
+      remainingNames.add(name);
+    }
+
+    final EventProxy lastEvent = getLastEvent(referenceTrace);
+    final String lastEventName = lastEvent.getName();
+    final Map<String,String> attribs = lastEvent.getAttributes();
+    for (final Map.Entry<String,String> entry : attribs.entrySet()) {
+      final String key = entry.getKey();
+      if (key.startsWith(CoobservabilityAttributeFactory.CONTROLLABITY_KEY)) {
+        final String name = entry.getValue();
+        if (!remainingNames.remove(name)) {
+          if (traceMap.containsKey(name)) {
+            fail("The counterexample contains more than one trace named '" +
+                 name + "'!");
+          } else {
+            fail("The counterexample contains no trace for the supervisor site '" +
+                 name + "' that disables its last event '" + lastEventName + "'!");
+          }
+        }
+      }
+    }
+    if (!remainingNames.isEmpty()) {
+      final String name = remainingNames.iterator().next();
+      fail("The counterexample contains a trace named '" + name +
+           "' that does not correspond to any supervisor site "+
+           "that can disable its last event '" + lastEventName + "'!");
+    }
+
+    checkTrace(des, referenceTrace, true);
+    for (final TraceProxy trace : traceMap.values()) {
+      final EventProxy traceLastEvent = getLastEvent(trace);
+      assertSame("The last event of the counterexample trace '" +
+                 trace.getName() + "' is '" + traceLastEvent.getName() +
+                 "', which is different from the last event '" +
+                 lastEventName + "' of the reference trace!",
+                 lastEvent, traceLastEvent);
+      checkTrace(des, trace, false);
+      checkObservability(referenceTrace, trace);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private EventProxy getLastEvent(final TraceProxy trace)
+  {
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    final int numSteps = steps.size();
+    assertTrue("The counterexample trace '" + trace.getName() +
+               "'is missing a failing event at the end!",
+               numSteps >= 2);
+    final TraceStepProxy lastStep = steps.get(numSteps - 1);
+    return lastStep.getEvent();
+  }
+
+  private void checkTrace(final ProductDESProxy des,
+                          final TraceProxy trace,
+                          final boolean reference)
+  {
+    for (final AutomatonProxy aut : des.getAutomata()) {
+      switch (aut.getKind()) {
+      case PLANT:
+        checkTrace(aut, trace);
+        break;
+      case SPEC:
+      case SUPERVISOR:
+        checkTrace(aut, trace, reference);
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  private void checkObservability(final TraceProxy referenceTrace,
+                                  final TraceProxy trace)
+  {
+    final String siteName = trace.getName();
+    final List<EventProxy> referenceEvents = referenceTrace.getEvents();
+    final Iterator<EventProxy> referenceIter = referenceEvents.iterator();
+    EventProxy referenceEvent = advanceToObservable(referenceIter, siteName);
+    final List<EventProxy> traceEvents = trace.getEvents();
+    final Iterator<EventProxy> traceIter = traceEvents.iterator();
+    EventProxy traceEvent = advanceToObservable(traceIter, siteName);
+    while (referenceEvent != null && traceEvent != null) {
+      assertSame("The counterexample trace '" + siteName +
+                 "' + contains a step with observable event '" +
+                 traceEvent.getName() +
+                 "', while the reference trace expects a step with '" +
+                 referenceEvent.getName() + "' instead!",
+                 referenceEvent, traceEvent);
+      referenceEvent = advanceToObservable(referenceIter, siteName);
+      traceEvent = advanceToObservable(traceIter, siteName);
+    }
+    if (referenceEvent != null) {
+      fail("The counterexample trace '" + siteName +
+           "' does not contain any step matching the observable event '" +
+           referenceEvent.getName() + "' at the end of the reference trace!");
+    }
+    if (traceEvent != null) {
+      fail("The counterexample trace '" + siteName +
+           "' contains an observable event '" + traceEvent.getName() +
+           "' at the end that does not match anything in the reference trace!");
+    }
+  }
+
+  private EventProxy advanceToObservable(final Iterator<EventProxy> iter,
+                                         final String siteName)
+  {
+    while (iter.hasNext()) {
+      final EventProxy event = iter.next();
+      final Map<String,String> attribs = event.getAttributes();
+      for (final Map.Entry<String,String> entry : attribs.entrySet()) {
+        final String key = entry.getKey();
+        if (key.startsWith(CoobservabilityAttributeFactory.OBSERVABITY_KEY)) {
+          final String name = entry.getValue();
+          if (siteName.equals(name)) {
+            return event;
+          }
+        }
+      }
+    }
+    return null;
   }
 
 }

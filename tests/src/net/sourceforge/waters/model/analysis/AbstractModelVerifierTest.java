@@ -217,6 +217,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     assertNotNull("Counterexample is NULL!", counter);
     assertNotNull("NULL product DES in counterexample!", counter.getProductDES());
     assertFalse("NULL automaton in counterexample!", counter.getAutomata().contains(null));
+    assertFalse("No traces in counterexample!", counter.getTraces().isEmpty());
     for (final TraceProxy trace : counter.getTraces()) {
       assertNotNull("NULL trace in counterexample!", trace);
       assertFalse("NULL event in trace!", trace.getEvents().contains(null));
