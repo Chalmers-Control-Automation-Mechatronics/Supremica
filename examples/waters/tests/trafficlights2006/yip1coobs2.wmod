@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="yip1">
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="yip1coobs2">
 <ConstantAliasList>
 <ConstantAlias Name="Streets">
 <ConstantAliasExpression><EnumSetExpression>
@@ -10,19 +10,65 @@
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
-<EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="tick">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="main"/>
+<B:Attribute Name="COOBS:observer2" Value="side"/>
+</B:AttributeMap>
+</EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="arrive_side"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="arrive_side">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="side"/>
+<B:Attribute Name="COOBS:observer2" Value="main"/>
+</B:AttributeMap>
+</EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="enter_main"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="enter_side"/>
-<EventDecl Kind="CONTROLLABLE" Name="green_main"/>
-<EventDecl Kind="CONTROLLABLE" Name="green_side"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="enter_side">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="side"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="green_main">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="main"/>
+<B:Attribute Name="COOBS:observer1" Value="main"/>
+<B:Attribute Name="COOBS:observer2" Value="side"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="green_side">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="side"/>
+<B:Attribute Name="COOBS:observer1" Value="side"/>
+<B:Attribute Name="COOBS:observer2" Value="main"/>
+</B:AttributeMap>
+</EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="leave_main"/>
 <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="leave_side"/>
-<EventDecl Kind="CONTROLLABLE" Name="red_main"/>
-<EventDecl Kind="CONTROLLABLE" Name="red_side"/>
-<EventDecl Kind="CONTROLLABLE" Name="yellow_main"/>
-<EventDecl Kind="CONTROLLABLE" Name="yellow_side"/>
+<EventDecl Kind="CONTROLLABLE" Name="red_main">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="main"/>
+<B:Attribute Name="COOBS:observer" Value="main"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="red_side">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="side"/>
+<B:Attribute Name="COOBS:observer" Value="side"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="yellow_main">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="main"/>
+<B:Attribute Name="COOBS:observer" Value="main"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="yellow_side">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="side"/>
+<B:Attribute Name="COOBS:observer" Value="side"/>
+</B:AttributeMap>
+</EventDecl>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT" Name="arrive">

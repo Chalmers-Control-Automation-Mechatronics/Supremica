@@ -95,10 +95,12 @@ public abstract class AbstractCoobservabilityCheckerTest
     testEmpty();
     testSmallFactory2();
     testAbp1();
-    testEmpty();
+    testAbp3();
     testOverflowException();
     testSmallFactory2();
+    testAbp3();
     testAbp1();
+    testAbp3();
   }
 
   public void testOverflowException()
@@ -152,6 +154,38 @@ public abstract class AbstractCoobservabilityCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "coobservability", "abp4.wmod");
+    runModelVerifier(des, true);
+  }
+
+
+  public void testTrafficlightsYip1Coobs1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "yip1coobs1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testTrafficlightsYip1Coobs2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "yip1coobs2.wmod");
+    runModelVerifier(des, true);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- controllability plus observability via coobservability
+  public void testTrafficlightsAc61Coobs() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ac61coobs.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testTrafficlightsYip1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "yip1.wmod");
     runModelVerifier(des, true);
   }
 
