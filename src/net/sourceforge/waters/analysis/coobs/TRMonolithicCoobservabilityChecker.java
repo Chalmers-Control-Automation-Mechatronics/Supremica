@@ -33,7 +33,8 @@
 
 package net.sourceforge.waters.analysis.coobs;
 
-import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -242,29 +243,18 @@ public class TRMonolithicCoobservabilityChecker
       mComponentInfoList.add(info0);
       mReferenceSite.setComponentIndex(a, c0);
       if (!mSiteMap.isEmpty()) {
-        switch (tr.getKind()) {
-        case PLANT:
-          for (final SupervisorSite site : mSiteMap.values()) {
+        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+        final boolean det = rel.isDeterministic();
+        for (final SupervisorSite site : mSiteMap.values()) {
+          if (det && !hasUnobservableTransition(tr, site)) {
+            info0.addShadowingSite(site);
             site.setComponentIndex(a, c0);
+          } else {
+            final ComponentInfo info1 = new ComponentInfo(tr, a, site);
+            final int c = mComponentInfoList.size();
+            mComponentInfoList.add(info1);
+            site.setComponentIndex(a, c);
           }
-          break;
-        case SPEC:
-          final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-          final boolean det = rel.isDeterministic();
-          for (final SupervisorSite site : mSiteMap.values()) {
-            if (det && !hasUnobservableTransition(tr, site)) {
-              info0.addShadowingSite(site);
-              site.setComponentIndex(a, c0);
-            } else {
-              final ComponentInfo info1 = new ComponentInfo(tr, a, site);
-              final int c = mComponentInfoList.size();
-              mComponentInfoList.add(info1);
-              site.setComponentIndex(a, c);
-            }
-          }
-          break;
-        default:
-          break;
         }
       }
     }
@@ -280,35 +270,22 @@ public class TRMonolithicCoobservabilityChecker
     throws AnalysisException
   {
     mReverse = reverse;
-    if (mTRAutomataExtended == null) {
-      final int numComponents = mComponentInfoList.size();
-      mTRAutomataExtended = new TRAutomatonProxy[numComponents];
-    }
-    int a = 0;
-    for (final ComponentInfo info : mComponentInfoList) {
-      final int a0 = info.getAutomatonIndex();
-      mTRAutomataExtended[a++] = automata[a0];
-    }
-    return super.setUpTransitions(mTRAutomataExtended, eventInfoMap, reverse);
+    return super.setUpTransitions(automata, eventInfoMap, reverse);
   }
 
   @Override
   protected void setUpStateTupleEncoding()
     throws AnalysisAbortException, OverflowException
   {
-    setUpStateTupleEncoding(mTRAutomataExtended);
-  }
-
-  @Override
-  protected void postProcessEventInfo(final List<EventInfo> eventInfoList)
-    throws AnalysisException
-  {
-    super.postProcessEventInfo(eventInfoList);
-    for (final CoobservabilityEventInfo info :
-         mCoobservabilityEventInfoMap.values()) {
-      checkAbort();
-      info.computeSiteIndices(this);
+    final int numComponents = mComponentInfoList.size();
+    mTRAutomataExtended = new TRAutomatonProxy[numComponents];
+    final TRAutomatonProxy[] trs = getTRAutomata();
+    int c = 0;
+    for (final ComponentInfo info : mComponentInfoList) {
+      final int a = info.getAutomatonIndex();
+      mTRAutomataExtended[c++] = trs[a];
     }
+    setUpStateTupleEncoding(mTRAutomataExtended);
   }
 
   @Override
@@ -316,78 +293,6 @@ public class TRMonolithicCoobservabilityChecker
     throws AnalysisException
   {
     return storeInitialStates(mTRAutomataExtended);
-  }
-
-  @Override
-  protected boolean expandState(final int[] encoded,
-                                final int[] decoded,
-                                final EventInfo event)
-    throws AnalysisException
-  {
-    final CoobservabilityEventInfo eventInfo =
-      (CoobservabilityEventInfo) event;
-    int d, siteEnd;
-    if (mReverse) {
-      siteEnd = eventInfo.getSiteGroupIndex(1);
-      d = eventInfo.findDisabling(decoded, 0, siteEnd);
-    } else {
-      siteEnd = eventInfo.getSiteGroupIndex(0);
-      d = eventInfo.findDisabling(decoded, 0, siteEnd);
-      if (d >= 0) {
-        final List<AutomatonEventInfo> disabling =
-          eventInfo.getDisablingAutomata();
-        final AutomatonEventInfo disablingAutInfo = disabling.get(d);
-        if (disablingAutInfo.isPlant()) {
-          return true;
-        } else {
-          // enabled by reference plant, disabled by reference spec
-          // check controllability condition
-          if (isControlledByShadowingSite(eventInfo, disablingAutInfo)) {
-            return true;
-          }
-          for (int i = d + 1; i < siteEnd; i++) {
-            final AutomatonEventInfo autInfo = disabling.get(i);
-            if (!autInfo.isEnabled(decoded) &&
-              isControlledByShadowingSite(eventInfo, autInfo)) {
-              return true;
-            }
-          }
-          final int end = disabling.size();
-          for (int i = siteEnd; i < end; i++) {
-            final AutomatonEventInfo autInfo = disabling.get(i);
-            final int a = autInfo.getAutomatonIndex();
-            final SupervisorSite site = mComponentInfoList.get(a).getSite();
-            if (eventInfo.isControllable(site) && !autInfo.isEnabled(decoded)) {
-              return true;
-            }
-          }
-          // not coobservable
-          final int e = event.getOutputCode();
-          final int a = disablingAutInfo.getAutomatonIndex();
-          if (!handleUncontrollableState(e, a)) {
-            return false;
-          }
-        }
-      }
-      if (eventInfo.hasObservingSpec()) {
-        final int siteStart = siteEnd;
-        siteEnd = eventInfo.getSiteGroupIndex(1);
-        d = eventInfo.findDisabling(decoded, siteStart, siteEnd);
-      }
-    }
-    if (d < 0) {
-      createSuccessorStatesEncodedOrDecoded(encoded, decoded, eventInfo, 1);
-    }
-    final int endGroupIndex = eventInfo.getNumberOfSiteIndices();
-    for (int groupIndex = 2; groupIndex < endGroupIndex; groupIndex++) {
-      final int siteStart = siteEnd;
-      siteEnd = eventInfo.getSiteGroupIndex(groupIndex);
-      if (eventInfo.findDisabling(decoded, siteStart, siteEnd) < 0) {
-        createSuccessorStatesEncodedOrDecoded(encoded, decoded,
-                                              eventInfo, groupIndex);
-      }
-    }
-    return true;
   }
 
   @Override
@@ -453,7 +358,7 @@ public class TRMonolithicCoobservabilityChecker
       final List<TraceStepProxy> list = new LinkedList<>();
       final SupervisorSite site = g == 0 ? mReferenceSite : iter.next();
       final TraceStepProxy step =
-        eventInfo.buildFinalTraceStep(this, decodedTarget, site);
+        eventInfo.buildFinalTraceStep(decodedTarget, site);
       list.add(step);
       steps.add(list);
    }
@@ -471,17 +376,17 @@ public class TRMonolithicCoobservabilityChecker
       stateSpace.getContents(source, encoded);
       encoding.decode(encoded, decodedSource);
       final SupervisorSite stepSite = findSteppingSite(decodedSource, decodedTarget);
-      if (stepSite == mReferenceSite) {
+      if (stepSite == mReferenceSite || eventInfo.isObservable(stepSite)) {
         final List<TraceStepProxy> list0 = steps.get(0);
         final TraceStepProxy step0 = eventInfo.buildIntermediateTraceStep
-          (this, decodedSource, decodedTarget, mReferenceSite);
+          (decodedSource, decodedTarget, mReferenceSite);
         list0.add(0, step0);
         int g = 1;
         for (final SupervisorSite site : controllers) {
           if (eventInfo.isObservable(site)) {
             final List<TraceStepProxy> list = steps.get(g);
             final TraceStepProxy step = eventInfo.buildIntermediateTraceStep
-              (this, decodedSource, decodedTarget, site);
+              (decodedSource, decodedTarget, site);
             list.add(0, step);
           }
           g++;
@@ -490,7 +395,7 @@ public class TRMonolithicCoobservabilityChecker
         final int g = controllers.indexOf(stepSite) + 1;
         final List<TraceStepProxy> list = steps.get(g);
         final TraceStepProxy step = eventInfo.buildIntermediateTraceStep
-          (this, decodedSource, decodedTarget, stepSite);
+          (decodedSource, decodedTarget, stepSite);
         list.add(0, step);
       }
       target = source;
@@ -613,34 +518,6 @@ public class TRMonolithicCoobservabilityChecker
     return false;
   }
 
-  private boolean isControlledByShadowingSite
-    (final CoobservabilityEventInfo eventInfo,
-     final AutomatonEventInfo autInfo)
-  {
-    final int a = autInfo.getAutomatonIndex();
-    final ComponentInfo compInfo = mComponentInfoList.get(a);
-    for (final SupervisorSite site : compInfo.getShadowingSites()) {
-      if (eventInfo.isControllable(site)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private void createSuccessorStatesEncodedOrDecoded
-    (final int[] encoded,
-     final int[] decoded,
-     final CoobservabilityEventInfo eventInfo,
-     final int groupIndex)
-    throws OverflowException
-  {
-    if (mReverse) {
-      eventInfo.createSuccessorStatesDecoded(decoded, groupIndex, this);
-    } else {
-      eventInfo.createSuccessorStatesEncoded(encoded, groupIndex, this);
-    }
-  }
-
 
   //#########################################################################
   //# Inner Class CoobservabilityEventInfo
@@ -653,11 +530,10 @@ public class TRMonolithicCoobservabilityChecker
    * information record holds automaton/site pairs that need to be checked
    * or updated when processing a particular event.<P>
    *
-   * <P>A list of {@link
+   * <P>To support state expansion for coobservability, the {@link
    * net.sourceforge.waters.analysis.monolithic.AbstractTRMonolithicModelAnalyzer.AutomatonEventInfo
-   * AutomatonEventInfo} records representing these pairs is retrieved by
-   * calling {@link #getDisablingAutomata()}). Within the list, the pairs are
-   * organised into groups as follows:</P>
+   * AutomatonEventInfo} records are replicated and into several lists for the
+   * following groups:</P>
    *
    * <UL>
    * <LI>Group 0 contains plants and specifications that use the event,
@@ -667,25 +543,35 @@ public class TRMonolithicCoobservabilityChecker
    * <LI>Group 1 contains specifications that use the event, one for each
    * site that can observe the event. These state components must be updated
    * together with those in group 0 if a transition is executed.</LI>
-   * <LI>Groups 2 and following contain specifications that use the event,
-   * with a separate group for each site that cannot observe the event.
+   * <LI>Groups 2 and following contain plants and specifications that use the
+   * event, with a separate group for each site that cannot observe the event.
    * The state components in each of these groups are updated together
    * but independently from all other groups.</LI>
    * </UL>
    *
-   * <P>The state components are ordered by group number for processing,
-   * the order within groups is optimised for speed of processing. Within
-   * group 0, plants are processed before specifications. The field
-   * {@link #mSiteIndices} determines which automaton/site pairs belong
-   * to which groups. Additionally, the field {@link #mSiteUpdates}
-   * contains lists of {@link
+   * <P>The list {@link #mSiteDisablers} contains lists corresponding to
+   * each group. When expanding a state, group&nbsp;0 is used to determine
+   * whether the controllability condition needs to be checked for a state.
+   * This is the case if the plants in group&nbsp;0 enable an event while
+   * the specifications in group&nbsp;0 disable it. In this case, at least
+   * one of the components in another group must also disable the event or the
+   * model is not coobservable.</P>
+   *
+   * <P>If the controllability condition passes, then transitions can be
+   * constructed using the records in groups 0 and&nbsp;1 together, and
+   * further transitions can be constructed for each of the other groups.
+   * The construction of transition is done using linked lists of {@link
    * net.sourceforge.waters.analysis.monolithic.AbstractTRMonolithicModelAnalyzer.AutomatonEventInfo
-   * AutomatonEventInfo} records representing the automaton/site pairs whose
-   * state component need updating when a transition occurs. They are indexed
-   * by the group numbers above, with groups 0 and&nbsp;1 combined under
-   * index&nbsp;1, and index&nbsp;0 always holds a <CODE>null</CODE> entry.</P>
+   * AutomatonEventInfo} records in the array {@link #mSiteUpdates}, which
+   * are also indexed by group number. Here, the entry at index&nbsp;0 is
+   * unused (always <CODE>null</CODE>) with its records merged into
+   * group&nbsp;1, as these two groups are processed together.</P>
+   *
+   * <P>For reverse transition exploration, the groups 0 and&nbsp;1 are
+   * also merged into group&nbsp;1 in {@link #mSiteDisablers}, as the
+   * controllability condition is not checked during reverse exploration.</P>
    */
-  private static class CoobservabilityEventInfo
+  private class CoobservabilityEventInfo
     extends AbstractTRMonolithicModelAnalyzer.EventInfo
   {
     //#######################################################################
@@ -695,8 +581,6 @@ public class TRMonolithicCoobservabilityChecker
        final EventProxy event)
     {
       super(event, false);
-      mComparator =
-        verifier.new CoobservabilityAutomatonEventInfoCamparator(this);
     }
 
     //#######################################################################
@@ -717,21 +601,6 @@ public class TRMonolithicCoobservabilityChecker
       return mObservers != null && mObservers.contains(site);
     }
 
-    private boolean hasObservingSpec()
-    {
-      return mHasObservingSpec;
-    }
-
-    private int getSiteGroupIndex(final int groupIndex)
-    {
-      return mSiteIndices[groupIndex];
-    }
-
-    private int getNumberOfSiteIndices()
-    {
-      return mSiteIndices.length;
-    }
-
     //#######################################################################
     //# Initialisation
     private void addController(final SupervisorSite site)
@@ -750,37 +619,18 @@ public class TRMonolithicCoobservabilityChecker
       mObservers.add(site);
     }
 
-    private void computeSiteIndices
-      (final TRMonolithicCoobservabilityChecker verifier)
+    @Override
+    protected void sort()
     {
-      if (mSiteIndices == null) {
-        final TIntArrayList indices =
-          new TIntArrayList(verifier.mSiteMap.size() + 1);
-        int index = 0;
-        int prevGroup = 0;
-        SupervisorSite prevSite = null;
-        for (final AutomatonEventInfo info : getDisablingAutomata()) {
-          final int a = info.getAutomatonIndex();
-          final SupervisorSite site =
-            verifier.mComponentInfoList.get(a).getSite();
-          final int group = getSiteGroup(site);
-          mHasObservingSpec |= group == 1;
-          if (group != prevGroup || group == 2 && site != prevSite) {
-            if (group == 2 && prevGroup == 0) {
-              indices.add(index);
-            }
-            indices.add(index);
-            prevGroup = group;
-            prevSite = site;
-          }
-          index++;
-        }
-        if (prevGroup == 0) {
-          indices.add(index);
-        }
-        indices.add(index);
-        mSiteIndices = indices.toArray();
-        mSiteUpdates = new AutomatonEventInfo[indices.size()];
+      computeSiteDisablers();
+      final Comparator<AutomatonEventInfo> comparator =
+        getAutomatonEventInfoComparator();
+      for (final List<AutomatonEventInfo> list : mSiteDisablers) {
+        Collections.sort(list, comparator);
+      }
+      if (mSiteUpdates == null) {
+        final int numGroups = mSiteDisablers.size();
+        mSiteUpdates = new AutomatonEventInfo[numGroups];
       } else {
         Arrays.fill(mSiteUpdates, null);
       }
@@ -788,106 +638,256 @@ public class TRMonolithicCoobservabilityChecker
       collectSiteUpdates(true);
     }
 
-    /**
-     * Adds update instructions to lists within the array {@link #mSiteIndices}.
-     * This method processes the list of disabling automata
-     * ({@link #getDisablingAutomata()} and prepends entries representing
-     * deterministic or nondeterministic automata (depending on the parameter)
-     * to the list representing their site group.
-     * @param  det  Whether or not deterministic automata are to be included.
-     * @see CoobservabilityEventInfo
-     */
+    private void computeSiteDisablers()
+    {
+      final List<AutomatonEventInfo> disablingList = getDisablingAutomata();
+      final int numDisabling = disablingList.size();
+      final TIntObjectMap<AutomatonEventInfo> disablingMap =
+        new TIntObjectHashMap<>(numDisabling);
+      for (final AutomatonEventInfo info : disablingList) {
+        final int a = info.getAutomatonIndex();
+        disablingMap.put(a, info);
+      }
+
+      final TRAutomatonProxy[] trs = getTRAutomata();
+      final List<AutomatonEventInfo> refList = new ArrayList<>(numDisabling);
+      final List<AutomatonEventInfo> observerList = new LinkedList<>();
+      final Map<SupervisorSite,List<AutomatonEventInfo>> nonObserverMap =
+        new LinkedHashMap<>();
+      int c = 0;
+      for (final ComponentInfo compInfo : mComponentInfoList) {
+        final int a = compInfo.getAutomatonIndex();
+        final AutomatonEventInfo refInfo = disablingMap.get(a);
+        if (refInfo != null) {
+          final TRAutomatonProxy tr = trs[a];
+          final SupervisorSite site = compInfo.getSite();
+          if (site == null) {
+            final boolean plant = refInfo.isPlant();
+            final AutomatonEventInfo altInfo =
+              new AutomatonEventInfo(refInfo, c, tr, plant, true);
+            refList.add(altInfo);
+          } else {
+            final AutomatonEventInfo siteInfo =
+              new AutomatonEventInfo(refInfo, c, tr, true, true);
+            if (isObservable(site)) {
+              observerList.add(siteInfo);
+            } else {
+              List<AutomatonEventInfo> list = nonObserverMap.get(site);
+              if (list == null) {
+                list = new LinkedList<>();
+                nonObserverMap.put(site, list);
+              }
+              list.add(siteInfo);
+            }
+          }
+        }
+        c++;
+      }
+      c = 0;
+      for (final ComponentInfo compInfo : mComponentInfoList) {
+        final int a = compInfo.getAutomatonIndex();
+        final AutomatonEventInfo refInfo = disablingMap.get(a);
+        if (refInfo != null && compInfo.getSite() == null) {
+          final TRAutomatonProxy tr = trs[a];
+          for (final SupervisorSite shadow : compInfo.getShadowingSites()) {
+            if (!isObservable(shadow)) {
+              final List<AutomatonEventInfo> list = nonObserverMap.get(shadow);
+              if (list != null) {
+                final AutomatonEventInfo shadowInfo =
+                  new AutomatonEventInfo(refInfo, c, tr, true, true);
+                list.add(shadowInfo);
+              }
+            }
+          }
+        }
+        c++;
+      }
+
+      if (mSiteDisablers == null) {
+        final int numGroups = 2 + nonObserverMap.size();
+        mSiteDisablers = new ArrayList<>(numGroups);
+        mSiteDisablers.add(refList);
+        mSiteDisablers.add(observerList);
+        mSiteDisablers.addAll(nonObserverMap.values());
+      } else {
+        // reverse
+        mSiteDisablers.clear();
+        mSiteDisablers.add(Collections.emptyList());
+        observerList.addAll(refList);
+        mSiteDisablers.add(observerList);
+        mSiteDisablers.addAll(nonObserverMap.values());
+      }
+    }
+
     private void collectSiteUpdates(final boolean det)
     {
-      int index = 0;
       // Index group 0 (reference) merged into group 1 (observers if existent)
       // mSiteUpdates[0] always remains null
-      int s = 1;
-      // TODO This assumes always enabling components are listed as 'disabling'
-      for (final AutomatonEventInfo info : getDisablingAutomata()) {
-        while (mSiteIndices[s] <= index) {
-          s++;
+      for (int disIndex = 0; disIndex < mSiteDisablers.size(); disIndex++) {
+        final int updateIndex;
+        if (disIndex > 0) {
+          updateIndex = disIndex;
+        } else if (mReverse) {
+          continue;
+        } else {
+          updateIndex = 1;
         }
-        if (!info.isSelfloopOnly() && info.isDetermistic() == det) {
-          info.setNextUpdate(mSiteUpdates[s]);
-          mSiteUpdates[s] = info;
+        final List<AutomatonEventInfo> list = mSiteDisablers.get(disIndex);
+        for (final AutomatonEventInfo info : list) {
+          if (!info.isSelfloopOnly() && info.isDetermistic() == det) {
+            info.setNextUpdate(mSiteUpdates[updateIndex]);
+            mSiteUpdates[updateIndex] = info;
+          }
         }
-        index++;
+      }
+    }
+
+    @Override
+    protected boolean expandState(final int[] encoded, final int[] decoded)
+      throws AnalysisException
+    {
+      AutomatonEventInfo disablingAutInfo;
+      if (mReverse) {
+        disablingAutInfo = findDisabling(decoded, 1);
+      } else {
+        final List<AutomatonEventInfo> disablers0 = mSiteDisablers.get(0);
+        final int d = findDisablingIndex(decoded, disablers0);
+        if (d >= 0) {
+          disablingAutInfo = disablers0.get(d);
+          if (disablingAutInfo.isPlant()) {
+            return true;
+          } else {
+            // enabled by reference plant, disabled by reference spec
+            // check controllability condition
+            if (isControlledByShadowingSite(disablingAutInfo)) {
+              return true;
+            }
+            for (int i = d + 1; i < disablers0.size(); i++) {
+              final AutomatonEventInfo autInfo = disablers0.get(i);
+              if (!autInfo.isEnabled(decoded) &&
+                  isControlledByShadowingSite(autInfo)) {
+                return true;
+              }
+            }
+            final List<AutomatonEventInfo> disablers1 = mSiteDisablers.get(1);
+            for (final AutomatonEventInfo autInfo : disablers1) {
+              final int a = autInfo.getAutomatonIndex();
+              final SupervisorSite site = mComponentInfoList.get(a).getSite();
+              if (isControllable(site) && !autInfo.isEnabled(decoded)) {
+                return true;
+              }
+            }
+            for (int g = 2; g < mSiteDisablers.size(); g++) {
+              final List<AutomatonEventInfo> disablersG = mSiteDisablers.get(g);
+              assert !disablersG.isEmpty();
+              final AutomatonEventInfo autInfo = disablersG.get(0);
+              final int a = autInfo.getAutomatonIndex();
+              final SupervisorSite site = mComponentInfoList.get(a).getSite();
+              if (isControllable(site) && findDisabling(decoded, g) != null) {
+                return true;
+              }
+            }
+            // not coobservable
+            final int e = getOutputCode();
+            final int a = disablingAutInfo.getAutomatonIndex();
+            if (!handleUncontrollableState(e, a)) {
+              return false;
+            }
+          }
+        }
+        disablingAutInfo = findDisabling(decoded, 1);
+      }
+      if (disablingAutInfo == null) {
+        createSuccessorStatesEncodedOrDecoded(encoded, decoded, 1);
+      }
+      for (int g = 2; g < mSiteDisablers.size(); g++) {
+        if (findDisabling(decoded, g) == null) {
+          createSuccessorStatesEncodedOrDecoded(encoded, decoded, g);
+        }
+      }
+      return true;
+    }
+
+    private AutomatonEventInfo findDisabling(final int[] decoded,
+                                             final int groupIndex)
+    {
+      final List<AutomatonEventInfo> list = mSiteDisablers.get(groupIndex);
+      return findDisabling(decoded, list);
+    }
+
+    private boolean isControlledByShadowingSite(final AutomatonEventInfo autInfo)
+    {
+      final int a = autInfo.getAutomatonIndex();
+      final ComponentInfo compInfo = mComponentInfoList.get(a);
+      for (final SupervisorSite site : compInfo.getShadowingSites()) {
+        if (isControllable(site)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void createSuccessorStatesEncodedOrDecoded(final int[] encoded,
+                                                       final int[] decoded,
+                                                       final int groupIndex)
+      throws OverflowException
+    {
+      if (mReverse) {
+        createSuccessorStatesDecoded(decoded, groupIndex);
+      } else {
+        createSuccessorStatesEncoded(encoded, groupIndex);
       }
     }
 
     private TraceStepProxy buildIntermediateTraceStep
-      (final TRMonolithicCoobservabilityChecker analyzer,
-       final int[] decodedSource,
+      (final int[] decodedSource,
        final int[] decodedTarget,
        final SupervisorSite site)
     {
       final EventProxy event = getEvent();
-      final TRAutomatonProxy[] trs = analyzer.getTRAutomata();
-      final int numAut = trs.length;
-      final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
-      final List<AutomatonEventInfo> disabling = getDisablingAutomata();
-      for (int i = 0; i < mSiteIndices[1]; i++) {
-        final AutomatonEventInfo transInfo = disabling.get(i);
-        final int c0 = transInfo.getAutomatonIndex();
-        final ComponentInfo compInfo = analyzer.mComponentInfoList.get(c0);
+      final TRAutomatonProxy[] trs = getTRAutomata();
+      final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(mNumAutomata);
+      for (final AutomatonEventInfo autInfo : mSiteDisablers.get(0)) {
+        final int c0 = autInfo.getAutomatonIndex();
+        final ComponentInfo compInfo = mComponentInfoList.get(c0);
         final int a = compInfo.getAutomatonIndex();
-        final int c = site.getComponentIndex(a);
         final TRAutomatonProxy tr = trs[a];
-        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+        final int c = site.getComponentIndex(a);
         final int s = decodedSource[c];
         final EventEncoding enc = tr.getEventEncoding();
         final int e = enc.getEventCode(event);
+        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         final TransitionIterator iter =
           rel.createSuccessorsReadOnlyIterator(s, e);
         if (!iter.advance()) {
           assert false : "Counterexample transition not defined!";
         } else if (iter.advance()) { // nondeterministic, so state info needed
-          final AutomatonProxy aut = analyzer.getInputAutomaton(a);
+          final AutomatonProxy aut = getInputAutomaton(a);
           final int t = decodedTarget[c];
           final StateProxy state = tr.getState(t);
           stateMap.put(aut, state);
         }
       }
-      final ProductDESProxyFactory factory = analyzer.getFactory();
+      final ProductDESProxyFactory factory = getFactory();
       return factory.createTraceStepProxy(event, stateMap);
     }
 
     private TraceStepProxy buildFinalTraceStep
-      (final TRMonolithicCoobservabilityChecker analyzer,
-       final int[] decoded,
+      (final int[] decoded,
        final SupervisorSite site)
     {
-      final int numAut = analyzer.getTRAutomata().length;
-      final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
-      final List<AutomatonEventInfo> disabling = getDisablingAutomata();
-      for (int i = 0; i < mSiteIndices[1]; i++) {
-        final AutomatonEventInfo transInfo = disabling.get(i);
-        final int c0 = transInfo.getAutomatonIndex();
-        final ComponentInfo compInfo = analyzer.mComponentInfoList.get(c0);
+      final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(mNumAutomata);
+      for (final AutomatonEventInfo autInfo : mSiteDisablers.get(0)) {
+        final int c0 = autInfo.getAutomatonIndex();
+        final ComponentInfo compInfo = mComponentInfoList.get(c0);
         final int a = compInfo.getAutomatonIndex();
         final int c = site.getComponentIndex(a);
-        transInfo.putTargetInStateMap(stateMap, decoded[c], analyzer);
+        autInfo.putTargetInStateMap(stateMap, decoded[c],
+                                    TRMonolithicCoobservabilityChecker.this);
       }
-      final ProductDESProxyFactory factory = analyzer.getFactory();
+      final ProductDESProxyFactory factory = getFactory();
       final EventProxy event = getEvent();
       return factory.createTraceStepProxy(event, stateMap);
-    }
-
-    /**
-     * Gets the site group representing the given site when processing this
-     * event.
-     * @see CoobservabilityEventInfo
-     */
-    private int getSiteGroup(final SupervisorSite site)
-    {
-      if (site == null) {
-        return 0;
-      } else if (isObservable(site)) {
-        return 1;
-      } else {
-        return 2;
-      }
     }
 
     //#######################################################################
@@ -902,54 +902,63 @@ public class TRMonolithicCoobservabilityChecker
     @Override
     protected Comparator<AutomatonEventInfo> getAutomatonEventInfoComparator()
     {
-      return mComparator;
+      if (mCoobservabilityAutomatonEventInfoComparator == null) {
+        mCoobservabilityAutomatonEventInfoComparator =
+          new CoobservabilityAutomatonEventInfoCamparator();
+      }
+      return mCoobservabilityAutomatonEventInfoComparator;
     }
 
     //#######################################################################
     //# State Expansion
     private void createSuccessorStatesEncoded
       (final int[] encoded,
-       final int groupIndex,
-       final TRMonolithicCoobservabilityChecker verifier)
+       final int groupIndex)
       throws OverflowException
     {
       final AutomatonEventInfo update = mSiteUpdates[groupIndex];
       if (update != null) {
         final int code = getOutputCode();
-        final int[] encodedTarget = verifier.getEncodedTargetBuffer(encoded);
-        update.createSuccessorStatesEncoded(code, encodedTarget, true, verifier);
+        final int[] encodedTarget = getEncodedTargetBuffer(encoded);
+        update.createSuccessorStatesEncoded(code, encodedTarget, true,
+                                            TRMonolithicCoobservabilityChecker.this);
       }
     }
 
     private void createSuccessorStatesDecoded
       (final int[] decoded,
-       final int groupIndex,
-       final TRMonolithicCoobservabilityChecker verifier)
+       final int groupIndex)
       throws OverflowException
     {
       final AutomatonEventInfo update = mSiteUpdates[groupIndex];
       if (update != null) {
         final int code = getOutputCode();
-        final int[] decodedTarget = verifier.getDecodedTargetBuffer(decoded);
-        update.createSuccessorStatesDecoded(code, decodedTarget, true, verifier);
+        final int[] decodedTarget = getDecodedTargetBuffer(decoded);
+        update.createSuccessorStatesDecoded(code, decodedTarget, true,
+                                            TRMonolithicCoobservabilityChecker.this);
       }
     }
 
     //#######################################################################
     //# Instance Variables
-    private final CoobservabilityAutomatonEventInfoCamparator mComparator;
-    private Set<SupervisorSite> mControllers;
-    private Set<SupervisorSite> mObservers;
-    private boolean mHasObservingSpec;
     /**
-     * Array of indices of automaton/event entries for different site
-     * groups to explore. For each site group, the array contains the
-     * smallest index into the list of disabling components ({@link
-     * #getDisablingAutomata()}) representing an entry no longer contained
-     * in the associated group.
+     * Set of supervisor sites that can disable this event.
+     */
+    private Set<SupervisorSite> mControllers;
+    /**
+     * Set of supervisor sites that can observe this event.
+     */
+    private Set<SupervisorSite> mObservers;
+    /**
+     * List of lists of {@link
+     * net.sourceforge.waters.analysis.monolithic.AbstractTRMonolithicModelAnalyzer.AutomatonEventInfo
+     * AutomatonEventInfo} records representing the automaton/site pairs whose
+     * state components need to be checked to determine whether a transition
+     * occurs. Each list represents a group or site with tuple components
+     * that need to be considered together by the algorithm.</P>
      * @see CoobservabilityEventInfo
      */
-    private int[] mSiteIndices;
+    private List<List<AutomatonEventInfo>> mSiteDisablers;
     /**
      * Array of {@link
      * net.sourceforge.waters.analysis.monolithic.AbstractTRMonolithicModelAnalyzer.AutomatonEventInfo
@@ -973,7 +982,8 @@ public class TRMonolithicCoobservabilityChecker
   {
     //#######################################################################
     //# Constructors
-    private ComponentInfo(final TRAutomatonProxy tr, final int autIndex)
+    private ComponentInfo(final TRAutomatonProxy tr,
+                          final int autIndex)
     {
       mTRAutomaton = tr;
       mAutomatonIndex = autIndex;
@@ -993,12 +1003,6 @@ public class TRMonolithicCoobservabilityChecker
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
-    private TRAutomatonProxy getTRAutomaton()
-    {
-      return mTRAutomaton;
-    }
-
     private int getAutomatonIndex()
     {
       return mAutomatonIndex;
@@ -1025,7 +1029,8 @@ public class TRMonolithicCoobservabilityChecker
     public String toString()
     {
       if (mSite == null) {
-        return mTRAutomaton.getName() + " (reference)";
+        return mTRAutomaton.getName() + " " +
+               CoobservabilityDiagnostics.REFERENCE_SITE_NAME;
       } else {
         return mTRAutomaton.getName() + " @ " + mSite.getName();
       }
@@ -1042,43 +1047,32 @@ public class TRMonolithicCoobservabilityChecker
 
   //#########################################################################
   //# Inner Class CoobservabilityAutomatonEventInfoCamparator
-  private class CoobservabilityAutomatonEventInfoCamparator
-    extends DefaultAutomatonEventInfoCamparator
+  private static class CoobservabilityAutomatonEventInfoCamparator
+    implements Comparator<AutomatonEventInfo>
   {
-    //#######################################################################
-    //# Constructor
-    private CoobservabilityAutomatonEventInfoCamparator
-      (final CoobservabilityEventInfo info)
-    {
-      mEventInfo = info;
-    }
-
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonEventInfo>
     @Override
     public int compare(final AutomatonEventInfo info1,
                        final AutomatonEventInfo info2)
     {
-      final int index1 = info1.getAutomatonIndex();
-      final SupervisorSite site1 = mComponentInfoList.get(index1).getSite();
-      final int group1 = mEventInfo.getSiteGroup(site1);
-      final int index2 = info2.getAutomatonIndex();
-      final SupervisorSite site2 = mComponentInfoList.get(index2).getSite();
-      final int group2 = mEventInfo.getSiteGroup(site2);
-      if (group1 != group2) {
-        return group1 - group2;
-      } else if (site1 != null) {
-        final int result = site1.compareTo(site2);
-        if (result != 0) {
-          return result;
-        }
+      // ignoring event controllability (unlike default)
+      final float prob1 = info1.getProbability();
+      final float prob2 = info2.getProbability();
+      final boolean prioritised1 = info1.isPlant() && prob1 < 1.0f;
+      final boolean prioritised2 = info2.isPlant() && prob2 < 1.0f;
+      if (prioritised1 && !prioritised2) {
+        return -1;
+      } else if (prioritised2 && !prioritised1) {
+        return 1;
+      } else if (prob1 < prob2) {
+        return -1;
+      } else if (prob1 > prob2) {
+        return 1;
+      } else {
+        return info1.getAutomatonIndex() - info2.getAutomatonIndex();
       }
-      return super.compare(info1, info2);
     }
-
-    //#######################################################################
-    //# Instance Variables
-    private final CoobservabilityEventInfo mEventInfo;
   }
 
 
@@ -1087,11 +1081,17 @@ public class TRMonolithicCoobservabilityChecker
   private String mDefaultSite = CoobservabilityAttributeFactory.DEFAULT_SITE_NAME;
 
   private int mNumAutomata;
+  private TRAutomatonProxy[] mTRAutomataExtended;
   private SupervisorSite mReferenceSite;
   private Map<String,SupervisorSite> mSiteMap;
   private Map<EventProxy,CoobservabilityEventInfo> mCoobservabilityEventInfoMap;
   private List<ComponentInfo> mComponentInfoList;
-  private TRAutomatonProxy[] mTRAutomataExtended;
   private boolean mReverse;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static CoobservabilityAutomatonEventInfoCamparator
+    mCoobservabilityAutomatonEventInfoComparator = null;
 
 }

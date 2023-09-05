@@ -295,7 +295,7 @@ public abstract class AbstractTRMonolithicModelVerifier
   {
     for (final EventInfo info : getEventInfo()) {
       callback.setEvent(info);
-      if (!expandState(encoded, decoded, info)) {
+      if (!info.expandState(encoded, decoded)) {
         break;
       }
     }

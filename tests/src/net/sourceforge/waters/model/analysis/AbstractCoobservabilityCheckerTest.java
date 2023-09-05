@@ -47,6 +47,7 @@ import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.analysis.coobs.CoobservabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
@@ -169,7 +170,7 @@ public abstract class AbstractCoobservabilityCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "yip1coobs2.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
 
@@ -262,20 +263,18 @@ public abstract class AbstractCoobservabilityCheckerTest
     final EventProxy lastEvent = getLastEvent(referenceTrace);
     final String lastEventName = lastEvent.getName();
     final Map<String,String> attribs = lastEvent.getAttributes();
+    boolean siteFound = false;
     for (final Map.Entry<String,String> entry : attribs.entrySet()) {
       final String key = entry.getKey();
       if (key.startsWith(CoobservabilityAttributeFactory.CONTROLLABITY_KEY)) {
         final String name = entry.getValue();
-        if (!remainingNames.remove(name)) {
-          if (traceMap.containsKey(name)) {
-            fail("The counterexample contains more than one trace named '" +
-                 name + "'!");
-          } else {
-            fail("The counterexample contains no trace for the supervisor site '" +
-                 name + "' that disables its last event '" + lastEventName + "'!");
-          }
-        }
+        checkExpectedController(name, traceMap, remainingNames, lastEventName);
+        siteFound = true;
       }
+    }
+    if (!siteFound && lastEvent.getKind() == EventKind.CONTROLLABLE) {
+      checkExpectedController(CoobservabilityAttributeFactory.DEFAULT_SITE_NAME,
+                              traceMap, remainingNames, lastEventName);
     }
     if (!remainingNames.isEmpty()) {
       final String name = remainingNames.iterator().next();
@@ -330,6 +329,22 @@ public abstract class AbstractCoobservabilityCheckerTest
     }
   }
 
+  private void checkExpectedController(final String siteName,
+                                       final Map<String,TraceProxy> traceMap,
+                                       final Set<String> remainingNames,
+                                       final String lastEventName)
+  {
+    if (!remainingNames.remove(siteName)) {
+      if (traceMap.containsKey(siteName)) {
+        fail("The counterexample contains more than one trace named '" +
+             siteName + "'!");
+      } else {
+        fail("The counterexample contains no trace for the supervisor site '" +
+             siteName + "' that disables its last event '" + lastEventName + "'!");
+      }
+    }
+  }
+
   private void checkObservability(final TraceProxy referenceTrace,
                                   final TraceProxy trace)
   {
@@ -368,6 +383,7 @@ public abstract class AbstractCoobservabilityCheckerTest
     while (iter.hasNext()) {
       final EventProxy event = iter.next();
       final Map<String,String> attribs = event.getAttributes();
+      boolean siteFound = false;
       for (final Map.Entry<String,String> entry : attribs.entrySet()) {
         final String key = entry.getKey();
         if (key.startsWith(CoobservabilityAttributeFactory.OBSERVABITY_KEY)) {
@@ -376,6 +392,11 @@ public abstract class AbstractCoobservabilityCheckerTest
             return event;
           }
         }
+        siteFound = true;
+      }
+      if (!siteFound && event.isObservable() &&
+          siteName.equals(CoobservabilityAttributeFactory.DEFAULT_SITE_NAME)) {
+        return event;
       }
     }
     return null;

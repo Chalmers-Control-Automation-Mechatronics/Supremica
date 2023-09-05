@@ -922,52 +922,10 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     throws AnalysisException
   {
     for (final EventInfo event : mEventInfo) {
-      if (!expandState(encoded, decoded, event)) {
+      if (!event.expandState(encoded, decoded)) {
         break;
       }
     }
-  }
-
-  /**
-   * Expands the transitions of the given event from the given state.
-   * This method calculates all transitions of the given event originating
-   * from the given state, creating new states and storing information as
-   * needed.
-   * @param  encoded  Compressed state tuple to be expanded.
-   * @param  decoded  Decompressed version of the same state tuple.
-   * @param  event    The event whose transitions are expanded.
-   * @return <CODE>true</CODE> to indicate that exploration should continue
-   *         after the call, <CODE>false</CODE> to indicate no further
-   *         transitions originating from this state should be processed.
-   */
-  protected boolean expandState(final int[] encoded,
-                                final int[] decoded,
-                                final EventInfo event)
-    throws AnalysisException
-  {
-    final AutomatonEventInfo disablingAut = event.findDisabling(decoded);
-    if (disablingAut == null) {
-      if (mPruningDeadlocks && event.isForbidden()) {
-        final int e = event.getOutputCode();
-        createDeadlockTransition(e);
-        if (event.isOutsideAlwaysEnabled()) {
-          return false;
-        }
-      } else {
-        // TODO Add Boolean return value to abandon state.
-        createSuccessorStates(encoded, decoded, event);
-      }
-    } else if (isSensitiveToControllability() &&
-               !event.isControllable() &&
-               // Note: events are controllable in reverse mode
-               !disablingAut.isPlant()) {
-      final int e = event.getOutputCode();
-      final int a = disablingAut.getAutomatonIndex();
-      if (!handleUncontrollableState(e, a)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   protected int storeInitialStates()
@@ -1528,7 +1486,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
   //#########################################################################
   //# Inner Class EventInfo
-  public static class EventInfo
+  public class EventInfo
     implements Comparable<EventInfo>
   {
     //#######################################################################
@@ -1671,6 +1629,47 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
 
     //#######################################################################
+    //# State Expansion
+    /**
+     * Expands the transitions of the this event from the given state.
+     * This method calculates all transitions of the given event originating
+     * from the given state, creating new states and storing information as
+     * needed.
+     * @param  encoded  Compressed state tuple to be expanded.
+     * @param  decoded  Decompressed version of the same state tuple.
+     * @return <CODE>true</CODE> to indicate that exploration should continue
+     *         after the call, <CODE>false</CODE> to indicate no further
+     *         transitions originating from this state should be processed.
+     */
+    protected boolean expandState(final int[] encoded,
+                                  final int[] decoded)
+      throws AnalysisException
+    {
+      final AutomatonEventInfo disablingAut = findDisabling(decoded);
+      if (disablingAut == null) {
+        if (mPruningDeadlocks && isForbidden()) {
+          final int e = getOutputCode();
+          createDeadlockTransition(e);
+          if (isOutsideAlwaysEnabled()) {
+            return false;
+          }
+        } else {
+          // TODO Add Boolean return value to abandon state.
+          createSuccessorStates(encoded, decoded, this);
+        }
+      } else if (isSensitiveToControllability() && !isControllable() &&
+                 // Note: events are controllable in reverse mode
+                 !disablingAut.isPlant()) {
+        final int e = getOutputCode();
+        final int a = disablingAut.getAutomatonIndex();
+        if (!handleUncontrollableState(e, a)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    //#######################################################################
     //# Uncontrollability
     public boolean canCauseUncontrollability()
     {
@@ -1766,7 +1765,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       }
     }
 
-    private void sort()
+    protected void sort()
     {
       Collections.sort(mDisablingAutomata, getAutomatonEventInfoComparator());
       final int numUpdates = mUpdatingAutomata.size();
@@ -1800,7 +1799,14 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     //# State Expansion
     public AutomatonEventInfo findDisabling(final int[] decoded)
     {
-      for (final AutomatonEventInfo info : mDisablingAutomata) {
+      return findDisabling(decoded, mDisablingAutomata);
+    }
+
+    public AutomatonEventInfo findDisabling
+      (final int[] decoded,
+       final List<? extends AutomatonEventInfo> list)
+    {
+      for (final AutomatonEventInfo info : list) {
         if (!info.isEnabled(decoded)) {
           return info;
         }
@@ -1808,15 +1814,15 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       return null;
     }
 
-    public int findDisabling(final int[] decoded,
-                             final int start,
-                             final int end)
+    public int findDisablingIndex(final int[] decoded,
+                                  final List<? extends AutomatonEventInfo> list)
     {
-      for (int i = start; i < end; i++) {
-        final AutomatonEventInfo info = mDisablingAutomata.get(i);
+      int d = 0;
+      for (final AutomatonEventInfo info : list) {
         if (!info.isEnabled(decoded)) {
-          return i;
+          return d;
         }
+        d++;
       }
       return -1;
     }
@@ -1936,6 +1942,22 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator.resetEvent(e);
       countTransitions(aut, deadlockInfo, true, nondeterminismSupported);
+    }
+
+    public AutomatonEventInfo(final AutomatonEventInfo info,
+                              final int autIndex,
+                              final TRAutomatonProxy aut,
+                              final boolean plant,
+                              final boolean controllable)
+    {
+      mAutomatonIndex = autIndex;
+      mPlant = plant;
+      mControllable = controllable;
+      mTransitionIterator = info.mTransitionIterator.clone();
+      mDeterministic = info.mDeterministic;
+      mSelfloopOnly = info.mSelfloopOnly;
+      mBlocked = info.mBlocked;
+      mProbability = info.mProbability;
     }
 
     private AutomatonEventInfo(final Collection<AutomatonEventInfo> parts,

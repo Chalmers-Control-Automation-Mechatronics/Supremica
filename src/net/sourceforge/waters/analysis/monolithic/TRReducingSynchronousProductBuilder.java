@@ -277,7 +277,7 @@ public class TRReducingSynchronousProductBuilder
           }
         }
       } else {
-        return expandState(mIntermediateEncoded, mIntermediateDecoded, event);
+        return event.expandState(mIntermediateEncoded, mIntermediateDecoded);
       }
     } else if (event == null) {
       final int target =
