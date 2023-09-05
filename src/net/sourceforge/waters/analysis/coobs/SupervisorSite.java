@@ -55,10 +55,12 @@ public class SupervisorSite implements Comparable<SupervisorSite>
   //#########################################################################
   //# Constructor
   public SupervisorSite(final String name,
+                        final boolean reference,
                         final int index,
                         final int numAutomata)
   {
     mName = name;
+    mReference = reference;
     mIndex = index;
     mComponentIndices = new int[numAutomata];
   }
@@ -69,6 +71,11 @@ public class SupervisorSite implements Comparable<SupervisorSite>
   public String getName()
   {
     return mName;
+  }
+
+  public boolean isReferenceSite()
+  {
+    return mReference;
   }
 
   public int getComponentIndex(final int autIndex)
@@ -103,6 +110,7 @@ public class SupervisorSite implements Comparable<SupervisorSite>
   //#########################################################################
   //# Instance Variables
   private final String mName;
+  private final boolean mReference;
   private final int mIndex;
   private final int[] mComponentIndices;
 

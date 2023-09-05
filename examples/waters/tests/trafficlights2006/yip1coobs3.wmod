@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="yip1coobs1">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="yip1coobs3">
 <B:Comment>Solution to traffic lights exercise by Peter Yun-il Park.
-This is a modified version for a coobservability check, with two supervisor sites for the main and side streets respectively. Each supervisor can control and observe events associated with its street (red/yellow/green plus arrive_side and enter_side for the side supervisor) provided that the event is controllable or observable, and in addition both supervisors can observe the tick.
-This model is not coobservable because of interdependency when switching over from main street to side street and vice versa.</B:Comment>
+This is a modified version for a coobservability check, with two supervisor sites for the main and side streets respectively. Each supervisor can control and observe lights events associated with its street (red/yellow/green), the side supervisor observes enter_side, and both supervisors can observe the events tick, arrive_side, green_main, red_main, and red_side.
+This model is coobservable.</B:Comment>
 <ConstantAliasList>
 <ConstantAlias Name="Streets">
 <ConstantAliasExpression><EnumSetExpression>
@@ -22,7 +22,8 @@ This model is not coobservable because of interdependency when switching over fr
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="arrive_side">
 <B:AttributeMap>
-<B:Attribute Name="COOBS:observer" Value="side"/>
+<B:Attribute Name="COOBS:observer1" Value="side"/>
+<B:Attribute Name="COOBS:observer2" Value="main"/>
 </B:AttributeMap>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="enter_main"/>
@@ -34,7 +35,8 @@ This model is not coobservable because of interdependency when switching over fr
 <EventDecl Kind="CONTROLLABLE" Name="green_main">
 <B:AttributeMap>
 <B:Attribute Name="COOBS:controller" Value="main"/>
-<B:Attribute Name="COOBS:observer" Value="main"/>
+<B:Attribute Name="COOBS:observer1" Value="main"/>
+<B:Attribute Name="COOBS:observer2" Value="side"/>
 </B:AttributeMap>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="green_side">
@@ -48,13 +50,15 @@ This model is not coobservable because of interdependency when switching over fr
 <EventDecl Kind="CONTROLLABLE" Name="red_main">
 <B:AttributeMap>
 <B:Attribute Name="COOBS:controller" Value="main"/>
-<B:Attribute Name="COOBS:observer" Value="main"/>
+<B:Attribute Name="COOBS:observer1" Value="main"/>
+<B:Attribute Name="COOBS:observer2" Value="side"/>
 </B:AttributeMap>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="red_side">
 <B:AttributeMap>
 <B:Attribute Name="COOBS:controller" Value="side"/>
-<B:Attribute Name="COOBS:observer" Value="side"/>
+<B:Attribute Name="COOBS:observer1" Value="side"/>
+<B:Attribute Name="COOBS:observer2" Value="main"/>
 </B:AttributeMap>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="yellow_main">

@@ -121,15 +121,15 @@ public class TRMonolithicCoobservabilityChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.coobs.CoobservabilityChecker
   @Override
-  public void setDefaultSite(final String name)
+  public void setDefaultSiteName(final String name)
   {
-    mDefaultSite = "".equals(name) ? null : name;
+    mDefaultSiteName = "".equals(name) ? null : name;
   }
 
   @Override
-  public String getDefaultSite()
+  public String getDefaultSiteName()
   {
-    return mDefaultSite == null ? "" : mDefaultSite;
+    return mDefaultSiteName == null ? "" : mDefaultSiteName;
   }
 
   @Override
@@ -156,7 +156,7 @@ public class TRMonolithicCoobservabilityChecker
     if (option.hasID(AbstractModelAnalyzerFactory.
                      OPTION_CoobservabilityChecker_DefaultSite)) {
       final String value = (String) option.getValue();
-      setDefaultSite(value);
+      setDefaultSiteName(value);
     }
   }
 
@@ -182,7 +182,7 @@ public class TRMonolithicCoobservabilityChecker
     final TRAutomatonProxy[] trs = getTRAutomata();
     mNumAutomata = trs.length;
     mReferenceSite = new SupervisorSite
-      (CoobservabilityDiagnostics.REFERENCE_SITE_NAME, -1, mNumAutomata);
+      (CoobservabilityDiagnostics.REFERENCE_SITE_NAME, true, -1, mNumAutomata);
     mSiteMap = new LinkedHashMap<>();
     mCoobservabilityEventInfoMap = new HashMap<>(numEvents);
 
@@ -217,15 +217,15 @@ public class TRMonolithicCoobservabilityChecker
                 observed = true;
               }
             }
-            if (mDefaultSite != null) {
+            if (mDefaultSiteName != null) {
               if (!controlled &&
                   (enc.getProperEventStatus(e) &
                    EventStatus.STATUS_CONTROLLABLE) != 0) {
-                final SupervisorSite site = getSite(mDefaultSite);
+                final SupervisorSite site = getSite(mDefaultSiteName);
                 info.addController(site);
               }
               if (!observed && event.isObservable()) {
-                final SupervisorSite site = getSite(mDefaultSite);
+                final SupervisorSite site = getSite(mDefaultSiteName);
                 info.addObserver(site);
               }
             }
@@ -238,7 +238,7 @@ public class TRMonolithicCoobservabilityChecker
     for (int a = 0; a < mNumAutomata; a++) {
       checkAbort();
       final TRAutomatonProxy tr = trs[a];
-      final ComponentInfo info0 = new ComponentInfo(tr, a);
+      final ComponentInfo info0 = new ComponentInfo(tr, a, mReferenceSite);
       final int c0 = mComponentInfoList.size();
       mComponentInfoList.add(info0);
       mReferenceSite.setComponentIndex(a, c0);
@@ -484,7 +484,7 @@ public class TRMonolithicCoobservabilityChecker
     SupervisorSite site = mSiteMap.get(name);
     if (site == null) {
       final int index = mSiteMap.size();
-      site = new SupervisorSite(name, index, mNumAutomata);
+      site = new SupervisorSite(name, false, index, mNumAutomata);
       mSiteMap.put(name, site);
     }
     return site;
@@ -661,7 +661,7 @@ public class TRMonolithicCoobservabilityChecker
         if (refInfo != null) {
           final TRAutomatonProxy tr = trs[a];
           final SupervisorSite site = compInfo.getSite();
-          if (site == null) {
+          if (site.isReferenceSite()) {
             final boolean plant = refInfo.isPlant();
             final AutomatonEventInfo altInfo =
               new AutomatonEventInfo(refInfo, c, tr, plant, true);
@@ -983,22 +983,17 @@ public class TRMonolithicCoobservabilityChecker
     //#######################################################################
     //# Constructors
     private ComponentInfo(final TRAutomatonProxy tr,
-                          final int autIndex)
-    {
-      mTRAutomaton = tr;
-      mAutomatonIndex = autIndex;
-      mSite = null;
-      mShadowingSites = new LinkedList<>();
-    }
-
-    private ComponentInfo(final TRAutomatonProxy tr,
                           final int autIndex,
                           final SupervisorSite site)
     {
       mTRAutomaton = tr;
       mAutomatonIndex = autIndex;
       mSite = site;
-      mShadowingSites = Collections.singletonList(null);
+      if (site.isReferenceSite()) {
+        mShadowingSites = new LinkedList<>();
+      } else {
+        mShadowingSites = Collections.singletonList(site);
+      }
     }
 
     //#######################################################################
@@ -1028,12 +1023,7 @@ public class TRMonolithicCoobservabilityChecker
     @Override
     public String toString()
     {
-      if (mSite == null) {
-        return mTRAutomaton.getName() + " " +
-               CoobservabilityDiagnostics.REFERENCE_SITE_NAME;
-      } else {
-        return mTRAutomaton.getName() + " @ " + mSite.getName();
-      }
+      return mTRAutomaton.getName() + " @ " + mSite.getName();
     }
 
     //#######################################################################
@@ -1078,7 +1068,8 @@ public class TRMonolithicCoobservabilityChecker
 
   //#########################################################################
   //# Instance Variables
-  private String mDefaultSite = CoobservabilityAttributeFactory.DEFAULT_SITE_NAME;
+  private String mDefaultSiteName =
+    CoobservabilityAttributeFactory.DEFAULT_SITE_NAME;
 
   private int mNumAutomata;
   private TRAutomatonProxy[] mTRAutomataExtended;

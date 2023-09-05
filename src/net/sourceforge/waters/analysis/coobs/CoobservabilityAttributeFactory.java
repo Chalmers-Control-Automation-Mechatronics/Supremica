@@ -115,7 +115,7 @@ public class CoobservabilityAttributeFactory implements AttributeFactory
    * The default value for the default site name, which may be used to assign
    * a controlling or observing supervisor to controllable or observable
    * events without the corresponding attribute.
-   * @see CoobservabilityChecker#setDefaultSite(String)
+   * @see CoobservabilityChecker#setDefaultSiteName(String)
    */
   public static final String DEFAULT_SITE_NAME = ":main";
 

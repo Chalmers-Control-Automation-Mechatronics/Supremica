@@ -173,9 +173,30 @@ public abstract class AbstractCoobservabilityCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testTrafficlightsYip1Coobs3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "yip1coobs3.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testTrafficlightsYip1Coobs4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "yip1coobs4.wmod");
+    runModelVerifier(des, true);
+  }
+
 
   //#########################################################################
   //# Test Cases --- controllability plus observability via coobservability
+  public void testSimpleCoobs() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "simple_coobs.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testTrafficlightsAc61Coobs() throws Exception
   {
     final ProductDESProxy des =
@@ -197,6 +218,30 @@ public abstract class AbstractCoobservabilityCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "empty_spec.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testParManEgLoCoobs1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("despot", "parallelManufacturingExample",
+                     "parManEg_lo_coobs1.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testParManEgLoCoobs2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("despot", "parallelManufacturingExample",
+                     "parManEg_lo_coobs2.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testParManEgLoCoobs3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("despot", "parallelManufacturingExample",
+                     "parManEg_lo_coobs3.wmod");
     runModelVerifier(des, true);
   }
 

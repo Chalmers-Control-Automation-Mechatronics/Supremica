@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *
  * <P>For controllable and observable events without these attributes
  * declared, the coobservability checker may be configured to assign
- * as default supervisor site using {@link #setDefaultSite(String)
+ * as default supervisor site using {@link #setDefaultSiteName(String)
  * setDefaultSite()}. Using the default site, coobservability is equivalent to
  * controllability for models without any supervisor site attributes.</P>
  *
@@ -88,15 +88,15 @@ public interface CoobservabilityChecker extends ModelVerifier
    *               empty string if no default supervisor is used.
    * @see AbstractModelAnalyzerFactory#OPTION_CoobservabilityChecker_DefaultSite
    */
-  public void setDefaultSite(final String name);
+  public void setDefaultSiteName(final String name);
 
   /**
    * Gets the name of the default supervisor site.
    * @return Name of default supervisor, or empty string if no default
    *         supervisor is used.
-   * @see #setDefaultSite(String) setDefaultSite()
+   * @see #setDefaultSiteName(String) setDefaultSite()
    */
-  public String getDefaultSite();
+  public String getDefaultSiteName();
 
 
   //#########################################################################
