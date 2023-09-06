@@ -392,11 +392,13 @@ public class TRMonolithicCoobservabilityChecker
           g++;
         }
       } else {
-        final int g = controllers.indexOf(stepSite) + 1;
-        final List<TraceStepProxy> list = steps.get(g);
-        final TraceStepProxy step = eventInfo.buildIntermediateTraceStep
-          (decodedSource, decodedTarget, stepSite);
-        list.add(0, step);
+        final int i = controllers.indexOf(stepSite);
+        if (i >= 0) {
+          final List<TraceStepProxy> list = steps.get(i + 1);
+          final TraceStepProxy step = eventInfo.buildIntermediateTraceStep
+            (decodedSource, decodedTarget, stepSite);
+          list.add(0, step);
+        }
       }
       target = source;
       final int[] tmp = decodedTarget;
@@ -505,8 +507,11 @@ public class TRMonolithicCoobservabilityChecker
                                             final SupervisorSite site)
   {
     final EventEncoding enc = tr.getEventEncoding();
-    for (int e = EventEncoding.TAU; e < enc.getNumberOfProperEvents(); e++) {
-      if ((enc.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
+    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    while (iter.advance()) {
+      if (iter.getCurrentFromState() != iter.getCurrentToState()) {
+        final int e = iter.getCurrentEvent();
         final EventProxy event = enc.getProperEvent(e);
         final CoobservabilityEventInfo info =
           mCoobservabilityEventInfoMap.get(event);

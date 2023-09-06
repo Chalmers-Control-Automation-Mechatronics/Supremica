@@ -158,6 +158,44 @@ public abstract class AbstractCoobservabilityCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testSmallFactory2Coobs1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "small_factory_2_coobs1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testSmallFactory2Coobs2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "small_factory_2_coobs2.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testSmallFactory2Coobs3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "small_factory_2_coobs3.wmod");
+    runModelVerifier(des, true);
+  }
+
+
+  public void testParManEgLoCoobs2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("despot", "parallelManufacturingExample",
+                     "parManEg_lo_coobs2.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testParManEgLoCoobs3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("despot", "parallelManufacturingExample",
+                     "parManEg_lo_coobs3.wmod");
+    runModelVerifier(des, true);
+  }
+
 
   public void testTrafficlightsYip1Coobs1() throws Exception
   {
@@ -226,22 +264,6 @@ public abstract class AbstractCoobservabilityCheckerTest
     final ProductDESProxy des =
       getCompiledDES("despot", "parallelManufacturingExample",
                      "parManEg_lo_coobs1.wmod");
-    runModelVerifier(des, true);
-  }
-
-  public void testParManEgLoCoobs2() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("despot", "parallelManufacturingExample",
-                     "parManEg_lo_coobs2.wmod");
-    runModelVerifier(des, false);
-  }
-
-  public void testParManEgLoCoobs3() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("despot", "parallelManufacturingExample",
-                     "parManEg_lo_coobs3.wmod");
     runModelVerifier(des, true);
   }
 
