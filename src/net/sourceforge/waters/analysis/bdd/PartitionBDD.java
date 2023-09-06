@@ -44,6 +44,7 @@ import java.util.Queue;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -229,8 +230,9 @@ abstract class PartitionBDD
 
   /**
    * Returns whether this BDD is a dominant literal. A BDD in a conjunctive
-   * partition is dominant if represents false, while a BDD in a disjunctive
-   * partition is dominant represents true.
+   * partition is dominant if it represents false, and a BDD in a disjunctive
+   * partition is dominant if it represents true. Transition partition BDDs
+   * are never dominant.
    */
   abstract boolean isDominant();
 

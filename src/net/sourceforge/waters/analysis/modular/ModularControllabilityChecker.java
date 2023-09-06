@@ -72,6 +72,9 @@ import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * The modular controllability check algorithm.
@@ -234,6 +237,7 @@ public class ModularControllabilityChecker
       final ModularHeuristic heuristic = getHeuristic();
       SafetyCounterExampleProxy counter = null;
       final Collection<AutomatonProxy> subsystem = new ArrayList<>(numAutomata);
+      final Logger logger = LogManager.getLogger();
       specLoop:
       while (!specs.isEmpty()) {
         checkAbort();
@@ -243,25 +247,27 @@ public class ModularControllabilityChecker
         final Set<AutomatonProxy> uncomposedSpecs = new TreeSet<>(specs);
         final AutomatonProxy spec =
           mStartsWithSmallestSpec ? specs.first() : specs.last();
+        logger.debug("Checking specification {} ...", spec.getName());
         subsystem.add(spec);
         uncomposedSpecs.remove(spec);
         ProductDESProxy subDES =
           AutomatonTools.createProductDESProxy(spec, factory);
         mono.setModel(subDES);
-        mono.setKindTranslator(new KindTranslator() {
-          @Override
-          public EventKind getEventKind(final EventProxy e)
-          {
-            return getKindTranslator().getEventKind(e);
-          }
+        final KindTranslator subTranslator =
+          new KindTranslator() {
+            @Override
+            public EventKind getEventKind(final EventProxy e)
+            {
+              return getKindTranslator().getEventKind(e);
+            }
 
-          @Override
-          public ComponentKind getComponentKind(final AutomatonProxy a)
-          {
-            return specs.contains(a) ? ComponentKind.SPEC
-              : ComponentKind.PLANT;
-          }
-        });
+            @Override
+            public ComponentKind getComponentKind(final AutomatonProxy a)
+            {
+              return specs.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
+            }
+          };
+        mono.setKindTranslator(subTranslator);
         while (!mono.run()) {
           recordStats(mono.getAnalysisResult());
           final Collection<AutomatonProxy> selectedAutomata =
@@ -272,6 +278,7 @@ public class ModularControllabilityChecker
                            mono.getCounterExample());
           checkAbort();
           if (selectedAutomata == null) {
+            logger.debug("Specification {} is not controllable.", spec.getName());
             if (counter == null) {
               counter = mono.getCounterExample();
               counter = extendTrace(heuristic, counter, automata);
@@ -288,6 +295,12 @@ public class ModularControllabilityChecker
               continue specLoop;
             } else {
               return false;
+            }
+          }
+          if (logger.isDebugEnabled()) {
+            for (final AutomatonProxy aut : selectedAutomata) {
+              logger.debug("Adding {} {} as {} ...", aut.getKind(),
+                           aut.getName(), subTranslator.getComponentKind(aut));
             }
           }
           subsystem.addAll(selectedAutomata);
@@ -308,6 +321,7 @@ public class ModularControllabilityChecker
       if (counter != null) {
         return false;
       } else {
+        logger.debug("All specifications have passed, model is not controllable.");
         return setSatisfiedResult();
       }
     } catch (final AnalysisException exception) {

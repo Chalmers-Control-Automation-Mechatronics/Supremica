@@ -99,14 +99,23 @@ public class CommandLineToolTest
 
   //#########################################################################
   //# Test Cases - specific combinations of factory/algorithm
-  public void testAnalyzer_BDDLanguageInclusion()
+  public void testAnalyzer_BDDLanguageInclusionGreedy()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "trafficlights2006", "ac61part");
+    final String[] args = new String[]
+      {"-bdd", "-lang", "-part", "greedy", file.toString()};
+    testCommandLine("bdd-lang", args, false, "counterexample:");
+  }
+
+  public void testAnalyzer_BDDLanguageInclusionProperty()
     throws Exception
   {
     final File file = getInputWmod("tests", "nasty", "just_property");
     final String[] args = new String[]
       {"-bdd", "-lang", file.toString(), "-pack", "java",
        "-property", "the_property", "-nout"};
-    testCommandLine("bdd-lang", args, false,
+    testCommandLine("bdd-lang-property", args, false,
                     "!DEBUG", "!counterexample:", "!Statistics:");
   }
 

@@ -82,10 +82,10 @@ public abstract class AbstractLanguageInclusionCheckerTest
   public void testReentrant()
     throws Exception
   {
-    testTrafficLightac61();
+    testTrafficLightsAc61Lang();
     testDisjointProp2();
     testSmallFactory2();
-    testTrafficLightac61();
+    testTrafficLightsAc61Lang();
     testHISC8nd();
   }
 
@@ -161,10 +161,17 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
   //#########################################################################
   //# Test Cases -- traffic light language inclusion
-  public void testTrafficLightac61() throws Exception
+  public void testTrafficLightsAc61Lang() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "ac61lang.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testTrafficLightsAc61Part() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ac61part.wmod");
     runModelVerifier(des, false);
   }
 

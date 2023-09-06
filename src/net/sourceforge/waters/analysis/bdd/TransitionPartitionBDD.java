@@ -40,6 +40,7 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -116,7 +117,7 @@ class TransitionPartitionBDD
   @Override
   boolean isDominant()
   {
-    return getBDD().isOne();
+    return false;
   }
 
 

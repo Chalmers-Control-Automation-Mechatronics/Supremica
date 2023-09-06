@@ -42,15 +42,15 @@ import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class BDDLanguageInclusionCheckerTest
+public class BDDAutomataPartitionLanguageInclusionCheckerTest
   extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
-    TestSuite testSuite =
-      new TestSuite(BDDLanguageInclusionCheckerTest.class);
+    final TestSuite testSuite =
+      new TestSuite(BDDAutomataPartitionLanguageInclusionCheckerTest.class);
     return testSuite;
   }
 
@@ -63,10 +63,15 @@ public class BDDLanguageInclusionCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected LanguageInclusionChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new BDDLanguageInclusionChecker(factory);
+    final BDDLanguageInclusionChecker checker =
+      new BDDLanguageInclusionChecker(factory);
+    checker.setTransitionPartitioningStrategy
+      (TransitionPartitioningStrategy.AUTOMATA);
+    return checker;
   }
 
 }

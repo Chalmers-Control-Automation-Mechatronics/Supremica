@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.BitSet;
 import java.util.Set;
 
@@ -45,8 +47,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -214,6 +214,15 @@ abstract class EventBDD
     final int size = mSynchronisedAutomataBitSet.size();
     final BitSet result = new BitSet(size);
     return result;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return mEvent.getName();
   }
 
 
