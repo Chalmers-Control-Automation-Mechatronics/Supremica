@@ -158,6 +158,20 @@ public abstract class AbstractCoobservabilityCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testNondetCoobs1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "nondet_coobs1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNondetCoobs2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "nondet_coobs2.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testSmallFactory2Coobs1() throws Exception
   {
     final ProductDESProxy des =

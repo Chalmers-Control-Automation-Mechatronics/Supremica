@@ -218,10 +218,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     assertNotNull("NULL product DES in counterexample!", counter.getProductDES());
     assertFalse("NULL automaton in counterexample!", counter.getAutomata().contains(null));
     assertFalse("No traces in counterexample!", counter.getTraces().isEmpty());
-    for (final TraceProxy trace : counter.getTraces()) {
-      assertNotNull("NULL trace in counterexample!", trace);
-      assertFalse("NULL event in trace!", trace.getEvents().contains(null));
-    }
+    assertFalse("NULL trace in counterexample!", counter.getTraces().contains(null));
   }
 
   /**
@@ -244,27 +241,58 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                                      final CounterExampleProxy counter)
     throws Exception
   {
-    assertSame("Product DES in trace is not the original model!",
+    assertSame("Product DES in counterexample is not the original model!",
                des, counter.getProductDES());
     final String desName = des.getName();
-    final String traceName = counter.getName();
-    assertTrue("Counterexample name '" + traceName +
+    final String counterName = counter.getName();
+    assertTrue("Counterexample name '" + counterName +
                "' does not match model name '" +
-               desName + "'!", traceName.startsWith(desName));
-    final Collection<AutomatonProxy> automata = des.getAutomata();
-    for (final AutomatonProxy aut : counter.getAutomata()) {
-      if (!automata.contains(aut)) {
+               desName + "'!", counterName.startsWith(desName));
+    final Collection<AutomatonProxy> desAutomata = des.getAutomata();
+    final Collection<AutomatonProxy> counterAutomata = counter.getAutomata();
+    for (final AutomatonProxy aut : counterAutomata) {
+      if (!desAutomata.contains(aut)) {
         fail("Counterexample automaton '" + aut.getName() +
              "' does not match any in product DES!");
       }
     }
     final Collection<EventProxy> events = des.getEvents();
     for (final TraceProxy trace : counter.getTraces()) {
-      for (final EventProxy event : trace.getEvents()) {
-        if (!events.contains(event)) {
-          fail("Counterexample event '" + event.getName() +
-               "' does not match any in product DES!");
+      final String traceName = trace.getName();
+      final String inTrace = traceName == null || traceName.isEmpty() ?
+        "" : " in trace '" + traceName + '\'';
+      int i = 0;
+      final List<TraceStepProxy> steps = trace.getTraceSteps();
+      for (final TraceStepProxy step : steps) {
+        final EventProxy event = step.getEvent();
+        if (i == 0) {
+          assertNull("First event" + inTrace + " is not null!", event);
+        } else if (event == null) {
+          fail("Found null event at step" + i + inTrace + '!');
+        } else if (!events.contains(event)) {
+          fail("Event '" + event.getName() + "' at step " + i +
+               inTrace + " does not match any in product DES!");
+        };
+        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+        for (final Map.Entry<AutomatonProxy,StateProxy> entry : stepMap.entrySet()) {
+          final AutomatonProxy aut = entry.getKey();
+          if (!counterAutomata.contains(aut)) {
+            fail("Step " + i + inTrace + " mentions an automaton '" +
+                 aut.getName() + "' not listed in the counterexample!");
+          }
+          final Collection<StateProxy> states = aut.getStates();
+          final StateProxy state = entry.getValue();
+          if (state == null) {
+            assertEquals("The non-final step " + i + inTrace +
+                         " associates a null state with automaton '" +
+                         aut.getName() + "'!", steps.size() - 1, i);
+          } else if (!states.contains(state)) {
+            fail("Step " + i + inTrace + " specifies state '" +
+                 state.getName() + "' for automaton '" + aut.getName() +
+                 "', which does not appear in the automaton!");
+          }
         }
+        i++;
       }
     }
   }

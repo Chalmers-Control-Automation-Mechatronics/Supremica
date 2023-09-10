@@ -971,7 +971,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
       if (simplified) {
         mPreselectionHeuristic.removeOverflowCandidatesContaining(aut);
         if (rel.getNumberOfStates() != oldNumStates) {
-          aut.resetStateNames();
+          aut.resetOriginalStates();
         }
       }
       // Record steps and update event status.

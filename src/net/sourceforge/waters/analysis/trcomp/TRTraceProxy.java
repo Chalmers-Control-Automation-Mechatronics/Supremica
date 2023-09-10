@@ -663,10 +663,10 @@ public abstract class TRTraceProxy
         return inputStep.getState(s);
       } else {
         final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
-        if (tr.getState(s) == null) {
-          tr.getState(s);
+        if (tr.getTRState(s) == null) {
+          tr.getTRState(s);
         }
-        return tr.getState(s);
+        return tr.getTRState(s);
       }
     }
 
@@ -752,7 +752,7 @@ public abstract class TRTraceProxy
         return new AbstractMap.SimpleEntry<>(aut, state);
       } else {
         final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
-        final StateProxy state = tr.getState(s);
+        final StateProxy state = tr.getTRState(s);
         return new AbstractMap.SimpleEntry<>(aut, state);
       }
     }

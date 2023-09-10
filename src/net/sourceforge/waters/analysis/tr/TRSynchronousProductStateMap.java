@@ -136,7 +136,7 @@ public class TRSynchronousProductStateMap
     final AutomatonProxy aut = mInputAutomata.get(autIndex);
     if (aut instanceof TRAutomatonProxy) {
       final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
-      return tr.getState(stateIndex);
+      return tr.getTRState(stateIndex);
     }
     if (mStateArrays == null) {
       mStateArrays = new StateProxy[mInputAutomata.size()][];

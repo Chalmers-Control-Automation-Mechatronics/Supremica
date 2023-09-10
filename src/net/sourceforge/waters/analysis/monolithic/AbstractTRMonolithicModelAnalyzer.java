@@ -732,7 +732,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     mStateSpace = null;
     mOutputEventEncoding = null;
     mDeadlockInfo = null;
-    mInputStateArrays = null;
     mDecodedSource = null;
     mEncodedSource = null;
     mDecodedTarget = null;
@@ -869,24 +868,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
    */
   protected StateProxy getInputState(final int autIndex, final int stateIndex)
   {
-    final AutomatonProxy aut = mInputAutomata[autIndex];
-    if (aut instanceof TRAutomatonProxy) {
-      final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
-      return tr.getState(stateIndex);
-    } else {
-      if (mInputStateArrays == null) {
-        final int numAutomata = mInputAutomata.length;
-        mInputStateArrays = new StateProxy[numAutomata][];
-      }
-      StateProxy[] array = mInputStateArrays[autIndex];
-      if (array == null) {
-        final Collection<StateProxy> states = aut.getStates();
-        final int numStates = states.size();
-        array = new StateProxy[numStates];
-        mInputStateArrays[autIndex] = states.toArray(array);
-      }
-      return array[stateIndex];
-    }
+    final TRAutomatonProxy tr = mTRAutomata[autIndex];
+    return tr.getOriginalState(stateIndex);
   }
 
 
@@ -952,7 +935,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
             nondeterministicIndices.add(a);
             break;
           } else {
-            final StateProxy state = aut.getState(s);
+            final StateProxy state = aut.getTRState(s);
             throw new NondeterministicDESException(aut, state);
           }
         }
@@ -961,7 +944,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         return 0;
       }
     }
-    storeInitialStates(nondeterministicIndices, 0);
+    storeInitialStates(trs, nondeterministicIndices, 0);
     return mNumberOfInitialStates = mStateSpace.size();
   }
 
@@ -1020,19 +1003,20 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
   }
 
-  private void storeInitialStates(final TIntArrayList nondeterministicIndices,
+  private void storeInitialStates(final TRAutomatonProxy[] trs,
+                                  final TIntArrayList nondeterministicIndices,
                                   final int index)
     throws OverflowException
   {
     if (index < nondeterministicIndices.size()) {
       final int a = nondeterministicIndices.get(index);
-      final TRAutomatonProxy aut = mTRAutomata[a];
+      final TRAutomatonProxy aut = trs[a];
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
         if (rel.isInitial(s)) {
           mDecodedTarget[a] = s;
-          storeInitialStates(nondeterministicIndices, index + 1);
+          storeInitialStates(trs, nondeterministicIndices, index + 1);
         }
       }
     } else {
@@ -2027,7 +2011,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
               if (nondeterminismSupported) {
                 mDeterministic = false;
               } else {
-                final StateProxy source = aut.getState(s);
+                final StateProxy source = aut.getTRState(s);
                 final int e = mTransitionIterator.getCurrentEvent();
                 final EventProxy event = aut.getEventEncoding().getProperEvent(e);
                 throw new NondeterministicDESException(aut, source, event);
@@ -2174,7 +2158,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       }
     }
 
-    public void putTargetInStateMap
+    private void putTargetInStateMap
       (final Map<AutomatonProxy,StateProxy> stateMap,
        final int source,
        final AbstractTRMonolithicModelAnalyzer analyzer)
@@ -2183,7 +2167,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         final int t = getFirstSuccessorState(source);
         if (t >= 0) {
           final AutomatonProxy aut = analyzer.getInputAutomaton(mAutomatonIndex);
-          final StateProxy target = analyzer.getInputState(mAutomatonIndex, t);
+          final TRAutomatonProxy tr = analyzer.getTRAutomaton(mAutomatonIndex);
+          final StateProxy target = tr.getOriginalState(t);
           stateMap.put(aut, target);
         }
       }
@@ -2307,7 +2292,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   private EventEncoding mOutputEventEncoding;
   private DeadlockInfo[] mDeadlockInfo;
   private int mNumberOfInitialStates;
-  private StateProxy[][] mInputStateArrays;
 
   // Temporary variables
   private int mCurrentSource;

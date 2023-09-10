@@ -97,7 +97,7 @@ class TRAbstractionStepInput
   {
     if (mEventEncoding == null) {
       final TRAutomatonProxy tr = (TRAutomatonProxy) mInputAutomaton;
-      return tr.getState(index);
+      return tr.getTRState(index);
     } else {
       return mStateEncoding.getState(index);
     }

@@ -439,7 +439,7 @@ public class ModularControllabilityChecker
             endOfTrace = true;
             continue;
           }
-          final StateProxy state = finder.getState(depth);
+          final StateProxy state = finder.getStateAt(depth);
           if (state != null) {
             if (newMap == null) {
               newMap = new HashMap<>(oldMap);

@@ -344,7 +344,7 @@ public class TRMonolithicCoobservabilityChecker
     final AutomatonProxy specAut = inputAutomata[a];
     final TRAutomatonProxy[] trs = getTRAutomata();
     final TRAutomatonProxy specTR = trs[a];
-    final StateProxy specState = specTR.getState(decodedTarget[c]);
+    final StateProxy specState = specTR.getTRState(decodedTarget[c]);
 
     // Final (failing) trace step
     CoobservabilityEventInfo eventInfo =
@@ -449,7 +449,7 @@ public class TRMonolithicCoobservabilityChecker
         final AutomatonProxy aut = getInputAutomaton(a);
         final int c = site.getComponentIndex(a);
         final int s = decoded[c];
-        final StateProxy state = tr.getState(s);
+        final StateProxy state = tr.getOriginalState(s);
         stateMap.put(aut, state);
       }
     }
@@ -852,7 +852,7 @@ public class TRMonolithicCoobservabilityChecker
       final EventProxy event = getEvent();
       final TRAutomatonProxy[] trs = getTRAutomata();
       final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(mNumAutomata);
-      for (final AutomatonEventInfo autInfo : mSiteDisablers.get(0)) {
+      for (final AutomatonEventInfo autInfo : mSiteDisablers.get(1)) {
         final int c0 = autInfo.getAutomatonIndex();
         final ComponentInfo compInfo = mComponentInfoList.get(c0);
         final int a = compInfo.getAutomatonIndex();
@@ -869,7 +869,7 @@ public class TRMonolithicCoobservabilityChecker
         } else if (iter.advance()) { // nondeterministic, so state info needed
           final AutomatonProxy aut = getInputAutomaton(a);
           final int t = decodedTarget[c];
-          final StateProxy state = tr.getState(t);
+          final StateProxy state = tr.getOriginalState(t);
           stateMap.put(aut, state);
         }
       }
@@ -878,20 +878,35 @@ public class TRMonolithicCoobservabilityChecker
     }
 
     private TraceStepProxy buildFinalTraceStep
-      (final int[] decoded,
+      (final int[] decodedSource,
        final SupervisorSite site)
     {
+      final EventProxy event = getEvent();
+      final TRAutomatonProxy[] trs = getTRAutomata();
       final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(mNumAutomata);
-      for (final AutomatonEventInfo autInfo : mSiteDisablers.get(0)) {
+      for (final AutomatonEventInfo autInfo : mSiteDisablers.get(1)) {
         final int c0 = autInfo.getAutomatonIndex();
         final ComponentInfo compInfo = mComponentInfoList.get(c0);
         final int a = compInfo.getAutomatonIndex();
         final int c = site.getComponentIndex(a);
-        autInfo.putTargetInStateMap(stateMap, decoded[c],
-                                    TRMonolithicCoobservabilityChecker.this);
+        final int s = decodedSource[c];
+        final TRAutomatonProxy tr = trs[a];
+        final EventEncoding enc = tr.getEventEncoding();
+        final int e = enc.getEventCode(event);
+        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+        final TransitionIterator iter =
+          rel.createSuccessorsReadOnlyIterator(s, e);
+        if (iter.advance()) {
+          final int t = iter.getCurrentTargetState();
+          if (iter.advance()) {
+            final AutomatonProxy aut = getInputAutomaton(a);
+            final StateProxy state = tr.getOriginalState(t);
+            stateMap.put(aut, state);
+
+          }
+        }
       }
       final ProductDESProxyFactory factory = getFactory();
-      final EventProxy event = getEvent();
       return factory.createTraceStepProxy(event, stateMap);
     }
 

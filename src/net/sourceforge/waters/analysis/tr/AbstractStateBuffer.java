@@ -64,85 +64,21 @@ public abstract class AbstractStateBuffer
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new state buffer with undefined dump state index.
+   */
   public AbstractStateBuffer()
   {
-
-  }
-
-  /**
-   * Creates a new state buffer. This constructor creates a new state buffer
-   * with the states in the given encoding. If the state encoding contains
-   * a <CODE>null</CODE> state, it is used as a reachable dump state,
-   * otherwise an additional unreachable dump state is added to the end of
-   * the state space.
-   * @param  stateEnc        State encoding that defines the assignment of
-   *                         state codes for the states in the buffer.
-   */
-  public AbstractStateBuffer(final StateEncoding stateEnc)
-  {
-    this(stateEnc, null);
+    mDumpStateIndex = -1;
   }
 
   /**
    * Creates a new state buffer.
-   * @param  stateEnc        State encoding that defines the assignment of
-   *                         state codes for the states in the buffer.
-   * @param  dumpState       Dump state to be used, or <CODE>null</CODE>.
-   *                         If the state encoding contains the indicated
-   *                         state, it is used as a reachable dump state,
-   *                         otherwise an additional unreachable dump state
-   *                         is added to the end of the state space.
+   * @param  dumpIndex       Dump state index to be assigned.
    */
-  public AbstractStateBuffer(final StateEncoding stateEnc,
-                             final StateProxy dumpState)
+  public AbstractStateBuffer(final int dumpIndex)
   {
-    final int numStates = stateEnc.getNumberOfStates();
-    mDumpStateIndex = -1;
-    for (int s = 0; s < numStates; s++) {
-      if (stateEnc.getState(s) == dumpState) {
-        mDumpStateIndex = s;
-        break;
-      }
-    }
-  }
-
-  /**
-   * Creates a new empty state buffer.
-   * This constructor allocates a new state buffer with the given number
-   * of states. States are initially marked as reachable, while all other
-   * attributes and markings of the states are initialised to be
-   * <CODE>false</CODE>. An additional unreachable dump state is added
-   * at the end.
-   * @param  size       The number of states in the new buffer.
-   * @param  propStatus Event status provider to determine the number of
-   *                    propositions and which propositions are used.
-   */
-  public AbstractStateBuffer(final int size,
-                             final EventStatusProvider propStatus)
-  {
-
-  }
-
-  /**
-   * Creates a new empty state buffer.
-   * This constructor allocates a new state buffer with the given number
-   * of states. States are initially marked as reachable, while all other
-   * attributes and markings of the states are initialised to be
-   * <CODE>false</CODE>.
-   * @param  size       The number of states in the new buffer.
-   * @param  dumpIndex  The index of the dump state in the new buffer.
-   *                    The dump state signifies a unmarked state without
-   *                    outgoing transitions. It must be specified for
-   *                    every state buffer to provide for algorithms that
-   *                    redirect transitions to such a state.
-   * @param  propStatus Event status provider to determine the number of
-   *                    propositions and which propositions are used.
-   */
-  public AbstractStateBuffer(final int size,
-                        final int dumpIndex,
-                        final EventStatusProvider propStatus)
-  {
-
+    mDumpStateIndex = dumpIndex;
   }
 
 

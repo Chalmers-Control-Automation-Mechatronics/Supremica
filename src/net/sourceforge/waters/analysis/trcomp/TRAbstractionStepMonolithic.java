@@ -129,18 +129,20 @@ class TRAbstractionStepMonolithic
     for (final TRAbstractionStep pred : preds) {
       analyzer.checkAbort();
       final String name = pred.getName();
-      final TRAutomatonProxy aut = traceAutomataMap.get(name);
-      final EventEncoding enc = aut.getEventEncoding();
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      final TRAutomatonProxy tr = traceAutomataMap.get(name);
+      final EventEncoding enc = tr.getEventEncoding();
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       final int[] states = new int[numSteps];
       int stepIndex = 0;
       int current = -1;
       for (final TraceStepProxy step : trace.getTraceSteps()) {
-        final StateProxy state = step.getStateMap().get(aut);
+        final StateProxy state = step.getStateMap().get(tr);
         if (state != null) {
-          current = aut.getStateIndex(state);
+          final TRAutomatonProxy.TRState trState =
+            (TRAutomatonProxy.TRState) state;
+          current = trState.getStateIndex();
         } else if (stepIndex == 0) {
           current = rel.getFirstInitialState();
           assert current >= 0 || counter instanceof SafetyCounterExampleProxy :

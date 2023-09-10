@@ -378,7 +378,7 @@ public class ModularNerodeEquivalenceChecker
       for (final AutomatonProxy aut : automata) {
         if (!oldAutomata.contains(aut)) {
           final TraceFinder finder = getTraceFinder(aut);
-          final StateProxy state = finder.getState(depth);
+          final StateProxy state = finder.getStateAt(depth);
           if (state != null) {
             if (newMap == null) {
               newMap = new HashMap<AutomatonProxy,StateProxy>(oldMap);

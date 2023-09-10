@@ -213,22 +213,28 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     checkConfig(config);
     mName = aut.getName();
     mKind = aut.getKind();
-    // Put events in eventEnc
-    final Set<EventProxy> events = new THashSet<>(aut.getEvents());
     if (stateEnc == null) {
       stateEnc = new StateEncoding(aut);
     }
+    int dumpIndex = -1;
+    if (dumpState != null) {
+      dumpIndex = stateEnc.getStateCode(dumpState);
+    }
+    if (dumpIndex < 0) {
+      dumpIndex = stateEnc.findUnusedCode();
+    }
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      mStateBuffer = new LongStateCountBuffer(stateEnc, dumpIndex);
+    } else {
+      mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpIndex);
+    }
+    mEventStatus = eventEnc;
+    final Set<EventProxy> events = new THashSet<>(aut.getEvents());
     // Copy transitions so transition list buffer constructors can sort ...
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list = new ArrayList<>(transitions);
-    final int numStates = stateEnc.getNumberOfStates() + 1;
-    final int numTrans = aut.getTransitions().size();
-    if ((config & CONFIG_COUNT_LONG) != 0) {
-      mStateBuffer = new LongStateCountBuffer(stateEnc, dumpState);
-    } else {
-      mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
-    }
-    mEventStatus = eventEnc;
+    final int numStates = mStateBuffer.getNumberOfStates();
+    final int numTrans = transitions.size();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numStates, mEventStatus, numTrans);
