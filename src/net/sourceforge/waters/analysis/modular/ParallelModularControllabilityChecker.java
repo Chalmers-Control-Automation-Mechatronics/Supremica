@@ -298,7 +298,7 @@ public class ParallelModularControllabilityChecker
                             final Collection<AutomatonProxy> changed)
     throws OverflowException
   {
-    final Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
+    final Collection<AutomatonProxy> changed2 = new ArrayList<>(changed);
     changed2.removeAll(run.mAdded);
     if (!changed2.isEmpty()) {
       if (run.mParent == null) {
@@ -317,7 +317,8 @@ public class ParallelModularControllabilityChecker
     for (final AutomatonProxy automaton : changed) {
       final KindTranslator translator = getKindTranslator();
       final TraceFinder finder = new TraceFinder(automaton, translator);
-      if (!finder.accepts(run.mCounter)) {
+      final TraceFinder.Result result = finder.examine(run.mCounter);
+      if (!result.isAccepted()) {
         return run;
       }
     }

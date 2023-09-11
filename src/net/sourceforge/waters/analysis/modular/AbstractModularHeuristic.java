@@ -93,6 +93,7 @@ abstract class AbstractModularHeuristic
     }
   }
 
+  @Override
   public TraceFinder getTraceFinder(final AutomatonProxy aut)
   {
     TraceFinder finder = mTraceFinders.get(aut);
@@ -156,7 +157,8 @@ abstract class AbstractModularHeuristic
                                 final TraceProxy trace)
   {
     final TraceFinder finder = getTraceFinder(aut);
-    return finder.computeNumberOfAcceptedSteps(trace);
+    final TraceFinder.Result result = finder.examine(trace);
+    return result.getTotalAcceptedSteps();
   }
 
   //#########################################################################

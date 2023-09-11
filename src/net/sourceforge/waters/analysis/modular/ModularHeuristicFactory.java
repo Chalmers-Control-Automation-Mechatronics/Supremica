@@ -115,6 +115,12 @@ public class ModularHeuristicFactory {
     RelMaxCommonEvents
   };
 
+  public enum CollectionMode {
+    FIRST,
+    BEST,
+    ALL
+  }
+
   public enum Preference {
     NOPREF,
     PREFER_PLANT,

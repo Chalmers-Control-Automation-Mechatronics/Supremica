@@ -321,7 +321,7 @@ public class ModularControllabilityChecker
       if (counter != null) {
         return false;
       } else {
-        logger.debug("All specifications have passed, model is not controllable.");
+        logger.debug("All specifications have passed, model is controllable.");
         return setSatisfiedResult();
       }
     } catch (final AnalysisException exception) {
@@ -380,7 +380,8 @@ public class ModularControllabilityChecker
     for (final AutomatonProxy aut : counter.getAutomata()) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
         final TraceFinder finder = heuristic.getTraceFinder(aut);
-        if (finder.isRejectingSpec(counter)) {
+        final TraceFinder.Result result = finder.examine(counter);
+        if (result.isRejectedBySpec()) {
           failedSpecs.add(aut);
         }
       }
@@ -433,13 +434,14 @@ public class ModularControllabilityChecker
       for (final AutomatonProxy aut : automata) {
         if (!oldAutomata.contains(aut)) {
           final TraceFinder finder = heuristic.getTraceFinder(aut);
+          final TraceFinder.Result result = finder.examine(counter);
           if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
-              depth > finder.computeNumberOfAcceptedSteps(trace)) {
+              depth > result.getTotalAcceptedSteps()) {
             // Found nonaccepting spec --- trace ends here.
             endOfTrace = true;
             continue;
           }
-          final StateProxy state = finder.getStateAt(depth);
+          final StateProxy state = result.getStateAt(0, depth);
           if (state != null) {
             if (newMap == null) {
               newMap = new HashMap<>(oldMap);
