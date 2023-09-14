@@ -33,70 +33,77 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.TraceFinder;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
+import net.sourceforge.waters.analysis.coobs.CoobservabilityDiagnostics;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 
 
 /**
- * <P>The modular controllability check algorithm,
+ * <P>The modular coobservability check algorithm,
  * implemented based on {@link AbstractModularVerifier}.</P>
  *
  * <P><I>Reference:</I><BR>
- * Bertil A. Brandin, Robi Malik, Petra Malik. Incremental verification
- * and synthesis of discrete-event systems guided by counter-examples.
- * IEEE Transactions on Control Systems Technology,
- * <STRONG>12</STRONG>&nbsp;(3), 387&ndash;401, 2004.</P>
+ * Huailiang Liu, Ryan Leduc, Robi Malik, S. Laurie Ricker.
+ * Incremental verification of co-observability in discrete-event systems.
+ * 2014 American Control Conference (ACC'14), 5446&ndash;5452, 2014.</P>
  *
- * @author Simon Ware, Robi Malik
+ * @author Robi Malik
  */
 
-public class ModularControllabilityChecker
-  extends AbstractModularSafetyVerifier
-  implements ControllabilityChecker
+public class ModularCoobservabilityChecker
+  extends AbstractModularVerifier
+  implements CoobservabilityChecker
 {
 
   //#########################################################################
   //# Constructors
-  public ModularControllabilityChecker(final ProductDESProxyFactory factory,
-                                       final SafetyVerifier mono)
+  public ModularCoobservabilityChecker(final ProductDESProxyFactory factory,
+                                       final CoobservabilityChecker mono)
   {
     this(null, factory, mono);
   }
 
-  public ModularControllabilityChecker(final ProductDESProxy model,
+  public ModularCoobservabilityChecker(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory,
-                                       final SafetyVerifier mono)
+                                       final CoobservabilityChecker mono)
   {
-    super(model,
-          factory,
-          ControllabilityKindTranslator.getInstance(),
-          mono);
+    super(model, factory, ControllabilityKindTranslator.getInstance(), mono);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.SafetyVerifier
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.des.CoobservabilityChecker
   @Override
-  public ControllabilityDiagnostics getDiagnostics()
+  public void setDefaultSiteName(final String name)
   {
-    return ControllabilityDiagnostics.getInstance();
+    mDefaultSiteName = "".equals(name) ? null : name;
+  }
+
+  @Override
+  public String getDefaultSiteName()
+  {
+    return mDefaultSiteName == null ? "" : mDefaultSiteName;
+  }
+
+  @Override
+  public CoobservabilityCounterExampleProxy getCounterExample()
+  {
+    return (CoobservabilityCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -106,9 +113,23 @@ public class ModularControllabilityChecker
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_CoobservabilityChecker_DefaultSite);
     db.append(options, ModularModelVerifierFactory.
-                       OPTION_ModularControllabilityChecker_Chain);
+                       OPTION_ModularCoobservabilityChecker_Chain);
     return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_CoobservabilityChecker_DefaultSite)) {
+      final String value = (String) option.getValue();
+      setDefaultSiteName(value);
+    } else {
+      super.setOption(option);
+    }
   }
 
 
@@ -116,43 +137,38 @@ public class ModularControllabilityChecker
   //# Overrides for
   //# net.sourceforge.waters.analysis.modular.AbstractModularVerifier
   @Override
-  protected HeuristicTraceChecker createHeuristicTraceChecker()
+  public CoobservabilityChecker getMonolithicVerifier()
   {
-    return new ControllabilityTraceChecker();
+    return (CoobservabilityChecker) super.getMonolithicVerifier();
+  }
+
+  @Override
+  public void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    final CoobservabilityChecker mono = getMonolithicVerifier();
+    mono.setDefaultSiteName(mDefaultSiteName);
+  }
+
+  @Override
+  protected CoobservabilityCounterExampleProxy createExtendedCounterexample
+    (final CounterExampleProxy counter,
+     final Collection<AutomatonProxy> newAutomata,
+     final List<TraceProxy> newTraces)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String name = CoobservabilityDiagnostics.getDefaultTraceName(des);
+    final String comment = counter.getComment();
+    return factory.createCoobservabilityCounterExampleProxy
+      (name, comment, null, des, newAutomata, newTraces);
   }
 
 
   //#########################################################################
-  //# Inner Class
-  private class ControllabilityTraceChecker implements HeuristicTraceChecker
-  {
-    //#######################################################################
-    //# Interface
-    //# net.sourceforge.waters.analysis.modular.HeuristicTraceChecker
-    @Override
-    public boolean accepts(final AutomatonProxy aut,
-                           final ComponentKind kind,
-                           final CounterExampleProxy counter,
-                           final TraceFinder.Result result)
-    {
-      if (result.isAccepted()) {
-        return true;
-      } else if (kind == ComponentKind.PLANT) {
-        return false;
-      } else {
-        final int pos = result.getTotalAcceptedSteps();
-        if (pos < 0) {
-          return false;
-        }
-        final SafetyCounterExampleProxy safety =
-          (SafetyCounterExampleProxy) counter;
-        final TraceProxy trace = safety.getTrace();
-        final List<EventProxy> events = trace.getEvents();
-        final EventProxy event = events.get(pos);
-        final KindTranslator translator = getKindTranslator();
-        return translator.getEventKind(event) == EventKind.UNCONTROLLABLE;
-      }
-    }
-  }
+  //# Data Members
+  private String mDefaultSiteName =
+    CoobservabilityAttributeFactory.DEFAULT_SITE_NAME;
 
 }

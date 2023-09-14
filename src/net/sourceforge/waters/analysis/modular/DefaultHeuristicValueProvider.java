@@ -31,99 +31,71 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
-import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-/**
- * A result record that can be returned by a modular analysis
- * algorithms.
- *
- * In addition to a standard verification result ({@link VerificationResult}),
- * the modular verification may contain a collection of specifications
- * found to be not controllable.
- *
- * @author Robi Malik
- */
-
-public class ModularVerificationResult
-  extends DefaultVerificationResult
+public class DefaultHeuristicValueProvider implements HeuristicValueProvider
 {
 
   //#########################################################################
-  //# Constructors
-  public ModularVerificationResult(final ModelVerifier verifier)
+  //# Constructor
+  public DefaultHeuristicValueProvider(final HeuristicFactory.Method method)
   {
-    super(verifier.getClass());
-    mFailedSpecs = null;
-  }
-
-  /**
-   * Creates a verification result representing an incomplete verification run.
-   */
-  public ModularVerificationResult(final Class<?> clazz)
-  {
-    super(clazz);
-    mFailedSpecs = null;
+    mMethod = method;
   }
 
 
   //#########################################################################
-  //# Simple Access Methods
-  public Collection<AutomatonProxy> getFailedSpecs()
-  {
-    return mFailedSpecs;
-  }
-
-  //#########################################################################
-  //# Providing Statistics
-  void addFailedSpecs(final Collection<? extends AutomatonProxy> failedSpecs)
-  {
-    if (mFailedSpecs == null) {
-      mFailedSpecs = new ArrayList<>(failedSpecs);
-    } else {
-      mFailedSpecs.addAll(failedSpecs);
-    }
-  }
-
-  void addFailedSpec(final AutomatonProxy spec)
-  {
-    if (mFailedSpecs == null) {
-      mFailedSpecs = new LinkedList<>();
-    }
-    mFailedSpecs.add(spec);
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
+  //# Interface net.sourceforge.waters.analysis.modular.HeuristicValueProvider
   @Override
-  public void merge(final AnalysisResult other)
+  public String getName()
   {
-    super.merge(other);
-    if (other instanceof ModularVerificationResult) {
-      final ModularVerificationResult modular =
-        (ModularVerificationResult) other;
-      if (mFailedSpecs == null) {
-        mFailedSpecs = new ArrayList<AutomatonProxy>(modular.mFailedSpecs);
-      } else if (modular.mFailedSpecs != null) {
-        mFailedSpecs.addAll(modular.mFailedSpecs);
-      }
-    }
+    return mMethod.name();
+  }
+
+  @Override
+  public HeuristicFactory.CollectionMode getCollectionMode()
+  {
+    return HeuristicFactory.CollectionMode.BEST;
+  }
+
+  @Override
+  public void setContext(final ProductDESProxy des,
+                         final KindTranslator translator,
+                         final CounterExampleProxy counter,
+                         final Collection<? extends AutomatonProxy> realPlants,
+                         final Collection<? extends AutomatonProxy> specPlants,
+                         final Collection<? extends AutomatonProxy> specs)
+  {
+  }
+
+  @Override
+  public float getHeuristicValue(final HeuristicEvaluator evaluator,
+                                 final AutomatonProxy aut)
+  {
+    return 0.0f;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return getName();
   }
 
 
   //#########################################################################
   //# Data Members
-  private Collection<AutomatonProxy> mFailedSpecs;
+  private final HeuristicFactory.Method mMethod;
 
 }

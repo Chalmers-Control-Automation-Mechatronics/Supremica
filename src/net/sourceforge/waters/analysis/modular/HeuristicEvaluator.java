@@ -44,18 +44,28 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A general-purpose implementation of the {@link ModularHeuristic}
- * interface. This class merely contains several useful methods to help
- * implementing the various heuristics. The actual heuristic procedure
- * is implemented in each subclass using the tools provided here.
+ * <P>A bridge to encapsulate various aspects of a component selection
+ * heuristic used by the {@link AbstractModularVerifier} and its
+ * subclasses.</P>
  *
- * @author Simon Ware
+ * <P>The heuristic evaluator combines the heuristic preference ({@link
+ * net.sourceforge.waters.analysis.modular.HeuristicFactory.Preference})
+ * and heuristic method ({@link
+ * net.sourceforge.waters.analysis.modular.HeuristicFactory.Method}) that
+ * defines the component selection strategy with a {@link
+ * HeuristicTraceChecker} that determines whether a component is deemed to
+ * accept a counterexample based on the property being checked.</P>
+ *
+ * @see HeuristicFactory
+ *
+ * @author Robi Malik, Simon Ware
  */
 
 class HeuristicEvaluator
@@ -65,7 +75,7 @@ class HeuristicEvaluator
   //#########################################################################
   //# Constructor
   HeuristicEvaluator(final KindTranslator translator,
-                     final ModularHeuristicFactory.Preference pref,
+                     final HeuristicFactory.Preference pref,
                      final HeuristicValueProvider heuristics,
                      final HeuristicTraceChecker checker)
   {
@@ -73,7 +83,7 @@ class HeuristicEvaluator
   }
 
   HeuristicEvaluator(final KindTranslator translator,
-                     final ModularHeuristicFactory.Preference pref,
+                     final HeuristicFactory.Preference pref,
                      final List<HeuristicValueProvider> heuristics,
                      final HeuristicTraceChecker checker)
   {
@@ -92,7 +102,7 @@ class HeuristicEvaluator
     return mKindTranslator;
   }
 
-  ModularHeuristicFactory.Preference getPreference()
+  HeuristicFactory.Preference getPreference()
   {
     return mPreference;
   }
@@ -101,6 +111,14 @@ class HeuristicEvaluator
   {
     final HeuristicValueProvider provider = mHeuristics.get(0);
     return provider.getName();
+  }
+
+  TraceFinder getTraceFinder(final AutomatonProxy aut,
+                             final ComponentKind kind)
+  {
+    final TraceFinder finder = getTraceFinder(aut);
+    finder.setComponentKind(kind);
+    return finder;
   }
 
   TraceFinder getTraceFinder(final AutomatonProxy aut)
@@ -120,10 +138,12 @@ class HeuristicEvaluator
   public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
   {
     for (final HeuristicValueProvider provider : mHeuristics) {
-      final int value1 = provider.getHeuristicValue(aut1);
-      final int value2 = provider.getHeuristicValue(aut2);
-      if (value1 != value2) {
-        return value1 - value2;
+      final float value1 = provider.getHeuristicValue(this, aut1);
+      final float value2 = provider.getHeuristicValue(this, aut2);
+      if (value1 < value2) {
+        return -1;
+      } else if (value1 > value2) {
+        return 1;
       }
     }
     final String name1 = aut1.getName();
@@ -134,12 +154,12 @@ class HeuristicEvaluator
 
   //#########################################################################
   //# Invocation
-  Collection<AutomatonProxy> collectNonAccepting
-    (final ProductDESProxy des,
-     final CounterExampleProxy counter,
-     final Collection<AutomatonProxy> realPlants,
-     final Collection<AutomatonProxy> specPlants,
-     final Collection<AutomatonProxy> specs)
+  <A extends AutomatonProxy>
+  Collection<A> collectNonAccepting(final ProductDESProxy des,
+                                    final CounterExampleProxy counter,
+                                    final Collection<A> realPlants,
+                                    final Collection<A> specPlants,
+                                    final Collection<A> specs)
   {
     final HeuristicValueProvider provider = mHeuristics.get(0);
     switch (provider.getCollectionMode()) {
@@ -155,14 +175,13 @@ class HeuristicEvaluator
     }
   }
 
-  Collection<AutomatonProxy> collectFirstNonAccepting
-    (final CounterExampleProxy counter,
-     final Collection<AutomatonProxy> realPlants,
-     final Collection<AutomatonProxy> specPlants,
-     final Collection<AutomatonProxy> specs)
+  <A extends AutomatonProxy>
+  Collection<A> collectFirstNonAccepting(final CounterExampleProxy counter,
+                                         final Collection<A> realPlants,
+                                         final Collection<A> specPlants,
+                                         final Collection<A> specs)
   {
-    final AutomatonProxy aut =
-      findFirstNonAccepting(counter, realPlants, specPlants, specs);
+    final A aut = findFirstNonAccepting(counter, realPlants, specPlants, specs);
     if (aut == null) {
       return Collections.emptyList();
     } else {
@@ -170,14 +189,13 @@ class HeuristicEvaluator
     }
   }
 
-  private AutomatonProxy findFirstNonAccepting
-    (final CounterExampleProxy counter,
-     final Collection<AutomatonProxy> realPlants,
-     final Collection<AutomatonProxy> specPlants,
-     final Collection<AutomatonProxy> specs)
+  <A extends AutomatonProxy>
+  A findFirstNonAccepting(final CounterExampleProxy counter,
+                          final Collection<A> realPlants,
+                          final Collection<A> specPlants,
+                          final Collection<A> specs)
   {
-    AutomatonProxy aut =
-      findFirstNonAccepting(counter, realPlants, ComponentKind.PLANT);
+    A aut = findFirstNonAccepting(counter, realPlants, ComponentKind.PLANT);
     if (aut == null) {
       aut = findFirstNonAccepting(counter, specPlants, ComponentKind.PLANT);
     }
@@ -187,18 +205,18 @@ class HeuristicEvaluator
     return aut;
   }
 
-  Collection<AutomatonProxy> collectBestNonAccepting
-    (final ProductDESProxy des,
-     final CounterExampleProxy counter,
-     final Collection<AutomatonProxy> realPlants,
-     final Collection<AutomatonProxy> specPlants,
-     final Collection<AutomatonProxy> specs)
+  <A extends AutomatonProxy>
+  Collection<A> collectBestNonAccepting(final ProductDESProxy des,
+                                        final CounterExampleProxy counter,
+                                        final Collection<A> realPlants,
+                                        final Collection<A> specPlants,
+                                        final Collection<A> specs)
   {
     for (final HeuristicValueProvider provider : mHeuristics) {
-      provider.setContext(des, counter, realPlants, specPlants, specs);
+      provider.setContext(des, mKindTranslator, counter,
+                          realPlants, specPlants, specs);
     }
-    final AutomatonProxy best =
-      findBestNonAccepting(counter, realPlants, specs, specs);
+    final A best = findBestNonAccepting(counter, realPlants, specPlants, specs);
     if (best == null) {
       return Collections.emptyList();
     } else {
@@ -206,12 +224,13 @@ class HeuristicEvaluator
     }
   }
 
-  AutomatonProxy findBestNonAccepting(final CounterExampleProxy counter,
-                                     final Collection<AutomatonProxy> realPlants,
-                                     final Collection<AutomatonProxy> specPlants,
-                                     final Collection<AutomatonProxy> specs)
+  <A extends AutomatonProxy>
+  A findBestNonAccepting(final CounterExampleProxy counter,
+                         final Collection<A> realPlants,
+                         final Collection<A> specPlants,
+                         final Collection<A> specs)
   {
-    AutomatonProxy best = null;
+    A best = null;
     switch (mPreference) {
     case NOPREF:
       best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
@@ -221,16 +240,16 @@ class HeuristicEvaluator
     case PREFER_PLANT:
       best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
       best = findBestNonAccepting(counter, specPlants, ComponentKind.PLANT, best);
-      if (best != null) {
+      if (best == null) {
         best = findBestNonAccepting(counter, specs, ComponentKind.PLANT, best);
       }
       break;
     case PREFER_REAL_PLANT:
       best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
-      if (best != null) {
+      if (best == null) {
         best = findBestNonAccepting(counter, specPlants, ComponentKind.PLANT, best);
       }
-      if (best != null) {
+      if (best == null) {
         best = findBestNonAccepting(counter, specs, ComponentKind.PLANT, best);
       }
       break;
@@ -238,13 +257,13 @@ class HeuristicEvaluator
     return best;
   }
 
-  Collection<AutomatonProxy> collectAllNonAccepting
-    (final CounterExampleProxy counter,
-     final Collection<AutomatonProxy> realPlants,
-     final Collection<AutomatonProxy> specPlants,
-     final Collection<AutomatonProxy> specs)
+  <A extends AutomatonProxy>
+  Collection<A> collectAllNonAccepting(final CounterExampleProxy counter,
+                                       final Collection<A> realPlants,
+                                       final Collection<A> specPlants,
+                                       final Collection<A> specs)
   {
-    final Collection<AutomatonProxy> output = new LinkedList<>();
+    final Collection<A> output = new LinkedList<>();
     switch (mPreference) {
     case NOPREF:
       collectAllNonAccepting(counter, realPlants, output, ComponentKind.PLANT);
@@ -274,11 +293,12 @@ class HeuristicEvaluator
 
   //#########################################################################
   //# Auxiliary Methods
-  private AutomatonProxy findFirstNonAccepting(final CounterExampleProxy counter,
-                                               final Collection<AutomatonProxy> input,
-                                               final ComponentKind kind)
+  private <A extends AutomatonProxy>
+  A findFirstNonAccepting(final CounterExampleProxy counter,
+                          final Collection<A> input,
+                          final ComponentKind kind)
   {
-    for (final AutomatonProxy aut : input) {
+    for (final A aut : input) {
       if (!accepts(aut, kind, counter)) {
         return aut;
       }
@@ -286,19 +306,21 @@ class HeuristicEvaluator
     return null;
   }
 
-  private AutomatonProxy findBestNonAccepting(final CounterExampleProxy counter,
-                                              final Collection<AutomatonProxy> input,
-                                              final ComponentKind kind)
+  private <A extends AutomatonProxy>
+  A findBestNonAccepting(final CounterExampleProxy counter,
+                         final Collection<A> input,
+                         final ComponentKind kind)
   {
     return findBestNonAccepting(counter, input, kind, null);
   }
 
-  private AutomatonProxy findBestNonAccepting(final CounterExampleProxy counter,
-                                              final Collection<AutomatonProxy> input,
-                                              final ComponentKind kind,
-                                              AutomatonProxy best)
+  private <A extends AutomatonProxy>
+  A findBestNonAccepting(final CounterExampleProxy counter,
+                         final Collection<A> input,
+                         final ComponentKind kind,
+                         A best)
   {
-    for (final AutomatonProxy aut : input) {
+    for (final A aut : input) {
       if (!accepts(aut, kind, counter)) {
         if (best == null || compare(aut, best) < 0) {
           best = aut;
@@ -308,12 +330,13 @@ class HeuristicEvaluator
     return best;
   }
 
-  private void collectAllNonAccepting(final CounterExampleProxy counter,
-                                      final Collection<AutomatonProxy> input,
-                                      final Collection<AutomatonProxy> output,
-                                      final ComponentKind kind)
+  private <A extends AutomatonProxy>
+  void collectAllNonAccepting(final CounterExampleProxy counter,
+                              final Collection<A> input,
+                              final Collection<A> output,
+                              final ComponentKind kind)
   {
-    for (final AutomatonProxy aut : input) {
+    for (final A aut : input) {
       if (!accepts(aut, kind, counter)) {
         output.add(aut);
       }
@@ -324,7 +347,7 @@ class HeuristicEvaluator
                           final ComponentKind kind,
                           final CounterExampleProxy counter)
   {
-    final TraceFinder finder = getTraceFinder(aut);
+    final TraceFinder finder = getTraceFinder(aut, kind);
     finder.setComponentKind(kind);
     final TraceFinder.Result result = finder.examine(counter);
     return mTraceChecker.accepts(aut, kind, counter, result);
@@ -336,91 +359,16 @@ class HeuristicEvaluator
   @Override
   public String toString()
   {
-    return getName();
+    return ProxyTools.getShortClassName(this) + " " + getName();
   }
 
 
   //#########################################################################
   //# Data Members
   private final KindTranslator mKindTranslator;
-  private final ModularHeuristicFactory.Preference mPreference;
+  private final HeuristicFactory.Preference mPreference;
   private final List<HeuristicValueProvider> mHeuristics;
   private final HeuristicTraceChecker mTraceChecker;
   private final Map<AutomatonProxy,TraceFinder> mTraceFinders;
-
-
-  //#########################################################################
-  //# To be moved
-  public interface HeuristicValueProvider
-  {
-    public String getName();
-    public ModularHeuristicFactory.CollectionMode getCollectionMode();
-    public void setContext(ProductDESProxy des,
-                           CounterExampleProxy counter,
-                           Collection<AutomatonProxy> realPlants,
-                           Collection<AutomatonProxy> specPlants,
-                           Collection<AutomatonProxy> specs);
-    public int getHeuristicValue(AutomatonProxy aut);
-  }
-
-  public class DefaultHeuristicValueProvider implements HeuristicValueProvider
-  {
-    @Override
-    public String getName()
-    {
-      final String fullname = getClass().getName();
-      final int dotpos = fullname.lastIndexOf('.');
-      final int start = dotpos + 1;
-      if (fullname.endsWith(HEURISTIC_SUFFIX)) {
-        final int end = fullname.length() - HEURISTIC_SUFFIX.length();
-        return fullname.substring(start, end);
-      } else {
-        return fullname.substring(start);
-      }
-    }
-
-    @Override
-    public ModularHeuristicFactory.CollectionMode getCollectionMode()
-    {
-      return ModularHeuristicFactory.CollectionMode.BEST;
-    }
-
-    @Override
-    public void setContext(final ProductDESProxy des,
-                           final CounterExampleProxy counter,
-                           final Collection<AutomatonProxy> realPlants,
-                           final Collection<AutomatonProxy> specPlants,
-                           final Collection<AutomatonProxy> specs)
-    {
-    }
-
-    @Override
-    public int getHeuristicValue(final AutomatonProxy aut)
-    {
-      return 0;
-    }
-  }
-
-  static final String HEURISTIC_SUFFIX = "Heuristic";
-
-  public interface HeuristicTraceChecker
-  {
-    public boolean accepts(AutomatonProxy aut,
-                           ComponentKind kind,
-                           CounterExampleProxy counter,
-                           TraceFinder.Result result);
-  }
-
-  public class DefaultHeuristicTraceChecker implements HeuristicTraceChecker
-  {
-    @Override
-    public boolean accepts(final AutomatonProxy aut,
-                           final ComponentKind kind,
-                           final CounterExampleProxy counter,
-                           final TraceFinder.Result result)
-    {
-      return result.isAccepted();
-    }
-  }
 
 }

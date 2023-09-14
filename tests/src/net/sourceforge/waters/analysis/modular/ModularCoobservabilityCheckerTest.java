@@ -31,88 +31,50 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.coobs;
+package net.sourceforge.waters.analysis.modular;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.monolithic.TRMonolithicCoobservabilityChecker;
+import net.sourceforge.waters.model.analysis.AbstractCoobservabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * <P>A record about a supervisor site for the purpose of verifying
- * coobservability.</P>
- *
- * <P>A supervisor site represents a set of events that can be
- * controlled and/or observed by a particular supervisor. This class
- * only contains the site name as defined through the event attributes
- * and some index details needed by the algorithm in class
- * {@link TRMonolithicCoobservabilityChecker}.</P>
+ * A test class for the {@link ModularCoobservabilityChecker}.
  *
  * @author Robi Malik
- * @see CoobservabilityChecker
  */
 
-public class SupervisorSite implements Comparable<SupervisorSite>
+public class ModularCoobservabilityCheckerTest
+  extends AbstractCoobservabilityCheckerTest
 {
-  //#########################################################################
-  //# Constructor
-  public SupervisorSite(final String name,
-                        final boolean reference,
-                        final int index,
-                        final int numAutomata)
-  {
-    mName = name;
-    mReference = reference;
-    mIndex = index;
-    mComponentIndices = new int[numAutomata];
-  }
-
 
   //#########################################################################
-  //# Simple Access
-  public String getName()
-  {
-    return mName;
+  //# Entry points in junit.framework.TestCase
+  public static Test suite() {
+    final TestSuite testSuite =
+      new TestSuite(ModularCoobservabilityCheckerTest.class);
+    return testSuite;
   }
 
-  public boolean isReferenceSite()
+  public static void main(final String[] args)
   {
-    return mReference;
-  }
-
-  public int getComponentIndex(final int autIndex)
-  {
-    return mComponentIndices[autIndex];
-  }
-
-  public void setComponentIndex(final int autIndex, final int compIndex)
-  {
-    mComponentIndices[autIndex] = compIndex;
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Interface java.util.Comparable<SupervisorSite>
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  public int compareTo(final SupervisorSite site)
+  protected CoobservabilityChecker
+    createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return mIndex - site.mIndex;
+    final CoobservabilityChecker mono = new TRMonolithicCoobservabilityChecker();
+    return new ModularCoobservabilityChecker(factory, mono);
   }
-
-
-  //#########################################################################
-  //# Debugging
-  @Override
-  public String toString()
-  {
-    return mName;
-  }
-
-
-  //#########################################################################
-  //# Instance Variables
-  private final String mName;
-  private final boolean mReference;
-  private final int mIndex;
-  private final int[] mComponentIndices;
 
 }

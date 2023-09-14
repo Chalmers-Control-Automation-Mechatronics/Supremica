@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.analysis.coobs.TRMonolithicCoobservabilityChecker;
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;

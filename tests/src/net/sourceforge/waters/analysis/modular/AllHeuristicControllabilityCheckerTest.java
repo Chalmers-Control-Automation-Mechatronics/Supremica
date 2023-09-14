@@ -31,88 +31,46 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.coobs;
+package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.monolithic.TRMonolithicCoobservabilityChecker;
-import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
- * <P>A record about a supervisor site for the purpose of verifying
- * coobservability.</P>
+ * A test for the {@link ModularControllabilityChecker} with the
+ * 'All' heuristic that adds all automata not accepting a counterexample
+ * to the next subsystem.
  *
- * <P>A supervisor site represents a set of events that can be
- * controlled and/or observed by a particular supervisor. This class
- * only contains the site name as defined through the event attributes
- * and some index details needed by the algorithm in class
- * {@link TRMonolithicCoobservabilityChecker}.</P>
- *
- * @author Robi Malik
- * @see CoobservabilityChecker
+ * @author Simon Ware, Robi Malik
  */
 
-public class SupervisorSite implements Comparable<SupervisorSite>
+public class AllHeuristicControllabilityCheckerTest
+  extends AbstractModularControllabilityCheckerTest
 {
-  //#########################################################################
-  //# Constructor
-  public SupervisorSite(final String name,
-                        final boolean reference,
-                        final int index,
-                        final int numAutomata)
-  {
-    mName = name;
-    mReference = reference;
-    mIndex = index;
-    mComponentIndices = new int[numAutomata];
-  }
-
 
   //#########################################################################
-  //# Simple Access
-  public String getName()
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
-    return mName;
+    final TestSuite testSuite =
+      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+    return testSuite;
   }
 
-  public boolean isReferenceSite()
+  public static void main(final String[] args)
   {
-    return mReference;
-  }
-
-  public int getComponentIndex(final int autIndex)
-  {
-    return mComponentIndices[autIndex];
-  }
-
-  public void setComponentIndex(final int autIndex, final int compIndex)
-  {
-    mComponentIndices[autIndex] = compIndex;
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Interface java.util.Comparable<SupervisorSite>
+  //# Overrides for
+  //# net.sourceforge.analysis.modular.AbstractModularControllabilityCheckerTest
   @Override
-  public int compareTo(final SupervisorSite site)
+  protected HeuristicFactory.Method getHeuristicMethod()
   {
-    return mIndex - site.mIndex;
+    return HeuristicFactory.Method.All;
   }
-
-
-  //#########################################################################
-  //# Debugging
-  @Override
-  public String toString()
-  {
-    return mName;
-  }
-
-
-  //#########################################################################
-  //# Instance Variables
-  private final String mName;
-  private final boolean mReference;
-  private final int mIndex;
-  private final int[] mComponentIndices;
 
 }

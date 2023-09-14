@@ -454,6 +454,18 @@ public class TRAutomatonProxy
     }
   }
 
+  public StateProxy getOriginalState(final StateProxy state)
+  {
+    if (state instanceof TRState) {
+      final TRState trState = (TRState) state;
+      if (trState.belongsTo(this)) {
+        final int code = trState.getStateIndex();
+        return getOriginalState(code);
+      }
+    }
+    return state;
+  }
+
   /**
    * Gets the state associated with the given state number.
    * @param  code  Number of state to be looked up.
@@ -679,6 +691,13 @@ public class TRAutomatonProxy
     public int getStateIndex()
     {
       return mIndex;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean belongsTo(final TRAutomatonProxy tr)
+    {
+      return TRAutomatonProxy.this == tr;
     }
 
     //#######################################################################

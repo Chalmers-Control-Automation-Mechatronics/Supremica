@@ -46,11 +46,11 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ConflictKind;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
-import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -119,6 +119,16 @@ public class ProductDESProxyPrinter
   }
 
   @Override
+  public Object visitCoobservabilityCounterExampleProxy
+    (final CoobservabilityCounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("COOBSERVABILITY COUNTEREXAMPLE ");
+    print(counter.getName());
+    return printCounterExample(counter);
+  }
+
+  @Override
   public Object visitCounterExampleProxy(final CounterExampleProxy counter)
     throws VisitorException
   {
@@ -163,16 +173,6 @@ public class ProductDESProxyPrinter
     printCounterExampleHeader(counter);
     final TraceProxy trace = counter.getTrace();
     return printTraceProxy(trace, 0);
-  }
-
-  @Override
-  public Object visitCoobservabilityCounterExampleProxy
-    (final CoobservabilityCounterExampleProxy counter)
-    throws VisitorException
-  {
-    print("MULTIPLE COUNTEREXAMPLE ");
-    print(counter.getName());
-    return printCounterExample(counter);
   }
 
   @Override

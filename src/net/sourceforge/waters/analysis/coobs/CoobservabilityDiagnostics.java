@@ -66,8 +66,7 @@ public class CoobservabilityDiagnostics
   @Override
   public String getTraceName(final ProductDESProxy des)
   {
-    final String desname = des.getName();
-    return desname + "-noncoobs";
+    return getDefaultTraceName(des);
   }
 
   @Override
@@ -102,6 +101,15 @@ public class CoobservabilityDiagnostics
       break;
     }
     return buffer.toString();
+  }
+
+
+  //#########################################################################
+  //# Static Access
+  public static String getDefaultTraceName(final ProductDESProxy des)
+  {
+    final String desname = des.getName();
+    return desname + "-noncoobs";
   }
 
 

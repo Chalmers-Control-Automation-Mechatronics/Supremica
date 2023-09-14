@@ -128,9 +128,10 @@ public class ChainedAnalyzerOptionPage
         operation.createModelAnalyzer(factory, desFactory);
       final List<Option<?>> analyzerOptions = analyzer.getOptions(this);
       options.addAll(analyzerOptions);
-    } catch (AnalysisConfigurationException |
-             ClassNotFoundException exception) {
+    } catch (final ClassNotFoundException exception) {
       throw new WatersRuntimeException(exception);
+    } catch (final AnalysisConfigurationException exception) {
+      // can't construct analyser - then no options
     }
   }
 

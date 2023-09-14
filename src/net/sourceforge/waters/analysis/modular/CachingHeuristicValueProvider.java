@@ -31,85 +31,79 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
+import gnu.trove.map.TObjectFloatMap;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
+import java.util.Collection;
+
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 
 
-/**
- * <P>The modular language inclusion check algorithm.,
- * implemented based on {@link AbstractModularVerifier}</P>
- *
- * <P><I>Reference:</I><BR>
- * Bertil A. Brandin, Robi Malik, Petra Malik. Incremental verification
- * and synthesis of discrete-event systems guided by counter-examples.
- * IEEE Transactions on Control Systems Technology,
- * <STRONG>12</STRONG>&nbsp;(3), 387&ndash;401, 2004.</P>
- *
- * @author Simon Ware, Robi Malik
- */
-
-public class ModularLanguageInclusionChecker
-  extends AbstractModularSafetyVerifier
-  implements LanguageInclusionChecker
+public abstract class CachingHeuristicValueProvider
+  extends DefaultHeuristicValueProvider
 {
 
   //#########################################################################
   //# Constructor
-  public ModularLanguageInclusionChecker(final ProductDESProxyFactory factory,
-                                         final SafetyVerifier mono)
+  public CachingHeuristicValueProvider(final HeuristicFactory.Method method)
   {
-    this(null, factory, mono);
+    this(method, true);
   }
 
-  public ModularLanguageInclusionChecker(final ProductDESProxy model,
-                                         final ProductDESProxyFactory factory,
-                                         final SafetyVerifier mono)
+  public CachingHeuristicValueProvider(final HeuristicFactory.Method method,
+                                       final boolean resetting)
   {
-    super(model,
-          factory,
-          LanguageInclusionKindTranslator.getInstance(),
-          mono);
+    super(method);
+    mCache = new TObjectFloatHashMap<>(30, 0.5f, Float.NEGATIVE_INFINITY);
+    mResetting = resetting;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyser
+  //# Interface net.sourceforge.waters.analysis.modular.HeuristicValueProvider
   @Override
-  public List<Option<?>> getOptions(final LeafOptionPage db)
+  public void setContext(final ProductDESProxy des,
+                         final KindTranslator translator,
+                         final CounterExampleProxy counter,
+                         final Collection<? extends AutomatonProxy> realPlants,
+                         final Collection<? extends AutomatonProxy> specPlants,
+                         final Collection<? extends AutomatonProxy> specs)
   {
-    final List<Option<?>> options = super.getOptions(db);
-    db.append(options, ModularModelVerifierFactory.
-                       OPTION_ModularLanguageInclusionChecker_Chain);
-    return options;
+    if (mResetting) {
+      mCache.clear();
+    }
+  }
+
+  @Override
+  public float getHeuristicValue(final HeuristicEvaluator evaluator,
+                                 final AutomatonProxy aut)
+  {
+    final float cached = mCache.get(aut);
+    if (cached != Float.NEGATIVE_INFINITY) {
+      return cached;
+    } else {
+      final float computed = computeHeuristicValue(evaluator, aut);
+      mCache.put(aut, computed);
+      return computed;
+    }
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.SafetyVerifier
-  @Override
-  public LanguageInclusionDiagnostics getDiagnostics()
-  {
-    return LanguageInclusionDiagnostics.getInstance();
-  }
+  //# Hooks
+  protected abstract float computeHeuristicValue(final HeuristicEvaluator evaluator,
+                                                 final AutomatonProxy aut);
 
 
   //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.analysis.modular.AbstractModularVerifier
-  @Override
-  protected boolean isMultiSpecsEnabled()
-  {
-    return false;
-  }
+  //# Data Members
+  private final TObjectFloatMap<AutomatonProxy> mCache;
+  private final boolean mResetting;
 
 }

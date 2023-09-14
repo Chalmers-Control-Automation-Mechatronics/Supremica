@@ -31,85 +31,64 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.List;
+import java.util.Collection;
 
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.analysis.abstraction.TraceFinder;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 
 
-/**
- * <P>The modular language inclusion check algorithm.,
- * implemented based on {@link AbstractModularVerifier}</P>
- *
- * <P><I>Reference:</I><BR>
- * Bertil A. Brandin, Robi Malik, Petra Malik. Incremental verification
- * and synthesis of discrete-event systems guided by counter-examples.
- * IEEE Transactions on Control Systems Technology,
- * <STRONG>12</STRONG>&nbsp;(3), 387&ndash;401, 2004.</P>
- *
- * @author Simon Ware, Robi Malik
- */
-
-public class ModularLanguageInclusionChecker
-  extends AbstractModularSafetyVerifier
-  implements LanguageInclusionChecker
+public abstract class CounterExampleHeuristicValueProvider
+  extends CachingHeuristicValueProvider
 {
-
   //#########################################################################
   //# Constructor
-  public ModularLanguageInclusionChecker(final ProductDESProxyFactory factory,
-                                         final SafetyVerifier mono)
+  public CounterExampleHeuristicValueProvider(final HeuristicFactory.Method method)
   {
-    this(null, factory, mono);
-  }
-
-  public ModularLanguageInclusionChecker(final ProductDESProxy model,
-                                         final ProductDESProxyFactory factory,
-                                         final SafetyVerifier mono)
-  {
-    super(model,
-          factory,
-          LanguageInclusionKindTranslator.getInstance(),
-          mono);
+    super(method);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyser
+  //# Interface net.sourceforge.waters.analysis.modular.HeuristicValueProvider
   @Override
-  public List<Option<?>> getOptions(final LeafOptionPage db)
+  public void setContext(final ProductDESProxy des,
+                         final KindTranslator translator,
+                         final CounterExampleProxy counter,
+                         final Collection<? extends AutomatonProxy> realPlants,
+                         final Collection<? extends AutomatonProxy> specPlants,
+                         final Collection<? extends AutomatonProxy> specs)
   {
-    final List<Option<?>> options = super.getOptions(db);
-    db.append(options, ModularModelVerifierFactory.
-                       OPTION_ModularLanguageInclusionChecker_Chain);
-    return options;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.SafetyVerifier
-  @Override
-  public LanguageInclusionDiagnostics getDiagnostics()
-  {
-    return LanguageInclusionDiagnostics.getInstance();
+    super.setContext(des, translator, counter, realPlants, specPlants, specs);
+    mCounterExample = counter;
   }
 
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.modular.AbstractModularVerifier
+  //# net.sourceforge.waters.analysis.modular.CachingHeuristicValueProvider
   @Override
-  protected boolean isMultiSpecsEnabled()
+  protected float computeHeuristicValue(final HeuristicEvaluator evaluator,
+                                        final AutomatonProxy aut)
   {
-    return false;
+    final TraceFinder finder = evaluator.getTraceFinder(aut);
+    final TraceFinder.Result result = finder.examine(mCounterExample);
+    return computeHeuristicValue(result);
   }
+
+
+  //#########################################################################
+  //# Hooks
+  protected abstract int computeHeuristicValue(TraceFinder.Result result);
+
+
+  //#########################################################################
+  //# Data Members
+  private CounterExampleProxy mCounterExample;
 
 }

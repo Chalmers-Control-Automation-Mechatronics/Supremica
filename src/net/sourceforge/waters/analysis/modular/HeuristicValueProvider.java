@@ -31,75 +31,31 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.Collection;
-import java.util.List;
 
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
-/**
- * <P>A common superclass for the modular controllability ({@link
- * ModularControllabilityChecker}) and language inclusion ({@link
- * ModularLanguageInclusionChecker}) checkers.</P>
- *
- * <P>Based on {@link AbstractModularVerifier}, this class only adds the
- * the details needed to handle safety counterexamples ({@link
- * SafetyCounterExampleProxy}).</P>
- *
- * @author Simon Ware, Robi Malik
- */
-
-abstract class AbstractModularSafetyVerifier
-  extends AbstractModularVerifier
-  implements SafetyVerifier
+public interface HeuristicValueProvider
 {
+  public String getName();
 
-  //#########################################################################
-  //# Constructors
-  public AbstractModularSafetyVerifier(final ProductDESProxy model,
-                                       final ProductDESProxyFactory factory,
-                                       final KindTranslator translator,
-                                       final SafetyVerifier mono)
-  {
-    super(model, factory, translator, mono);
-  }
+  public HeuristicFactory.CollectionMode getCollectionMode();
 
+  public void setContext(ProductDESProxy des,
+                         KindTranslator translator,
+                         CounterExampleProxy counter,
+                         Collection<? extends AutomatonProxy> realPlants,
+                         Collection<? extends AutomatonProxy> specPlants,
+                         Collection<? extends AutomatonProxy> specs);
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.SafetyVerifier
-  @Override
-  public SafetyCounterExampleProxy getCounterExample()
-  {
-    return (SafetyCounterExampleProxy) super.getCounterExample();
-  }
-
-
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.analysis.modular.AbstractModularVerifier
-  @Override
-  protected SafetyCounterExampleProxy createExtendedCounterexample
-    (final CounterExampleProxy counter,
-     final Collection<AutomatonProxy> newAutomata,
-     final List<TraceProxy> newTraces)
-  {
-    assert newTraces.size() == 1;
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String name = getDiagnostics().getTraceName(des);
-    final String comment = counter.getComment();
-    final TraceProxy trace = newTraces.get(0);
-    return factory.createSafetyCounterExampleProxy(name, comment, null, des,
-                                                   newAutomata, trace);
-  }
+  public float getHeuristicValue(HeuristicEvaluator evaluator,
+                                 AutomatonProxy aut);
 
 }

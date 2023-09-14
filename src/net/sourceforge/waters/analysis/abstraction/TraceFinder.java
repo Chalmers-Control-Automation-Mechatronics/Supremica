@@ -54,7 +54,6 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -139,8 +138,11 @@ public class TraceFinder
    */
   public Result examine(final CounterExampleProxy counter)
   {
-    if (mLastInput != counter) {
-      final List<TraceProxy> traces = counter.getTraces();
+    final List<TraceProxy> traces = counter.getTraces();
+    if (traces.size() == 1) {
+      final TraceProxy trace = traces.get(0);
+      examine(trace);
+    } else if (mLastInput != counter) {
       final int numPaths = mDeterministic ? 0 : traces.size();
       final Result result = new Result(numPaths);
       int index = 0;
@@ -154,16 +156,6 @@ public class TraceFinder
       mLastResult = result;
     }
     return mLastResult;
-  }
-
-  /**
-   * Checks whether the automaton accepts the traces of the given safety
-   * counterexample.
-   */
-  public Result examine(final SafetyCounterExampleProxy counter)
-  {
-    final TraceProxy trace = counter.getTrace();
-    return examine(trace);
   }
 
   /**
@@ -204,12 +196,9 @@ public class TraceFinder
         depth++;
       }
       final int numSteps = events.size();
-      if (spec) {
-        return new Result(depth, depth >= numSteps - 1,
-                             depth == numSteps - 1);
-      } else {
-        return new Result(depth, depth == numSteps, false);
-      }
+      final boolean accepted = (depth == numSteps);
+      final boolean finalStepSpecFailure = mSpec && (depth == numSteps - 1);
+      return new Result(depth, accepted, finalStepSpecFailure);
     } else {
       // Nondeterministic automaton ...
       final EventEncoding eventEnc = mTRAutomaton.getEventEncoding();
@@ -223,6 +212,7 @@ public class TraceFinder
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       final int numSteps = events.size();
       int depth = 0;
+      boolean finalStepSpecFailure = false;
       outer:
       for (final EventProxy event : events) {
         final int eventID = eventEnc.getEventCode(event);
@@ -239,7 +229,8 @@ public class TraceFinder
                 nextLevel.add(next);
               }
             }
-            if (!gotSuccessor && depth == numSteps - 1) {
+            if (!gotSuccessor && mSpec && depth == numSteps - 1) {
+              finalStepSpecFailure = true;
               break outer;
             }
           }
@@ -276,12 +267,8 @@ public class TraceFinder
       if (mInitialStates.size() > 1) {
         path[0] = mTRAutomaton.getOriginalState(nextStateID);
       }
-      if (spec) {
-        return new Result(depth, depth >= numSteps - 1,
-                             depth == numSteps - 1, path);
-      } else {
-        return new Result(depth, depth == numSteps, false, path);
-      }
+      final boolean accepted = (depth == numSteps);
+      return new Result(depth, accepted, finalStepSpecFailure, path);
     }
   }
 
@@ -297,28 +284,28 @@ public class TraceFinder
       mTotalAcceptedSteps = 0;
       mFirstAcceptedSteps = Integer.MIN_VALUE;
       mAccepted = true;
-      mRejectedBySpec = false;
+      mFinalStepSpecFailure = false;
       mPaths = numPaths > 0 ? new StateProxy[numPaths][] : null;
     }
 
     private Result(final int numSteps,
                    final boolean accepted,
-                   final boolean rejectedBySpec)
+                   final boolean finalStepSpecFailure)
     {
       mTotalAcceptedSteps = mFirstAcceptedSteps = numSteps;
       mAccepted = accepted;
-      mRejectedBySpec = rejectedBySpec;
+      mFinalStepSpecFailure = finalStepSpecFailure;
       mPaths = null;
     }
 
     private Result(final int numSteps,
                    final boolean accepted,
-                   final boolean rejectedBySpec,
+                   final boolean finalStepSpecFailure,
                    final StateProxy[] path)
     {
       mTotalAcceptedSteps = mFirstAcceptedSteps = numSteps;
       mAccepted = accepted;
-      mRejectedBySpec = rejectedBySpec;
+      mFinalStepSpecFailure = finalStepSpecFailure;
       mPaths = new StateProxy[1][];
       mPaths[0] = path;
     }
@@ -346,9 +333,9 @@ public class TraceFinder
       return mAccepted;
     }
 
-    public boolean isRejectedBySpec()
+    public boolean isFinalStepSpecFailure()
     {
-      return mRejectedBySpec;
+      return mFinalStepSpecFailure;
     }
 
     public StateProxy getStateAt(final int pathIndex, final int stateIndex)
@@ -371,7 +358,7 @@ public class TraceFinder
       }
       if (mFirstAcceptedSteps < -1) {
         mFirstAcceptedSteps = subResult.mFirstAcceptedSteps;
-        mRejectedBySpec = subResult.mRejectedBySpec;
+        mFinalStepSpecFailure = subResult.mFinalStepSpecFailure;
       }
       mAccepted &= subResult.mAccepted;
       if (mPaths != null) {
@@ -384,7 +371,7 @@ public class TraceFinder
     private int mTotalAcceptedSteps;
     private int mFirstAcceptedSteps;
     private boolean mAccepted;
-    private boolean mRejectedBySpec;
+    private boolean mFinalStepSpecFailure;
     private final StateProxy[][] mPaths;
   }
 

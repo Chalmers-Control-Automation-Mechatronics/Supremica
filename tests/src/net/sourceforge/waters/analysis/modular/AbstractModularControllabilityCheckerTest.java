@@ -31,88 +31,69 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.coobs;
+package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.monolithic.TRMonolithicCoobservabilityChecker;
-import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
+import net.sourceforge.waters.analysis.bdd.BDDControllabilityChecker;
+import net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory;
+import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
+import net.sourceforge.waters.model.analysis.
+  AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * <P>A record about a supervisor site for the purpose of verifying
- * coobservability.</P>
- *
- * <P>A supervisor site represents a set of events that can be
- * controlled and/or observed by a particular supervisor. This class
- * only contains the site name as defined through the event attributes
- * and some index details needed by the algorithm in class
- * {@link TRMonolithicCoobservabilityChecker}.</P>
+ * Abstract base class for test cases of the {@link
+ * ModularControllabilityChecker} with different heuristics.
  *
  * @author Robi Malik
- * @see CoobservabilityChecker
  */
 
-public class SupervisorSite implements Comparable<SupervisorSite>
+public abstract class AbstractModularControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
-  //#########################################################################
-  //# Constructor
-  public SupervisorSite(final String name,
-                        final boolean reference,
-                        final int index,
-                        final int numAutomata)
-  {
-    mName = name;
-    mReference = reference;
-    mIndex = index;
-    mComponentIndices = new int[numAutomata];
-  }
-
 
   //#########################################################################
-  //# Simple Access
-  public String getName()
+  //# Hooks
+  protected abstract HeuristicFactory.Method getHeuristicMethod();
+
+  protected HeuristicFactory.Preference getHeuristicPreference()
   {
-    return mName;
+    return HeuristicFactory.Preference.NOPREF;
   }
 
-  public boolean isReferenceSite()
+  protected ControllabilityChecker createMonolithicChecker
+    (final ProductDESProxyFactory desFactory)
   {
-    return mReference;
-  }
-
-  public int getComponentIndex(final int autIndex)
-  {
-    return mComponentIndices[autIndex];
-  }
-
-  public void setComponentIndex(final int autIndex, final int compIndex)
-  {
-    mComponentIndices[autIndex] = compIndex;
+    final BDDModelVerifierFactory bddFactory =
+      BDDModelVerifierFactory.getInstance();
+    final BDDControllabilityChecker bdd =
+      bddFactory.createControllabilityChecker(desFactory);
+    bdd.setBDDPackage(BDDPackage.CUDD);
+    bdd.setTransitionPartitioningStrategy
+      (TransitionPartitioningStrategy.AUTOMATA);
+    return bdd;
   }
 
 
   //#########################################################################
-  //# Interface java.util.Comparable<SupervisorSite>
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  public int compareTo(final SupervisorSite site)
+  protected ModularControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory desFactory)
   {
-    return mIndex - site.mIndex;
+    final ControllabilityChecker mono = createMonolithicChecker(desFactory);
+    final ModularModelVerifierFactory modularFactory =
+      ModularModelVerifierFactory.getInstance();
+    final ModularControllabilityChecker checker =
+      modularFactory.createControllabilityChecker(desFactory);
+    checker.setHeuristicPreference(getHeuristicPreference());
+    checker.setHeuristicMethod(getHeuristicMethod());
+    checker.setCollectsFailedSpecs(true);
+    checker.setMonolithicVerifier(mono);
+    return checker;
   }
-
-
-  //#########################################################################
-  //# Debugging
-  @Override
-  public String toString()
-  {
-    return mName;
-  }
-
-
-  //#########################################################################
-  //# Instance Variables
-  private final String mName;
-  private final boolean mReference;
-  private final int mIndex;
-  private final int[] mComponentIndices;
 
 }
