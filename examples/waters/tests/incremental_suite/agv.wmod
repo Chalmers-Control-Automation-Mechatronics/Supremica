@@ -1,49 +1,185 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="agv" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-<ns2:Comment>Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).
-25731072 reachable states.</ns2:Comment>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="agv">
+<B:Comment>Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).
+25731072 reachable states.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="PROPOSITION" Name=":forbidden"/>
-<EventDecl Kind="CONTROLLABLE" Name="c1"/>
+<EventDecl Kind="CONTROLLABLE" Name="c1">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="c10"/>
-<EventDecl Kind="CONTROLLABLE" Name="c2"/>
-<EventDecl Kind="CONTROLLABLE" Name="c3"/>
-<EventDecl Kind="CONTROLLABLE" Name="c4"/>
-<EventDecl Kind="CONTROLLABLE" Name="c5"/>
-<EventDecl Kind="CONTROLLABLE" Name="c6"/>
-<EventDecl Kind="CONTROLLABLE" Name="c7"/>
-<EventDecl Kind="CONTROLLABLE" Name="c8"/>
-<EventDecl Kind="CONTROLLABLE" Name="c9"/>
+<EventDecl Kind="CONTROLLABLE" Name="c2">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c3">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c4">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="3"/>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c5">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="2"/>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c6">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="2"/>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c7">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="3"/>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c8">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="4"/>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="c9">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="4"/>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="e10"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="e11"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="e20"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="e21"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="e30"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="e31"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u10"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u11"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u20"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u21"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u22"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u23"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u24"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u25"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u26"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u27"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u28"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u29"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u30"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u31"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u40"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u41"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u42"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u43"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u44"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u45"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u50"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u51"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="u52"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u10">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u11">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u20">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u21">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u22">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u23">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u24">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u25">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="1"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u26">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u27">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u28">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u29">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u30">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u31">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="2"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u40">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u41">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u42">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u43">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u44">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u45">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="3"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u50">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u51">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="u52">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer" Value="4"/>
+</B:AttributeMap>
+</EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="u53"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="w11"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="w12"/>
@@ -67,52 +203,273 @@
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="199" Y="194"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="q1"/>
-<SimpleNode Name="q2"/>
-<SimpleNode Name="q3"/>
-<SimpleNode Name="q4"/>
+<SimpleNode Name="q1">
+<PointGeometry>
+<Point X="231" Y="67"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q2">
+<PointGeometry>
+<Point X="169" Y="321"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q3">
+<PointGeometry>
+<Point X="326" Y="225"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q4">
+<PointGeometry>
+<Point X="72" Y="163"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="c2"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="227" Y="128"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q2" Source="q0">
+<Edge Source="q0" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="u23"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="265"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q3" Source="q0">
+<Edge Source="q0" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="c3"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="265" Y="222"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q4" Source="q0">
+<Edge Source="q0" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="c1"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="188"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q1">
+<Edge Source="q1" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u11"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="206" Y="122"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q2">
+<Edge Source="q2" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u24"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="172" Y="260"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u25"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="270" Y="200"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q4">
+<Edge Source="q4" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u10"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="133" Y="166"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Zone2">
+<Graph>
+<NodeList>
+<SimpleNode Name="q0">
+<PointGeometry>
+<Point X="151" Y="145"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q1">
+<PointGeometry>
+<Point X="248" Y="231"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q2">
+<PointGeometry>
+<Point X="65" Y="243"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q3">
+<PointGeometry>
+<Point X="237" Y="48"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="q4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="53" Y="58"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="q0" Target="q1">
+<LabelBlock>
+<SimpleIdentifier Name="c6"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="196" Y="200"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q0" Target="q2">
+<LabelBlock>
+<SimpleIdentifier Name="u21"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="205"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q0" Target="q3">
+<LabelBlock>
+<SimpleIdentifier Name="u26"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="206" Y="100"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q0" Target="q4">
+<LabelBlock>
+<SimpleIdentifier Name="c5"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="105" Y="89"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q1" Target="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u31"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="211" Y="183"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q2" Target="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u22"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="190"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q3" Target="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u27"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="189" Y="85"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="q4" Target="q0">
+<LabelBlock>
+<SimpleIdentifier Name="u30"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="90" Y="106"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -124,109 +481,134 @@
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="194" Y="198"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="q1"/>
-<SimpleNode Name="q2"/>
-<SimpleNode Name="q3"/>
-<SimpleNode Name="q4"/>
+<SimpleNode Name="q1">
+<PointGeometry>
+<Point X="159" Y="71"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q2">
+<PointGeometry>
+<Point X="320" Y="164"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q3">
+<PointGeometry>
+<Point X="228" Y="323"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q4">
+<PointGeometry>
+<Point X="68" Y="233"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="c4"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="186" Y="126"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q2" Source="q0">
+<Edge Source="q0" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="u28"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="265" Y="190"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q3" Source="q0">
+<Edge Source="q0" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="u44"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="223" Y="262"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q4" Source="q0">
+<Edge Source="q0" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="c7"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="227"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q1">
+<Edge Source="q1" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u20"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="132"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q2">
+<Edge Source="q2" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u29"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="259" Y="168"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u45"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="201" Y="268"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q4">
+<Edge Source="q4" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u40"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="SPEC" Name="Zone2">
-<Graph>
-<NodeList>
-<SimpleNode Name="q0"/>
-<SimpleNode Name="q1"/>
-<SimpleNode Name="q2"/>
-<SimpleNode Name="q3"/>
-<SimpleNode Initial="true" Name="q4">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="q1" Source="q0">
-<LabelBlock>
-<SimpleIdentifier Name="c6"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q2" Source="q0">
-<LabelBlock>
-<SimpleIdentifier Name="u21"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q3" Source="q0">
-<LabelBlock>
-<SimpleIdentifier Name="u26"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q4" Source="q0">
-<LabelBlock>
-<SimpleIdentifier Name="c5"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q0" Source="q1">
-<LabelBlock>
-<SimpleIdentifier Name="u31"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q0" Source="q2">
-<LabelBlock>
-<SimpleIdentifier Name="u22"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q0" Source="q3">
-<LabelBlock>
-<SimpleIdentifier Name="u27"/>
-</LabelBlock>
-</Edge>
-<Edge Target="q0" Source="q4">
-<LabelBlock>
-<SimpleIdentifier Name="u30"/>
-</LabelBlock>
+<SplineGeometry>
+<Point X="122" Y="206"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -238,52 +620,134 @@
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="188" Y="196"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="q1"/>
-<SimpleNode Name="q2"/>
-<SimpleNode Name="q3"/>
-<SimpleNode Name="q4"/>
+<SimpleNode Name="q1">
+<PointGeometry>
+<Point X="144" Y="72"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q2">
+<PointGeometry>
+<Point X="312" Y="153"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q3">
+<PointGeometry>
+<Point X="232" Y="318"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="q4">
+<PointGeometry>
+<Point X="65" Y="241"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="c8"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="175" Y="125"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q2" Source="q0">
+<Edge Source="q0" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="u41"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="259" Y="183"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q3" Source="q0">
+<Edge Source="q0" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="u50"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="222" Y="258"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q4" Source="q0">
+<Edge Source="q0" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="c9"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="125" Y="230"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q1">
+<Edge Source="q1" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u43"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="154" Y="132"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q2">
+<Edge Source="q2" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u42"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="251" Y="161"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u51"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="201" Y="266"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q4">
+<Edge Source="q4" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u52"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="118" Y="209"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -295,23 +759,47 @@
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="57" Y="57"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q1">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="120" Y="119"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="e21"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="80" Y="95"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q0" Source="q1">
+<Edge Source="q1" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="e20"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="79"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -341,22 +829,22 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w21"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="w22"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="w23"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="w24"/>
 </LabelBlock>
@@ -389,22 +877,22 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w31"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="w32"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="w33"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="w34"/>
 </LabelBlock>
@@ -427,12 +915,12 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="e30"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q1">
+<Edge Source="q1" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="e31"/>
 </LabelBlock>
@@ -465,22 +953,22 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w11"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="w12"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="w13"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="w15"/>
 </LabelBlock>
@@ -503,12 +991,12 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="e10"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q1">
+<Edge Source="q1" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="e11"/>
 </LabelBlock>
@@ -523,83 +1011,179 @@
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="193" Y="313"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q1">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="282" Y="268"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q11">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="97" Y="282"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="311" Y="173"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q4">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="264" Y="84"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q7">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="169" Y="52"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Initial="true" Name="q8">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="80" Y="97"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q9">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="51" Y="193"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="p4">
+<Edge Source="p4" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w13"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="241" Y="297"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="c9"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="304" Y="223"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="p4" Source="q11">
+<Edge Source="q11" Target="p4">
 <LabelBlock>
 <SimpleIdentifier Name="u51"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="143" Y="304"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q4" Source="q2">
+<Edge Source="q2" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="u52"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="294" Y="125"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q7" Source="q4">
+<Edge Source="q4" Target="q7">
 <LabelBlock>
 <SimpleIdentifier Name="u53"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="218" Y="61"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q8" Source="q7">
+<Edge Source="q7" Target="q8">
 <LabelBlock>
 <SimpleIdentifier Name="e20"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="121" Y="68"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q9" Source="q8">
+<Edge Source="q8" Target="q9">
 <LabelBlock>
 <SimpleIdentifier Name="c10"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="58" Y="143"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q11" Source="q9">
+<Edge Source="q9" Target="q11">
 <LabelBlock>
 <SimpleIdentifier Name="u50"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="67" Y="240"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -629,22 +1213,22 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w11"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="w12"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="w13"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q3">
+<Edge Source="q3" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="w14"/>
 </LabelBlock>
@@ -707,52 +1291,52 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="p4">
+<Edge Source="p4" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w15"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="c7"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q12" Source="q11">
+<Edge Source="q11" Target="q12">
 <LabelBlock>
 <SimpleIdentifier Name="u44"/>
 </LabelBlock>
 </Edge>
-<Edge Target="p4" Source="q12">
+<Edge Source="q12" Target="p4">
 <LabelBlock>
 <SimpleIdentifier Name="u45"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="u40"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q4" Source="q3">
+<Edge Source="q3" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="u41"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q7" Source="q4">
+<Edge Source="q4" Target="q7">
 <LabelBlock>
 <SimpleIdentifier Name="u42"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q8" Source="q7">
+<Edge Source="q7" Target="q8">
 <LabelBlock>
 <SimpleIdentifier Name="w31"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q9" Source="q8">
+<Edge Source="q8" Target="q9">
 <LabelBlock>
 <SimpleIdentifier Name="c8"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q11" Source="q9">
+<Edge Source="q9" Target="q11">
 <LabelBlock>
 <SimpleIdentifier Name="u43"/>
 </LabelBlock>
@@ -795,32 +1379,32 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="q0">
+<Edge Source="q0" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="w14"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="c5"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="u30"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q4" Source="q3">
+<Edge Source="q3" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="w22"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q5" Source="q4">
+<Edge Source="q4" Target="q5">
 <LabelBlock>
 <SimpleIdentifier Name="c6"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q0" Source="q5">
+<Edge Source="q5" Target="q0">
 <LabelBlock>
 <SimpleIdentifier Name="u31"/>
 </LabelBlock>
@@ -903,72 +1487,72 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="p4">
+<Edge Source="p4" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="e30"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="c3"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q11" Source="q10">
+<Edge Source="q10" Target="q11">
 <LabelBlock>
 <SimpleIdentifier Name="u21"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q12" Source="q11">
+<Edge Source="q11" Target="q12">
 <LabelBlock>
 <SimpleIdentifier Name="u22"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q13" Source="q12">
+<Edge Source="q12" Target="q13">
 <LabelBlock>
 <SimpleIdentifier Name="u23"/>
 </LabelBlock>
 </Edge>
-<Edge Target="p4" Source="q13">
+<Edge Source="q13" Target="p4">
 <LabelBlock>
 <SimpleIdentifier Name="u24"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="u25"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q4" Source="q3">
+<Edge Source="q3" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="u26"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q5" Source="q4">
+<Edge Source="q4" Target="q5">
 <LabelBlock>
 <SimpleIdentifier Name="u27"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q6" Source="q5">
+<Edge Source="q5" Target="q6">
 <LabelBlock>
 <SimpleIdentifier Name="u28"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q7" Source="q6">
+<Edge Source="q6" Target="q7">
 <LabelBlock>
 <SimpleIdentifier Name="u29"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q8" Source="q7">
+<Edge Source="q7" Target="q8">
 <LabelBlock>
 <SimpleIdentifier Name="w32"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q9" Source="q8">
+<Edge Source="q8" Target="q9">
 <LabelBlock>
 <SimpleIdentifier Name="c4"/>
 </LabelBlock>
 </Edge>
-<Edge Target="q10" Source="q9">
+<Edge Source="q9" Target="q10">
 <LabelBlock>
 <SimpleIdentifier Name="u20"/>
 </LabelBlock>
@@ -983,63 +1567,135 @@
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="86" Y="67"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q1">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="184" Y="53"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="247" Y="130"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q3">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="212" Y="223"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q4">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="114" Y="237"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 <SimpleNode Name="q5">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
+<PointGeometry>
+<Point X="51" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Target="q1" Source="p2">
+<Edge Source="p2" Target="q1">
 <LabelBlock>
 <SimpleIdentifier Name="e10"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="133" Y="51"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q2" Source="q1">
+<Edge Source="q1" Target="q2">
 <LabelBlock>
 <SimpleIdentifier Name="c1"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="222" Y="86"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q3" Source="q2">
+<Edge Source="q2" Target="q3">
 <LabelBlock>
 <SimpleIdentifier Name="u10"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="237" Y="179"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q4" Source="q3">
+<Edge Source="q3" Target="q4">
 <LabelBlock>
 <SimpleIdentifier Name="w23"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="238"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="q5" Source="q4">
+<Edge Source="q4" Target="q5">
 <LabelBlock>
 <SimpleIdentifier Name="c2"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="76" Y="204"/>
+</SplineGeometry>
 </Edge>
-<Edge Target="p2" Source="q5">
+<Edge Source="q5" Target="p2">
 <LabelBlock>
 <SimpleIdentifier Name="u11"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="60" Y="110"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>

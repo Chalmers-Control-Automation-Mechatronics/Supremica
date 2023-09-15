@@ -33,8 +33,13 @@
 
 package net.sourceforge.waters.analysis.coobs;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.Set;
+
 import net.sourceforge.waters.analysis.monolithic.TRMonolithicCoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
+import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
@@ -62,6 +67,12 @@ public class SupervisorSite implements Comparable<SupervisorSite>
   {
     mName = name;
     mReference = reference;
+    if (reference) {
+      mControlledEvents = mObservedEvents = null;
+    } else {
+      mControlledEvents = new THashSet<>();
+      mObservedEvents = new THashSet<>();
+    }
     mIndex = index;
     mComponentIndices = new int[numAutomata];
   }
@@ -77,6 +88,26 @@ public class SupervisorSite implements Comparable<SupervisorSite>
   public boolean isReferenceSite()
   {
     return mReference;
+  }
+
+  public Set<EventProxy> getControlledEvents()
+  {
+    return mControlledEvents;
+  }
+
+  public void addControlledEvent(final EventProxy event)
+  {
+    mControlledEvents.add(event);
+  }
+
+  public Set<EventProxy> getObservedEvents()
+  {
+    return mObservedEvents;
+  }
+
+  public void addObservedEvent(final EventProxy event)
+  {
+    mObservedEvents.add(event);
   }
 
   public int getComponentIndex(final int autIndex)
@@ -112,6 +143,8 @@ public class SupervisorSite implements Comparable<SupervisorSite>
   //# Instance Variables
   private final String mName;
   private final boolean mReference;
+  private Set<EventProxy> mControlledEvents;
+  private Set<EventProxy> mObservedEvents;
   private final int mIndex;
   private final int[] mComponentIndices;
 

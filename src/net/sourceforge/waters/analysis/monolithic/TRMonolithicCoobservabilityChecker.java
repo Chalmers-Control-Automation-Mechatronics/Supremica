@@ -66,6 +66,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -233,6 +234,21 @@ public class TRMonolithicCoobservabilityChecker
             }
           }
         }
+      }
+    }
+
+    final Iterator<SupervisorSite> iter = mSiteMap.values().iterator();
+    while (iter.hasNext()) {
+      final SupervisorSite site = iter.next();
+      boolean needed = false;
+      for (final EventProxy event : site.getControlledEvents()) {
+        if (isDisabledBySpec(event)) {
+          needed = true;
+          break;
+        }
+      }
+      if (!needed) {
+        iter.remove();
       }
     }
 
@@ -525,6 +541,35 @@ public class TRMonolithicCoobservabilityChecker
     return false;
   }
 
+  private boolean isDisabledBySpec(final EventProxy event)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final TRAutomatonProxy[] trs = getTRAutomata();
+    for (final TRAutomatonProxy tr : trs) {
+      if (translator.getComponentKind(tr) == ComponentKind.PLANT) {
+        continue;
+      }
+      final EventEncoding enc = tr.getEventEncoding();
+      final int e = enc.getEventCode(event);
+      if (e < 0 ||
+          (enc.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) != 0) {
+        continue;
+      }
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      final int numStates = rel.getNumberOfStates();
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      for (int s = 0; s < numStates; s++) {
+        if (rel.isReachable(s)) {
+          iter.reset(s, e);
+          if (!iter.advance()) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
 
   //#########################################################################
   //# Inner Class CoobservabilityEventInfo
@@ -616,6 +661,7 @@ public class TRMonolithicCoobservabilityChecker
         mControllers = new THashSet<>();
       }
       mControllers.add(site);
+      site.addControlledEvent(getEvent());
     }
 
     private void addObserver(final SupervisorSite site)
@@ -624,6 +670,7 @@ public class TRMonolithicCoobservabilityChecker
         mObservers = new THashSet<>();
       }
       mObservers.add(site);
+      site.addObservedEvent(getEvent());
     }
 
     @Override

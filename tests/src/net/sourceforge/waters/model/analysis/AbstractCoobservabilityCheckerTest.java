@@ -193,6 +193,13 @@ public abstract class AbstractCoobservabilityCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testFms2016Coobs1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "fms2016coobs1.wmod");
+    runModelVerifier(des, false);
+  }
+
 
   public void testParManEgLoCoobs2() throws Exception
   {
@@ -208,6 +215,14 @@ public abstract class AbstractCoobservabilityCheckerTest
       getCompiledDES("despot", "parallelManufacturingExample",
                      "parManEg_lo_coobs3.wmod");
     runModelVerifier(des, true);
+  }
+
+
+  public void testAgv() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "incremental_suite", "agv.wmod");
+    runModelVerifier(des, false);
   }
 
 
