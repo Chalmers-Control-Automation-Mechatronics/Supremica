@@ -420,8 +420,10 @@ abstract class AbstractModularVerifier
             final KindTranslator translator =
               mMonolithicVerifier.getKindTranslator();
             for (final AutomatonProxy aut : selectedAutomata) {
-              logger.debug("Adding {} {} as {} ...", aut.getKind(),
-                           aut.getName(), translator.getComponentKind(aut));
+              logger.debug("Adding {} {} as {} ...",
+                           aut.getKind().name().toLowerCase(),
+                           aut.getName(),
+                           translator.getComponentKind(aut).name().toLowerCase());
             }
           }
           subsystem.addAll(selectedAutomata);

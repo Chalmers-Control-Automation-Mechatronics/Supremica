@@ -33,63 +33,49 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
- * Abstract base class for test cases of the {@link
- * ModularControllabilityChecker} with different heuristics.
+ * A test for the {@link ModularControllabilityChecker} with the
+ * MaxCommonUncontrollableEvents heuristic.
  *
- * @author Robi Malik
+ * @author Simon Ware, Robi Malik
  */
 
-public abstract class AbstractModularControllabilityCheckerTest
-  extends AbstractControllabilityCheckerTest
+public class MaxCommonUncontrollableEventsControllabilityCheckerTest
+  extends AbstractModularControllabilityCheckerTest
 {
 
   //#########################################################################
-  //# Hooks
-  protected abstract HeuristicFactory.Method getHeuristicMethod();
-
-  protected HeuristicFactory.Preference getHeuristicPreference()
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
-    return HeuristicFactory.Preference.NOPREF;
+    final TestSuite testSuite =
+      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+    return testSuite;
   }
 
-  protected ControllabilityChecker createMonolithicChecker
-    (final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
+  public static void main(final String[] args)
   {
-    final ModelAnalyzerFactory monoFactory =
-      MonolithicModelAnalyzerFactory.getInstance();
-    return monoFactory.createControllabilityChecker(desFactory);
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  //# Overrides for
+  //# net.sourceforge.analysis.modular.AbstractModularControllabilityCheckerTest
   @Override
-  protected ModularControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
+  protected HeuristicFactory.Preference getHeuristicPreference()
   {
-    final ControllabilityChecker mono = createMonolithicChecker(desFactory);
-    final ModularModelVerifierFactory modularFactory =
-      ModularModelVerifierFactory.getInstance();
-    final ModularControllabilityChecker checker =
-      modularFactory.createControllabilityChecker(desFactory);
-    checker.setHeuristicPreference(getHeuristicPreference());
-    checker.setHeuristicMethod(getHeuristicMethod());
-    checker.setCollectsFailedSpecs(true);
-    checker.setMonolithicVerifier(mono);
-    return checker;
+    return HeuristicFactory.Preference.PREFER_REAL_PLANT;
+  }
+
+  @Override
+  protected HeuristicFactory.Method getHeuristicMethod()
+  {
+    return HeuristicFactory.Method.MaxCommonUncontrollableEvents;
   }
 
 }

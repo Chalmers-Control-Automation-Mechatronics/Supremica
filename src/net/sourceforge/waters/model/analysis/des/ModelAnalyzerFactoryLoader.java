@@ -68,7 +68,7 @@ public enum ModelAnalyzerFactoryLoader
   PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory", "-po"),
   Supremica("org.supremica.automata.waters.SupremicaModelAnalyzerFactory", "-sup"),
   TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory", "-trcomp"),
-  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory", "trmono");
+  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory", "-trmono");
 
 
   //#########################################################################

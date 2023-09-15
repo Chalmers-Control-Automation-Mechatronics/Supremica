@@ -67,12 +67,6 @@ public class EarlyNotAcceptControllabilityCheckerTest
   //# Overrides for
   //# net.sourceforge.analysis.modular.AbstractModularControllabilityCheckerTest
   @Override
-  protected HeuristicFactory.Preference getHeuristicPreference()
-  {
-    return HeuristicFactory.Preference.PREFER_PLANT;
-  }
-
-  @Override
   protected HeuristicFactory.Method getHeuristicMethod()
   {
     return HeuristicFactory.Method.EarlyNotAccept;

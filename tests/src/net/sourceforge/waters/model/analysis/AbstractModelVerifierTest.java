@@ -485,7 +485,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    * @return An instance of the model verifier
    */
   protected abstract ModelVerifier createModelVerifier
-    (ProductDESProxyFactory factory);
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
 
   /**
    * Configures the model verifier under test for a given product DES. This

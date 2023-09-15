@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
@@ -86,8 +87,9 @@ public class HeuristicFactory
                                             final KindTranslator translator,
                                             final HeuristicTraceChecker checker)
   {
-    final HeuristicValueProvider provider = method.createProvider();
-    return new HeuristicEvaluator(translator, pref, provider, checker);
+    final List<HeuristicValueProvider> providers =
+      method.getListWithAlternatives();
+    return new HeuristicEvaluator(translator, pref, providers, checker);
   }
 
   public HeuristicEvaluator createEvaluator(final Preference pref,
@@ -106,7 +108,7 @@ public class HeuristicFactory
 
 
   //#########################################################################
-  //# Enumeration Types
+  //# Inner Enumeration Method
   public enum Method {
     All {
       @Override
@@ -133,6 +135,11 @@ public class HeuristicFactory
           }
         };
       }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinStates, MinTransitions);
+      }
     },
     LateNotAccept {
       @Override
@@ -146,12 +153,23 @@ public class HeuristicFactory
           }
         };
       }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinStates, MinTransitions);
+      }
     },
     MaxCommonEvents {
       @Override
       public HeuristicValueProvider createProvider()
       {
         return new CommonEventsHeuristicValueProvider(this);
+      }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MaxCommonUncontrollableEvents, MinEvents,
+                                       MinStates, MinTransitions);
       }
     },
     MaxCommonUncontrollableEvents {
@@ -160,6 +178,12 @@ public class HeuristicFactory
       {
         return new CommonEventsHeuristicValueProvider(this,
                                                       EventKind.UNCONTROLLABLE);
+      }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MaxCommonEvents, MinEvents,
+                                       MinStates, MinTransitions);
       }
     },
     MaxStates {
@@ -174,6 +198,11 @@ public class HeuristicFactory
             return - aut.getStates().size();
           }
         };
+      }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinTransitions);
       }
     },
     MinEvents {
@@ -195,6 +224,11 @@ public class HeuristicFactory
           }
         };
       }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinStates, MinTransitions);
+      }
     },
     MinNewEvents {
       @Override
@@ -215,6 +249,11 @@ public class HeuristicFactory
           }
         };
       }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinStates, MinTransitions);
+      }
     },
     MinStates {
       @Override
@@ -228,6 +267,11 @@ public class HeuristicFactory
             return aut.getStates().size();
           }
         };
+      }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinTransitions);
       }
     },
     MinTransitions {
@@ -243,6 +287,11 @@ public class HeuristicFactory
           }
         };
       }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinStates);
+      }
     },
     One {
       @Override
@@ -255,6 +304,32 @@ public class HeuristicFactory
             return CollectionMode.FIRST;
           }
         };
+      }
+    },
+    Plant {
+      @Override
+      public HeuristicValueProvider createProvider()
+      {
+        return new KindPreferenceHeuristicValueProvider
+          (this, Preference.PREFER_PLANT);
+      }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinStates, MinTransitions);
+      }
+    },
+    RealPlant {
+      @Override
+      public HeuristicValueProvider createProvider()
+      {
+        return new KindPreferenceHeuristicValueProvider
+          (this, Preference.PREFER_REAL_PLANT);
+      }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinStates, MinTransitions);
       }
     },
     RelMaxCommonEvents {
@@ -280,6 +355,11 @@ public class HeuristicFactory
           }
         };
       }
+      @Override
+      public List<HeuristicValueProvider> getListWithAlternatives()
+      {
+        return getListWithAlternatives(MinEvents, MinStates, MinTransitions);
+      }
     };
 
     //#######################################################################
@@ -288,14 +368,41 @@ public class HeuristicFactory
     {
       return new DefaultHeuristicValueProvider(this);
     }
+
+    public List<HeuristicValueProvider> getListWithAlternatives()
+    {
+      final HeuristicValueProvider provider = createProvider();
+      return Collections.singletonList(provider);
+    }
+
+    public List<HeuristicValueProvider> getListWithAlternatives(final Method... methods)
+    {
+      final List<HeuristicValueProvider> list =
+        new ArrayList<>(methods.length + 1);
+      HeuristicValueProvider provider = createProvider();
+      list.add(provider);
+      for (final Method method : methods) {
+        if (method != this) {
+          provider = method.createProvider();
+          list.add(provider);
+        }
+      }
+      return list;
+    }
   }
 
+
+  //#########################################################################
+  //# Inner Enumeration Method
   public enum Preference {
     NOPREF,
     PREFER_PLANT,
     PREFER_REAL_PLANT
   }
 
+
+  //#########################################################################
+  //# Inner Enumeration Method
   public enum CollectionMode {
     FIRST,
     BEST,

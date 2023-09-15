@@ -31,65 +31,74 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import java.util.Collection;
+
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-/**
- * Abstract base class for test cases of the {@link
- * ModularControllabilityChecker} with different heuristics.
- *
- * @author Robi Malik
- */
-
-public abstract class AbstractModularControllabilityCheckerTest
-  extends AbstractControllabilityCheckerTest
+public class KindPreferenceHeuristicValueProvider
+  extends DefaultHeuristicValueProvider
 {
 
   //#########################################################################
-  //# Hooks
-  protected abstract HeuristicFactory.Method getHeuristicMethod();
-
-  protected HeuristicFactory.Preference getHeuristicPreference()
+  //# Constructor
+  public KindPreferenceHeuristicValueProvider(final HeuristicFactory.Method method,
+                                              final HeuristicFactory.Preference pref)
   {
-    return HeuristicFactory.Preference.NOPREF;
-  }
-
-  protected ControllabilityChecker createMonolithicChecker
-    (final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
-  {
-    final ModelAnalyzerFactory monoFactory =
-      MonolithicModelAnalyzerFactory.getInstance();
-    return monoFactory.createControllabilityChecker(desFactory);
+    super(method);
+    mPreference = pref;
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  //# Interface net.sourceforge.waters.analysis.modular.HeuristicValueProvider
   @Override
-  protected ModularControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
+  public void setContext(final ProductDESProxy des,
+                         final KindTranslator translator,
+                         final CounterExampleProxy counter,
+                         final Collection<? extends AutomatonProxy> realPlants,
+                         final Collection<? extends AutomatonProxy> specPlants,
+                         final Collection<? extends AutomatonProxy> specs)
   {
-    final ControllabilityChecker mono = createMonolithicChecker(desFactory);
-    final ModularModelVerifierFactory modularFactory =
-      ModularModelVerifierFactory.getInstance();
-    final ModularControllabilityChecker checker =
-      modularFactory.createControllabilityChecker(desFactory);
-    checker.setHeuristicPreference(getHeuristicPreference());
-    checker.setHeuristicMethod(getHeuristicMethod());
-    checker.setCollectsFailedSpecs(true);
-    checker.setMonolithicVerifier(mono);
-    return checker;
+    mRealPlants = realPlants;
+    mSpecPlants = specPlants;
   }
+
+  @Override
+  public float getHeuristicValue(final HeuristicEvaluator evaluator,
+                                 final AutomatonProxy aut)
+  {
+    switch (mPreference) {
+    case PREFER_REAL_PLANT:
+      if (mRealPlants.contains(aut)) {
+        return -2;
+      } else if (mSpecPlants.contains(aut)) {
+        return -1;
+      }
+      break;
+    case PREFER_PLANT:
+      if (mRealPlants.contains(aut) || mSpecPlants.contains(aut)) {
+        return -1;
+      }
+      break;
+    default:
+      break;
+    }
+    return 0;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final HeuristicFactory.Preference mPreference;
+
+  private Collection<? extends AutomatonProxy> mRealPlants;
+  private Collection<? extends AutomatonProxy> mSpecPlants;
 
 }
