@@ -98,13 +98,6 @@ public class MonolithicModelAnalyzerFactory
   }
 
   @Override
-  public TRMonolithicCoobservabilityChecker createCoobservabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRMonolithicCoobservabilityChecker();
-  }
-
-  @Override
   public TRMonolithicDeadlockChecker createDeadlockChecker
     (final ProductDESProxyFactory factory)
   {

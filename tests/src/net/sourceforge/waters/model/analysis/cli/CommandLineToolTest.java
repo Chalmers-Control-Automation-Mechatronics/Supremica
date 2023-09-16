@@ -99,26 +99,7 @@ public class CommandLineToolTest
 
   //#########################################################################
   //# Test Cases - specific combinations of factory/algorithm
-  public void testAnalyzer_BDDLanguageInclusionGreedy()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "trafficlights2006", "ac61part");
-    final String[] args = new String[]
-      {"-bdd", "-lang", "-part", "greedy", file.toString()};
-    testCommandLine("bdd-lang", args, false, "counterexample:");
-  }
-
-  public void testAnalyzer_BDDLanguageInclusionProperty()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "nasty", "just_property");
-    final String[] args = new String[]
-      {"-bdd", "-lang", file.toString(), "-pack", "java",
-       "-property", "the_property", "-nout"};
-    testCommandLine("bdd-lang-property", args, false,
-                    "!DEBUG", "!counterexample:", "!Statistics:");
-  }
-
+  // controllability
   public void testAnalyzer_ModularControllability()
     throws Exception
   {
@@ -160,6 +141,18 @@ public class CommandLineToolTest
     testCommandLine("mono-cont", args, false, "counterexample:", "!Statistics");
   }
 
+
+  // coobservability
+  public void testAnalyzer_ModularCoobservability()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "coobservability", "fms2016coobs2");
+    final String[] args = new String[]
+      {"-mod", "-coobs", file.toString()};
+    testCommandLine("mod-coobs", args, false, "counterexample:", "!Statistics");
+  }
+
+  // diagnosability
   public void testAnalyzer_MonolithicDiagnosability()
     throws Exception
   {
@@ -180,35 +173,6 @@ public class CommandLineToolTest
     testCommandLine("mono-diag-fault", args, true);
   }
 
-  public void testAnalyzer_MonolithicSynthesisReduced()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "synthesis", "ransomware_sample");
-    final String[] args = new String[]
-      {"-mono", "-synth", "-red", "Small cliques", file.toString()};
-    testCommandLine("mono-synth-red", args, true, " *S:4", "! *S:5");
-  }
-
-  public void testAnalyzer_MonolithicSynthesisSaved()
-    throws Exception
-  {
-    final String name = "small_factory_2";
-    final File file = getInputWmod("tests", "synthesis", name);
-    final File saveFile = new File(getOutputDirectory(), name + ".wmod");
-    final String[] args = new String[]
-      {"-mono", "-synth", "-o", saveFile.toString(), file.toString()};
-    testCommandLine("mono-synth-saved", args, true,
-                    "supervisor saved to " + saveFile);
-    final DocumentManager manager = getDocumentManager();
-    final ModuleProxy module = (ModuleProxy) manager.load(saveFile);
-    final List<Proxy> components = module.getComponentList();
-    assertEquals("Unexpected number of components in output!",
-                 1, components.size());
-    final SimpleComponentProxy comp = (SimpleComponentProxy) components.get(0);
-    assertEquals("Unexpected component kind of output supervisor!",
-                 ComponentKind.SUPERVISOR, comp.getKind());
-  }
-
   public void testAnalyzer_NativeControllability()
     throws Exception
   {
@@ -218,6 +182,53 @@ public class CommandLineToolTest
     testCommandLine("native-cont", args, true);
   }
 
+  public void testAnalyzer_TRCompControllability()
+    throws Exception
+  {
+    final File file1 = getInputWmod("handwritten", "small_factory_2");
+    final File file2 = getInputWmod("handwritten", "small_factory_2u");
+    final String[] args = new String[]
+      {"-trcomp", "-cont",
+       file1.toString(), file2.toString(), "-q", "-nout"};
+    testCommandLine("trcomp-cont", args,
+                    "small_factory_2 ... true \\(.*",
+                    "small_factory_2u ... false \\(.*");
+  }
+
+
+  // language inclusion
+  public void testAnalyzer_BDDLanguageInclusionGreedy()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "trafficlights2006", "ac61part");
+    final String[] args = new String[]
+      {"-bdd", "-lang", "-part", "greedy", file.toString()};
+    testCommandLine("bdd-lang", args, false, "counterexample:");
+  }
+
+  public void testAnalyzer_BDDLanguageInclusionProperty()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "just_property");
+    final String[] args = new String[]
+      {"-bdd", "-lang", file.toString(), "-pack", "java",
+       "-property", "the_property", "-nout"};
+    testCommandLine("bdd-lang-property", args, false,
+                    "!DEBUG", "!counterexample:", "!Statistics:");
+  }
+
+  public void testAnalyzer_TRCompLanguageInclusion()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "five_properties");
+    final String[] args = new String[]
+      {"-trcomp", "-lang",
+       file.toString(), "-property", "prop[3]"};
+    testCommandLine("trcomp-lang", args, true);
+  }
+
+
+  // nonblocking
   public void testAnalyzer_NativeGNonblocking()
     throws Exception
   {
@@ -269,29 +280,6 @@ public class CommandLineToolTest
                     ".*SelfloopSubsumptionTRSimplifier.*", "!WARN.*");
   }
 
-  public void testAnalyzer_TRCompControllability()
-    throws Exception
-  {
-    final File file1 = getInputWmod("handwritten", "small_factory_2");
-    final File file2 = getInputWmod("handwritten", "small_factory_2u");
-    final String[] args = new String[]
-      {"-trcomp", "-cont",
-       file1.toString(), file2.toString(), "-q", "-nout"};
-    testCommandLine("trcomp-cont", args,
-                    "small_factory_2 ... true \\(.*",
-                    "small_factory_2u ... false \\(.*");
-  }
-
-  public void testAnalyzer_TRCompLanguageInclusion()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "nasty", "five_properties");
-    final String[] args = new String[]
-      {"-trcomp", "-lang",
-       file.toString(), "-property", "prop[3]"};
-    testCommandLine("trcomp-lang", args, true);
-  }
-
   public void testAnalyzer_TRCompSIC6()
     throws Exception
   {
@@ -302,6 +290,39 @@ public class CommandLineToolTest
                     ".*SIC property VI.*",
                     ".*ObservationEquivalenceTRSimplifier.*");
   }
+
+
+  // synthesis
+  public void testAnalyzer_MonolithicSynthesisReduced()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "synthesis", "ransomware_sample");
+    final String[] args = new String[]
+      {"-mono", "-synth", "-red", "Small cliques", file.toString()};
+    testCommandLine("mono-synth-red", args, true, " *S:4", "! *S:5");
+  }
+
+  public void testAnalyzer_MonolithicSynthesisSaved()
+    throws Exception
+  {
+    final String name = "small_factory_2";
+    final File file = getInputWmod("tests", "synthesis", name);
+    final File saveFile = new File(getOutputDirectory(), name + ".wmod");
+    final String[] args = new String[]
+      {"-mono", "-synth", "-o", saveFile.toString(), file.toString()};
+    testCommandLine("mono-synth-saved", args, true,
+                    "supervisor saved to " + saveFile);
+    final DocumentManager manager = getDocumentManager();
+    final ModuleProxy module = (ModuleProxy) manager.load(saveFile);
+    final List<Proxy> components = module.getComponentList();
+    assertEquals("Unexpected number of components in output!",
+                 1, components.size());
+    final SimpleComponentProxy comp = (SimpleComponentProxy) components.get(0);
+    assertEquals("Unexpected component kind of output supervisor!",
+                 ComponentKind.SUPERVISOR, comp.getKind());
+  }
+
+
 
 
   //#########################################################################

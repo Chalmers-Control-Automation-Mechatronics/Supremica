@@ -153,7 +153,8 @@ public class ModularModelVerifierFactory
               "Monolithic coobservability checker",
               "Algorithm used to analyze the subsystems during modular " +
               "or incremental processing.",
-              db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
+              db, ModelAnalyzerFactoryLoader.Modular,
+              ModelAnalyzerFactoryLoader.TRMonolithic, CHAIN_SUPPRESSIONS));
 
     db.register(new BooleanOption
              (OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis,

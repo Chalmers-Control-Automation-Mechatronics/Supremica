@@ -60,7 +60,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  */
 
 public class AnalysisOptionPage
-  extends SelectorLeafOptionPage<ModelAnalyzerFactoryLoader>
+  extends AbstractAnalysisOptionPage
 {
 
   //#########################################################################
@@ -73,22 +73,13 @@ public class AnalysisOptionPage
   public AnalysisOptionPage(final AnalysisOperation operation,
                             final boolean canBeDisabled)
   {
-    super(operation.getOptionPagePrefix(), operation.getShortWindowTitle());
-    mOperation = operation;
+    super(operation);
     final EnumFactory<ModelAnalyzerFactoryLoader> enumFactory =
       ModelAnalyzerFactoryLoader.createEnumFactory(operation, canBeDisabled);
     mAlgorithmOption = new EnumOption<ModelAnalyzerFactoryLoader>
       ("Algorithm", "Algorithm", null, null, enumFactory);
     register(mAlgorithmOption);
     registerAnalyzerFactoryOptions();
-  }
-
-
-  //#########################################################################
-  //# Simple Access
-  public AnalysisOperation getAnalysisOperation()
-  {
-    return mOperation;
   }
 
 
@@ -110,8 +101,9 @@ public class AnalysisOptionPage
         final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
         final ProductDESProxyFactory desFactory =
           ProductDESElementFactory.getInstance();
+        final AnalysisOperation operation = getAnalysisOperation();
         final ModelAnalyzer analyzer =
-          mOperation.createModelAnalyzer(factory, desFactory);
+          operation.createModelAnalyzer(factory, desFactory);
         final List<Option<?>> analyzerOptions = analyzer.getOptions(this);
         options.addAll(analyzerOptions);
       } catch (AnalysisConfigurationException |
@@ -119,15 +111,6 @@ public class AnalysisOptionPage
         throw new WatersRuntimeException(exception);
       }
     }
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.options.LeafOptionPage
-  @Override
-  public String getShortDescription()
-  {
-    return mOperation.getShortWindowTitle();
   }
 
 
@@ -152,7 +135,6 @@ public class AnalysisOptionPage
 
   //#########################################################################
   //# Data Members
-  private final AnalysisOperation mOperation;
   private final EnumOption<ModelAnalyzerFactoryLoader> mAlgorithmOption;
 
 }

@@ -31,79 +31,64 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.model.options;
 
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 
 /**
- * A model analyser factory that produces monolithic implementations
- * of analysis algorithms that are based on {@link TRAutomatonProxy}.
+ * <P>Abstract base class for options page to configure an analysis algorithm.</P>
+ *
+ * <P>The analysis option page is associated with a given analysis task,
+ * e.g., conflict check. Subclassed further for main algorithm selection
+ * ({@link AnalysisOptionPage}) an chained analyser selection
+ * ({@link ChainedAnalyzerOptionPage}).</P>
  *
  * @author Robi Malik
  */
 
-public class TRMonolithicModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public abstract class AbstractAnalysisOptionPage
+  extends SelectorLeafOptionPage<ModelAnalyzerFactoryLoader>
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static TRMonolithicModelAnalyzerFactory getInstance()
-  {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final TRMonolithicModelAnalyzerFactory INSTANCE =
-      new TRMonolithicModelAnalyzerFactory();
-  }
-
-
-  //#########################################################################
   //# Constructors
-  private TRMonolithicModelAnalyzerFactory()
+  public AbstractAnalysisOptionPage(final AnalysisOperation operation)
   {
+    this(operation,
+         operation.getOptionPagePrefix(),
+         operation.getShortWindowTitle());
+  }
+
+  public AbstractAnalysisOptionPage(final AnalysisOperation operation,
+                                    final String prefix,
+                                    final String title)
+  {
+    super(prefix, title);
+    mOperation = operation;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
-  @Override
-  public TRMonolithicControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
+  //# Simple Access
+  public AnalysisOperation getAnalysisOperation()
   {
-    return new TRMonolithicControllabilityChecker();
+    return mOperation;
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.options.LeafOptionPage
   @Override
-  public TRMonolithicCoobservabilityChecker createCoobservabilityChecker
-    (final ProductDESProxyFactory factory)
+  public String getShortDescription()
   {
-    return new TRMonolithicCoobservabilityChecker();
+    return mOperation.getShortWindowTitle();
   }
 
-  @Override
-  public TRMonolithicDeadlockChecker createDeadlockChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRMonolithicDeadlockChecker();
-  }
 
-  @Override
-  public TRMonolithicLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRMonolithicLanguageInclusionChecker();
-  }
-
-  @Override
-  public TRSynchronousProductBuilder createSynchronousProductBuilder
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRSynchronousProductBuilder();
-  }
+  //#########################################################################
+  //# Data Members
+  private final AnalysisOperation mOperation;
 
 }
