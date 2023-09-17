@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,6 +52,8 @@ import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -327,6 +330,22 @@ public class CommandLineToolTest
 
   //#########################################################################
   //# Test Cases - specific combinations of options
+  public void testOption_CompileOnly()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "cell");
+    final File output = getOutputWdes("cell");
+    final String[] args = new String[]
+      {"-c", file.toString(), "-o", output.toString(), "-v"};
+    testCommandLine("c", args, "Compiled product DES saved to .*");
+    assertTrue("Compiler output file not found!", output.canRead());
+    final DocumentManager manager = getDocumentManager();
+    final ProductDESProxy des = (ProductDESProxy) manager.load(output);
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    assertEquals("Unexpected number of automata in compiler output!",
+                 7, automata.size());
+  }
+
   public void testOption_D()
     throws Exception
   {
@@ -412,7 +431,11 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args = new String[] {"@name", "junit"};
-    testCommandLine("name", args, "USAGE: junit <.*");
+    testCommandLine("name", args, "USAGE:",
+                                  "junit -c.*",
+                                  "junit <.*",
+                                  "Possible algorithms are:",
+                                  "Possible operations are:");
   }
 
   public void testOption_MarkingBad()
@@ -500,6 +523,11 @@ public class CommandLineToolTest
   private File getInputWdes(final String... path)
   {
     return getInputFile(path, ".wdes");
+  }
+
+  private File getOutputWdes(final String... path)
+  {
+    return getOutputFile(path, ".wdes");
   }
 
   private File getInputProperties(final String... path)

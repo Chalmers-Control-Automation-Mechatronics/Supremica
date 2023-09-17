@@ -176,11 +176,7 @@ public abstract class CommandLineArgument
 
   public static void doIndent(final PrintStream stream, final int spaces)
   {
-    if (spaces > 0) {
-      for (int i = 0; i < spaces; i++) {
-        stream.print(' ');
-      }
-    } else {
+    for (int i = 0; i < spaces; i++) {
       stream.print(' ');
     }
   }

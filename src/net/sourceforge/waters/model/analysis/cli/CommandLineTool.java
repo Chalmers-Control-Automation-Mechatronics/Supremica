@@ -139,6 +139,8 @@ public class CommandLineTool implements Configurable
       new VerboseLogConfigurationFactory(mVerbosity);
     ConfigurationFactory.setConfigurationFactory(cfactory);
     final Formatter formatter = new Formatter(System.out);
+    final ProductDESProxyFactory desFactory =
+      ProductDESElementFactory.getInstance();
 
     try {
       int firstOptionIndex;
@@ -148,32 +150,38 @@ public class CommandLineTool implements Configurable
       } else {
         firstOptionIndex = 0;
       }
+      final AnalysisOperation operation;
       if (args.length == firstOptionIndex + 1 &&
           args[firstOptionIndex].equals("-version")) {
         Version.printConsoleInfo(System.out);
         ExitException.testFriendlyExit(0);
-      } else if (args.length < firstOptionIndex + 2) {
+        return;
+      } else if (args.length >= firstOptionIndex + 1 &&
+                 args[firstOptionIndex].equals("-c")) {
+        firstOptionIndex++;
+        operation = null;
+      } else if (args.length >= firstOptionIndex + 2) {
+        final String algorithmArg = args[firstOptionIndex++];
+        final String operationArg = args[firstOptionIndex++];
+        if (!algorithmArg.startsWith("-") || !operationArg.startsWith("-")) {
+          usage();
+        }
+        final ModelAnalyzerFactoryLoader factoryLoader = parseEnumValue
+          ("algorithm", ModelAnalyzerFactoryLoader.getEnumFactory(), algorithmArg);
+        operation = parseEnumValue
+          ("operation", AnalysisOperation.getEnumFactory(), operationArg);
+        final ModelAnalyzerFactory factory =
+          factoryLoader.getModelAnalyzerFactory();
+        try {
+          mAnalyzer = operation.createModelAnalyzer(factory, desFactory);
+        } catch (final AnalysisConfigurationException exception) {
+          failUnsupportedAlgorithm(operation, factory);
+        }
+      } else {
         usage();
-      }
-      final String algorithmArg = args[firstOptionIndex++];
-      final String operationArg = args[firstOptionIndex++];
-      if (!algorithmArg.startsWith("-") || !operationArg.startsWith("-")) {
-        usage();
+        return;
       }
 
-      final ModelAnalyzerFactoryLoader factoryLoader = parseEnumValue
-        ("algorithm", ModelAnalyzerFactoryLoader.getEnumFactory(), algorithmArg);
-      final AnalysisOperation operation = parseEnumValue
-        ("operation", AnalysisOperation.getEnumFactory(), operationArg);
-      final ModelAnalyzerFactory factory =
-        factoryLoader.getModelAnalyzerFactory();
-      final ProductDESProxyFactory desFactory =
-        ProductDESElementFactory.getInstance();
-      try {
-        mAnalyzer = operation.createModelAnalyzer(factory, desFactory);
-      } catch (final AnalysisConfigurationException exception) {
-        failUnsupportedAlgorithm(operation, factory);
-      }
 
       final List<String> argList = new LinkedList<>();
       for (int i = firstOptionIndex; i < args.length; i++) {
@@ -187,8 +195,10 @@ public class CommandLineTool implements Configurable
       final ModuleCompiler dummyCompiler =
         new ModuleCompiler(null, null, null);
       mContext.registerArguments(WatersOptionPages.COMPILER, dummyCompiler);
-      final AnalysisOptionPage analyserPage = operation.getOptionPage();
-      mContext.registerArguments(analyserPage, mAnalyzer);
+      if (operation != null) {
+        final AnalysisOptionPage analyserPage = operation.getOptionPage();
+        mContext.registerArguments(analyserPage, mAnalyzer);
+      }
       final ListIterator<String> argIter = argList.listIterator();
       mContext.parse(argIter);
       mContext.configure(this);
@@ -244,7 +254,9 @@ public class CommandLineTool implements Configurable
           fullName = ModuleCompiler.getParametrizedName(module, bindings);
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          operation.preConfigure(compiler);
+          if (operation != null) {
+            operation.preConfigure(compiler);
+          }
           mContext.configure(compiler);
           watchdog.addAbortable(compiler);
           try {
@@ -270,6 +282,17 @@ public class CommandLineTool implements Configurable
           System.out.println();
         } else {
           System.out.flush();
+        }
+
+        if (operation == null) {
+          if (mOutputFile != null) {
+            docManager.saveAs(des, mOutputFile);
+            if (mVerbosity.isLessSpecificThan(Level.INFO)) {
+              formatter.format("Compiled product DES saved to %s\n",
+                               mOutputFile.toString());
+            }
+          }
+          continue;
         }
 
         mContext.setProductDES(des);
@@ -414,8 +437,7 @@ public class CommandLineTool implements Configurable
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(CommandLineOptionContext.
-                     OPTION_CommandLineTool_Csv)) {
+    if (option.hasID(CommandLineOptionContext.OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
       final File file = opt.getValue();
       if (file != null) {
@@ -516,7 +538,9 @@ public class CommandLineTool implements Configurable
 
   private void usage()
   {
-    System.err.print("USAGE: ");
+    System.err.println("USAGE:");
+    System.err.print(mToolName);
+    System.err.println(" -c [options] <file> ...");
     System.err.print(mToolName);
     System.err.println(" <algorithm> <operation> [options] <file> ...");
     ModelAnalyzerFactoryLoader.getEnumFactory().

@@ -145,9 +145,20 @@ public abstract class AbstractWatersTest
     return dir;
   }
 
+  protected File getOutputFile(final String[] path, final String ext)
+  {
+    final File dir = getOutputDirectory();
+    return getFile(dir, path, ext);
+  }
+
   protected File getInputFile(final String[] path, final String ext)
   {
-    File dir = getWatersInputRoot();
+    final File dir = getWatersInputRoot();
+    return getFile(dir, path, ext);
+  }
+
+  private File getFile(File dir, final String[] path, final String ext)
+  {
     final int len = path.length - 1;
     for (int i = 0; i < len; i++) {
       dir = new File(dir, path[i]);
