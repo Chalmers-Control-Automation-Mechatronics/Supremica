@@ -1,0 +1,12 @@
+event tu_load\[0\] COOBS:controller1 1
+event tu_accept\[0\] COOBS:observer1 1
+event .*\[1\] COOBS:observer1 1
+event .*\[1\] controllable COOBS:controller1 1
+event tu_load\[1\] COOBS:controller2 2
+event tu_accept\[1\] COOBS:observer2 2
+event .*\[2\] COOBS:observer2 2
+event .*\[2\] controllable COOBS:controller2 2
+event tu_load\[2\] COOBS:controller3 3
+event tu_accept\[2\] COOBS:observer3 3
+event .*\[3\] COOBS:observer3 3
+event .*\[3\] controllable COOBS:controller3 3

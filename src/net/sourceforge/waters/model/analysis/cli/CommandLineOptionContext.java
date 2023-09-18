@@ -485,6 +485,9 @@ public class CommandLineOptionContext implements OptionContext
     public CommandLineToolOptionPage()
     {
       super("cli", "Command Line Tool");
+      register(new FileOption(OPTION_CommandLineTool_AnnotationsFile, null,
+                              "Annotations file", "-ann",
+                              FileOption.Type.INPUT_FILE));
       register(new FileOption(OPTION_CommandLineTool_Csv, null,
                               "Save statistics in CSV file", "-csv",
                               FileOption.Type.OUTPUT_FILE));
@@ -543,6 +546,8 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Class Constants
+  public static final String OPTION_CommandLineTool_AnnotationsFile =
+    "CommandLineTool.AnnotationsFile";
   public static final String OPTION_CommandLineTool_Csv =
     "CommandLineTool.Csv";
   public static final String OPTION_CommandLineTool_Properties =

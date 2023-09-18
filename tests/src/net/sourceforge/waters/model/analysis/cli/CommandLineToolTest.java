@@ -41,18 +41,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -346,6 +350,60 @@ public class CommandLineToolTest
                  7, automata.size());
   }
 
+  public void testOption_AnnotationsFile()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "transferline");
+    final File annsFile = getInputCann("handwritten", "transferline");
+    final File output = getOutputWdes("transferline3");
+    final String[] args = new String[]
+      {"-c", file.toString(), "-D", "N=3", "-ann", annsFile.toString(),
+       "-o", output.toString()};
+    testCommandLine("ann", args);
+    assertTrue("Compiler output file not found!", output.canRead());
+    final DocumentManager manager = getDocumentManager();
+    final ProductDESProxy des = (ProductDESProxy) manager.load(output);
+
+    final Pattern pattern = Pattern.compile("\\[([0-9])\\]");
+    for (final EventProxy event : des.getEvents()) {
+      final String name = event.getName();
+      final Matcher matcher = pattern.matcher(name);
+      if (matcher.find()) {
+        final Map<String,String> attribs = event.getAttributes();
+        final String group = matcher.group(1);
+        final int index = Integer.parseInt(group);
+        if (index > 0) {
+          if (event.getKind() == EventKind.CONTROLLABLE) {
+            final String key =
+              CoobservabilityAttributeFactory.CONTROLLABITY_KEY + group;
+            assertEquals("Unexpected attribute for event '" + name + "'!",
+                         group, attribs.get(key));
+          }
+          if (event.isObservable()) {
+            final String key =
+              CoobservabilityAttributeFactory.OBSERVABITY_KEY + group;
+            assertEquals("Unexpected attribute for event '" + name + "'!",
+                         group, attribs.get(key));
+          }
+        }
+        if (index < 3) {
+          final String next = Integer.toString(index + 1);
+          if (name.startsWith("tu_load")) {
+            final String key =
+              CoobservabilityAttributeFactory.CONTROLLABITY_KEY + next;
+            assertEquals("Unexpected attribute for event '" + name + "'!",
+                         next, attribs.get(key));
+          } else if (name.startsWith("tu_accept")) {
+            final String key =
+              CoobservabilityAttributeFactory.OBSERVABITY_KEY + next;
+            assertEquals("Unexpected attribute for event '" + name + "'!",
+                         next, attribs.get(key));
+          }
+        }
+      }
+    }
+  }
+
   public void testOption_D()
     throws Exception
   {
@@ -525,6 +583,11 @@ public class CommandLineToolTest
     return getInputFile(path, ".wdes");
   }
 
+  private File getInputCann(final String... path)
+  {
+    return getInputFile(path, ".cann");
+  }
+
   private File getOutputWdes(final String... path)
   {
     return getOutputFile(path, ".wdes");
@@ -566,6 +629,9 @@ public class CommandLineToolTest
       System.setErr(sysErr);
     }
 
+    if (outputPatterns.length == 0) {
+      return;
+    }
     final List<PatternHandler> patterns =
       new ArrayList<>(outputPatterns.length + 1);
     final List<PatternHandler> antiPatterns =

@@ -139,8 +139,7 @@ public class CommandLineTool implements Configurable
       new VerboseLogConfigurationFactory(mVerbosity);
     ConfigurationFactory.setConfigurationFactory(cfactory);
     final Formatter formatter = new Formatter(System.out);
-    final ProductDESProxyFactory desFactory =
-      ProductDESElementFactory.getInstance();
+    mFactory = ProductDESElementFactory.getInstance();
 
     try {
       int firstOptionIndex;
@@ -173,7 +172,7 @@ public class CommandLineTool implements Configurable
         final ModelAnalyzerFactory factory =
           factoryLoader.getModelAnalyzerFactory();
         try {
-          mAnalyzer = operation.createModelAnalyzer(factory, desFactory);
+          mAnalyzer = operation.createModelAnalyzer(factory, mFactory);
         } catch (final AnalysisConfigurationException exception) {
           failUnsupportedAlgorithm(operation, factory);
         }
@@ -211,9 +210,9 @@ public class CommandLineTool implements Configurable
       final SAXModuleMarshaller moduleMarshaller =
         new SAXModuleMarshaller(moduleFactory, optable, false);
       final SAXProductDESMarshaller desMarshaller =
-        new SAXProductDESMarshaller(desFactory);
+        new SAXProductDESMarshaller(mFactory);
       final SAXCounterExampleMarshaller traceMarshaller =
-        new SAXCounterExampleMarshaller(desFactory);
+        new SAXCounterExampleMarshaller(mFactory);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
@@ -240,8 +239,8 @@ public class CommandLineTool implements Configurable
         final long start = System.currentTimeMillis();
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
-        final ProductDESProxy des;
         final String fullName;
+        ProductDESProxy des;
         long compileTime = -1;
         if (doc instanceof ProductDESProxy) {
           des = (ProductDESProxy) doc;
@@ -253,7 +252,7 @@ public class CommandLineTool implements Configurable
             CompilerOptions.PARAMETER_BINDINGS.getValue();
           fullName = ModuleCompiler.getParametrizedName(module, bindings);
           final ModuleCompiler compiler =
-            new ModuleCompiler(docManager, desFactory, module);
+            new ModuleCompiler(docManager, mFactory, module);
           if (operation != null) {
             operation.preConfigure(compiler);
           }
@@ -284,6 +283,9 @@ public class CommandLineTool implements Configurable
           System.out.flush();
         }
 
+        if (mAnnotator != null) {
+          des = mAnnotator.apply(des);
+        }
         if (operation == null) {
           if (mOutputFile != null) {
             docManager.saveAs(des, mOutputFile);
@@ -418,6 +420,8 @@ public class CommandLineTool implements Configurable
   {
     final List<Option<?>> options = new LinkedList<>();
     page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_AnnotationsFile);
+    page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Csv);
     page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Properties);
@@ -437,7 +441,23 @@ public class CommandLineTool implements Configurable
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(CommandLineOptionContext.OPTION_CommandLineTool_Csv)) {
+    if (option.hasID(CommandLineOptionContext.
+                     OPTION_CommandLineTool_AnnotationsFile)) {
+      final FileOption opt = (FileOption) option;
+      final File file = opt.getValue();
+      if (file != null) {
+        try {
+          mAnnotator = new EventAnnotator(mFactory, file);
+        } catch (final FileNotFoundException exception) {
+          LogManager.getLogger().error("Can't open annotations file {}.", file);
+          ExitException.testFriendlyExit(1);
+        } catch (final IOException exception) {
+          LogManager.getLogger().error("Error reading annotations file {}: {}",
+                                       file, exception.getMessage());
+          ExitException.testFriendlyExit(1);
+        }
+      }
+    } else if (option.hasID(CommandLineOptionContext.OPTION_CommandLineTool_Csv)) {
       final FileOption opt = (FileOption) option;
       final File file = opt.getValue();
       if (file != null) {
@@ -582,11 +602,13 @@ public class CommandLineTool implements Configurable
   private boolean mStats = false;
   private int mTimeout = -1;
   private PrintWriter mCsv = null;
+  private EventAnnotator mAnnotator;
   private File mOutputFile = null;
   private String mToolName =
     "java " + ProxyTools.getShortClassName(CommandLineTool.class);
   private boolean mCsvFirst = true;
 
+  private ProductDESProxyFactory mFactory;
   private CommandLineOptionContext mContext;
   private ModelAnalyzer mAnalyzer;
 
