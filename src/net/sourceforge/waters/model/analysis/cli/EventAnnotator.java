@@ -75,21 +75,25 @@ public class EventAnnotator
     final BufferedReader reader = new BufferedReader(in);
     int lineNumber = 0;
     try {
+      final Pattern blankPattern = Pattern.compile("[ \\t]*");
       String line = reader.readLine();
-      lineNumber++;
       while (line != null) {
-        final String[] words = line.split("  *");
-        if (words.length < 3) {
-          throw new IOException("Missing key or value annotation on line " +
-                                lineNumber + ".");
-        }
-        final String key = words[0];
-        if (key.equalsIgnoreCase("event")) {
-          final EventPattern pattern = new EventPattern(words, lineNumber);
-          mPatterns.add(pattern);
-        } else {
-          throw new IOException("Unsupported pattern type '" + key +
-                                "' on line " + lineNumber + ".");
+        lineNumber++;
+        final Matcher blankMatcher = blankPattern.matcher(line);
+        if (!blankMatcher.matches()) {
+          final String[] words = line.split("  *", 0);
+          if (words.length < 3) {
+            throw new IOException("Missing key or value annotation on line " +
+              lineNumber + ".");
+          }
+          final String key = words[0];
+          if (key.equalsIgnoreCase("event")) {
+            final EventPattern pattern = new EventPattern(words, lineNumber);
+            mPatterns.add(pattern);
+          } else {
+            throw new IOException("Unsupported pattern type '" + key +
+                                  "' on line " + lineNumber + ".");
+          }
         }
         line = reader.readLine();
       }
