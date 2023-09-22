@@ -287,12 +287,17 @@ public class HISCCPInterfaceConsistencyCheckerTest
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_highlevel.wmod", true);
   }
 
-  public void testHISCCP_parManEg_node0()
+  public void testHISCCP_parManEg_node0ac()
   throws Exception
   {
-    runModelVerifier("despot", "parallelManufacturingExample", "Node0.wmod", true);
+    runModelVerifier("despot", "parallelManufacturingExample", "Node0ac.wmod", true);
   }
 
+  public void testHISCCP_parManEg_node0orig()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node0orig.wmod", true);
+  }
   public void testHISCCP_parManEg_node1()
   throws Exception
   {

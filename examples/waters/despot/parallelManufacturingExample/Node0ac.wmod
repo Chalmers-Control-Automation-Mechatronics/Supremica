@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="Node0">
-<B:Comment>Parallel Manufacturing System imported from DESpot, with bug fixes according to Ada Clevinger.</B:Comment>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="Node0ac">
+<B:Comment>Parallel Manufacturing System imported from DESpot, with bug fixes according to Ada Clevinger.
+The model is controllable, nonblocking, and coobservable subject to supervisor sites in Node0.cann.
+It has 5702550 reachabke states.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
 <EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
