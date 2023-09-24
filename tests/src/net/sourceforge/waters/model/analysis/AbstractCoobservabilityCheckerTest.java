@@ -251,7 +251,7 @@ public abstract class AbstractCoobservabilityCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "yip1coobs4.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
 

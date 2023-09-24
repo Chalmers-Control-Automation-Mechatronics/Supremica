@@ -2,7 +2,7 @@
 <Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="yip1coobs4">
 <B:Comment>Solution to traffic lights exercise by Peter Yun-il Park.
 This is a modified version for a coobservability check, with two supervisor sites for the main and side streets respectively. Each supervisor can control and observe the events to turn its lights red or yellow, the side supervisor observes enter_side, both supervisors can observe the events tick and arrive_side, and both supervisors control the events to turn the lights geen.
-This model is coobservable,</B:Comment>
+This model is not coobservable because of a bug that turns the side street lights green without a car having arrived.</B:Comment>
 <ConstantAliasList>
 <ConstantAlias Name="Streets">
 <ConstantAliasExpression><EnumSetExpression>

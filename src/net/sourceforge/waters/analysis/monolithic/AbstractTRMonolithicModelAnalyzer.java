@@ -55,6 +55,7 @@ import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.analysis.tr.TRKindTranslator;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -363,6 +364,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
+    final TRKindTranslator trTranslator = new TRKindTranslator(translator);
+    setKindTranslator(trTranslator);
     final ProductDESProxy des = getModel();
     final Collection<AutomatonProxy> automata = des.getAutomata();
     int numAutomata = 0;
@@ -382,6 +385,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy
           (aut, translator, config);
         mTRAutomata[a] = tr;
+        trTranslator.add(aut, tr);
         a++;
       }
     }
@@ -725,6 +729,9 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   protected void tearDown()
   {
     super.tearDown();
+    final TRKindTranslator trTranslator = (TRKindTranslator) getKindTranslator();
+    final KindTranslator translator = trTranslator.getParent();
+    setKindTranslator(translator);
     mInputAutomata = null;
     mTRAutomata = null;
     mEventInfo = null;

@@ -55,7 +55,8 @@ public class CoobservabilityDiagnostics
 
   //#########################################################################
   //# Constructor
-  public CoobservabilityDiagnostics(final List<SupervisorSite> controllers)
+  public CoobservabilityDiagnostics
+    (final List<CoobservabilitySignature.Site> controllers)
   {
     mControllers = controllers;
   }
@@ -91,7 +92,7 @@ public class CoobservabilityDiagnostics
       break;
     case 1:
       buffer.append("the only supervisor that could disable this event, ");
-      final SupervisorSite site = mControllers.get(0);
+      final CoobservabilitySignature.Site site = mControllers.get(0);
       buffer.append(site.getName());
       buffer.append(", cannot do so unambiguously.");
       break;
@@ -115,7 +116,7 @@ public class CoobservabilityDiagnostics
 
   //#########################################################################
   //# Data Members
-  private final List<SupervisorSite> mControllers;
+  private final List<CoobservabilitySignature.Site> mControllers;
 
 
   //#########################################################################
