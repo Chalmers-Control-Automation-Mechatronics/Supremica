@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.analysis.coobs.CoobservabilityDiagnostics;
+import net.sourceforge.waters.analysis.coobs.CoobservabilitySignature;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
@@ -101,6 +102,12 @@ public class ModularCoobservabilityChecker
   }
 
   @Override
+  public void setSignature(final CoobservabilitySignature sig)
+  {
+    mSignature = sig;
+  }
+
+  @Override
   public CoobservabilityCounterExampleProxy getCounterExample()
   {
     return (CoobservabilityCounterExampleProxy) super.getCounterExample();
@@ -152,6 +159,18 @@ public class ModularCoobservabilityChecker
   }
 
   @Override
+  protected void configureMonolithicVerifier(final ProductDESProxy des)
+  {
+    super.configureMonolithicVerifier(des);
+    if (mSignature != null) {
+      final CoobservabilityChecker mono = getMonolithicVerifier();
+      final CoobservabilitySignature sig =
+        new CoobservabilitySignature(mSignature, des);
+      mono.setSignature(sig);
+    }
+  }
+
+  @Override
   protected CoobservabilityCounterExampleProxy createExtendedCounterexample
     (final CounterExampleProxy counter,
      final Collection<AutomatonProxy> newAutomata,
@@ -168,6 +187,7 @@ public class ModularCoobservabilityChecker
 
   //#########################################################################
   //# Data Members
+  private CoobservabilitySignature mSignature;
   private String mDefaultSiteName =
     CoobservabilityAttributeFactory.DEFAULT_SITE_NAME;
 

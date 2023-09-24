@@ -180,6 +180,30 @@ public class CoobservabilitySignature
     }
   }
 
+  public CoobservabilitySignature(final CoobservabilitySignature sig,
+                                  final ProductDESProxy des)
+  {
+    final Collection<EventProxy> events = des.getEvents();
+    final Collection<Site> sites = sig.getSites();
+    final int numSites = sites.size();
+    final Map<Site,Site> cloneMap = new HashMap<>(numSites);
+    mSites = new LinkedList<>();
+    for (final Site site : sites) {
+      final Site cloned = site.restrict(events);
+      cloneMap.put(site, cloned);
+      mSites.add(cloned);
+    }
+    final int numEvents = Math.max(sig.mEventMap.size(), events.size());
+    mEventMap = new HashMap<>(numEvents);
+    for (final EventProxy event : events) {
+      final EventInfo info = sig.mEventMap.get(event);
+      if (info != null) {
+        final EventInfo cloned = new EventInfo(info, cloneMap);
+        mEventMap.put(event, cloned);
+      }
+    }
+  }
+
   private Site getSite(final Map<String,Site> siteMap, final String name)
   {
     Site site = siteMap.get(name);
@@ -611,6 +635,25 @@ public class CoobservabilitySignature
       mObservedEvents = new THashSet<>(site.mObservedEvents);
     }
 
+    private Site(final Site site, final Collection<EventProxy> events)
+    {
+      final int numEvents = events.size();
+      final int numControlled = Math.max(numEvents, site.mControlledEvents.size());
+      mControlledEvents = new THashSet<>(numControlled);
+      for (final EventProxy event : events) {
+        if (site.mControlledEvents.contains(event)) {
+          mControlledEvents.add(event);
+        }
+      }
+      final int numObserved = Math.max(numEvents, site.mObservedEvents.size());
+      mObservedEvents = new THashSet<>(numObserved);
+      for (final EventProxy event : events) {
+        if (site.mObservedEvents.contains(event)) {
+          mObservedEvents.add(event);
+        }
+      }
+    }
+
     //#########################################################################
     //# Simple Access
     public String getName()
@@ -672,6 +715,8 @@ public class CoobservabilitySignature
     @Override
     protected abstract Site clone();
 
+    protected abstract Site restrict(Collection<EventProxy> events);
+
     abstract void appendName(StringBuilder builder, boolean braced);
 
     abstract Collection<SingletonSite> getSingletonMembers();
@@ -720,6 +765,13 @@ public class CoobservabilitySignature
       mName = site.mName;
     }
 
+    private SingletonSite(final SingletonSite site,
+                          final Collection<EventProxy> events)
+    {
+      super(site, events);
+      mName = site.mName;
+    }
+
     //#########################################################################
     //# Overrides for
     //# net.sourceforge.waters.analysis.coobs.CoobservabilitySignature.Site
@@ -727,6 +779,12 @@ public class CoobservabilitySignature
     protected SingletonSite clone()
     {
       return new SingletonSite(this);
+    }
+
+    @Override
+    protected SingletonSite restrict(final Collection<EventProxy> events)
+    {
+      return new SingletonSite(this, events);
     }
 
     @Override
@@ -774,6 +832,12 @@ public class CoobservabilitySignature
       }
     }
 
+    private MergedSite(final Site site, final Collection<EventProxy> events)
+    {
+      super(site, events);
+      mMembers = new LinkedList<>();
+    }
+
     //#########################################################################
     //# Overrides for
     //# net.sourceforge.waters.analysis.coobs.CoobservabilitySignature.Site
@@ -783,6 +847,17 @@ public class CoobservabilitySignature
       final MergedSite site = new MergedSite();
       for (final SingletonSite member : mMembers) {
         final SingletonSite cloned = member.clone();
+        site.include(cloned);
+      }
+      return site;
+    }
+
+    @Override
+    public MergedSite restrict(final Collection<EventProxy> events)
+    {
+      final MergedSite site = new MergedSite(this, events);
+      for (final SingletonSite member : mMembers) {
+        final SingletonSite cloned = member.restrict(events);
         site.include(cloned);
       }
       return site;

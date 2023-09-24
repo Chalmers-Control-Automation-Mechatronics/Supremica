@@ -34,6 +34,8 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
+import net.sourceforge.waters.analysis.coobs.CoobservabilitySignature;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -55,6 +57,11 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * as default supervisor site using {@link #setDefaultSiteName(String)
  * setDefaultSite()}. Using the default site, coobservability is equivalent to
  * controllability for models without any supervisor site attributes.</P>
+ *
+ * <P>As usual, a {@link KindTranslator} can be set to transform the
+ * controllability status of events as well as component kinds.
+ * Alternatively, the relationship between events and supervisor sites
+ * can be defined by specifying a {@link CoobservabilitySignature}.</P>
  *
  * <P>A model is coobservable with respect to a group of supervisor sites if it
  * satisfies the following controllability condition: If in the synchronous
@@ -97,6 +104,16 @@ public interface CoobservabilityChecker extends ModelVerifier
    * @see #setDefaultSiteName(String) setDefaultSite()
    */
   public String getDefaultSiteName();
+
+  /**
+   * Sets a coobservability signature to determine which events are controlled
+   * by which supervisor site. If not specified, a signature is obtained from
+   * the event kind and attribute information in the model. If specified, the
+   * signature replaces the information in the model. The signature object may
+   * be modified while running the coobservability check, so the caller should
+   * not assume that it retains its contents afterwards.
+   */
+  public void setSignature(CoobservabilitySignature sig);
 
 
   //#########################################################################

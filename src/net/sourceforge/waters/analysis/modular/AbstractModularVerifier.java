@@ -434,7 +434,7 @@ abstract class AbstractModularVerifier
           final String comment = getSubsystemComment(specName);
           subDES = AutomatonTools.createProductDESProxy(specName, comment,
                                                         subsystem, factory);
-          mMonolithicVerifier.setModel(subDES);
+          configureMonolithicVerifier(subDES);
         }
 
         final VerificationResult subResult =
@@ -476,6 +476,14 @@ abstract class AbstractModularVerifier
     mRemainingPlants = null;
     mSpecsConvertedToPlants = null;
     mAutomataMap = null;
+  }
+
+
+  //#########################################################################
+  //# Hooks
+  protected void configureMonolithicVerifier(final ProductDESProxy des)
+  {
+    mMonolithicVerifier.setModel(des);
   }
 
 

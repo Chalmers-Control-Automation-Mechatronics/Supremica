@@ -131,6 +131,12 @@ public class TRMonolithicCoobservabilityChecker
   }
 
   @Override
+  public void setSignature(final CoobservabilitySignature sig)
+  {
+    mSignature = sig;
+  }
+
+  @Override
   public CoobservabilityCounterExampleProxy getCounterExample()
   {
     return (CoobservabilityCounterExampleProxy) super.getCounterExample();
@@ -179,7 +185,10 @@ public class TRMonolithicCoobservabilityChecker
     final ProductDESProxy des = getModel();
     final KindTranslator translator = getKindTranslator();
     final TRAutomatonProxy[] trs = getTRAutomata();
-    mSignature = new CoobservabilitySignature(des, translator, mDefaultSiteName);
+    if (mSignature == null) {
+      mSignature = new CoobservabilitySignature(des, translator,
+                                                mDefaultSiteName);
+    }
     mSignature.filter(trs, translator);
     mSignature.merge();
     mSignature.subsume();
@@ -199,7 +208,7 @@ public class TRMonolithicCoobservabilityChecker
     final int numEvents = events.size();
     mCoobservabilityEventInfoMap = new HashMap<>(numEvents);
     for (final EventProxy event : des.getEvents()) {
-      final EventKind kind = event.getKind();
+      final EventKind kind = translator.getEventKind(event);
       if (kind == EventKind.CONTROLLABLE || kind == EventKind.UNCONTROLLABLE) {
         final CoobservabilityEventInfo info =
           new CoobservabilityEventInfo(event);
