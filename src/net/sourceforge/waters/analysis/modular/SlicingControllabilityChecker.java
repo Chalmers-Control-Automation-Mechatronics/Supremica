@@ -33,90 +33,65 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
+import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
+/**
+ * <P>A modular controllability check algorithm that uses one uncontrollable
+ * event at a time.</P>
+ *
+ * <P><I>Reference:</I><BR>
+ * Bertil A. Brandin, Robi Malik, Petra Malik. Incremental verification
+ * and synthesis of discrete-event systems guided by counter-examples.
+ * IEEE Transactions on Control Systems Technology,
+ * <STRONG>12</STRONG>&nbsp;(3), 387&ndash;401, 2004.</P>
+ *
+ * @author Simon Ware, Robi Malik
+ */
 
-public class OneUncontrollableCheckerTest
-  extends AbstractControllabilityCheckerTest
+public class SlicingControllabilityChecker
+  extends AbstractSlicingSafetyVerifier
+  implements ControllabilityChecker
 {
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  //# Constructors
+  public SlicingControllabilityChecker(final ProductDESProxyFactory factory,
+                                       final ControllabilityChecker mono)
   {
-    final TestSuite testSuite =
-      new TestSuite(OneUncontrollableCheckerTest.class);
-    return testSuite;
+    this(null, factory, mono);
   }
 
-  public static void main(final String[] args)
+  public SlicingControllabilityChecker(final ProductDESProxy model,
+                                       final ProductDESProxyFactory factory,
+                                       final ControllabilityChecker mono)
   {
-    junit.textui.TestRunner.run(suite());
-  }
-
-
-  //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractControllabilityCheckerTest
-  @Override
-  public void testHISCAIP0Sub1Patch0() throws Exception
-  {
-    try {
-      super.testHISCAIP0Sub1Patch0();
-    } catch (final OverflowException exception) {
-      // Can't do this one-uncontrollable-at-a-time --- too bad :-(
-    }
-  }
-
-  @Override
-  public void testHISCAIP0Sub1Patch1() throws Exception
-  {
-    try {
-      super.testHISCAIP0Sub1Patch1();
-    } catch (final OverflowException exception) {
-      // Can't do this one-uncontrollable-at-a-time --- too bad :-(
-    }
-  }
-
-  @Override
-  public void testHISCAIP0Sub1Patch2() throws Exception
-  {
-    try {
-      super.testHISCAIP0Sub1Patch2();
-    } catch (final OverflowException exception) {
-      // Can't do this one-uncontrollable-at-a-time --- too bad :-(
-    }
-  }
-
-  @Override
-  public void testTransferline__5() throws Exception
-  {
-    try {
-      super.testTransferline__5();
-    } catch (final OverflowException exception) {
-      // Can't do this one-uncontrollable-at-a-time --- too bad :-(
-    }
+    super(model,
+          ControllabilityKindTranslator.getInstance(),
+          ControllabilityDiagnostics.getInstance(),
+          factory,
+          mono);
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyser
   @Override
-  protected ControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory desfactory)
+  public List<Option<?>> getOptions(final LeafOptionPage db)
   {
-    return new OneUncontrollableChecker
-      (null, desfactory,
-       new ModularControllabilityChecker
-         (null, desfactory, new NativeControllabilityChecker(null, desfactory)));
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, SlicingModelVerifierFactory.
+                       OPTION_SlicingControllabilityChecker_Chain);
+    return options;
   }
+
 
 }

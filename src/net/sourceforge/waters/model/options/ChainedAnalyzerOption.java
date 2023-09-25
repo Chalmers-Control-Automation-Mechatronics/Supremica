@@ -79,8 +79,22 @@ public class ChainedAnalyzerOption
                                final ModelAnalyzerFactoryLoader defaultLoader,
                                final String[] chainSuppressions)
   {
+    this(id, shortName, description, parentPage.getAnalysisOperation(),
+         parentPage, parentLoader, defaultLoader, chainSuppressions);
+  }
+
+  public ChainedAnalyzerOption(final String id,
+                               final String shortName,
+                               final String description,
+                               final AnalysisOperation operation,
+                               final AnalysisOptionPage parentPage,
+                               final ModelAnalyzerFactoryLoader parentLoader,
+                               final ModelAnalyzerFactoryLoader defaultLoader,
+                               final String[] chainSuppressions)
+  {
     super(id, shortName, description, "-chain",
           createEnumFactory(parentPage, parentLoader, defaultLoader));
+    mOperation = operation;
     mOptionPage =
       new ChainedAnalyzerOptionPage(parentPage, this, chainSuppressions);
     mParentLoader = parentLoader;
@@ -92,6 +106,7 @@ public class ChainedAnalyzerOption
     super(template, createEnumFactory(parentPage,
                                       template.mParentLoader,
                                       template.getDefaultValue()));
+    mOperation = template.mOperation;
     mOptionPage =
       new ChainedAnalyzerOptionPage(parentPage, this, template.mOptionPage);
     mParentLoader = template.mParentLoader;
@@ -162,9 +177,8 @@ public class ChainedAnalyzerOption
     final ModelAnalyzerFactoryLoader loader = getValue();
     try {
       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-      final AnalysisOperation operation = mOptionPage.getAnalysisOperation();
       final ModelAnalyzer analyzer =
-        operation.createModelAnalyzer(factory, desFactory);
+        mOperation.createModelAnalyzer(factory, desFactory);
       for (final Option<?> option : analyzer.getOptions(mOptionPage)) {
         analyzer.setOption(option);
       }
@@ -213,5 +227,6 @@ public class ChainedAnalyzerOption
   //# Data Members
   private final ChainedAnalyzerOptionPage mOptionPage;
   private final ModelAnalyzerFactoryLoader mParentLoader;
+  private final AnalysisOperation mOperation;
 
 }

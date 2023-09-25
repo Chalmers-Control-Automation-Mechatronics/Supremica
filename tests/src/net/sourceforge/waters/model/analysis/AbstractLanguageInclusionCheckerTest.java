@@ -451,10 +451,6 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
 
   //#########################################################################
-  //# Test Cases -- Parameterised
-
-
-  //#########################################################################
   //# Specialised Invocation Code to Check Particular Properties
   protected void runModelVerifier(final String group,
                                   final String name,

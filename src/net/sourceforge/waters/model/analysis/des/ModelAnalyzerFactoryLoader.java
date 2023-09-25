@@ -65,6 +65,7 @@ public enum ModelAnalyzerFactoryLoader
   Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory", "-mono"),
   Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory", "-native"),
   PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory", "-po"),
+  Slicing("net.sourceforge.waters.analysis.modular.SlicingModelVerifierFactory", "-slice"),
   Supremica("org.supremica.automata.waters.SupremicaModelAnalyzerFactory", "-sup"),
   TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory", "-trcomp"),
   TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory", "-trmono");

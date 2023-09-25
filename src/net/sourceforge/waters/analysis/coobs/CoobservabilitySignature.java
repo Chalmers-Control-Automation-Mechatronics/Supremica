@@ -510,12 +510,10 @@ public class CoobservabilitySignature
 
   public SiteSet findMinimalSiteSet()
   {
-    if (mEventMap.isEmpty()) {
-      return null;
-    } else {
-      final Map<Set<Site>,SiteSet> candidates = new HashMap<>();
-      int bestNumSites = Integer.MAX_VALUE;
-      for (final EventInfo info : mEventMap.values()) {
+    final Map<Set<Site>,SiteSet> candidates = new HashMap<>();
+    int bestNumSites = Integer.MAX_VALUE;
+    for (final EventInfo info : mEventMap.values()) {
+      if (!info.isTotallyControllable()) {
         final Collection<Site> sites = info.getControllingSites();
         final int numSites = sites.size();
         if (numSites < bestNumSites) {
@@ -533,6 +531,10 @@ public class CoobservabilitySignature
           }
         }
       }
+    }
+    if (candidates.isEmpty()) {
+      return null;
+    } else {
       return Collections.min(candidates.values());
     }
   }
@@ -984,6 +986,7 @@ public class CoobservabilitySignature
     public String toString()
     {
       final StringBuilder builder = new StringBuilder();
+      builder.append('{');
       boolean first = true;
       for (final Site site : mSites) {
         if (first) {
@@ -993,6 +996,7 @@ public class CoobservabilitySignature
         }
         site.appendName(builder, true);
       }
+      builder.append('}');
       return builder.toString();
     }
 
