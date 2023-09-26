@@ -333,6 +333,7 @@ public class TRMonolithicCoobservabilityChecker
     CoobservabilityEventInfo eventInfo =
       (CoobservabilityEventInfo) getEventInfo(e);
     final EventProxy event = eventInfo.getEvent();
+    assert !mSignature.isTotallyControllable(event);
     final List<CoobservabilitySignature.Site> controllers =
       mSignature.getControllingSites(event);
     final int numTraces = controllers.size() + 1;

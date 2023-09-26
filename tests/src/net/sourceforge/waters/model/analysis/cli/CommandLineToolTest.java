@@ -159,6 +159,17 @@ public class CommandLineToolTest
     testCommandLine("mod-coobs", args, false, "counterexample:", "!Statistics");
   }
 
+  public void testAnalyzer_SlicingCoobservability()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
+    final File annsFile = getInputCann("tests", "coobservability", "verriegel");
+    final String[] args = new String[]
+      {"-slice", "-coobs", file.toString(), "-ann", annsFile.toString()};
+    testCommandLine("slice-coobs", args, true);
+  }
+
+
   // diagnosability
   public void testAnalyzer_MonolithicDiagnosability()
     throws Exception

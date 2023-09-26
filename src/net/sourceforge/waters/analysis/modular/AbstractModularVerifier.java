@@ -389,13 +389,14 @@ abstract class AbstractModularVerifier
         final Set<TRAutomatonProxy> uncomposedSpecPlants =
           new TreeSet<>(mSpecsConvertedToPlants);
         ProductDESProxy subDES = createDES(subsystem);
-        mMonolithicVerifier.setModel(subDES);
+        configureMonolithicVerifier(subDES);
 
         while (!mMonolithicVerifier.run()) {
           final VerificationResult subResult =
             mMonolithicVerifier.getAnalysisResult();
           recordStats(subResult);
           final CounterExampleProxy counter = subResult.getCounterExample();
+          debugCounterExample(counter);
           final Collection<TRAutomatonProxy> selectedAutomata =
             mHeuristicEvaluator.collectNonAccepting(subDES, counter,
                                                     uncomposedPlants,
@@ -638,6 +639,25 @@ abstract class AbstractModularVerifier
     return AutomatonTools.createProductDESProxy(name, comment,
                                                 subsystem, factory);
   }
+
+
+  //#########################################################################
+  //# Debugging
+  private void debugCounterExample(final CounterExampleProxy counter)
+  {
+    final Logger logger = LogManager.getLogger();
+    if (logger.isDebugEnabled()) {
+      final TraceProxy trace = counter.getTraces().get(0);
+      final List<EventProxy> events = trace.getEvents();
+      final int end = events.size() - 1;
+      if (end >= 0) {
+        final EventProxy event = events.get(end);
+        logger.debug("> Trace ends with {}", event.getName());
+      }
+    }
+  }
+
+
 
 
   //#########################################################################

@@ -237,6 +237,7 @@ public class CoobservabilitySignature
   {
     final EventInfo info = mEventMap.get(event);
     if (info == null) {
+      assert false : "Unkown event loopup of " + event.getName() + "!";
       return false;
     } else {
       return info.isTotallyControllable();

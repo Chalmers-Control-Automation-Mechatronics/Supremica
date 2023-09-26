@@ -290,13 +290,13 @@ public class HISCCPInterfaceConsistencyCheckerTest
   public void testHISCCP_parManEg_node0ac()
   throws Exception
   {
-    runModelVerifier("despot", "parallelManufacturingExample", "Node0ac.wmod", true);
+    runModelVerifier("despot", "parallelManufacturingExample", "pms_ac.wmod", true);
   }
 
   public void testHISCCP_parManEg_node0orig()
   throws Exception
   {
-    runModelVerifier("despot", "parallelManufacturingExample", "Node0orig.wmod", true);
+    runModelVerifier("despot", "parallelManufacturingExample", "pms_orig.wmod", true);
   }
   public void testHISCCP_parManEg_node1()
   throws Exception
