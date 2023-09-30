@@ -2,7 +2,7 @@
 <Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="verriegel4coobs">
 <B:Comment>Central locking system model from KorSys project. This is the enhanced version with four individual doors.
 This model has been modified by renaming events to support event annotations for a coobservability check.
-The model is controllable and nonblocking and coobservable based on annotations in verriegel,cann.
+The model is controllable and nonblocking, and it is coobservable based on annotations in verriegel4ann1.cann but not verriegel4ann2.cann.
 It has 45,877,446,552 reachable states, and the diameter is 111.
 </B:Comment>
 <ConstantAliasList>
@@ -348,9 +348,9 @@ It has 45,877,446,552 reachable states, and the diameter is 111.
 </BoxGeometry>
 </GroupNode>
 <GroupNode Name=":1">
+<NodeRef Name="FS"/>
 <NodeRef Name="VR"/>
 <NodeRef Name="ER"/>
-<NodeRef Name="FS"/>
 <NodeRef Name=":3"/>
 <BoxGeometry>
 <Box X="80" Y="112" Width="320" Height="432"/>
@@ -1179,16 +1179,16 @@ It has 45,877,446,552 reachable states, and the diameter is 111.
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="COD"/>
-<NodeRef Name="ZS"/>
-<NodeRef Name="ER"/>
-<NodeRef Name="VR"/>
-<NodeRef Name="IN"/>
-<NodeRef Name="RQZS"/>
-<NodeRef Name="RQVR"/>
-<NodeRef Name="TSTZS"/>
-<NodeRef Name="SER"/>
 <NodeRef Name="RQSER"/>
+<NodeRef Name="COD"/>
+<NodeRef Name="RQVR"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="RQZS"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="TSTZS"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="SER"/>
 <NodeRef Name="RQER"/>
 <BoxGeometry>
 <Box X="112" Y="16" Width="480" Height="416"/>
@@ -2223,29 +2223,29 @@ It has 45,877,446,552 reachable states, and the diameter is 111.
 </SimpleNode>
 <GroupNode Name=":0">
 <NodeRef Name="vr6"/>
-<NodeRef Name="zs7"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="vr3"/>
 <NodeRef Name="zs2"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="zs3"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="er3"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="zs6"/>
-<NodeRef Name="vr1"/>
 <NodeRef Name="VR"/>
 <NodeRef Name="ZS"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="IN"/>
-<NodeRef Name="ER"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="zs9"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="zs5"/>
 <NodeRef Name="vr8"/>
-<NodeRef Name="vr7"/>
-<NodeRef Name="vr5"/>
+<NodeRef Name="zs9"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs6"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="vr2"/>
 <NodeRef Name="zs8"/>
+<NodeRef Name="zs7"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="vr7"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="vr4"/>
 <BoxGeometry>
 <Box X="80" Y="48" Width="512" Height="448"/>
 </BoxGeometry>
@@ -3773,30 +3773,30 @@ It has 45,877,446,552 reachable states, and the diameter is 111.
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="zs7"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="zs8"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="vr5"/>
-<NodeRef Name="vr1"/>
-<NodeRef Name="VR"/>
-<NodeRef Name="IN"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="ER"/>
-<NodeRef Name="vr6"/>
 <NodeRef Name="er2"/>
-<NodeRef Name="zs9"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="zs3"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="er3"/>
 <NodeRef Name="vr2"/>
 <NodeRef Name="vr8"/>
 <NodeRef Name="zs6"/>
-<NodeRef Name="er3"/>
-<NodeRef Name="ZS"/>
-<NodeRef Name="zs5"/>
-<NodeRef Name="vr7"/>
+<NodeRef Name="vr6"/>
+<NodeRef Name="zs7"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="ER"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs2"/>
 <NodeRef Name="er1"/>
+<NodeRef Name="vr7"/>
+<NodeRef Name="zs8"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="zs9"/>
+<NodeRef Name="zs5"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="zs4"/>
 <BoxGeometry>
 <Box X="48" Y="16" Width="544" Height="448"/>
 </BoxGeometry>
@@ -4872,20 +4872,20 @@ It has 45,877,446,552 reachable states, and the diameter is 111.
 </LabelGeometry>
 </SimpleNode>
 <GroupNode Name=":1">
-<NodeRef Name="IN"/>
-<NodeRef Name="zs3"/>
-<NodeRef Name="zs1"/>
 <NodeRef Name="zs4"/>
-<NodeRef Name="zs2"/>
 <NodeRef Name="er3"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="vr5"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="vr1"/>
 <NodeRef Name="vr2"/>
+<NodeRef Name="vr4"/>
 <NodeRef Name="er4"/>
 <NodeRef Name="er1"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="zs1"/>
 <BoxGeometry>
 <Box X="48" Y="64" Width="512" Height="496"/>
 </BoxGeometry>
@@ -5352,20 +5352,20 @@ It has 45,877,446,552 reachable states, and the diameter is 111.
 </SimpleNode>
 <GroupNode Name=":0">
 <NodeRef Name="zs5"/>
-<NodeRef Name="er4"/>
-<NodeRef Name="er3"/>
-<NodeRef Name="vr4"/>
-<NodeRef Name="IN"/>
-<NodeRef Name="zs3a"/>
-<NodeRef Name="er2"/>
-<NodeRef Name="zs4"/>
-<NodeRef Name="vr3"/>
-<NodeRef Name="vr2"/>
-<NodeRef Name="zs1"/>
-<NodeRef Name="zs2"/>
-<NodeRef Name="er1"/>
-<NodeRef Name="zs3b"/>
 <NodeRef Name="vr1"/>
+<NodeRef Name="zs3a"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="er4"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="zs3b"/>
+<NodeRef Name="vr2"/>
 <BoxGeometry>
 <Box X="32" Y="16" Width="512" Height="544"/>
 </BoxGeometry>

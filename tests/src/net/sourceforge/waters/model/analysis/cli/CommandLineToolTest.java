@@ -163,7 +163,7 @@ public class CommandLineToolTest
     throws Exception
   {
     final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
-    final File annsFile = getInputCann("tests", "coobservability", "verriegel");
+    final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann1");
     final String[] args = new String[]
       {"-slice", "-coobs", file.toString(), "-ann", annsFile.toString()};
     testCommandLine("slice-coobs", args, true);
@@ -348,14 +348,17 @@ public class CommandLineToolTest
   public void testOption_CompileOnly()
     throws Exception
   {
+    final String renamed = "cell_renamed";
     final File file = getInputWmod("handwritten", "cell");
-    final File output = getOutputWdes("cell");
+    final File output = getOutputWdes(renamed);
     final String[] args = new String[]
       {"-c", file.toString(), "-o", output.toString(), "-v"};
     testCommandLine("c", args, "Compiled product DES saved to .*");
     assertTrue("Compiler output file not found!", output.canRead());
     final DocumentManager manager = getDocumentManager();
     final ProductDESProxy des = (ProductDESProxy) manager.load(output);
+    final String name = des.getName();
+    assertEquals("Unexpected name of out product DES!", renamed, name);
     final Collection<AutomatonProxy> automata = des.getAutomata();
     assertEquals("Unexpected number of automata in compiler output!",
                  7, automata.size());
@@ -387,14 +390,14 @@ public class CommandLineToolTest
           if (event.getKind() == EventKind.CONTROLLABLE) {
             final String key =
               CoobservabilityAttributeFactory.CONTROLLABITY_KEY + group;
-            assertEquals("Unexpected attribute for event '" + name + "'!",
-                         group, attribs.get(key));
+            assertEquals("Unexpected controllability attribute for event '" +
+                         name + "'!", group, attribs.get(key));
           }
           if (event.isObservable()) {
             final String key =
               CoobservabilityAttributeFactory.OBSERVABITY_KEY + group;
-            assertEquals("Unexpected attribute for event '" + name + "'!",
-                         group, attribs.get(key));
+            assertEquals("Unexpected observability attribute for event '" +
+                         name + "'!", group, attribs.get(key));
           }
         }
         if (index < 3) {
@@ -402,13 +405,13 @@ public class CommandLineToolTest
           if (name.startsWith("tu_load")) {
             final String key =
               CoobservabilityAttributeFactory.CONTROLLABITY_KEY + next;
-            assertEquals("Unexpected attribute for event '" + name + "'!",
-                         next, attribs.get(key));
+            assertEquals("Unexpected controllability attribute for event '" +
+                         name + "'!", next, attribs.get(key));
           } else if (name.startsWith("tu_accept")) {
             final String key =
               CoobservabilityAttributeFactory.OBSERVABITY_KEY + next;
-            assertEquals("Unexpected attribute for event '" + name + "'!",
-                         next, attribs.get(key));
+            assertEquals("Unexpected observability attribute for event '" +
+                         name + "'!", next, attribs.get(key));
           }
         }
       }

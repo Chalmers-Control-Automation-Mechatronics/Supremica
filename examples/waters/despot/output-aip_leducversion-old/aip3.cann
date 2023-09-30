@@ -1,0 +1,20 @@
+event [^\.]* COOBS:observer0 hi
+event .* HISC:EventType=REQUEST COOBS:observer0 hi
+event .* HISC:EventType=ANSWER COOBS:observer0 hi
+event [^\.]* controllable HISC:EventType!=ANSWER COOBS:controller0 hi
+event .*AS1 COOBS:observer1 as1
+event .*AS1 controllable HISC:EventType!=REQUEST COOBS:controller1 as1
+event .*AS2 COOBS:observer1 as2
+event .*AS2 controllable HISC:EventType!=REQUEST COOBS:controller1 as2
+event .*AS3 COOBS:observer1 as3
+event .*AS3 controllable HISC:EventType!=REQUEST COOBS:controller1 as3
+event .*TU1 COOBS:observer1 tu1
+event .*TU1 controllable HISC:EventType!=REQUEST COOBS:controller1 tu1
+event .*TU2 COOBS:observer1 tu2
+event .*TU2 controllable HISC:EventType!=REQUEST COOBS:controller1 tu2
+event .*TU3 COOBS:observer1 tu3
+event .*TU3 controllable HISC:EventType!=REQUEST COOBS:controller1 tu3
+event TrnsfToEL3.* COOBS:observer1 tu3
+event TrnsfToEL3.* controllable HISC:EventType!=REQUEST COOBS:controller1 tu3
+event .*TU4 COOBS:observer1 tu4
+event .*TU4 controllable HISC:EventType!=REQUEST COOBS:controller1 tu4

@@ -257,6 +257,7 @@ public class CommandLineTool implements Configurable
             operation.preConfigure(compiler);
           }
           mContext.configure(compiler);
+          compiler.setOutputName(mOutputFile);
           watchdog.addAbortable(compiler);
           try {
             des = compiler.compile();

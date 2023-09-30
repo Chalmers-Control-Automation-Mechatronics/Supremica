@@ -86,20 +86,33 @@ public class CoobservabilityDiagnostics
     buffer.append(" in state ");
     buffer.append(state.getName());
     buffer.append(", which is possible according to the plant model while ");
-    switch (mControllers.size()) {
-    case 0:
+    final int numControllers = mControllers.size();
+    if (numControllers == 0) {
       buffer.append("there is no supervisor that can disable this event.");
-      break;
-    case 1:
-      buffer.append("the only supervisor that could disable this event, ");
-      final CoobservabilitySignature.Site site = mControllers.get(0);
-      buffer.append(site.getName());
-      buffer.append(", cannot do so unambiguously.");
-      break;
-    default:
-      buffer.append("none of the supervisors that could disable this event " +
-                    "can do so unambiguously.");
-      break;
+    } else {
+      CoobservabilitySignature.Site site = null;
+      if (numControllers == 1) {
+        final CoobservabilitySignature.Site first = mControllers.get(0);
+        for (final CoobservabilitySignature.Site member :
+             first.getSingletonMembers()) {
+          if (member.isControlledEvent(event)) {
+            if (site == null) {
+              site = member;
+            } else {
+              site = null;
+              break;
+            }
+          }
+        }
+      }
+      if (site != null) {
+        buffer.append("the only supervisor that could disable this event, ");
+        buffer.append(site.getName());
+        buffer.append(", cannot do so unambiguously.");
+      } else {
+        buffer.append("none of the supervisors that could disable this event " +
+                      "can do so unambiguously.");
+      }
     }
     return buffer.toString();
   }

@@ -92,12 +92,14 @@ public class CommonEventsHeuristicValueProvider
     for (final AutomatonProxy aut : des.getAutomata()) {
       if (!automata.contains(aut)) {
         for (final EventProxy event : aut.getEvents()) {
+          final EventKind kind = translator.getEventKind(event);
           if (mEventKind == null) {
-            if (translator.getEventKind(event) != EventKind.PROPOSITION) {
+            if (kind == EventKind.CONTROLLABLE ||
+                kind == EventKind.UNCONTROLLABLE) {
               mCurrentEvents.add(event);
             }
           } else {
-            if (translator.getEventKind(event) == mEventKind) {
+            if (kind == mEventKind) {
               mCurrentEvents.add(event);
             }
           }

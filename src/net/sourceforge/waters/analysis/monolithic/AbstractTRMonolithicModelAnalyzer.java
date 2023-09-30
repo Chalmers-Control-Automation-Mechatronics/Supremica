@@ -364,8 +364,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
-    final TRKindTranslator trTranslator = new TRKindTranslator(translator);
-    setKindTranslator(trTranslator);
+    mTRKindTranslator = new TRKindTranslator(translator);
+    setKindTranslator(mTRKindTranslator);
     final ProductDESProxy des = getModel();
     final Collection<AutomatonProxy> automata = des.getAutomata();
     int numAutomata = 0;
@@ -385,7 +385,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
         final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy
           (aut, translator, config);
         mTRAutomata[a] = tr;
-        trTranslator.add(aut, tr);
+        mTRKindTranslator.add(aut, tr);
         a++;
       }
     }
@@ -729,9 +729,12 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   protected void tearDown()
   {
     super.tearDown();
-    final TRKindTranslator trTranslator = (TRKindTranslator) getKindTranslator();
-    final KindTranslator translator = trTranslator.getParent();
-    setKindTranslator(translator);
+    // tearDown() may be called before or after TRKindTranslator was created ...
+    if (mTRKindTranslator != null) {
+      final KindTranslator parent = mTRKindTranslator.getParent();
+      setKindTranslator(parent);
+      mTRKindTranslator = null;
+    }
     mInputAutomata = null;
     mTRAutomata = null;
     mEventInfo = null;
@@ -2293,6 +2296,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   // Data structures for state space representation
   private AutomatonProxy[] mInputAutomata;
   private TRAutomatonProxy[] mTRAutomata;
+  private TRKindTranslator mTRKindTranslator;
   private Collection<EventInfo> mEventInfo;
   private StateTupleEncoding mStateTupleEncoding;
   private IntArrayBuffer mStateSpace;

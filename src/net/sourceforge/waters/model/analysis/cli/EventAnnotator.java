@@ -243,6 +243,12 @@ public class EventAnnotator
         } else if (word.equalsIgnoreCase("unobservable") &&
                    mObservability == null) {
           mObservability = true;
+        } else if (word.indexOf("!=") >= 0) {
+          final String[] parts = word.split("!=");
+          if (mNotExpectedAttributes == null) {
+            mNotExpectedAttributes = new HashMap<>();
+          }
+          mNotExpectedAttributes.put(parts[0], parts[1]);
         } else if (word.indexOf('=') >= 0) {
           final String[] parts = word.split("=");
           if (mExpectedAttributes == null) {
@@ -271,13 +277,25 @@ public class EventAnnotator
         return false;
       } else if (mObservability != null && mObservability != event.isObservable()) {
         return false;
-      } else if (mExpectedAttributes != null) {
+      }
+      if (mExpectedAttributes != null) {
         final Map<String,String> attribs = event.getAttributes();
         for (final Map.Entry<String,String> entry : mExpectedAttributes.entrySet()) {
           final String key = entry.getKey();
           final String value = attribs.get(key);
           final String expected = entry.getValue();
           if (!expected.equals(value)) {
+            return false;
+          }
+        }
+      }
+      if (mNotExpectedAttributes != null) {
+        final Map<String,String> attribs = event.getAttributes();
+        for (final Map.Entry<String,String> entry : mNotExpectedAttributes.entrySet()) {
+          final String key = entry.getKey();
+          final String value = attribs.get(key);
+          final String notExpected = entry.getValue();
+          if (notExpected.equals(value)) {
             return false;
           }
         }
@@ -304,6 +322,7 @@ public class EventAnnotator
     private EventKind mEventKind;
     private Boolean mObservability;
     private Map<String,String> mExpectedAttributes;
+    private Map<String,String> mNotExpectedAttributes;
     private final String mKey;
     private final String mValue;
   }

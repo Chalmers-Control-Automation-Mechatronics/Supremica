@@ -1,0 +1,26 @@
+event [^\.]* COOBS:observer hi
+event [^\.]* controllable COOBS:controller hi
+event switch3\..* COOBS:observer:switch3 switch3
+event switch3\..* controllable COOBS:controller:switch3r switch3
+event .*_Sw3_.* COOBS:observer:switch3 switch3
+event sec46\..* COOBS:observer:sec4 sec4
+event sec46\..* controllable COOBS:controller:sec4 sec4
+event .*_Sw4:* COOBS:observer:sec4 sec4
+event sec57\..* COOBS:observer:sec5 sec5
+event sec57\..* controllable COOBS:controller:sec5r sec5
+event .*_Sw5:* COOBS:observer:sec5 sec5
+event switch8\..* COOBS:observer:switch8 switch8
+event switch8\..* controllable COOBS:controller:switch8 switch8
+event .*_Sw8_.* COOBS:observe:switch8r switch8
+event ll2\..* COOBS:observer:ll2 ll2
+event ll2\..* controllable COOBS:controller:ll2 ll2
+event .*_II_.* COOBS:observer:ll2 ll2
+event crane1\..* COOBS:observer:crane1 crane1
+event crane1\..* controllable COOBS:controller:crane1 crane1
+event .*_Cr1_.* COOBS:observer:crane1 crane1
+event crane2\..* COOBS:observer:crane2 crane2
+event crane2\..* controllable COOBS:controller:crane2 crane2
+event .*_Cr2_.* COOBS:observer:crane2 crane2
+event crane3\..* COOBS:observer:crane3 crane3
+event crane3\..* controllable COOBS:controller:crane3 crane3
+event .*_Cr3_.* COOBS:observer:crane3 crane3

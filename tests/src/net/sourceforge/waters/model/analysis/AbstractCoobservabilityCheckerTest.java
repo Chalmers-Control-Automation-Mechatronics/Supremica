@@ -172,6 +172,13 @@ public abstract class AbstractCoobservabilityCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testSiteMerger() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "coobservability", "site_merger.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testSmallFactory2Coobs1() throws Exception
   {
     final ProductDESProxy des =
@@ -349,11 +356,21 @@ public abstract class AbstractCoobservabilityCheckerTest
                  referenceTrace.getName());
     final Map<String,TraceProxy> traceMap = new LinkedHashMap<>(traces.size() - 1);
     final Set<String> remainingNames = new THashSet<>(traces.size() - 1);
+    final Set<TraceProxy> remainingTraces = new THashSet<>(traces.size() - 1);
     while (iter.hasNext()) {
       final TraceProxy trace = iter.next();
       final String name = trace.getName();
-      traceMap.put(name, trace);
-      remainingNames.add(name);
+      if (name.contains(",")) {
+        final String [] names = name.split(",");
+        for (final String part : names) {
+          traceMap.put(part, trace);
+          remainingNames.add(part);
+        }
+      } else {
+        traceMap.put(name, trace);
+        remainingNames.add(name);
+      }
+      remainingTraces.add(trace);
     }
 
     final EventProxy lastEvent = getLastEvent(referenceTrace);
@@ -364,16 +381,19 @@ public abstract class AbstractCoobservabilityCheckerTest
       final String key = entry.getKey();
       if (key.startsWith(CoobservabilityAttributeFactory.CONTROLLABITY_KEY)) {
         final String name = entry.getValue();
-        checkExpectedController(name, traceMap, remainingNames, lastEventName);
+        checkExpectedController(name, traceMap, remainingNames,
+                                remainingTraces, lastEventName);
         siteFound = true;
       }
     }
     if (!siteFound && lastEvent.getKind() == EventKind.CONTROLLABLE) {
       checkExpectedController(CoobservabilityAttributeFactory.DEFAULT_SITE_NAME,
-                              traceMap, remainingNames, lastEventName);
+                              traceMap, remainingNames,
+                              remainingTraces, lastEventName);
     }
-    if (!remainingNames.isEmpty()) {
-      final String name = remainingNames.iterator().next();
+    if (!remainingTraces.isEmpty()) {
+      final TraceProxy trace = remainingTraces.iterator().next();
+      final String name = trace.getName();
       fail("The counterexample contains a trace named '" + name +
            "' that does not correspond to any supervisor site "+
            "that can disable its last event '" + lastEventName + "'!");
@@ -428,6 +448,7 @@ public abstract class AbstractCoobservabilityCheckerTest
   private void checkExpectedController(final String siteName,
                                        final Map<String,TraceProxy> traceMap,
                                        final Set<String> remainingNames,
+                                       final Set<TraceProxy> remainingTraces,
                                        final String lastEventName)
   {
     if (!remainingNames.remove(siteName)) {
@@ -439,6 +460,8 @@ public abstract class AbstractCoobservabilityCheckerTest
              siteName + "' that disables its last event '" + lastEventName + "'!");
       }
     }
+    final TraceProxy trace = traceMap.get(siteName);
+    remainingTraces.remove(trace);
   }
 
   private void checkObservability(final TraceProxy referenceTrace,
