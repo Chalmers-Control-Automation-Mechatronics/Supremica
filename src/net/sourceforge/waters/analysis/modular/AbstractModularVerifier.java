@@ -614,9 +614,7 @@ abstract class AbstractModularVerifier
   protected void recordStats(final VerificationResult subresult)
   {
     final ModularVerificationResult result = getAnalysisResult();
-    result.updateNumberOfAutomata(subresult.getTotalNumberOfAutomata());
-    result.updateNumberOfStates(subresult.getTotalNumberOfStates());
-    result.updateNumberOfTransitions(subresult.getTotalNumberOfTransitions());
+    result.addMonolithicResult(subresult);
   }
 
 

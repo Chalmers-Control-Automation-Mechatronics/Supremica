@@ -131,10 +131,7 @@ public class DefaultVerificationResult
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    if (mCounterExample == null) {
-      final VerificationResult result = (VerificationResult) other;
-      mCounterExample = result.getCounterExample();
-    }
+    mCounterExample = null;
   }
 
 

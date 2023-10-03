@@ -31,22 +31,22 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.cpp.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicVerificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
- * A result record that can returned by a native verification algorithm.
+ * A result record that can returned by a monolithic coobservability
+ * verification algorithm.
  *
  * @author Robi Malik
  */
 
-public class NativeVerificationResult
+public class MonolithicCoobservabilityVerificationResult
   extends MonolithicVerificationResult
 {
 
@@ -56,7 +56,7 @@ public class NativeVerificationResult
    * Creates a verification result representing an incomplete run.
    * @param  analyzer The model analyser creating this result.
    */
-  public NativeVerificationResult(final ModelAnalyzer analyzer)
+  public MonolithicCoobservabilityVerificationResult(final ModelAnalyzer analyzer)
   {
     this(analyzer.getClass());
   }
@@ -65,60 +65,31 @@ public class NativeVerificationResult
    * Creates a verification result representing an incomplete run.
    * @param  clazz    The class of the model verifier creating this result.
    */
-  public NativeVerificationResult(final Class<?> clazz)
+  public MonolithicCoobservabilityVerificationResult(final Class<?> clazz)
   {
     super(clazz);
-    mTarjanComponentCount = -1;
-    mTarjanControlStackHeight = -1;
-    mTarjanComponentStackHeight = -1;
+    mPeakNumberOfSites = -1;
   }
 
 
   //#########################################################################
   //# Simple Access Methods
   /**
-   * Gets the number of strongly connected components detected by
-   * Tarjan's algorithm.
+   * Gets the peak number of supervisor sites considered during verification.
+   * If multiple runs are recorded, this method returns the maximum number of
+   * supervisor sites considered at any one time.
    */
-  public int getTarjanComponentCount()
+  public int getPeakNumberOfSites()
   {
-    return mTarjanComponentCount;
-  }
-
-  /**
-   * Gets the maximum height of the control stack when Tarjan's algorithm
-   * is used.
-   */
-  public int getTarjanControlStackHeight()
-  {
-    return mTarjanControlStackHeight;
-  }
-
-  /**
-   * Gets the maximum height of the component stack when Tarjan's algorithm
-   * is used.
-   */
-  public int getTarjanComponentStackHeight()
-  {
-    return mTarjanComponentStackHeight;
+    return mPeakNumberOfSites;
   }
 
 
   //#########################################################################
   //# Providing Statistics
-  public void setTarjanComponentCount(final int value)
+  public void setNumberOfSites(final int numSites)
   {
-    mTarjanComponentCount = value;
-  }
-
-  public void setTarjanControlStackHeight(final int value)
-  {
-    mTarjanControlStackHeight = value;
-  }
-
-  public void setTarjanComponentStackHeight(final int value)
-  {
-    mTarjanComponentStackHeight = value;
+    mPeakNumberOfSites = Math.max(mPeakNumberOfSites, numSites);
   }
 
 
@@ -128,13 +99,10 @@ public class NativeVerificationResult
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    final NativeVerificationResult result = (NativeVerificationResult) other;
-    mTarjanComponentCount =
-      mergeAdd(mTarjanComponentCount, result.mTarjanComponentCount);
-    mTarjanControlStackHeight =
-      Math.max(mTarjanControlStackHeight, result.mTarjanControlStackHeight);
-    mTarjanComponentStackHeight =
-      Math.max(mTarjanComponentStackHeight, result.mTarjanComponentStackHeight);
+    final MonolithicCoobservabilityVerificationResult result =
+      (MonolithicCoobservabilityVerificationResult) other;
+    mPeakNumberOfSites =
+      Math.max(mPeakNumberOfSites, result.mPeakNumberOfSites);
   }
 
 
@@ -144,17 +112,9 @@ public class NativeVerificationResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    if (mTarjanComponentCount >= 0) {
-      writer.print("Number of strongly connected components: ");
-      writer.println(mTarjanComponentCount);
-    }
-    if (mTarjanControlStackHeight >= 0) {
-      writer.print("Maximum height of Tarjan control stack: ");
-      writer.println(mTarjanControlStackHeight);
-    }
-    if (mTarjanComponentStackHeight >= 0) {
-      writer.print("Maximum height of Tarjan component stack: ");
-      writer.println(mTarjanComponentStackHeight);
+    if (mPeakNumberOfSites >= 0) {
+      writer.print("Peak number of supervisor sites: ");
+      writer.println(mPeakNumberOfSites);
     }
   }
 
@@ -162,9 +122,7 @@ public class NativeVerificationResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",TarjanSCCs");
-    writer.print(",TarjanControlStackHeight");
-    writer.print(",TarjanComponentStackHeight");
+    writer.print(",PeakSites");
   }
 
   @Override
@@ -172,18 +130,12 @@ public class NativeVerificationResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mTarjanComponentCount);
-    writer.print(',');
-    writer.print(mTarjanControlStackHeight);
-    writer.print(',');
-    writer.print(mTarjanComponentStackHeight);
+    writer.print(mPeakNumberOfSites);
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mTarjanComponentCount;
-  private int mTarjanControlStackHeight;
-  private int mTarjanComponentStackHeight;
+  private int mPeakNumberOfSites;
 
 }

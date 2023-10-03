@@ -144,6 +144,21 @@ public class TRMonolithicCoobservabilityChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyser
+  @Override
+  public MonolithicCoobservabilityVerificationResult createAnalysisResult()
+  {
+    return new MonolithicCoobservabilityVerificationResult(this);
+  }
+
+  @Override
+  public MonolithicCoobservabilityVerificationResult getAnalysisResult()
+  {
+    return (MonolithicCoobservabilityVerificationResult) super.getAnalysisResult();
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.options.Configurable
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
@@ -192,6 +207,8 @@ public class TRMonolithicCoobservabilityChecker
     mSignature.filter(trs, translator);
     mSignature.merge();
     mSignature.subsume();
+    final MonolithicCoobservabilityVerificationResult result = getAnalysisResult();
+    result.setNumberOfSites(mSignature.getSites().size());
 
     mNumAutomata = trs.length;
     mReferenceSite = new SiteInfo(mNumAutomata);

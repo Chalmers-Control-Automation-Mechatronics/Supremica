@@ -86,6 +86,7 @@ public class StateTupleEncoding
     int autIndex = 0;
     for (final int numStates : sizes) {
       final int numBits = AutomatonTools.log2(numStates);
+      mNumberOfUsedBits += numBits;
       int wordIndex;
       for (wordIndex = 0; wordIndex < used.size(); wordIndex++) {
         if (used.get(wordIndex) + numBits <= SIZE_INT) {
@@ -146,6 +147,14 @@ public class StateTupleEncoding
   public int getNumberOfWords()
   {
     return mWordInfo.size();
+  }
+
+  /**
+   * Gets the number of words used by the encoded state tuples.
+   */
+  public int getNumberOfUsedBits()
+  {
+    return mNumberOfUsedBits;
   }
 
 
@@ -278,6 +287,7 @@ public class StateTupleEncoding
   //# Data Members
   private final AutomatonInfo[] mAutomatonInfo;
   private final List<List<AutomatonInfo>> mWordInfo;
+  private int mNumberOfUsedBits;
 
 
   //#########################################################################

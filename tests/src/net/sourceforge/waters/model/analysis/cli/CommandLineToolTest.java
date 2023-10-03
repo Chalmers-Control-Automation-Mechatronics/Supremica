@@ -155,8 +155,9 @@ public class CommandLineToolTest
   {
     final File file = getInputWmod("tests", "coobservability", "fms2016coobs2");
     final String[] args = new String[]
-      {"-mod", "-coobs", file.toString()};
-    testCommandLine("mod-coobs", args, false, "counterexample:", "!Statistics");
+      {"-mod", "-coobs", file.toString(), "-stats"};
+    testCommandLine("mod-coobs", args, false, "counterexample:",
+                    "Statistics:", "Number of supervisor sites: .*");
   }
 
   public void testAnalyzer_SlicingCoobservability()

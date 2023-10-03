@@ -40,6 +40,7 @@ import net.sourceforge.waters.analysis.coobs.CoobservabilitySignature;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
@@ -47,6 +48,7 @@ import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindT
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
@@ -172,6 +174,18 @@ public class SlicingCoobservabilityChecker
     return mNestedVerifier.supportsNondeterminism();
   }
 
+  @Override
+  public ModularCoobservabilityVerificationResult getAnalysisResult()
+  {
+    return (ModularCoobservabilityVerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public ModularCoobservabilityVerificationResult createAnalysisResult()
+  {
+    return new ModularCoobservabilityVerificationResult(this);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -211,6 +225,8 @@ public class SlicingCoobservabilityChecker
       mSignature =
         new CoobservabilitySignature(des, translator, mDefaultSiteName);
     }
+    final ModularCoobservabilityVerificationResult result = getAnalysisResult();
+    result.setNumberOfSites(mSignature.getSites().size());
   }
 
   @Override
@@ -227,9 +243,11 @@ public class SlicingCoobservabilityChecker
         final CoobservabilitySignature sig =
           new CoobservabilitySignature(mSignature, sites);
         mNestedVerifier.setSignature(sig);
-        if (!mNestedVerifier.run()) {
-          final CoobservabilityCounterExampleProxy counter =
-            mNestedVerifier.getCounterExample();
+        mNestedVerifier.run();
+        final VerificationResult subResult = mNestedVerifier.getAnalysisResult();
+        recordStats(subResult);
+        if (!subResult.isSatisfied()) {
+          final CounterExampleProxy counter = subResult.getCounterExample();
           return setFailedResult(counter);
         }
         mSignature.removeCoveredEvents(sites);
@@ -256,6 +274,15 @@ public class SlicingCoobservabilityChecker
   {
     super.tearDown();
     mSignature = null;
+  }
+
+
+  //#########################################################################
+  //# Collecting Statistics
+  protected void recordStats(final VerificationResult subresult)
+  {
+    final ModularVerificationResult result = getAnalysisResult();
+    result.addMonolithicResults(subresult);
   }
 
 

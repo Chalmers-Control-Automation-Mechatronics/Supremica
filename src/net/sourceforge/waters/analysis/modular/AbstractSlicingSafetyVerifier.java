@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -115,6 +116,18 @@ public abstract class AbstractSlicingSafetyVerifier
     return mNestedVerifier.supportsNondeterminism();
   }
 
+  @Override
+  public ModularVerificationResult getAnalysisResult()
+  {
+    return (ModularVerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public ModularVerificationResult createAnalysisResult()
+  {
+    return new ModularVerificationResult(this);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -170,7 +183,6 @@ public abstract class AbstractSlicingSafetyVerifier
       }
       Collections.sort(uncontrollables);
 
-      mStates = 0;
       for (final EventProxy event : uncontrollables) {
         checkAbort();
         mNestedVerifier.setKindTranslator(new KindTranslator()
@@ -198,12 +210,13 @@ public abstract class AbstractSlicingSafetyVerifier
             return translator.getComponentKind(a);
           }
         });
-        mNestedVerifier.setNodeLimit(getNodeLimit()/* - mStates*/);
-        if (!mNestedVerifier.run()) {
-          mStates += mNestedVerifier.getAnalysisResult().getTotalNumberOfStates();
-          return setFailedResult(mNestedVerifier.getCounterExample());
+        mNestedVerifier.run();
+        final VerificationResult subResult = mNestedVerifier.getAnalysisResult();
+        recordStats(subResult);
+        if (!subResult.isSatisfied()) {
+          final CounterExampleProxy counter = subResult.getCounterExample();
+          return setFailedResult(counter);
         }
-        mStates += mNestedVerifier.getAnalysisResult().getTotalNumberOfStates();
       }
       return setSatisfiedResult();
 
@@ -223,19 +236,16 @@ public abstract class AbstractSlicingSafetyVerifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  @Override
-  protected void addStatistics()
+  //# Collecting Statistics
+  protected void recordStats(final VerificationResult subresult)
   {
-    super.addStatistics();
-    final VerificationResult result = getAnalysisResult();
-    result.setNumberOfStates(mStates);
+    final ModularVerificationResult result = getAnalysisResult();
+    result.addMonolithicResults(subresult);
   }
 
 
   //#########################################################################
   //# Data Members
   private SafetyVerifier mNestedVerifier;
-  private int mStates;
 
 }

@@ -80,6 +80,7 @@ public class DefaultAnalysisResult
     mException = null;
     mTotalNumberOfEvents = -1;
     mTotalNumberOfAutomata = -1;
+    mPeakNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
     mPeakNumberOfStates = -1.0;
     mTotalNumberOfTransitions = -1.0;
@@ -143,6 +144,12 @@ public class DefaultAnalysisResult
   public int getTotalNumberOfAutomata()
   {
     return mTotalNumberOfAutomata;
+  }
+
+  @Override
+  public int getPeakNumberOfAutomata()
+  {
+    return mPeakNumberOfAutomata;
   }
 
   @Override
@@ -213,6 +220,7 @@ public class DefaultAnalysisResult
   public void setNumberOfAutomata(final int numaut)
   {
     mTotalNumberOfAutomata = numaut;
+    mPeakNumberOfAutomata = Math.max(mPeakNumberOfAutomata, numaut);
   }
 
   @Override
@@ -307,6 +315,8 @@ public class DefaultAnalysisResult
       mTotalNumberOfTransitions =
         mergeAdd(mTotalNumberOfTransitions,
                  other.getTotalNumberOfTransitions());
+      mPeakNumberOfAutomata =
+        Math.max(mPeakNumberOfAutomata, other.getPeakNumberOfAutomata());
       mPeakNumberOfStates =
         Math.max(mPeakNumberOfStates, other.getPeakNumberOfStates());
       mPeakNumberOfTransitions =
@@ -390,6 +400,9 @@ public class DefaultAnalysisResult
       formatter.format("Total number of transitions: %.0f\n",
                        mTotalNumberOfTransitions);
     }
+    if (mPeakNumberOfAutomata >= 0) {
+      writer.println("Peak number of automata: " + mPeakNumberOfAutomata);
+    }
     if (mPeakNumberOfStates >= 0) {
       formatter.format("Peak number of states: %.0f\n", mPeakNumberOfStates);
     }
@@ -439,6 +452,10 @@ public class DefaultAnalysisResult
       formatter.format("%.0f", mTotalNumberOfTransitions);
     }
     writer.print(',');
+    if (mPeakNumberOfAutomata >= 0) {
+      writer.print(mPeakNumberOfAutomata);
+    }
+    writer.print(',');
     if (mPeakNumberOfStates >= 0) {
       formatter.format("%.0f", mPeakNumberOfStates);
     }
@@ -463,6 +480,7 @@ public class DefaultAnalysisResult
     writer.print(",TotAut");
     writer.print(",TotStates");
     writer.print(",TotTrans");
+    writer.print(",PeakAut");
     writer.print(",PeakStates");
     writer.print(",PeakTrans");
     writer.print(",PeakNodes");
@@ -546,6 +564,7 @@ public class DefaultAnalysisResult
   private WatersException mException;
   private int mTotalNumberOfEvents;
   private int mTotalNumberOfAutomata;
+  private int mPeakNumberOfAutomata;
   private double mTotalNumberOfStates;
   private double mPeakNumberOfStates;
   private double mTotalNumberOfTransitions;

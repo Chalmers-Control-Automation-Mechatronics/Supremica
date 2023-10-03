@@ -39,8 +39,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -114,6 +115,12 @@ public abstract class AbstractTRMonolithicModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
   @Override
+  public MonolithicVerificationResult createAnalysisResult()
+  {
+    return new MonolithicVerificationResult(this);
+  }
+
+  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -136,9 +143,9 @@ public abstract class AbstractTRMonolithicModelVerifier
   }
 
   @Override
-  public VerificationResult getAnalysisResult()
+  public MonolithicVerificationResult getAnalysisResult()
   {
-    return (VerificationResult) super.getAnalysisResult();
+    return (MonolithicVerificationResult) super.getAnalysisResult();
   }
 
   @Override
@@ -157,9 +164,12 @@ public abstract class AbstractTRMonolithicModelVerifier
   //#########################################################################
   //# Invocation
   @Override
-  public VerificationResult createAnalysisResult()
+  protected void setUpStateTupleEncoding(final TRAutomatonProxy[] trs)
+    throws AnalysisAbortException, OverflowException
   {
-    return new DefaultVerificationResult(this);
+    super.setUpStateTupleEncoding(trs);
+    final MonolithicVerificationResult result = getAnalysisResult();
+    result.setEncodingSize(getStateTupleEncoding().getNumberOfUsedBits());
   }
 
   @Override
@@ -299,6 +309,15 @@ public abstract class AbstractTRMonolithicModelVerifier
         break;
       }
     }
+  }
+
+  @Override
+  protected void createTransition(final int event, final int target)
+    throws OverflowException
+  {
+    super.createTransition(event, target);
+    final MonolithicVerificationResult result = getAnalysisResult();
+    result.addExploredTransition();
   }
 
 

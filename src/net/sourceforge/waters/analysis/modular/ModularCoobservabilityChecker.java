@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
@@ -139,6 +140,18 @@ public class ModularCoobservabilityChecker
     }
   }
 
+  @Override
+  public ModularCoobservabilityVerificationResult createAnalysisResult()
+  {
+    return new ModularCoobservabilityVerificationResult(this);
+  }
+
+  @Override
+  public ModularCoobservabilityVerificationResult getAnalysisResult()
+  {
+    return (ModularCoobservabilityVerificationResult) super.getAnalysisResult();
+  }
+
 
   //#########################################################################
   //# Overrides for
@@ -156,6 +169,16 @@ public class ModularCoobservabilityChecker
     super.setUp();
     final CoobservabilityChecker mono = getMonolithicVerifier();
     mono.setDefaultSiteName(mDefaultSiteName);
+    final ModularCoobservabilityVerificationResult result = getAnalysisResult();
+    if (mSignature != null) {
+      result.setNumberOfSites(mSignature.getSites().size());
+    } else {
+      final ProductDESProxy des = getModel();
+      final KindTranslator translator = getKindTranslator();
+      final CoobservabilitySignature sig =
+        new CoobservabilitySignature(des, translator);
+      result.setNumberOfSites(sig.getSites().size());
+    }
   }
 
   @Override

@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -45,12 +46,13 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 /**
- * A result record that can be returned by a modular analysis
- * algorithms.
+ * <P>A result record that can be returned by a modular analysis
+ * algorithms.</P>
  *
- * In addition to a standard verification result ({@link VerificationResult}),
- * the modular verification may contain a collection of specifications
- * found to be not controllable.
+ * <P>In addition to a standard verification result ({@link VerificationResult}),
+ * the modular verification contains the cumulative analysis from all monolithic
+ * verification attempts. It may also contain a collection of specifications
+ * found to be not controllable.</P>
  *
  * @author Robi Malik
  */
@@ -63,8 +65,7 @@ public class ModularVerificationResult
   //# Constructors
   public ModularVerificationResult(final ModelVerifier verifier)
   {
-    super(verifier.getClass());
-    mFailedSpecs = null;
+    this(verifier.getClass());
   }
 
   /**
@@ -74,6 +75,8 @@ public class ModularVerificationResult
   {
     super(clazz);
     mFailedSpecs = null;
+    mNumberOfMonolithicRuns = -1;
+    mMonolithicStats = null;
   }
 
 
@@ -84,8 +87,48 @@ public class ModularVerificationResult
     return mFailedSpecs;
   }
 
+  public int getNumberOfMonolithicRuns()
+  {
+    return mNumberOfMonolithicRuns;
+  }
+
+  public VerificationResult getMonolithicResult()
+  {
+    return mMonolithicStats;
+  }
+
+
   //#########################################################################
   //# Providing Statistics
+  void addMonolithicResult(final VerificationResult result)
+  {
+    if (mMonolithicStats == null) {
+      mNumberOfMonolithicRuns = 1;
+      mMonolithicStats = result;
+    } else {
+      mNumberOfMonolithicRuns++;
+      mMonolithicStats.merge(result);
+    }
+    updatePeakMemoryUsage(result.getPeakMemoryUsage());
+  }
+
+  void addMonolithicResults(final VerificationResult result)
+  {
+    if (result instanceof ModularVerificationResult) {
+      final ModularVerificationResult modular = (ModularVerificationResult) result;
+      mNumberOfMonolithicRuns =
+        mergeAdd(mNumberOfMonolithicRuns, modular.mNumberOfMonolithicRuns);
+      if (mMonolithicStats == null) {
+        mMonolithicStats = modular.mMonolithicStats;
+      } else if (modular.mMonolithicStats != null) {
+        mMonolithicStats.merge(modular.mMonolithicStats);
+      }
+      updatePeakMemoryUsage(result.getPeakMemoryUsage());
+    } else {
+      addMonolithicResult(result);
+    }
+  }
+
   void addFailedSpecs(final Collection<? extends AutomatonProxy> failedSpecs)
   {
     if (mFailedSpecs == null) {
@@ -118,6 +161,53 @@ public class ModularVerificationResult
       } else if (modular.mFailedSpecs != null) {
         mFailedSpecs.addAll(modular.mFailedSpecs);
       }
+      mNumberOfMonolithicRuns =
+        mergeAdd(mNumberOfMonolithicRuns, modular.mNumberOfMonolithicRuns);
+      if (mMonolithicStats == null) {
+        mMonolithicStats = modular.mMonolithicStats;
+      } else if (modular.mMonolithicStats != null) {
+        mMonolithicStats.merge(modular.mMonolithicStats);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Printing
+  @Override
+  public void print(final PrintWriter writer)
+  {
+    super.print(writer);
+    if (mNumberOfMonolithicRuns >= 0) {
+      writer.println("Number of monolithic verification runs: " +
+                     mNumberOfMonolithicRuns);
+    }
+    if (mMonolithicStats != null) {
+      writer.println("--------------------------------------------------");
+      mMonolithicStats.print(writer);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",Monolithic");
+    if (mMonolithicStats != null) {
+      writer.print(',');
+      mMonolithicStats.printCSVHorizontalHeadings(writer);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    writer.print(',');
+    writer.print(mNumberOfMonolithicRuns);
+    if (mMonolithicStats != null) {
+      writer.print(',');
+      mMonolithicStats.printCSVHorizontal(writer);
     }
   }
 
@@ -125,5 +215,7 @@ public class ModularVerificationResult
   //#########################################################################
   //# Data Members
   private Collection<AutomatonProxy> mFailedSpecs;
+  private int mNumberOfMonolithicRuns;
+  private VerificationResult mMonolithicStats;
 
 }

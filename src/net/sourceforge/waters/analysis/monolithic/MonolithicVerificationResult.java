@@ -31,23 +31,24 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.cpp.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.PrintWriter;
+import java.util.Formatter;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicVerificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
- * A result record that can returned by a native verification algorithm.
+ * A result record that can returned by a monolithic verification algorithm.
  *
  * @author Robi Malik
  */
 
-public class NativeVerificationResult
-  extends MonolithicVerificationResult
+public class MonolithicVerificationResult
+  extends DefaultVerificationResult
 {
 
   //#########################################################################
@@ -56,7 +57,7 @@ public class NativeVerificationResult
    * Creates a verification result representing an incomplete run.
    * @param  analyzer The model analyser creating this result.
    */
-  public NativeVerificationResult(final ModelAnalyzer analyzer)
+  public MonolithicVerificationResult(final ModelAnalyzer analyzer)
   {
     this(analyzer.getClass());
   }
@@ -65,60 +66,50 @@ public class NativeVerificationResult
    * Creates a verification result representing an incomplete run.
    * @param  clazz    The class of the model verifier creating this result.
    */
-  public NativeVerificationResult(final Class<?> clazz)
+  public MonolithicVerificationResult(final Class<?> clazz)
   {
     super(clazz);
-    mTarjanComponentCount = -1;
-    mTarjanControlStackHeight = -1;
-    mTarjanComponentStackHeight = -1;
+    mEncodingSize = -1;
+    mNumExploredTransitions = 0;
   }
 
 
   //#########################################################################
   //# Simple Access Methods
   /**
-   * Gets the number of strongly connected components detected by
-   * Tarjan's algorithm.
+   * Gets the number of bits used to encode state tuples.
    */
-  public int getTarjanComponentCount()
+  public double getEncodingSize()
   {
-    return mTarjanComponentCount;
+    return mEncodingSize;
   }
 
   /**
-   * Gets the maximum height of the control stack when Tarjan's algorithm
-   * is used.
+   * Gets the total number of transitions explored during analysis.
+   * This is a runtime estimate. If transitions are processed more than
+   * once, each time is counted separately.
    */
-  public int getTarjanControlStackHeight()
+  public double getNumberOfExploredTransitions()
   {
-    return mTarjanControlStackHeight;
-  }
-
-  /**
-   * Gets the maximum height of the component stack when Tarjan's algorithm
-   * is used.
-   */
-  public int getTarjanComponentStackHeight()
-  {
-    return mTarjanComponentStackHeight;
+    return mNumExploredTransitions;
   }
 
 
   //#########################################################################
   //# Providing Statistics
-  public void setTarjanComponentCount(final int value)
+  public void setEncodingSize(final int value)
   {
-    mTarjanComponentCount = value;
+    mEncodingSize = value;
   }
 
-  public void setTarjanControlStackHeight(final int value)
+  public void setNumberOfExploredTransitions(final double value)
   {
-    mTarjanControlStackHeight = value;
+    mNumExploredTransitions = value;
   }
 
-  public void setTarjanComponentStackHeight(final int value)
+  public void addExploredTransition()
   {
-    mTarjanComponentStackHeight = value;
+    mNumExploredTransitions++;
   }
 
 
@@ -128,13 +119,10 @@ public class NativeVerificationResult
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    final NativeVerificationResult result = (NativeVerificationResult) other;
-    mTarjanComponentCount =
-      mergeAdd(mTarjanComponentCount, result.mTarjanComponentCount);
-    mTarjanControlStackHeight =
-      Math.max(mTarjanControlStackHeight, result.mTarjanControlStackHeight);
-    mTarjanComponentStackHeight =
-      Math.max(mTarjanComponentStackHeight, result.mTarjanComponentStackHeight);
+    final MonolithicVerificationResult result = (MonolithicVerificationResult) other;
+    mEncodingSize = Math.max(mEncodingSize, result.mEncodingSize);
+    mNumExploredTransitions =
+      mergeAdd(mNumExploredTransitions, result.mNumExploredTransitions);
   }
 
 
@@ -144,17 +132,16 @@ public class NativeVerificationResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    if (mTarjanComponentCount >= 0) {
-      writer.print("Number of strongly connected components: ");
-      writer.println(mTarjanComponentCount);
+    @SuppressWarnings("resource")
+    final Formatter formatter = new Formatter(writer);
+    if (mEncodingSize >= 0) {
+      writer.print("Peak encoding size: ");
+      writer.print(mEncodingSize);
+      writer.println(" bits");
     }
-    if (mTarjanControlStackHeight >= 0) {
-      writer.print("Maximum height of Tarjan control stack: ");
-      writer.println(mTarjanControlStackHeight);
-    }
-    if (mTarjanComponentStackHeight >= 0) {
-      writer.print("Maximum height of Tarjan component stack: ");
-      writer.println(mTarjanComponentStackHeight);
+    if (mNumExploredTransitions >= 0.0) {
+      formatter.format("Total number of transitions explored: %.0f\n",
+                       mNumExploredTransitions);
     }
   }
 
@@ -162,9 +149,8 @@ public class NativeVerificationResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",TarjanSCCs");
-    writer.print(",TarjanControlStackHeight");
-    writer.print(",TarjanComponentStackHeight");
+    writer.print(",EncodingSize");
+    writer.print(",ExploredTrans");
   }
 
   @Override
@@ -172,18 +158,15 @@ public class NativeVerificationResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mTarjanComponentCount);
+    writer.print(mEncodingSize);
     writer.print(',');
-    writer.print(mTarjanControlStackHeight);
-    writer.print(',');
-    writer.print(mTarjanComponentStackHeight);
+    writer.print(mNumExploredTransitions);
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mTarjanComponentCount;
-  private int mTarjanControlStackHeight;
-  private int mTarjanComponentStackHeight;
+  private int mEncodingSize;
+  private double mNumExploredTransitions;
 
 }
