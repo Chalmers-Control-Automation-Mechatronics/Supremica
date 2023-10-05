@@ -176,7 +176,7 @@ public class ModularCoobservabilityChecker
       final ProductDESProxy des = getModel();
       final KindTranslator translator = getKindTranslator();
       final CoobservabilitySignature sig =
-        new CoobservabilitySignature(des, translator);
+        new CoobservabilitySignature(des, translator, mDefaultSiteName);
       result.setNumberOfSites(sig.getSites().size());
     }
   }

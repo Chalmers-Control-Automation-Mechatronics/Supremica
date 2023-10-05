@@ -34,27 +34,25 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.PrintWriter;
+import java.util.Collection;
 
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.DefaultProductDESResult;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A synchronous product result record returned by transition-relation
- * based synchronous product builders.
+ * A synthesis result record returned by monolithic synthesis algorithms.
  *
- * @see AbstractTRSynchronousProductBuilder
  * @author Robi Malik
  */
-
-public class TRSynchronousProductResult
+//TODO Merge this class with MonolithicSynthesisResult
+public class TRSynthesisResult
   extends MonolithicAnalysisResult
-  implements SynchronousProductResult
+  implements ProductDESResult
 {
 
   //#########################################################################
@@ -63,7 +61,7 @@ public class TRSynchronousProductResult
    * Creates a synchronous product result representing an incomplete run.
    * @param  analyzer The model analyser creating this result.
    */
-  public TRSynchronousProductResult(final SynchronousProductBuilder analyzer)
+  public TRSynthesisResult(final SupervisorSynthesizer analyzer)
   {
     this(analyzer.getClass());
   }
@@ -72,131 +70,90 @@ public class TRSynchronousProductResult
    * Creates a synchronous product result representing an incomplete run.
    * @param  clazz    The class of the model analyser creating this result.
    */
-  public TRSynchronousProductResult(final Class<?> clazz)
+  public TRSynthesisResult(final Class<?> clazz)
   {
     super(clazz);
-    mReducedDiamondsCount = -1;
   }
 
 
   //#########################################################################
-  //# Simple Access Methods
-  /**
-   * Gets the number of states that were reduced by means of reducing
-   * synchronous composition.
-   * @see TRReducingSynchronousProductBuilder
-   */
-  public int getReducedDiamondsCount()
-  {
-    return mReducedDiamondsCount;
-  }
-
-
-  //#########################################################################
-  //# Providing Statistics
-  public void setReducedDiamondsCount(final int count)
-  {
-    mReducedDiamondsCount = count;
-  }
-
-  public void addReducedDiamond()
-  {
-    mReducedDiamondsCount++;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.AutomatonResult
+  //# Interface net.sourceforge.waters.model.analysis.ProductDESResult
   @Override
-  public AutomatonProxy getComputedProxy()
+  public ProductDESProxy getComputedProxy()
   {
-    return mComputedAutomaton;
+    return mComputedDES;
   }
 
   @Override
-  public TRAutomatonProxy getComputedAutomaton()
+  public ProductDESProxy getComputedProductDES()
   {
-    return mComputedAutomaton;
+    return getComputedProxy();
   }
 
   @Override
-  public void setComputedProxy(final AutomatonProxy aut)
+  public Collection<AutomatonProxy> getComputedAutomata()
   {
-    setSatisfied(aut != null);
-    mComputedAutomaton = (TRAutomatonProxy) aut;
+    final ProductDESProxy des = getComputedProductDES();
+    if (des == null) {
+      return null;
+    } else {
+      return des.getAutomata();
+    }
   }
 
   @Override
-  public void setComputedAutomaton(final AutomatonProxy aut)
+  public void setComputedProxy(final ProductDESProxy des)
   {
-    setComputedProxy(aut);
-    setSatisfied(aut != null);
+    mComputedDES = des;
+    setSatisfied(des != null);
   }
 
   @Override
-  public String getResultDescription()
+  public void setComputedProductDES(final ProductDESProxy des)
   {
-    return "synchronous product";
-  }
-
-
-  //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.SynchronousProductResult
-  @Override
-  public TRSynchronousProductStateMap getStateMap()
-  {
-    return mStateMap;
-  }
-
-  @Override
-  public void setStateMap(final SynchronousProductStateMap map)
-  {
-    mStateMap = (TRSynchronousProductStateMap) map;
+    setComputedProxy(des);
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
   @Override
+  public String getResultDescription()
+  {
+    return "supervisor";
+  }
+
+  @Override
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    final TRSynchronousProductResult result =
-      (TRSynchronousProductResult) other;
-    mReducedDiamondsCount =
-      mergeAdd(mReducedDiamondsCount, result.mReducedDiamondsCount);
+    mComputedDES = null;
   }
 
   @Override
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    if (mReducedDiamondsCount >= 0) {
-      writer.print("Number of reduced diamonds: ");
-      writer.println(mReducedDiamondsCount);
-    }
+    DefaultProductDESResult.printStats(writer, this);
   }
 
   @Override
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",ReducedDiamonds");
+    DefaultProductDESResult.printCSVHorizontalHeadings(writer, this);
   }
 
   @Override
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
-    writer.print(',');
-    writer.print(mReducedDiamondsCount);
+    DefaultProductDESResult.printCSVHorizontal(writer, this);
   }
 
 
   //#########################################################################
   //# Data Members
-  private TRAutomatonProxy mComputedAutomaton;
-  private TRSynchronousProductStateMap mStateMap;
-  private int mReducedDiamondsCount;
+  private ProductDESProxy mComputedDES;
 
 }

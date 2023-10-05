@@ -34,124 +34,82 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.PrintWriter;
+import java.util.Formatter;
 
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
- * A synchronous product result record returned by transition-relation
- * based synchronous product builders.
+ * A result record that can returned by a monolithic analysis algorithm.
  *
- * @see AbstractTRSynchronousProductBuilder
  * @author Robi Malik
  */
 
-public class TRSynchronousProductResult
-  extends MonolithicAnalysisResult
-  implements SynchronousProductResult
+public class MonolithicAnalysisResult
+  extends DefaultAnalysisResult
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a synchronous product result representing an incomplete run.
+   * Creates an analysis result representing an incomplete run.
    * @param  analyzer The model analyser creating this result.
    */
-  public TRSynchronousProductResult(final SynchronousProductBuilder analyzer)
+  public MonolithicAnalysisResult(final ModelAnalyzer analyzer)
   {
     this(analyzer.getClass());
   }
 
   /**
-   * Creates a synchronous product result representing an incomplete run.
-   * @param  clazz    The class of the model analyser creating this result.
+   * Creates an analysis result representing an incomplete run.
+   * @param  clazz    The class of the model verifier creating this result.
    */
-  public TRSynchronousProductResult(final Class<?> clazz)
+  public MonolithicAnalysisResult(final Class<?> clazz)
   {
     super(clazz);
-    mReducedDiamondsCount = -1;
+    mEncodingSize = -1;
+    mNumExploredTransitions = 0;
   }
 
 
   //#########################################################################
   //# Simple Access Methods
   /**
-   * Gets the number of states that were reduced by means of reducing
-   * synchronous composition.
-   * @see TRReducingSynchronousProductBuilder
+   * Gets the number of bits used to encode state tuples.
    */
-  public int getReducedDiamondsCount()
+  public double getEncodingSize()
   {
-    return mReducedDiamondsCount;
+    return mEncodingSize;
+  }
+
+  /**
+   * Gets the total number of transitions explored during analysis.
+   * This is a runtime estimate. If transitions are processed more than
+   * once, each time is counted separately.
+   */
+  public double getNumberOfExploredTransitions()
+  {
+    return mNumExploredTransitions;
   }
 
 
   //#########################################################################
   //# Providing Statistics
-  public void setReducedDiamondsCount(final int count)
+  public void setEncodingSize(final int value)
   {
-    mReducedDiamondsCount = count;
+    mEncodingSize = value;
   }
 
-  public void addReducedDiamond()
+  public void setNumberOfExploredTransitions(final double value)
   {
-    mReducedDiamondsCount++;
+    mNumExploredTransitions = value;
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.AutomatonResult
-  @Override
-  public AutomatonProxy getComputedProxy()
+  public void addExploredTransition()
   {
-    return mComputedAutomaton;
-  }
-
-  @Override
-  public TRAutomatonProxy getComputedAutomaton()
-  {
-    return mComputedAutomaton;
-  }
-
-  @Override
-  public void setComputedProxy(final AutomatonProxy aut)
-  {
-    setSatisfied(aut != null);
-    mComputedAutomaton = (TRAutomatonProxy) aut;
-  }
-
-  @Override
-  public void setComputedAutomaton(final AutomatonProxy aut)
-  {
-    setComputedProxy(aut);
-    setSatisfied(aut != null);
-  }
-
-  @Override
-  public String getResultDescription()
-  {
-    return "synchronous product";
-  }
-
-
-  //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.SynchronousProductResult
-  @Override
-  public TRSynchronousProductStateMap getStateMap()
-  {
-    return mStateMap;
-  }
-
-  @Override
-  public void setStateMap(final SynchronousProductStateMap map)
-  {
-    mStateMap = (TRSynchronousProductStateMap) map;
+    mNumExploredTransitions++;
   }
 
 
@@ -161,19 +119,29 @@ public class TRSynchronousProductResult
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    final TRSynchronousProductResult result =
-      (TRSynchronousProductResult) other;
-    mReducedDiamondsCount =
-      mergeAdd(mReducedDiamondsCount, result.mReducedDiamondsCount);
+    final MonolithicAnalysisResult result = (MonolithicAnalysisResult) other;
+    mEncodingSize = Math.max(mEncodingSize, result.mEncodingSize);
+    mNumExploredTransitions =
+      mergeAdd(mNumExploredTransitions, result.mNumExploredTransitions);
   }
 
+
+  //#########################################################################
+  //# Printing
   @Override
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    if (mReducedDiamondsCount >= 0) {
-      writer.print("Number of reduced diamonds: ");
-      writer.println(mReducedDiamondsCount);
+    @SuppressWarnings("resource")
+    final Formatter formatter = new Formatter(writer);
+    if (mEncodingSize >= 0) {
+      writer.print("Peak encoding size: ");
+      writer.print(mEncodingSize);
+      writer.println(" bits");
+    }
+    if (mNumExploredTransitions >= 0.0) {
+      formatter.format("Total number of transitions explored: %.0f\n",
+                       mNumExploredTransitions);
     }
   }
 
@@ -181,7 +149,8 @@ public class TRSynchronousProductResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",ReducedDiamonds");
+    writer.print(",EncodingSize");
+    writer.print(",ExploredTrans");
   }
 
   @Override
@@ -189,14 +158,15 @@ public class TRSynchronousProductResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mReducedDiamondsCount);
+    writer.print(mEncodingSize);
+    writer.print(',');
+    writer.print(mNumExploredTransitions);
   }
 
 
   //#########################################################################
   //# Data Members
-  private TRAutomatonProxy mComputedAutomaton;
-  private TRSynchronousProductStateMap mStateMap;
-  private int mReducedDiamondsCount;
+  private int mEncodingSize;
+  private double mNumExploredTransitions;
 
 }

@@ -197,6 +197,7 @@ public class TRMonolithicCoobservabilityChecker
   {
     assert getEventEncoding() == null;
 
+    final MonolithicCoobservabilityVerificationResult result = getAnalysisResult();
     final ProductDESProxy des = getModel();
     final KindTranslator translator = getKindTranslator();
     final TRAutomatonProxy[] trs = getTRAutomata();
@@ -204,11 +205,11 @@ public class TRMonolithicCoobservabilityChecker
       mSignature = new CoobservabilitySignature(des, translator,
                                                 mDefaultSiteName);
     }
+    result.setNumberOfSites(mSignature.getSites().size());
     mSignature.filter(trs, translator);
     mSignature.merge();
     mSignature.subsume();
-    final MonolithicCoobservabilityVerificationResult result = getAnalysisResult();
-    result.setNumberOfSites(mSignature.getSites().size());
+    result.updatePeakNumberOfSites(mSignature.getSites().size());
 
     mNumAutomata = trs.length;
     mReferenceSite = new SiteInfo(mNumAutomata);

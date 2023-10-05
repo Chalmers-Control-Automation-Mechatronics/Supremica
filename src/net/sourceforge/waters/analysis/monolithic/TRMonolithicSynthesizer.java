@@ -43,12 +43,9 @@ import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TarjanControlStack;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.des.DefaultProductDESResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -56,6 +53,14 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+
+/**
+ * An alternative implementation of the monolithic synthesis algorithm
+ * that uses ideas of Tarjan's algorithm to detect blocking states early.
+ *
+ * @author Benjamin Wheeler
+ */
 
 public class TRMonolithicSynthesizer
   extends AbstractTRMonolithicModelAnalyzer implements SupervisorSynthesizer
@@ -83,6 +88,108 @@ public class TRMonolithicSynthesizer
     mFactory = factory;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
+  @Override
+  public void setOutputName(final String name)
+  {
+    mOutputName = name;
+  }
+
+  @Override
+  public String getOutputName()
+  {
+    return mOutputName;
+  }
+
+  @Override
+  public boolean isNonblockingSynthesis()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void setConfiguredDefaultMarking(final EventProxy marking)
+  {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public EventProxy getConfiguredDefaultMarking()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void setNondeterminismEnabled(final boolean enable)
+  {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
+  {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public SupervisorReductionFactory getSupervisorReductionFactory()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public boolean isSupervisorLocalizationEnabled()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void setNonblockingSynthesis(final boolean nonblocking)
+  {
+    // TODO Auto-generated method stub
+  }
+
+
+  @Override
+  public TRSynthesisResult createAnalysisResult()
+  {
+    return new TRSynthesisResult(this);
+  }
+
+  @Override
+  public TRSynthesisResult getAnalysisResult()
+  {
+    return (TRSynthesisResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public ProductDESProxy getComputedProxy()
+  {
+    return getComputedProductDES();
+  }
+
+  @Override
+  public ProductDESProxy getComputedProductDES()
+  {
+    final TRSynthesisResult result = getAnalysisResult();
+    return result.getComputedProductDES();
+  }
+
+
+  //#########################################################################
+  //# Invocation
   @Override
   protected void setUp() throws AnalysisException
   {
@@ -298,7 +405,7 @@ public class TRMonolithicSynthesizer
       final TRAutomatonProxy aut = new TRAutomatonProxy(enc, rel);
       final ProductDESProxy des = AutomatonTools.createProductDESProxy(aut, desFactory);
 
-      final ProductDESResult result = getAnalysisResult();
+      final TRSynthesisResult result = getAnalysisResult();
       result.setComputedProductDES(des);
       setAnalysisResult(result);
     }
@@ -306,117 +413,8 @@ public class TRMonolithicSynthesizer
       //Whole model is bad
       setBooleanResult(false);
     }
-
-
   }
 
-
-
-
-
-
-
-
-
-  @Override
-  public ProductDESProxy getComputedProductDES()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public ProductDESResult getAnalysisResult()
-  {
-    return (ProductDESResult) super.getAnalysisResult();
-  }
-
-  @Override
-  public void setOutputName(final String name)
-  {
-    mOutputName = name;
-  }
-
-  @Override
-  public String getOutputName()
-  {
-    return mOutputName;
-  }
-
-  @Override
-  public ProductDESProxy getComputedProxy()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void setNonblockingSynthesis(final boolean nonblocking)
-  {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public boolean isNonblockingSynthesis()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void setNondeterminismEnabled(final boolean enable)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public SupervisorReductionFactory getSupervisorReductionFactory()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public boolean isSupervisorLocalizationEnabled()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public AnalysisResult createAnalysisResult()
-  {
-    return new DefaultProductDESResult(this);
-  }
 
 
 
@@ -508,8 +506,5 @@ public class TRMonolithicSynthesizer
   private static final int EXPANDED = 0x80000000;
   private static final int CLOSED_GOOD = -1;
   private static final int CLOSED_BAD = -2;
-
-
-
 
 }

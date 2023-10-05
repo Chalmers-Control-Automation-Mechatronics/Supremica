@@ -34,11 +34,14 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.PrintWriter;
-import java.util.Formatter;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -48,68 +51,77 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  */
 
 public class MonolithicVerificationResult
-  extends DefaultVerificationResult
+  extends MonolithicAnalysisResult
+  implements VerificationResult
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a verification result representing an incomplete run.
-   * @param  analyzer The model analyser creating this result.
+   * Creates a new verification result representing an incomplete run.
+   * @param  verifier The model verifier creating this result.
    */
-  public MonolithicVerificationResult(final ModelAnalyzer analyzer)
+  public MonolithicVerificationResult(final ModelVerifier verifier)
   {
-    this(analyzer.getClass());
+    this(verifier.getClass());
   }
 
   /**
-   * Creates a verification result representing an incomplete run.
+   * Creates a new verification result representing an incomplete run.
    * @param  clazz    The class of the model verifier creating this result.
    */
   public MonolithicVerificationResult(final Class<?> clazz)
   {
     super(clazz);
-    mEncodingSize = -1;
-    mNumExploredTransitions = 0;
   }
 
 
   //#########################################################################
-  //# Simple Access Methods
-  /**
-   * Gets the number of bits used to encode state tuples.
-   */
-  public double getEncodingSize()
+  //# Interface net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
+  public void setSatisfied(final boolean sat)
   {
-    return mEncodingSize;
-  }
-
-  /**
-   * Gets the total number of transitions explored during analysis.
-   * This is a runtime estimate. If transitions are processed more than
-   * once, each time is counted separately.
-   */
-  public double getNumberOfExploredTransitions()
-  {
-    return mNumExploredTransitions;
+    super.setSatisfied(sat);
+    if (sat) {
+      mCounterExample = null;
+    }
   }
 
 
   //#########################################################################
-  //# Providing Statistics
-  public void setEncodingSize(final int value)
+  //# Interface net.sourceforge.waters.model.analysis.ProxyResult<TraceProxy>
+  @Override
+  public CounterExampleProxy getComputedProxy()
   {
-    mEncodingSize = value;
+    return getCounterExample();
   }
 
-  public void setNumberOfExploredTransitions(final double value)
+  @Override
+  public void setComputedProxy(final CounterExampleProxy counterexample)
   {
-    mNumExploredTransitions = value;
+    setCounterExample(counterexample);
   }
 
-  public void addExploredTransition()
+  @Override
+  public String getResultDescription()
   {
-    mNumExploredTransitions++;
+    return "counterexample";
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.VerificationResult
+  @Override
+  public CounterExampleProxy getCounterExample()
+  {
+    return mCounterExample;
+  }
+
+  @Override
+  public void setCounterExample(final CounterExampleProxy counterexample)
+  {
+    super.setSatisfied(false);
+    mCounterExample = counterexample;
   }
 
 
@@ -119,10 +131,7 @@ public class MonolithicVerificationResult
   public void merge(final AnalysisResult other)
   {
     super.merge(other);
-    final MonolithicVerificationResult result = (MonolithicVerificationResult) other;
-    mEncodingSize = Math.max(mEncodingSize, result.mEncodingSize);
-    mNumExploredTransitions =
-      mergeAdd(mNumExploredTransitions, result.mNumExploredTransitions);
+    mCounterExample = null;
   }
 
 
@@ -132,25 +141,10 @@ public class MonolithicVerificationResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    @SuppressWarnings("resource")
-    final Formatter formatter = new Formatter(writer);
-    if (mEncodingSize >= 0) {
-      writer.print("Peak encoding size: ");
-      writer.print(mEncodingSize);
-      writer.println(" bits");
+    if (mCounterExample != null) {
+      final int len = getCounterExampleLength(mCounterExample);
+      writer.println("Counterexample length: " + len);
     }
-    if (mNumExploredTransitions >= 0.0) {
-      formatter.format("Total number of transitions explored: %.0f\n",
-                       mNumExploredTransitions);
-    }
-  }
-
-  @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
-  {
-    super.printCSVHorizontalHeadings(writer);
-    writer.print(",EncodingSize");
-    writer.print(",ExploredTrans");
   }
 
   @Override
@@ -158,15 +152,47 @@ public class MonolithicVerificationResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mEncodingSize);
-    writer.print(',');
-    writer.print(mNumExploredTransitions);
+    if (mCounterExample != null) {
+      final int len = getCounterExampleLength(mCounterExample);
+      writer.print(len);
+    }
+    if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
+      writer.print(',');
+      if (mCounterExample == null) {
+        writer.print("NONCONFLICTING");
+      } else if (mCounterExample instanceof ConflictCounterExampleProxy) {
+        final ConflictCounterExampleProxy conflict =
+          (ConflictCounterExampleProxy) mCounterExample;
+        writer.print(conflict.getKind());
+      }
+    }
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",CounterLength");
+    if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
+      writer.print(",ConflictKind");
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  public static int getCounterExampleLength(final CounterExampleProxy counter)
+  {
+    int len = 0;
+    for (final TraceProxy trace : counter.getTraces()) {
+      len += trace.getEvents().size();
+    }
+    return len;
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mEncodingSize;
-  private double mNumExploredTransitions;
+  private CounterExampleProxy mCounterExample;
 
 }

@@ -322,6 +322,18 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
   }
 
+  @Override
+  public MonolithicAnalysisResult createAnalysisResult()
+  {
+    return new MonolithicAnalysisResult(this);
+  }
+
+  @Override
+  public MonolithicAnalysisResult getAnalysisResult()
+  {
+    return (MonolithicAnalysisResult) super.getAnalysisResult();
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -432,6 +444,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     mEncodedSource = new int[numWords];
     mDecodedTarget = new int[numAutomata];
     mEncodedTarget = new int[numWords];
+    final MonolithicAnalysisResult result = getAnalysisResult();
+    result.setEncodingSize(mStateTupleEncoding.getNumberOfUsedBits());
   }
 
   private void createEventEncoding()
@@ -1109,10 +1123,15 @@ public abstract class AbstractTRMonolithicModelAnalyzer
    * exploration has discovered a new transition. The event and target
    * state numbers are provided as arguments. The source state of the
    * transition is obtained by calling {@link #getCurrentSource()}.
+   * The default implementation increases the counter for explorer transitions
+   * in the analysis result record (statistics) and should be called by
+   * subclasses overriding this method.
    */
   protected void createTransition(final int event, final int target)
     throws OverflowException
   {
+    final MonolithicAnalysisResult result = getAnalysisResult();
+    result.addExploredTransition();
   }
 
   /**

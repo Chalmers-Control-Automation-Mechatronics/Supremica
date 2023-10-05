@@ -36,7 +36,9 @@ package net.sourceforge.waters.analysis.modular;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.CoobservabilityVerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 
 
 /**
@@ -48,6 +50,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 public class ModularCoobservabilityVerificationResult
   extends ModularVerificationResult
+  implements CoobservabilityVerificationResult
 {
 
   //#########################################################################
@@ -73,13 +76,29 @@ public class ModularCoobservabilityVerificationResult
 
 
   //#########################################################################
-  //# Simple Access Methods
-  /**
-   * Gets the number of supervisor sites found in the verified model.
-   */
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.CoobservabilityVerificationResult
+  @Override
   public int getNumberOfSites()
   {
     return mNumberOfSites;
+  }
+
+  @Override
+  public int getPeakNumberOfSites()
+  {
+    final CoobservabilityVerificationResult mono = getMonolithicResult();
+    if (mono != null) {
+      return mono.getPeakNumberOfSites();
+    } else {
+      return 0;
+    }
+  }
+
+  @Override
+  public CoobservabilityCounterExampleProxy getCounterExample()
+  {
+    return (CoobservabilityCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -88,6 +107,15 @@ public class ModularCoobservabilityVerificationResult
   public void setNumberOfSites(final int numSites)
   {
     mNumberOfSites = numSites;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
+  public CoobservabilityVerificationResult getMonolithicResult()
+  {
+    return (CoobservabilityVerificationResult) super.getMonolithicResult();
   }
 
 
@@ -110,7 +138,7 @@ public class ModularCoobservabilityVerificationResult
   public void print(final PrintWriter writer)
   {
     if (mNumberOfSites >= 0) {
-      writer.print("Number of supervisor sites: ");
+      writer.print("Number of supervisor sites in model: ");
       writer.println(mNumberOfSites);
     }
     super.print(writer);
@@ -128,7 +156,9 @@ public class ModularCoobservabilityVerificationResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mNumberOfSites);
+    if (mNumberOfSites >= 0) {
+      writer.print(mNumberOfSites);
+    }
   }
 
 

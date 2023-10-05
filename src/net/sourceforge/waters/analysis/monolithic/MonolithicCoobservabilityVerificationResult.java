@@ -36,7 +36,9 @@ package net.sourceforge.waters.analysis.monolithic;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.CoobservabilityVerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 
 
 /**
@@ -48,6 +50,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 public class MonolithicCoobservabilityVerificationResult
   extends MonolithicVerificationResult
+  implements CoobservabilityVerificationResult
 {
 
   //#########################################################################
@@ -68,26 +71,40 @@ public class MonolithicCoobservabilityVerificationResult
   public MonolithicCoobservabilityVerificationResult(final Class<?> clazz)
   {
     super(clazz);
-    mPeakNumberOfSites = -1;
+    mNumberOfSites = mPeakNumberOfSites = -1;
   }
 
 
   //#########################################################################
-  //# Simple Access Methods
-  /**
-   * Gets the peak number of supervisor sites considered during verification.
-   * If multiple runs are recorded, this method returns the maximum number of
-   * supervisor sites considered at any one time.
-   */
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.CoobservabilityVerificationResult
+  @Override
+  public int getNumberOfSites()
+  {
+    return mNumberOfSites;
+  }
+
+  @Override
   public int getPeakNumberOfSites()
   {
     return mPeakNumberOfSites;
+  }
+
+  @Override
+  public CoobservabilityCounterExampleProxy getCounterExample()
+  {
+    return (CoobservabilityCounterExampleProxy) super.getCounterExample();
   }
 
 
   //#########################################################################
   //# Providing Statistics
   public void setNumberOfSites(final int numSites)
+  {
+    mPeakNumberOfSites = numSites;
+  }
+
+  public void updatePeakNumberOfSites(final int numSites)
   {
     mPeakNumberOfSites = Math.max(mPeakNumberOfSites, numSites);
   }
@@ -101,6 +118,7 @@ public class MonolithicCoobservabilityVerificationResult
     super.merge(other);
     final MonolithicCoobservabilityVerificationResult result =
       (MonolithicCoobservabilityVerificationResult) other;
+    mNumberOfSites = -1;
     mPeakNumberOfSites =
       Math.max(mPeakNumberOfSites, result.mPeakNumberOfSites);
   }
@@ -112,6 +130,10 @@ public class MonolithicCoobservabilityVerificationResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
+    if (mNumberOfSites >= 0) {
+      writer.print("Number of supervisor sites in model: ");
+      writer.println(mNumberOfSites);
+    }
     if (mPeakNumberOfSites >= 0) {
       writer.print("Peak number of supervisor sites: ");
       writer.println(mPeakNumberOfSites);
@@ -122,7 +144,7 @@ public class MonolithicCoobservabilityVerificationResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",PeakSites");
+    writer.print(",NumSites,PeakSites");
   }
 
   @Override
@@ -130,12 +152,19 @@ public class MonolithicCoobservabilityVerificationResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
-    writer.print(mPeakNumberOfSites);
+    if (mNumberOfSites >= 0) {
+      writer.print(mNumberOfSites);
+    }
+    writer.print(',');
+    if (mPeakNumberOfSites >= 0) {
+      writer.print(mPeakNumberOfSites);
+    }
   }
 
 
   //#########################################################################
   //# Data Members
+  private int mNumberOfSites;
   private int mPeakNumberOfSites;
 
 }

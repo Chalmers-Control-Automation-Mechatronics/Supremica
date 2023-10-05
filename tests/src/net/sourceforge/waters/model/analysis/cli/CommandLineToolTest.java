@@ -157,7 +157,7 @@ public class CommandLineToolTest
     final String[] args = new String[]
       {"-mod", "-coobs", file.toString(), "-stats"};
     testCommandLine("mod-coobs", args, false, "counterexample:",
-                    "Statistics:", "Number of supervisor sites: .*");
+                    "Statistics:", "Number of supervisor sites in model: .*");
   }
 
   public void testAnalyzer_SlicingCoobservability()

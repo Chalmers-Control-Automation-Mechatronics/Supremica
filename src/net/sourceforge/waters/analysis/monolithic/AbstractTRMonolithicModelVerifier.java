@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -163,15 +161,6 @@ public abstract class AbstractTRMonolithicModelVerifier
 
   //#########################################################################
   //# Invocation
-  @Override
-  protected void setUpStateTupleEncoding(final TRAutomatonProxy[] trs)
-    throws AnalysisAbortException, OverflowException
-  {
-    super.setUpStateTupleEncoding(trs);
-    final MonolithicVerificationResult result = getAnalysisResult();
-    result.setEncodingSize(getStateTupleEncoding().getNumberOfUsedBits());
-  }
-
   @Override
   public boolean run()
     throws AnalysisException
@@ -309,15 +298,6 @@ public abstract class AbstractTRMonolithicModelVerifier
         break;
       }
     }
-  }
-
-  @Override
-  protected void createTransition(final int event, final int target)
-    throws OverflowException
-  {
-    super.createTransition(event, target);
-    final MonolithicVerificationResult result = getAnalysisResult();
-    result.addExploredTransition();
   }
 
 

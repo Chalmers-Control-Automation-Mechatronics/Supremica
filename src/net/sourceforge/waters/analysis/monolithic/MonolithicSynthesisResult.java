@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *
  * @author Robi Malik
  */
-
+// TODO Merge this class with TRSynthesisResult
 public class MonolithicSynthesisResult
   extends DefaultProductDESResult
 {
