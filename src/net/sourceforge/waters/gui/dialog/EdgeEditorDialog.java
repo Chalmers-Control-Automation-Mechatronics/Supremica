@@ -57,6 +57,7 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
+import net.sourceforge.waters.gui.grapheditor.GraphInsertPosition;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -274,12 +275,7 @@ public class EdgeEditorDialog
               final BinaryExpressionSubject binaction =
                 (BinaryExpressionSubject) action;
               actions.add(binaction);
-            } catch (final ParseException exception) {
-              JOptionPane.showMessageDialog(this, exception.getMessage(),
-                                            "Syntax error in action!",
-                                            JDialog.DO_NOTHING_ON_CLOSE);
-              return;
-            } catch (final TypeMismatchException exception) {
+            } catch (final ParseException | TypeMismatchException exception) {
               JOptionPane.showMessageDialog(this, exception.getMessage(),
                                             "Syntax error in action!",
                                             JDialog.DO_NOTHING_ON_CLOSE);
@@ -295,7 +291,7 @@ public class EdgeEditorDialog
       Command command = null;
       if (block == null) {
         if (guard != null || actions != null) {
-          final EdgeSubject newEdge = (EdgeSubject)cloner.getClone(mEdge);
+          final EdgeSubject newEdge = (EdgeSubject) cloner.getClone(mEdge);
           final List<SimpleExpressionSubject> guards =
             guard == null ? null : Collections.singletonList(guard);
           // TODO Find a better position ...
@@ -305,20 +301,15 @@ public class EdgeEditorDialog
           final GuardActionBlockSubject newblock =
             new GuardActionBlockSubject(guards, actions, geo);
           newEdge.setGuardActionBlock(newblock);
-          if(!eq.equals(mEdge, newEdge)){
+          if (!eq.equals(mEdge, newEdge)) {
             command = new EditCommand(mEdge, newEdge, null);
           }
         }
       } else {
         if (guard == null && actions == null) {
-          final List<GuardActionBlockSubject> selection =
-            Collections.singletonList(block);
-          final List<InsertInfo> deletes =
-            mPanel.getDeletionVictims(selection);
-          // The user may now have cancelled the deletion (?)
-          if (deletes != null) {
-            command = new DeleteCommand(deletes, mPanel);
-          }
+          final GraphInsertPosition insPos = new GraphInsertPosition(mEdge);
+          final InsertInfo info = new InsertInfo(block, insPos);
+          command = new DeleteCommand(info, mPanel);
         } else {
           final GuardActionBlockSubject newblock =
             (GuardActionBlockSubject) cloner.getClone(block);
@@ -334,7 +325,7 @@ public class EdgeEditorDialog
           if (actions != null) {
             bactions.addAll(actions);
           }
-          if(!eq.equals(block, newblock)){
+          if (!eq.equals(block, newblock)) {
             command = new EditCommand(block, newblock, null);
           }
         }

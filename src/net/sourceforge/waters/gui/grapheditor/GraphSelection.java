@@ -281,9 +281,9 @@ public class GraphSelection implements Iterable<ProxySubject>
   }
 
   /**
-   * <P>Returns a detailed specification of what graph need to be deleted to
-   * delete the currently selected items.</P>
-   * <P>This includes all items in the selection; additionally, when a
+   * <P>Returns a detailed specification of what parts of a graph need to be
+   * deleted to delete the currently selected items.</P>
+   * <P>This includes all items in the selection; additionally, when
    * deleting nodes ({@link NodeProxy}), all attached edges ({@link EdgeProxy})
    * must also be deleted and are included in the result.</P>
    * @return A list of {@link InsertInfo} objects containing the items to
