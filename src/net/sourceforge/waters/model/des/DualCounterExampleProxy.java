@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.des;
 
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
+
 /**
  * <P>A counterexample consisting of two traces.</P>
  *
@@ -48,6 +50,7 @@ package net.sourceforge.waters.model.des;
  * </UL>
  *
  * @author Robi Malik
+ * @see DiagnosabilityChecker
  */
 
 public interface DualCounterExampleProxy

@@ -1,0 +1,18 @@
+event [^\.]* COOBS:observer0 hi
+event [^\.]* controllable COOBS:controller0 hi
+event .*AS1 COOBS:observer1 as1
+event .*AS1 controllable COOBS:controller1 as1
+event .*AS2 COOBS:observer1 as2
+event .*AS2 controllable COOBS:controller1 as2
+event .*AS3 COOBS:observer1 as3
+event .*AS3 controllable COOBS:controller1 as3
+event .*TU1 COOBS:observer1 tu1
+event .*TU1 controllable COOBS:controller1 tu1
+event .*TU2 COOBS:observer1 tu2
+event .*TU2 controllable COOBS:controller1 tu2
+event .*TU3 COOBS:observer1 tu3
+event .*TU3 controllable COOBS:controller1 tu3
+event TrnsfToEL3.* COOBS:observer1 tu3
+event TrnsfToEL3.* controllable COOBS:controller1 tu3
+event .*TU4 COOBS:observer1 tu4
+event .*TU4 controllable COOBS:controller1 tu4

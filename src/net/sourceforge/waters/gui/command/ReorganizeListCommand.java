@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,11 +33,11 @@
 
 package net.sourceforge.waters.gui.command;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.IdentityHashMap;
-import java.util.ArrayList;
+import java.util.List;
 
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
@@ -60,13 +60,15 @@ public class ReorganizeListCommand
 		mIdentifiers.addAll(identifiers);
 		Collections.sort(mIdentifiers, new Comparator<AbstractSubject>()
 		{
-			public int compare(final AbstractSubject a1, final AbstractSubject a2)
+			@Override
+      public int compare(final AbstractSubject a1, final AbstractSubject a2)
 			{
 				return (mList.getEventIdentifierListModifiable().indexOf(a1) -
                 mList.getEventIdentifierListModifiable().indexOf(a2));
 			}
 
-			public boolean equals(final Object o)
+			@Override
+      public boolean equals(final Object o)
 			{
 				return o == this;
 			}
@@ -75,12 +77,13 @@ public class ReorganizeListCommand
 		for (final AbstractSubject a : identifiers)
 		{
 			final int index = mList.getEventIdentifierList().indexOf(a);
-			mIndexs.put(a, new Integer(index));
+			mIndexs.put(a, index);
 		}
 		mNewPosition = newPosition;
 	}
 
-	public void execute()
+	@Override
+  public void execute()
 	{
 		final List<AbstractSubject> list = mList.getEventIdentifierListModifiable();
 		list.removeAll(mIdentifiers);
@@ -101,6 +104,7 @@ public class ReorganizeListCommand
     /**
      * Undoes the Command
      */
+    @Override
     public void undo()
     {
 		final List<AbstractSubject> list =
@@ -113,15 +117,18 @@ public class ReorganizeListCommand
 		}
     }
 
+    @Override
     public void setUpdatesSelection(final boolean update)
     {
     }
 
-	public boolean isSignificant()
+	@Override
+  public boolean isSignificant()
 	{
 		return true;
 	}
 
+    @Override
     public String getName()
     {
 		return mDescription;

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -59,7 +59,7 @@ public class FocusPreservingTrigger
                                     final char accelerator)
   {
     final int code = KeyEvent.getExtendedKeyCodeForChar(accelerator);
-    final KeyStroke stroke = KeyStroke.getKeyStroke(code, KeyEvent.ALT_MASK);
+    final KeyStroke stroke = KeyStroke.getKeyStroke(code, KeyEvent.ALT_DOWN_MASK);
     final Action action = new FocusPreservingTrigger(button, stroke);
     final String text = button.getText();
     final int mnemonicIndex =

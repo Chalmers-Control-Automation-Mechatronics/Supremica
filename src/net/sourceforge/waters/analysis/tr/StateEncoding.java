@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -84,20 +85,30 @@ public class StateEncoding
   }
 
   /**
+   * Creates a with the given number of states, but with no state objects
+   * associated to any state.
+   */
+  public StateEncoding(final int size)
+  {
+    mStates = new StateProxy[size];
+    mStateCodeMap = new TObjectIntHashMap<>(size, 0.5f, -1);;
+  }
+
+  /**
    * Creates a new state encoding for the given automaton.
    * State codes are assigned in the order they appear in the automaton's
    * state list.
    */
   public StateEncoding(final AutomatonProxy aut)
   {
-    this(aut.getStates());
+    init(aut.getStates());
   }
 
   /**
    * Creates a new state encoding for the given states.
    * State codes are assigned in the order they appear in the given
-   * collection. Any <CODE>null</CODE> entries cause code numbers to be
-   * skipped.
+   * collection. Any <CODE>null</CODE> entries are not associated with a state
+   * object, but their code numbers are still used.
    */
   public StateEncoding(final Collection<? extends StateProxy> states)
   {
@@ -107,12 +118,29 @@ public class StateEncoding
   /**
    * Creates a new state encoding for the given states.
    * State codes are assigned according to their indexes in the given
-   * array. Any <CODE>null</CODE> entries cause code numbers to be skipped.
+   * array. Any <CODE>null</CODE> entries are not associated with a state
+   * object, but their code numbers are still used.
    * @param  states  New states array. Will not be copied.
    */
   public StateEncoding(final StateProxy[] states)
   {
     init(states);
+  }
+
+  /**
+   * Creates a new state encoding by copying another.
+   * The new state encoding does not share the original encoding's state array.
+   */
+  public StateEncoding(final StateEncoding enc)
+  {
+    if (enc.mStates == null) {
+      mStates = null;
+      mStateCodeMap = null;
+    } else {
+      final StateProxy[] states =
+        Arrays.copyOf(enc.mStates, enc.getNumberOfStates());
+      init(states);
+    }
   }
 
 
@@ -144,10 +172,46 @@ public class StateEncoding
   //#########################################################################
   //# Initialisation
   /**
+   * Resets this state encoding to use the given states and an optional
+   * dump state.
+   * @param  states     Collection of states, whose state codes are
+   *                    assigned in the order they appear. Any <CODE>null</CODE>
+   *                    entries are not associated with a state object, but their
+   *                    code numbers are still used.
+   * @param  dumpState  Dump state to be used, or <CODE>null</CODE>.
+   *                    If the collection of states does not contain the dump
+   *                    state, an additional state is allocated and associated
+   *                    with the dump state as the last state number.
+   */
+  public void init(final Collection<? extends StateProxy> states,
+                   final StateProxy dumpState)
+  {
+    int numStates = states.size();
+    if (!states.contains(dumpState)) {
+      numStates++;
+    }
+    mStates = new StateProxy[numStates];
+    mStateCodeMap = new TObjectIntHashMap<>(numStates, 0.5f, -1);
+    int code = 0;
+    for (final StateProxy state : states) {
+      if (state != null) {
+        mStates[code] = state;
+        mStateCodeMap.put(state, code);
+      }
+      code++;
+    }
+    if (numStates > states.size() && dumpState != null) {
+      code = numStates - 1;
+      mStates[code] = dumpState;
+      mStateCodeMap.put(dumpState, code);
+    }
+  }
+
+  /**
    * Resets this state encoding to use the given states.
    * State codes are assigned in the order they appear in the given
-   * collection. Any <CODE>null</CODE> entries cause code numbers to be
-   * skipped.
+   * collection. Any <CODE>null</CODE> entries are not associated with a state
+   * object, but their code numbers are still used.
    */
   public void init(final Collection<? extends StateProxy> states)
   {
@@ -167,7 +231,8 @@ public class StateEncoding
   /**
    * Resets this state encoding to use the given states.
    * State codes are assigned according to their indexes in the given
-   * array. Any <CODE>null</CODE> entries cause code numbers to be skipped.
+   * array. Any <CODE>null</CODE> entries are not associated with a state
+   * object, but their code numbers are still used.
    * @param  states  New states array. Will not be copied.
    */
   public void init(final StateProxy[] states)
@@ -252,6 +317,20 @@ public class StateEncoding
   public TObjectIntHashMap<StateProxy> getStateCodeMap()
   {
     return mStateCodeMap;
+  }
+
+  /**
+   * Returns the smallest state code associated with a <CODE>null</CODE>
+   * state object in the encoding, or <CODE>-1</CODE>.
+   */
+  public int findUnusedCode()
+  {
+    for (int c = 0; c < mStates.length; c++) {
+      if (mStates[c] == null) {
+        return c;
+      }
+    }
+    return -1;
   }
 
 

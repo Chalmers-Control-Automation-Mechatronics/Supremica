@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -44,8 +44,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -58,9 +56,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 /**
  * A Java implementation of a monolithic controllability or language
@@ -71,7 +66,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public abstract class TRMonolithicSafetyVerifier
-  extends TRAbstractModelVerifier
+  extends AbstractTRMonolithicModelVerifier
   implements SafetyVerifier
 {
 
@@ -119,39 +114,6 @@ public abstract class TRMonolithicSafetyVerifier
   public SafetyCounterExampleProxy getCounterExample()
   {
     return (SafetyCounterExampleProxy) super.getCounterExample();
-  }
-
-
-  //#########################################################################
-  //# Invocation
-  @Override
-  public boolean run()
-    throws AnalysisException
-  {
-    try {
-      setUp();
-      final VerificationResult result = getAnalysisResult();
-      if (!result.isFinished()) {
-        exploreStateSpace();
-        if (!result.isFinished()) {
-          result.setSatisfied(true);
-        }
-      }
-      return result.isSatisfied();
-    } catch (final AnalysisException exception) {
-      throw setExceptionResult(exception);
-    } catch (final OutOfMemoryError error) {
-      tearDown();
-      final Logger logger = LogManager.getLogger();
-      logger.debug("<out of memory>");
-      final OverflowException exception = new OverflowException(error);
-      throw setExceptionResult(exception);
-    } catch (final StackOverflowError error) {
-      final OverflowException exception = new OverflowException(error);
-      throw setExceptionResult(exception);
-    } finally {
-      tearDown();
-    }
   }
 
 
@@ -208,6 +170,7 @@ public abstract class TRMonolithicSafetyVerifier
     final List<TraceStepProxy> steps;
     final String comment;
     if (e < 0) {
+      // failed property due to missing initial state
       final int numAut = getInputAutomata().length;
       final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
       for (int a = 0; a < numAut; a++) {
@@ -224,13 +187,9 @@ public abstract class TRMonolithicSafetyVerifier
       steps = Collections.singletonList(step);
       comment = null;
     } else {
-      TraceStepProxy finalStep = null;
-      for (final EventInfo info : getEventInfo()) {
-        if (info.getOutputCode() == e) {
-          finalStep = info.buildFinalTraceStep(this, target);
-          break;
-        }
-      }
+      // failed property due to disabled event
+      final EventInfo info = getEventInfo(e);
+      final TraceStepProxy finalStep = info.buildFinalTraceStep(this, target);
       steps = buildTraceToBadState(target);
       steps.add(finalStep);
       final EventEncoding eventEnc = getOutputEventEncoding();

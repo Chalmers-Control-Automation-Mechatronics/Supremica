@@ -1628,7 +1628,7 @@ public class VelocityBalancer
     // indexOfNextNode-array
     int currKeyPointIndex = 0;
     while (currKeyPointIndex > -1) {
-      keyPointIndices.add(new Integer(currKeyPointIndex));
+      keyPointIndices.add(currKeyPointIndex);
 
       // This (ugly) procedure is done to avoid mixing with path- and key points
       // by accident

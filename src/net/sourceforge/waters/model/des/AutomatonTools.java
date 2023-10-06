@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -148,6 +148,24 @@ public final class AutomatonTools
      final Collection<? extends AutomatonProxy> automata,
      final ProductDESProxyFactory factory)
   {
+    return createProductDESProxy(name, null, automata, factory);
+  }
+  /**
+   * Creates a product DES consisting of the given automata.
+   * @param  name     The name to be given to the product DES.
+   * @param  comment  The comment string for the product DES.
+   * @param  automata The automata to be used for the product DES.
+   * @param  factory  Factory to construct objects.
+   * @return A product DES with only the given automata. The product DES
+   *         event alphabet consists of the union of the events sets of its
+   *         automata in deterministic order.
+   */
+  public static ProductDESProxy createProductDESProxy
+    (final String name,
+     final String comment,
+     final Collection<? extends AutomatonProxy> automata,
+     final ProductDESProxyFactory factory)
+  {
     int numEvents = 0;
     for (final AutomatonProxy aut : automata) {
       numEvents += aut.getEvents().size();
@@ -163,7 +181,8 @@ public final class AutomatonTools
         }
       }
     }
-    return factory.createProductDESProxy(name, eventList, automata);
+    return factory.createProductDESProxy(name, comment, null,
+                                         eventList, automata);
   }
 
   /**

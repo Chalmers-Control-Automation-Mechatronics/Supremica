@@ -1883,11 +1883,11 @@ public class AutomatonMinimizer
             final StateInfo info = new StateInfoIncoming(state);
 
             // Get list of states with same hashcode, add this info
-            List<StateInfo> list = infoHash.get(new Integer(info.hashCode()));
+            List<StateInfo> list = infoHash.get(info.hashCode());
             if (list == null)
             {
                 list = new LinkedList<StateInfo>();
-                infoHash.put(new Integer(info.hashCode()), list);
+                infoHash.put(info.hashCode(), list);
             }
             list.add(info);
         }
@@ -2142,11 +2142,11 @@ public class AutomatonMinimizer
             final StateInfo info = new StateInfoActiveEventsRule(state);
 
             // Get list of states with same hashcode
-            LinkedList<StateInfo> list = (LinkedList<StateInfo>) infoHash.get(new Integer(info.hashCode()));
+            LinkedList<StateInfo> list = (LinkedList<StateInfo>) infoHash.get(info.hashCode());
             if (list == null)
             {
                 list = new LinkedList<StateInfo>();
-                infoHash.put(new Integer(info.hashCode()), list);
+                infoHash.put(info.hashCode(), list);
             }
             list.add(info);
         }

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -256,7 +256,7 @@ public class CommandLineOptionContext implements OptionContext
       } else if (name.startsWith("-")) {
         System.err.println("Unsupported option " + name +
                            ". Try -help to see available options.");
-        System.exit(1);
+        ExitException.testFriendlyExit(1);
       }
     }
   }
@@ -441,7 +441,7 @@ public class CommandLineOptionContext implements OptionContext
                       final ListIterator<String> iter)
     {
       showHelpMessage(System.out);
-      System.exit(0);
+      ExitException.testFriendlyExit(0);
     }
   }
 
@@ -470,7 +470,7 @@ public class CommandLineOptionContext implements OptionContext
                       final ListIterator<String> iter)
     {
       Version.printConsoleInfo(System.out);
-      System.exit(0);
+      ExitException.testFriendlyExit(0);
     }
   }
 
@@ -485,6 +485,9 @@ public class CommandLineOptionContext implements OptionContext
     public CommandLineToolOptionPage()
     {
       super("cli", "Command Line Tool");
+      register(new FileOption(OPTION_CommandLineTool_AnnotationsFile, null,
+                              "Annotations file", "-ann",
+                              FileOption.Type.INPUT_FILE));
       register(new FileOption(OPTION_CommandLineTool_Csv, null,
                               "Save statistics in CSV file", "-csv",
                               FileOption.Type.OUTPUT_FILE));
@@ -543,6 +546,8 @@ public class CommandLineOptionContext implements OptionContext
 
   //#########################################################################
   //# Class Constants
+  public static final String OPTION_CommandLineTool_AnnotationsFile =
+    "CommandLineTool.AnnotationsFile";
   public static final String OPTION_CommandLineTool_Csv =
     "CommandLineTool.Csv";
   public static final String OPTION_CommandLineTool_Properties =

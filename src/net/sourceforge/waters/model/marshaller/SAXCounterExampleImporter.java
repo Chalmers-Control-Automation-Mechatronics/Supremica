@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -46,6 +46,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ConflictKind;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -81,6 +82,15 @@ public class SAXCounterExampleImporter
           (final AbstractContentHandler<?> parent)
         {
           return new ConflictCounterExampleProxyHandler(parent);
+        }
+      });
+    registerHandler(SchemaDES.ELEMENT_CoobservabilityCounterExample,
+      new SAXHandlerCreator<CoobservabilityCounterExampleProxy>() {
+        @Override
+        AbstractContentHandler<CoobservabilityCounterExampleProxy> createHandler
+        (final AbstractContentHandler<?> parent)
+        {
+          return new MultipleCounterExampleProxyHandler(parent);
         }
       });
     registerHandler(SchemaDES.ELEMENT_DualCounterExample,
@@ -535,6 +545,34 @@ public class SAXCounterExampleImporter
       final TraceProxy trace = getTrace();
       return mFactory.createLoopCounterExampleProxy
         (name, comment, uri, mProductDES, automata, trace);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class MultipleCounterExampleProxyHandler
+  private class MultipleCounterExampleProxyHandler
+    extends CounterExampleProxyHandler<CoobservabilityCounterExampleProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private MultipleCounterExampleProxyHandler(final AbstractContentHandler<?> parent)
+    {
+      super(parent);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<ConflictCounterExampleProxy>
+    @Override
+    CoobservabilityCounterExampleProxy getResult() throws SAXParseException
+    {
+      final String name = getName();
+      final String comment = getComment();
+      final URI uri = getURI();
+      final List<AutomatonProxy> automata = getAutomata();
+      final List<TraceProxy> traces = getTraces();
+      return mFactory.createCoobservabilityCounterExampleProxy
+        (name, comment, uri, mProductDES, automata, traces);
     }
   }
 

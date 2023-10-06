@@ -1,0 +1,79 @@
+event [^\[\]]* COOBS:observer0 hi
+event [^\[\]]* controllable COOBS:controller0 hi
+event .*\[AS1\] COOBS:observer1 as1
+event .*\[AS1\] controllable COOBS:controller1 as1
+event .*\[AS2\] COOBS:observer1 as2
+event .*\[AS2\] controllable COOBS:controller1 as2
+event .*\[AS3\] COOBS:observer1 as3
+event .*\[AS3\] controllable COOBS:controller1 as3
+event .*\[TU1\] COOBS:observer1 tu1
+event .*\[TU1\] controllable COOBS:controller1 tu1
+event .*\[TU2\] COOBS:observer1 tu2
+event .*\[TU2\] controllable COOBS:controller1 tu2
+event .*\[TU3\] COOBS:observer1 tu3
+event .*\[TU3\] controllable COOBS:controller1 tu3
+event TrnsfToEL3.* COOBS:observer1 tu3
+event TrnsfToEL3.* controllable COOBS:controller1 tu3
+event .*\[TU4\] COOBS:observer1 tu4
+event .*\[TU4\] controllable COOBS:controller1 tu4
+
+event ASDwn.* COOBS:observer0 hi
+event ASDwn.* controllable COOBS:controller0 hi
+event AssmbErr.* COOBS:observer0 hi
+event AssmbErr.* controllable COOBS:controller0 hi
+event DoRpr.* COOBS:observer0 hi
+event DoRpr.* controllable COOBS:controller0 hi
+event DwnOpNeeded.* COOBS:observer0 hi
+event DwnOpNeeded.* controllable COOBS:controller0 hi
+event IsErr.* COOBS:observer0 hi
+event IsErr.* controllable COOBS:controller0 hi
+event IsPallet.* COOBS:observer0 hi
+event IsPallet.* controllable COOBS:controller0 hi
+event LibPallet.* COOBS:observer0 hi
+event LibPallet.* controllable COOBS:controller0 hi
+event NoError.* COOBS:observer0 hi
+event NoError.* controllable COOBS:controller0 hi
+event NoPallet.* COOBS:observer0 hi
+event NoPallet.* controllable COOBS:controller0 hi
+event NoTrnsfEL.* COOBS:observer0 hi
+event NoTrnsfEL.* controllable COOBS:controller0 hi
+event NotDwnOpNeeded.* COOBS:observer0 hi
+event NotDwnOpNeeded.* controllable COOBS:controller0 hi
+event NotOpNeeded.* COOBS:observer0 hi
+event NotOpNeeded.* controllable COOBS:controller0 hi
+event OpNeeded.* COOBS:observer0 hi
+event OpNeeded.* controllable COOBS:controller0 hi
+event PalletRepd.* COOBS:observer0 hi
+event PalletRepd.* controllable COOBS:controller0 hi
+event PalletRlsd.* COOBS:observer0 hi
+event PalletRlsd.* controllable COOBS:controller0 hi
+event ProcCpl.* COOBS:observer0 hi
+event ProcCpl.* controllable COOBS:controller0 hi
+event ProcErr.* COOBS:observer0 hi
+event ProcErr.* controllable COOBS:controller0 hi
+event ProcPallet.* COOBS:observer0 hi
+event ProcPallet.* controllable COOBS:controller0 hi
+event ProcTyp.* COOBS:observer0 hi
+event ProcTyp.* controllable COOBS:controller0 hi
+event QDwnOpNeeded.* COOBS:observer0 hi
+event QDwnOpNeeded.* controllable COOBS:controller0 hi
+event QError.* COOBS:observer0 hi
+event QError.* controllable COOBS:controller0 hi
+event QOpNeeded.* COOBS:observer0 hi
+event QOpNeeded.* controllable COOBS:controller0 hi
+event QPallet.* COOBS:observer0 hi
+event QPallet.* controllable COOBS:controller0 hi
+event QStnUp.* COOBS:observer0 hi
+event QStnUp.* controllable COOBS:controller0 hi
+event RTaskCpl.* COOBS:observer0 hi
+event RTaskCpl.* controllable COOBS:controller0 hi
+event RobDwn.* COOBS:observer0 hi
+event RobDwn.* controllable COOBS:controller0 hi
+event RobUp.* COOBS:observer0 hi
+event RobUp.* controllable COOBS:controller0 hi
+event StnDwn.* COOBS:observer0 hi
+event StnDwn.* controllable COOBS:controller0 hi
+event StnUp.* COOBS:observer0 hi
+event StnUp.* controllable COOBS:controller0 hi
+event Trnsf.* COOBS:observer0 hi
+event Trnsf.* controllable COOBS:controller0 hi

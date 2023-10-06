@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -894,7 +894,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     if (rel.checkReachability()) {
       for (int s = 0; s < rel.getNumberOfStates(); s++) {
         if (!rel.isReachable(s) && s != rel.getDumpStateIndex()) {
-          final StateProxy state = tr.getState(s);
+          final StateProxy state = tr.getTRState(s);
           fail("Synthesised supervisor '" + aut.getName() +
                "' contains unreachable state '" + state.getName() + "'!");
         }

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -578,7 +578,6 @@ public class UnifiedEFAConflictCheckerExperiments
     {
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       mConflictChecker =  new CompositionalConflictChecker(factory);
-      mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
       mConflictChecker.setAbstractionProcedureCreator
         (ConflictAbstractionProcedureFactory.NB);
@@ -610,19 +609,13 @@ public class UnifiedEFAConflictCheckerExperiments
       final ProductDESProxy des = compile(module, bindings);
       final long finish = System.currentTimeMillis();
       mConflictChecker.setModel(des);
+      mWatchdog.addAbortable(mConflictChecker);
       mConflictChecker.run();
       final AnalysisResult result =
         mConflictChecker.getAnalysisResult();
+      mWatchdog.removeAbortable(mConflictChecker);
       result.setCompileTime(finish - start);
       return result;
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    @Override
-    public void finalize()
-    {
-      mWatchdog.removeAbortable(mConflictChecker);
     }
 
     //#######################################################################
@@ -643,7 +636,6 @@ public class UnifiedEFAConflictCheckerExperiments
     {
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       mConflictChecker =  new BDDConflictChecker(factory);
-      mWatchdog.addAbortable(mConflictChecker);
       // Configuration of BDDConflictChecker ...
       mConflictChecker.setBDDPackage(BDDPackage.CUDD);
       mConflictChecker.setTransitionPartitioningStrategy
@@ -664,16 +656,11 @@ public class UnifiedEFAConflictCheckerExperiments
     {
       final ProductDESProxy des = compile(module, bindings);
       mConflictChecker.setModel(des);
+      mWatchdog.addAbortable(mConflictChecker);
       mConflictChecker.run();
-      return mConflictChecker.getAnalysisResult();
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    @Override
-    public void finalize()
-    {
+      final AnalysisResult result = mConflictChecker.getAnalysisResult();
       mWatchdog.removeAbortable(mConflictChecker);
+      return result;
     }
 
     //#######################################################################

@@ -31,12 +31,6 @@
 //# exception.
 //###########################################################################
 
-// With the replacement of javah by javac -h, it is no longer possible to
-// generate a single file containing all headers. This file includes all the
-// headers created by the build file {supremica}/waters/build.xml,
-// but it was created manually and will not be updated when new header source
-// files are added.
-
 #ifndef _Invocations_h_
 #define _Invocations_h_
 

@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="pms_ac">
+<B:Comment>Parallel Manufacturing System imported from DESpot, with bug fixes according to Ada Clevinger.
+The model is controllable, nonblocking, and coobservable subject to supervisor sites in Node0.cann.
+It has 5702550 reachabke states.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
+<EventDecl Kind="CONTROLLABLE" Name="deposit_part"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="finish_exit_1">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="finish_exit_2">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="finish_exit_3">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="new_part"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="package"/>
+<EventDecl Kind="CONTROLLABLE" Name="part_enter_1">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="part_enter_2">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="part_enter_3">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="part_f_obuff"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="part_fails"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="part_passes"/>
+<EventDecl Kind="CONTROLLABLE" Name="ret_inbuff"/>
+<EventDecl Kind="CONTROLLABLE" Name="take_item"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="Ensure_matFb">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="80" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="176" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="272" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="368" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<PointGeometry>
+<Point X="480" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="318" Y="126"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="part_passes"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="320" Y="169"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="418" Y="122"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="part_passes"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="427" Y="162"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="part_passes"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="131" Y="165"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="127" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="part_passes"/>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="220" Y="167"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="223" Y="127"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="In_Buff">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="256" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="352" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="448" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<PointGeometry>
+<Point X="544" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="ret_inbuff"/>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="309" Y="142"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="part_enter_1"/>
+<SimpleIdentifier Name="part_enter_2"/>
+<SimpleIdentifier Name="part_enter_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="206" Y="177"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="ret_inbuff"/>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="393" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="part_enter_1"/>
+<SimpleIdentifier Name="part_enter_2"/>
+<SimpleIdentifier Name="part_enter_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-47" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="311" Y="178"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="ret_inbuff"/>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="208" Y="142"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="part_enter_1"/>
+<SimpleIdentifier Name="part_enter_2"/>
+<SimpleIdentifier Name="part_enter_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="404" Y="181"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="ret_inbuff"/>
+<SimpleIdentifier Name="new_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-36"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="496" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="part_enter_1"/>
+<SimpleIdentifier Name="part_enter_2"/>
+<SimpleIdentifier Name="part_enter_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="496" Y="176"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Out_Buff">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-24" Y="0"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="288" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="416" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="544" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<PointGeometry>
+<Point X="672" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="finish_exit_1"/>
+<SimpleIdentifier Name="finish_exit_2"/>
+<SimpleIdentifier Name="finish_exit_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="part_enter_1"/>
+<SimpleIdentifier Name="part_enter_2"/>
+<SimpleIdentifier Name="part_enter_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-56" Y="-57"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="158" Y="99"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="part_f_obuff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="482" Y="179"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="part_f_obuff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="353" Y="179"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="finish_exit_1"/>
+<SimpleIdentifier Name="finish_exit_2"/>
+<SimpleIdentifier Name="finish_exit_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-52"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="479" Y="143"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="part_f_obuff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="228" Y="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="finish_exit_1"/>
+<SimpleIdentifier Name="finish_exit_2"/>
+<SimpleIdentifier Name="finish_exit_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="358" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="part_enter_1"/>
+<SimpleIdentifier Name="part_enter_2"/>
+<SimpleIdentifier Name="part_enter_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-49"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="300" Y="102"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="finish_exit_1"/>
+<SimpleIdentifier Name="finish_exit_2"/>
+<SimpleIdentifier Name="finish_exit_3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-53"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="608" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="part_f_obuff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="608" Y="176"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Package_Buffer">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="-192" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="-80" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="32" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="144" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<PointGeometry>
+<Point X="272" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="take_item"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-25" Y="138"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="deposit_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="88" Y="114"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="take_item"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-143" Y="140"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="deposit_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-25" Y="119"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="take_item"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="208" Y="146"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="take_item"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="87" Y="141"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="deposit_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="208" Y="114"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="deposit_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-143" Y="116"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Packaging_System">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="153" Y="46"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="16" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="313" Y="46"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="153" Y="206"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s3" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="allow_exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-87" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="package"/>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="take_item"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-38"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Sink">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="267" Y="209"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="allow_exit"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="267" Y="150"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Source">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="270" Y="236"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="new_part"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="270" Y="177"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Test_Unit">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="153" Y="46"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="16" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="313" Y="46"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="153" Y="206"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="53" Y="206"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s4" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="deposit_part"/>
+<LabelGeometry Anchor="NW">
+<Point X="-67" Y="-114"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s3" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="ret_inbuff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-87" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="part_passes"/>
+<LabelGeometry Anchor="NW">
+<Point X="-147" Y="-84"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="part_fails"/>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="part_f_obuff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-38"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<Instance ModuleName="Node1" Name="Node1">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="finish_exit_1">
+<SimpleIdentifier Name="finish_exit_1"/>
+</ParameterBinding>
+<ParameterBinding Name="part_enter_1">
+<SimpleIdentifier Name="part_enter_1"/>
+</ParameterBinding>
+</Instance>
+<Instance ModuleName="Node2" Name="Node2">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="finish_exit_2">
+<SimpleIdentifier Name="finish_exit_2"/>
+</ParameterBinding>
+<ParameterBinding Name="part_enter_2">
+<SimpleIdentifier Name="part_enter_2"/>
+</ParameterBinding>
+</Instance>
+<Instance ModuleName="Node3" Name="Node3">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="finish_exit_3">
+<SimpleIdentifier Name="finish_exit_3"/>
+</ParameterBinding>
+<ParameterBinding Name="part_enter_3">
+<SimpleIdentifier Name="part_enter_3"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</Module>

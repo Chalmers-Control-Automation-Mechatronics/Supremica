@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,34 +33,33 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
-import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
- * <P>A common superclass for all modular verifiers. This class provides
- * common implementations for the {@link
- * net.sourceforge.waters.model.analysis.des.SafetyVerifier SafetyVerifier}
- * interface and enables uniform access to set the heuristic ({@link
- * ModularHeuristic}).</P>
+ * <P>A common superclass for the modular controllability ({@link
+ * ModularControllabilityChecker}) and language inclusion ({@link
+ * ModularLanguageInclusionChecker}) checkers.</P>
  *
- * @author Robi Malik
+ * <P>Based on {@link AbstractModularVerifier}, this class only adds the
+ * the details needed to handle safety counterexamples ({@link
+ * SafetyCounterExampleProxy}).</P>
+ *
+ * @author Simon Ware, Robi Malik
  */
 
 abstract class AbstractModularSafetyVerifier
-  extends AbstractSafetyVerifier
+  extends AbstractModularVerifier
   implements SafetyVerifier
 {
 
@@ -68,146 +67,39 @@ abstract class AbstractModularSafetyVerifier
   //# Constructors
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory,
-                                       final SafetyVerifier mono)
-  {
-    this(model, null, null, factory, mono);
-  }
-
-  public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final KindTranslator translator,
-                                       final SafetyDiagnostics diag,
-                                       final ProductDESProxyFactory factory,
                                        final SafetyVerifier mono)
   {
-    super(model, translator, diag, factory);
-    mMonolithicVerifier = mono;
-    mHeuristicMethod = ModularHeuristicFactory.Method.RelMaxCommonEvents;
-    mHeuristicPreference = ModularHeuristicFactory.Preference.NOPREF;
+    super(model, factory, translator, mono);
   }
 
 
   //#########################################################################
-  //# Configuration
-  public SafetyVerifier getMonolithicVerifier()
+  //# Interface net.sourceforge.waters.model.analysis.des.SafetyVerifier
+  @Override
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    return mMonolithicVerifier;
-  }
-
-  public void setMonolithicVerifier(final SafetyVerifier verifier)
-  {
-    mMonolithicVerifier = verifier;
-  }
-
-  public ModularHeuristicFactory.Method getHeuristicMethod()
-  {
-    return mHeuristicMethod;
-  }
-
-  public void setHeuristicMethod(final ModularHeuristicFactory.Method method)
-  {
-    mHeuristicMethod = method;
-  }
-
-  public ModularHeuristicFactory.Preference getHeuristicPreference()
-  {
-    return mHeuristicPreference;
-  }
-
-  public void setHeuristicPreference
-    (final ModularHeuristicFactory.Preference preference)
-  {
-    mHeuristicPreference = preference;
-  }
-
-  public ModularHeuristic getHeuristic()
-  {
-    final ModularHeuristicFactory factory =
-      ModularHeuristicFactory.getInstance();
-    final KindTranslator translator = getKindTranslator();
-    return
-      factory.getHeuristic(mHeuristicMethod, mHeuristicPreference, translator);
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.modular.AbstractModularVerifier
   @Override
-  public boolean supportsNondeterminism()
+  protected SafetyCounterExampleProxy createExtendedCounterexample
+    (final CounterExampleProxy counter,
+     final Collection<AutomatonProxy> newAutomata,
+     final List<TraceProxy> newTraces)
   {
-    return mMonolithicVerifier.supportsNondeterminism();
+    assert newTraces.size() == 1;
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String name = getDiagnostics().getTraceName(des);
+    final String comment = counter.getComment();
+    final TraceProxy trace = newTraces.get(0);
+    return factory.createSafetyCounterExampleProxy(name, comment, null, des,
+                                                   newAutomata, trace);
   }
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-  @Override
-  public List<Option<?>> getOptions(final LeafOptionPage db)
-  {
-    final List<Option<?>> options = super.getOptions(db);
-    db.prepend(options, ModularModelVerifierFactory.
-                        OPTION_AbstractModularSafetyVerifier_HeuristicPreference);
-    db.prepend(options, ModularModelVerifierFactory.
-                        OPTION_AbstractModularSafetyVerifier_HeuristicMethod);
-    return options;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void setOption(final Option<?> option)
-  {
-    if (option.hasID(ModularModelVerifierFactory.
-                     OPTION_AbstractModularSafetyVerifier_HeuristicPreference)) {
-      final EnumOption<ModularHeuristicFactory.Preference> enumOption =
-        (EnumOption<ModularHeuristicFactory.Preference>) option;
-      setHeuristicPreference(enumOption.getValue());
-    } else if (option.hasID(ModularModelVerifierFactory.
-                            OPTION_AbstractModularSafetyVerifier_HeuristicMethod)) {
-      final EnumOption<ModularHeuristicFactory.Method> enumOption =
-        (EnumOption<ModularHeuristicFactory.Method>) option;
-      setHeuristicMethod(enumOption.getValue());
-    } else if (option.hasID(ModularModelVerifierFactory.
-                            OPTION_ModularControllabilityChecker_Chain) ||
-               option.hasID(ModularModelVerifierFactory.
-                            OPTION_ModularLanguageInclusionChecker_Chain)) {
-      try {
-        final ChainedAnalyzerOption chain = (ChainedAnalyzerOption) option;
-        final ProductDESProxyFactory factory = getFactory();
-        final SafetyVerifier secondaryAnalyzer =
-          (SafetyVerifier) chain.createAndConfigureModelAnalyzer(factory);
-        setMonolithicVerifier(secondaryAnalyzer);
-      } catch (final AnalysisConfigurationException exception) {
-        throw new WatersRuntimeException(exception);
-      }
-    } else {
-      super.setOption(option);
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-    if (mMonolithicVerifier != null) {
-      mMonolithicVerifier.requestAbort();
-    }
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    super.resetAbort();
-    if (mMonolithicVerifier != null) {
-      mMonolithicVerifier.resetAbort();
-    }
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private SafetyVerifier mMonolithicVerifier;
-  private ModularHeuristicFactory.Method mHeuristicMethod;
-  private ModularHeuristicFactory.Preference mHeuristicPreference;
 
 }

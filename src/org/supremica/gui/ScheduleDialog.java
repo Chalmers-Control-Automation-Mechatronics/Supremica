@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -570,7 +570,7 @@ public class ScheduleDialog
 
     void readMemoryCapacity()
     {
-        memoryCapacity = (new Integer(memoryCapacityField.getText()));
+        memoryCapacity = Integer.parseInt(memoryCapacityField.getText());
     }
 
     /**
@@ -847,8 +847,8 @@ class ApproxWeightsDialog
     {
         try
         {
-            xWeight = new Double(xField.getText()).doubleValue();
-            yWeight = new Double(yField.getText()).doubleValue();
+            xWeight = Double.parseDouble(xField.getText());
+            yWeight = Double.parseDouble(yField.getText());
 
             if (xWeight < 0 || yWeight < 0)
             {

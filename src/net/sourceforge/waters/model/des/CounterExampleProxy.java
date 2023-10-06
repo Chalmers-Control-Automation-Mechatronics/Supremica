@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -83,5 +83,15 @@ public interface CounterExampleProxy
    * @return  An unmodifiable list of objects of type {@link TraceProxy}.
    */
   public List<TraceProxy> getTraces();
+
+  /**
+   * Returns whether the last step of the traces in this counterexample
+   * represents a failing safety property. If this method returns
+   * <CODE>true</CODE>, then the last trace step is not expected to
+   * be enabled by all automata. Otherwise all steps are enabled by
+   * all automata. Trace steps before the last should be enabled in
+   * all cases.
+   */
+  public boolean includesFailingStep();
 
 }

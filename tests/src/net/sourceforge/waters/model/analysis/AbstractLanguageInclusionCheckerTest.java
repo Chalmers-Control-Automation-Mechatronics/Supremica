@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -82,10 +82,10 @@ public abstract class AbstractLanguageInclusionCheckerTest
   public void testReentrant()
     throws Exception
   {
-    testTrafficLightac61();
+    testTrafficLightsAc61Lang();
     testDisjointProp2();
     testSmallFactory2();
-    testTrafficLightac61();
+    testTrafficLightsAc61Lang();
     testHISC8nd();
   }
 
@@ -161,10 +161,17 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
   //#########################################################################
   //# Test Cases -- traffic light language inclusion
-  public void testTrafficLightac61() throws Exception
+  public void testTrafficLightsAc61Lang() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "ac61lang.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testTrafficLightsAc61Part() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ac61part.wmod");
     runModelVerifier(des, false);
   }
 
@@ -441,10 +448,6 @@ public abstract class AbstractLanguageInclusionCheckerTest
   {
     runModelVerifier("tests", "hisc", "aip0sub1p0_coreach0.wmod", true);
   }
-
-
-  //#########################################################################
-  //# Test Cases -- Parameterised
 
 
   //#########################################################################

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -35,12 +35,14 @@
 
 package org.supremica.gui.ide.actions;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+
 import org.supremica.gui.ide.IDE;
 
 /**
@@ -54,7 +56,7 @@ public class AnalyzerDeleteSelectedAutomataAction
     /**
      * Constructor.
      */
-    public AnalyzerDeleteSelectedAutomataAction(List<IDEAction> actionList)
+    public AnalyzerDeleteSelectedAutomataAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -63,12 +65,13 @@ public class AnalyzerDeleteSelectedAutomataAction
 
         putValue(Action.NAME, "Delete selected");
         putValue(Action.SHORT_DESCRIPTION, "Delete selected automata");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_D));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_D);
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -76,6 +79,7 @@ public class AnalyzerDeleteSelectedAutomataAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
         ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata().removeAutomata(

@@ -50,7 +50,7 @@ public class ClosedNodes extends Hashtable<Object,Object> {
     }
 
  	public ArrayList<int[]> getNodeArray(final int key) {
-		return (ArrayList<int[]>) get(new Integer(key));
+		return (ArrayList<int[]>) get(key);
     }
 
     public int[] getNode(final int key, final int arrayIndex) throws Exception {
@@ -115,10 +115,10 @@ public class ClosedNodes extends Hashtable<Object,Object> {
     }
 
     public boolean containsKey(final int key) {
-		return containsKey(new Integer(key));
+		return containsKey(key);
     }
 
     public Object get(final int key) {
-		return get(new Integer(key));
+		return get(key);
     }
 }

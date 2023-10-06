@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
@@ -167,9 +168,9 @@ public class ProductDESElementFactory
     (final String name,
      final EventKind kind,
      final boolean observable)
-{
-  return new EventElement(name, kind, observable);
-}
+  {
+    return new EventElement(name, kind, observable);
+  }
 
   @Override
   public EventProxy createEventProxy(final String name, final EventKind kind)
@@ -202,6 +203,19 @@ public class ProductDESElementFactory
     return new LoopCounterExampleElement(name, des, trace);
   }
 
+
+  @Override
+  public CoobservabilityCounterExampleProxy createCoobservabilityCounterExampleProxy
+    (final String name,
+     final String comment,
+     final URI location,
+     final ProductDESProxy des,
+     final Collection<? extends AutomatonProxy> automata,
+     final List<TraceProxy> traces)
+  {
+    return new CoobservabilityCounterExampleElement(name, comment, location, des,
+                                             automata, traces);
+  }
 
   @Override
   public ProductDESProxy createProductDESProxy

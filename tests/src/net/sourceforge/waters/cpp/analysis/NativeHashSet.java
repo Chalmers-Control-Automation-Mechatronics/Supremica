@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -68,11 +68,12 @@ public class NativeHashSet<E> extends AbstractSet<E>
     addAll(collection);
   }
 
-  @Override
+  /* Removed due to upcoming deprecation - memory leak may result.
   protected void finalize()
   {
     destroyNativeHashSet(mNativeHandler);
   }
+  */
 
 
   //#########################################################################
@@ -147,11 +148,12 @@ public class NativeHashSet<E> extends AbstractSet<E>
       mNativeIter = createNativeIterator(mNativeHandler);
     }
 
-    @Override
+    /* Removed due to upcoming deprecation - memory leak may result.
     protected void finalize()
     {
       destroyNativeIterator(mNativeIter);
     }
+    */
 
     //#######################################################################
     //# Interface java.util.Iterator

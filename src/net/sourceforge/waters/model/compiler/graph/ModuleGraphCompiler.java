@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -134,7 +134,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
 
   //##########################################################################
-  //# Optimisation Configuration
+  //# Configuration
   public boolean isOptimizationEnabled()
   {
     return mIsOptimizationEnabled;
@@ -143,6 +143,11 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   public void setOptimizationEnabled(final boolean enable)
   {
     mIsOptimizationEnabled = enable;
+  }
+
+  public void setOutputName(final String name)
+  {
+    mOutputName = name;
   }
 
 
@@ -173,7 +178,8 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     try {
-      final String name = mInputModule.getName();
+      final String name =
+        mOutputName == null ? mInputModule.getName() : mOutputName;
       final String comment = mInputModule.getComment();
 
       // Process event declarations.
@@ -745,6 +751,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   private final ModuleProxy mInputModule;
 
   private boolean mIsOptimizationEnabled = true;
+  private String mOutputName = null;
 
   private Map<String,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;

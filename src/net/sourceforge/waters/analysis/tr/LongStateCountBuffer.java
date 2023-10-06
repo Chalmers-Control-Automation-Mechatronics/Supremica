@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -43,19 +46,16 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 
 /**
- * A data structure that compactly stores the status information of the states
- * in a transition relation.
- * <p>
- * The state buffer considers a state space represented by <code>long</code>
+ * <P>A data structure that compactly stores the status information of the states
+ * in a transition relation.</P>
+ *
+ * <P>The long state buffer considers a state space represented by <code>long</code>
  * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
  * For each state code, it stores the following status information.
  * Each state can be designated as <I>initial</I> and/or <I>reachable</I>,
- * and can have a state-count value from 1 to 2<sup>63</sup>-1.
+ * and can have a state-count value from 1 to 2<sup>63</sup>-1.</P>
  *
  * @see StateEncoding
  *
@@ -68,35 +68,21 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new state buffer.
-   * <p>
-   * This constructor creates a new state buffer
-   * with the states in the given encoding. If the state encoding contains
-   * a <CODE>null</CODE> state, it is used as a reachable dump state,
-   * otherwise an additional unreachable dump state is added to the end of
-   * the state space.
-   * @param  stateEnc        State encoding that defines the assignment of
-   *                         state codes for the states in the buffer.
-   */
-  public LongStateCountBuffer(final StateEncoding stateEnc)
-  {
-    this(stateEnc, null);
-  }
-
-  /**
-   * Creates a new state buffer.
-   * @param  stateEnc        State encoding that defines the assignment of
-   *                         state codes for the states in the buffer.
-   * @param  dumpState       Dump state to be used, or <CODE>null</CODE>.
-   *                         If the state encoding contains the indicated
-   *                         state, it is used as a reachable dump state,
-   *                         otherwise an additional unreachable dump state
-   *                         is added to the end of the state space.
+   * Creates a new integer state buffer.
+   * @param  stateEnc   State encoding that defines the assignment of
+   *                    state codes for the states in the buffer.
+   *                    Any state codes associated with non-<CODE>null</CODE>
+   *                    state objects are marked as reachable, and the
+   *                    initial state status is taken from the state objects.
+   * @param  dumpIndex  Dump state index to be used, or <CODE>-1</CODE>.
+   *                    If <CODE>-1</CODE> is specified, the state buffer
+   *                    is extended with one additional unreachable state
+   *                    at the end, which is used as dump state.
    */
   public LongStateCountBuffer(final StateEncoding stateEnc,
-                              final StateProxy dumpState)
+                              final int dumpIndex)
   {
-    super(stateEnc, dumpState);
+    super(dumpIndex);
     final int numStates = stateEnc.getNumberOfStates();
     // Initialise the array of states.
     if (getDumpStateIndex() >= 0) {
@@ -148,7 +134,8 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * @param eventStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
    */
-  public LongStateCountBuffer(final int size, final EventStatusProvider eventStatus)
+  public LongStateCountBuffer(final int size,
+                              final EventStatusProvider eventStatus)
   {
     this(size);
   }
@@ -189,7 +176,8 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * @param eventStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
    */
-  public LongStateCountBuffer(final int size, final int dumpIndex,
+  public LongStateCountBuffer(final int size,
+                              final int dumpIndex,
                               final EventStatusProvider eventStatus)
   {
     this(size, dumpIndex);

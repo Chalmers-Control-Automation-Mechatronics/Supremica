@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -69,7 +69,7 @@ public class AnalyzerViewAlphabetAction
 
         putValue(Action.NAME, "Alphabet");
         putValue(Action.SHORT_DESCRIPTION, "View Alphabet");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_L));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_L);
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/Alphabet16.gif")));
     }

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -77,8 +77,8 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
 /**
- * A tree model for the aliases panels.
- *
+ * A tree model for browsing various parts of a module. Used by the
+ * components and alias panels, and for editing node properties.
  * @see ModuleTree
  * @author Carly Hona, Robi Malik, Tom Levy
  */
@@ -113,7 +113,7 @@ class ModuleTreeModel
   public void addTreeModelListener(final TreeModelListener listener)
   {
     if (mListeners == null) {
-      mListeners = new LinkedList<TreeModelListener>();
+      mListeners = new LinkedList<>();
     }
     mListeners.add(listener);
   }
@@ -185,7 +185,7 @@ class ModuleTreeModel
   public void valueForPathChanged(final TreePath path, final Object newvalue)
   {
     throw new UnsupportedOperationException
-      ("AliasesTreeModel does not support value change!");
+      (ProxyTools.getShortClassName(this) + " does not support value change!");
   }
 
 

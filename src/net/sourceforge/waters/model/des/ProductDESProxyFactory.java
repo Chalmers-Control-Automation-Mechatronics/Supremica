@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -150,6 +150,31 @@ public interface ProductDESProxyFactory
      ProductDESProxy des,
      List<? extends EventProxy> events,
      ConflictKind kind);
+
+
+  /**
+   * Creates a new coobservability counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
+   *                      or <CODE>null</CODE>.
+   * @param  location     The URI to be associated with the new
+   *                      document, or <CODE>null</CODE>.
+   * @param  des          The product DES for which this counterexample is
+   *                      generated.
+   * @param  automata     The set of automata for the new counterexample,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  traces       The list of traces constituting the new counterexample.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      automata, events, or states cannot be found
+   *                      in the product DES.
+   */
+  public CoobservabilityCounterExampleProxy createCoobservabilityCounterExampleProxy
+    (String name,
+     String comment,
+     URI location,
+     ProductDESProxy des,
+     Collection<? extends AutomatonProxy> automata,
+     List<TraceProxy> traces);
 
 
   /**

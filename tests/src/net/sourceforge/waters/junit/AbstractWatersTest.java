@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -145,9 +145,20 @@ public abstract class AbstractWatersTest
     return dir;
   }
 
+  protected File getOutputFile(final String[] path, final String ext)
+  {
+    final File dir = getOutputDirectory();
+    return getFile(dir, path, ext);
+  }
+
   protected File getInputFile(final String[] path, final String ext)
   {
-    File dir = getWatersInputRoot();
+    final File dir = getWatersInputRoot();
+    return getFile(dir, path, ext);
+  }
+
+  private File getFile(File dir, final String[] path, final String ext)
+  {
     final int len = path.length - 1;
     for (int i = 0; i < len; i++) {
       dir = new File(dir, path[i]);

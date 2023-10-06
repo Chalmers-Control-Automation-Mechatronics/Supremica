@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -97,7 +97,7 @@ class TRAbstractionStepInput
   {
     if (mEventEncoding == null) {
       final TRAutomatonProxy tr = (TRAutomatonProxy) mInputAutomaton;
-      return tr.getState(index);
+      return tr.getTRState(index);
     } else {
       return mStateEncoding.getState(index);
     }

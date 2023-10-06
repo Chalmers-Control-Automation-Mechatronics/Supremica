@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="nondet_coobs1">
+<B:Comment>A test for coobservability with a nondeterministic specification.
+The model is not coobservable because event e cannot be disabled unambiguously after it has occurred once.
+The counterexample must include state information for the nondetermistic transition.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="spec">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="192" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="144" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point X="240" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="S1" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="145" Y="172"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S0" Target="S2">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

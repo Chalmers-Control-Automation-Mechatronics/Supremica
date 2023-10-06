@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -36,6 +36,7 @@ package net.sourceforge.waters.model.analysis.des;
 import net.sourceforge.waters.analysis.abstraction.StateReorderingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
@@ -93,6 +94,14 @@ public abstract class AbstractModelAnalyzerFactory
     throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("control-loop check");
+  }
+
+  @Override
+  public CoobservabilityChecker createCoobservabilityChecker
+    (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
+  {
+    throw createUnsupportedOperationException("coobservability check");
   }
 
   @Override
@@ -205,6 +214,15 @@ public abstract class AbstractModelAnalyzerFactory
               EventSetOption.DefaultKind.CONTROLLABLE,
               "Loop Events",
               "Non-Loop Events"));
+
+    db.register(new StringOption
+             (OPTION_CoobservabilityChecker_DefaultSite,
+              "Default supervisor site",
+              "Name of supervisor site assigned to controllable or " +
+              "observable events without a site given as an attribute. " +
+              "Leave blank to assign no controlling or observing site.",
+              "-defaultSite",
+              CoobservabilityAttributeFactory.DEFAULT_SITE_NAME));
 
     db.register(new StringListOption
       (OPTION_DiagnosabilityChecker_FaultClasses,
@@ -358,6 +376,9 @@ public abstract class AbstractModelAnalyzerFactory
 
   public static final String OPTION_ControlLoopChecker_LoopEvents =
     "ControlLoopChecker.LoopEvents";
+
+  public static final String OPTION_CoobservabilityChecker_DefaultSite =
+    "CoobservabilityChecker.DefaultSite";
 
   public static final String OPTION_DiagnosabilityChecker_FaultClasses =
     "DiagnosabilityChecker.FaultClasses";

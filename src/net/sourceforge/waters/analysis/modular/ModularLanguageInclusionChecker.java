@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,50 +33,29 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.set.hash.THashSet;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.analysis.trcomp.TRControllabilityChecker;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.EventKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
- * <P>The modular language inclusion check algorithm.</P>
+ * <P>The modular language inclusion check algorithm.,
+ * implemented based on {@link AbstractModularVerifier}</P>
  *
- * <P>The modular language inclusion checker is a simple wrapper to
- * split a model with several properties into several models with only
- * one property each. Each model is checked individually by another safety
- * verifier. If one check fails, language inclusion is found to be not
- * satisfied, otherwise it is satisfied.</P>
+ * <P><I>Reference:</I><BR>
+ * Bertil A. Brandin, Robi Malik, Petra Malik. Incremental verification
+ * and synthesis of discrete-event systems guided by counter-examples.
+ * IEEE Transactions on Control Systems Technology,
+ * <STRONG>12</STRONG>&nbsp;(3), 387&ndash;401, 2004.</P>
  *
- * <P>The model verifier checking the individual properties can be
- * configured. It typically is a {@link ModularControllabilityChecker}
- * or {@link TRControllabilityChecker}. The modular language
- * inclusion checker is only useful for models with more than one
- * property; if there is only one property, it will delegate the
- * complete task to the secondary model verifier.</P>
- *
- * @author Simon Ware
+ * @author Simon Ware, Robi Malik
  */
 
 public class ModularLanguageInclusionChecker
@@ -97,29 +76,14 @@ public class ModularLanguageInclusionChecker
                                          final SafetyVerifier mono)
   {
     super(model,
-          LanguageInclusionKindTranslator.getInstance(),
-          LanguageInclusionDiagnostics.getInstance(),
           factory,
+          LanguageInclusionKindTranslator.getInstance(),
           mono);
-    mStates = 0;
   }
 
 
   //#########################################################################
-  //# Configuration
-  SafetyVerifier getInnerControllabilityChecker()
-  {
-    return mConfiguredControllabilityChecker;
-  }
-
-  void setInnerControllabilityChecker(final SafetyVerifier inner)
-  {
-    mConfiguredControllabilityChecker = inner;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyser
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {
@@ -131,158 +95,21 @@ public class ModularLanguageInclusionChecker
 
 
   //#########################################################################
-  //# Invocation
+  //# Interface net.sourceforge.waters.model.analysis.des.SafetyVerifier
   @Override
-  protected void setUp() throws AnalysisException
+  public LanguageInclusionDiagnostics getDiagnostics()
   {
-    super.setUp();
-    if (mConfiguredControllabilityChecker == null) {
-      final ProductDESProxyFactory factory = getFactory();
-      final SafetyVerifier mono = getMonolithicVerifier();
-      mUsedControllabilityChecker =
-        new ModularControllabilityChecker(null, factory, mono);
-    } else {
-      mUsedControllabilityChecker = mConfiguredControllabilityChecker;
-    }
-    mStates = 0;
-  }
-
-  @Override
-  public boolean run()
-    throws AnalysisException
-    {
-    setUp();
-    try {
-      final List<AutomatonProxy> properties = new ArrayList<>();
-      final List<AutomatonProxy> automata =
-        new ArrayList<>(getModel().getAutomata().size());
-      final KindTranslator translator = getKindTranslator();
-      for (final AutomatonProxy aut : getModel().getAutomata()) {
-        final ComponentKind kind = translator.getComponentKind(aut);
-        if (kind == ComponentKind.PLANT) {
-          automata.add(aut);
-        } else if (kind == ComponentKind.SPEC) {
-          properties.add(aut);
-        }
-      }
-      Collections.sort(properties);
-      final int propIndex = automata.size();
-      final ProductDESProxyFactory factory = getFactory();
-      final Collection<EventProxy> events = getModel().getEvents();
-      final String modelName = getModel().getName();
-      for (final AutomatonProxy prop : properties) {
-        automata.add(prop);
-        final String name = modelName + "-" + prop.getName();
-        final String comment = "Automatically generated to check property '" +
-          prop.getName() + "' of model '" + modelName + "'.";
-        final ProductDESProxy model =
-          factory.createProductDESProxy(name, comment, null, events, automata);
-        mUsedControllabilityChecker.setModel(model);
-        final KindTranslator chain =
-          new ChainKindTranslator(translator, properties);
-        mUsedControllabilityChecker.setKindTranslator(chain);
-        mUsedControllabilityChecker.setNodeLimit(getNodeLimit() - mStates);
-        final boolean satisfied = mUsedControllabilityChecker.run();
-        final VerificationResult result =
-          mUsedControllabilityChecker.getAnalysisResult();
-        mStates += result.getTotalNumberOfStates();
-        if (!satisfied) {
-          return setFailedResult
-            (mUsedControllabilityChecker.getCounterExample(), prop);
-        }
-        automata.remove(propIndex);
-      }
-      return setSatisfiedResult();
-    } finally {
-      tearDown();
-    }
-  }
-
-  @Override
-  protected void tearDown()
-  {
-    mUsedControllabilityChecker = null;
-    super.tearDown();
-  }
-
-  @Override
-  protected void addStatistics()
-  {
-    super.addStatistics();
-    final VerificationResult result = getAnalysisResult();
-    result.setNumberOfStates(mStates);
+    return LanguageInclusionDiagnostics.getInstance();
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private boolean setFailedResult(final SafetyCounterExampleProxy counter,
-                                  final AutomatonProxy property)
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.modular.AbstractModularVerifier
+  @Override
+  protected boolean isMultiSpecsEnabled()
   {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String propname = property.getName();
-    final String cleanedname = propname.replaceAll(":", "-");
-    final String tracename = desname + '-' + cleanedname;
-    final Collection<AutomatonProxy> automata = counter.getAutomata();
-    final TraceProxy trace = counter.getTrace();
-    final SafetyCounterExampleProxy wrapper =
-      factory.createSafetyCounterExampleProxy(tracename, null, null,
-                                              des, automata, trace);
-    return setFailedResult(wrapper);
+    return false;
   }
-
-
-  //#########################################################################
-  //# Inner Class ChainKindTranslator
-  private static class ChainKindTranslator implements KindTranslator
-  {
-
-    //#######################################################################
-    //# Constructor
-    private ChainKindTranslator(final KindTranslator master,
-                                final Collection<AutomatonProxy> properties)
-    {
-      mMaster = master;
-      mProperties = new THashSet<AutomatonProxy>(properties);
-    }
-
-    //#######################################################################
-    //# Inner Class ChainKindTranslator
-    @Override
-    public ComponentKind getComponentKind(final AutomatonProxy aut)
-    {
-      if (mProperties.contains(aut)) {
-        return ComponentKind.SPEC;
-      } else {
-        return ComponentKind.PLANT;
-      }
-    }
-
-    @Override
-    public EventKind getEventKind(final EventProxy event)
-    {
-      final EventKind kind = mMaster.getEventKind(event);
-      if (kind == EventKind.CONTROLLABLE) {
-        return EventKind.UNCONTROLLABLE;
-      } else {
-        return kind;
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final KindTranslator mMaster;
-    private final Collection<AutomatonProxy> mProperties;
-
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private SafetyVerifier mConfiguredControllabilityChecker;
-  private SafetyVerifier mUsedControllabilityChecker;
-  private int mStates;
 
 }

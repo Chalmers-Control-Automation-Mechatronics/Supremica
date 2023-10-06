@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -80,12 +80,16 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  * <LI>{@link EventProxy} objects are retrieved from the event encoding.</LI>
  * <LI>{@link StateProxy} objects are created on demand when a state is
  *     first requested. Then they are remembered to make sure that subsequent
- *     calls to retrieve the same state return the same object.</LI>
+ *     calls to retrieve the same state return the same object.
+ *     When a TRAutomatonProxy object is created from an {@link AutomatonProxy}
+ *     object, it also remembers the states of that automaton, and they can
+ *     be retrieved by calling {@link #getOriginalState(int)}.</LI>
  * <LI>{@link TransitionProxy} objects are only created and returned on
  *     demand. If the same transition is retrieved twice, two different
  *     objects will be returned.</LI>
  * </UL>
  *
+ * @see ListBufferTransitionRelation
  * @author Robi Malik
  */
 
@@ -96,6 +100,13 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Factory Methods
+  /**
+   * Creates a TRAutomatonProxy from an automaton if necessary.
+   * This method checks whether the given automaton is a TRAutomatonProxy,
+   * and if so, returns it unchanged. Otherwise, it creates a new
+   * TRAutomatonProxy to match it.   *
+   * @param  aut      The automaton to be converted.
+   */
   public static TRAutomatonProxy createTRAutomatonProxy
     (final AutomatonProxy aut)
     throws OverflowException
@@ -104,6 +115,16 @@ public class TRAutomatonProxy
     return createTRAutomatonProxy(aut, translator);
   }
 
+  /**
+   * Creates a TRAutomatonProxy from an automaton if necessary.
+   * This method checks whether the given automaton is a TRAutomatonProxy,
+   * and if so, returns it unchanged. Otherwise, it creates a new
+   * TRAutomatonProxy to match it.
+   * @param  aut      The automaton to be converted.
+   * @param  translator  Kind translator that determines the {@link EventKind}
+   *                  of events in the event encoding of the new automaton
+   *                  if it is created.
+   */
   public static TRAutomatonProxy createTRAutomatonProxy
     (final AutomatonProxy aut, final KindTranslator translator)
     throws OverflowException
@@ -111,6 +132,25 @@ public class TRAutomatonProxy
     return createTRAutomatonProxy(aut, translator, 0);
   }
 
+  /**
+   * Creates a TRAutomatonProxy from an automaton if necessary.
+   * This method checks whether the given automaton is a TRAutomatonProxy,
+   * and if so, returns it unchanged. Otherwise, it creates a new
+   * TRAutomatonProxy to match it.
+   * @param  aut      The automaton to be converted.
+   * @param  translator  Kind translator that determines the {@link EventKind}
+   *                  of events in the event encoding of the new automaton
+   *                  if it is created.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  needed in transition relation. Should be zero or one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   *                  If the given automaton is already a TRAutomatonProxy
+   *                  and the argument is nonzero, the transition relation is
+   *                  reconfigured, otherwise the configuration is used
+   *                  when creating the new transition relation.
+   */
   public static TRAutomatonProxy createTRAutomatonProxy
     (final AutomatonProxy aut,
      final KindTranslator translator,
@@ -195,16 +235,37 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a TRAutomatonProxy to encapsulate a transition relation.
+   * This constructor merely stores references to the given event encoding
+   * and transition relation.
+   * @param  eventEnc  Event encoding to be used.
+   * @param  rel       Transition relation to be encapsulated.
+   */
   public TRAutomatonProxy(final EventEncoding eventEnc,
                           final ListBufferTransitionRelation rel)
   {
     rel.useEventEncoding(eventEnc);
     mEventEncoding = eventEnc;
-    mStates = null;
+    mOriginalStates = null;
     mTransitionRelation = rel;
     provideTauEvent();
   }
 
+  /**
+   * Creates a TRAutomatonProxy to match a given automaton.
+   * This constructor creates a new event encoding and transition relation
+   * to reflect the contents of the given automaton. The states of the
+   * automaton can be retrieved using {@link #getOriginalState(int)}.
+   * @param  aut      The automaton to be replicated.
+   * @param  translator  Kind translator that determines the {@link EventKind}
+   *                  of events in the new event encoding.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  created in the copied transition relation. Should be one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   */
   public TRAutomatonProxy(final AutomatonProxy aut,
                           final KindTranslator translator,
                           final int config)
@@ -213,6 +274,23 @@ public class TRAutomatonProxy
     this(aut, translator, null, config);
   }
 
+  /**
+   * Creates a TRAutomatonProxy to match a given automaton.
+   * This constructor creates a new event encoding and transition relation
+   * to reflect the contents of the given automaton. The states of the
+   * automaton can be retrieved using {@link #getOriginalState(int)}.
+   * @param  aut      The automaton to be replicated.
+   * @param  translator  Kind translator that determines the {@link EventKind}
+   *                  of events in the new event encoding.
+   * @param  dumpState  A state of the given automaton to be used as dump state
+   *                  when creating the transition relation, or <CODE>null</CODE>
+   *                  to create a new unreachable dump state instead.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  created in the copied transition relation. Should be one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   */
   public TRAutomatonProxy(final AutomatonProxy aut,
                           final KindTranslator translator,
                           final StateProxy dumpState,
@@ -222,6 +300,20 @@ public class TRAutomatonProxy
     this(aut, new EventEncoding(aut, translator), dumpState, config);
   }
 
+  /**
+   * Creates a TRAutomatonProxy to match a given automaton and event encoding.
+   * This constructor uses the given event encoding without copying and creates
+   * a new transition relation to reflect the contents of the given automaton.
+   * The states of the automaton can be retrieved using {@link
+   * #getOriginalState(int)}.
+   * @param  aut      The automaton to be replicated.
+   * @param  eventEnc Event encoding to be used.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  created in the copied transition relation. Should be one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   */
   public TRAutomatonProxy(final AutomatonProxy aut,
                           final EventEncoding eventEnc,
                           final int config)
@@ -230,6 +322,23 @@ public class TRAutomatonProxy
     this(aut, eventEnc, null, config);
   }
 
+  /**
+   * Creates a TRAutomatonProxy to match a given automaton and event encoding.
+   * This constructor uses the given event encoding without copying and creates
+   * a new transition relation to reflect the contents of the given automaton.
+   * The states of the automaton can be retrieved using {@link
+   * #getOriginalState(int)}.
+   * @param  aut      The automaton to be replicated.
+   * @param  eventEnc Event encoding to be used.
+   * @param  dumpState  A state of the given automaton to be used as dump state
+   *                  when creating the transition relation, or <CODE>null</CODE>
+   *                  to create a new unreachable dump state instead.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  created in the copied transition relation. Should be one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   */
   public TRAutomatonProxy(final AutomatonProxy aut,
                           final EventEncoding eventEnc,
                           final StateProxy dumpState,
@@ -239,6 +348,25 @@ public class TRAutomatonProxy
     this(aut, eventEnc, new StateEncoding(aut), dumpState, config);
   }
 
+  /**
+   * Creates a TRAutomatonProxy to match a given automaton, event encoding,
+   * and state encoding. This constructor uses the given event encoding without
+   * copying and creates a new transition relation to reflect the contents of
+   * the given automaton. The automaton's states are encoded based on the given
+   * state* encoding and can be retrieved using {@link #getOriginalState(int)}.
+   * @param  aut      The automaton to be replicated.
+   * @param  eventEnc Event encoding to be used.
+   * @param  stateEnc State encoding to provide a mapping between state numbers
+   *                  and states.
+   * @param  dumpState  A state in the state encoding to be used as dump state
+   *                  when creating the transition relation, or <CODE>null</CODE>
+   *                  to create a new unreachable dump state instead.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  created in the copied transition relation. Should be one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   */
   public TRAutomatonProxy(final AutomatonProxy aut,
                           final EventEncoding eventEnc,
                           final StateEncoding stateEnc,
@@ -249,35 +377,47 @@ public class TRAutomatonProxy
     mEventEncoding = eventEnc;
     mTransitionRelation = new ListBufferTransitionRelation
       (aut, mEventEncoding, stateEnc, dumpState, config);
-    mStates = null;
-    final int numStates = stateEnc.getNumberOfStates();
-    mStateNames = new String[numStates];
-    for (int s = 0; s < numStates; s++) {
-      final StateProxy state = stateEnc.getState(s);
-      mStateNames[s] = state.getName();
-    }
+    final int numStates = mTransitionRelation.getNumberOfStates();
+    mOriginalStates = new StateProxy[numStates];
+    final StateProxy[] encStates = stateEnc.getStatesArray();
+    System.arraycopy(encStates, 0, mOriginalStates, 0, encStates.length);
     provideTauEvent();
   }
 
+  /**
+   * Creates a new TRAutomatonProxy by copying another.
+   * This constructor creates a deep copy, with new separate event encoding
+   * and transition relation.
+   * @param  aut       TRAutomatonProxy object to be duplicated.
+   */
   public TRAutomatonProxy(final TRAutomatonProxy aut)
   {
     mEventEncoding = new EventEncoding(aut.mEventEncoding);
+    mOriginalStates = aut.mOriginalStates;
     final ListBufferTransitionRelation rel = aut.mTransitionRelation;
     final int config = rel.getConfiguration();
     mTransitionRelation =
       new ListBufferTransitionRelation(rel, mEventEncoding, config);
-    mStates = null;
-    mStateNames = aut.mStateNames;
   }
 
+  /**
+   * Creates a new TRAutomatonProxy by copying another.
+   * This constructor creates a deep copy, with new separate event encoding
+   * and transition relation.
+   * @param  aut      TRAutomatonProxy object to be duplicated.
+   * @param  config   Configuration flags defining which transition buffers are
+   *                  created in the copied transition relation. Should be one
+   *                  of {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS},
+   *                  {@link ListBufferTransitionRelation#CONFIG_PREDECESSORS},
+   *                  or {@link ListBufferTransitionRelation#CONFIG_ALL}.
+   */
   public TRAutomatonProxy(final TRAutomatonProxy aut, final int config)
   {
     mEventEncoding = new EventEncoding(aut.mEventEncoding);
+    mOriginalStates = aut.mOriginalStates;
     final ListBufferTransitionRelation rel = aut.mTransitionRelation;
     mTransitionRelation =
       new ListBufferTransitionRelation(rel, mEventEncoding, config);
-    mStates = null;
-    mStateNames = aut.mStateNames;
   }
 
 
@@ -293,31 +433,61 @@ public class TRAutomatonProxy
     return mTransitionRelation;
   }
 
-  public StateProxy getState(final int stateIndex)
+  /**
+   * Gets the original state associated with the given state number.
+   * When a TRAutomatonProxy object is created from an {@link AutomatonProxy}
+   * object, it remembers the states of that automaton, and this method can
+   * be used to retrieve a state from there.
+   * @param  code  Number of state to be looked up.
+   * @return A state of the original automaton or <CODE>null</CODE> if not
+   *         available. As the TRAutomatonProxy may have changed to differ
+   *         from the original, the returned state's attributes (initial,
+   *         markings, etc.) are not guaranteed to be the same as those
+   *         retrieved using {@link #getStates()} or {@link #getTRState(int)}.
+   */
+  public StateProxy getOriginalState(final int code)
   {
-    if (mStates == null) {
-      mStates = new TRStateList();
+    if (mOriginalStates == null) {
+      return null;
+    } else {
+      return mOriginalStates[code];
     }
-    return mStates.createState(stateIndex);
   }
 
-  public int getStateIndex(final StateProxy state)
+  public StateProxy getOriginalState(final StateProxy state)
   {
-    final TRState trState = (TRState) state;
-    return trState.getStateIndex();
+    if (state instanceof TRState) {
+      final TRState trState = (TRState) state;
+      if (trState.belongsTo(this)) {
+        final int code = trState.getStateIndex();
+        return getOriginalState(code);
+      }
+    }
+    return state;
   }
 
   /**
-   * Clears all state names. When a TRAutomatonProxy object is created from
-   * an automaton, it remembers the state names of the input automaton.
-   * However, as the transition relation is modified, the original state
-   * names may longer be accurate. Then this method can be used to reset
-   * all state names and use automatically generated names based on the
-   * state numbers instead.
+   * Gets the state associated with the given state number.
+   * @param  code  Number of state to be looked up.
+   * @return A {@link StateProxy} object that is unique to this TRAutomatonProxy
+   *         and that reflects the current attributes of the requested state.
    */
-  public void resetStateNames()
+  public TRState getTRState(final int code)
   {
-    mStateNames = null;
+    final TRStateList states = getTRStates();
+    return states.createState(code);
+  }
+
+  /**
+   * Clears all references to state objects. When a TRAutomatonProxy object is
+   * created from an automaton, it remembers the states of the input automaton.
+   * However, as the transition relation is modified, the original state
+   * objects may longer be accurate. Then this method can be used to reset
+   * all state objects and use new automatically generated ones instead.
+   */
+  public void resetOriginalStates()
+  {
+    mOriginalStates = null;
   }
 
   public void setName(final String name)
@@ -374,10 +544,7 @@ public class TRAutomatonProxy
   @Override
   public Set<StateProxy> getStates()
   {
-    if (mStates == null) {
-      mStates = new TRStateList();
-    }
-    return mStates;
+    return getTRStates();
   }
 
   @Override
@@ -401,18 +568,18 @@ public class TRAutomatonProxy
     mEventEncoding.provideTauEvent(name);
   }
 
-  private StateProxy createState(final int index)
+  private TRStateList getTRStates()
   {
-    if (mStates == null) {
-      mStates = new TRStateList();
+    if (mStateList == null) {
+      mStateList = new TRStateList();
     }
-    return mStates.createState(index);
+    return mStateList;
   }
 
 
   //#########################################################################
   //# Inner Class TRState
-  class TRState
+  public class TRState
     implements StateProxy, Cloneable
   {
     //#######################################################################
@@ -427,11 +594,10 @@ public class TRAutomatonProxy
     @Override
     public String getName()
     {
-      if (mStateNames != null) {
-        if (mIndex < mStateNames.length) {
-          return mStateNames[mIndex];
-        } else if (mIndex != mTransitionRelation.getDumpStateIndex()) {
-          mStateNames = null;
+      if (mOriginalStates != null) {
+        final StateProxy state = mOriginalStates[mIndex];
+        if (state != null) {
+          return state.getName();
         }
       }
       return ":" + mIndex;
@@ -447,7 +613,7 @@ public class TRAutomatonProxy
     public Collection<EventProxy> getPropositions()
     {
       final long pattern = mTransitionRelation.getAllMarkings(mIndex);
-      return mStates.createMarkings(pattern);
+      return mStateList.createMarkings(pattern);
     }
 
     @Override
@@ -522,9 +688,16 @@ public class TRAutomatonProxy
 
     //#######################################################################
     //# Specific Access
-    int getStateIndex()
+    public int getStateIndex()
     {
       return mIndex;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean belongsTo(final TRAutomatonProxy tr)
+    {
+      return TRAutomatonProxy.this == tr;
     }
 
     //#######################################################################
@@ -654,7 +827,7 @@ public class TRAutomatonProxy
     public StateProxy next()
     {
       if (hasNext()) {
-        return mStates.createState(mIndex++);
+        return mStateList.createState(mIndex++);
       } else {
         throw new NoSuchElementException
           ("Attempting to read past end of state list in TRAutomatonProxy!");
@@ -729,11 +902,11 @@ public class TRAutomatonProxy
         final ProductDESProxyFactory factory =
           ProductDESElementFactory.getInstance();
         final int s = mTransitionIterator.getCurrentSourceState();
-        final StateProxy source = createState(s);
+        final StateProxy source = mStateList.createState(s);
         final int e = mTransitionIterator.getCurrentEvent();
         final EventProxy event = mEventEncoding.getProperEvent(e);
         final int t = mTransitionIterator.getCurrentTargetState();
-        final StateProxy target = createState(t);
+        final StateProxy target = mStateList.createState(t);
         return factory.createTransitionProxy(source, event, target);
       } else {
         throw new NoSuchElementException
@@ -760,8 +933,8 @@ public class TRAutomatonProxy
   //# Data Members
   private final EventEncoding mEventEncoding;
   private final ListBufferTransitionRelation mTransitionRelation;
-  private TRStateList mStates;
-  private String[] mStateNames;
+  private StateProxy[] mOriginalStates;
+  private TRStateList mStateList;
 
 
   //#########################################################################

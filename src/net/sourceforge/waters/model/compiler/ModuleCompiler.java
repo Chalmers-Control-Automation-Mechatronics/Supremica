@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.compiler;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
@@ -228,6 +229,42 @@ public class ModuleCompiler extends AbortableCompiler
     }
   }
 
+  /**
+   * Sets a name for the output product DES.
+   * By default, the name of the compiled product DES is set to the name
+   * of the input module. This default can be replaced by specifying a
+   * non-<CODE>null</CODE> alternative through this method.
+   * @param  name  Name of output or <CODE>null</CODE>.
+   */
+  public void setOutputName(final String name)
+  {
+    mOutputName = name;
+  }
+
+  /**
+   * Sets a name for the output product DES to match the given file.
+   * By default, the name of the compiled product DES is set to the name
+   * of the input module. This default can be replaced by specifying a
+   * non-<CODE>null</CODE> alternative through this method.
+   * @param  file  Output file or <CODE>null</CODE>. If non-<CODE>null</CODE>,
+   *               the output is named according to the file name stripped
+   *               of any path prefix and extension.
+   */
+  public void setOutputName(final File file)
+  {
+    if (file == null) {
+      mOutputName = null;
+    } else {
+      final String tail = file.getName();
+      final int dotPos = tail.indexOf('.');
+      if (dotPos < 0) {
+        mOutputName = tail;
+      } else {
+        mOutputName = tail.substring(0, dotPos);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -404,6 +441,7 @@ public class ModuleCompiler extends AbortableCompiler
       ModuleGraphCompiler graphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       graphCompiler.setOptimizationEnabled(mOptimizationEnabled);
+      graphCompiler.setOutputName(mOutputName);
       checkAbort();
       mActiveAbortable = graphCompiler;
       final ProductDESProxy des = graphCompiler.compile();
@@ -768,6 +806,7 @@ public class ModuleCompiler extends AbortableCompiler
   private boolean mCompilationInfoIsDirty;
   private Abortable mActiveAbortable;
 
+  private String mOutputName = null;
   private boolean mOptimizationEnabled = true;
   private boolean mExpandingEFSMTransitions = true;
   private boolean mNormalizationEnabled = true;

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -37,6 +37,7 @@ package org.supremica.gui;
 
 import java.awt.EventQueue;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -226,29 +227,30 @@ public class AutomataSynthesisWorker
         final String[] result = (getTime()).split("\\s");
         Float out = (float)-1;
         if(result.length==2)
-            out = (new Float(result[0]))/1000;
+            out = (Float.parseFloat(result[0]))/1000;
         else
         {
-            Float f1=new Float(-1),f2=new Float(-1);
+            float f1 = -1;
+            float f2 = -1;
             if(result[1].equals("seconds"))
-                f1 = new Float(result[0]);
+                f1 = Float.parseFloat(result[0]);
             else if(result[1].equals("minutes"))
-                f1 = new Float(result[0])*60;
+                f1 = Float.parseFloat(result[0])*60;
             else if(result[1].equals("hours"))
-                f1 = new Float(result[0])*120;
+                f1 = Float.parseFloat(result[0])*120;
 
             if(result[3].equals("milliseconds"))
-                f2 = new Float(result[2])/ 1000;
+                f2 = Float.parseFloat(result[2])/ 1000;
             else if(result[3].equals("seconds"))
-                f2 = new Float(result[2]);
+                f2 = Float.parseFloat(result[2]);
             else if(result[3].equals("minutes"))
-                f2 = new Float(result[2])*60;
+                f2 = Float.parseFloat(result[2])*60;
 
             out = (f1+f2);
         }
 
         BigDecimal bd = new BigDecimal(out);
-        bd = bd.setScale(3,BigDecimal.ROUND_DOWN);
+        bd = bd.setScale(3, RoundingMode.DOWN);
 
         return bd;
 

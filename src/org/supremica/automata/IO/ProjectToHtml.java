@@ -259,7 +259,7 @@ public class ProjectToHtml
 
 					try
 					{
-						dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.getValue() + " -Tpng");
+						dotProcess = Runtime.getRuntime().exec(new String[] {Config.DOT_EXECUTE_COMMAND.getValue(), " -Tpng"});
 					}
 					catch (final IOException ex)
 					{

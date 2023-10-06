@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -107,7 +107,31 @@ public class DefaultProductDESResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
-    final Collection<AutomatonProxy> automata = getComputedAutomata();
+    printStats(writer, this);
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    printCSVHorizontalHeadings(writer, this);
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    printCSVHorizontal(writer, this);
+  }
+
+
+  //#########################################################################
+  //# Static Methods
+  public static void printStats(final PrintWriter writer,
+                                final ProductDESResult result)
+  {
+    final Collection<? extends AutomatonProxy> automata =
+      result.getComputedAutomata();
     if (automata != null) {
       final int numAutomata = automata.size();
       writer.println("Number of computed automata: " + numAutomata);
@@ -134,10 +158,9 @@ public class DefaultProductDESResult
     }
   }
 
-  @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  public static void printCSVHorizontalHeadings(final PrintWriter writer,
+                                                final ProductDESResult result)
   {
-    super.printCSVHorizontalHeadings(writer);
     writer.print(',');
     writer.print("NumOutputAutmata");
     writer.print(',');
@@ -146,11 +169,11 @@ public class DefaultProductDESResult
     writer.print("MaxOutputStates");
   }
 
-  @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  public static void printCSVHorizontal(final PrintWriter writer,
+                                        final ProductDESResult result)
   {
-    super.printCSVHorizontal(writer);
-    final Collection<AutomatonProxy> automata = getComputedAutomata();
+    final Collection<? extends AutomatonProxy> automata =
+      result.getComputedAutomata();
     if (automata == null) {
       writer.print(",,,");
     } else {

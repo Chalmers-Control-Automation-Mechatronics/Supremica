@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -35,7 +35,6 @@ package net.sourceforge.waters.model.options;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Properties;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -68,8 +67,34 @@ public class ChainedAnalyzerOption
      final ModelAnalyzerFactoryLoader parentLoader,
      final String... chainSuppressions)
   {
+    this(id, shortName, description, parentPage, parentLoader,
+         null, chainSuppressions);
+  }
+
+  public ChainedAnalyzerOption(final String id,
+                               final String shortName,
+                               final String description,
+                               final AnalysisOptionPage parentPage,
+                               final ModelAnalyzerFactoryLoader parentLoader,
+                               final ModelAnalyzerFactoryLoader defaultLoader,
+                               final String[] chainSuppressions)
+  {
+    this(id, shortName, description, parentPage.getAnalysisOperation(),
+         parentPage, parentLoader, defaultLoader, chainSuppressions);
+  }
+
+  public ChainedAnalyzerOption(final String id,
+                               final String shortName,
+                               final String description,
+                               final AnalysisOperation operation,
+                               final AnalysisOptionPage parentPage,
+                               final ModelAnalyzerFactoryLoader parentLoader,
+                               final ModelAnalyzerFactoryLoader defaultLoader,
+                               final String[] chainSuppressions)
+  {
     super(id, shortName, description, "-chain",
-          createEnumFactory(parentPage, parentLoader));
+          createEnumFactory(parentPage, parentLoader, defaultLoader));
+    mOperation = operation;
     mOptionPage =
       new ChainedAnalyzerOptionPage(parentPage, this, chainSuppressions);
     mParentLoader = parentLoader;
@@ -78,11 +103,15 @@ public class ChainedAnalyzerOption
   private ChainedAnalyzerOption(final ChainedAnalyzerOption template,
                                 final ChainedAnalyzerOptionPage parentPage)
   {
-    super(template, createEnumFactory(parentPage, template.mParentLoader));
+    super(template, createEnumFactory(parentPage,
+                                      template.mParentLoader,
+                                      template.getDefaultValue()));
+    mOperation = template.mOperation;
     mOptionPage =
       new ChainedAnalyzerOptionPage(parentPage, this, template.mOptionPage);
     mParentLoader = template.mParentLoader;
   }
+
 
 
   //#########################################################################
@@ -148,9 +177,8 @@ public class ChainedAnalyzerOption
     final ModelAnalyzerFactoryLoader loader = getValue();
     try {
       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-      final AnalysisOperation operation = mOptionPage.getAnalysisOperation();
       final ModelAnalyzer analyzer =
-        operation.createModelAnalyzer(factory, desFactory);
+        mOperation.createModelAnalyzer(factory, desFactory);
       for (final Option<?> option : analyzer.getOptions(mOptionPage)) {
         analyzer.setOption(option);
       }
@@ -185,14 +213,13 @@ public class ChainedAnalyzerOption
   }
 
   private static EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
-    (final SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> parentPage,
-     final ModelAnalyzerFactoryLoader parentLoader)
+    (final AbstractAnalysisOptionPage parentPage,
+     final ModelAnalyzerFactoryLoader parentLoader,
+     final ModelAnalyzerFactoryLoader defaultLoader)
   {
-    final EnumOption<ModelAnalyzerFactoryLoader> selector =
-      parentPage.getCurrentPageSelectorOption();
-    final List<ModelAnalyzerFactoryLoader> loaders =
-      selector.getEnumConstants();
-    return ModelAnalyzerFactoryLoader.createEnumFactory(loaders, parentLoader);
+    final AnalysisOperation operation = parentPage.getAnalysisOperation();
+    return ModelAnalyzerFactoryLoader.createEnumFactory
+      (operation, defaultLoader, parentLoader);
   }
 
 
@@ -200,5 +227,6 @@ public class ChainedAnalyzerOption
   //# Data Members
   private final ChainedAnalyzerOptionPage mOptionPage;
   private final ModelAnalyzerFactoryLoader mParentLoader;
+  private final AnalysisOperation mOperation;
 
 }

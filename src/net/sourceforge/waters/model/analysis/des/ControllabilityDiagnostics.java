@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -70,12 +70,14 @@ public class ControllabilityDiagnostics
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyDiagnostics
+  @Override
   public String getTraceName(final ProductDESProxy des)
   {
     final String desname = des.getName();
     return desname + "-uncontrollable";
   }
 
+  @Override
   public String getTraceComment(final ProductDESProxy des,
                                 final EventProxy event,
                                 final AutomatonProxy aut,
@@ -97,6 +99,6 @@ public class ControllabilityDiagnostics
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -7274416029301492184L;
 
 }

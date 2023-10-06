@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -470,29 +471,30 @@ public class AutomataSynthesizer
         final String[] result = (getTime()).split("\\s");
         Float out = (float)-1;
         if(result.length==2)
-            out = (new Float(result[0]))/1000;
+            out = (Float.parseFloat(result[0]))/1000;
         else
         {
-            Float f1=new Float(-1),f2=new Float(-1);
+            float f1 = -1;
+            float f2 = -1;
             if(result[1].equals("seconds"))
-                f1 = new Float(result[0]);
+                f1 = Float.parseFloat(result[0]);
             else if(result[1].equals("minutes"))
-                f1 = new Float(result[0])*60;
+                f1 = Float.parseFloat(result[0])*60;
             else if(result[1].equals("hours"))
-                f1 = new Float(result[0])*60*60;
+                f1 = Float.parseFloat(result[0])*60*60;
 
             if(result[3].equals("milliseconds"))
-                f2 = new Float(result[2])/ 1000;
+                f2 = Float.parseFloat(result[2])/ 1000;
             else if(result[3].equals("seconds"))
-                f2 = new Float(result[2]);
+                f2 = Float.parseFloat(result[2]);
             else if(result[3].equals("minutes"))
-                f2 = new Float(result[2])*60;
+                f2 = Float.parseFloat(result[2])*60;
 
             out = (f1+f2);
         }
 
         BigDecimal bd = new BigDecimal(out);
-        bd = bd.setScale(3,BigDecimal.ROUND_DOWN);
+        bd = bd.setScale(3, RoundingMode.DOWN);
 
         return bd;
 

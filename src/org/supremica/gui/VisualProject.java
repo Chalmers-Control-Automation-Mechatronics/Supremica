@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -756,12 +756,12 @@ public class VisualProject
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_STATES_COLUMN)
             {
-                return new Integer(theAutomaton.nbrOfStates());
+                return theAutomaton.nbrOfStates();
             }
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN)
             {
-                return new Integer(theAutomaton.nbrOfEvents());
+                return theAutomaton.nbrOfEvents();
             }
 
             return "Unknown";
@@ -916,17 +916,17 @@ public class VisualProject
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_STATES_COLUMN)
             {
-                return new Integer(theAutomaton.nbrOfStates());
+                return theAutomaton.nbrOfStates();
             }
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN)
             {
-                return new Integer(theAutomaton.nbrOfEvents());
+                return theAutomaton.nbrOfEvents();
             }
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TRANSITIONS_COLUMN)
             {
-                return new Integer(theAutomaton.nbrOfTransitions());
+                return theAutomaton.nbrOfTransitions();
             }
 
             return "Unknown";

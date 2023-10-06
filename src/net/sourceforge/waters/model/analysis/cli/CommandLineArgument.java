@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -176,11 +176,7 @@ public abstract class CommandLineArgument
 
   public static void doIndent(final PrintStream stream, final int spaces)
   {
-    if (spaces > 0) {
-      for (int i = 0; i < spaces; i++) {
-        stream.print(' ');
-      }
-    } else {
+    for (int i = 0; i < spaces; i++) {
       stream.print(' ');
     }
   }
@@ -191,7 +187,7 @@ public abstract class CommandLineArgument
   public static void fail(final String msg)
   {
     System.err.println(msg);
-    System.exit(1);
+    ExitException.testFriendlyExit(1);
   }
 
   protected void failMissingValue()

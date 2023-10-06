@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2004-2021 Robi Malik
+  Copyright (C) 2004-2023 Robi Malik
 
   This file is part of Waters.
   Waters is free software: you can redistribute it and/or modify it under
@@ -226,6 +226,14 @@
       <xs:extension base="D:CounterExampleType">
         <xs:attribute name="Kind" type="D:ConflictKind" default="CONFLICT"/>
       </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="CoobservabilityCounterExample">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:CounterExampleType"/>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>

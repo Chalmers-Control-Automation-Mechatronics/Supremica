@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,38 +33,39 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
 /**
- * A tool to determine whether a nondeterministic automaton accepts
- * a given trace.
+ * <P>A tool to determine whether a (possibly nondeterministic) automaton accepts
+ * a trace.</P>
  *
- * The TraceFinder can determine whether an event sequence is accepted,
+ * <P>The trace finder can determine whether an event sequence is accepted,
  * and provide an appropriate sequence of states through the automaton.
  * It remembers an automaton for repeated processing of different traces,
- * and uses a {@link ListBufferTransitionRelation} for efficient searching.
+ * constructing a {@link TRAutomatonProxy} if needed for efficient searching.</P>
  *
  * @author Robi Malik
  */
@@ -76,34 +77,40 @@ public class TraceFinder
   //# Constructors
   public TraceFinder(final AutomatonProxy aut, final KindTranslator translator)
   {
-    try {
-      mAutomaton = aut;
-      final Collection<EventProxy> empty = Collections.emptyList();
-      mEventEncoding = new EventEncoding(aut, translator, empty,
-                                         EventEncoding.FILTER_PROPOSITIONS);
-      final StateEncoding enc = new StateEncoding(aut);
-      mTransitionRelation = new ListBufferTransitionRelation
-        (aut, mEventEncoding.clone(), enc,
-         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      final ComponentKind kind = translator.getComponentKind(aut);
-      mTransitionRelation.setKind(kind);
-      mInitialStates = new ArrayList<SearchRecord>();
-      final int numStates = mTransitionRelation.getNumberOfStates();
-      for (int state = 0; state < numStates; state++) {
-        if (mTransitionRelation.isInitial(state)) {
-          final SearchRecord record = new SearchRecord(state);
-          mInitialStates.add(record);
-        }
+    if (aut instanceof TRAutomatonProxy) {
+      mTRAutomaton = (TRAutomatonProxy) aut;
+      final ListBufferTransitionRelation rel = mTRAutomaton.getTransitionRelation();
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    } else {
+      try {
+        final Collection<EventProxy> empty = Collections.emptyList();
+        final EventEncoding eventEnc =
+          new EventEncoding(aut, translator, empty,
+                            EventEncoding.FILTER_PROPOSITIONS);
+        mTRAutomaton =
+          new TRAutomatonProxy(aut, eventEnc,
+                               ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      } catch (final OverflowException exception) {
+        // Should not get overflow with 0 propositions ...
+        throw new WatersRuntimeException(exception);
       }
-      final boolean det =
-        mInitialStates.size() <= 1 && mTransitionRelation.isDeterministic();
-      mStateEncoding = det ? null : enc;
-      mNumberOfAcceptedSteps = -1;
-      mPath = null;
-    } catch (final OverflowException exception) {
-      // Should not get overflow with 0 propositions ...
-      throw new WatersRuntimeException(exception);
     }
+    mSpec = translator.getComponentKind(aut) != ComponentKind.PLANT;
+    final ListBufferTransitionRelation rel = mTRAutomaton.getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    mStateMap = new TObjectIntHashMap<>(numStates, 0.5f, -1);
+    mInitialStates = new ArrayList<SearchRecord>();
+    for (int s = 0; s < numStates; s++) {
+      final StateProxy state = mTRAutomaton.getOriginalState(s);
+      if (state != null) {
+        mStateMap.put(state, s);
+      }
+      if (rel.isInitial(s)) {
+        final SearchRecord record = new SearchRecord(s);
+        mInitialStates.add(record);
+      }
+    }
+    mDeterministic = mInitialStates.size() <= 1 && rel.isDeterministic();
   }
 
 
@@ -111,44 +118,74 @@ public class TraceFinder
   //# Simple Access
   public boolean isDeterministic()
   {
-    return mStateEncoding == null;
+    return mDeterministic;
   }
 
+  public void setComponentKind(final ComponentKind kind)
+  {
+    final boolean spec = kind != ComponentKind.PLANT;
+    if (spec != mSpec) {
+      mSpec = spec;
+      mLastInput = null;
+      mLastResult = null;
+    }
+  }
 
   //#########################################################################
   //# Invocation
   /**
-   * Checks whether the automaton completely accepts the given trace.
+   * Checks whether the automaton accepts all traces of the given counterexample.
    */
-  public boolean accepts(final TraceProxy trace)
+  public Result examine(final CounterExampleProxy counter)
   {
-    final int len = trace.getEvents().size();
-    return computeNumberOfAcceptedSteps(trace) == len;
+    final List<TraceProxy> traces = counter.getTraces();
+    if (traces.size() == 1) {
+      final TraceProxy trace = traces.get(0);
+      examine(trace);
+    } else if (mLastInput != counter) {
+      final int numPaths = mDeterministic ? 0 : traces.size();
+      final Result result = new Result(numPaths);
+      int index = 0;
+      for (final TraceProxy trace : counter.getTraces()) {
+        final boolean spec = index == 0 && mSpec;
+        final Result subResult = examine(trace, spec);
+        result.merge(subResult, index);
+        index++;
+      }
+      mLastInput = counter;
+      mLastResult = result;
+    }
+    return mLastResult;
   }
 
   /**
    * Checks whether the automaton accepts the given trace.
-   * @return The number of events in the trace accepted by the automaton.
-   *         A return value of trace.{@link TraceProxy#getEvents()
-   *         getEvents()}.size() indicates that the complete trace is
-   *         accepted. A return value of -1 indicates that the automaton
-   *         has no initial state, and 0 indicates that the first event of
-   *         the trace is not eligible in any initial state.
    */
-  public int computeNumberOfAcceptedSteps(final TraceProxy trace)
+  public Result examine(final TraceProxy trace)
+  {
+    if (mLastInput != trace) {
+      mLastInput = trace;
+      mLastResult = examine(trace, mSpec);
+    }
+    return mLastResult;
+  }
+
+  private Result examine(final TraceProxy trace, final boolean spec)
   {
     if (mInitialStates.isEmpty()) {
       // No initial state ...
-      return -1;
-    } else if (mStateEncoding == null) {
-      // Deterministic automaton ...
-      final TransitionIterator iter =
-        mTransitionRelation.createSuccessorsReadOnlyIterator();
+      return new Result(-1, false, false);
+    } else if (mDeterministic) {
+      final EventEncoding enc = mTRAutomaton.getEventEncoding();
+      final ListBufferTransitionRelation rel =
+        mTRAutomaton.getTransitionRelation();
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       final SearchRecord record = mInitialStates.get(0);
+      final List<EventProxy> events = trace.getEvents();
       int state = record.getState();
       int depth = 0;
-      for (final EventProxy event : trace.getEvents()) {
-        final int eventID = mEventEncoding.getEventCode(event);
+      for (final EventProxy event : events) {
+        final int eventID = enc.getEventCode(event);
         if (eventID >= 0) {
           iter.reset(state, eventID);
           if (!iter.advance()) {
@@ -158,30 +195,43 @@ public class TraceFinder
         }
         depth++;
       }
-      mNumberOfAcceptedSteps = depth;
-      return depth;
+      final int numSteps = events.size();
+      final boolean accepted = (depth == numSteps);
+      final boolean finalStepSpecFailure = mSpec && (depth == numSteps - 1);
+      return new Result(depth, accepted, finalStepSpecFailure);
     } else {
       // Nondeterministic automaton ...
+      final EventEncoding eventEnc = mTRAutomaton.getEventEncoding();
+      final ListBufferTransitionRelation rel =
+        mTRAutomaton.getTransitionRelation();
       final List<EventProxy> events = trace.getEvents();
       List<SearchRecord> currentLevel =
         new ArrayList<SearchRecord>(mInitialStates);
       List<SearchRecord> nextLevel = new ArrayList<SearchRecord>();
       final TIntHashSet visited = new TIntHashSet();
-      final TransitionIterator iter =
-        mTransitionRelation.createSuccessorsReadOnlyIterator();
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      final int numSteps = events.size();
       int depth = 0;
+      boolean finalStepSpecFailure = false;
+      outer:
       for (final EventProxy event : events) {
-        final int eventID = mEventEncoding.getEventCode(event);
+        final int eventID = eventEnc.getEventCode(event);
         if (eventID >= 0) {
           for (final SearchRecord current : currentLevel) {
             final int state = current.getState();
             iter.reset(state, eventID);
+            boolean gotSuccessor = false;
             while (iter.advance()) {
+              gotSuccessor = true;
               final int target = iter.getCurrentTargetState();
               if (visited.add(target)) {
                 final SearchRecord next = new SearchRecord(target, current);
                 nextLevel.add(next);
               }
+            }
+            if (!gotSuccessor && mSpec && depth == numSteps - 1) {
+              finalStepSpecFailure = true;
+              break outer;
             }
           }
           if (nextLevel.isEmpty()) {
@@ -195,7 +245,7 @@ public class TraceFinder
         }
         depth++;
       }
-      mPath = new StateProxy[depth + 1];
+      final StateProxy[] path = new StateProxy[depth + 1];
       int index = depth;
       SearchRecord current = currentLevel.get(0);
       int nextStateID = current.getState();
@@ -203,11 +253,11 @@ public class TraceFinder
       while (current != null) {
         final int currentStateID = current.getState();
         final EventProxy event = events.get(index - 1);
-        final int eventID = mEventEncoding.getEventCode(event);
+        final int eventID = eventEnc.getEventCode(event);
         if (eventID >= 0) {
           iter.reset(currentStateID, eventID);
           if (iter.advance() && iter.advance()) {
-            mPath[index] = mStateEncoding.getState(nextStateID);
+            path[index] = mTRAutomaton.getOriginalState(nextStateID);
           }
           nextStateID = currentStateID;
           current = current.getPredecessor();
@@ -215,101 +265,121 @@ public class TraceFinder
         index--;
       }
       if (mInitialStates.size() > 1) {
-        mPath[0] = mStateEncoding.getState(nextStateID);
+        path[0] = mTRAutomaton.getOriginalState(nextStateID);
       }
-      mNumberOfAcceptedSteps = depth;
-      return depth;
-    }
-  }
-
-  /**
-   * Determines whether the automaton rejects the given safety counterexample.
-   * This method determines whether the automaton can reach a state where
-   * the next event from the trace is not enabled. The trace must include
-   * information about the automaton, which is used to track the state in
-   * case of nondeterminism.
-   * @param  counter  The counterexample to be checked.
-   * @return <CODE>true</CODE> if the remainder of the counterexample is
-   *         accepted starting from the last recorded state for the automaton
-   *         in the trace;
-   *         <CODE>false</CODE> otherwise.
-   */
-  public boolean isRejectingSpec(final SafetyCounterExampleProxy counter)
-  {
-    assert counter.getAutomata().contains(mAutomaton);
-    assert mTransitionRelation.getKind() == ComponentKind.SPEC;
-
-    final TraceProxy trace = counter.getTrace();
-    final List<TraceStepProxy> steps = trace.getTraceSteps();
-    final int numSteps = steps.size();
-    final int numEvents = numSteps - 1;
-    if (isDeterministic()) {
-      return computeNumberOfAcceptedSteps(trace) < numEvents;
-    }
-
-    final ListIterator<TraceStepProxy> listIter = steps.listIterator(numSteps);
-    StateProxy state = null;
-    while (state == null && listIter.hasPrevious()) {
-      final TraceStepProxy step = listIter.previous();
-      state = step.getStateMap().get(mAutomaton);
-    }
-    if (state == null) {
-      return computeNumberOfAcceptedSteps(trace) < numEvents;
-    }
-
-    listIter.next();
-    final TransitionIterator transIter =
-      mTransitionRelation.createSuccessorsReadOnlyIterator();
-    int s = mStateEncoding.getStateCode(state);
-    while (listIter.hasNext()) {
-      final TraceStepProxy step = listIter.next();
-      final EventProxy event = step.getEvent();
-      final int e = mEventEncoding.getEventCode(event);
-      if (e >= 0) {
-        transIter.reset(s, e);
-        if (!transIter.advance()) {
-          return true;
-        }
-        s = transIter.getCurrentTargetState();
-      }
-    }
-    return false;
-  }
-
-
-  /**
-   * Gets the number of steps computed from the last call to
-   * {@link #computeNumberOfAcceptedSteps(TraceProxy)
-   * computeNumberOfAcceptedSteps()}.
-   */
-  public int getNumberOfAcceptedSteps()
-  {
-    return mNumberOfAcceptedSteps;
-  }
-
-  /**
-   * Gets a trace state on the path found by a previous call to
-   * {@link #computeNumberOfAcceptedSteps(TraceProxy) accepts()}
-   * @param  depth   The index position of the state to be looked up,
-   *                 where 0 indicates the initial state of the trace.
-   * @return The state on the path, or <CODE>null</CODE> to indicate a
-   *         the this state can be recomputed deterministically from its
-   *         predecessor.
-   */
-  public StateProxy getState(final int depth)
-  {
-    if (mPath != null) {
-      return mPath[depth];
-    } else {
-      return null;
+      final boolean accepted = (depth == numSteps);
+      return new Result(depth, accepted, finalStepSpecFailure, path);
     }
   }
 
 
   //#########################################################################
-  //# Inner Class SearchRecord
-  private static class SearchRecord {
+  //# Inner Class TraceInfo
+  public static class Result
+  {
+    //#######################################################################
+    //# Constructor
+    private Result(final int numPaths)
+    {
+      mTotalAcceptedSteps = 0;
+      mFirstAcceptedSteps = Integer.MIN_VALUE;
+      mAccepted = true;
+      mFinalStepSpecFailure = false;
+      mPaths = numPaths > 0 ? new StateProxy[numPaths][] : null;
+    }
 
+    private Result(final int numSteps,
+                   final boolean accepted,
+                   final boolean finalStepSpecFailure)
+    {
+      mTotalAcceptedSteps = mFirstAcceptedSteps = numSteps;
+      mAccepted = accepted;
+      mFinalStepSpecFailure = finalStepSpecFailure;
+      mPaths = null;
+    }
+
+    private Result(final int numSteps,
+                   final boolean accepted,
+                   final boolean finalStepSpecFailure,
+                   final StateProxy[] path)
+    {
+      mTotalAcceptedSteps = mFirstAcceptedSteps = numSteps;
+      mAccepted = accepted;
+      mFinalStepSpecFailure = finalStepSpecFailure;
+      mPaths = new StateProxy[1][];
+      mPaths[0] = path;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    /**
+     * Gets the number of trace events accepted by the automaton.
+     * A return value of -1 indicates that the automaton has no initial state,
+     * and 0 indicates that the first event of the trace is not eligible in any
+     * initial state.
+     */
+    public int getTotalAcceptedSteps()
+    {
+      return mTotalAcceptedSteps;
+    }
+
+    public int mFirstAcceptedSteps()
+    {
+      return mFirstAcceptedSteps;
+    }
+
+    public boolean isAccepted()
+    {
+      return mAccepted;
+    }
+
+    public boolean isFinalStepSpecFailure()
+    {
+      return mFinalStepSpecFailure;
+    }
+
+    public StateProxy getStateAt(final int pathIndex, final int stateIndex)
+    {
+      if (mPaths == null) {
+        return null;
+      } else if (stateIndex < mPaths[pathIndex].length) {
+        return mPaths[pathIndex][stateIndex];
+      } else {
+        return null;
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void merge(final Result subResult, final int traceIndex)
+    {
+      if (mTotalAcceptedSteps >= 0) {
+        mTotalAcceptedSteps += subResult.mTotalAcceptedSteps;
+      }
+      if (mFirstAcceptedSteps < -1) {
+        mFirstAcceptedSteps = subResult.mFirstAcceptedSteps;
+        mFinalStepSpecFailure = subResult.mFinalStepSpecFailure;
+      }
+      mAccepted &= subResult.mAccepted;
+      if (mPaths != null) {
+        mPaths[traceIndex] = subResult.mPaths[0];
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private int mTotalAcceptedSteps;
+    private int mFirstAcceptedSteps;
+    private boolean mAccepted;
+    private boolean mFinalStepSpecFailure;
+    private final StateProxy[][] mPaths;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SearchRecord
+  private static class SearchRecord
+  {
     //#######################################################################
     //# Constructor
     private SearchRecord(final int state)
@@ -339,19 +409,18 @@ public class TraceFinder
     //# Data Members
     private final int mState;
     private final SearchRecord mPredecessor;
-
   }
 
 
   //#########################################################################
   //# Data Members
-  private AutomatonProxy mAutomaton;
-  private final EventEncoding mEventEncoding;
-  private final StateEncoding mStateEncoding;
-  private final ListBufferTransitionRelation mTransitionRelation;
+  private final TRAutomatonProxy mTRAutomaton;
+  private boolean mSpec;
+  private final TObjectIntMap<StateProxy> mStateMap;
   private final List<SearchRecord> mInitialStates;
+  private final boolean mDeterministic;
 
-  private int mNumberOfAcceptedSteps;
-  private StateProxy[] mPath;
+  private Proxy mLastInput;
+  private Result mLastResult;
 
 }

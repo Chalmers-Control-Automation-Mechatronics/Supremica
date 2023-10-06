@@ -1,0 +1,34 @@
+event [^\[\]]* COOBS:observer koord
+event [^\[\]]* controllable COOBS:controller koord
+event CS_ok.* COOBS:observer koord
+event CS_ok.* COOBS:controller koord
+event done_ZS.* COOBS:controller koord
+event tuer_.* COOBS:observer koord
+event zuendung_.* COOBS:observer koord
+event .*\[hi\] COOBS:observer koord
+event .*\[hi\] controllable COOBS:controller koord
+event .*\[lo\] COOBS:observer koord
+event .*\[FS\] COOBS:observer koord
+event .*\[FS\] controllable COOBS:controller koord
+event .*\[WSP\] COOBS:observer koord
+event .*\[WSP\] controllable COOBS:controller koord
+event .*\[FT\] COOBS:observer:ft ft
+event .*\[FT\] controllable COOBS:controller:ft ft
+event soft_.* COOBS:observer:ft ft
+event .*\[lo\] COOBS:observer:ft ft
+event .*\[lo\] controllable COOBS:controller:ft ft
+event .*\[BT\] COOBS:observer:bt bt
+event .*\[BT\] controllable COOBS:controller:bt bt
+event soft_.* COOBS:observer:bt bt
+event .*\[lo\] COOBS:observer:bt bt
+event .*\[lo\] controllable COOBS:controller:bt bt
+event .*\[FH\] COOBS:observer:fh fh
+event .*\[FH\] controllable COOBS:controller:fh fh
+event soft_.* COOBS:observer:fh fh
+event .*\[lo\] COOBS:observer:fh fh
+event .*\[lo\] controllable COOBS:controller:fh fh
+event .*\[BH\] COOBS:observer:bh bh
+event .*\[BH\] controllable COOBS:controller:bh bh
+event soft_.* COOBS:observer:bh bh
+event .*\[lo\] COOBS:observer:bh bh
+event .*\[lo\] controllable COOBS:controller:bh bh

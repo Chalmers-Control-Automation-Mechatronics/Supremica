@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,17 +33,17 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.analysis.monolithic.TRMonolithicCoobservabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.EnumOption;
 
 
 /**
@@ -69,8 +69,9 @@ public class ModularModelVerifierFactory
   public ModularControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ModularControllabilityChecker
-      (null, factory, new NativeControllabilityChecker(factory));
+    final NativeControllabilityChecker mono =
+      new NativeControllabilityChecker(factory);
+    return new ModularControllabilityChecker(factory, mono);
   }
 
   @Override
@@ -81,12 +82,21 @@ public class ModularModelVerifierFactory
   }
 
   @Override
+  public ModularCoobservabilityChecker createCoobservabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    final TRMonolithicCoobservabilityChecker mono =
+      new TRMonolithicCoobservabilityChecker();
+    return new ModularCoobservabilityChecker(factory, mono);
+  }
+
+  @Override
   public ModularLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    final SafetyVerifier mono =
+    final NativeLanguageInclusionChecker mono =
       new NativeLanguageInclusionChecker(factory);
-    return new ModularLanguageInclusionChecker(null, factory, mono);
+    return new ModularLanguageInclusionChecker(factory, mono);
   }
 
   @Override
@@ -101,41 +111,50 @@ public class ModularModelVerifierFactory
   public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
-    db.register(new EnumOption<ModularHeuristicFactory.Method>
-             (OPTION_AbstractModularSafetyVerifier_HeuristicMethod,
+    db.register(new EnumOption<HeuristicFactory.Method>
+             (OPTION_AbstractModularVerifier_HeuristicMethod,
               "Heuristic Method",
               "Strategy to select additional components when a subsystem " +
               "fails the check during modular verification.",
               "-heuristic",
-              ModularHeuristicFactory.Method.values(),
-              ModularHeuristicFactory.Method.MaxCommonEvents));
-    db.register(new EnumOption<ModularHeuristicFactory.Preference>
-             (OPTION_AbstractModularSafetyVerifier_HeuristicPreference,
+              HeuristicFactory.Method.values(),
+              HeuristicFactory.Method.MaxCommonEvents));
+    db.register(new EnumOption<HeuristicFactory.Preference>
+             (OPTION_AbstractModularVerifier_HeuristicPreference,
               "Heuristic Preference",
               "What kind of plants are selected preferentially by the heuristic.",
               "-preference",
-              ModularHeuristicFactory.Preference.values(),
-              ModularHeuristicFactory.Preference.NOPREF));
-
-    db.register(new ChainedAnalyzerOption
-      (OPTION_ModularControllabilityChecker_Chain,
-       "Monolithic controllability checker",
-       "Algorithm used to analyze the subsystems during modular " +
-       "or incremental processing.",
-       db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
+              HeuristicFactory.Preference.values(),
+              HeuristicFactory.Preference.NOPREF));
     db.register(new BooleanOption
-             (OPTION_ModularControllabilityChecker_CollectsFailedSpecs,
+             (OPTION_AbstractModularVerifier_CollectsFailedSpecs,
               "Collect failed specifications",
-              "Continue checking if a specification is found not controllable.",
+              "Continue checking if a specification is found to fail verification.",
               "-collect",
               false));
     db.register(new BooleanOption
-             (OPTION_ModularControllabilityChecker_StartsWithSmallestSpec,
+             (OPTION_AbstractModularVerifier_StartsWithSmallestSpec,
               "Start with smallest spefication",
-              "Sort the specifications by number of states, and start " +
-              "with the smallest.",
+              "Enable to process specifications in order of increasing " +
+              "number of states, disable to process them in order of " +
+              "decreasing number of states.",
               "-so",
               true));
+
+    db.register(new ChainedAnalyzerOption
+             (OPTION_ModularControllabilityChecker_Chain,
+              "Monolithic controllability checker",
+              "Algorithm used to analyze the subsystems during modular " +
+              "or incremental processing.",
+              db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
+
+    db.register(new ChainedAnalyzerOption
+             (OPTION_ModularCoobservabilityChecker_Chain,
+              "Monolithic coobservability checker",
+              "Algorithm used to analyze the subsystems during modular " +
+              "or incremental processing.",
+              db, ModelAnalyzerFactoryLoader.Modular,
+              ModelAnalyzerFactoryLoader.TRMonolithic, CHAIN_SUPPRESSIONS));
 
     db.register(new BooleanOption
              (OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis,
@@ -163,19 +182,19 @@ public class ModularModelVerifierFactory
               AutomataGroup.MergeVersion.values(),
               AutomataGroup.MergeVersion.MaxCommonEvents));
     db.register(new EnumOption<AutomataGroup.SelectVersion>
-           (OPTION_ModularControlLoopChecker_SelectVersion,
-            "Select Version",
-            "Method used to select the primary automaton for merging",
-            "-select",
-            AutomataGroup.SelectVersion.values(),
-            AutomataGroup.SelectVersion.Naive));
+             (OPTION_ModularControlLoopChecker_SelectVersion,
+              "Select Version",
+              "Method used to select the primary automaton for merging",
+              "-select",
+              AutomataGroup.SelectVersion.values(),
+              AutomataGroup.SelectVersion.Naive));
 
     db.register(new ChainedAnalyzerOption
-      (OPTION_ModularLanguageInclusionChecker_Chain,
-       "Monolithic language inclusion checker",
-       "Algorithm used to analyze the subsystems during modular " +
-       "or incremental processing.",
-       db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
+             (OPTION_ModularLanguageInclusionChecker_Chain,
+              "Monolithic language inclusion checker",
+              "Algorithm used to analyze the subsystems during modular " +
+              "or incremental processing.",
+              db, ModelAnalyzerFactoryLoader.Modular, CHAIN_SUPPRESSIONS));
   }
 
 
@@ -198,21 +217,25 @@ public class ModularModelVerifierFactory
   //#########################################################################
   //# Class Constants
   public static final String
-    OPTION_AbstractModularSafetyVerifier_HeuristicMethod =
-    "AbstractModularSafetyVerifier.HeuristicMethod";
+    OPTION_AbstractModularVerifier_HeuristicMethod =
+    "AbstractModularSafetyVerifier.HeuristicMethod"; // legacy name
   public static final String
-    OPTION_AbstractModularSafetyVerifier_HeuristicPreference =
-    "AbstractModularSafetyVerifier.HeuristicPreference";
+    OPTION_AbstractModularVerifier_HeuristicPreference =
+    "AbstractModularSafetyVerifier.HeuristicPreference"; // legacy name
+  public static final String
+    OPTION_AbstractModularVerifier_StartsWithSmallestSpec =
+    "ModularControllabilityChecker.StartsWithSmallestSpec"; // legacy name
+  public static final String
+    OPTION_AbstractModularVerifier_CollectsFailedSpecs =
+    "ModularControllabilityChecker.CollectsFailedSpecs"; // legacy name
 
-  public static final String
-    OPTION_ModularControllabilityChecker_CollectsFailedSpecs =
-    "ModularControllabilityChecker.CollectsFailedSpecs";
-  public static final String
-    OPTION_ModularControllabilityChecker_StartsWithSmallestSpec =
-    "ModularControllabilityChecker.StartsWithSmallestSpec";
   public static final String
     OPTION_ModularControllabilityChecker_Chain =
     "ModularControllabilityChecker.chain";
+
+  public static final String
+    OPTION_ModularCoobservabilityChecker_Chain =
+    "ModularCoobservabilityChecker.chain";
 
   public static final String
     OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis =

@@ -1,8 +1,10 @@
 package org.supremica.automata.algorithms.scheduling;
 
-import java.util.*;
+import java.util.Hashtable;
 
-import org.supremica.automata.*;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.State;
 import org.supremica.util.ActionTimer;
 
 public class VisibilityGraphRelaxer
@@ -18,19 +20,19 @@ public class VisibilityGraphRelaxer
      * (as returned by the visibility graph)
      */
     protected Hashtable<String, Double> visGraphRelax = null;
-       
+
     /** The Visibility Graphs, used for relaxation. Can handle two robots at a time */
     protected Hashtable<String, VisGraphScheduler> visibilityGraphs = null;
 
 	private volatile boolean relaxFromNodes;
-	private Automata plantAutomata;
+	private final Automata plantAutomata;
 	@SuppressWarnings("unused")
-	private NodeExpander expander;
-	private ModifiedAstar scheduler;
-	private OneProductRelaxer oneProdRelaxer;
-	private ActionTimer timer;
+	private final NodeExpander expander;
+	private final ModifiedAstar scheduler;
+	private final OneProductRelaxer oneProdRelaxer;
+	private final ActionTimer timer;
 
-	public VisibilityGraphRelaxer(NodeExpander expander, ModifiedAstar scheduler, boolean relaxFromNodes)
+	public VisibilityGraphRelaxer(final NodeExpander expander, final ModifiedAstar scheduler, final boolean relaxFromNodes)
 		throws Exception
 	{
 		this.expander = expander;
@@ -52,20 +54,20 @@ public class VisibilityGraphRelaxer
 
 		for (int i=0; i<cycleTimes.length; i++)
 		{
-			State initState = plantAutomata.getAutomatonAt(i).getInitialState();
+			final State initState = plantAutomata.getAutomatonAt(i).getInitialState();
 			cycleTimes[i] = oneProdRelaxer.getRemainingCosts()[i][initState.getIndex()] + initState.getCost();
 		}
 
 		timer.restart();
 		preprocessVisibilityGraphs();
-		scheduler.addToMessages("\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n", 
-                        SchedulingConstants.MESSAGE_TYPE_INFO); 
+		scheduler.addToMessages("\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n",
+                        SchedulingConstants.MESSAGE_TYPE_INFO);
 	}
 
-	public double getRelaxation(double[] node)
+	public double getRelaxation(final double[] node)
 		throws Exception
 	{
-		double[] effTimePoint = new double[plantAutomata.size()];
+		final double[] effTimePoint = new double[plantAutomata.size()];
 		String timePointKey = "";
 
 		// Calculate the visibility graph time coordinate, corresponding to the current node
@@ -82,41 +84,41 @@ public class VisibilityGraphRelaxer
 		}
 
 		double estimatedRemainingCost;
-		Double previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
+		final Double previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
 		if (previousVisibilityRelaxation == null)
 		{
 			double visibilityRelaxation = -1;
-				
+
 			for (int i=0; i<plantAutomata.size() - 1; i++)
 			{
 				for (int j=i+1; j<plantAutomata.size(); j++)
 				{
-					String visibilityGraphsKey = plantAutomata.getAutomatonAt(i).getName() + "_" + plantAutomata.getAutomatonAt(j).getName();
-					VisGraphScheduler relaxScheduler = visibilityGraphs.get(visibilityGraphsKey);
-				
+					final String visibilityGraphsKey = plantAutomata.getAutomatonAt(i).getName() + "_" + plantAutomata.getAutomatonAt(j).getName();
+					final VisGraphScheduler relaxScheduler = visibilityGraphs.get(visibilityGraphsKey);
+
 					//Tillf
-					ActionTimer relaxTimer = new ActionTimer();
+					final ActionTimer relaxTimer = new ActionTimer();
 					relaxTimer.restart();
-					
-					double currVisibilityRelaxation = relaxScheduler.scheduleFrom(new double[]{effTimePoint[i], effTimePoint[j]});
-					try 
+
+					final double currVisibilityRelaxation = relaxScheduler.scheduleFrom(new double[]{effTimePoint[i], effTimePoint[j]});
+					try
 					{
 						while (!relaxScheduler.schedulingDone())
 						{
 							scheduler.sleep(1);
 						}
 					}
-					catch (InterruptedException ex)
+					catch (final InterruptedException ex)
 					{
-						scheduler.addToMessages("INTERRUPTED_EXCEPTION in ModifiedAstar.calcEstimatedCost()...", 
-                                                        SchedulingConstants.MESSAGE_TYPE_INFO); 
+						scheduler.addToMessages("INTERRUPTED_EXCEPTION in ModifiedAstar.calcEstimatedCost()...",
+                                                        SchedulingConstants.MESSAGE_TYPE_INFO);
 						throw(ex);
-					}				
+					}
 
 // 					//Tillf
 // 					scheduleFromTime += relaxTimer.elapsedTime();
 // 					scheduleFromCounter++;
-					
+
 					if (visibilityRelaxation < currVisibilityRelaxation)
 					{
 						visibilityRelaxation = currVisibilityRelaxation;
@@ -150,25 +152,25 @@ public class VisibilityGraphRelaxer
 		}
 
 		//Tillf
-		boolean approximation = false;
+		final boolean approximation = false;
 		if (approximation)
 		{
-			double xWeight = 200;
-			double yWeight = 100;
+			final double xWeight = 200;
+			final double yWeight = 100;
 			double depth = 0;
 			for (int i=0; i<scheduler.getActiveLength(); i++)
 			{
 				depth += Math.pow(node[scheduler.getActiveAutomataIndex()[i]], 2);
 			}
 			depth = Math.sqrt(depth);
-			return (new Double(estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth)))).doubleValue();
+			return estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth));
 
 // 			double addition = 1;
 // 			for (int i=0; i<scheduler.getActiveLength(); i++)
 // 			{
 // 				int automataIndex = scheduler.getActiveAutomataIndex()[i];
 
-// 				double currAddition = oneProdRelaxer.getRemainingCosts()[automataIndex][(int)node[automataIndex]] / cycleTimes[automataIndex];			
+// 				double currAddition = oneProdRelaxer.getRemainingCosts()[automataIndex][(int)node[automataIndex]] / cycleTimes[automataIndex];
 // 				if (currAddition < addition)
 // 				{
 // 					addition = currAddition;
@@ -181,7 +183,8 @@ public class VisibilityGraphRelaxer
 		return estimatedRemainingCost;
 	}
 
-	public double getRelaxation(Node node)
+	@Override
+  public double getRelaxation(final Node node)
 		throws Exception
 	{
 		return getRelaxation(node.getBasis());
@@ -197,28 +200,28 @@ public class VisibilityGraphRelaxer
 			for (int j=i+1; j<plantAutomata.size(); j++)
 			{
 				String key = "";
-				Automata automataPair = new Automata();
+				final Automata automataPair = new Automata();
 
 				Automaton currAuto = plantAutomata.getAutomatonAt(i);
 				automataPair.addAutomaton(currAuto);
 				key += currAuto.getName() + "_";
-				
+
 				currAuto = plantAutomata.getAutomatonAt(j);
 				automataPair.addAutomaton(currAuto);
-				key += currAuto.getName();				
+				key += currAuto.getName();
 
-				VisGraphScheduler vgSched = new VisGraphScheduler(automataPair, scheduler.getAllAutomata().getSpecificationAutomata(), false, true);
-				try 
+				final VisGraphScheduler vgSched = new VisGraphScheduler(automataPair, scheduler.getAllAutomata().getSpecificationAutomata(), false, true);
+				try
 				{
 					while (!vgSched.isInitialized())
 					{
 						scheduler.sleep(1);
 					}
 				}
-				catch (InterruptedException ex)
+				catch (final InterruptedException ex)
 				{
 					scheduler.addToMessages("EXCEPTION in ModifiedAstar.preprocessVisibilityGraphs()...",
-                                                SchedulingConstants.MESSAGE_TYPE_INFO); 
+                                                SchedulingConstants.MESSAGE_TYPE_INFO);
 					throw(ex);
 				}
 

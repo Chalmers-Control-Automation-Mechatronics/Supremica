@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -128,13 +128,21 @@ public interface AnalysisResult
    */
   public int getTotalNumberOfAutomata();
 
+  /**
+   * Gets the maximum number of automata considered by the analysis at any one
+   * time. The peak number of states should identify the size of the largest
+   * synchronous product constructed. For monolithic algorithms, it will be equal
+   * to the total number of automata, but for modular or compositional algorithms
+   * it may be different.
+   * @return The peak number of automata, or <CODE>-1</CODE> if unknown.
+   */
+  public int getPeakNumberOfAutomata();
 
   /**
    * Gets the total number of states constructed by the analysis algorithm.
    * @return The total number of states, or <CODE>-1</CODE> if unknown.
    */
   public double getTotalNumberOfStates();
-
 
   /**
    * Gets the maximum number of states constructed by the analysis. The peak
@@ -230,6 +238,8 @@ public interface AnalysisResult
 
   /**
    * Specifies a value for the total number of automata used by the analysis.
+   * Also updates the peak number of automata if it is smaller than the
+   * argument.
    */
   public void setNumberOfAutomata(final int numaut);
 

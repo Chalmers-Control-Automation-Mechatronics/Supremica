@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -58,7 +58,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  */
 
 public class ChainedAnalyzerOptionPage
-  extends SelectorLeafOptionPage<ModelAnalyzerFactoryLoader>
+  extends AbstractAnalysisOptionPage
 {
 
   //#########################################################################
@@ -68,10 +68,10 @@ public class ChainedAnalyzerOptionPage
      final EnumOption<ModelAnalyzerFactoryLoader> selector,
      final String... overridden)
   {
-    super(parent.getPrefix() + "." + selector.getID(),
+    super(parent.getAnalysisOperation(),
+          parent.getPrefix() + "." + selector.getID(),
           selector.getShortName());
     mParent = parent;
-    mOperation = parent.getAnalysisOperation();
     mAlgorithmOption = selector;
     mOverriddenIDs = new THashSet<>(overridden.length);
     for (final String id : overridden) {
@@ -84,10 +84,10 @@ public class ChainedAnalyzerOptionPage
      final EnumOption<ModelAnalyzerFactoryLoader> selector,
      final ChainedAnalyzerOptionPage template)
   {
-    super(parent.getPrefix() + "." + selector.getID(),
+    super(parent.getAnalysisOperation(),
+          parent.getPrefix() + "." + selector.getID(),
           selector.getShortName());
     mParent = parent;
-    mOperation = parent.getAnalysisOperation();
     mAlgorithmOption = selector;
     mOverriddenIDs = template.mOverriddenIDs;
   }
@@ -98,11 +98,6 @@ public class ChainedAnalyzerOptionPage
   public SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> getParent()
   {
     return mParent;
-  }
-
-  public AnalysisOperation getAnalysisOperation()
-  {
-    return mOperation;
   }
 
 
@@ -128,8 +123,8 @@ public class ChainedAnalyzerOptionPage
         operation.createModelAnalyzer(factory, desFactory);
       final List<Option<?>> analyzerOptions = analyzer.getOptions(this);
       options.addAll(analyzerOptions);
-    } catch (AnalysisConfigurationException |
-             ClassNotFoundException exception) {
+    } catch (final ClassNotFoundException |
+                   AnalysisConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
@@ -180,7 +175,6 @@ public class ChainedAnalyzerOptionPage
   //#########################################################################
   //# Data Members
   private final SelectorLeafOptionPage<ModelAnalyzerFactoryLoader> mParent;
-  private final AnalysisOperation mOperation;
   private final EnumOption<ModelAnalyzerFactoryLoader> mAlgorithmOption;
   private final Set<String> mOverriddenIDs;
 

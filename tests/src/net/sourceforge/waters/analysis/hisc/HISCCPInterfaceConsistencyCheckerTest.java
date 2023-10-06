@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -287,12 +287,17 @@ public class HISCCPInterfaceConsistencyCheckerTest
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_highlevel.wmod", true);
   }
 
-  public void testHISCCP_parManEg_node0()
+  public void testHISCCP_parManEg_node0ac()
   throws Exception
   {
-    runModelVerifier("despot", "parallelManufacturingExample", "Node0.wmod", true);
+    runModelVerifier("despot", "parallelManufacturingExample", "pms_ac.wmod", true);
   }
 
+  public void testHISCCP_parManEg_node0orig()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "pms_orig.wmod", true);
+  }
   public void testHISCCP_parManEg_node1()
   throws Exception
   {

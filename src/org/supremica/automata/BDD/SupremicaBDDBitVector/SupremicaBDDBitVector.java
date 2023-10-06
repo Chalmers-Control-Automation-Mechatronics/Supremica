@@ -536,7 +536,7 @@ public abstract class SupremicaBDDBitVector
                 while (mask.val() <= max && overflow.isZero()) {
                     final BDD equality = this.equ(mask);
                     if (equality.satCount() > 0) {
-                        satSet.add(new Integer(mask.val()));
+                        satSet.add(mask.val());
                     }
                     overflow = mask.increment();
                 }

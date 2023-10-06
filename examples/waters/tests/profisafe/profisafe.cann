@@ -1,0 +1,4 @@
+event HOST_.* COOBS:observer host
+event HOST_.* controllable COOBS:controller host
+event SLAVE_.* COOBS:observer slave
+event SLAVE_.* controllable COOBS:controller slave

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -67,7 +67,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -133,12 +132,13 @@ public class Simulation implements ModelObserver, Observer
     return mStateHistory.size();
   }
 
-  public void setTrace(final TraceProxy trace)
-  {
-    mTrace = trace;
-    mTraceInvalidated = false;
-  }
-
+  /**
+   * Returns the counterexample trace being displayed in the simulator.
+   * @return The counterexample trace that was used to initialise the
+   *         simulation, or <CODE>null</CODE> if the simulator was launched
+   *         without a counterexample or the trace was invalidated by the
+   *         user executing other events.
+   */
   public TraceProxy getTrace()
   {
     if (mTraceInvalidated) {
@@ -397,7 +397,7 @@ public class Simulation implements ModelObserver, Observer
 
   public void switchToTraceMode(final CounterExampleProxy counter)
   {
-    final boolean allowLast = !(counter instanceof SafetyCounterExampleProxy);
+    final boolean allowLast = !counter.includesFailingStep();
     final TraceProxy trace = counter.getTraces().get(0);
     executeTrace(trace, allowLast);
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -1010,11 +1010,11 @@ public class Simulation implements ModelObserver, Observer
     while (iter.hasNext()) {
       final TraceStepProxy traceStep = iter.next();
       if (iter.hasNext() || mAllowLastStep) {
-        final EventProxy event = traceStep.getEvent();
         if (state == null) {
           state = SimulatorState.createInitialState
             (mOrderedAutomata, traceStep);
         } else {
+          final EventProxy event = traceStep.getEvent();
           state = SimulatorState.createSuccessorState(state, event, traceStep);
         }
         mStateHistory.add(state);

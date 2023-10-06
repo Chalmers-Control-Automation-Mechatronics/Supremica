@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -65,7 +65,7 @@ public class AnalyzerViewAutomatonAction
 
         putValue(Action.NAME, "Automaton");
         putValue(Action.SHORT_DESCRIPTION, "View Automaton");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/automaton16.gif")));
     }

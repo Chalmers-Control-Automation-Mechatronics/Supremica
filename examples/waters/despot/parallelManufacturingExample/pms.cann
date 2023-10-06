@@ -1,0 +1,21 @@
+event [^N:].* COOBS:observer0 hi
+event [^N:].* controllable COOBS:controller0 hi
+event part_passes COOBS:controller0 hi
+     
+event part_enter_1 COOBS:observer1 lo1
+event part_enter_1 COOBS:controller1 lo1
+event finish_exit_1 COOBS:observer1 lo1
+event Node1.* COOBS:observer1 lo1
+event Node1.* controllable COOBS:controller1 lo1
+
+event part_enter_2 COOBS:observer2 lo2
+event part_enter_2 COOBS:controller2 lo2
+event finish_exit_2 COOBS:observer2 lo2
+event Node2.* COOBS:observer2 lo2
+event Node2.* controllable COOBS:controller2 lo2
+
+event part_enter_3 COOBS:observer3 lo3
+event part_enter_3 COOBS:controller3 lo3
+event finish_exit_3 COOBS:observer3 lo3
+event Node3.* COOBS:observer3 lo3
+event Node3.* controllable COOBS:controller3 lo3

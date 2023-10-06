@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -94,7 +94,7 @@ public class EditorReadFisherThompsonAction
         setEditorActiveRequired(true);
 
         putValue(Action.NAME, "Fisher-Thompson problem...");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Read Fisher-Thompson problem from a file in form of the transpose of Table 7 in Liljenvall's Lic. thesis.");
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));

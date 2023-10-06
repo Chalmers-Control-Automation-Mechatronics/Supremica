@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ConflictKind;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -115,6 +116,16 @@ public class ProductDESProxyPrinter
     printCounterExampleHeader(counter);
     final TraceProxy trace = counter.getTrace();
     return printTraceProxy(trace, 0);
+  }
+
+  @Override
+  public Object visitCoobservabilityCounterExampleProxy
+    (final CoobservabilityCounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("COOBSERVABILITY COUNTEREXAMPLE ");
+    print(counter.getName());
+    return printCounterExample(counter);
   }
 
   @Override

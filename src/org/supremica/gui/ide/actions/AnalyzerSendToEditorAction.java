@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -94,7 +94,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
     setAnalyzerActiveRequired(true);
     putValue(Action.NAME, "To editor");
     putValue(Action.SHORT_DESCRIPTION, "Send selected automata to editor");
-    putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_E);
     //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
     putValue(Action.SMALL_ICON,
              new ImageIcon(IDE.class.getResource

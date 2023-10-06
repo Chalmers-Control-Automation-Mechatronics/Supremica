@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -37,21 +37,27 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
-import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -100,17 +106,7 @@ public class CommandLineToolTest
 
   //#########################################################################
   //# Test Cases - specific combinations of factory/algorithm
-  public void testAnalyzer_BDDLanguageInclusion()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "nasty", "just_property");
-    final String[] args = new String[]
-      {"-bdd", "-lang", file.toString(), "-pack", "java",
-       "-property", "the_property", "-nout"};
-    testCommandLine("bdd-lang", args, false,
-                    "!DEBUG", "!counterexample:", "!Statistics:");
-  }
-
+  // controllability
   public void testAnalyzer_ModularControllability()
     throws Exception
   {
@@ -152,6 +148,30 @@ public class CommandLineToolTest
     testCommandLine("mono-cont", args, false, "counterexample:", "!Statistics");
   }
 
+
+  // coobservability
+  public void testAnalyzer_ModularCoobservability()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "coobservability", "fms2016coobs2");
+    final String[] args = new String[]
+      {"-mod", "-coobs", file.toString(), "-stats"};
+    testCommandLine("mod-coobs", args, false, "counterexample:",
+                    "Statistics:", "Number of supervisor sites in model: .*");
+  }
+
+  public void testAnalyzer_SlicingCoobservability()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
+    final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann1");
+    final String[] args = new String[]
+      {"-slice", "-coobs", file.toString(), "-ann", annsFile.toString()};
+    testCommandLine("slice-coobs", args, true);
+  }
+
+
+  // diagnosability
   public void testAnalyzer_MonolithicDiagnosability()
     throws Exception
   {
@@ -172,35 +192,6 @@ public class CommandLineToolTest
     testCommandLine("mono-diag-fault", args, true);
   }
 
-  public void testAnalyzer_MonolithicSynthesisReduced()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "synthesis", "ransomware_sample");
-    final String[] args = new String[]
-      {"-mono", "-synth", "-red", "Small cliques", file.toString()};
-    testCommandLine("mono-synth-red", args, true, " *S:4", "! *S:5");
-  }
-
-  public void testAnalyzer_MonolithicSynthesisSaved()
-    throws Exception
-  {
-    final String name = "small_factory_2";
-    final File file = getInputWmod("tests", "synthesis", name);
-    final File saveFile = new File(getOutputDirectory(), name + ".wmod");
-    final String[] args = new String[]
-      {"-mono", "-synth", "-o", saveFile.toString(), file.toString()};
-    testCommandLine("mono-synth-saved", args, true,
-                    "supervisor saved to " + saveFile);
-    final DocumentManager manager = getDocumentManager();
-    final ModuleProxy module = (ModuleProxy) manager.load(saveFile);
-    final List<Proxy> components = module.getComponentList();
-    assertEquals("Unexpected number of components in output!",
-                 1, components.size());
-    final SimpleComponentProxy comp = (SimpleComponentProxy) components.get(0);
-    assertEquals("Unexpected component kind of output supervisor!",
-                 ComponentKind.SUPERVISOR, comp.getKind());
-  }
-
   public void testAnalyzer_NativeControllability()
     throws Exception
   {
@@ -210,6 +201,53 @@ public class CommandLineToolTest
     testCommandLine("native-cont", args, true);
   }
 
+  public void testAnalyzer_TRCompControllability()
+    throws Exception
+  {
+    final File file1 = getInputWmod("handwritten", "small_factory_2");
+    final File file2 = getInputWmod("handwritten", "small_factory_2u");
+    final String[] args = new String[]
+      {"-trcomp", "-cont",
+       file1.toString(), file2.toString(), "-q", "-nout"};
+    testCommandLine("trcomp-cont", args,
+                    "small_factory_2 ... true \\(.*",
+                    "small_factory_2u ... false \\(.*");
+  }
+
+
+  // language inclusion
+  public void testAnalyzer_BDDLanguageInclusionGreedy()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "trafficlights2006", "ac61part");
+    final String[] args = new String[]
+      {"-bdd", "-lang", "-part", "greedy", file.toString()};
+    testCommandLine("bdd-lang", args, false, "counterexample:");
+  }
+
+  public void testAnalyzer_BDDLanguageInclusionProperty()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "just_property");
+    final String[] args = new String[]
+      {"-bdd", "-lang", file.toString(), "-pack", "java",
+       "-property", "the_property", "-nout"};
+    testCommandLine("bdd-lang-property", args, false,
+                    "!DEBUG", "!counterexample:", "!Statistics:");
+  }
+
+  public void testAnalyzer_TRCompLanguageInclusion()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "nasty", "five_properties");
+    final String[] args = new String[]
+      {"-trcomp", "-lang",
+       file.toString(), "-property", "prop[3]"};
+    testCommandLine("trcomp-lang", args, true);
+  }
+
+
+  // nonblocking
   public void testAnalyzer_NativeGNonblocking()
     throws Exception
   {
@@ -261,29 +299,6 @@ public class CommandLineToolTest
                     ".*SelfloopSubsumptionTRSimplifier.*", "!WARN.*");
   }
 
-  public void testAnalyzer_TRCompControllability()
-    throws Exception
-  {
-    final File file1 = getInputWmod("handwritten", "small_factory_2");
-    final File file2 = getInputWmod("handwritten", "small_factory_2u");
-    final String[] args = new String[]
-      {"-trcomp", "-cont",
-       file1.toString(), file2.toString(), "-q", "-nout"};
-    testCommandLine("trcomp-cont", args,
-                    "small_factory_2 ... true \\(.*",
-                    "small_factory_2u ... false \\(.*");
-  }
-
-  public void testAnalyzer_TRCompLanguageInclusion()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "nasty", "five_properties");
-    final String[] args = new String[]
-      {"-trcomp", "-lang",
-       file.toString(), "-property", "prop[3]"};
-    testCommandLine("trcomp-lang", args, true);
-  }
-
   public void testAnalyzer_TRCompSIC6()
     throws Exception
   {
@@ -296,8 +311,114 @@ public class CommandLineToolTest
   }
 
 
+  // synthesis
+  public void testAnalyzer_MonolithicSynthesisReduced()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "synthesis", "ransomware_sample");
+    final String[] args = new String[]
+      {"-mono", "-synth", "-red", "Small cliques", file.toString()};
+    testCommandLine("mono-synth-red", args, true, " *S:4", "! *S:5");
+  }
+
+  public void testAnalyzer_MonolithicSynthesisSaved()
+    throws Exception
+  {
+    final String name = "small_factory_2";
+    final File file = getInputWmod("tests", "synthesis", name);
+    final File saveFile = new File(getOutputDirectory(), name + ".wmod");
+    final String[] args = new String[]
+      {"-mono", "-synth", "-o", saveFile.toString(), file.toString()};
+    testCommandLine("mono-synth-saved", args, true,
+                    "supervisor saved to " + saveFile);
+    final DocumentManager manager = getDocumentManager();
+    final ModuleProxy module = (ModuleProxy) manager.load(saveFile);
+    final List<Proxy> components = module.getComponentList();
+    assertEquals("Unexpected number of components in output!",
+                 1, components.size());
+    final SimpleComponentProxy comp = (SimpleComponentProxy) components.get(0);
+    assertEquals("Unexpected component kind of output supervisor!",
+                 ComponentKind.SUPERVISOR, comp.getKind());
+  }
+
+
+
+
   //#########################################################################
   //# Test Cases - specific combinations of options
+  public void testOption_CompileOnly()
+    throws Exception
+  {
+    final String renamed = "cell_renamed";
+    final File file = getInputWmod("handwritten", "cell");
+    final File output = getOutputWdes(renamed);
+    final String[] args = new String[]
+      {"-c", file.toString(), "-o", output.toString(), "-v"};
+    testCommandLine("c", args, "Compiled product DES saved to .*");
+    assertTrue("Compiler output file not found!", output.canRead());
+    final DocumentManager manager = getDocumentManager();
+    final ProductDESProxy des = (ProductDESProxy) manager.load(output);
+    final String name = des.getName();
+    assertEquals("Unexpected name of out product DES!", renamed, name);
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    assertEquals("Unexpected number of automata in compiler output!",
+                 7, automata.size());
+  }
+
+  public void testOption_AnnotationsFile()
+    throws Exception
+  {
+    final File file = getInputWmod("handwritten", "transferline");
+    final File annsFile = getInputCann("handwritten", "transferline");
+    final File output = getOutputWdes("transferline3");
+    final String[] args = new String[]
+      {"-c", file.toString(), "-D", "N=3", "-ann", annsFile.toString(),
+       "-o", output.toString()};
+    testCommandLine("ann", args);
+    assertTrue("Compiler output file not found!", output.canRead());
+    final DocumentManager manager = getDocumentManager();
+    final ProductDESProxy des = (ProductDESProxy) manager.load(output);
+
+    final Pattern pattern = Pattern.compile("\\[([0-9])\\]");
+    for (final EventProxy event : des.getEvents()) {
+      final String name = event.getName();
+      final Matcher matcher = pattern.matcher(name);
+      if (matcher.find()) {
+        final Map<String,String> attribs = event.getAttributes();
+        final String group = matcher.group(1);
+        final int index = Integer.parseInt(group);
+        if (index > 0) {
+          if (event.getKind() == EventKind.CONTROLLABLE) {
+            final String key =
+              CoobservabilityAttributeFactory.CONTROLLABITY_KEY + group;
+            assertEquals("Unexpected controllability attribute for event '" +
+                         name + "'!", group, attribs.get(key));
+          }
+          if (event.isObservable()) {
+            final String key =
+              CoobservabilityAttributeFactory.OBSERVABITY_KEY + group;
+            assertEquals("Unexpected observability attribute for event '" +
+                         name + "'!", group, attribs.get(key));
+          }
+        }
+        if (index < 3) {
+          final String next = Integer.toString(index + 1);
+          if (name.startsWith("tu_load")) {
+            final String key =
+              CoobservabilityAttributeFactory.CONTROLLABITY_KEY + next;
+            assertEquals("Unexpected controllability attribute for event '" +
+                         name + "'!", next, attribs.get(key));
+          } else if (name.startsWith("tu_accept")) {
+            final String key =
+              CoobservabilityAttributeFactory.OBSERVABITY_KEY + next;
+            assertEquals("Unexpected observability attribute for event '" +
+                         name + "'!", next, attribs.get(key));
+          }
+        }
+      }
+    }
+  }
+
   public void testOption_D()
     throws Exception
   {
@@ -383,7 +504,11 @@ public class CommandLineToolTest
     throws Exception
   {
     final String[] args = new String[] {"@name", "junit"};
-    testCommandLine("name", args, "USAGE: junit <.*");
+    testCommandLine("name", args, "USAGE:",
+                                  "junit -c.*",
+                                  "junit <.*",
+                                  "Possible algorithms are:",
+                                  "Possible operations are:");
   }
 
   public void testOption_MarkingBad()
@@ -446,19 +571,12 @@ public class CommandLineToolTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    System.setSecurityManager(new NoExitSecurityManager());
+    ExitException.setTestMode(true);
     for (final AnalysisOperation operation : AnalysisOperation.values()) {
       final AnalysisOptionPage page = operation.getOptionPage();
       page.restoreDefaultValues();
     }
     WatersOptionPages.COMPILER.restoreDefaultValues();
-  }
-
-  @Override
-  protected void tearDown() throws Exception
-  {
-    System.setSecurityManager(null); // or save and restore original
-    super.tearDown();
   }
 
   @Override
@@ -478,6 +596,16 @@ public class CommandLineToolTest
   private File getInputWdes(final String... path)
   {
     return getInputFile(path, ".wdes");
+  }
+
+  private File getInputCann(final String... path)
+  {
+    return getInputFile(path, ".cann");
+  }
+
+  private File getOutputWdes(final String... path)
+  {
+    return getOutputFile(path, ".wdes");
   }
 
   private File getInputProperties(final String... path)
@@ -516,6 +644,9 @@ public class CommandLineToolTest
       System.setErr(sysErr);
     }
 
+    if (outputPatterns.length == 0) {
+      return;
+    }
     final List<PatternHandler> patterns =
       new ArrayList<>(outputPatterns.length + 1);
     final List<PatternHandler> antiPatterns =
@@ -629,33 +760,6 @@ public class CommandLineToolTest
     private final Pattern mPattern;
     private boolean mOneOff;
     private boolean mAnti;
-  }
-
-
-  //#########################################################################
-  //# Inner Class NoExitSecurityManager
-  private static class NoExitSecurityManager extends SecurityManager
-  {
-    //#######################################################################
-    //# Overrides for java.lang.SecurityManager
-    @Override
-    public void checkPermission(final Permission perm)
-    {
-      // allow anything.
-    }
-
-    @Override
-    public void checkPermission(final Permission perm, final Object context)
-    {
-      // allow anything.
-    }
-
-    @Override
-    public void checkExit(final int status)
-    {
-      super.checkExit(status);
-      throw new ExitException(status);
-    }
   }
 
 }

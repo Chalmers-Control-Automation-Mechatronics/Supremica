@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -71,6 +71,13 @@ public interface ModelAnalyzerFactory
     throws AnalysisConfigurationException;
 
   /**
+   * Creates a coobservability checker.
+   */
+  public CoobservabilityChecker createCoobservabilityChecker
+    (ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException;
+
+  /**
    * Creates a deadlock checker.
    */
   public DeadlockChecker createDeadlockChecker
@@ -113,8 +120,6 @@ public interface ModelAnalyzerFactory
     throws AnalysisConfigurationException;
 
 
-  //#########################################################################
-  //# Options
   public void registerOptions(AnalysisOptionPage db);
 
 }

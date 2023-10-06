@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -35,7 +35,6 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -66,9 +65,10 @@ public enum ModelAnalyzerFactoryLoader
   Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory", "-mono"),
   Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory", "-native"),
   PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory", "-po"),
+  Slicing("net.sourceforge.waters.analysis.modular.SlicingModelVerifierFactory", "-slice"),
   Supremica("org.supremica.automata.waters.SupremicaModelAnalyzerFactory", "-sup"),
   TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory", "-trcomp"),
-  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory", "trmono");
+  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory", "-trmono");
 
 
   //#########################################################################
@@ -145,10 +145,12 @@ public enum ModelAnalyzerFactoryLoader
   }
 
   public static EnumFactory<ModelAnalyzerFactoryLoader> createEnumFactory
-    (final List<ModelAnalyzerFactoryLoader> loaders,
+    (final AnalysisOperation operation,
+     final ModelAnalyzerFactoryLoader defaultLoader,
      final ModelAnalyzerFactoryLoader suppressedLoader)
   {
-    return new ModelAnalyzerFactoryLoaderEnumFactory(loaders, suppressedLoader);
+    return new ModelAnalyzerFactoryLoaderEnumFactory
+      (operation, defaultLoader, suppressedLoader);
   }
 
 
@@ -170,12 +172,31 @@ public enum ModelAnalyzerFactoryLoader
     private ModelAnalyzerFactoryLoaderEnumFactory
       (final AnalysisOperation operation, final boolean canBeDisabled)
     {
+      this(operation, null, null, canBeDisabled);
+    }
+
+    private ModelAnalyzerFactoryLoaderEnumFactory
+      (final AnalysisOperation operation,
+       final ModelAnalyzerFactoryLoader defaultLoader,
+       final ModelAnalyzerFactoryLoader suppressedLoader)
+    {
+      this(operation, defaultLoader, suppressedLoader, false);
+    }
+
+    private ModelAnalyzerFactoryLoaderEnumFactory
+      (final AnalysisOperation operation,
+       final ModelAnalyzerFactoryLoader defaultLoader,
+       final ModelAnalyzerFactoryLoader suppressedLoader,
+       final boolean canBeDisabled)
+    {
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
       for (final ModelAnalyzerFactoryLoader loader :
            ModelAnalyzerFactoryLoader.values()) {
-        if (loader == Disabled && canBeDisabled) {
-          register(loader);
+        if (loader == suppressedLoader) {
+          continue;
+        } else if (loader == Disabled && canBeDisabled) {
+          register(loader, loader == defaultLoader);
         } else {
           try {
             final ModelAnalyzerFactory factory =
@@ -183,7 +204,7 @@ public enum ModelAnalyzerFactoryLoader
             final ModelAnalyzer analyzer =
               operation.createModelAnalyzer(factory, desFactory);
             if (analyzer != null) {
-              register(loader);
+              register(loader, loader == defaultLoader);
             }
           } catch (ClassNotFoundException |
                    AnalysisConfigurationException |
@@ -193,22 +214,12 @@ public enum ModelAnalyzerFactoryLoader
           }
         }
       }
-      findDefault();
-    }
-
-    private ModelAnalyzerFactoryLoaderEnumFactory
-      (final List<ModelAnalyzerFactoryLoader> loaders,
-       final ModelAnalyzerFactoryLoader suppressedLoader)
-    {
-      for (final ModelAnalyzerFactoryLoader loader : loaders) {
-        if (loader != suppressedLoader) {
-          register(loader);
-        }
+      if (getDefaultValue() != defaultLoader) {
+        findDefault();
       }
-      findDefault();
     }
 
-    private void findDefault()
+   private void findDefault()
     {
       for (final ModelAnalyzerFactoryLoader loader : getEnumConstants()) {
         switch (loader) {

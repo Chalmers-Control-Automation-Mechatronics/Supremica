@@ -47,7 +47,7 @@ public class BrowserControl
 			}
 			else if (osName.startsWith("Windows"))
 			{
-				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				Runtime.getRuntime().exec(new String[] {"rundll32", "url.dll,FileProtocolHandler", url});
 			}
 			else
 			{ //assume Unix or Linux

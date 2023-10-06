@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -38,8 +38,10 @@ import java.io.PrintWriter;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.des.DefaultSynchronousProductResult;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 /**
@@ -51,7 +53,8 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  */
 
 public class TRSynchronousProductResult
-  extends DefaultSynchronousProductResult
+  extends MonolithicAnalysisResult
+  implements SynchronousProductResult
 {
 
   //#########################################################################
@@ -60,7 +63,7 @@ public class TRSynchronousProductResult
    * Creates a synchronous product result representing an incomplete run.
    * @param  analyzer The model analyser creating this result.
    */
-  public TRSynchronousProductResult(final ModelAnalyzer analyzer)
+  public TRSynchronousProductResult(final SynchronousProductBuilder analyzer)
   {
     this(analyzer.getClass());
   }
@@ -78,18 +81,6 @@ public class TRSynchronousProductResult
 
   //#########################################################################
   //# Simple Access Methods
-  @Override
-  public TRAutomatonProxy getComputedAutomaton()
-  {
-    return (TRAutomatonProxy) super.getComputedAutomaton();
-  }
-
-  @Override
-  public TRSynchronousProductStateMap getStateMap()
-  {
-    return (TRSynchronousProductStateMap) super.getStateMap();
-  }
-
   /**
    * Gets the number of states that were reduced by means of reducing
    * synchronous composition.
@@ -111,6 +102,56 @@ public class TRSynchronousProductResult
   public void addReducedDiamond()
   {
     mReducedDiamondsCount++;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.AutomatonResult
+  @Override
+  public AutomatonProxy getComputedProxy()
+  {
+    return mComputedAutomaton;
+  }
+
+  @Override
+  public TRAutomatonProxy getComputedAutomaton()
+  {
+    return mComputedAutomaton;
+  }
+
+  @Override
+  public void setComputedProxy(final AutomatonProxy aut)
+  {
+    setSatisfied(aut != null);
+    mComputedAutomaton = (TRAutomatonProxy) aut;
+  }
+
+  @Override
+  public void setComputedAutomaton(final AutomatonProxy aut)
+  {
+    setComputedProxy(aut);
+    setSatisfied(aut != null);
+  }
+
+  @Override
+  public String getResultDescription()
+  {
+    return "synchronous product";
+  }
+
+
+  //#########################################################################
+  //# Interface for net.sourceforge.waters.model.analysis.SynchronousProductResult
+  @Override
+  public TRSynchronousProductStateMap getStateMap()
+  {
+    return mStateMap;
+  }
+
+  @Override
+  public void setStateMap(final SynchronousProductStateMap map)
+  {
+    mStateMap = (TRSynchronousProductStateMap) map;
   }
 
 
@@ -154,6 +195,8 @@ public class TRSynchronousProductResult
 
   //#########################################################################
   //# Data Members
+  private TRAutomatonProxy mComputedAutomaton;
+  private TRSynchronousProductStateMap mStateMap;
   private int mReducedDiamondsCount;
 
 }

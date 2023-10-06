@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="simple_coobs">
+<B:Comment>A test case for coobservability verification.
+The model is coobservable because the plant and specification are identical, but a naive coobservability check could assume that the supervisor may confuse the two states due to the unobservable event u and make a wrong conttol decision.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="u"/>
+<EventDecl Kind="CONTROLLABLE" Name="c"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="plant">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="192" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="64"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="c"/>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="235" Y="78"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="spec">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="96" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="192" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="64"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="c"/>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="235" Y="78"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

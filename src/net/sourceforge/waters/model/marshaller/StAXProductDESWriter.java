@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -42,6 +42,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ConflictKind;
+import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -89,6 +90,17 @@ public class StAXProductDESWriter
     writeStartElement(NAMESPACE, SchemaDES.ELEMENT_ConflictCounterExample);
     writeAttribute(SchemaDES.ATTRIB_Kind,
                    cex.getKind(), ConflictKind.CONFLICT); // TODO use default
+    visitCounterExampleProxy(cex);
+    writeEndElement();
+    return null;
+  }
+
+  @Override
+  public Object visitCoobservabilityCounterExampleProxy
+    (final CoobservabilityCounterExampleProxy cex)
+    throws VisitorException
+  {
+    writeStartElement(NAMESPACE, SchemaDES.ELEMENT_CoobservabilityCounterExample);
     visitCounterExampleProxy(cex);
     writeEndElement();
     return null;

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -92,7 +92,7 @@ public class WatersPopupActionManager
   {
     if (action.isEnabled()) {
       final String key = (String) action.getValue(Action.ACTION_COMMAND_KEY);
-      final int mods = event == null ? 0 : event.getModifiers();
+      final int mods = event == null ? 0 : event.getModifiersEx();
       final ActionEvent newevent =
         new ActionEvent(this, ActionEvent.ACTION_PERFORMED, key, mods);
       action.actionPerformed(newevent);

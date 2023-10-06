@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2021 Robi Malik
+//# Copyright (C) 2004-2023 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,12 +33,12 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 
 /**
@@ -149,7 +149,8 @@ public class BDDModelVerifierFactory
               "The method used to split the transition relation BDD into " +
               "disjunctive components.",
               "-part",
-              TransitionPartitioningStrategy.values()));
+              TransitionPartitioningStrategy.values(),
+              TransitionPartitioningStrategy.AUTOMATA));
     db.register(new EnumOption<VariableOrdering>
              (OPTION_BDDModelAnalyzer_VariableOrdering,
               "Initial variable ordering",

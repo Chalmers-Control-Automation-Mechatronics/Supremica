@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -35,6 +35,9 @@
 
 package org.supremica.gui.ide;
 
+import att.grappa.Graph;
+import att.grappa.GrappaPanel;
+
 import java.awt.Dimension;
 
 import org.supremica.automata.Automaton;
@@ -42,9 +45,6 @@ import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.gui.DotBuilder;
 import org.supremica.gui.DotBuilderGraphObserver;
 import org.supremica.gui.WhiteScrollPane;
-
-import att.grappa.Graph;
-import att.grappa.GrappaPanel;
 
 class AnalyzerAutomatonViewerPanel
     extends WhiteScrollPane
@@ -91,7 +91,7 @@ class AnalyzerAutomatonViewerPanel
 
     private void build()
     {
-        DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
+        DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton));
     }
 
     @Override

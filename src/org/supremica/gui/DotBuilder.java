@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2021 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2023 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,25 +67,41 @@ public class DotBuilder
 	private PrintWriter toDotWriter;
 	private InputStream fromDotStream;
 	private Process dotProcess;
-	private final String dotArguments;
+	private final List<String> dotCommand = new LinkedList<>();
 	Graph theGraph = null;
 
-	private DotBuilder(final DotBuilderStreamObserver theStreamObserver, final DotBuilderGraphObserver theGraphObserver, final AutomataSerializer theSerializer, final String dotArguments)
-	{
-		this.theStreamObserver = theStreamObserver;
-		this.theGraphObserver = theGraphObserver;
-		this.theSerializer = theSerializer;
-		this.dotArguments = dotArguments;
+    private DotBuilder(final DotBuilderStreamObserver theStreamObserver,
+                       final DotBuilderGraphObserver theGraphObserver,
+                       final AutomataSerializer theSerializer,
+                       final List<String> dotArguments)
+    {
+      this.theStreamObserver = theStreamObserver;
+      this.theGraphObserver = theGraphObserver;
+      this.theSerializer = theSerializer;
+      dotCommand.add(Config.DOT_EXECUTE_COMMAND.getValue());
+      if (dotArguments != null) {
+        dotCommand.addAll(dotArguments);
+      }
+      setPriority(Thread.MIN_PRIORITY);
+    }
 
-		setPriority(Thread.MIN_PRIORITY);
-	}
+    public static DotBuilder getDotBuilder(final DotBuilderStreamObserver theStreamObserver,
+                                           final DotBuilderGraphObserver theGraphObserver,
+                                           final AutomataSerializer theSerializer)
+    {
+        return getDotBuilder(theStreamObserver, theGraphObserver, theSerializer, null);
+    }
 
-	public static DotBuilder getDotBuilder(final DotBuilderStreamObserver theStreamObserver, final DotBuilderGraphObserver theGraphObserver, final AutomataSerializer theSerializer, final String dotArguments)
-	{
-		final DotBuilder dotBuilder = new DotBuilder(theStreamObserver, theGraphObserver, theSerializer, dotArguments);
-		dotBuilder.start();
-		return dotBuilder;
-	}
+    public static DotBuilder getDotBuilder(final DotBuilderStreamObserver theStreamObserver,
+                                           final DotBuilderGraphObserver theGraphObserver,
+                                           final AutomataSerializer theSerializer,
+                                           final List<String> dotArguments)
+    {
+        final DotBuilder dotBuilder =
+          new DotBuilder(theStreamObserver, theGraphObserver, theSerializer, dotArguments);
+        dotBuilder.start();
+        return dotBuilder;
+    }
 
 	@Override
   public void run()
@@ -139,7 +157,7 @@ public class DotBuilder
 
 		try
 		{
-			initializeStreams(dotArguments);
+			initializeStreams(dotCommand);
 		}
 		catch (final Exception ex)
 		{
@@ -217,25 +235,23 @@ public class DotBuilder
 		}
 	}
 
-	private void initializeStreams(final String arguments)
+	private void initializeStreams(final List<String> cmd)
 	{
-		final String dot_cmd = Config.DOT_EXECUTE_COMMAND.getValue() + " " + arguments;
-
-		try
-		{
-			dotProcess = Runtime.getRuntime().exec(dot_cmd);
-		}
-		catch (final IOException ex)
-		{
-			logger.error("Cannot run (" + dot_cmd + "). Is dot in the path?", ex);
-			return;
-		}
-
-		final OutputStream pOut = dotProcess.getOutputStream();
-		final BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
-
-		toDotWriter = new PrintWriter(pBuffOut);
-		fromDotStream = dotProcess.getInputStream();
+	  final String[] cmdArray = new String[dotCommand.size()];
+	  dotCommand.toArray(cmdArray);
+	  try
+	  {
+	    dotProcess = Runtime.getRuntime().exec(cmdArray);
+	  }
+	  catch (final IOException ex)
+	  {
+	    logger.error("Cannot run (" + cmdArray + "). Is dot in the path?", ex);
+	    return;
+	  }
+	  final OutputStream pOut = dotProcess.getOutputStream();
+	  final BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
+	  toDotWriter = new PrintWriter(pBuffOut);
+	  fromDotStream = dotProcess.getInputStream();
 	}
 
 }
