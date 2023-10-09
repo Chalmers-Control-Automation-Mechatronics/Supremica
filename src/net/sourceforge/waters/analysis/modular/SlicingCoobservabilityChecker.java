@@ -164,6 +164,7 @@ public class SlicingCoobservabilityChecker
       } catch (final AnalysisConfigurationException exception) {
         throw new WatersRuntimeException(exception);
       }
+    } else {
       super.setOption(option);
     }
   }
