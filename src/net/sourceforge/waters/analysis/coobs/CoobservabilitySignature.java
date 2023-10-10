@@ -139,6 +139,11 @@ public class CoobservabilitySignature
         }
       }
     }
+    final Site site = siteMap.get(defaultSiteName);
+    if (site != null && site.getControlledEvents().isEmpty()) {
+      removeEmptySiteFromEvents(site);
+      mSites.remove(site);
+    }
   }
 
   public CoobservabilitySignature(final CoobservabilitySignature sig)
@@ -581,8 +586,17 @@ public class CoobservabilitySignature
     while (iter.hasNext()) {
       final Site site = iter.next();
       if (site.getControlledEvents().isEmpty()) {
+        removeEmptySiteFromEvents(site);
         iter.remove();
       }
+    }
+  }
+
+  private void removeEmptySiteFromEvents(final Site site)
+  {
+    for (final EventProxy event : site.getObservedEvents()) {
+      final EventInfo info = mEventMap.get(event);
+      info.removeObservingSite(site);
     }
   }
 
@@ -1071,6 +1085,16 @@ public class CoobservabilitySignature
         mObservingSites = new LinkedList<>();
       }
       mObservingSites.add(site);
+    }
+
+    private void removeObservingSite(final Site site)
+    {
+      if (mObservingSites != null) {
+        mObservingSites.remove(site);
+        if (mObservingSites.isEmpty()) {
+          mObservingSites = null;
+        }
+      }
     }
 
     private boolean isTotallyControllable()
