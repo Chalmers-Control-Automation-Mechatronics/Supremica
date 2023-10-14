@@ -153,7 +153,7 @@ public class CommandLineToolTest
   public void testAnalyzer_ModularCoobservability()
     throws Exception
   {
-    final File file = getInputWmod("tests", "coobservability", "fms2016coobs2");
+    final File file = getInputWmod("tests", "coobservability", "fms2016coobs");
     final String[] args = new String[]
       {"-mod", "-coobs", file.toString(), "-stats"};
     testCommandLine("mod-coobs", args, false, "counterexample:",
@@ -168,6 +168,17 @@ public class CommandLineToolTest
     final String[] args = new String[]
       {"-slice", "-coobs", file.toString(), "-ann", annsFile.toString()};
     testCommandLine("slice-coobs", args, true);
+  }
+
+  public void testAnalyzer_ModularCoobservabilityTimeout()
+    throws Exception
+  {
+    final File file = getInputWdes("tests", "coobservability", "verriegel4coobs");
+    final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann2");
+    final String[] args = new String[]
+      {"-mod", "-coobs", file.toString(), "-heuristic", "LateNotAccept",
+       "-ann", annsFile.toString(), "-timeout", "45"};
+    testCommandLine("mod-coobs-timeout", args, "TIMEOUT .*");
   }
 
 

@@ -842,7 +842,7 @@ public class TRMonolithicCoobservabilityChecker
     private void createSuccessorStatesEncodedOrDecoded(final int[] encoded,
                                                        final int[] decoded,
                                                        final int groupIndex)
-      throws OverflowException
+      throws AnalysisException
     {
       if (mReverse) {
         createSuccessorStatesDecoded(decoded, groupIndex);
@@ -955,7 +955,7 @@ public class TRMonolithicCoobservabilityChecker
     private void createSuccessorStatesDecoded
       (final int[] decoded,
        final int groupIndex)
-      throws OverflowException
+      throws AnalysisException
     {
       final AutomatonEventInfo update = mSiteUpdates[groupIndex];
       if (update != null) {

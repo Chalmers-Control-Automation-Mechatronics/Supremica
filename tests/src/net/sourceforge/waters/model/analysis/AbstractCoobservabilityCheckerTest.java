@@ -200,10 +200,10 @@ public abstract class AbstractCoobservabilityCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testFms2016Coobs1() throws Exception
+  public void testFms2016Part() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "coobservability", "fms2016coobs1.wmod");
+      getCompiledDES("tests", "coobservability", "fms2016part.wmod");
     runModelVerifier(des, false);
   }
 

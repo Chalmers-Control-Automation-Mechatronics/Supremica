@@ -975,7 +975,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   protected void createSuccessorStates(final int[] encoded,
                                        final int[] decoded,
                                        final EventInfo event)
-    throws OverflowException
+    throws AnalysisException
   {
     if (mStateCallback == null) {
       final int[] encodedTarget = getEncodedTargetBuffer(encoded);
@@ -1183,7 +1183,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
      final int[] decodedTarget,
      final boolean suppressedSelfloop,
      final AbstractTRMonolithicModelAnalyzer builder)
-    throws OverflowException
+    throws AnalysisException
   {
     if (updateSequence != null) {
       updateSequence.createSuccessorStatesDecoded
@@ -1853,7 +1853,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     public void createSuccessorStatesDecoded
       (final int[] decodedTarget,
        final AbstractTRMonolithicModelAnalyzer builder)
-      throws OverflowException
+      throws AnalysisException
     {
       final boolean selfloopOnly = EventStatus.isSelfloopOnlyEvent(mStatus);
       AbstractTRMonolithicModelAnalyzer.createSuccessorStatesDecoded
@@ -2157,7 +2157,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
        final int[] decodedTarget,
        final boolean suppressedSelfloop,
        final AbstractTRMonolithicModelAnalyzer builder)
-      throws OverflowException
+      throws AnalysisException
     {
       final int source = mTransitionIterator.getCurrentSourceState();
       if (mDeterministic) {
@@ -2173,6 +2173,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
       } else {
         mTransitionIterator.reset();
         while (mTransitionIterator.advance()) {
+          builder.checkAbort();
           final int target = mTransitionIterator.getCurrentTargetState();
           if (builder.isDeadlockState(mAutomatonIndex, target)) {
             builder.createDeadlockTransition(event);
