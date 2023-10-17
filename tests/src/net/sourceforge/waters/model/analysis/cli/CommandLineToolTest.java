@@ -173,7 +173,7 @@ public class CommandLineToolTest
   public void testAnalyzer_ModularCoobservabilityTimeout()
     throws Exception
   {
-    final File file = getInputWdes("tests", "coobservability", "verriegel4coobs");
+    final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
     final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann2");
     final String[] args = new String[]
       {"-mod", "-coobs", file.toString(), "-heuristic", "LateNotAccept",
