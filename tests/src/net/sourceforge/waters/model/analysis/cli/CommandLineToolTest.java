@@ -160,6 +160,18 @@ public class CommandLineToolTest
                     "Statistics:", "Number of supervisor sites in model: .*");
   }
 
+  public void testAnalyzer_ModularCoobservabilityTimeout()
+    throws Exception
+  {
+    final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
+    final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann2");
+    final String[] args = new String[]
+      {"-mod", "-coobs", file.toString(), "-ann", annsFile.toString(),
+       "-heuristic", "LateNotAccept", "-chain", "-trmono", "-ndm",
+       "-timeout", "30"};
+    testCommandLine("mod-coobs-timeout", args, "!true.*", "TIMEOUT \\(.*");
+  }
+
   public void testAnalyzer_SlicingCoobservability()
     throws Exception
   {
@@ -168,17 +180,6 @@ public class CommandLineToolTest
     final String[] args = new String[]
       {"-slice", "-coobs", file.toString(), "-ann", annsFile.toString()};
     testCommandLine("slice-coobs", args, true);
-  }
-
-  public void testAnalyzer_ModularCoobservabilityTimeout()
-    throws Exception
-  {
-    final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
-    final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann2");
-    final String[] args = new String[]
-      {"-mod", "-coobs", file.toString(), "-heuristic", "LateNotAccept",
-       "-ann", annsFile.toString(), "-timeout", "45"};
-    testCommandLine("mod-coobs-timeout", args, "TIMEOUT .*");
   }
 
 

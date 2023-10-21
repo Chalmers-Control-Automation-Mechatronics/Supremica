@@ -860,6 +860,11 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     return mStateTupleEncoding;
   }
 
+  protected int getStateTupleSize()
+  {
+    return mTRAutomata.length;
+  }
+
   protected IntArrayBuffer getStateSpace()
   {
     return mStateSpace;

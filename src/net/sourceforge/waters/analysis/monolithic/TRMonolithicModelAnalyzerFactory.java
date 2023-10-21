@@ -36,6 +36,8 @@ package net.sourceforge.waters.analysis.monolithic;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.AnalysisOptionPage;
+import net.sourceforge.waters.model.options.BooleanOption;
 
 
 /**
@@ -106,4 +108,25 @@ public class TRMonolithicModelAnalyzerFactory
     return new TRSynchronousProductBuilder();
   }
 
+
+  @Override
+  public void registerOptions(final AnalysisOptionPage db)
+  {
+    super.registerOptions(db);
+    db.register(new BooleanOption
+             (OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled,
+              "Use depth map",
+              "Use depth map rather than reverse transition expansion " +
+              "when computing counterexample " +
+              "(slower on average but guranteed linear worst case).",
+              "-dm",
+              true));
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String
+    OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled =
+    "AbstractTRMonolithicModelVerifier.DepthMapEnabled";
 }

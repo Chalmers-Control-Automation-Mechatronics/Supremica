@@ -156,6 +156,12 @@ public abstract class TRMonolithicSafetyVerifier
     return false;
   }
 
+  @Override
+  protected int getTraceDepth(final int target)
+  {
+    return getDepthMapSize() - 2;
+  }
+
 
   //#########################################################################
   //# Counterexamples

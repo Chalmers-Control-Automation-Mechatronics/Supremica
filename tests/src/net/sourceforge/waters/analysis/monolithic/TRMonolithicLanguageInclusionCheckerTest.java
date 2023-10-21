@@ -67,7 +67,10 @@ public class TRMonolithicLanguageInclusionCheckerTest
   protected LanguageInclusionChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new TRMonolithicLanguageInclusionChecker();
+    final TRMonolithicLanguageInclusionChecker checker =
+      new TRMonolithicLanguageInclusionChecker();
+    checker.setDepthMapEnabled(false);
+    return checker;
   }
 
 }

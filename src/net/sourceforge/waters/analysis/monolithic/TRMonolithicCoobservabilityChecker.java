@@ -288,6 +288,12 @@ public class TRMonolithicCoobservabilityChecker
   }
 
   @Override
+  protected int getStateTupleSize()
+  {
+    return mTRAutomataExtended.length;
+  }
+
+  @Override
   protected int storeInitialStates()
     throws AnalysisException
   {
@@ -306,6 +312,12 @@ public class TRMonolithicCoobservabilityChecker
     } else {
       return setFailedResult(null);
     }
+  }
+
+  @Override
+  protected int getTraceDepth(final int target)
+  {
+    return getDepthMapSize() - 2;
   }
 
   @Override
@@ -373,14 +385,14 @@ public class TRMonolithicCoobservabilityChecker
    }
 
     // Intermediate trace steps
-    final CounterExampleCallback callback = prepareForCounterExample();
-    final int numInit = getNumberOfInitialStates();
     int target = s;
+    final CounterExampleCallback callback = prepareForCounterExample(target);
+    final int numInit = getNumberOfInitialStates();
     // Until we reach the start state ...
     while (target >= numInit) {
-      expandState(encoded, decodedTarget, callback);
-      eventInfo = (CoobservabilityEventInfo) callback.getSmallestStateEvent();
-      final int source = callback.getSmallestStateIndex();
+      callback.findPredecessor(target);
+      eventInfo = (CoobservabilityEventInfo) callback.getFoundEvent();
+      final int source = callback.getFoundSource();
       assert source < target;
       stateSpace.getContents(source, encoded);
       encoding.decode(encoded, decodedSource);
@@ -844,7 +856,7 @@ public class TRMonolithicCoobservabilityChecker
                                                        final int groupIndex)
       throws AnalysisException
     {
-      if (mReverse) {
+      if (getStateCallback() != null) {
         createSuccessorStatesDecoded(decoded, groupIndex);
       } else {
         createSuccessorStatesEncoded(encoded, groupIndex);

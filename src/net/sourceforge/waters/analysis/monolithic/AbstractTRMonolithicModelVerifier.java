@@ -33,13 +33,18 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -87,11 +92,26 @@ public abstract class AbstractTRMonolithicModelVerifier
 
 
   //#########################################################################
+  //# Configuration
+  public void setDepthMapEnabled(final boolean enabled)
+  {
+    mDepthMapEnabled = enabled;
+  }
+
+  public boolean isDepthMapEnabled()
+  {
+    return mDepthMapEnabled;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
   public List<Option<?>> getOptions(final LeafOptionPage db)
   {
     final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, TRMonolithicModelAnalyzerFactory.
+                        OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_DetailedOutputEnabled);
     return options;
@@ -104,6 +124,10 @@ public abstract class AbstractTRMonolithicModelVerifier
                      OPTION_ModelVerifier_DetailedOutputEnabled)) {
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(TRMonolithicModelAnalyzerFactory.
+                            OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDepthMapEnabled(boolOption.getBooleanValue());
     } else {
       super.setOption(option);
     }
@@ -219,19 +243,62 @@ public abstract class AbstractTRMonolithicModelVerifier
 
 
   //#########################################################################
-  //# Counterexamples
+  //# Depth Map
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    if (mDepthMapEnabled) {
+      mDepthMap = new TIntArrayList();
+    }
+  }
+
+  @Override
+  protected void exploreStateSpace()
+    throws AnalysisException
+  {
+    if (mDepthMap == null) {
+      super.exploreStateSpace();
+    } else {
+      final AnalysisResult result = getAnalysisResult();
+      final IntArrayBuffer stateSpace = getStateSpace();
+      mDepthMap.add(0);
+      int current = 0;
+      int nextLevel = storeInitialStates();
+      while (current < nextLevel && !result.isFinished()) {
+        mDepthMap.add(nextLevel);
+        for (; current < nextLevel && !result.isFinished(); current++) {
+          checkAbort();
+          expandState(current);
+        }
+        nextLevel = stateSpace.size();
+      }
+    }
+  }
+
   @Override
   protected void tearDown()
   {
     setStateCallback(null);
+    mDepthMap = null;
     super.tearDown();
   }
 
-  protected CounterExampleCallback prepareForCounterExample()
+
+  //#########################################################################
+  //# Counterexamples
+  protected CounterExampleCallback prepareForCounterExample(final int target)
     throws AnalysisException
   {
-    setUpReverseTransitions();
-    final CounterExampleCallback callback = new CounterExampleCallback();
+    final CounterExampleCallback callback;
+    if (mDepthMap == null) {
+      setUpReverseTransitions();
+      callback = new BackwardCounterExampleCallback();
+    } else {
+      final int depth = getTraceDepth(target);
+      callback = new ForwardCounterExampleCallback(depth);
+    }
     setStateCallback(callback);
     return callback;
   }
@@ -239,57 +306,63 @@ public abstract class AbstractTRMonolithicModelVerifier
   protected List<TraceStepProxy> buildTraceToBadState(int target)
     throws AnalysisException
   {
-    final CounterExampleCallback callback = prepareForCounterExample();
-    final AutomatonProxy[] automataArray= getTRAutomata();
-    final int numAut = automataArray.length;
+    final CounterExampleCallback callback = prepareForCounterExample(target);
+    final int numAut = getStateTupleSize();
     final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(numAut);
     final int numInit = getNumberOfInitialStates();
     final ProductDESProxyFactory factory = getFactory();
-    final int[] encodedSource =
-      new int[getStateTupleEncoding().getNumberOfWords()];
-    final int[] decodedSource = new int[numAut];
     final List<TraceStepProxy> steps = new LinkedList<>();
 
     // Until we reach the start state...
-    do {
-      getStateSpace().getContents(target, encodedSource);
-      getStateTupleEncoding().decode(encodedSource, decodedSource);
-      expandState(encodedSource, decodedSource, callback);
-      final int next = callback.getSmallestStateIndex();
-      for (int i = 0; i < automataArray.length; i++) {
-        final AutomatonProxy aut = getInputAutomaton(i);
-        final int s = decodedSource[i];
-        final StateProxy state = getInputState(i, s);
-        stateMap.put(aut, state);
-      }
-      final TraceStepProxy step;
-      if (target >= numInit) {
-        final EventInfo eventInfo = callback.getSmallestStateEvent();
-        final EventProxy event = eventInfo.getEvent();
-        step = factory.createTraceStepProxy(event, stateMap);
-        stateMap.clear();
-        target = next;
-      } else {
-        step = factory.createTraceStepProxy(null, stateMap);
-        target = -1;
-      }
+    while (target >= numInit) {
+      callback.findPredecessor(target);
+      final EventInfo eventInfo = callback.getFoundEvent();
+      final EventProxy event = eventInfo.getEvent();
+      callback.populateStateMap(target, stateMap);
+      final TraceStepProxy step = factory.createTraceStepProxy(event, stateMap);
       steps.add(0, step);
-    } while (target >= 0);
+      stateMap.clear();
+      target = callback.getFoundSource();
+    }
+    callback.populateStateMap(target, stateMap);
+    final TraceStepProxy step = factory.createTraceStepProxy(null, stateMap);
+    steps.add(0, step);
     return steps;
   }
+
+  protected int getTraceDepth(final int target)
+  {
+    int lo = 0;
+    int up = getDepthMapSize() - 2;
+    while (lo < up) {
+      final int mid = (lo + up) >> 1;
+      if (mDepthMap.get(mid + 1) <= target) {
+        lo = mid + 1;
+      } else {
+        up = mid;
+      }
+    }
+    return lo;
+  }
+
+  protected int getDepthMapSize()
+  {
+    return mDepthMap.size();
+  }
+
 
   /**
    * Expands the given state for counterexample search.
    * This method calculates all transitions originating from the given state
    * recording the reached state with the smallest index and the associated
-   * event using a {@link CounterExampleCallback}.
+   * event using a {@link BackwardCounterExampleCallback}.
    * @param  encoded  Compressed state tuple to be expanded.
    * @param  decoded  Decompressed version of the same state tuple.
    * @param  callback Counterexample callback in use.
    */
   protected void expandState(final int[] encoded,
                              final int[] decoded,
-                             final CounterExampleCallback callback)
+                             final BackwardCounterExampleCallback callback)
     throws AnalysisException
   {
     for (final EventInfo info : getEventInfo()) {
@@ -303,36 +376,148 @@ public abstract class AbstractTRMonolithicModelVerifier
 
   //#########################################################################
   //# Inner Class CounterExampleCallback
-  protected class CounterExampleCallback implements StateCallback
+  abstract class CounterExampleCallback implements StateCallback
   {
-
     //#######################################################################
     //# Constructor
     private CounterExampleCallback()
     {
-      final int size = getStateTupleEncoding().getNumberOfWords();
-      mEncoded = new int[size];
-      mSmallestStateIndex = getCurrentSource();
+      final int numWords = getStateTupleEncoding().getNumberOfWords();
+      final int tupleSize = getStateTupleSize();
+      mEncodedSource = new int[numWords];
+      mDecodedSource = new int[tupleSize];
+      mEncodedTarget = new int[numWords];
+      mFoundSource = Integer.MAX_VALUE;
+      mFoundEvent = null;
+    }
+
+    //#######################################################################
+    //# Hooks
+    abstract void findPredecessor(int target) throws AnalysisException;
+
+    //#######################################################################
+    //# Auxiliary Methods
+    int[] getEncodedSource()
+    {
+      return mEncodedSource;
+    }
+
+    int[] getDecodedSource()
+    {
+      return mDecodedSource;
+    }
+
+    void setFound(final int source, final EventInfo event)
+    {
+      mFoundSource = source;
+      mFoundEvent = event;
+    }
+
+    int getFoundSource()
+    {
+      return mFoundSource;
+    }
+
+    void populateStateMap(final int target,
+                          final Map<AutomatonProxy,StateProxy> stateMap)
+    {
+      final TRAutomatonProxy[] automataArray = getTRAutomata();
+      getStateSpace().getContents(target, mEncodedSource);
+      getStateTupleEncoding().decode(mEncodedSource, mDecodedSource);
+      for (int i = 0; i < automataArray.length; i++) {
+        final AutomatonProxy aut = getInputAutomaton(i);
+        final int s = mDecodedSource[i];
+        final StateProxy state = getInputState(i, s);
+        stateMap.put(aut, state);
+      }
+    }
+
+    EventInfo getFoundEvent()
+    {
+      return mFoundEvent;
+    }
+
+    int getStateIndex(final int[] decoded)
+    {
+      getStateTupleEncoding().encode(decoded, mEncodedTarget);
+      return getStateSpace().getIndex(mEncodedTarget);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int[] mEncodedSource;
+    private final int[] mDecodedSource;
+    private final int[] mEncodedTarget;
+    private int mFoundSource;
+    private EventInfo mFoundEvent;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ForwardCounterExampleCallback
+  private class ForwardCounterExampleCallback extends CounterExampleCallback
+  {
+    //#######################################################################
+    //# Constructor
+    private ForwardCounterExampleCallback(final int depth)
+    {
+      mLevel = depth - 1;
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.monolithic.
+    //# AbstractTRMonolithicModelVerifier.CounterExampleCallback
+    @Override
+    void findPredecessor(final int target)
+      throws AnalysisException
+    {
+      mTarget = target;
+      mFound = false;
+      final int[] encodedSource = getEncodedSource();
+      final int[] decodedSource = getDecodedSource();
+      final int start = mDepthMap.get(mLevel);
+      final int end = mDepthMap.get(mLevel + 1);
+      outer:
+      for (int s = start; s < end; s++) {
+        getStateSpace().getContents(s, encodedSource);
+        getStateTupleEncoding().decode(encodedSource, decodedSource);
+        for (final EventInfo event : getEventInfo()) {
+          event.expandState(encodedSource, decodedSource);
+          if (mFound) {
+            setFound(s, event);
+            break outer;
+          }
+        }
+      }
+      assert mFound;
+      mLevel--;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.monolithic.
     //# TRAbstractModelAnalyzer.StateCallback
     @Override
-    public boolean newState(final int[] tuple)
+    public boolean newState(final int[] decoded)
       throws OverflowException
     {
-      getStateTupleEncoding().encode(tuple, mEncoded);
-      final int currentStateIndex = getStateSpace().getIndex(mEncoded);
-      // if -1; then not visited, so skip
-      if (currentStateIndex != -1 &&
-          currentStateIndex < mSmallestStateIndex) {
-        mSmallestStateIndex = currentStateIndex;
-        mSmallestStateEvent = mCurrentEvent;
+      if (getStateIndex(decoded) == mTarget) {
+        mFound = true;
       }
       return false;
     }
 
+    //#######################################################################
+    //# Data Members
+    private int mLevel;
+    private int mTarget;
+    private boolean mFound;
+  }
+
+
+  //#########################################################################
+  //# Inner Class BackwardCounterExampleCallback
+  protected class BackwardCounterExampleCallback extends CounterExampleCallback
+  {
     //#######################################################################
     //# Simple Access
     public void setEvent(final EventInfo info)
@@ -340,22 +525,45 @@ public abstract class AbstractTRMonolithicModelVerifier
       mCurrentEvent = info;
     }
 
-    public int getSmallestStateIndex()
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.monolithic.
+    //# AbstractTRMonolithicModelVerifier.CounterExampleCallback
+    @Override
+    void findPredecessor(final int target)
+      throws AnalysisException
     {
-      return mSmallestStateIndex;
+      final int[] encodedSource = getEncodedSource();
+      final int[] decodedSource = getDecodedSource();
+      getStateSpace().getContents(target, encodedSource);
+      getStateTupleEncoding().decode(encodedSource, decodedSource);
+      expandState(encodedSource, decodedSource, this);
     }
 
-    public EventInfo getSmallestStateEvent()
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.monolithic.
+    //# TRAbstractModelAnalyzer.StateCallback
+    @Override
+    public boolean newState(final int[] decoded)
+      throws OverflowException
     {
-      return mSmallestStateEvent;
+      final int currentStateIndex = getStateIndex(decoded);
+      // if -1; then not visited, so skip
+      if (currentStateIndex != -1 &&
+          currentStateIndex < getFoundSource()) {
+        setFound(currentStateIndex, mCurrentEvent);
+      }
+      return false;
     }
 
     //#######################################################################
     //# Data Members
-    private final int[] mEncoded;
-    private int mSmallestStateIndex;
     private EventInfo mCurrentEvent;
-    private EventInfo mSmallestStateEvent;
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private boolean mDepthMapEnabled = true;
+  private TIntArrayList mDepthMap;
 
 }
