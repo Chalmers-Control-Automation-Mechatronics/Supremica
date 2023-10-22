@@ -160,16 +160,14 @@ public class CommandLineToolTest
                     "Statistics:", "Number of supervisor sites in model: .*");
   }
 
-  public void testAnalyzer_ModularCoobservabilityTimeout()
+  public void testAnalyzer_ModularCoobservabilityHeuritics()
     throws Exception
   {
-    final File file = getInputWmod("tests", "coobservability", "verriegel4coobs");
-    final File annsFile = getInputCann("tests", "coobservability", "verriegel4ann2");
+    final File file = getInputWmod("tests", "coobservability", "fms2016coobs");
     final String[] args = new String[]
-      {"-mod", "-coobs", file.toString(), "-ann", annsFile.toString(),
-       "-heuristic", "LateNotAccept", "-chain", "-trmono", "-ndm",
-       "-timeout", "30"};
-    testCommandLine("mod-coobs-timeout", args, "!true.*", "TIMEOUT \\(.*");
+      {"-mod", "-coobs", file.toString(),
+       "-heuristic", "MaxCommonEvents,Oops,MinStates"};
+    testCommandLine("mod-coobs-comma", args, "Unsupported value 'Oops' for .*");
   }
 
   public void testAnalyzer_SlicingCoobservability()

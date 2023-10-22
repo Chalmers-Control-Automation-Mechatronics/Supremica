@@ -61,6 +61,7 @@ import net.sourceforge.waters.model.options.ColorOption;
 import net.sourceforge.waters.model.options.ComponentKindOption;
 import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.model.options.DoubleOption;
+import net.sourceforge.waters.model.options.EnumListOption;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.model.options.FileOption;
@@ -141,6 +142,13 @@ public class CommandLineOptionContext implements OptionContext
   public <E> OptionEditor<E> createEnumEditor(final EnumOption<E> option)
   {
     return new EnumCommandLineArgument<E>(option);
+  }
+
+  @Override
+  public <E> OptionEditor<List<E>>
+  createEnumListEditor(final EnumListOption<E> option)
+  {
+    return new EnumListCommandLineArgument<E>(option);
   }
 
   @Override

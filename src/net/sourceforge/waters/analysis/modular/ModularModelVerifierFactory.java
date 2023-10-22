@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.EnumListOption;
 import net.sourceforge.waters.model.options.EnumOption;
 
 
@@ -111,21 +112,13 @@ public class ModularModelVerifierFactory
   public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
-    db.register(new EnumOption<HeuristicFactory.Method>
+    db.register(new EnumListOption<HeuristicFactory.Method>
              (OPTION_AbstractModularVerifier_HeuristicMethod,
               "Heuristic Method",
               "Strategy to select additional components when a subsystem " +
               "fails the check during modular verification.",
               "-heuristic",
-              HeuristicFactory.Method.values(),
-              HeuristicFactory.Method.MaxCommonEvents));
-    db.register(new EnumOption<HeuristicFactory.Preference>
-             (OPTION_AbstractModularVerifier_HeuristicPreference,
-              "Heuristic Preference",
-              "What kind of plants are selected preferentially by the heuristic.",
-              "-preference",
-              HeuristicFactory.Preference.values(),
-              HeuristicFactory.Preference.NOPREF));
+              HeuristicFactory.getInstance()));
     db.register(new BooleanOption
              (OPTION_AbstractModularVerifier_CollectsFailedSpecs,
               "Collect failed specifications",
@@ -219,9 +212,6 @@ public class ModularModelVerifierFactory
   public static final String
     OPTION_AbstractModularVerifier_HeuristicMethod =
     "AbstractModularSafetyVerifier.HeuristicMethod"; // legacy name
-  public static final String
-    OPTION_AbstractModularVerifier_HeuristicPreference =
-    "AbstractModularSafetyVerifier.HeuristicPreference"; // legacy name
   public static final String
     OPTION_AbstractModularVerifier_StartsWithSmallestSpec =
     "ModularControllabilityChecker.StartsWithSmallestSpec"; // legacy name

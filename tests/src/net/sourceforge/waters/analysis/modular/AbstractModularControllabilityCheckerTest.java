@@ -57,11 +57,6 @@ public abstract class AbstractModularControllabilityCheckerTest
   //# Hooks
   protected abstract HeuristicFactory.Method getHeuristicMethod();
 
-  protected HeuristicFactory.Preference getHeuristicPreference()
-  {
-    return HeuristicFactory.Preference.NOPREF;
-  }
-
   protected ControllabilityChecker createMonolithicChecker
     (final ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException
@@ -85,7 +80,6 @@ public abstract class AbstractModularControllabilityCheckerTest
       ModularModelVerifierFactory.getInstance();
     final ModularControllabilityChecker checker =
       modularFactory.createControllabilityChecker(desFactory);
-    checker.setHeuristicPreference(getHeuristicPreference());
     checker.setHeuristicMethod(getHeuristicMethod());
     checker.setCollectsFailedSpecs(true);
     checker.setMonolithicVerifier(mono);

@@ -55,9 +55,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  * heuristic used by the {@link AbstractModularVerifier} and its
  * subclasses.</P>
  *
- * <P>The heuristic evaluator combines the heuristic preference ({@link
- * net.sourceforge.waters.analysis.modular.HeuristicFactory.Preference})
- * and heuristic method ({@link
+ * <P>The heuristic evaluator combines the heuristic method ({@link
  * net.sourceforge.waters.analysis.modular.HeuristicFactory.Method}) that
  * defines the component selection strategy with a {@link
  * HeuristicTraceChecker} that determines whether a component is deemed to
@@ -75,20 +73,17 @@ class HeuristicEvaluator
   //#########################################################################
   //# Constructor
   HeuristicEvaluator(final KindTranslator translator,
-                     final HeuristicFactory.Preference pref,
                      final HeuristicValueProvider heuristics,
                      final HeuristicTraceChecker checker)
   {
-    this(translator, pref, Collections.singletonList(heuristics), checker);
+    this(translator, Collections.singletonList(heuristics), checker);
   }
 
   HeuristicEvaluator(final KindTranslator translator,
-                     final HeuristicFactory.Preference pref,
                      final List<HeuristicValueProvider> heuristics,
                      final HeuristicTraceChecker checker)
   {
     mKindTranslator = translator;
-    mPreference = pref;
     mHeuristics = heuristics;
     mTraceChecker = checker;
     mTraceFinders = new HashMap<AutomatonProxy,TraceFinder>();
@@ -100,11 +95,6 @@ class HeuristicEvaluator
   KindTranslator getKindTranslator()
   {
     return mKindTranslator;
-  }
-
-  HeuristicFactory.Preference getPreference()
-  {
-    return mPreference;
   }
 
   String getName()
@@ -200,7 +190,7 @@ class HeuristicEvaluator
       aut = findFirstNonAccepting(counter, specPlants, ComponentKind.PLANT);
     }
     if (aut == null) {
-      aut = findFirstNonAccepting(counter, specs, ComponentKind.PLANT);
+      aut = findFirstNonAccepting(counter, specs, ComponentKind.SPEC);
     }
     return aut;
   }
@@ -230,30 +220,9 @@ class HeuristicEvaluator
                          final Collection<A> specPlants,
                          final Collection<A> specs)
   {
-    A best = null;
-    switch (mPreference) {
-    case NOPREF:
-      best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
-      best = findBestNonAccepting(counter, specPlants, ComponentKind.PLANT, best);
-      best = findBestNonAccepting(counter, specs, ComponentKind.PLANT, best);
-      break;
-    case PREFER_PLANT:
-      best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
-      best = findBestNonAccepting(counter, specPlants, ComponentKind.PLANT, best);
-      if (best == null) {
-        best = findBestNonAccepting(counter, specs, ComponentKind.PLANT, best);
-      }
-      break;
-    case PREFER_REAL_PLANT:
-      best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
-      if (best == null) {
-        best = findBestNonAccepting(counter, specPlants, ComponentKind.PLANT, best);
-      }
-      if (best == null) {
-        best = findBestNonAccepting(counter, specs, ComponentKind.PLANT, best);
-      }
-      break;
-    }
+    A best = findBestNonAccepting(counter, realPlants, ComponentKind.PLANT);
+    best = findBestNonAccepting(counter, specPlants, ComponentKind.PLANT, best);
+    best = findBestNonAccepting(counter, specs, ComponentKind.SPEC, best);
     return best;
   }
 
@@ -264,29 +233,9 @@ class HeuristicEvaluator
                                        final Collection<A> specs)
   {
     final Collection<A> output = new LinkedList<>();
-    switch (mPreference) {
-    case NOPREF:
-      collectAllNonAccepting(counter, realPlants, output, ComponentKind.PLANT);
-      collectAllNonAccepting(counter, specPlants, output, ComponentKind.PLANT);
-      collectAllNonAccepting(counter, specs, output, ComponentKind.SPEC);
-      break;
-    case PREFER_PLANT:
-      collectAllNonAccepting(counter, realPlants, output, ComponentKind.PLANT);
-      collectAllNonAccepting(counter, specPlants, output, ComponentKind.PLANT);
-      if (!output.isEmpty()) {
-        collectAllNonAccepting(counter, specs, output, ComponentKind.SPEC);
-      }
-      break;
-    case PREFER_REAL_PLANT:
-      collectAllNonAccepting(counter, realPlants, output, ComponentKind.PLANT);
-      if (!output.isEmpty()) {
-        collectAllNonAccepting(counter, specPlants, output, ComponentKind.PLANT);
-      }
-      if (!output.isEmpty()) {
-        collectAllNonAccepting(counter, specs, output, ComponentKind.SPEC);
-      }
-      break;
-    }
+    collectAllNonAccepting(counter, realPlants, output, ComponentKind.PLANT);
+    collectAllNonAccepting(counter, specPlants, output, ComponentKind.PLANT);
+    collectAllNonAccepting(counter, specs, output, ComponentKind.SPEC);
     return output;
   }
 
@@ -366,7 +315,6 @@ class HeuristicEvaluator
   //#########################################################################
   //# Data Members
   private final KindTranslator mKindTranslator;
-  private final HeuristicFactory.Preference mPreference;
   private final List<HeuristicValueProvider> mHeuristics;
   private final HeuristicTraceChecker mTraceChecker;
   private final Map<AutomatonProxy,TraceFinder> mTraceFinders;

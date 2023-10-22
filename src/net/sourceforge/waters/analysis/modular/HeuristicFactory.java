@@ -82,18 +82,16 @@ public class HeuristicFactory
     return method.createProvider();
   }
 
-  public HeuristicEvaluator createEvaluator(final Preference pref,
-                                            final Method method,
+  public HeuristicEvaluator createEvaluator(final Method method,
                                             final KindTranslator translator,
                                             final HeuristicTraceChecker checker)
   {
     final List<HeuristicValueProvider> providers =
       method.getListWithAlternatives();
-    return new HeuristicEvaluator(translator, pref, providers, checker);
+    return new HeuristicEvaluator(translator, providers, checker);
   }
 
-  public HeuristicEvaluator createEvaluator(final Preference pref,
-                                            final List<Method> methods,
+  public HeuristicEvaluator createEvaluator(final List<Method> methods,
                                             final KindTranslator translator,
                                             final HeuristicTraceChecker checker)
   {
@@ -103,7 +101,7 @@ public class HeuristicFactory
       final HeuristicValueProvider provider = method.createProvider();
       providers.add(provider);
     }
-    return new HeuristicEvaluator(translator, pref, providers, checker);
+    return new HeuristicEvaluator(translator, providers, checker);
   }
 
 
@@ -310,8 +308,7 @@ public class HeuristicFactory
       @Override
       public HeuristicValueProvider createProvider()
       {
-        return new KindPreferenceHeuristicValueProvider
-          (this, Preference.PREFER_PLANT);
+        return new PlantPreferenceHeuristicValueProvider(this, false);
       }
       @Override
       public List<HeuristicValueProvider> getListWithAlternatives()
@@ -323,8 +320,7 @@ public class HeuristicFactory
       @Override
       public HeuristicValueProvider createProvider()
       {
-        return new KindPreferenceHeuristicValueProvider
-          (this, Preference.PREFER_REAL_PLANT);
+        return new PlantPreferenceHeuristicValueProvider(this, true);
       }
       @Override
       public List<HeuristicValueProvider> getListWithAlternatives()
@@ -375,7 +371,8 @@ public class HeuristicFactory
       return Collections.singletonList(provider);
     }
 
-    public List<HeuristicValueProvider> getListWithAlternatives(final Method... methods)
+    public List<HeuristicValueProvider> getListWithAlternatives
+      (final Method... methods)
     {
       final List<HeuristicValueProvider> list =
         new ArrayList<>(methods.length + 1);
@@ -389,15 +386,6 @@ public class HeuristicFactory
       }
       return list;
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Enumeration Method
-  public enum Preference {
-    NOPREF,
-    PREFER_PLANT,
-    PREFER_REAL_PLANT
   }
 
 

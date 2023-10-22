@@ -356,9 +356,11 @@ public class TraceFinder
       if (mTotalAcceptedSteps >= 0) {
         mTotalAcceptedSteps += subResult.mTotalAcceptedSteps;
       }
-      if (mFirstAcceptedSteps < -1) {
+      if (traceIndex == 0) {
         mFirstAcceptedSteps = subResult.mFirstAcceptedSteps;
         mFinalStepSpecFailure = subResult.mFinalStepSpecFailure;
+      } else {
+        mFinalStepSpecFailure &= subResult.mAccepted;
       }
       mAccepted &= subResult.mAccepted;
       if (mPaths != null) {

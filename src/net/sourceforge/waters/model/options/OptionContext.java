@@ -99,6 +99,13 @@ public interface OptionContext
   createEnumEditor(EnumOption<E> option);
 
   /**
+   * Creates an option editor for an option representing a list of enumerated
+   * items.
+   */
+  public <E> OptionEditor<List<E>>
+  createEnumListEditor(EnumListOption<E> option);
+
+  /**
    * Creates an option editor for an event set option.
    */
   public OptionEditor<Set<EventProxy>>

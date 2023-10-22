@@ -31,80 +31,69 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.cli;
 
-import java.io.PrintStream;
-import java.util.ListIterator;
+package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.options.EnumOption;
+import java.util.Collection;
 
-/**
- *
- * @author Benjamin Wheeler
- */
-public class EnumCommandLineArgument<E> extends OptionCommandLineArgument<E>
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
+
+public class PlantPreferenceHeuristicValueProvider
+  extends DefaultHeuristicValueProvider
 {
 
-  //#######################################################################
+  //#########################################################################
   //# Constructor
-  public EnumCommandLineArgument(final EnumOption<E> option)
+  public PlantPreferenceHeuristicValueProvider(final HeuristicFactory.Method method,
+                                               final boolean realPlant)
   {
-    super(option);
-  }
-
-
-  //#######################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.analysis.cli.CommandLineArgument
-  @Override
-  public EnumOption<E> getOption()
-  {
-    return (EnumOption<E>) super.getOption();
-  }
-
-  @Override
-  protected String getArgumentTemplate()
-  {
-    return "<value>";
+    super(method);
+    mPreferringRealPlants = realPlant;
   }
 
 
   //#########################################################################
-  //# Parsing
+  //# Interface net.sourceforge.waters.analysis.modular.HeuristicValueProvider
   @Override
-  public void parse(final CommandLineOptionContext context,
-                    final ListIterator<String> iter)
-    throws AnalysisException
+  public void setContext(final ProductDESProxy des,
+                         final KindTranslator translator,
+                         final CounterExampleProxy counter,
+                         final Collection<? extends AutomatonProxy> realPlants,
+                         final Collection<? extends AutomatonProxy> specPlants,
+                         final Collection<? extends AutomatonProxy> specs)
   {
-    iter.remove();
-    if (iter.hasNext()) {
-      final EnumOption<E> option = getOption();
-      final String arg = iter.next();
-      try {
-        option.set(arg);
-      } catch (final ParseException exception) {
-        System.err.println(exception.getMessage());
-        option.dumpEnumeration(System.err, 0);
-        ExitException.testFriendlyExit(1);
+    mRealPlants = realPlants;
+    mSpecPlants = specPlants;
+  }
+
+  @Override
+  public float getHeuristicValue(final HeuristicEvaluator evaluator,
+                                 final AutomatonProxy aut)
+  {
+    if (mPreferringRealPlants) {
+      if (mRealPlants.contains(aut)) {
+        return -2;
+      } else if (mSpecPlants.contains(aut)) {
+        return -1;
       }
-      iter.remove();
-      setUsed(true);
     } else {
-      failMissingValue();
+      if (mRealPlants.contains(aut) || mSpecPlants.contains(aut)) {
+        return -1;
+      }
     }
+    return 0;
   }
 
 
   //#########################################################################
-  //# Printing
-  @Override
-  public void dump(final PrintStream stream)
-  {
-    super.dump(stream);
-    final EnumOption<E> option = getOption();
-    option.dumpEnumeration(stream, INDENT);
-  }
+  //# Data Members
+  private final boolean mPreferringRealPlants;
+
+  private Collection<? extends AutomatonProxy> mRealPlants;
+  private Collection<? extends AutomatonProxy> mSpecPlants;
 
 }

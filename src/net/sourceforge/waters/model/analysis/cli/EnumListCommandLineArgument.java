@@ -31,74 +31,87 @@
 //# exception.
 //###########################################################################
 
+package net.sourceforge.waters.model.analysis.cli;
 
-package net.sourceforge.waters.analysis.modular;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.ListIterator;
 
-import java.util.Collection;
-
-import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.CounterExampleProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.options.EnumListOption;
 
 
-public class KindPreferenceHeuristicValueProvider
-  extends DefaultHeuristicValueProvider
+/**
+ * A command line argument to set an option representing a list of
+ * values from an enumeration. Enables the user to enter a string of names
+ * separated by commas that are converted into a list of enumerated items.
+ *
+ * @author Robi Malik
+ */
+
+public class EnumListCommandLineArgument<E>
+  extends OptionCommandLineArgument<List<E>>
 {
 
-  //#########################################################################
+  //#######################################################################
   //# Constructor
-  public KindPreferenceHeuristicValueProvider(final HeuristicFactory.Method method,
-                                              final HeuristicFactory.Preference pref)
+  public EnumListCommandLineArgument(final EnumListOption<E> option)
   {
-    super(method);
-    mPreference = pref;
+    super(option);
+  }
+
+
+  //#######################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.cli.CommandLineArgument
+  @Override
+  public EnumListOption<E> getOption()
+  {
+    return (EnumListOption<E>) super.getOption();
+  }
+
+  @Override
+  protected String getArgumentTemplate()
+  {
+    return "<value>,<value>,...";
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.modular.HeuristicValueProvider
+  //# Parsing
   @Override
-  public void setContext(final ProductDESProxy des,
-                         final KindTranslator translator,
-                         final CounterExampleProxy counter,
-                         final Collection<? extends AutomatonProxy> realPlants,
-                         final Collection<? extends AutomatonProxy> specPlants,
-                         final Collection<? extends AutomatonProxy> specs)
+  public void parse(final CommandLineOptionContext context,
+                    final ListIterator<String> iter)
+    throws AnalysisException
   {
-    mRealPlants = realPlants;
-    mSpecPlants = specPlants;
-  }
-
-  @Override
-  public float getHeuristicValue(final HeuristicEvaluator evaluator,
-                                 final AutomatonProxy aut)
-  {
-    switch (mPreference) {
-    case PREFER_REAL_PLANT:
-      if (mRealPlants.contains(aut)) {
-        return -2;
-      } else if (mSpecPlants.contains(aut)) {
-        return -1;
+    iter.remove();
+    if (iter.hasNext()) {
+      final EnumListOption<E> option = getOption();
+      final String arg = iter.next();
+      try {
+        option.set(arg);
+      } catch (final ParseException exception) {
+        System.err.println(exception.getMessage());
+        option.dumpEnumeration(System.err, 0);
+        ExitException.testFriendlyExit(1);
       }
-      break;
-    case PREFER_PLANT:
-      if (mRealPlants.contains(aut) || mSpecPlants.contains(aut)) {
-        return -1;
-      }
-      break;
-    default:
-      break;
+      iter.remove();
+      setUsed(true);
+    } else {
+      failMissingValue();
     }
-    return 0;
   }
 
 
   //#########################################################################
-  //# Data Members
-  private final HeuristicFactory.Preference mPreference;
-
-  private Collection<? extends AutomatonProxy> mRealPlants;
-  private Collection<? extends AutomatonProxy> mSpecPlants;
+  //# Printing
+  @Override
+  public void dump(final PrintStream stream)
+  {
+    super.dump(stream);
+    final EnumListOption<E> option = getOption();
+    option.dumpEnumeration(stream, INDENT);
+  }
 
 }

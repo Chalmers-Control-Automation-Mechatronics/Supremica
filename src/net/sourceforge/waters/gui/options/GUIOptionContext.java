@@ -62,6 +62,7 @@ import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
 import net.sourceforge.waters.model.options.ColorOption;
 import net.sourceforge.waters.model.options.ComponentKindOption;
 import net.sourceforge.waters.model.options.DoubleOption;
+import net.sourceforge.waters.model.options.EnumListOption;
 import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.EventSetOption;
 import net.sourceforge.waters.model.options.FileOption;
@@ -187,6 +188,13 @@ public class GUIOptionContext implements OptionContext
   createEnumEditor(final EnumOption<E> option)
   {
     return new EnumOptionPanel<>(this, option);
+  }
+
+  @Override
+  public <E> OptionEditor<List<E>>
+  createEnumListEditor(final EnumListOption<E> option)
+  {
+    return new EnumListOptionPanel<>(this, option);
   }
 
   @Override

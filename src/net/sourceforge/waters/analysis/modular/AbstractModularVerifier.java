@@ -74,7 +74,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.EnumListOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.PositiveIntOption;
@@ -115,8 +115,8 @@ abstract class AbstractModularVerifier
     super(model, factory, translator);
     mMonolithicVerifier = mono;
     mStartsWithSmallestSpec = true;
-    mHeuristicMethod = HeuristicFactory.Method.MaxCommonEvents;
-    mHeuristicPreference = HeuristicFactory.Preference.NOPREF;
+    mHeuristicMethods =
+      Collections.singletonList(HeuristicFactory.Method.MaxCommonEvents);
     mCollectsFailedSpecs = false;
   }
 
@@ -143,24 +143,19 @@ abstract class AbstractModularVerifier
     return mStartsWithSmallestSpec;
   }
 
-  public HeuristicFactory.Preference getHeuristicPreference()
+  public List<HeuristicFactory.Method> getHeuristicMethod()
   {
-    return mHeuristicPreference;
-  }
-
-  public void setHeuristicPreference(final HeuristicFactory.Preference pref)
-  {
-    mHeuristicPreference = pref;
-  }
-
-  public HeuristicFactory.Method getHeuristicMethod()
-  {
-    return mHeuristicMethod;
+    return mHeuristicMethods;
   }
 
   public void setHeuristicMethod(final HeuristicFactory.Method method)
   {
-    mHeuristicMethod = method;
+    setHeuristicMethod(Collections.singletonList(method));
+  }
+
+  public void setHeuristicMethod(final List<HeuristicFactory.Method> methods)
+  {
+    mHeuristicMethods = methods;
   }
 
   public void setCollectsFailedSpecs(final boolean collect)
@@ -185,8 +180,6 @@ abstract class AbstractModularVerifier
     db.prepend(options, ModularModelVerifierFactory.
                OPTION_AbstractModularVerifier_HeuristicMethod);
     db.prepend(options, ModularModelVerifierFactory.
-               OPTION_AbstractModularVerifier_HeuristicPreference);
-    db.prepend(options, ModularModelVerifierFactory.
                OPTION_AbstractModularVerifier_StartsWithSmallestSpec);
     db.append(options, AbstractModelAnalyzerFactory.
               OPTION_ModelAnalyzer_FinalStateLimit);
@@ -204,15 +197,10 @@ abstract class AbstractModularVerifier
       final BooleanOption boolOption = (BooleanOption) option;
       setStartsWithSmallestSpec(boolOption.getBooleanValue());
     } else if (option.hasID(ModularModelVerifierFactory.
-                            OPTION_AbstractModularVerifier_HeuristicPreference)) {
-      final EnumOption<HeuristicFactory.Preference> enumOption =
-        (EnumOption<HeuristicFactory.Preference>) option;
-      setHeuristicPreference(enumOption.getValue());
-    } else if (option.hasID(ModularModelVerifierFactory.
                             OPTION_AbstractModularVerifier_HeuristicMethod)) {
-      final EnumOption<HeuristicFactory.Method> enumOption =
-        (EnumOption<HeuristicFactory.Method>) option;
-      setHeuristicMethod(enumOption.getValue());
+      final EnumListOption<HeuristicFactory.Method> enumListOption =
+        (EnumListOption<HeuristicFactory.Method>) option;
+      setHeuristicMethod(enumListOption.getValue());
     } else if (option.hasID(ModularModelVerifierFactory.
                             OPTION_AbstractModularVerifier_CollectsFailedSpecs)) {
       final BooleanOption boolOption = (BooleanOption) option;
@@ -336,8 +324,14 @@ abstract class AbstractModularVerifier
 
     final HeuristicFactory factory = HeuristicFactory.getInstance();
     final HeuristicTraceChecker checker = createHeuristicTraceChecker();
-    mHeuristicEvaluator = factory.createEvaluator
-      (mHeuristicPreference, mHeuristicMethod, translator, checker);
+    if (mHeuristicMethods.size() == 1) {
+      final HeuristicFactory.Method method = mHeuristicMethods.get(0);
+      mHeuristicEvaluator =
+        factory.createEvaluator(method, translator, checker);
+    } else {
+      mHeuristicEvaluator =
+        factory.createEvaluator(mHeuristicMethods, translator, checker);
+    }
     mMonolithicVerifier.setNodeLimit(getNodeLimit());
     mMonolithicVerifier.setTransitionLimit(getTransitionLimit());
     mMonolithicVerifier.setCounterExampleEnabled(true);
@@ -709,8 +703,7 @@ abstract class AbstractModularVerifier
   // Configuration
   private ModelVerifier mMonolithicVerifier;
   private boolean mStartsWithSmallestSpec;
-  private HeuristicFactory.Method mHeuristicMethod;
-  private HeuristicFactory.Preference mHeuristicPreference;
+  private List<HeuristicFactory.Method> mHeuristicMethods;
   private boolean mCollectsFailedSpecs;
 
   // Data structures during run

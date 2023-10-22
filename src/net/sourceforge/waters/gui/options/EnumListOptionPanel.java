@@ -31,80 +31,81 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.cli;
+package net.sourceforge.waters.gui.options;
 
-import java.io.PrintStream;
-import java.util.ListIterator;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.expr.ParseException;
+import javax.swing.JComboBox;
+
+import net.sourceforge.waters.model.options.EnumListOption;
 import net.sourceforge.waters.model.options.EnumOption;
 
+
 /**
+ * <P>An option editor for lists of enumerated items.</P>
  *
- * @author Benjamin Wheeler
+ * <P>This preliminary implementation only supports singleton lists.
+ * It displays a combo box like {@link EnumOption} and sets the option value
+ * by creating a singleton list. If the option value is a list with more than
+ * one element, only the first element gets displayed, and changing it results
+ * in the remaining elements being deleted.</P>
+ *
+ * @author Robi Malik
  */
-public class EnumCommandLineArgument<E> extends OptionCommandLineArgument<E>
+
+class EnumListOptionPanel<T>
+  extends OptionPanel<List<T>>
 {
-
-  //#######################################################################
-  //# Constructor
-  public EnumCommandLineArgument(final EnumOption<E> option)
+  //#########################################################################
+  //# Constructors
+  EnumListOptionPanel(final GUIOptionContext context,
+                      final EnumListOption<T> option)
   {
-    super(option);
-  }
-
-
-  //#######################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.analysis.cli.CommandLineArgument
-  @Override
-  public EnumOption<E> getOption()
-  {
-    return (EnumOption<E>) super.getOption();
-  }
-
-  @Override
-  protected String getArgumentTemplate()
-  {
-    return "<value>";
+    super(context, option);
   }
 
 
   //#########################################################################
-  //# Parsing
+  //# Overrides for net.sourceforge.waters.gui.Options.OptionPanel
+  @SuppressWarnings("unchecked")
   @Override
-  public void parse(final CommandLineOptionContext context,
-                    final ListIterator<String> iter)
-    throws AnalysisException
+  JComboBox<T> getEntryComponent()
   {
-    iter.remove();
-    if (iter.hasNext()) {
-      final EnumOption<E> option = getOption();
-      final String arg = iter.next();
-      try {
-        option.set(arg);
-      } catch (final ParseException exception) {
-        System.err.println(exception.getMessage());
-        option.dumpEnumeration(System.err, 0);
-        ExitException.testFriendlyExit(1);
-      }
-      iter.remove();
-      setUsed(true);
-    } else {
-      failMissingValue();
-    }
+    return (JComboBox<T>) super.getEntryComponent();
+  }
+
+  @Override
+  JComboBox<T> createEntryComponent()
+  {
+    final EnumListOption<T> option = getOption();
+    final Vector<T> vector = new Vector<>(option.getEnumConstants());
+    final JComboBox<T> comboBox = new JComboBox<>(vector);
+    final List<T> list = option.getValue();
+    final T value = list.get(0);
+    comboBox.setSelectedItem(value);
+    return comboBox;
   }
 
 
   //#########################################################################
-  //# Printing
+  //# Interface net.sourceforge.waters.model.options.OptionEditor
   @Override
-  public void dump(final PrintStream stream)
+  public EnumListOption<T> getOption()
   {
-    super.dump(stream);
-    final EnumOption<E> option = getOption();
-    option.dumpEnumeration(stream, INDENT);
+    return (EnumListOption<T>) super.getOption();
+  }
+
+  @Override
+  public void commitValue()
+  {
+    final JComboBox<T> comboBox = getEntryComponent();
+    final int index = comboBox.getSelectedIndex();
+    final T value = comboBox.getItemAt(index);
+    final EnumListOption<T> option = getOption();
+    final List<T> list = Collections.singletonList(value);
+    option.setValue(list);
   }
 
 }
