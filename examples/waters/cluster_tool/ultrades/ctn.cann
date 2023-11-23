@@ -1,0 +1,263 @@
+event .*\[1\] COOBS:observer1 1
+event .*\[1\] controllable COOBS:controller 1
+event c1\[2\] COOBS:observer2 1
+event c1\[2\] COOBS:controller2 1
+event c3\[2\] COOBS:observer2 1
+
+event c2\[1\] COOBS:observer0 2
+event c3\[1\] COOBS:observer0 2
+event c3\[1\] COOBS:controller0 2
+event .*\[2\] COOBS:observer1 2
+event .*\[2\] controllable COOBS:controller 2
+event c1\[3\] COOBS:observer2 2
+event c1\[3\] COOBS:controller2 2
+event c3\[3\] COOBS:observer2 2
+
+event c2\[2\] COOBS:observer0 3
+event c3\[2\] COOBS:observer0 3
+event c3\[2\] COOBS:controller0 3
+event .*\[3\] COOBS:observer1 3
+event .*\[3\] controllable COOBS:controller 3
+event c1\[4\] COOBS:observer2 3
+event c1\[4\] COOBS:controller2 3
+event c3\[4\] COOBS:observer2 3
+
+event c2\[3\] COOBS:observer0 4
+event c3\[3\] COOBS:observer0 4
+event c3\[3\] COOBS:controller0 4
+event .*\[4\] COOBS:observer1 4
+event .*\[4\] controllable COOBS:controller 4
+event c1\[5\] COOBS:observer2 4
+event c1\[5\] COOBS:controller2 4
+event c3\[5\] COOBS:observer2 4
+
+event c2\[4\] COOBS:observer0 5
+event c3\[4\] COOBS:observer0 5
+event c3\[4\] COOBS:controller0 5
+event .*\[5\] COOBS:observer1 5
+event .*\[5\] controllable COOBS:controller 5
+event c1\[6\] COOBS:observer2 5
+event c1\[6\] COOBS:controller2 5
+event c3\[6\] COOBS:observer2 5
+
+event c2\[5\] COOBS:observer0 6
+event c3\[5\] COOBS:observer0 6
+event c3\[5\] COOBS:controller0 6
+event .*\[6\] COOBS:observer1 6
+event .*\[6\] controllable COOBS:controller 6
+event c1\[7\] COOBS:observer2 6
+event c1\[7\] COOBS:controller2 6
+event c3\[7\] COOBS:observer2 6
+
+event c2\[6\] COOBS:observer0 7
+event c3\[6\] COOBS:observer0 7
+event c3\[6\] COOBS:controller0 7
+event .*\[7\] COOBS:observer1 7
+event .*\[7\] controllable COOBS:controller 7
+event c1\[8\] COOBS:observer2 7
+event c1\[8\] COOBS:controller2 7
+event c3\[8\] COOBS:observer2 7
+
+event c2\[7\] COOBS:observer0 8
+event c3\[7\] COOBS:observer0 8
+event c3\[7\] COOBS:controller0 8
+event .*\[8\] COOBS:observer1 8
+event .*\[8\] controllable COOBS:controller 8
+event c1\[9\] COOBS:observer2 8
+event c1\[9\] COOBS:controller2 8
+event c3\[9\] COOBS:observer2 8
+
+event c2\[8\] COOBS:observer0 9
+event c3\[8\] COOBS:observer0 9
+event c3\[8\] COOBS:controller0 9
+event .*\[9\] COOBS:observer1 9
+event .*\[9\] controllable COOBS:controller 9
+event c1\[10\] COOBS:observer2 9
+event c1\[10\] COOBS:controller2 9
+event c3\[10\] COOBS:observer2 9
+
+event c2\[9\] COOBS:observer0 10
+event c3\[9\] COOBS:observer0 10
+event c3\[9\] COOBS:controller0 10
+event .*\[10\] COOBS:observer1 10
+event .*\[10\] controllable COOBS:controller 10
+event c1\[11\] COOBS:observer2 10
+event c1\[11\] COOBS:controller2 10
+event c3\[11\] COOBS:observer2 10
+
+event c2\[10\] COOBS:observer0 11
+event c3\[10\] COOBS:observer0 11
+event c3\[10\] COOBS:controller0 11
+event .*\[11\] COOBS:observer1 11
+event .*\[11\] controllable COOBS:controller 11
+event c1\[12\] COOBS:observer2 11
+event c1\[12\] COOBS:controller2 11
+event c3\[12\] COOBS:observer2 11
+
+event c2\[11\] COOBS:observer0 12
+event c3\[11\] COOBS:observer0 12
+event c3\[11\] COOBS:controller0 12
+event .*\[12\] COOBS:observer1 12
+event .*\[12\] controllable COOBS:controller 12
+event c1\[13\] COOBS:observer2 12
+event c1\[13\] COOBS:controller2 12
+event c3\[13\] COOBS:observer2 12
+
+event c2\[12\] COOBS:observer0 13
+event c3\[12\] COOBS:observer0 13
+event c3\[12\] COOBS:controller0 13
+event .*\[13\] COOBS:observer1 13
+event .*\[13\] controllable COOBS:controller 13
+event c1\[14\] COOBS:observer2 13
+event c1\[14\] COOBS:controller2 13
+event c3\[14\] COOBS:observer2 13
+
+event c2\[13\] COOBS:observer0 14
+event c3\[13\] COOBS:observer0 14
+event c3\[13\] COOBS:controller0 14
+event .*\[14\] COOBS:observer1 14
+event .*\[14\] controllable COOBS:controller 14
+event c1\[15\] COOBS:observer2 14
+event c1\[15\] COOBS:controller2 14
+event c3\[15\] COOBS:observer2 14
+
+event c2\[14\] COOBS:observer0 15
+event c3\[14\] COOBS:observer0 15
+event c3\[14\] COOBS:controller0 15
+event .*\[15\] COOBS:observer1 15
+event .*\[15\] controllable COOBS:controller 15
+event c1\[16\] COOBS:observer2 15
+event c1\[16\] COOBS:controller2 15
+event c3\[16\] COOBS:observer2 15
+
+event c2\[15\] COOBS:observer0 16
+event c3\[15\] COOBS:observer0 16
+event c3\[15\] COOBS:controller0 16
+event .*\[16\] COOBS:observer1 16
+event .*\[16\] controllable COOBS:controller 16
+event c1\[17\] COOBS:observer2 16
+event c1\[17\] COOBS:controller2 16
+event c3\[17\] COOBS:observer2 16
+
+event c2\[16\] COOBS:observer0 17
+event c3\[16\] COOBS:observer0 17
+event c3\[16\] COOBS:controller0 17
+event .*\[17\] COOBS:observer1 17
+event .*\[17\] controllable COOBS:controller 17
+event c1\[18\] COOBS:observer2 17
+event c1\[18\] COOBS:controller2 17
+event c3\[18\] COOBS:observer2 17
+
+event c2\[17\] COOBS:observer0 18
+event c3\[17\] COOBS:observer0 18
+event c3\[17\] COOBS:controller0 18
+event .*\[18\] COOBS:observer1 18
+event .*\[18\] controllable COOBS:controller 18
+event c1\[19\] COOBS:observer2 18
+event c1\[19\] COOBS:controller2 18
+event c3\[19\] COOBS:observer2 18
+
+event c2\[18\] COOBS:observer0 19
+event c3\[18\] COOBS:observer0 19
+event c3\[18\] COOBS:controller0 19
+event .*\[19\] COOBS:observer1 19
+event .*\[19\] controllable COOBS:controller 19
+event c1\[20\] COOBS:observer2 19
+event c1\[20\] COOBS:controller2 19
+event c3\[20\] COOBS:observer2 19
+
+event c2\[19\] COOBS:observer0 20
+event c3\[19\] COOBS:observer0 20
+event c3\[19\] COOBS:controller0 20
+event .*\[20\] COOBS:observer1 20
+event .*\[20\] controllable COOBS:controller 20
+event c1\[21\] COOBS:observer2 20
+event c1\[21\] COOBS:controller2 20
+event c3\[21\] COOBS:observer2 20
+
+event c2\[20\] COOBS:observer0 21
+event c3\[20\] COOBS:observer0 21
+event c3\[20\] COOBS:controller0 21
+event .*\[21\] COOBS:observer1 21
+event .*\[21\] controllable COOBS:controller 21
+event c1\[22\] COOBS:observer2 21
+event c1\[22\] COOBS:controller2 21
+event c3\[22\] COOBS:observer2 21
+
+event c2\[21\] COOBS:observer0 22
+event c3\[21\] COOBS:observer0 22
+event c3\[21\] COOBS:controller0 22
+event .*\[22\] COOBS:observer1 22
+event .*\[22\] controllable COOBS:controller 22
+event c1\[23\] COOBS:observer2 22
+event c1\[23\] COOBS:controller2 22
+event c3\[23\] COOBS:observer2 22
+
+event c2\[22\] COOBS:observer0 23
+event c3\[22\] COOBS:observer0 23
+event c3\[22\] COOBS:controller0 23
+event .*\[23\] COOBS:observer1 23
+event .*\[23\] controllable COOBS:controller 23
+event c1\[24\] COOBS:observer2 23
+event c1\[24\] COOBS:controller2 23
+event c3\[24\] COOBS:observer2 23
+
+event c2\[23\] COOBS:observer0 24
+event c3\[23\] COOBS:observer0 24
+event c3\[23\] COOBS:controller0 24
+event .*\[24\] COOBS:observer1 24
+event .*\[24\] controllable COOBS:controller 24
+event c1\[25\] COOBS:observer2 24
+event c1\[25\] COOBS:controller2 24
+event c3\[25\] COOBS:observer2 24
+
+event c2\[24\] COOBS:observer0 25
+event c3\[24\] COOBS:observer0 25
+event c3\[24\] COOBS:controller0 25
+event .*\[25\] COOBS:observer1 25
+event .*\[25\] controllable COOBS:controller 25
+event c1\[26\] COOBS:observer2 25
+event c1\[26\] COOBS:controller2 25
+event c3\[26\] COOBS:observer2 25
+
+event c2\[25\] COOBS:observer0 26
+event c3\[25\] COOBS:observer0 26
+event c3\[25\] COOBS:controller0 26
+event .*\[26\] COOBS:observer1 26
+event .*\[26\] controllable COOBS:controller 26
+event c1\[27\] COOBS:observer2 26
+event c1\[27\] COOBS:controller2 26
+event c3\[27\] COOBS:observer2 26
+
+event c2\[26\] COOBS:observer0 27
+event c3\[26\] COOBS:observer0 27
+event c3\[26\] COOBS:controller0 27
+event .*\[27\] COOBS:observer1 27
+event .*\[27\] controllable COOBS:controller 27
+event c1\[28\] COOBS:observer2 27
+event c1\[28\] COOBS:controller2 27
+event c3\[28\] COOBS:observer2 27
+
+event c2\[27\] COOBS:observer0 28
+event c3\[27\] COOBS:observer0 28
+event c3\[27\] COOBS:controller0 28
+event .*\[28\] COOBS:observer1 28
+event .*\[28\] controllable COOBS:controller 28
+event c1\[29\] COOBS:observer2 28
+event c1\[29\] COOBS:controller2 28
+event c3\[29\] COOBS:observer2 28
+
+event c2\[28\] COOBS:observer0 29
+event c3\[28\] COOBS:observer0 29
+event c3\[28\] COOBS:controller0 29
+event .*\[29\] COOBS:observer1 29
+event .*\[29\] controllable COOBS:controller 29
+event c1\[30\] COOBS:observer2 29
+event c1\[30\] COOBS:controller2 29
+event c3\[30\] COOBS:observer2 29
+
+event c2\[29\] COOBS:observer0 30
+event c3\[29\] COOBS:observer0 30
+event c3\[29\] COOBS:controller0 30
+event .*\[30\] COOBS:observer1 30
+event .*\[30\] controllable COOBS:controller 30

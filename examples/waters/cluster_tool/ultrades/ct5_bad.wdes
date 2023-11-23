@@ -1,0 +1,876 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="ct5_bad">
+<B:Comment>Parameterised cluster tool.
+Buggy blocking version due to incorrect instantiation of RSup[I], used to expose coobservability checker bug.</B:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Name="c1[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c1[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="2"/>
+<B:Attribute Name="COOBS:controller2" Value="1"/>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+<B:Attribute Name="COOBS:observer2" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c1[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="3"/>
+<B:Attribute Name="COOBS:controller2" Value="2"/>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+<B:Attribute Name="COOBS:observer2" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c1[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="4"/>
+<B:Attribute Name="COOBS:controller2" Value="3"/>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+<B:Attribute Name="COOBS:observer2" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c1[5]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="5"/>
+<B:Attribute Name="COOBS:controller2" Value="4"/>
+<B:Attribute Name="COOBS:observer1" Value="5"/>
+<B:Attribute Name="COOBS:observer2" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c2[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c2[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="2"/>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c2[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="3"/>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c2[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="4"/>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c2[5]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="5"/>
+<B:Attribute Name="COOBS:observer1" Value="5"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c3[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:controller0" Value="2"/>
+<B:Attribute Name="COOBS:observer0" Value="2"/>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c3[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="2"/>
+<B:Attribute Name="COOBS:controller0" Value="3"/>
+<B:Attribute Name="COOBS:observer0" Value="3"/>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c3[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="3"/>
+<B:Attribute Name="COOBS:controller0" Value="4"/>
+<B:Attribute Name="COOBS:observer0" Value="4"/>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c3[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="4"/>
+<B:Attribute Name="COOBS:controller0" Value="5"/>
+<B:Attribute Name="COOBS:observer0" Value="5"/>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="1"/>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="2"/>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="3"/>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="4"/>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="CONTROLLABLE" Name="c[5]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:controller" Value="5"/>
+<B:Attribute Name="COOBS:observer1" Value="5"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u1[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u1[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u1[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u1[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u1[5]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="5"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u2[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u2[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u2[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u2[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u3[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u3[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u3[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u3[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u3[5]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="5"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u[1]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="1"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u[2]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="2"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u[3]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="3"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u[4]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="4"/>
+</B:AttributeMap>
+</Event>
+<Event Kind="UNCONTROLLABLE" Name="u[5]">
+<B:AttributeMap>
+<B:Attribute Name="COOBS:observer1" Value="5"/>
+</B:AttributeMap>
+</Event>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="Robot[1]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[1]"/>
+<EventRef Name="c2[1]"/>
+<EventRef Name="c3[1]"/>
+<EventRef Name="u1[1]"/>
+<EventRef Name="u2[1]"/>
+<EventRef Name="u3[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+<State Name="S3"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[1]" Target="S1"/>
+<Transition Source="S1" Event="u1[1]" Target="S0"/>
+<Transition Source="S0" Event="c2[1]" Target="S2"/>
+<Transition Source="S2" Event="u2[1]" Target="S0"/>
+<Transition Source="S0" Event="c3[1]" Target="S3"/>
+<Transition Source="S3" Event="u3[1]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BR[1]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[2]"/>
+<EventRef Name="c3[1]"/>
+<EventRef Name="u2[1]"/>
+<EventRef Name="u3[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c1[2]" Target="S0"/>
+<Transition Source="S0" Event="u2[1]" Target="S1"/>
+<Transition Source="S0" Event="u3[2]" Target="S2"/>
+<Transition Source="S2" Event="c3[1]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="RSup[1]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[2]"/>
+<EventRef Name="c2[1]"/>
+<EventRef Name="c2[2]"/>
+<EventRef Name="c3[1]"/>
+<EventRef Name="c3[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c2[1]" Target="S2"/>
+<Transition Source="S0" Event="c3[2]" Target="S2"/>
+<Transition Source="S2" Event="c1[2]" Target="S0"/>
+<Transition Source="S2" Event="c3[1]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Robot[2]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[2]"/>
+<EventRef Name="c2[2]"/>
+<EventRef Name="c3[2]"/>
+<EventRef Name="u1[2]"/>
+<EventRef Name="u2[2]"/>
+<EventRef Name="u3[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+<State Name="S3"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[2]" Target="S1"/>
+<Transition Source="S1" Event="u1[2]" Target="S0"/>
+<Transition Source="S0" Event="c2[2]" Target="S2"/>
+<Transition Source="S2" Event="u2[2]" Target="S0"/>
+<Transition Source="S0" Event="c3[2]" Target="S3"/>
+<Transition Source="S3" Event="u3[2]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BR[2]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[3]"/>
+<EventRef Name="c3[2]"/>
+<EventRef Name="u2[2]"/>
+<EventRef Name="u3[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c1[3]" Target="S0"/>
+<Transition Source="S0" Event="u2[2]" Target="S1"/>
+<Transition Source="S0" Event="u3[3]" Target="S2"/>
+<Transition Source="S2" Event="c3[2]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="RSup[2]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[3]"/>
+<EventRef Name="c2[2]"/>
+<EventRef Name="c2[3]"/>
+<EventRef Name="c3[2]"/>
+<EventRef Name="c3[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c2[2]" Target="S2"/>
+<Transition Source="S0" Event="c3[3]" Target="S2"/>
+<Transition Source="S2" Event="c1[3]" Target="S0"/>
+<Transition Source="S2" Event="c3[2]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Robot[3]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[3]"/>
+<EventRef Name="c2[3]"/>
+<EventRef Name="c3[3]"/>
+<EventRef Name="u1[3]"/>
+<EventRef Name="u2[3]"/>
+<EventRef Name="u3[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+<State Name="S3"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[3]" Target="S1"/>
+<Transition Source="S1" Event="u1[3]" Target="S0"/>
+<Transition Source="S0" Event="c2[3]" Target="S2"/>
+<Transition Source="S2" Event="u2[3]" Target="S0"/>
+<Transition Source="S0" Event="c3[3]" Target="S3"/>
+<Transition Source="S3" Event="u3[3]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BR[3]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[4]"/>
+<EventRef Name="c3[3]"/>
+<EventRef Name="u2[3]"/>
+<EventRef Name="u3[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c1[4]" Target="S0"/>
+<Transition Source="S0" Event="u2[3]" Target="S1"/>
+<Transition Source="S0" Event="u3[4]" Target="S2"/>
+<Transition Source="S2" Event="c3[3]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="RSup[3]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[4]"/>
+<EventRef Name="c2[3]"/>
+<EventRef Name="c2[4]"/>
+<EventRef Name="c3[3]"/>
+<EventRef Name="c3[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c2[3]" Target="S2"/>
+<Transition Source="S0" Event="c3[4]" Target="S2"/>
+<Transition Source="S2" Event="c1[4]" Target="S0"/>
+<Transition Source="S2" Event="c3[3]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Robot[4]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[4]"/>
+<EventRef Name="c2[4]"/>
+<EventRef Name="c3[4]"/>
+<EventRef Name="u1[4]"/>
+<EventRef Name="u2[4]"/>
+<EventRef Name="u3[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+<State Name="S3"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[4]" Target="S1"/>
+<Transition Source="S1" Event="u1[4]" Target="S0"/>
+<Transition Source="S0" Event="c2[4]" Target="S2"/>
+<Transition Source="S2" Event="u2[4]" Target="S0"/>
+<Transition Source="S0" Event="c3[4]" Target="S3"/>
+<Transition Source="S3" Event="u3[4]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BR[4]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[5]"/>
+<EventRef Name="c3[4]"/>
+<EventRef Name="u2[4]"/>
+<EventRef Name="u3[5]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c1[5]" Target="S0"/>
+<Transition Source="S0" Event="u2[4]" Target="S1"/>
+<Transition Source="S0" Event="u3[5]" Target="S2"/>
+<Transition Source="S2" Event="c3[4]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="RSup[4]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[5]"/>
+<EventRef Name="c2[4]"/>
+<EventRef Name="c2[5]"/>
+<EventRef Name="c3[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c2[4]" Target="S2"/>
+<Transition Source="S0" Event="c2[5]" Target="S2"/>
+<Transition Source="S2" Event="c1[5]" Target="S0"/>
+<Transition Source="S2" Event="c3[4]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BC[1]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c2[1]"/>
+<EventRef Name="c[1]"/>
+<EventRef Name="u1[1]"/>
+<EventRef Name="u[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c[1]" Target="S0"/>
+<Transition Source="S0" Event="u1[1]" Target="S1"/>
+<Transition Source="S0" Event="u[1]" Target="S2"/>
+<Transition Source="S2" Event="c2[1]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Chamber[1]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c[1]"/>
+<EventRef Name="u[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c[1]" Target="S1"/>
+<Transition Source="S1" Event="u[1]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="CSup[1]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[1]"/>
+<EventRef Name="c2[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[1]" Target="S1"/>
+<Transition Source="S1" Event="c2[1]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BC[2]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c2[2]"/>
+<EventRef Name="c[2]"/>
+<EventRef Name="u1[2]"/>
+<EventRef Name="u[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c[2]" Target="S0"/>
+<Transition Source="S0" Event="u1[2]" Target="S1"/>
+<Transition Source="S0" Event="u[2]" Target="S2"/>
+<Transition Source="S2" Event="c2[2]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Chamber[2]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c[2]"/>
+<EventRef Name="u[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c[2]" Target="S1"/>
+<Transition Source="S1" Event="u[2]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="CSup[2]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[2]"/>
+<EventRef Name="c2[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[2]" Target="S1"/>
+<Transition Source="S1" Event="c2[2]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BC[3]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c2[3]"/>
+<EventRef Name="c[3]"/>
+<EventRef Name="u1[3]"/>
+<EventRef Name="u[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c[3]" Target="S0"/>
+<Transition Source="S0" Event="u1[3]" Target="S1"/>
+<Transition Source="S0" Event="u[3]" Target="S2"/>
+<Transition Source="S2" Event="c2[3]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Chamber[3]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c[3]"/>
+<EventRef Name="u[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c[3]" Target="S1"/>
+<Transition Source="S1" Event="u[3]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="CSup[3]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[3]"/>
+<EventRef Name="c2[3]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[3]" Target="S1"/>
+<Transition Source="S1" Event="c2[3]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BC[4]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c2[4]"/>
+<EventRef Name="c[4]"/>
+<EventRef Name="u1[4]"/>
+<EventRef Name="u[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c[4]" Target="S0"/>
+<Transition Source="S0" Event="u1[4]" Target="S1"/>
+<Transition Source="S0" Event="u[4]" Target="S2"/>
+<Transition Source="S2" Event="c2[4]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Chamber[4]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c[4]"/>
+<EventRef Name="u[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c[4]" Target="S1"/>
+<Transition Source="S1" Event="u[4]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="CSup[4]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[4]"/>
+<EventRef Name="c2[4]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[4]" Target="S1"/>
+<Transition Source="S1" Event="c2[4]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="BC[5]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c2[5]"/>
+<EventRef Name="c[5]"/>
+<EventRef Name="u1[5]"/>
+<EventRef Name="u[5]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S1" Event="c[5]" Target="S0"/>
+<Transition Source="S0" Event="u1[5]" Target="S1"/>
+<Transition Source="S0" Event="u[5]" Target="S2"/>
+<Transition Source="S2" Event="c2[5]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Chamber[5]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c[5]"/>
+<EventRef Name="u[5]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c[5]" Target="S1"/>
+<Transition Source="S1" Event="u[5]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="CSup[5]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[5]"/>
+<EventRef Name="c2[5]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[5]" Target="S1"/>
+<Transition Source="S1" Event="c2[5]" Target="S0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Robot[5]">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="c1[5]"/>
+<EventRef Name="c2[5]"/>
+<EventRef Name="u1[5]"/>
+<EventRef Name="u3[5]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="S1"/>
+<State Name="S2"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="c1[5]" Target="S1"/>
+<Transition Source="S1" Event="u1[5]" Target="S0"/>
+<Transition Source="S0" Event="c2[5]" Target="S2"/>
+<Transition Source="S2" Event="u3[5]" Target="S0"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

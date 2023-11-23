@@ -365,7 +365,6 @@ public class CoobservabilitySignature
           if (info != null) {
             if (kind == ComponentKind.PLANT) {
               info.setTotallyControllable();
-              mEventMap.remove(event);
               numNeedsChecking--;
               removedFromSites = true;
             } else if (info.setNeedsChecking()) {

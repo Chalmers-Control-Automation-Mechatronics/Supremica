@@ -38,6 +38,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.monolithic.TRMonolithicCoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractCoobservabilityCheckerTest;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -71,5 +72,17 @@ public class SlicingCoobservabilityCheckerTest
       new TRMonolithicCoobservabilityChecker();
     return new SlicingCoobservabilityChecker(factory, mono);
   }
+
+
+  //#########################################################################
+  //# Test Case Overrides
+  public void testCt5Bad() throws Exception
+  {
+    // 55 reachable states, but only solved with slicing technique
+    final ProductDESProxy des =
+      getCompiledDES("cluster_tool", "ultrades", "ct5_bad.wdes");
+    runModelVerifier(des, true);
+  }
+
 
 }
