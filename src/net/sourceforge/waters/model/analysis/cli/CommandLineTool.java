@@ -236,7 +236,7 @@ public class CommandLineTool implements Configurable
       }
 
       for (final String name : argList) {
-        final long start = System.currentTimeMillis();
+        final long start0 = System.currentTimeMillis();
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
         final String fullName;
@@ -265,7 +265,7 @@ public class CommandLineTool implements Configurable
             compileTime = stop - compileStart;
           } catch (final EvalAbortException exception) {
             final long stop = System.currentTimeMillis();
-            final float difftime = 0.001f * (stop - start);
+            final float difftime = 0.001f * (stop - start0);
             formatter.format("TIMEOUT (%.3f s)\n", difftime);
             final AnalysisResult result = new DefaultAnalysisResult(mAnalyzer);
             compileTime = stop - compileStart;
@@ -277,13 +277,6 @@ public class CommandLineTool implements Configurable
             watchdog.removeAbortable(compiler);
           }
         }
-        System.out.print(fullName + " ... ");
-        if (mVerbosity != Level.OFF) {
-          System.out.println();
-        } else {
-          System.out.flush();
-        }
-
         if (mAnnotator != null) {
           des = mAnnotator.apply(des);
         }
@@ -301,97 +294,111 @@ public class CommandLineTool implements Configurable
         mContext.setProductDES(des);
         mContext.configure(mAnalyzer);
         mAnalyzer.setModel(des);
-        boolean additions = false;
-        try {
-          mAnalyzer.run();
-          final AnalysisResult result = mAnalyzer.getAnalysisResult();
-          final long stop = System.currentTimeMillis();
-          final boolean satisfied = result.isSatisfied();
-          final double numstates = result.getTotalNumberOfStates();
-          final float difftime = 0.001f * (stop - start);
-          final int numnodes = result.getPeakNumberOfNodes();
-          if (numstates < 0 && numnodes < 0) {
-            formatter.format("%b (%.3f s)\n", satisfied, difftime);
-          } else if (numnodes < 0 || numnodes == (int) numstates) {
-            formatter.format("%b (%.0f states, %.3f s)\n",
-                             satisfied, numstates, difftime);
-          } else if (numstates < 0) {
-            formatter.format("%b (%d nodes, %.3f s)\n",
-                             satisfied, numnodes, difftime);
-          } else {
-            formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
-                             satisfied, numstates, numnodes, difftime);
-          }
-          if (result instanceof ProxyResult<?>) {
-            final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
-            final Proxy resultProxy = proxyResult.getComputedProxy();
-            if (resultProxy != null) {
-              final String description = proxyResult.getResultDescription();
-              if (mOutputFile != null && resultProxy instanceof DocumentProxy) {
-                final DocumentProxy resultDoc;
-                if (resultProxy instanceof ProductDESProxy &&
+        final long setUpTime = System.currentTimeMillis() - start0;
+        for (int i = 0; i < mRepetitions; i++) {
+          System.out.print(fullName + " ... ");
+          final long start1 = System.currentTimeMillis();
+
+          boolean additions = false;
+          try {
+            if (mVerbosity != Level.OFF) {
+              System.out.println();
+            } else {
+              System.out.flush();
+            }
+            mAnalyzer.run();
+            final AnalysisResult result = mAnalyzer.getAnalysisResult();
+            final long stop = System.currentTimeMillis();
+            final boolean satisfied = result.isSatisfied();
+            final double numstates = result.getTotalNumberOfStates();
+            final float difftime = 0.001f * (stop - start1 + setUpTime);
+            final int numnodes = result.getPeakNumberOfNodes();
+            if (numstates < 0 && numnodes < 0) {
+              formatter.format("%b (%.3f s)\n", satisfied, difftime);
+            } else if (numnodes < 0 || numnodes == (int) numstates) {
+              formatter.format("%b (%.0f states, %.3f s)\n",
+                               satisfied, numstates, difftime);
+            } else if (numstates < 0) {
+              formatter.format("%b (%d nodes, %.3f s)\n",
+                               satisfied, numnodes, difftime);
+            } else {
+              formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
+                               satisfied, numstates, numnodes, difftime);
+            }
+            if (result instanceof ProxyResult<?>) {
+              final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
+              final Proxy resultProxy = proxyResult.getComputedProxy();
+              if (resultProxy != null) {
+                final String description = proxyResult.getResultDescription();
+                if (mOutputFile != null && resultProxy instanceof DocumentProxy) {
+                  final DocumentProxy resultDoc;
+                  if (resultProxy instanceof ProductDESProxy &&
                     SAXModuleMarshaller.WMOD_FILE_FILTER.accept(mOutputFile)) {
-                  final ProductDESProxy resultDES = (ProductDESProxy) resultProxy;
-                  final ProductDESImporter importer =
-                    new ProductDESImporter(moduleFactory, docManager);
-                  resultDoc = importer.importModule(resultDES);
+                    final ProductDESProxy resultDES = (ProductDESProxy) resultProxy;
+                    final ProductDESImporter importer =
+                      new ProductDESImporter(moduleFactory, docManager);
+                    resultDoc = importer.importModule(resultDES);
+                  } else {
+                    resultDoc = (DocumentProxy) resultProxy;
+                  }
+                  docManager.saveAs(resultDoc, mOutputFile);
+                  if (mVerbosity.isLessSpecificThan(Level.INFO)) {
+                    formatter.format("%s saved to %s\n",
+                                     description, mOutputFile.toString());
+                  }
                 } else {
-                  resultDoc = (DocumentProxy) resultProxy;
+                  System.out.println(SEPARATOR);
+                  System.out.println(description + ":");
+                  System.out.print(resultProxy);
+                  additions = true;
                 }
-                docManager.saveAs(resultDoc, mOutputFile);
-                if (mVerbosity.isLessSpecificThan(Level.INFO)) {
-                  formatter.format("%s saved to %s\n",
-                                   description, mOutputFile.toString());
-                }
-              } else {
-                System.out.println(SEPARATOR);
-                System.out.println(description + ":");
-                System.out.print(resultProxy);
-                additions = true;
               }
             }
+          } catch (final OutOfMemoryError error) {
+            final long stop = System.currentTimeMillis();
+            final float difftime = 0.001f * (stop - start1 + setUpTime);
+            formatter.format("OUT OF MEMORY (%.3f s)\n", difftime);
+            final AnalysisResult result = mAnalyzer.getAnalysisResult();
+            if (result != null) {
+              final OverflowException overflow = new OverflowException(error);
+              result.setException(overflow);
+            }
+            i = mRepetitions;
+          } catch (final OverflowException overflow) {
+            final long stop = System.currentTimeMillis();
+            final float difftime = 0.001f * (stop - start1 + setUpTime);
+            final String msg = overflow.getMessage();
+            if (mVerbosity != Level.OFF && msg != null) {
+              System.out.println(msg);
+            }
+            formatter.format("OVERFLOW (%.3f s)\n", difftime);
+            i = mRepetitions;
+          } catch (final AnalysisAbortException abort) {
+            final long stop = System.currentTimeMillis();
+            final float difftime = 0.001f * (stop - start1 + setUpTime);
+            formatter.format("TIMEOUT (%.3f s)\n", difftime);
+            i = mRepetitions;
           }
-        } catch (final OutOfMemoryError error) {
-          final long stop = System.currentTimeMillis();
-          final float difftime = 0.001f * (stop - start);
-          formatter.format("OUT OF MEMORY (%.3f s)\n", difftime);
           final AnalysisResult result = mAnalyzer.getAnalysisResult();
           if (result != null) {
-            final OverflowException overflow = new OverflowException(error);
-            result.setException(overflow);
+            if (compileTime >= 0) {
+              result.setCompileTime(compileTime);
+            }
+            if (mStats) {
+              System.out.println(SEPARATOR);
+              System.out.println("Statistics:");
+              System.out.println("Automata in model: " +
+                des.getAutomata().size());
+              System.out.println("Events in model: " +
+                des.getEvents().size());
+              result.print(System.out);
+              additions = true;
+            }
+            writeCSV(fullName, result);
           }
-        } catch (final OverflowException overflow) {
-          final long stop = System.currentTimeMillis();
-          final float difftime = 0.001f * (stop - start);
-          final String msg = overflow.getMessage();
-          if (mVerbosity != Level.OFF && msg != null) {
-            System.out.println(msg);
-          }
-          formatter.format("OVERFLOW (%.3f s)\n", difftime);
-        } catch (final AnalysisAbortException abort) {
-          final long stop = System.currentTimeMillis();
-          final float difftime = 0.001f * (stop - start);
-          formatter.format("TIMEOUT (%.3f s)\n", difftime);
-        }
-        final AnalysisResult result = mAnalyzer.getAnalysisResult();
-        if (result != null) {
-          if (compileTime >= 0) {
-            result.setCompileTime(compileTime);
-          }
-          if (mStats) {
+          if (additions) {
             System.out.println(SEPARATOR);
-            System.out.println("Statistics:");
-            System.out.println("Automata in model: " +
-                               des.getAutomata().size());
-            System.out.println("Events in model: " +
-                               des.getEvents().size());
-            result.print(System.out);
-            additions = true;
           }
-          writeCSV(fullName, result);
-        }
-        if (additions) {
-          System.out.println(SEPARATOR);
         }
       }
 
@@ -428,6 +435,8 @@ public class CommandLineTool implements Configurable
                          OPTION_CommandLineTool_Properties);
     page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Quiet);
+    page.append(options, CommandLineOptionContext.
+                         OPTION_CommandLineTool_Repetitions);
     page.append(options, CommandLineOptionContext.
                          OPTION_CommandLineTool_Stats);
     page.append(options, CommandLineOptionContext.
@@ -492,6 +501,10 @@ public class CommandLineTool implements Configurable
       if (flag.getBooleanValue()) {
         mVerbosity = Level.OFF;
       }
+    } else if (option.hasID(CommandLineOptionContext.
+                            OPTION_CommandLineTool_Repetitions)) {
+      final PositiveIntOption opt = (PositiveIntOption) option;
+      mRepetitions = opt.getIntValue();
     } else if (option.hasID(CommandLineOptionContext.
                             OPTION_CommandLineTool_Stats)) {
       final BooleanOption flag = (BooleanOption) option;
@@ -602,6 +615,7 @@ public class CommandLineTool implements Configurable
   private Level mVerbosity = Level.INFO;
   private boolean mStats = false;
   private int mTimeout = -1;
+  private int mRepetitions = 1;
   private PrintWriter mCsv = null;
   private EventAnnotator mAnnotator;
   private File mOutputFile = null;

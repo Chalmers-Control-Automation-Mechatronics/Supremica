@@ -505,6 +505,9 @@ public class CommandLineOptionContext implements OptionContext
       register(new BooleanOption(OPTION_CommandLineTool_Quiet, null,
                                  "Suppress all log output",
                                  "+quiet|+q", false));
+      register(new PositiveIntOption(OPTION_CommandLineTool_Repetitions, null,
+                                     "Number of times to run successful " +
+                                     "operations", "-repeat", 1));
       register(new BooleanOption(OPTION_CommandLineTool_Stats, null,
                                  "Print statistics", "+stats", false));
       register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
@@ -562,6 +565,8 @@ public class CommandLineOptionContext implements OptionContext
     "CommandLineTool.Properties";
   public static final String OPTION_CommandLineTool_Quiet =
     "CommandLineTool.Quiet";
+  public static final String OPTION_CommandLineTool_Repetitions =
+    "CommandLineTool.Repetitions";
   public static final String OPTION_CommandLineTool_Stats =
     "CommandLineTool.Stats";
   public static final String OPTION_CommandLineTool_Timeout =

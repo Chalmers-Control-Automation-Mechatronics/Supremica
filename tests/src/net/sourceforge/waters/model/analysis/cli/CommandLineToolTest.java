@@ -539,6 +539,23 @@ public class CommandLineToolTest
     testCommandLine("quiet", args, "small_factory_2 ... true \\(.*", "!DEBUG.*");
   }
 
+  public void testOption_Repeat()
+    throws Exception
+  {
+    final File file1 = getInputWmod("tests", "incremental_suite", "agv");
+    final File file2 = getInputWmod("handwritten", "small_factory_2");
+    final String[] args =
+      new String[] {"-mono", "-cont", "-fslimit", "100", "-repeat", "3", "-q",
+                    file1.toString(), file2.toString()};
+    testCommandLine("repeat", args,
+                    "agv ... OVERFLOW .*",
+                    "!agv.*",
+                    "small_factory_2 ... true .*",
+                    "small_factory_2 ... true .*",
+                    "small_factory_2 ... true .*",
+                    "!small_factory_2.*");
+  }
+
   public void testOption_Timeout()
     throws Exception
   {
@@ -659,8 +676,6 @@ public class CommandLineToolTest
     }
     final List<PatternHandler> patterns =
       new ArrayList<>(outputPatterns.length + 1);
-    final List<PatternHandler> antiPatterns =
-      new ArrayList<>(outputPatterns.length);
     if (expectedResult != null) {
       final String resultRegex =
         String.format("([a-zA-Z0-9]+ \\.\\.\\. )?%b \\(.*", expectedResult);
@@ -669,41 +684,41 @@ public class CommandLineToolTest
     }
     for (final String regex : outputPatterns) {
       final PatternHandler pattern = new PatternHandler(regex);
-      if (pattern.isAntiPattern()) {
-        antiPatterns.add(pattern);
-      } else {
-        patterns.add(pattern);
-      }
+      patterns.add(pattern);
     }
+    final List<PatternHandler> antiPatterns =
+      new ArrayList<>(outputPatterns.length);
     final Iterator<PatternHandler> iter = patterns.iterator();
-    PatternHandler pattern = iter.next();
+    PatternHandler nextPattern = null;
 
     final FileReader reader = new FileReader(logFile);
     final BufferedReader buffered = new BufferedReader(reader);
     try {
-      String line;
-      while ((line = buffered.readLine()) != null) {
-        for (final PatternHandler anti : antiPatterns) {
-          if (anti.matches(line)) {
-            fail("Unexpected output: " + anti.toString() + "!");
-          }
-        }
-        if (pattern != null && pattern.matches(line)) {
+      while (true) {
+        while (nextPattern == null && iter.hasNext()) {
+          final PatternHandler pattern = iter.next();
           if (pattern.isAntiPattern()) {
             antiPatterns.add(pattern);
-          }
-          if (iter.hasNext()) {
-            pattern = iter.next();
           } else {
-            pattern = null;
-            if (antiPatterns.isEmpty()) {
-              break;
-            }
+            nextPattern = pattern;
           }
         }
+        final String line = buffered.readLine();
+        if (line == null) {
+          break;
+        }
+        for (final PatternHandler anti : antiPatterns) {
+          if (anti.matches(line)) {
+            fail("Unexpected output: " + line + "!");
+          }
+        }
+        if (nextPattern != null && nextPattern.matches(line)) {
+          nextPattern = null;
+          antiPatterns.clear();
+        }
       }
-      if (pattern != null) {
-        fail("Missing output: " + pattern.toString() + "!");
+      if (nextPattern != null) {
+        fail("Missing output: " + nextPattern.toString() + "!");
       }
     } finally {
       buffered.close();
