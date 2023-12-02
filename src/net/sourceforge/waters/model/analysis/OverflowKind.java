@@ -50,24 +50,42 @@ public enum OverflowKind {
   /**
    * Overflow by constructing an automaton with too many states.
    */
-  STATE,
+  STATE(" states"),
   /**
    * Overflow by constructing an automaton with too many transitions.
    */
-  TRANSITION,
+  TRANSITION(" transitions"),
   /**
    * Overflow by constructing too many nodes.
    * This may be used by BDDs or other symbolic algorithms
    */
-  NODE,
+  NODE(" nodes"),
   /**
    * Overflow after catching {@link OutOfMemoryError}.
    */
-  MEMORY,
+  MEMORY("OUT OF MEMORY", " bytes"),
   /**
    * Overflow after catching {@link StackOverflowError}.
    */
-  STACK;
+  STACK(" bytes"),
+  /**
+   * Overflow due to exceeding a time limit.
+   */
+  TIME("TIMEOUT", "s");
+
+
+  //#########################################################################
+  //# Constructor
+  private OverflowKind(final String unit)
+  {
+    this("OVERFLOW", unit);
+  }
+
+  private OverflowKind(final String label, final String unit)
+  {
+    mLabel = label;
+    mUnit = unit;
+  }
 
 
   //#########################################################################
@@ -87,19 +105,25 @@ public enum OverflowKind {
       final char ch = name.charAt(i);
       buffer.append(Character.toLowerCase(ch));
     }
-    buffer.append(" limit ");
+    buffer.append(" limit");
     if (limit >= 0) {
-      buffer.append("of ");
+      buffer.append(" of ");
       buffer.append(limit);
-      buffer.append(' ');
-      for (int i = 0; i < namelen; i++) {
-        final char ch = name.charAt(i);
-        buffer.append(Character.toLowerCase(ch));
-      }
-      buffer.append("s ");
+      buffer.append(mUnit);
     }
-    buffer.append("exceeded!");
+    buffer.append(" exceeded!");
     return buffer.toString();
   }
+
+  public String getLabel()
+  {
+    return mLabel;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final String mLabel;
+  private final String mUnit;
 
 }

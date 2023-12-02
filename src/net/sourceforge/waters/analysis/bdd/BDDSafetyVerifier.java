@@ -43,6 +43,7 @@ import java.util.Map;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -199,11 +200,11 @@ public class BDDSafetyVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mConditionPartitioning != null) {
-      mConditionPartitioning.requestAbort();
+      mConditionPartitioning.requestAbort(sender);
     }
   }
 
@@ -236,7 +237,7 @@ public class BDDSafetyVerifier
   //# Overrides for net.sourceforge.waters.analysis.bdd.BDDModelVerifier
   @Override
   void createAutomatonBDDs()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
@@ -356,7 +357,7 @@ public class BDDSafetyVerifier
 
   @Override
   boolean containsBadState(final BDD reached)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     for (final ConjunctiveConditionBDD part : mConditionBDDs) {
       BDD condpart = part.getBDD();
@@ -388,7 +389,7 @@ public class BDDSafetyVerifier
   }
 
   private SafetyCounterExampleProxy computeCounterExample()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     for (final PartitionBDD part : mConditionBDDs) {
       part.dispose();

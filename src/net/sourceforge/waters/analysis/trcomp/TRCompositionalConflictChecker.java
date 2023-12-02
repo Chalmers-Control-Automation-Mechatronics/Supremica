@@ -71,6 +71,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -349,11 +350,11 @@ public class TRCompositionalConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mLanguageInclusionChecker != null) {
-      mLanguageInclusionChecker.requestAbort();
+      mLanguageInclusionChecker.requestAbort(sender);
     }
   }
 

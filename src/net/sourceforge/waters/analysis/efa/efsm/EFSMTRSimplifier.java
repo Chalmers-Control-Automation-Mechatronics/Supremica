@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -241,10 +242,10 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mSimplifier.requestAbort();
+    super.requestAbort(sender);
+    mSimplifier.requestAbort(sender);
   }
 
   @Override

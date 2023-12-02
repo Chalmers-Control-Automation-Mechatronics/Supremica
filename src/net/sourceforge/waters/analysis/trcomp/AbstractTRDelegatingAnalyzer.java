@@ -38,13 +38,14 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 
 /**
@@ -346,10 +347,10 @@ public abstract class AbstractTRDelegatingAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mDelegate.requestAbort();
+    super.requestAbort(sender);
+    mDelegate.requestAbort(sender);
   }
 
   @Override

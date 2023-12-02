@@ -50,6 +50,7 @@ import java.util.TreeSet;
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -266,11 +267,11 @@ abstract class AbstractModularVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mMonolithicVerifier != null) {
-      mMonolithicVerifier.requestAbort();
+      mMonolithicVerifier.requestAbort(sender);
     }
   }
 
@@ -486,7 +487,7 @@ abstract class AbstractModularVerifier
   }
 
   protected CounterExampleProxy extendToModel(final CounterExampleProxy counter)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     if (isCounterExampleEnabled()) {
       final Set<AutomatonProxy> traceAutomata =
@@ -512,7 +513,7 @@ abstract class AbstractModularVerifier
 
   private TraceProxy extendToModel(final TraceProxy trace,
                                    final Set<AutomatonProxy> traceAutomata)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final List<TraceStepProxy> oldSteps = trace.getTraceSteps();

@@ -51,23 +51,27 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortRequester;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 public class CliqueBasedReductionLocalisedComparisons
   extends AbstractTRSimplifierTest
+  implements AbortRequester
 {
 
   public static void main(final String[] args) throws Exception
   {
     int[] maxNumberOfCoversValues = new int[] {2, 5};
-    long timeout = 30; //s
+    int timeout = 30; //s
     if (args.length > 0) {
-      timeout = Long.parseLong(args[0]);
+      timeout = Integer.parseInt(args[0]);
       if (args.length > 1) {
         maxNumberOfCoversValues = new int[args.length - 1];
         for (int i = 1; i < args.length; i++) {
@@ -78,7 +82,7 @@ public class CliqueBasedReductionLocalisedComparisons
     runAllComparisons(timeout, maxNumberOfCoversValues);
   }
 
-  private static void runAllComparisons(final long timeout,
+  private static void runAllComparisons(final int timeout,
                                         final int[] maxNumberOfCoversValues)
     throws Exception
   {
@@ -174,7 +178,7 @@ public class CliqueBasedReductionLocalisedComparisons
   public CliqueBasedReductionLocalisedComparisons(final String filename,
                                                   final HeuristicCoverStrategy coverStrategy,
                                                   final int maxNumberOfCovers,
-                                                  final long timeout)
+                                                  final int timeout)
   {
     this.mFilename = getOutputDirectory() + "/" + filename;
     this.mCoverStrategy = coverStrategy;
@@ -497,11 +501,11 @@ public class CliqueBasedReductionLocalisedComparisons
       }).get(mTimeout, TimeUnit.SECONDS);
     } catch (final TimeoutException ex) {
       System.err.println("Timeout");
-      simplifier.requestAbort();
+      simplifier.requestAbort(this);
     } catch (final Exception ex) {
       System.err.println(ex);
     } finally {
-      simplifier.requestAbort();
+      simplifier.requestAbort(this);
       singlePool.shutdown();
     }
 
@@ -677,11 +681,21 @@ public class CliqueBasedReductionLocalisedComparisons
     runTransitionRelationSimplifier(GROUP, SUBDIR, name);
   }
 
+
+  //#######################################################################
+  //# Interface net.sourceforge.waters.model.analysis.AbortRequester
+  @Override
+  public AnalysisAbortException createAbortException()
+  {
+    return new OverflowException(OverflowKind.TIME, mTimeout);
+  }
+
+
   //#########################################################################
   //# Data Members
   private final MaxCliqueSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
   private final int mMaxNumberOfCovers;
-  private final long mTimeout; //seconds;
+  private final int mTimeout; //seconds;
   private final String mFilename;
   private PrintWriter mPrintWriter;
 

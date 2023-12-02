@@ -47,9 +47,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.HTMLPrinter;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 import org.apache.logging.log4j.LogManager;
@@ -242,13 +243,15 @@ public abstract class AnalysisProgressDialog extends JDialog
   //# Inner Class AnalyzerThread
   private class AnalyzerThread extends Thread
   {
+    //#######################################################################
+    //# Overrides for java.lang.Thread
     @Override
     public void run()
     {
       super.run();
       try {
         mAnalyzer.run();
-      } catch (final AnalysisAbortException exception) {
+      } catch (final UserAbortException exception) {
         // Do nothing: Aborted
         return;
       } catch (final AnalysisException exception) {
@@ -272,6 +275,9 @@ public abstract class AnalysisProgressDialog extends JDialog
         });
         return;
       }
+
+      //#######################################################################
+      //# Overrides for java.lang.Thread
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run()
@@ -287,10 +293,12 @@ public abstract class AnalysisProgressDialog extends JDialog
       });
     }
 
-    public boolean abort()
+    //#######################################################################
+    //# Abort Handler
+    private boolean abort()
     {
       if (mAnalyzer != null) {
-        mAnalyzer.requestAbort();
+        mAnalyzer.requestAbort(AbortRequester.USER);
         return true;
       } else {
         return false;

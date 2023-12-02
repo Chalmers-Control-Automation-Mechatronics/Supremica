@@ -537,7 +537,7 @@ public class MonolithicSafetyVerifier
    *         property is satisfied and there is no counterexample.
    */
   private SafetyCounterExampleProxy computeCounterExample()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

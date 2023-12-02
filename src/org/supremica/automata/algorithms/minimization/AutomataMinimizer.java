@@ -50,6 +50,7 @@ package org.supremica.automata.algorithms.minimization;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.apache.logging.log4j.LogManager;
@@ -465,12 +466,12 @@ public class AutomataMinimizer
         // Print total reduction statistics
         AutomatonMinimizer.logStatistics(options);
 //        // Print largest automaton size if observable
-//        logger.info("The automaton with the most states had " + 
+//        logger.info("The automaton with the most states had " +
 //                mostStates + " states.");
-//        logger.info("The automaton with the most transitions had " + 
+//        logger.info("The automaton with the most transitions had " +
 //                mostTransitions + " transitions.");
 //        // Print total state & transition number examined
-//        logger.info("The automata encountered had " + totalStates + 
+//        logger.info("The automata encountered had " + totalStates +
 //                " states and " + totalTransitions + " transitions in total.");
         final StringBuffer statstr = new StringBuffer("Operation statistics:\n");
         statstr.append("\tAutomaton with most states had: ").append(mostStates).append(" states\n");
@@ -741,7 +742,7 @@ public class AutomataMinimizer
                     for (final LabeledEvent event : bestAutomaton.getAlphabet())
                     {
                         if (event.isObservable())
-						{	
+						{
 							final Automata aut = eventToAutomataMap.get(event);
 							if(aut == null)
 							{
@@ -1069,14 +1070,14 @@ public class AutomataMinimizer
      * @see  ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         abortRequested = true;
         logger.debug("AutomataMinimizer requested to stop.");
         // Stop current minimization thread!
         if (threadToAbort != null)
         {
-            threadToAbort.requestAbort();
+            threadToAbort.requestAbort(sender);
         }
     }
 

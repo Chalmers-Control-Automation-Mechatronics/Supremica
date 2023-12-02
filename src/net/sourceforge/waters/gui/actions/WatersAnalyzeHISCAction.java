@@ -39,11 +39,11 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.gui.compiler.CompilationDialog;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -98,7 +98,7 @@ public abstract class WatersAnalyzeHISCAction
     try {
       final ProductDESProxy des = compiler.compile();
       compilationSucceeded(des);
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException exception) {
       final CompilationDialog dialog = new CompilationDialog(ide, null);
       dialog.setEvalException(exception, getVerb());
     }

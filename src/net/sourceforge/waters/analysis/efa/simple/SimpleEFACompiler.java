@@ -38,9 +38,10 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFACompiler;
+import net.sourceforge.waters.model.analysis.AbortRequester;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -74,13 +75,13 @@ public class SimpleEFACompiler
   }
 
   @Override
-  public SimpleEFASystem compile() throws EvalException
+  public SimpleEFASystem compile() throws AnalysisException
   {
     return compile(null);
   }
 
   public SimpleEFASystem compile(final List<ParameterBindingProxy> bindings)
-   throws EvalException
+   throws AnalysisException
   {
     setUp();
     final ModuleInstanceCompiler mModuleInstanceCompiler;
@@ -186,11 +187,11 @@ public class SimpleEFACompiler
 
   //#########################################################################
   @Override
-public void requestAbort()
+public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mEFASystemBuilder != null) {
-      mEFASystemBuilder.requestAbort();
+      mEFASystemBuilder.requestAbort(sender);
     }
   }
   @Override

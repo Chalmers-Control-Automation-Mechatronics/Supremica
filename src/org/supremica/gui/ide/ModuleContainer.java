@@ -48,8 +48,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.command.Command;
@@ -67,6 +65,7 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -81,6 +80,8 @@ import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -491,15 +492,16 @@ public class ModuleContainer
     mBackgroundCompiler.forceCompile(observer);
   }
 
-  public void setCompilationException(final EvalException exception)
+  public void setCompilationException(final AnalysisException exception)
   {
     final ModuleCompilationErrors old = mModuleContext.getCompilationErrors();
     final ModuleCompilationErrors current;
-    if (exception == null) {
+    if (exception == null || !(exception instanceof EvalException)) {
       current = ModuleCompilationErrors.NONE;
     } else {
       current = new ModuleCompilationErrors();
-      for (final EvalException e : exception.getAll()) {
+      final EvalException evalException = (EvalException) exception;
+      for (final AnalysisException e : evalException.getLeafExceptions()) {
         current.add(e);
       }
     }

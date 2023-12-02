@@ -61,6 +61,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.PropertySuppressionKindTranslator;
@@ -278,10 +279,10 @@ public class ProjectBuildFromWaters
    * @param module
    *          The WATERS module to be converted.
    * @return The module in Supremica form.
-   * @throws EvalException
+   * @throws AnalysisException
    *           to indicate that compilation of the module has failed.
    */
-  public Project build(final ModuleProxy module) throws EvalException
+  public Project build(final ModuleProxy module) throws AnalysisException
   {
     if (module == null) {
       throw new NullPointerException("NULL module passed to ProjectBuildFromWaters.build()!");

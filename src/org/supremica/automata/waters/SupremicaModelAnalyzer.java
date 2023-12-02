@@ -53,9 +53,7 @@ package org.supremica.automata.waters;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
@@ -69,6 +67,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
@@ -234,18 +235,18 @@ public abstract class SupremicaModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mSupremicaTask != null) {
-      mSupremicaTask.requestAbort();
+      mSupremicaTask.requestAbort(sender);
     }
   }
 
   @Override
   public void resetAbort()
   {
-    super.requestAbort();
+    super.resetAbort();
     if (mSupremicaTask != null) {
       mSupremicaTask.resetAbort();
     }

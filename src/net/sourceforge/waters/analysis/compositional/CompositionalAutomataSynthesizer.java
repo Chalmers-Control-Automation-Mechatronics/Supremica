@@ -60,6 +60,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -240,17 +241,17 @@ public class CompositionalAutomataSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mPreSupervisorReducer != null) {
-        mPreSupervisorReducer.requestAbort();
+        mPreSupervisorReducer.requestAbort(sender);
       }
     if (mMainSupervisorReducer != null) {
-        mMainSupervisorReducer.requestAbort();
+        mMainSupervisorReducer.requestAbort(sender);
       }
     if (mHalfwaySimplifier != null) {
-      mHalfwaySimplifier.requestAbort();
+      mHalfwaySimplifier.requestAbort(sender);
     }
   }
 

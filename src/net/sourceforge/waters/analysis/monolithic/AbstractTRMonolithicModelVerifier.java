@@ -479,6 +479,7 @@ public abstract class AbstractTRMonolithicModelVerifier
       final int end = mDepthMap.get(mLevel + 1);
       outer:
       for (int s = start; s < end; s++) {
+        checkAbort();
         getStateSpace().getContents(s, encodedSource);
         getStateTupleEncoding().decode(encodedSource, decodedSource);
         for (final EventInfo event : getEventInfo()) {

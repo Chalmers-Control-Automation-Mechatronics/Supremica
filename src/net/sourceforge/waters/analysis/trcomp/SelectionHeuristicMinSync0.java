@@ -37,6 +37,7 @@ import java.util.Collection;
 
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -60,11 +61,11 @@ abstract class SelectionHeuristicMinSync0
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.requestAbort();
+      mSynchronousProductBuilder.requestAbort(sender);
     }
   }
 

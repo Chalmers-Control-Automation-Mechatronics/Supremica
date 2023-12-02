@@ -38,7 +38,8 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -313,7 +314,7 @@ public abstract class AbstractTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(AbortRequester sender)
   {
     mIsAborting = true;
   }
@@ -509,15 +510,15 @@ public abstract class AbstractTRSimplifier
 
   /**
    * Checks whether this simplifier has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
+   * and if so, performs the abort by throwing an {@link UserAbortException}.
    * This method should be called periodically by any transition relation
    * simplifier that supports being aborted by user request.
    */
   protected void checkAbort()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
+      final UserAbortException exception = new UserAbortException();
       throw exception;
     }
   }

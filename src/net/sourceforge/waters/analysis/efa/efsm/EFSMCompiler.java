@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -78,14 +79,14 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mModuleInstanceCompiler != null) {
-      mModuleInstanceCompiler.requestAbort();
+      mModuleInstanceCompiler.requestAbort(sender);
     }
     if (mEFSMSystemBuilder != null) {
-      mEFSMSystemBuilder.requestAbort();
+      mEFSMSystemBuilder.requestAbort(sender);
     }
   }
 

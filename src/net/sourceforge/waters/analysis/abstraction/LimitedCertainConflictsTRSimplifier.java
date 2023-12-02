@@ -52,7 +52,7 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -619,7 +619,7 @@ public class LimitedCertainConflictsTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private int findCoreachableStates(final int level)
-  throws AnalysisAbortException
+  throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();

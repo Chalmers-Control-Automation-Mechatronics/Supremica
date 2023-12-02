@@ -41,7 +41,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -187,7 +187,7 @@ public class TauEliminationTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private void explore(final int start)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     if (!mRoot[start]) {
       mRoot[start] = true;
@@ -201,7 +201,7 @@ public class TauEliminationTRSimplifier
   }
 
   private void exploreGroup(final int root)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TIntHashSet visited = new TIntHashSet();
@@ -248,7 +248,7 @@ public class TauEliminationTRSimplifier
   }
 
   private void cleanUp()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter;

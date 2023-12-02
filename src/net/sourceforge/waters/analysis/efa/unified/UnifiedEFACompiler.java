@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -137,14 +138,14 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mModuleInstanceCompiler != null) {
-      mModuleInstanceCompiler.requestAbort();
+      mModuleInstanceCompiler.requestAbort(sender);
     }
     if (mNormaliser != null) {
-      mNormaliser.requestAbort();
+      mNormaliser.requestAbort(sender);
     }
   }
 

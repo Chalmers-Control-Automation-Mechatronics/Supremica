@@ -46,18 +46,19 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *
  * <P>A {@link ModelAnalyzer} or other class that contains an abortable
  * algorithm should implement this interface. Its user can request the
- * algorithm to abort by calling {@link #requestAbort()}, which is typically
- * done from a separate thread. The running algorithm then should stop by
- * throwing an {@link AnalysisAbortException} at the next convenient time.
- * This usually means that the algorithm must check periodically whether an
- * abort request has been received.</P>
+ * algorithm to abort by calling {@link #requestAbort(AbortRequester)}, which
+ * is typically done from a separate thread. The running algorithm then should
+ * stop by throwing an {@link AnalysisAbortException} at the next convenient
+ * time. This usually means that the algorithm must check periodically whether
+ * an abort request has been received.</P>
  *
  * <P>The easiest way to implement this behaviour is by extending the helper
  * class {@link AbstractAbortable} and making the algorithm call {@link
- * AbstractAbortable#checkAbort() checkAbort()} periodically.</P>
+ * AbstractAbortable#checkAbort() checkAbort()} periodically. If that is
+ * not possible, class {@link AbstractAbortable} provides a static method
+ * {@link AbstractAbortable#checkAbort(AbortRequester) checkAbort()} to
+ * facilitate the periodic check.</P>
  *
- * @see AbstractAbortable
- * @see AnalysisAbortException
  * @author Robi Malik
  */
 
@@ -72,10 +73,13 @@ public interface Abortable
    * request abort at a later time. It may take some time for the model
    * analyser to check this flag and react, or the request may not be
    * obeyed at all. If a model analyser aborts, it will throw an
-   * {@link AnalysisAbortException} from its {@link ModelAnalyzer#run() run()}
-   * method.
+   * {@link AnalysisAbortException}.
+   * @param  sender  The object requesting the abort. When the abort is
+   *                 processed, it should call the sender's {@link
+   *                 AbortRequester#createAbortException() createAbortException()}
+   *                 method to create an exception an throw that exception.
    */
-  public void requestAbort();
+  public void requestAbort(AbortRequester sender);
 
   /**
    * Returns whether the model analyser has been requested to abort.

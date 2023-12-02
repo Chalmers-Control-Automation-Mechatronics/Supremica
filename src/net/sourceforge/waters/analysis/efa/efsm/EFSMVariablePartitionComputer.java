@@ -50,8 +50,9 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -93,10 +94,10 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mBisimulator.requestAbort();
+    super.requestAbort(sender);
+    mBisimulator.requestAbort(sender);
   }
 
   @Override
@@ -327,7 +328,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
   }
 
   private boolean checkEventEncoding(final EFSMEventEncoding encoding)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     for (int e = EventEncoding.NONTAU; e < encoding.size(); e++) {
       final ConstraintList update = encoding.getUpdate(e);

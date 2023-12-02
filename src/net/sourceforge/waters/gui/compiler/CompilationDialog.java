@@ -48,7 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.HTMLPrinter;
-import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 
 import org.supremica.gui.ide.IDE;
 
@@ -104,19 +104,19 @@ public class CompilationDialog extends JDialog
 
   /**
    * Displays an error message.
-   * @param exception   The <CODE>EvalException</CODE> for which to display
+   * @param exception   The <CODE>AnalysisException</CODE> for which to display
    *                    the message.
    * @param taskVerb    Should fit in the sentence "The module cannot be
    *                    <I>verb</I> because it has errors".
    */
-  public void setEvalException(final EvalException exception,
+  public void setEvalException(final AnalysisException exception,
                                final String taskVerb)
   {
     final StringBuilder sb = new StringBuilder();
     sb.append("The module cannot be ");
     sb.append(taskVerb);
     sb.append(" because it has ");
-    final List<EvalException> all = exception.getAll();
+    final List<? extends AnalysisException> all = exception.getLeafExceptions();
     if (all.size() == 1) {
       sb.append("an error: " );
       sb.append(all.get(0).getMessage());

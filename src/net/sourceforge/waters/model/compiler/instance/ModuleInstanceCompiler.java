@@ -52,6 +52,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -59,7 +60,6 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.MultiExceptionModuleProxyVisitor;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -482,7 +482,7 @@ public class ModuleInstanceCompiler
     throws VisitorException
   {
     try {
-      checkAbort();
+      checkAbortInVisitor();
       final IdentifierProxy ident = alias.getIdentifier();
       final ScopeKind scope = alias.getScope();
       final CompiledParameterBinding binding =
@@ -575,7 +575,7 @@ public class ModuleInstanceCompiler
     throws VisitorException
   {
     try {
-      checkAbort();
+      checkAbortInVisitor();
       final IdentifierProxy ident = decl.getIdentifier();
       final ScopeKind scope = decl.getScope();
       final CompiledParameterBinding binding =
@@ -763,7 +763,7 @@ public class ModuleInstanceCompiler
     throws VisitorException
   {
     try {
-      checkAbort();
+      checkAbortInVisitor();
       // First evaluate all indices,
       final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
       // Then perform a search. The location depends on the context.
@@ -856,8 +856,7 @@ public class ModuleInstanceCompiler
 
       } catch (final VisitorException exception) {
         final Throwable cause = exception.getCause();
-        if (cause instanceof EvalException &&
-            !(cause instanceof EvalAbortException)) {
+        if (cause instanceof EvalException) {
           innerException = (EvalException) cause;
         } else {
           throw exception;
@@ -875,7 +874,7 @@ public class ModuleInstanceCompiler
       }
 
       if (innerException != null) {
-        for (final EvalException ex : innerException.getAll()) {
+        for (final AnalysisException ex : innerException.getLeafExceptions()) {
           final InstantiationException next =
             new InstantiationException(ex, inst);
           compilationInfo.raiseInVisitor(next);
@@ -1068,7 +1067,7 @@ public class ModuleInstanceCompiler
     throws VisitorException
   {
     try {
-      checkAbort();
+      checkAbortInVisitor();
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
         return null;
       }

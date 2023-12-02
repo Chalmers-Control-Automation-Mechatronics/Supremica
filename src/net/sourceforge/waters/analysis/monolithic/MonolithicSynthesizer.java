@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -125,14 +126,14 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mMinimizationChain != null) {
-      mMinimizationChain.requestAbort();
+      mMinimizationChain.requestAbort(sender);
     }
     if (mReductionChain != null) {
-      mReductionChain.requestAbort();
+      mReductionChain.requestAbort(sender);
     }
   }
 
@@ -955,7 +956,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
     //#########################################################################
     //# State Exploration
     public boolean explore(final int[] encodedTuple)
-      throws OverflowException, AnalysisAbortException
+      throws AnalysisAbortException
     {
       checkAbort();
       mSTEncoding.decode(encodedTuple, mmDecodedTuple);
@@ -1064,7 +1065,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
 
     @Override
     public boolean explore(final int[] encodedTuple)
-      throws OverflowException, AnalysisAbortException
+      throws AnalysisAbortException
     {
       checkAbort();
       mSTEncoding.decode(encodedTuple, mmDecodedTuple);

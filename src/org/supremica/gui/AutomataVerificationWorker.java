@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.apache.logging.log4j.LogManager;
@@ -111,8 +112,7 @@ public class AutomataVerificationWorker
         {
             JOptionPane.showMessageDialog(mOwner, errorMessage,
                 "Alert", JOptionPane.ERROR_MESSAGE);
-            requestAbort();
-
+            requestAbort(AbortRequester.USER);
             return;
         }
 
@@ -158,7 +158,7 @@ public class AutomataVerificationWorker
 				break;
 			default:
 				// Error... this can't happen!
-				requestAbort();
+				requestAbort(AbortRequester.USER);
 				logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " +
 							 "this can't happen.\nPlease send bug report to bugs@supremica.org.");
 			  return;
@@ -178,7 +178,7 @@ public class AutomataVerificationWorker
         }
         catch (final Exception ex)
         {
-            requestAbort();
+            requestAbort(AbortRequester.USER);
             JOptionPane.showMessageDialog(mOwner, ex.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
             logger.error(ex.getMessage());
@@ -205,7 +205,7 @@ public class AutomataVerificationWorker
         }
         catch (final Exception ex)
         {
-          this.requestAbort();
+          this.requestAbort(AbortRequester.USER);
         }
         // Add test result from Diagnosability verification
         if (vtype == VerificationType.DIAGNOSABILITY &&
@@ -275,7 +275,7 @@ public class AutomataVerificationWorker
      *@see  ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         abortRequested = true;
 
@@ -297,4 +297,5 @@ public class AutomataVerificationWorker
     public void resetAbort(){
       abortRequested = false;
     }
+
 }

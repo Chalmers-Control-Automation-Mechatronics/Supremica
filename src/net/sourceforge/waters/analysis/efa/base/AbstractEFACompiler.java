@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.analysis.efa.base;
 
-import net.sourceforge.waters.model.compiler.AbortableCompiler;
-import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
@@ -49,7 +49,7 @@ public abstract class AbstractEFACompiler
   TR extends AbstractEFATransitionRelation<L>,
   C extends AbstractEFAVariableContext<L, V>,
   S extends AbstractEFASystem<L, V, TR, C>>
- extends AbortableCompiler
+ extends AbstractAbortable
 {
 
   //##########################################################################
@@ -76,7 +76,7 @@ public abstract class AbstractEFACompiler
 
 
   //##########################################################################
-  public abstract S compile() throws EvalException;
+  public abstract S compile() throws AnalysisException;
 
 
   //#########################################################################

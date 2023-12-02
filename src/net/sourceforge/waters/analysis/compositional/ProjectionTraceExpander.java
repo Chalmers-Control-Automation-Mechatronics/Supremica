@@ -47,7 +47,6 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -78,7 +77,7 @@ public class ProjectionTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final TIntArrayList crucialEvents = getEventSteps(traceSteps);
     final SearchRecord endRecord = convertEventSteps(crucialEvents);
@@ -112,7 +111,7 @@ public class ProjectionTraceExpander extends TRTraceExpander
   }
 
   private SearchRecord convertEventSteps(final TIntArrayList eventSteps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     // 1. Collect initial states
     final ListBufferTransitionRelation rel = getTransitionRelation();

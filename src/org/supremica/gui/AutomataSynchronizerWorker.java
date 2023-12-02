@@ -39,6 +39,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.apache.logging.log4j.LogManager;
@@ -194,7 +195,7 @@ public class AutomataSynchronizerWorker
     }
 
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         abortRequested = true;
     }

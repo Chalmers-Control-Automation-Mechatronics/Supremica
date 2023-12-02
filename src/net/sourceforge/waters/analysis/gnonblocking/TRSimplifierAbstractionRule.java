@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -81,9 +82,9 @@ abstract class TRSimplifierAbstractionRule extends AbstractionRule
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    mSimplifier.requestAbort();
+    mSimplifier.requestAbort(sender);
   }
 
   @Override

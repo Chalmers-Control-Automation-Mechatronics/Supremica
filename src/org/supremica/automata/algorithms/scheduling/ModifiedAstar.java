@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -456,7 +458,7 @@ public class ModifiedAstar
     }
 
 	@Override
-    public void requestAbort()
+    public void requestAbort(AbortRequester sender)
     {
         requestStop(false);
     }

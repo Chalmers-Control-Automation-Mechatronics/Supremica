@@ -39,7 +39,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 
 
 /**
@@ -118,7 +118,7 @@ public class SpecialEventsTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     // Set up ...
     final ListBufferTransitionRelation rel = getTransitionRelation();

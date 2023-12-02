@@ -44,7 +44,6 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -94,7 +93,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
     final List<SearchRecord> convertedSteps =
@@ -108,7 +107,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   //# Auxiliary Methods
   private List<SearchRecord> convertCrucialSteps
     (final List<SearchRecord> crucialSteps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     int len = crucialSteps.size();
     SearchRecord last = crucialSteps.get(len - 1);
@@ -137,7 +136,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   }
 
   private SearchRecord convertCrucialSteps(final SearchRecord[] crucialSteps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int tau = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();

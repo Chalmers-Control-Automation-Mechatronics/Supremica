@@ -145,7 +145,7 @@ public class UnifiedEFAConflictCheckerExperiments
           checkPML("pml3", c, n, true);
 //          checkPML("pml4", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -160,7 +160,7 @@ public class UnifiedEFAConflictCheckerExperiments
 //        testPrimeSieve7();
         testPrimeSieve8();
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
 
@@ -168,35 +168,35 @@ public class UnifiedEFAConflictCheckerExperiments
 //      testCaseStudy();
 //      testCaseStudyNonblocking();
       testProductionCell();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
         checkProfisafe("profisafe_ihost_efa_0b", maxseqno, false);
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       testPslBig();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
 
     try {
       testPslBigBlocking();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       testPslBigNonblocking();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       testPslBigWithManyRestartTrans();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
@@ -206,7 +206,7 @@ public class UnifiedEFAConflictCheckerExperiments
           for (int n = 500; n <= 500; n+= 100) {
             checkTransferLineRework("transferline_efsm_rework_block", r, n, false);
           }
-        } catch (final AnalysisException | EvalException exception) {
+        } catch (final AnalysisException exception) {
           // next please ...
         }
       }
@@ -215,7 +215,7 @@ public class UnifiedEFAConflictCheckerExperiments
           for (int n = 500; n <= 500; n+= 100) {
             checkTransferLineRework("transferline_efsm_rework", r, n, true);
           }
-        } catch (final AnalysisException | EvalException exception) {
+        } catch (final AnalysisException exception) {
           // next please ...
         }
       }
@@ -236,14 +236,14 @@ public class UnifiedEFAConflictCheckerExperiments
 //        final int maxval = primes[s] * primes[s] - 1;
 //        checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
 //      }
-//    } catch (final AnalysisException | EvalException exception) {
+//    } catch (final AnalysisException exception) {
 //      // next please ...
 //    }
 //    try {
 //      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
 //        checkProfisafe("profisafe_ihost_efa_2", maxseqno, false);
 //      }
-//    } catch (final AnalysisException | EvalException exception) {
+//    } catch (final AnalysisException exception) {
 //      // next please ...
 //    }
 
@@ -251,14 +251,14 @@ public class UnifiedEFAConflictCheckerExperiments
 //      for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
 //        checkProfisafe("profisafe_islave_efa", maxseqno, true);
 //      }
-//    } catch (final AnalysisException | EvalException exception) {
+//    } catch (final AnalysisException exception) {
 //      // next please ...
 //    }
     try {
       for (int i = 300; i <= 400; i += 100) {
         checkRoundRobin(i);
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
 //    try {
@@ -266,7 +266,7 @@ public class UnifiedEFAConflictCheckerExperiments
 //        final int nn = n == 0 ? 1 : n;
 //        checkJDEDS2014(10, nn);
 //      }
-//    } catch (final AnalysisException | EvalException exception) {
+//    } catch (final AnalysisException exception) {
 //      // next please ...
 //    }
   }
@@ -324,7 +324,7 @@ public class UnifiedEFAConflictCheckerExperiments
   //# Auxiliary Methods
   private ProductDESProxy compile(final ModuleProxy module,
                                   final List<ParameterBindingProxy> bindings)
-    throws EvalException, OverflowException
+    throws AnalysisException
   {
     try {
       final DocumentManager manager = getDocumentManager();

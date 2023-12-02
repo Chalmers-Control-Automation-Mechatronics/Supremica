@@ -47,7 +47,6 @@ import java.util.Properties;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -65,11 +64,9 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -263,10 +260,11 @@ public class CommandLineTool implements Configurable
             des = compiler.compile();
             final long stop = System.currentTimeMillis();
             compileTime = stop - compileStart;
-          } catch (final EvalAbortException exception) {
+          } catch (final OverflowException exception) {
             final long stop = System.currentTimeMillis();
             final float difftime = 0.001f * (stop - start0);
-            formatter.format("TIMEOUT (%.3f s)\n", difftime);
+            final String label = exception.getOverflowKind().getLabel();
+            formatter.format("%s (%.3f s)\n", label, difftime);
             final AnalysisResult result = new DefaultAnalysisResult(mAnalyzer);
             compileTime = stop - compileStart;
             result.setCompileTime(compileTime);
@@ -367,16 +365,12 @@ public class CommandLineTool implements Configurable
           } catch (final OverflowException overflow) {
             final long stop = System.currentTimeMillis();
             final float difftime = 0.001f * (stop - start1 + setUpTime);
+            final String label = overflow.getOverflowKind().getLabel();
             final String msg = overflow.getMessage();
             if (mVerbosity != Level.OFF && msg != null) {
               System.out.println(msg);
             }
-            formatter.format("OVERFLOW (%.3f s)\n", difftime);
-            i = mRepetitions;
-          } catch (final AnalysisAbortException abort) {
-            final long stop = System.currentTimeMillis();
-            final float difftime = 0.001f * (stop - start1 + setUpTime);
-            formatter.format("TIMEOUT (%.3f s)\n", difftime);
+            formatter.format("%s (%.3f s)\n", label, difftime);
             i = mRepetitions;
           }
           final AnalysisResult result = mAnalyzer.getAnalysisResult();
@@ -402,7 +396,7 @@ public class CommandLineTool implements Configurable
         }
       }
 
-    } catch (final EvalException | AnalysisException |
+    } catch (final AnalysisException |
                    WatersUnmarshalException | IOException exception) {
       showSupportedException(exception);
     } catch (final ExitException exception) {

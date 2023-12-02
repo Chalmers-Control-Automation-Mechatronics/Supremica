@@ -54,6 +54,7 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 import org.apache.logging.log4j.LogManager;
@@ -228,10 +229,10 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mSimplifier.requestAbort();
+    super.requestAbort(sender);
+    mSimplifier.requestAbort(sender);
   }
 
   @Override

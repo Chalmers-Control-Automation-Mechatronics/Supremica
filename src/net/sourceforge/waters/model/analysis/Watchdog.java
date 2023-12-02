@@ -56,8 +56,10 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *   // configure analyzer for experiment i ...
  *   try {
  *     analyzer.{@link ModelAnalyzer#run() run}();
- *   } catch (final {@link AnalysisAbortException} exception) {
- *     // it has timed out ...
+ *   } catch (final {@link OverflowException} exception) {
+ *     if (exception.{@link OverflowException#getOverflowKind() getOverflowKind}() == {@link OverflowKind}.{@link OverflowKind#TIME TIME}) {
+ *       // it has timed out ...
+ *     }
  *   }
  *   watchdog.{@link #reset() reset}();  // so the timer is reset
  * }</PRE>
@@ -65,14 +67,17 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * @author Robi Malik
  */
 
-public class Watchdog extends Thread {
-
+public class Watchdog
+  extends Thread
+  implements AbortRequester
+{
   //#########################################################################
   //# Constructor
   /**
    * Creates a new watchdog.
    * @param  seconds     The time in seconds before {@link
-   *                     Abortable#requestAbort() requestAbort()} is called.
+   *                     Abortable#requestAbort(AbortRequester) requestAbort()}
+   *                     is called.
    */
   public Watchdog(final int seconds)
   {
@@ -86,10 +91,11 @@ public class Watchdog extends Thread {
    * Creates a new watchdog.
    * @param  abortable   The object to be controlled by timeout.
    *                     If the timeout is reached, the abortable's
-   *                     {@link Abortable#requestAbort() requestAbort()}
-   *                     method is called.
+   *                     {@link Abortable#requestAbort(AbortRequester)
+   *                     requestAbort()} method is called.
    * @param  seconds     The time in seconds before {@link
-   *                     Abortable#requestAbort() requestAbort()} is called.
+   *                     Abortable#requestAbort(AbortRequester) requestAbort()}
+   *                     is called.
    */
   public Watchdog(final Abortable abortable, final int seconds)
   {
@@ -100,6 +106,24 @@ public class Watchdog extends Thread {
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the watchdog's configured timeout in seconds.
+   */
+  public int getTimeoutSeconds()
+  {
+    return (int) (mTimeoutMillis / 1000L);
+  }
+
+  /**
+   * Returns whether the timeout has been reached.
+   * @return <CODE>true</CODE> if the timer has been started and expired,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isExpired()
+  {
+    return mStartTime < 0;
+  }
+
   /**
    * Resets the watchdog timer and cancels all abort requests.
    */
@@ -120,7 +144,7 @@ public class Watchdog extends Thread {
   {
     mAbortables.add(abortable);
     if (mStartTime < 0) {
-      abortable.requestAbort();
+      abortable.requestAbort(this);
     }
   }
 
@@ -145,8 +169,8 @@ public class Watchdog extends Thread {
   }
 
   /**
-   * Terminates this watchdog. This method removes all abortables,
-   * interrupts the tread and waits for it to terminate.
+   * Terminates this watchdog without timeout. This method removes all
+   * abortables, interrupts the tread and waits for it to terminate.
    */
   public synchronized void terminate()
   {
@@ -186,12 +210,22 @@ public class Watchdog extends Thread {
           System.out.flush();
         }
         for (final Abortable abortable : mAbortables) {
-          abortable.requestAbort();
+          abortable.requestAbort(this);
         }
       }
     } catch (final InterruptedException exception) {
       // Interrupt means terminate ...
     }
+  }
+
+
+  //#######################################################################
+  //# Interface net.sourceforge.waters.model.analysis.AbortRequester
+  @Override
+  public AnalysisAbortException createAbortException()
+  {
+    final int seconds = getTimeoutSeconds();
+    return new OverflowException(OverflowKind.TIME, seconds);
   }
 
 

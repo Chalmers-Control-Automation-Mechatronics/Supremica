@@ -59,6 +59,7 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -213,7 +214,7 @@ public class ScheduleDialog
             {
                 if (sched != null)
                 {
-                    sched.requestAbort();
+                    sched.requestAbort(AbortRequester.USER);
                     reset();
                 }
                 else
@@ -710,6 +711,7 @@ public class ScheduleDialog
             }
         }
     }
+
 }
 
 

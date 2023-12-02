@@ -56,7 +56,7 @@ import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntPairStack;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
@@ -230,7 +230,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
   //#########################################################################
   //# Compatibility Relation
   private void setUpCompatibilityRelation()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     createEventInfo();
     final TIntArrayList supervisedEvents = getSupervisedEvents();
@@ -281,7 +281,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
   private void propagateIncompatible(final TLongArrayStack stack,
                                      final int state1,
                                      final int state2)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     if (mCompatibilityRelation.pushIncompatibleIfNew(stack, state1, state2)) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -381,7 +381,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
   }
 
   private void setUpAllCompatibleMarkings()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mAllCompatibleMarkings = rel.createMarkings();
@@ -612,7 +612,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     }
 
     private boolean collectEnablingClique(final TIntArrayList buffer)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       buffer.clear();
       for (final int s : mCompatibilityRelation.getRelevantStates()) {
@@ -768,7 +768,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     }
 
     private int extendToSmallCover(final TIntArrayList clique)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       mBuffer.clear();
       if (!clique.isEmpty()) {
@@ -799,7 +799,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
 
     private void collectCommonNeighbours(final TIntArrayList cliqueList,
                                          final TIntArrayList neighbours)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       final TIntHashSet cliqueSet = new TIntHashSet(cliqueList);
       outer:
@@ -887,7 +887,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     //#######################################################################
     //# Clique Extension
     private int extendToMaxClique(final int clique)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       mCliqueBuffer.clear();
       mCliqueDB.collect(clique, mCliqueBuffer);
@@ -1189,7 +1189,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     //#######################################################################
     //# Domination Tests
     private boolean isDominatedBySome(final int clique, final int list)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       mListReadIterator.reset(list);
       while (mListReadIterator.advance()) {
@@ -1203,7 +1203,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     }
 
     private void removeAllDominated(final int clique, final int list)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       mListEditIterator.reset(list);
       while (mListEditIterator.advance()) {
@@ -1217,7 +1217,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     }
 
     private int removeAllDominatedWithUnion(final int clique)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       mCliqueBuffer.clear();
       mCliqueDB.collect(clique, mCliqueBuffer);
@@ -1236,7 +1236,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     private boolean removeAllDominatedWithUnion(final TIntArrayList cliqueList,
                                                 final TIntHashSet cliqueSet,
                                                 final int list)
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       boolean addedSome = false;
       mListEditIterator.reset(list);

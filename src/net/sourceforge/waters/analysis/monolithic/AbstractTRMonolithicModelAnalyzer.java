@@ -404,13 +404,13 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   }
 
   protected void setUpStateTupleEncoding()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     setUpStateTupleEncoding(mTRAutomata);
   }
 
   protected void setUpStateTupleEncoding(final TRAutomatonProxy[] trs)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int numAutomata = trs.length;
     mDecodedDeadlockState = new int[numAutomata];
@@ -458,7 +458,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   }
 
   protected Map<EventProxy,? extends EventInfo> setUpEventEncoding()
-    throws OverflowException, AnalysisAbortException
+    throws AnalysisAbortException
   {
     final ProductDESProxy des = getModel();
 
@@ -546,7 +546,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   }
 
   protected void setUpDeadlockInfo()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int numProps = mOutputEventEncoding.getNumberOfPropositions();
     if (mPruningDeadlocks && numProps > 0) {

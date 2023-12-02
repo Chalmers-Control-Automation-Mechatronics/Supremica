@@ -39,6 +39,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -46,7 +47,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
@@ -332,7 +332,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   }
 
   protected ProductDESProxy loadProductDES(final URI unmodifiedDESURI)
-      throws WatersUnmarshalException, IOException, EvalException
+      throws WatersUnmarshalException, IOException, AnalysisException
   {
     final DocumentProxy doc = mDocumentManager.load(unmodifiedDESURI);
     ProductDESProxy des;

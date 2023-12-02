@@ -59,7 +59,7 @@ import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntComparator;
 import net.sourceforge.waters.analysis.tr.WatersIntHeap;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
@@ -452,14 +452,14 @@ public class MaxCliqueSupervisorReductionTRSimplifier
 
   private interface CoverStrategy
   {
-    public TIntList getCoversOf(TIntList compatible) throws AnalysisAbortException;
+    public TIntList getCoversOf(TIntList compatible) throws UserAbortException;
   }
 
 
   private interface DependencyStrategy
   {
     public void processNewDependencies(Candidate solution,
-                                       TIntList newDependencies) throws AnalysisAbortException;
+                                       TIntList newDependencies) throws UserAbortException;
   }
 
   private interface AddCandidateStrategy {
@@ -507,7 +507,7 @@ public class MaxCliqueSupervisorReductionTRSimplifier
      */
     @Override
     public void processNewDependencies(final Candidate candidate,
-                                       final TIntList dependentIds) throws AnalysisAbortException
+                                       final TIntList dependentIds) throws UserAbortException
     {
       checkAbort();
       mSetBuffer.clear();
@@ -591,7 +591,7 @@ public class MaxCliqueSupervisorReductionTRSimplifier
   {
 
     @Override
-    public TIntList getCoversOf(final TIntList compatible) throws AnalysisAbortException
+    public TIntList getCoversOf(final TIntList compatible) throws UserAbortException
     {
       final TIntList possibleAdditions =
         new TIntArrayList(mNumStates - mStatesCompatibleWithAll.size());
@@ -607,7 +607,7 @@ public class MaxCliqueSupervisorReductionTRSimplifier
     private void bronKerboschWithPivot(final TIntList clique,
                                        final TIntList possibleAdditions,
                                        final TIntList alreadyChecked,
-                                       final TIntList maximalCliquesIdsToFill) throws AnalysisAbortException
+                                       final TIntList maximalCliquesIdsToFill) throws UserAbortException
     {
       checkAbort();
       //if we have exhausted all possibilities, this must be the largest clique we have seen
@@ -707,7 +707,7 @@ public class MaxCliqueSupervisorReductionTRSimplifier
     }
 
     @Override
-    public TIntList getCoversOf(final TIntList compatible) throws AnalysisAbortException
+    public TIntList getCoversOf(final TIntList compatible) throws UserAbortException
     {
       final TIntList possibleAdditions =
         new TIntArrayList(mNumStates - mStatesCompatibleWithAll.size());
@@ -725,7 +725,7 @@ public class MaxCliqueSupervisorReductionTRSimplifier
 
     private void heuristicBronKerbosch(final TIntList clique,
                                        final WatersIntHeap possibleAdditions,
-                                       final TIntSet maximalCliquesIdsToFill) throws AnalysisAbortException
+                                       final TIntSet maximalCliquesIdsToFill) throws UserAbortException
     {
       //if we have exhausted all possibilities, this must be the largest clique we have seen
       checkAbort();
@@ -938,7 +938,7 @@ public class MaxCliqueSupervisorReductionTRSimplifier
   }
 
   private boolean buildReducedSupervisor(final Candidate reducedSupervisor)
-    throws OverflowException, AnalysisAbortException
+    throws OverflowException, UserAbortException
   {
 
     checkAbort();

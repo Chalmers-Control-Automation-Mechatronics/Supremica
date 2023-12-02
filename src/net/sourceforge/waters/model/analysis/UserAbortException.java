@@ -31,41 +31,49 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
-
-import net.sourceforge.waters.model.expr.EvalException;
+package net.sourceforge.waters.model.analysis;
 
 
 /**
- * An exception indicating that compilation has been aborted
- * in response to a user request or timeout.
+ * An exception indicating that an analysis algorithm has been aborted
+ * in response to a user request.
  *
  * @author Robi Malik
  */
 
-public class EvalAbortException extends EvalException {
+public class UserAbortException extends AnalysisAbortException {
 
   //#########################################################################
   //# Constructors
   /**
    * Constructs a new abort exception with a default message.
    */
-  public EvalAbortException()
+  public UserAbortException()
   {
-    this("Compilation aborted.");
+    this("Abort requested by user.");
   }
 
   /**
    * Constructs a new abort exception with a given message.
    */
-  public EvalAbortException(final String msg)
+  public UserAbortException(final String msg)
   {
     super(msg);
+  }
+
+  /**
+   * Constructs a new abort exception with the specified cause. The detail
+   * message will be <CODE>(cause==null ? null : cause.toString())</CODE>
+   * (which typically contains the class and detail message of cause).
+   */
+  public UserAbortException(final Throwable cause)
+  {
+    super(cause);
   }
 
 
   //#########################################################################
   //# Static Class Variables
-  private static final long serialVersionUID = 8143133897793009203L;
+  private static final long serialVersionUID = -2601097829012752986L;
 
 }

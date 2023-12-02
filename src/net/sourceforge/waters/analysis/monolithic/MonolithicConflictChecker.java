@@ -47,9 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -70,6 +67,9 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 
 /**
@@ -404,7 +404,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
    */
   private boolean exploreBackwards(final int stateid, final BitSet coreachable,
                                    int maxdepth)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     if (maxdepth-- > 0) {
       checkAbort();

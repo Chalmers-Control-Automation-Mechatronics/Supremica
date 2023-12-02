@@ -45,6 +45,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -52,7 +55,6 @@ import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -139,7 +141,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Robi Malik, Roger Su
  */
-public class EFACompiler extends AbortableCompiler
+public class EFACompiler extends AbstractAbortable
 {
   //#########################################################################
   //# Constructor
@@ -159,14 +161,14 @@ public class EFACompiler extends AbortableCompiler
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mTransitionRelationBuilder != null) {
-      mTransitionRelationBuilder.requestAbort();
+      mTransitionRelationBuilder.requestAbort(sender);
     }
     if (mVariableAutomatonBuilder != null) {
-      mVariableAutomatonBuilder.requestAbort();
+      mVariableAutomatonBuilder.requestAbort(sender);
     }
   }
 
@@ -185,7 +187,7 @@ public class EFACompiler extends AbortableCompiler
 
   //#########################################################################
   //# Invocation
-  public ModuleProxy compile() throws EvalException
+  public ModuleProxy compile() throws AnalysisException
   {
     try {
       mRootContext = new EFAModuleContext(mInputModule);
@@ -242,7 +244,7 @@ public class EFACompiler extends AbortableCompiler
   //#########################################################################
   //# Event Partitioning
   private void computeEventPartitions()
-    throws EvalException
+    throws AnalysisException
   {
     final ConstraintPropagator propagator =
       new ConstraintPropagator(mFactory, mCompilationInfo, mOperatorTable,
@@ -306,7 +308,7 @@ public class EFACompiler extends AbortableCompiler
     (final EFAEventDecl edecl,
      final List<EFAAutomatonTransitionGroup> groups,
      final ConstraintPropagator propagator)
-    throws EvalException
+    throws AnalysisException
   {
     final int size = groups.size();
     final List<EFAAutomatonTransition> parts =
@@ -322,7 +324,7 @@ public class EFACompiler extends AbortableCompiler
      final int index,
      final ConstraintPropagator parent,
      final List<Proxy> locations)
-    throws EvalException
+    throws AnalysisException
   {
     if (index < groups.size()) {
       final int numlocs = locations.size();
@@ -352,7 +354,7 @@ public class EFACompiler extends AbortableCompiler
   private void splitEventPartition(final EFAEventDecl edecl,
                                    final ConstraintPropagator parent,
                                    final Collection<Proxy> locations)
-    throws EvalException
+    throws AnalysisException
   {
     checkAbort();
     if (parent.isUnsatisfiable()) {
@@ -385,7 +387,7 @@ public class EFACompiler extends AbortableCompiler
   private void createEvent(final EFAEventDecl edecl,
                            final ConstraintPropagator propagator,
                            final Collection<Proxy> locations)
-    throws EvalException
+    throws AnalysisException
   {
     final ConstraintList guard = propagator.getAllConstraints();
     if (guard != null) {
@@ -722,7 +724,7 @@ public class EFACompiler extends AbortableCompiler
           }
         }
         return null;
-      } catch (final EvalException exception) {
+      } catch (final AnalysisException exception) {
         throw wrap(exception);
       } finally {
         mCurrentComponent = null;
@@ -741,7 +743,7 @@ public class EFACompiler extends AbortableCompiler
     //# Auxiliary Methods
     private void makeDisjoint(final EFAAutomatonTransitionGroup group,
                               final boolean catchAll)
-      throws EvalException
+      throws AnalysisException
     {
       final List<EFAAutomatonTransition> parts =
         new ArrayList<>(group.getPartialTransitions());
@@ -783,7 +785,7 @@ public class EFACompiler extends AbortableCompiler
                               final Collection<EFAAutomatonTransition> result,
                               final ConstraintPropagator parent,
                               final SimpleComponentProxy catchAll)
-      throws EvalException
+      throws AnalysisException
     {
       checkAbort();
       if (iter.hasNext()) {
@@ -1068,7 +1070,7 @@ public class EFACompiler extends AbortableCompiler
         mCompilationInfo.add(result, comp);
         mComponents.add(result);
         return result;
-      } catch (final EvalException exception) {
+      } catch (final AnalysisException exception) {
         throw wrap(exception);
       }
     }

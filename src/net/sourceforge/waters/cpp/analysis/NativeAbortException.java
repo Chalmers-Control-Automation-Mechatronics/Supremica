@@ -31,57 +31,33 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 
 /**
- * An exception indicating that an compilation has been aborted due
- * to running out of memory.
+ * An exception indicating that a native analysis algorithm has been aborted
+ * through its {@link NativeModelAnalyzer#requestAbortNative()} method.
  *
  * @author Robi Malik
  */
 
-public class EvalOverflowException extends EvalException {
+public abstract class NativeAbortException extends AnalysisAbortException
+{
 
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new exception indicating out of memory.
+   * Constructs a new abort exception with a default message.
    */
-  public EvalOverflowException(final OutOfMemoryError cause)
+  public NativeAbortException()
   {
-    super(cause);
-    mKind = OverflowKind.MEMORY;
+    super("Analysis aborted!");
   }
-
-  /**
-   * Constructs a new exception indicating stack overflow.
-   */
-  public EvalOverflowException(final StackOverflowError cause)
-  {
-    super(cause);
-    mKind = OverflowKind.STACK;
-  }
-
-
-  //#########################################################################
-  //# Overrides for Base Class java.lang.Exception
-  @Override
-  public String getMessage()
-  {
-    return mKind.getMessage();
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final OverflowKind mKind;
 
 
   //#########################################################################
   //# Static Class Variables
-  private static final long serialVersionUID = 1819375548327201455L;
+  private static final long serialVersionUID = -7536140907342917589L;
 
 }

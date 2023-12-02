@@ -44,6 +44,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.language.ProxyNamer;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.NestedBlockProxy;
@@ -140,36 +141,40 @@ public class ModuleCompilationErrors
    * @param error   The <CODE>EvalException</CODE> that represents the
    *                compilation error.
    */
-  public void add(final EvalException error)
+  public void add(final AnalysisException error)
   {
-    if (error.getLocation() instanceof ProxySubject) {
-      ProxySubject location = (ProxySubject) error.getLocation();
-      ProxySubject child = location;
-      // Move out of simple expressions
-      while (location instanceof SimpleExpressionProxy) {
-        child = location;
-        location = SubjectTools.getProxyParent(location);
-      }
-      // Children of lists get individual tooltips and underlines
-      if (child.getParent() instanceof ArrayListSubject &&
+    if (error instanceof EvalException) {
+      final EvalException exception = (EvalException) error;
+      final Proxy proxy = exception.getLocation();
+      if (proxy instanceof ProxySubject) {
+        ProxySubject location = (ProxySubject) proxy;
+        ProxySubject child = location;
+        // Move out of simple expressions
+        while (location instanceof SimpleExpressionProxy) {
+          child = location;
+          location = SubjectTools.getProxyParent(location);
+        }
+        // Children of lists get individual tooltips and underlines
+        if (child.getParent() instanceof ArrayListSubject &&
           !(location instanceof EventDeclSubject)) {
-        location = child;
-      }
-      List<EvalException> errors = mErrors.get(location);
-      if (errors == null) {
-        errors = new ArrayList<>();
-        mErrors.put(location, errors);
-      }
-      errors.add(error);
-      // Condition and foreach blocks get individual underlines
-      if (location instanceof NestedBlockProxy) {
-        location = child;
-      }
-      mUnderlines.add(location);
-      // Increment error counts of ancestors
-      while (location != null) {
-        mErrorCounts.adjustOrPutValue(location, 1, 1);
-        location = SubjectTools.getProxyParent(location);
+          location = child;
+        }
+        List<EvalException> errors = mErrors.get(location);
+        if (errors == null) {
+          errors = new ArrayList<>();
+          mErrors.put(location, errors);
+        }
+        errors.add(exception);
+        // Condition and foreach blocks get individual underlines
+        if (location instanceof NestedBlockProxy) {
+          location = child;
+        }
+        mUnderlines.add(location);
+        // Increment error counts of ancestors
+        while (location != null) {
+          mErrorCounts.adjustOrPutValue(location, 1, 1);
+          location = SubjectTools.getProxyParent(location);
+        }
       }
     }
   }

@@ -35,7 +35,10 @@ package net.sourceforge.waters.model.compiler;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -100,11 +103,7 @@ public class MultiExceptionModuleProxyVisitor
   protected void recordCaughtException(final EvalException exception)
     throws EvalException
   {
-    if (exception instanceof EvalAbortException) {
-      throw exception;
-    } else {
-      mCompilationInfo.raise(exception);
-    }
+    mCompilationInfo.raise(exception);
   }
 
   protected void recordCaughtException(final VisitorException exception,
@@ -141,8 +140,7 @@ public class MultiExceptionModuleProxyVisitor
     throws VisitorException
   {
     final Throwable cause = exception.getCause();
-    if ((cause instanceof EvalException) &&
-        !(cause instanceof EvalAbortException)) {
+    if (cause instanceof EvalException) {
       mCompilationInfo.raiseInVisitor((EvalException) cause);
     } else {
       throw exception;
@@ -194,44 +192,39 @@ public class MultiExceptionModuleProxyVisitor
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    mIsAborting = true;
+    mAbortRequester = sender;
   }
 
   @Override
   public boolean isAborting()
   {
-    return mIsAborting;
+    return mAbortRequester != null;
   }
 
   @Override
   public void resetAbort()
   {
-    mIsAborting = false;
+    mAbortRequester = null;
   }
 
   protected void checkAbort()
-    throws EvalAbortException
+    throws AnalysisAbortException
   {
-    if (mIsAborting) {
-      throw new EvalAbortException();
-    }
+    AbstractAbortable.checkAbort(mAbortRequester);
   }
 
   protected void checkAbortInVisitor()
     throws VisitorException
   {
-    if (mIsAborting) {
-      final EvalAbortException exception = new EvalAbortException();
-      throw new VisitorException(exception);
-    }
+    AbstractAbortable.checkAbortInVisitor(mAbortRequester);
   }
 
 
   //#########################################################################
   //# Data Members
   private final CompilationInfo mCompilationInfo;
-  private boolean mIsAborting;
+  private AbortRequester mAbortRequester;
 
 }

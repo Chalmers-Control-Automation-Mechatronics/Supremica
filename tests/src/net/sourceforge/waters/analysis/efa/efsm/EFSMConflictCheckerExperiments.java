@@ -154,14 +154,14 @@ public class EFSMConflictCheckerExperiments
     mCompositionSelectionHeuristic =
       new ChainSelectionHeuristic<EFSMPair>(minV, minF, minSync);
 
-   checkPML("pml3", 2, 3, true); // Dummy call, result to be discarded.
+    checkPML("pml3", 2, 3, true); // Dummy call, result to be discarded.
     checkPML("pml3", 2, 3, true);
     for (int n = 2; n <= 10; n+=2) {
       try {
         for (int c = 3; c <= 6; c+=3) {
           checkPML("pml3", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -170,7 +170,7 @@ public class EFSMConflictCheckerExperiments
         for (int n = 2; n <= 100; n += 2) {
           checkPML("pml3", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -179,7 +179,7 @@ public class EFSMConflictCheckerExperiments
         for (int n = 2; n <= 2; n += 2) {
           checkPML("pml7", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -188,7 +188,7 @@ public class EFSMConflictCheckerExperiments
         for (int n = 2; n <= 2; n += 2) {
           checkPML("pml8", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -197,7 +197,7 @@ public class EFSMConflictCheckerExperiments
         for (int n = 2; n <= 2; n += 2) {
           checkPML("pml9", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -206,7 +206,7 @@ public class EFSMConflictCheckerExperiments
         for (int n = 2; n <= 2; n += 2) {
           checkPML("pml10", c, n, true);
         }
-      } catch (final AnalysisException | EvalException exception) {
+      } catch (final AnalysisException exception) {
         // next please ...
       }
     }
@@ -214,17 +214,17 @@ public class EFSMConflictCheckerExperiments
       testPsl();
       testPslBig();
       testPslBigWithManyRestartTrans();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       testPslBigBlocking();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       testPslBigNonblocking();
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
 
@@ -237,8 +237,6 @@ public class EFSMConflictCheckerExperiments
           }
         } catch (final AnalysisException exception) {
           // next please ...
-        } catch (final EvalException exception) {
-          // next please ...
         }
       }
        }
@@ -250,8 +248,6 @@ public class EFSMConflictCheckerExperiments
           }
         } catch (final AnalysisException exception) {
           // next please ...
-        } catch (final EvalException exception) {
-          // next please ...
         }
       }
       try {
@@ -259,8 +255,6 @@ public class EFSMConflictCheckerExperiments
           checkPhilosophers("dining_philosophers", n, false);
         }
       } catch (final AnalysisException exception) {
-        // next please ...
-      } catch (final EvalException exception) {
         // next please ...
       }
     }
@@ -273,7 +267,7 @@ public class EFSMConflictCheckerExperiments
         testPrimeSieve7();
         testPrimeSieve8();
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
@@ -282,21 +276,21 @@ public class EFSMConflictCheckerExperiments
         final int maxval = primes[s] * primes[s] - 1;
         checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
         checkProfisafe("profisafe_islave_efsm", maxseqno, true);
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
     try {
       for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
         checkProfisafe("profisafe_ihost_efsm", maxseqno, true);
       }
-    } catch (final AnalysisException | EvalException exception) {
+    } catch (final AnalysisException exception) {
       // next please ...
     }
   }
@@ -361,7 +355,7 @@ public class EFSMConflictCheckerExperiments
   //# Auxiliary Methods
   private ProductDESProxy compile(final ModuleProxy module,
                                   final List<ParameterBindingProxy> bindings)
-    throws EvalException, OverflowException
+    throws AnalysisException
   {
     try {
       final DocumentManager manager = getDocumentManager();

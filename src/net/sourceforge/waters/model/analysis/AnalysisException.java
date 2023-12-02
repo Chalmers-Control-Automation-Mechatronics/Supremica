@@ -33,7 +33,11 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.Collections;
+import java.util.List;
+
 import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.expr.MultiEvalException;
 
 
 /**
@@ -79,6 +83,21 @@ public class AnalysisException extends WatersException
                            final Throwable cause)
   {
     super(message, cause);
+  }
+
+
+  //#########################################################################
+  //# Support for Multi Exceptions
+  /**
+   * Returns all the leaf exceptions associated with this instance.
+   * The default implementation returns a singleton list containing
+   * <CODE>this</CODE>, but a {@link MultiEvalException} may return a
+   * list containing several exceptions.
+   * @return The exceptions associated with this instance.
+   */
+  public List<? extends AnalysisException> getLeafExceptions()
+  {
+    return Collections.singletonList(this);
   }
 
 

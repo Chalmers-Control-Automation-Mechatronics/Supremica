@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -100,7 +101,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   //#########################################################################
   //# Hand-Crafting Test Cases
   public void testCompile_empty_1()
-    throws EvalException
+    throws AnalysisException
   {
     final String name = "empty";
     final ModuleProxy module = mModuleFactory.createModuleProxy
@@ -113,7 +114,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   public void testCompile_empty_2()
-    throws EvalException
+    throws AnalysisException
   {
     final String modname = "almost_empty";
     final String instname = "instance";
@@ -1478,7 +1479,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     try {
       des = compile(module, bindings);
     } catch (final MultiEvalException exception) {
-      final List<EvalException> all = exception.getAll();
+      final List<EvalException> all = exception.getLeafExceptions();
       if (all.size() >= 1) {
         throw all.get(0);
       } else {
@@ -1529,14 +1530,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   private ProductDESProxy compile(final ModuleProxy module)
-    throws EvalException
+    throws AnalysisException
   {
     return compile(module, null);
   }
 
   private ProductDESProxy compile(final ModuleProxy module,
                                   final List<ParameterBindingProxy> bindings)
-    throws EvalException
+    throws AnalysisException
   {
     mCompiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
@@ -1590,7 +1591,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                                final ExpectedException... expected)
   {
     final EvalException caughtEval = (EvalException) caught;
-    final List<EvalException> allCaught = caughtEval.getAll();
+    final List<? extends EvalException> allCaught =
+      caughtEval.getLeafExceptions();
     for (final EvalException caught1 : allCaught) {
       final String msg = caught1.getMessage();
       assertNotNull("Caught " + ProxyTools.getShortClassName(caught1) +
@@ -1610,7 +1612,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       assertTrue("Multiple exceptions are enabled, " +
                  "but did not catch a MultiEvalException!",
                  caught instanceof MultiEvalException);
-      final Set<EvalException> covered = new THashSet<>(allCaught.size());
+      final Set<AnalysisException> covered = new THashSet<>(allCaught.size());
       for (final ExpectedException expected1 : expected) {
         checkException(caughtEval, expected1, covered);
       }
@@ -1633,12 +1635,12 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     }
   }
 
-  private void checkException(final EvalException caught,
+  private void checkException(final AnalysisException caught,
                               final ExpectedException expected,
-                              final Set<EvalException> covered)
+                              final Set<AnalysisException> covered)
   {
     boolean found = false;
-    for (final EvalException caught1 : caught.getAll()) {
+    for (final AnalysisException caught1 : caught.getLeafExceptions()) {
       if (expected.matches(caught1)) {
         found = true;
         if (covered != null) {
@@ -1946,7 +1948,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       return mExceptionClass.getSimpleName();
     }
 
-    private boolean matches(final EvalException exception)
+    private boolean matches(final AnalysisException exception)
     {
       if (!mExceptionClass.isAssignableFrom(exception.getClass())) {
         return false;

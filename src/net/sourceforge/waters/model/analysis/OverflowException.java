@@ -41,7 +41,7 @@ package net.sourceforge.waters.model.analysis;
  * @author Robi Malik
  */
 
-public class OverflowException extends AnalysisException {
+public class OverflowException extends AnalysisAbortException {
 
   //#########################################################################
   //# Constructors
@@ -73,10 +73,23 @@ public class OverflowException extends AnalysisException {
 
   /**
    * Constructs an overflow exception with a message indicating the
-   * type of limit and the number of states or transitions reached.
+   * type of and size of the limit.
    */
   public OverflowException(final OverflowKind kind, final int limit)
   {
+    mKind = kind;
+    mLimit = limit;
+  }
+
+  /**
+   * Constructs an overflow exception with a message indicating the
+   * type of and size of the limit, and with a cause.
+   */
+  public OverflowException(final OverflowKind kind,
+                           final int limit,
+                           final Throwable cause)
+  {
+    super(cause);
     mKind = kind;
     mLimit = limit;
   }
@@ -87,18 +100,6 @@ public class OverflowException extends AnalysisException {
   public OverflowException(final String msg)
   {
     super(msg);
-    mKind = null;
-    mLimit = -1;
-  }
-
-  /**
-   * Constructs a new exception with the specified cause. The detail
-   * message will be <CODE>(cause==null ? null : cause.toString())</CODE>
-   * (which typically contains the class and detail message of cause).
-   */
-  public OverflowException(final Throwable cause)
-  {
-    super(cause);
     mKind = null;
     mLimit = -1;
   }

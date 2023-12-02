@@ -44,7 +44,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -117,7 +116,7 @@ class HidingStep extends AbstractionStep
   //# Trace Computation
   @Override
   List<TraceStepProxy> convertTraceSteps(final List<TraceStepProxy> steps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     Map<AutomatonProxy,StateProxy> previousMapOrig = null;
     final ListIterator<TraceStepProxy> iter = steps.listIterator();
@@ -138,7 +137,7 @@ class HidingStep extends AbstractionStep
     (final Map<AutomatonProxy,StateProxy> previousMapOrig,
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final Map<AutomatonProxy,StateProxy> nextMapOrig =
       new HashMap<AutomatonProxy,StateProxy>(nextMapResult);
@@ -166,7 +165,7 @@ class HidingStep extends AbstractionStep
 
   EventProxy findEvent(final Map<AutomatonProxy,StateProxy> sources,
                        final Map<AutomatonProxy,StateProxy> targets)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final Collection<EventProxy> possible =
       new LinkedList<EventProxy>(mLocalEvents);

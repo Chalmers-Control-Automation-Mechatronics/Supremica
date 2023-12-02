@@ -42,6 +42,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.apache.logging.log4j.LogManager;
@@ -107,7 +108,7 @@ public class AutomataSynthesisWorker
         {
             if(ide != null)
                 JOptionPane.showMessageDialog(ide.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
-            requestAbort();
+            requestAbort(AbortRequester.USER);
             return;
         }
         timer = new ActionTimer();
@@ -262,7 +263,7 @@ public class AutomataSynthesisWorker
      *@see  ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         abortRequested = true;
 
@@ -284,4 +285,5 @@ public class AutomataSynthesisWorker
     public void resetAbort(){
       abortRequested = false;
     }
+
 }

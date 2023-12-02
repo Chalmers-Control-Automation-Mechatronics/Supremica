@@ -55,7 +55,6 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -243,7 +242,7 @@ public abstract class TRTraceExpander
   List<TraceStepProxy> getSaturatedTraceSteps
     (final List<TraceStepProxy> steps,
      final Collection<AutomatonProxy> automata)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = mModelVerifier.getFactory();
     final int numAutomata = automata.size();
@@ -375,7 +374,7 @@ public abstract class TRTraceExpander
 
   void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
                        final List<SearchRecord> convertedSteps)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int tau = EventEncoding.TAU;
     final ProductDESProxyFactory factory = mModelVerifier.getFactory();
@@ -554,7 +553,7 @@ public abstract class TRTraceExpander
   }
 
   void checkAbort()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     mModelVerifier.checkAbort();
   }

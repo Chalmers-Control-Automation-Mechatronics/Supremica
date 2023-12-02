@@ -71,7 +71,6 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                                final Collection<EventProxy> propositions)
   {
     super(factory, translator, propositions);
-    mIsAborting = false;
   }
 
 
@@ -98,33 +97,12 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   }
 
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-
   //#######################################################################
   //# Rule Application
   @Override
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
-  throws AnalysisAbortException
+    throws AnalysisAbortException
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
@@ -207,23 +185,6 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     mAutToAbstract = null;
   }
 
-  //#######################################################################
-  //# Auxiliary Methods
-  /**
-   * Checks whether this simplifier has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any transition relation
-   * simplifier that supports being aborted by user request.
-   */
-  private void checkAbort()
-    throws AnalysisAbortException
-  {
-    if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
-      throw exception;
-    }
-  }
-
 
   //#######################################################################
   //# Data Members
@@ -231,7 +192,6 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   private EventProxy mDefaultMarking;
   private AutomatonProxy mAutToAbstract;
 
-  private boolean mIsAborting;
   private OldTransitionRelation mTR;
 
 }

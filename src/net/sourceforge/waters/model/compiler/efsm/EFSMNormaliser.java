@@ -50,6 +50,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -58,7 +59,6 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
@@ -133,7 +133,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  * @author Sahar Mohajerani, Robi Malik, Roger Su
  */
 
-public class EFSMNormaliser extends AbortableCompiler
+public class EFSMNormaliser extends AbstractAbortable
 {
   //#########################################################################
   //# Constructor

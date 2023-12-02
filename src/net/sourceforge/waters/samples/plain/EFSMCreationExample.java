@@ -39,6 +39,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -47,7 +48,6 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
@@ -311,7 +311,7 @@ public class EFSMCreationExample
       System.out.println("Successfully created and compiled module.");
     } catch (SAXException | ParserConfigurationException exception) {
       System.err.println("FATAL: Failed to configure unmarshaller.");
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException exception) {
       System.err.println("Error compiling module: " + exception.getMessage());
     }
 

@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,18 +50,12 @@ import net.sourceforge.waters.analysis.gnonblocking.FindBlockingStates;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -63,14 +63,14 @@ import gnu.trove.set.hash.TIntHashSet;
  *
  * <P><I>Reference:</I><BR>
  * Simon Ware, Robi Malik. An Algorithm to Test the Conflict Preorder.
- * Science of Computer Programming, <STRONG>89</STRONG>&nbsp;(A), 23-40,
+ * Science of Computer Programming, <STRONG>89</STRONG>&nbsp;(A), 23&ndash;40,
  * 2014.</P>
  *
  * @author Simon Ware, Robi Malik
  */
 
 public class TRConflictPreorderChecker
-  implements Abortable
+  extends AbstractAbortable
 {
 
   //#########################################################################
@@ -102,7 +102,6 @@ public class TRConflictPreorderChecker
     mSecondBlocking = fbs.getBlockingStates();
     mSuccessors = new ArrayList<TIntArrayList>();
     mPredeccessors = new ArrayList<TIntHashSet[]>();
-    mIsAborting = false;
   }
 
 
@@ -174,7 +173,6 @@ public class TRConflictPreorderChecker
    */
   private void setUp()
   {
-    mIsAborting = false;
     mAnalysisResult = new ConflictPreorderResult();
     mAnalysisResult.addPair(mFirstRelation, mSecondRelation);
     mStartTime = System.currentTimeMillis();
@@ -196,7 +194,6 @@ public class TRConflictPreorderChecker
     mSecondBlocking = null;
     mSuccessors = null;
     mPredeccessors = null;
-    mIsAborting = false;
     addStatistics();
   }
 
@@ -242,43 +239,6 @@ public class TRConflictPreorderChecker
     }
   }
 
-  /**
-   * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any model analyser that
-   * supports being aborted by user request.
-   */
-  private void checkAbort()
-    throws AnalysisAbortException
-  {
-    if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
-      setExceptionResult(exception);
-      throw exception;
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -297,8 +257,8 @@ public class TRConflictPreorderChecker
     final TIntArrayList togo = new TIntArrayList(set.toArray());
     while (!togo.isEmpty()) {
       final int state = togo.removeAt(togo.size() - 1);
-      final TransitionIterator ti = trans.createSuccessorsReadOnlyIterator(state,
-                                                                     EventEncoding.TAU);
+      final TransitionIterator ti =
+        trans.createSuccessorsReadOnlyIterator(state, EventEncoding.TAU);
       while (ti.advance()) {
         if (taureach.add(ti.getCurrentTargetState())) {
           togo.add(ti.getCurrentTargetState());
@@ -549,11 +509,11 @@ public class TRConflictPreorderChecker
     return tset;
   }
 
+
   //#########################################################################
   //# Inner Class LCPair
   private static class LCPair
   {
-
     //#######################################################################
     //# Constructor
     private LCPair(final TIntHashSet first, final TIntHashSet second)
@@ -602,7 +562,6 @@ public class TRConflictPreorderChecker
   //# Inner Class MCTriple
   private static class MCTriple
   {
-
     //#######################################################################
     //# Constructor
     private MCTriple(final LCPair ptuple, final int s)
@@ -649,6 +608,5 @@ public class TRConflictPreorderChecker
 
   private ConflictPreorderResult mAnalysisResult;
   private long mStartTime;
-  private boolean mIsAborting;
 
 }

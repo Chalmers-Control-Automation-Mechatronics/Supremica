@@ -58,9 +58,10 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -228,7 +229,7 @@ public class AutomataVerifier
     /**
      * This is an attempt to clean up this interface.
      */
-  public boolean verify() throws UnsupportedOperationException, AnalysisAbortException
+  public boolean verify() throws UnsupportedOperationException, UserAbortException
   {
     try {
       // Find out what should be done and do it!
@@ -316,7 +317,7 @@ public class AutomataVerifier
       default:
         throw new UnsupportedOperationException("The selected type of verification is not implemented!");
       }
-    } catch (final AnalysisAbortException exception) {
+    } catch (final UserAbortException exception) {
       logger.info("Verification aborted.");
       throw new RuntimeException(exception);
     } catch (final Exception e) {
@@ -1211,7 +1212,7 @@ public class AutomataVerifier
       logger.info("Number of blocking states: "
                   + bddVerifier.numberOfBlockingStates());
     } catch (final Exception ex) {
-      requestAbort();
+      requestAbort(AbortRequester.USER);
       throw ex;
     } finally {
       bddVerifier.done();
@@ -1360,10 +1361,8 @@ public class AutomataVerifier
             if (!allIndividuallyNonblocking)
             {
                 logger.error("The automaton " + currAutomaton + " is blocking!");
-
                 // logger.error("Aborting verification...");
-                requestAbort();
-
+                requestAbort(AbortRequester.USER);
                 return false;
             }
         }
@@ -1482,7 +1481,7 @@ public class AutomataVerifier
             // Something went wrong?
             if (result == null)
             {
-                requestAbort();
+                requestAbort(AbortRequester.USER);
                 throw new RuntimeException("Failure in compositional nonblocking verification");
             }
             threadToAbort = null;
@@ -1492,7 +1491,7 @@ public class AutomataVerifier
         }
         catch (final Exception ex)
         {
-            requestAbort();
+            requestAbort(AbortRequester.USER);
             logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
             logger.error(ex.getStackTrace());
             throw ex;
@@ -1735,7 +1734,7 @@ public class AutomataVerifier
      * @see  ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         logger.debug("AutomataVerifier is requested to stop.");
 
@@ -1749,12 +1748,12 @@ public class AutomataVerifier
 
         if (bddVerifier != null)
         {
-          bddVerifier.requestAbort();
+          bddVerifier.requestAbort(sender);
         }
 
         if (threadToAbort != null)
         {
-            threadToAbort.requestAbort();
+            threadToAbort.requestAbort(sender);
         }
 
         if (executionDialog != null)
@@ -1881,4 +1880,5 @@ public class AutomataVerifier
 
         return verifier.verify();
     }
+
 }

@@ -52,7 +52,6 @@ import net.sourceforge.waters.analysis.efa.simple.SimpleEFASystem;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -145,7 +144,7 @@ public class EditorEFASynchAction
        getActiveDocumentContainer().getActivePanel();
       mHelper.importToIDE(root, module, list);
       System.err.println("Finish importing ...");
-    } catch (AnalysisException | EvalException | IOException | UnsupportedFlavorException ex) {
+    } catch (AnalysisException | IOException | UnsupportedFlavorException ex) {
       logger.error(ex);
     }
   }

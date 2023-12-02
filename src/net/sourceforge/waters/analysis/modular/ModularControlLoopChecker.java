@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AbstractControlLoopChecker;
@@ -291,11 +292,11 @@ public class ModularControlLoopChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mMonolithicVerifier != null) {
-      mMonolithicVerifier.requestAbort();
+      mMonolithicVerifier.requestAbort(sender);
     }
   }
 

@@ -39,7 +39,8 @@ import java.util.List;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.OptionPage;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
@@ -180,7 +181,7 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(AbortRequester sender)
   {
     mIsAborting = true;
   }
@@ -247,15 +248,15 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
 
   /**
    * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
+   * and if so, performs the abort by throwing an {@link UserAbortException}.
    * This method should be called periodically by any model analyser that
    * supports being aborted by user request.
    */
   protected void checkAbort()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
+      final UserAbortException exception = new UserAbortException();
       setExceptionResult(exception);
       throw exception;
     }

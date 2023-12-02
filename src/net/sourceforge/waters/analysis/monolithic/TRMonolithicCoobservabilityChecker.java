@@ -193,7 +193,7 @@ public class TRMonolithicCoobservabilityChecker
 
   @Override
   protected Map<EventProxy,CoobservabilityEventInfo> setUpEventEncoding()
-    throws OverflowException, AnalysisAbortException
+    throws AnalysisAbortException
   {
     assert getEventEncoding() == null;
 
@@ -274,7 +274,7 @@ public class TRMonolithicCoobservabilityChecker
 
   @Override
   protected void setUpStateTupleEncoding()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int numComponents = mComponentInfoList.size();
     mTRAutomataExtended = new TRAutomatonProxy[numComponents];
@@ -777,6 +777,7 @@ public class TRMonolithicCoobservabilityChecker
         createSuccessorStatesEncodedOrDecoded(encoded, decoded, 1);
       }
       for (int g = 2; g < mSiteDisablers.size(); g++) {
+        // TODO checkAbort(); ??
         if (findDisabling(decoded, g) == null) {
           createSuccessorStatesEncodedOrDecoded(encoded, decoded, g);
         }

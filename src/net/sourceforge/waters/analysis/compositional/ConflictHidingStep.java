@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -86,7 +85,7 @@ class ConflictHidingStep extends HidingStep
     (final Map<AutomatonProxy,StateProxy> previousMapOrig,
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final AutomatonProxy resultAutomaton = getResultAutomaton();
     final StateProxy nextStateResult = nextMapResult.get(resultAutomaton);
@@ -102,7 +101,7 @@ class ConflictHidingStep extends HidingStep
     (final Map<AutomatonProxy,StateProxy> previousMapOrig,
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final List<AutomatonProxy> originalAutomata =
       getOriginalAutomata();

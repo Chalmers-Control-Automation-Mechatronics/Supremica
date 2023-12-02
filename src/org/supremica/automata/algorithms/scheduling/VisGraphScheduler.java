@@ -5,6 +5,8 @@ import java.util.Hashtable;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexMap;
@@ -600,7 +602,7 @@ public class VisGraphScheduler
     }
 
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         requestStop(false);
     }

@@ -42,8 +42,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.Abortable;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -89,7 +88,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *
  * @author Mohammad Reza Shoaei
  */
-public class SimpleEFASystemBuilder implements Abortable
+public class SimpleEFASystemBuilder extends AbstractAbortable
 {
 
   public SimpleEFASystemBuilder(final ModuleProxyFactory factory,
@@ -217,41 +216,7 @@ public class SimpleEFASystemBuilder implements Abortable
   {
     return mUserPass;
   }
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
 
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-  //#########################################################################
-  // Auxiliary methods
-
-  void checkAbort() throws AnalysisAbortException
-  {
-    if (mIsAborting) {
-      throw new AnalysisAbortException();
-    }
-  }
-
-  void checkAbortInVisitor() throws VisitorException
-  {
-    if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
-      throw new VisitorException(exception);
-    }
-  }
 
   //#########################################################################
   //# Inner Class Pass2Visitor
@@ -263,7 +228,6 @@ public class SimpleEFASystemBuilder implements Abortable
    */
   private class Pass2Visitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -327,11 +291,11 @@ public class SimpleEFASystemBuilder implements Abortable
       return null;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Pass2 Data Members
     private int mCurrentVariable;
-
   }
+
 
   //#########################################################################
   //# Inner Class Pass3Visitor
@@ -353,7 +317,7 @@ public class SimpleEFASystemBuilder implements Abortable
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    // The vistor always first visit (call) this method.
+    // The visitor always first visit (call) this method.
     @Override
     public Object visitModuleProxy(final ModuleProxy module)
      throws VisitorException
@@ -369,14 +333,14 @@ public class SimpleEFASystemBuilder implements Abortable
       if (mIsMarkingVariablEFAEnable) {
         try {
           createMarkingVariablesEFA();
-        } catch (final AnalysisException | DuplicateIdentifierException exception) {
+        } catch (final AnalysisException exception) {
           throw wrap(exception);
         }
       }
       return null;
     }
 
-    // Visitin simple components
+    // Visiting simple components
     @Override
     public SimpleEFAComponent visitSimpleComponentProxy(
      final SimpleComponentProxy comp)
@@ -620,7 +584,6 @@ public class SimpleEFASystemBuilder implements Abortable
 
     //#######################################################################
     //# Auxiliary Methods
-
     // Constructing the transition relation
     private ListBufferTransitionRelation createTransitionRelation(final SimpleComponentProxy comp)
      throws AnalysisException
@@ -810,7 +773,7 @@ public class SimpleEFASystemBuilder implements Abortable
     }
 
     //#########################################################################
-  //# Pass3 Data Members
+    //# Pass3 Data Members
     private SimpleEFALabelEncoding mLabelEncoding;
     private SimpleEFAStateEncoding mStateEncoding;
     private List<SimpleNodeProxy> mNodeList;
@@ -827,8 +790,8 @@ public class SimpleEFASystemBuilder implements Abortable
     private TIntHashSet mCurrentPrime;
     private TIntHashSet mCurrentUnprime;
     private boolean mIsEFA;
-
   }
+
 
   //#########################################################################
   //# SimpleEFASystemBuilder Data Members
@@ -843,7 +806,6 @@ public class SimpleEFASystemBuilder implements Abortable
   private final TIntArrayList mMarkedVariables;
   private final List<SimpleExpressionProxy> mVariableMarkingPredicates;
   private final SimpleEFASystem mResultEFASystem;
-  private boolean mIsAborting;
   private final Collection<DefaultModuleProxyVisitor> mUserPass;
   private final SimpleEFAHelper mHelper;
   private boolean mIsConstraintPropagatorEnabled;

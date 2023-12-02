@@ -44,7 +44,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -247,7 +247,7 @@ public class TauLoopRemovalTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private void exploreDFS(final int start)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter;

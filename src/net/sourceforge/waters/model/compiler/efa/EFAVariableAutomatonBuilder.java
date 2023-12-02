@@ -42,16 +42,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.compiler.AbortableCompiler;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -77,7 +77,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
  * @author Robi Malik
  */
 
-class EFAVariableAutomatonBuilder extends AbortableCompiler
+class EFAVariableAutomatonBuilder extends AbstractAbortable
 {
 
   //#########################################################################
@@ -98,7 +98,7 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
   //#########################################################################
   //# Invocation
   SimpleComponentProxy constructSimpleComponent(final EFAVariable var)
-    throws EvalException
+    throws AnalysisException
   {
     try {
       mVariable = var;
@@ -133,7 +133,7 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
   //#########################################################################
   //# Data Members
   private void constructVariableRange()
-    throws EvalException
+    throws AnalysisException
   {
     final VariableComponentProxy comp =
       (VariableComponentProxy) mVariable.getComponent();
@@ -191,7 +191,7 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
   }
 
   private void constructEventTransitions(final EFAEvent event)
-    throws EvalException
+    throws AnalysisException
   {
     final EFAVariableTransitionRelation rel = event.getTransitionRelation();
     final EFAVariableTransitionRelationPart part = rel.getPart(mVariable);
@@ -212,7 +212,7 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
   }
 
   private void constructEdges()
-    throws EvalAbortException
+    throws AnalysisAbortException
   {
     final int numedges = mEdgeMap.size();
     mEdgeList = new ArrayList<EdgeProxy>(numedges);

@@ -60,7 +60,6 @@ import net.sf.javabdd.BDDVarSet;
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -175,7 +174,7 @@ public class BDDManager extends AbstractAbortable
     public BDD reachableStates(final BDD initialStates,final BDDTransitions transitions,
                                       final BDDVarSet sourceStateVariables, final BDDVarSet eventVariables,
                                       final BDDPairing destToSourceStatePairing)
-                                        throws AnalysisAbortException, OverflowException
+                                        throws AnalysisAbortException
     {
         final BDD reachableStatesBDD = initialStates.id();
         BDD previousReachableStatesBDD = null;
@@ -259,7 +258,7 @@ public class BDDManager extends AbstractAbortable
                                  final BDDVarSet sourceStateVariables,
                                  final BDDVarSet eventVariables,
                                  final BDDPairing destToSourceStatePairing)
-                                   throws AnalysisAbortException, OverflowException
+                                   throws AnalysisAbortException
     {
         final BDD coreachableStatesBDD = markedStates.id();
         BDD previousCoreachableStatesBDD = null;

@@ -51,7 +51,11 @@ import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFact
 import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
@@ -62,11 +66,12 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 public class MonolithicCliqueBasedSupervisorReductionComparisons
   extends AbstractSupervisorSynthesizerTest
+  implements AbortRequester
 {
   public static void main(final String[] args) throws Exception
   {
     if (args.length > 0) {
-      final long timeout = Long.parseLong(args[0]);
+      final int timeout = Integer.parseInt(args[0]);
       int[] maxNumberOfCoversValues = null;
       if (args.length > 1) {
         maxNumberOfCoversValues = new int[args.length - 1];
@@ -82,7 +87,8 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
         for (final HeuristicCoverStrategy coverStrategy : strategies) {
           final String baseOutputName = coverStrategy.name() + "_" + maxNumberOfCovers + ".csv";
           final MonolithicCliqueBasedSupervisorReductionComparisons comparisons =
-            new MonolithicCliqueBasedSupervisorReductionComparisons(baseOutputName, coverStrategy, maxNumberOfCovers, timeout);
+            new MonolithicCliqueBasedSupervisorReductionComparisons
+            (baseOutputName, coverStrategy, maxNumberOfCovers, timeout);
           run(comparisons);
         }
       }
@@ -166,7 +172,10 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     this.mMaxNumberOfCovers = 0; //unused with non-heuristic
   }
 
-  public MonolithicCliqueBasedSupervisorReductionComparisons(final String filename, final HeuristicCoverStrategy coverStrategy, final int maxNumberOfCovers, final long timeout)
+  public MonolithicCliqueBasedSupervisorReductionComparisons(final String filename,
+                                                             final HeuristicCoverStrategy coverStrategy,
+                                                             final int maxNumberOfCovers,
+                                                             final int timeout)
   {
     this.mFilename = getOutputDirectory() + "/" + filename;
     this.mCoverStrategy = coverStrategy;
@@ -349,12 +358,12 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
         }).get(mTimeout, TimeUnit.SECONDS);
       } catch (final TimeoutException ex) {
         System.err.println(des.getName() + " " + ex);
-        mSynthesizer.requestAbort();
+        mSynthesizer.requestAbort(this);
       } catch (final Exception ex) {
         System.err.println(ex);
       }
       finally {
-        mSynthesizer.requestAbort();
+        mSynthesizer.requestAbort(this);
         singlePool.shutdown();
       }
 
@@ -378,11 +387,21 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     return null;
   }
 
+
+  //#######################################################################
+  //# Interface net.sourceforge.waters.model.analysis.AbortRequester
+  @Override
+  public AnalysisAbortException createAbortException()
+  {
+    return new OverflowException(OverflowKind.TIME, mTimeout);
+  }
+
+
   //#########################################################################
   //# Data Members
   private final MaxCliqueSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
   private final int mMaxNumberOfCovers;
-  private final long mTimeout; //seconds;
+  private final int mTimeout; //seconds;
   private final String mFilename;
   private PrintWriter mPrintWriter;
 

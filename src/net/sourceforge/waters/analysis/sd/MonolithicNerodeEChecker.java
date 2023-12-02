@@ -761,7 +761,7 @@ public class MonolithicNerodeEChecker
    *         property is satisfied and there is no counterexample.
    */
   private SafetyCounterExampleProxy computeCounterExample()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -827,7 +827,7 @@ public class MonolithicNerodeEChecker
    * This is to be used by the Modular checker.
    */
   private SafetyCounterExampleProxy computeCounterExample2()
-      throws AnalysisAbortException, OverflowException
+      throws AnalysisAbortException
     {
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des = getModel();

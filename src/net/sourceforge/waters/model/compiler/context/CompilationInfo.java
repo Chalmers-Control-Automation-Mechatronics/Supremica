@@ -43,7 +43,6 @@ import java.util.Map.Entry;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
@@ -320,8 +319,7 @@ public class CompilationInfo
       if (isSourceInfoEnabled()) {
         adjustLocation(exception);
       }
-      final boolean abort = exception instanceof EvalAbortException;
-      if (isMultiExceptionsEnabled() && !abort) {
+      if (isMultiExceptionsEnabled()) {
         mExceptions.add(exception);
       } else {
         throw exception;

@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.hisc;
 
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -98,10 +99,10 @@ abstract public class AbstractSICConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mChecker.requestAbort();
+    super.requestAbort(sender);
+    mChecker.requestAbort(sender);
   }
 
   @Override

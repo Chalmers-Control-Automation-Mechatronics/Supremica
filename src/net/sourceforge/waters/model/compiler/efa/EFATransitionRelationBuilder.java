@@ -44,8 +44,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -71,7 +72,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class EFATransitionRelationBuilder extends AbortableCompiler
+class EFATransitionRelationBuilder extends AbstractAbortable
 {
 
   //#########################################################################
@@ -105,7 +106,7 @@ class EFATransitionRelationBuilder extends AbortableCompiler
   void addEventRecord(final EFAEventDecl edecl,
                       final ConstraintList constraints,
                       final Collection<Proxy> locations)
-    throws EvalException
+    throws AnalysisException
   {
     final EFAVariableTransitionRelation rel =
       buildTransitionRelation(edecl, constraints);
@@ -163,7 +164,7 @@ class EFATransitionRelationBuilder extends AbortableCompiler
   //# Building Transition Relations
   private EFAVariableTransitionRelation buildTransitionRelation
     (final EFAEventDecl edecl, final ConstraintList constraints)
-    throws EvalException
+    throws AnalysisException
   {
     try {
       final EFAVariableTransitionRelation result;

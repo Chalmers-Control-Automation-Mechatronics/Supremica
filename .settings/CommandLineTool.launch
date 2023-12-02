@@ -11,9 +11,12 @@
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
         <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
     </listAttribute>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.model.analysis.cli.CommandLineTool"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="waters"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-mod -cont examples/waters/tests/trafficlights2006/ac61.wmod"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-mod -coobs -heuristic Plant,EarlyNotAccept,MinEvents,MinStates,MinTransitions -nout -q /home/robi/src/git/sahar/coobs/suite_files/transferline10.wdes -timeout 600"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
 </launchConfiguration>

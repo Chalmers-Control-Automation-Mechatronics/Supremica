@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -323,7 +324,7 @@ public class AutomatonMinimizer
                     // Partition
                     findCoarsestPartitioning(equivClasses, equivalenceRelation);
                 } catch (final Exception ex) {
-                    requestAbort();
+                    requestAbort(AbortRequester.USER);
                     throw ex;
                 }
 
@@ -373,7 +374,7 @@ public class AutomatonMinimizer
             if (theAutomaton.nbrOfForbiddenStates() > 0)
             {
                 logger.warn("Supervision equivalence can not cope with previously forbidden states.");
-                requestAbort();
+                requestAbort(AbortRequester.USER);
                 throw new IllegalArgumentException("Automaton contains forbidden states, which is currently not supported by supervision equivalence");
             }
 
@@ -534,7 +535,7 @@ public class AutomatonMinimizer
           // Partition
           findCoarsestPartitioning(equivClasses, equivalenceRelation);
         } catch (final Exception exception) {
-          requestAbort();
+          requestAbort(AbortRequester.USER);
           throw exception;
         }
         if (abortRequested) {
@@ -3194,7 +3195,7 @@ public class AutomatonMinimizer
 
 
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
       abortRequested = true;
 
@@ -3212,7 +3213,9 @@ public class AutomatonMinimizer
     {
       abortRequested = false;
     }
+
 }
+
 
 interface StateInfo
 {

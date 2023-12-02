@@ -652,7 +652,7 @@ void ProductExplorer::
 doAbort()
   const
 {
-  throw jni::PreJavaException(jni::CLASS_AnalysisAbortException);
+  throw jni::PreJavaException(jni::CLASS_NativeAbortException);
 }
 
 
@@ -1898,7 +1898,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeStateCounter_runNativeAlgorithm
 
 
 JNIEXPORT void JNICALL
-Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbort
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbortNative
   (JNIEnv *env, jobject jchecker)
 {
   jni::ClassCache cache(env);
@@ -1913,7 +1913,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbort
 
 
 JNIEXPORT void JNICALL
-Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_resetAbort
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_resetAbortNative
   (JNIEnv *env, jobject jchecker)
 {
   jni::ClassCache cache(env);

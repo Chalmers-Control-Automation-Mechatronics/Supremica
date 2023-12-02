@@ -45,6 +45,27 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.external.valid.ValidUnmarshaller;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.ProxyResult;
+import net.sourceforge.waters.model.analysis.UserAbortException;
+import net.sourceforge.waters.model.analysis.Watchdog;
+import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
+import net.sourceforge.waters.model.analysis.cli.VerboseLogConfigurationFactory;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.options.BooleanOption;
 import net.sourceforge.waters.model.options.Configurable;
 import net.sourceforge.waters.model.options.EnumOption;
@@ -54,28 +75,6 @@ import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.ParameterBindingListOption;
 import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.model.options.SimpleLeafOptionPage;
-import net.sourceforge.waters.external.valid.ValidUnmarshaller;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.ProxyResult;
-import net.sourceforge.waters.model.analysis.Watchdog;
-import net.sourceforge.waters.model.analysis.cli.CommandLineOptionContext;
-import net.sourceforge.waters.model.analysis.cli.VerboseLogConfigurationFactory;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.apache.logging.log4j.Level;
@@ -231,7 +230,7 @@ public class UnifiedEFACommandLineTool
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("OVERFLOW (%.3f s)\n", difftime);
-        } catch (final AnalysisAbortException abort) {
+        } catch (final UserAbortException abort) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("TIMEOUT (%.3f s)\n", difftime);
@@ -268,7 +267,7 @@ public class UnifiedEFACommandLineTool
         first = false;
       }
 
-    } catch (final EvalException | AnalysisException |
+    } catch (final AnalysisException |
                    WatersUnmarshalException | IOException exception) {
       showSupportedException(exception);
     } catch (final Throwable exception) {

@@ -231,10 +231,6 @@ glue class VerificationResult extends AnalysisResult {
   void setCounterExample(glue CounterExampleProxy counter);
 }
 
-glue class AnalysisAbortException extends Exception {
-  AnalysisAbortException();
-}
-
 glue class AnalysisConfigurationException extends Exception {
   AnalysisConfigurationException(String msg);
 }
@@ -328,4 +324,8 @@ glue class NativeControlLoopChecker extends NativeModelVerifier {
 }
 
 glue class NativeStateCounter extends NativeModelAnalyzer {
+}
+
+glue class NativeAbortException extends Exception {
+  NativeAbortException();
 }

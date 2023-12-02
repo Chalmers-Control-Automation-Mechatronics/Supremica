@@ -46,13 +46,14 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
@@ -104,21 +105,21 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    mIsAborting = true;
+    mAbortRequester = sender;
   }
 
   @Override
   public boolean isAborting()
   {
-    return mIsAborting;
+    return mAbortRequester != null;
   }
 
   @Override
   public void resetAbort()
   {
-    mIsAborting = false;
+    mAbortRequester = null;
   }
 
 
@@ -126,10 +127,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   //# Aborting
   private void checkAbort() throws VisitorException
   {
-    if (mIsAborting) {
-      final EvalAbortException exception = new EvalAbortException();
-      throw new VisitorException(exception);
-    }
+    AbstractAbortable.checkAbortInVisitor(mAbortRequester);
   }
 
 
@@ -771,5 +769,5 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   private CompiledNode mCurrentSource;
   private CompiledNode mCurrentTarget;
 
-  private boolean mIsAborting;
+  private AbortRequester mAbortRequester;
 }

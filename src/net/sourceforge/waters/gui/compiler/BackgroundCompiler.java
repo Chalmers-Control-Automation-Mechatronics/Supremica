@@ -41,11 +41,8 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.OptionChangeEvent;
-import net.sourceforge.waters.model.options.OptionChangeListener;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOptions;
-import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -53,6 +50,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.OptionChangeEvent;
+import net.sourceforge.waters.model.options.OptionChangeListener;
 import net.sourceforge.waters.model.options.WatersOptionPages;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -254,23 +254,23 @@ public class BackgroundCompiler
    * @param  compiledDES    The compiled DES returned by the
    *                        {@link ModuleCompiler}, or <CODE>null</CODE>
    *                        in case of error.
-   * @param  evalException  An exception produced by the {@link ModuleCompiler},
+   * @param  exception  An exception produced by the {@link ModuleCompiler},
    *                        or <CODE>null</CODE> if compilation was
    *                        successful.
    */
   public void compilationFinished(final ProductDESProxy compiledDES,
-                                  final EvalException evalException)
+                                  final AnalysisException exception)
   {
-    assert compiledDES != null || evalException != null;
+    assert compiledDES != null || exception != null;
     mRunning = false;
     if (mRestart) {
       mRestart = false;
       compile(mObserver);
     } else {
       mCompiledDES = compiledDES;
-      mEvalException = evalException;
+      mEvalException = exception;
       mSourceInfoMap = mCompiler.getSourceInfoMap();
-      mModuleContainer.setCompilationException(evalException);
+      mModuleContainer.setCompilationException(exception);
       notifyObserver();
       if (mModuleChanged) {
         startTimer();
@@ -358,15 +358,22 @@ public class BackgroundCompiler
     } else if (hasObserver && !succeeded) {
       mDialog.setEvalException(mEvalException, mObserver.getVerb());
     } else if (!hasObserver && !succeeded) {
-      for (final EvalException exception : mEvalException.getAll()) {
-        if (exception instanceof EvalAbortException) {
-          final Logger logger = LogManager.getLogger();
-          logger.info(exception.getMessage());
-        } else if (!(exception.getLocation() instanceof ProxySubject)) {
+      for (final AnalysisException exception : mEvalException.getLeafExceptions()) {
+        if (!hasLocation(exception)) {
           final Logger logger = LogManager.getLogger();
           logger.error(exception.getMessage());
         }
       }
+    }
+  }
+
+  private boolean hasLocation(final AnalysisException exception)
+  {
+    if (exception instanceof EvalException) {
+      final EvalException evalException = (EvalException) exception;
+      return evalException.getLocation() instanceof ProxySubject;
+    } else {
+      return false;
     }
   }
 
@@ -419,7 +426,7 @@ public class BackgroundCompiler
   private boolean mRestart;
   private CompilationObserver mObserver;
   private ProductDESProxy mCompiledDES;
-  private EvalException mEvalException;
+  private AnalysisException mEvalException;
   private Map<Object, SourceInfo> mSourceInfoMap;
   private CompilationDialog mDialog;
 

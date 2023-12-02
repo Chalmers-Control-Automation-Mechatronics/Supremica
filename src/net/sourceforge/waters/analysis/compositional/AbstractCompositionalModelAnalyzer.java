@@ -54,17 +54,11 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.FileOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -91,6 +85,13 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.ChainedAnalyzerOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.FileOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -866,17 +867,17 @@ public abstract class AbstractCompositionalModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mAbstractionProcedure != null) {
-      mAbstractionProcedure.requestAbort();
+      mAbstractionProcedure.requestAbort(sender);
     }
     if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.requestAbort();
+      mSynchronousProductBuilder.requestAbort(sender);
     }
     if (mCurrentMonolithicAnalyzer != null) {
-      mCurrentMonolithicAnalyzer.requestAbort();
+      mCurrentMonolithicAnalyzer.requestAbort(sender);
     }
   }
 

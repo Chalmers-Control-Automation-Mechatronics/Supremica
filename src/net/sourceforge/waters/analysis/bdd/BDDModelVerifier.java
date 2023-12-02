@@ -52,11 +52,7 @@ import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -73,6 +69,11 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -219,11 +220,11 @@ public abstract class BDDModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mTransitionPartitioning != null) {
-      mTransitionPartitioning.requestAbort();
+      mTransitionPartitioning.requestAbort(sender);
     }
   }
 
@@ -314,7 +315,7 @@ public abstract class BDDModelVerifier
 
   @Override
   public void checkAbort()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     super.checkAbort();
     if (mBDDFactory != null) {
@@ -415,7 +416,7 @@ public abstract class BDDModelVerifier
   //#########################################################################
   //# Algorithm Implementation
   void createAutomatonBDDs()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
@@ -608,7 +609,7 @@ public abstract class BDDModelVerifier
   }
 
   BDD getMarkedStateBDD(final EventProxy prop)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final BDD result = mBDDFactory.one();
     for (final AutomatonBDD autbdd : mAutomatonBDDs) {
@@ -748,7 +749,7 @@ public abstract class BDDModelVerifier
   }
 
   boolean containsBadState(final BDD reached)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     return false;
   }
@@ -759,7 +760,7 @@ public abstract class BDDModelVerifier
   }
 
   List<TraceStepProxy> computeTrace(final BDD target)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     int lower = 0;
     int upper = mLevels.size() - 1;
@@ -781,7 +782,7 @@ public abstract class BDDModelVerifier
   }
 
   List<TraceStepProxy> computeTrace(final BDD target, final int level)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final List<TransitionPartitionBDD> partitioning =
       mTransitionPartitioning.getFullPartition();
@@ -862,7 +863,7 @@ public abstract class BDDModelVerifier
                       BDD preds,
                       BDD targetPrimed,
                       final List<TraceStepProxy> trace)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final Map<EventProxy,TransitionPartitionBDD> map =
       part.getTransitionComponents();

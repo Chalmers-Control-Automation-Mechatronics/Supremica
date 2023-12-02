@@ -187,27 +187,6 @@ public class CanonizeAbstractionRule
 
 
   //########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-
-  //########################################################################
   //# Logging
   @Override
   Logger getLogger()
@@ -222,7 +201,4 @@ public class CanonizeAbstractionRule
   private EventProxy mOmegaMarking;
   private EventProxy mAlphaMarking;
   private final EventProxy mCont;
-
-
-  private boolean mIsAborting = false;
 }

@@ -36,34 +36,45 @@ package net.sourceforge.waters.model.analysis;
 
 /**
  * An exception indicating that an analysis algorithm has been aborted
- * in response to a user request or timeout.
+ * in response to a user request or overflow or timeout.
  *
  * @author Robi Malik
  */
 
-public class AnalysisAbortException extends AnalysisException {
+public abstract class AnalysisAbortException extends AnalysisException
+{
 
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new overflow exception with a default message.
+   * Constructs a new abort exception with a default message.
    */
-  public AnalysisAbortException()
+  protected AnalysisAbortException()
   {
     this("Analysis aborted!");
   }
 
   /**
-   * Constructs a new overflow exception with a given message.
+   * Constructs a new abort exception with a given message.
    */
-  public AnalysisAbortException(final String msg)
+  protected AnalysisAbortException(final String msg)
   {
     super(msg);
+  }
+
+  /**
+   * Constructs a new abort exception with the specified cause. The detail
+   * message will be <CODE>(cause==null ? null : cause.toString())</CODE>
+   * (which typically contains the class and detail message of cause).
+   */
+  protected AnalysisAbortException(final Throwable cause)
+  {
+    super(cause);
   }
 
 
   //#########################################################################
   //# Static Class Variables
-  private static final long serialVersionUID = -2601097829012752986L;
+  private static final long serialVersionUID = 7223058318831394979L;
 
 }

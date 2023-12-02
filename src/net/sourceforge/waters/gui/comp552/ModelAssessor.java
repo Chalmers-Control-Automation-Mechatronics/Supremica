@@ -383,11 +383,8 @@ public class ModelAssessor
       printProductDES(des, sol, printable);
       printGraphs(printable, compiler);
       sol.runTests(des);
-    } catch (final WatersUnmarshalException exception) {
-      showException(exception);
-    } catch (final IOException exception) {
-      showException(exception);
-    } catch (final EvalException exception) {
+    } catch (final WatersUnmarshalException | IOException |
+             AnalysisException exception) {
       showException(exception);
     }
   }
@@ -817,7 +814,7 @@ public class ModelAssessor
      * using event arrays as defined in the given attempt.
      */
     private void compileProductDES(final ModuleProxy attempt)
-      throws EvalException
+      throws AnalysisException
     {
       if (mModule == null) {
         mEventMap = Collections.emptyMap();

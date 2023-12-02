@@ -51,7 +51,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -217,7 +217,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
 
   private void mergeEvents
     (final Map<Set<UnifiedEFAVariable>, List<AbstractEFAEvent>> variableMap)
-    throws AnalysisAbortException, EvalException
+    throws UserAbortException, EvalException
   {
     final Collection<List<AbstractEFAEvent>> groups = variableMap.values();
     final UnifiedEFAEventEncoding encoding =
@@ -259,7 +259,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
 
   private void mergeEvents(final Map<TLongArrayList,TIntArrayList> eventMap,
                            final TIntArrayList unusedEvents)
-    throws AnalysisAbortException, EvalException
+    throws UserAbortException, EvalException
   {
     mergeEvents(unusedEvents);
     for (final TIntArrayList events : eventMap.values()) {
@@ -268,7 +268,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   }
 
   private void mergeEvents(final TIntArrayList events)
-    throws AnalysisAbortException, EvalException
+    throws UserAbortException, EvalException
   {
 
     if (events.size() > 1) {

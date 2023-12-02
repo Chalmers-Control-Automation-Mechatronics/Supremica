@@ -50,13 +50,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -146,7 +147,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
  *
  * @author Robi Malik, Roger Su
  */
-public class EFSMCompiler extends AbortableCompiler
+public class EFSMCompiler extends AbstractAbortable
 {
   //#########################################################################
   //# Constructor
@@ -166,7 +167,7 @@ public class EFSMCompiler extends AbortableCompiler
 
   //#########################################################################
   //# Invocation
-  public ModuleProxy compile() throws EvalException
+  public ModuleProxy compile() throws AnalysisException
   {
     try {
       mRootContext = new EFSMModuleContext(mInputModule, mOperatorTable);
@@ -549,7 +550,7 @@ public class EFSMCompiler extends AbortableCompiler
     //#######################################################################
     //# Invocation
     private void process()
-      throws EvalException
+      throws AnalysisException
     {
       for (final EFSMEventDeclaration decl : mEFSMEventDeclarations) {
         splitEvent(decl);
@@ -563,7 +564,7 @@ public class EFSMCompiler extends AbortableCompiler
     //#######################################################################
     //# Event Splitting
     private void splitEvent(final EFSMEventDeclaration decl)
-      throws EvalException
+      throws AnalysisException
     {
       final ConstraintList ga = decl.getGuardedActions();
       if (ga.isTrue()) {
@@ -606,7 +607,7 @@ public class EFSMCompiler extends AbortableCompiler
     }
 
     private void splitEvent(final ConstraintPropagator parent)
-      throws EvalException
+      throws AnalysisException
     {
       checkAbort();
       if (!parent.isUnsatisfiable()) {

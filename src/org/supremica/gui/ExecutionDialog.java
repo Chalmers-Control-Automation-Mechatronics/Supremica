@@ -53,6 +53,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 
@@ -270,7 +271,7 @@ public final class ExecutionDialog
       .hasNext();) {
       final Abortable threadToStop = exIt.next();
       if (!threadToStop.isAborting()) {
-        threadToStop.requestAbort();
+        threadToStop.requestAbort(AbortRequester.USER);
       }
     }
   }

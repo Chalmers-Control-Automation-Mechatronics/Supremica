@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.javabdd.BDDFactory;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -89,7 +89,7 @@ class AutomatonPartitioning
   //# Algorithm
   @Override
   void merge(final AutomatonBDD[] automatonBDDs)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final int numEvents = mEventMap.size();
     final int threshold = (int) Math.ceil(THRESHOLD * numEvents);

@@ -64,6 +64,7 @@ import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthe
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizerNormality;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
@@ -882,7 +883,7 @@ public class AutomataSynthesizer
      * @see  ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         mAbortRequested = true;
 
@@ -891,7 +892,7 @@ public class AutomataSynthesizer
         // Stop currently executing thread!
         if (mThreadToAbort != null)
         {
-            mThreadToAbort.requestAbort();
+            mThreadToAbort.requestAbort(sender);
         }
     }
 

@@ -51,9 +51,9 @@ package org.supremica.automata.BDD;
 
 import java.io.File;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,27 +74,27 @@ public class BDDVerifier implements Abortable
         bddAutomata = new BDDAutomata(theAutomata);
     }
 
-    public double numberOfReachableStates() throws AnalysisAbortException, OverflowException
+    public double numberOfReachableStates() throws AnalysisAbortException
     {
         return bddAutomata.numberOfReachableStates();
     }
 
-    public double numberOfCoreachableStates() throws AnalysisAbortException, OverflowException
+    public double numberOfCoreachableStates() throws AnalysisAbortException
     {
         return bddAutomata.numberOfCoreachableStates();
     }
 
-    public double numberOfReachableAndCoreachableStates() throws AnalysisAbortException, OverflowException
+    public double numberOfReachableAndCoreachableStates() throws AnalysisAbortException
     {
         return bddAutomata.numberOfReachableAndCoreachableStates();
     }
 
-    public double numberOfBlockingStates() throws AnalysisAbortException, OverflowException
+    public double numberOfBlockingStates() throws AnalysisAbortException
     {
         return bddAutomata.numberOfBlockingStates();
     }
 
-    public boolean isNonblocking() throws AnalysisAbortException, OverflowException
+    public boolean isNonblocking() throws AnalysisAbortException
     {
         return bddAutomata.isNonblocking();
     }
@@ -156,11 +156,11 @@ public class BDDVerifier implements Abortable
     }
 
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
       logger.debug("BDDVerifier is requested to stop.");
       isAborting = true;
-      bddAutomata.requestAbort();
+      bddAutomata.requestAbort(sender);
     }
 
     @Override

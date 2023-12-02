@@ -35,12 +35,15 @@ package net.sourceforge.waters.gui.compiler;
 
 import javax.swing.SwingUtilities;
 
-import net.sourceforge.waters.model.compiler.EvalOverflowException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.expr.EvalException;
 
-public class CompilationWorker implements Runnable
+
+public class CompilationWorker
+  implements Runnable
 {
 
   //#########################################################################
@@ -68,12 +71,12 @@ public class CompilationWorker implements Runnable
         notifyOwner(compiledDES, null);
       } catch (final OutOfMemoryError error) {
         System.gc();
-        final EvalException exception = new EvalOverflowException(error);
+        final OverflowException exception = new OverflowException(error);
         notifyOwner(null, exception);
       } catch (final StackOverflowError error) {
-        final EvalException exception = new EvalOverflowException(error);
+        final OverflowException exception = new OverflowException(error);
         notifyOwner(null, exception);
-      } catch (final EvalException exception) {
+      } catch (final AnalysisException exception) {
         notifyOwner(null, exception);
       }
     }
@@ -90,7 +93,7 @@ public class CompilationWorker implements Runnable
 
   public synchronized void abort()
   {
-    mCompiler.requestAbort();
+    mCompiler.requestAbort(AbortRequester.USER);
   }
 
   public synchronized void terminate()
@@ -122,14 +125,14 @@ public class CompilationWorker implements Runnable
   }
 
   private void notifyOwner(final ProductDESProxy compiledDES,
-                           final EvalException evalException)
+                           final AnalysisException exception)
   {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run()
       {
         if (!mTerminate) {
-          mOwner.compilationFinished(compiledDES, evalException);
+          mOwner.compilationFinished(compiledDES, exception);
         }
       }
     });

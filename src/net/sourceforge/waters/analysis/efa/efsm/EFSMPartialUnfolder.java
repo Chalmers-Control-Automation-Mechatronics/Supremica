@@ -54,7 +54,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -524,7 +524,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
     //#######################################################################
     //# Access
     private void expandState(final int source)
-      throws EvalException, AnalysisAbortException
+      throws EvalException, UserAbortException
     {
       final long pair = mUnfoldedStateList.get(source);
       final int sourceState = (int) (pair & 0xffffffffL);
@@ -547,7 +547,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
 
     private void expand(final int source, final int beforeClass,
                         final int event, final int targetState)
-      throws EvalException, AnalysisAbortException
+      throws EvalException, UserAbortException
     {
 
       InputUpdateInfo info = mInputUpdateInfo[event];

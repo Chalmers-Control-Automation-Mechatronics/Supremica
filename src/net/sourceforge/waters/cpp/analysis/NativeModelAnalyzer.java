@@ -36,10 +36,7 @@ package net.sourceforge.waters.cpp.analysis;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -48,6 +45,10 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 
 /**
@@ -186,8 +187,12 @@ public abstract class NativeModelAnalyzer
         result.setRuntime(stop - start);
         setAnalysisResult(result);
         return result.isSatisfied();
-      } catch (final AnalysisException exception) {
+      } catch (AnalysisException exception) {
         final long stop = System.currentTimeMillis();
+        if (exception instanceof NativeAbortException) {
+          final AbortRequester requester = getAbortRequester();
+          exception = requester.createAbortException();
+        }
         final AnalysisResult result = createAnalysisResult();
         result.setException(exception);
         result.setRuntime(stop - start);
@@ -199,14 +204,29 @@ public abstract class NativeModelAnalyzer
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort(final AbortRequester sender)
+  {
+    super.requestAbort(sender);
+    requestAbortNative();
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    resetAbortNative();
+  }
+
+
+  //#########################################################################
   //# Native Methods
   abstract AnalysisResult runNativeAlgorithm() throws AnalysisException;
 
-  @Override
-  public native void requestAbort();
+  public native void requestAbortNative();
 
-  @Override
-  public native void resetAbort();
+  public native void resetAbortNative();
 
   public static native long getPeakMemoryUsage();
 

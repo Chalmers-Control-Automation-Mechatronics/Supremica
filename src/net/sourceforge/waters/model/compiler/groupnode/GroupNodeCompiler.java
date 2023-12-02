@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
@@ -364,6 +365,8 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
       } catch (final EvalException exception) {
         exception.provideLocation(ident);
         throw wrap(exception);
+      } catch (final AnalysisException exception) {
+        throw wrap(exception);
       }
     }
 
@@ -437,7 +440,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
                              final ConstraintPropagator propagator,
                              final List<BinaryExpressionProxy> actions,
                              final SimpleNodeProxy target)
-      throws EvalException, VisitorException
+      throws AnalysisException, VisitorException
     {
       createEdges(ident, propagator, actions, target, true);
     }
@@ -447,7 +450,7 @@ public class GroupNodeCompiler extends MultiExceptionModuleProxyVisitor
                              final List<BinaryExpressionProxy> actions,
                              final SimpleNodeProxy target,
                              final boolean original)
-      throws EvalException, VisitorException
+      throws AnalysisException, VisitorException
     {
       checkAbort();
       if (mSimple) {

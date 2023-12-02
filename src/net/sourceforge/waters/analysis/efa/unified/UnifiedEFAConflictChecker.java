@@ -52,21 +52,16 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.EnumOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.ParameterBindingListOption;
-import net.sourceforge.waters.model.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -78,6 +73,12 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.ParameterBindingListOption;
+import net.sourceforge.waters.model.options.PositiveIntOption;
 
 import org.apache.logging.log4j.Logger;
 
@@ -260,23 +261,23 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mUnfolder != null) {
-      mUnfolder.requestAbort();
+      mUnfolder.requestAbort(sender);
     }
     if (mSimplifier != null) {
-      mSimplifier.requestAbort();
+      mSimplifier.requestAbort(sender);
     }
     if (mUpdateMerger != null) {
-      mUpdateMerger.requestAbort();
+      mUpdateMerger.requestAbort(sender);
     }
     if (mSynchronizer != null) {
-      mSynchronizer.requestAbort();
+      mSynchronizer.requestAbort(sender);
     }
     if (mNonblockingChecker != null) {
-      mNonblockingChecker.requestAbort();
+      mNonblockingChecker.requestAbort(sender);
     }
   }
 
@@ -563,7 +564,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
   }
 
-  private void splitSubsystems() throws AnalysisAbortException
+  private void splitSubsystems() throws UserAbortException
   {
     final Set<UnifiedEFATransitionRelation> trs =
       mCurrentSubSystem.getTransitionRelations();
@@ -599,7 +600,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   }
 
   private SubSystemInfo collectSubSystem(final Collection<EventInfo> remaining)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final Iterator<EventInfo> iter = remaining.iterator();
     final EventInfo startInfo = iter.next();
@@ -816,7 +817,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   private void registerTR(final UnifiedEFATransitionRelation tr,
                           final boolean unfolding)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     // getLogger().debug(tr.getName() + " is nonblocking: " +
     //                   mNonblockingChecker.run(tr));
@@ -1882,7 +1883,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
 
     private Collection<UnifiedEFACandidate> createMustLCandidates()
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       final Map<UnifiedEFACandidate,UnifiedEFACandidate> candidateMap =
         new HashMap<>(mEventInfoMap.size());

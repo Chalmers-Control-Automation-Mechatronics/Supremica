@@ -98,11 +98,11 @@ uint64_t hashInt(uint64_t key)
 
 uint64_t hashInt32Array(const uint32_t* array, uint32_t size, uint32_t mask0)
 {
-  register int rest = size;
-  register int factor = 0;
-  register uint64_t a;
-  register uint64_t b;
-  register uint64_t result = 0;
+  int rest = size;
+  int factor = 0;
+  uint64_t a;
+  uint64_t b;
+  uint64_t result = 0;
   // Handle most of the key ...
   while (rest >= 4) {
     a = (array[0] & mask0) + ((uint64_t) array[1] << 32) + FACTORS[factor++];
@@ -135,11 +135,11 @@ uint64_t hashInt32Array(const uint32_t* array, uint32_t size, uint32_t mask0)
 
 uint64_t hashInt64Array(const uint64_t* array, uint32_t size, uint64_t mask0)
 {
-  register int rest = size;
-  register int factor = 0;
-  register uint64_t a;
-  register uint64_t b;
-  register uint64_t result = 0;
+  int rest = size;
+  int factor = 0;
+  uint64_t a;
+  uint64_t b;
+  uint64_t result = 0;
   // Handle most of the key ...
   while (rest >= 2) {
     a = (array[0] & mask0) + FACTORS[factor++];
@@ -160,8 +160,8 @@ uint64_t hashInt64Array(const uint64_t* array, uint32_t size, uint64_t mask0)
 uint64_t hashString(const char* key)
 {
   const int len = strlen(key);
-  register int rest = len;
-  register uint64_t result = GOLD64 * len;
+  int rest = len;
+  uint64_t result = GOLD64 * len;
   // Handle most of the key ...
   while (rest >= 8) {
     result +=

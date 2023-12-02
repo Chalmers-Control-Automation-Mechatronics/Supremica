@@ -61,9 +61,9 @@ import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -377,7 +377,7 @@ public class BDDAutomata
         uncontrollableStatesBDD = uncontrollableStatesBDD.and(uncontrollableStates);
     }
 
-    public double numberOfReachableStates() throws AnalysisAbortException, OverflowException
+    public double numberOfReachableStates() throws AnalysisAbortException
     {
         if (nbrOfReachableStates < 0)
         {
@@ -386,7 +386,7 @@ public class BDDAutomata
         return nbrOfReachableStates;
     }
 
-    public double numberOfCoreachableStates() throws AnalysisAbortException, OverflowException
+    public double numberOfCoreachableStates() throws AnalysisAbortException
     {
         if (nbrOfCoreachableStates < 0)
         {
@@ -395,7 +395,7 @@ public class BDDAutomata
         return nbrOfCoreachableStates;
     }
 
-    public double numberOfBlockingStates() throws AnalysisAbortException, OverflowException
+    public double numberOfBlockingStates() throws AnalysisAbortException
     {
         if (nbrOfBlockingStates < 0)
         {
@@ -404,7 +404,7 @@ public class BDDAutomata
         return nbrOfBlockingStates;
     }
 
-    public double numberOfReachableAndCoreachableStates() throws AnalysisAbortException, OverflowException
+    public double numberOfReachableAndCoreachableStates() throws AnalysisAbortException
     {
         if (nbrOfReachableAndCoreachableStates < 0)
         {
@@ -413,7 +413,7 @@ public class BDDAutomata
         return nbrOfReachableAndCoreachableStates;
     }
 
-    public boolean isNonblocking() throws AnalysisAbortException, OverflowException
+    public boolean isNonblocking() throws AnalysisAbortException
     {
         final BDD reachableStatesBDD = getReachableStates();
         final BDD coreachableStatesBDD = getCoreachableStates();
@@ -421,7 +421,7 @@ public class BDDAutomata
         return impBDD.equals(manager.getOneBDD());
     }
 
-    public BDD getReachableStates() throws AnalysisAbortException, OverflowException
+    public BDD getReachableStates() throws AnalysisAbortException
     {
         if (reachableStatesBDD == null)
         {
@@ -432,7 +432,7 @@ public class BDDAutomata
         return reachableStatesBDD;
     }
 
-    BDD getCoreachableStates() throws AnalysisAbortException, OverflowException
+    BDD getCoreachableStates() throws AnalysisAbortException
     {
         if (coreachableStatesBDD == null)
         {
@@ -442,7 +442,7 @@ public class BDDAutomata
         return coreachableStatesBDD;
     }
 
-    public BDD getReachableAndCoreachableStates() throws AnalysisAbortException, OverflowException
+    public BDD getReachableAndCoreachableStates() throws AnalysisAbortException
     {
         if (reachableAndCoreachableStatesBDD == null)
         {
@@ -458,7 +458,7 @@ public class BDDAutomata
         return reachableAndCoreachableStatesBDD;
     }
 
-    public Automaton getSupervisor() throws AnalysisAbortException, OverflowException
+    public Automaton getSupervisor() throws AnalysisAbortException
     {
         final Automaton supervisorAutomaton = new Automaton("Sup");
         final BDD reachableAndCoreachableStatesBDD = getReachableAndCoreachableStates();
@@ -533,11 +533,10 @@ public class BDDAutomata
     }
 
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
-      // TODO Auto-generated method stub
       isAborting = true;
-      manager.requestAbort();
+      manager.requestAbort(sender);
     }
 
     @Override

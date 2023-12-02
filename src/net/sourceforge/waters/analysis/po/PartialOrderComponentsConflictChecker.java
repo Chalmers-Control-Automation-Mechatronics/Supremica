@@ -43,7 +43,7 @@ import net.sourceforge.waters.analysis.monolithic.StateHashSet;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.model.options.PropositionOption;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -397,7 +397,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
 
   @Override
   protected ConflictCounterExampleProxy computePOCounterExample()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

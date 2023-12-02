@@ -45,6 +45,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
@@ -161,12 +162,12 @@ public class ProjectingSupervisorReductionTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mVerifierBuilder.requestAbort();
+    super.requestAbort(sender);
+    mVerifierBuilder.requestAbort(sender);
     if (mPreSimplifier != null) {
-      mPreSimplifier.requestAbort();
+      mPreSimplifier.requestAbort(sender);
     }
   }
 

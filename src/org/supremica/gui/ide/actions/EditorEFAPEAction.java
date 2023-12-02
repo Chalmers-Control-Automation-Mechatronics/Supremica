@@ -56,12 +56,12 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.algorithms.IISCT.EFAPartialEvaluator;
 
 /**
@@ -151,8 +151,7 @@ public class EditorEFAPEAction
        getActiveDocumentContainer().getActivePanel();
       mHelper.importToIDE(root, system, module);
       System.err.println("Finish importing ...");
-    } catch (AnalysisException | EvalException | IOException |
-             UnsupportedFlavorException ex) {
+    } catch (AnalysisException | IOException | UnsupportedFlavorException ex) {
       final Logger logger = LogManager.getLogger(getClass());
       final String msg = ex.getMessage() == null ? "" : ex.getMessage();
       logger.error(ProxyTools.getShortClassName(ex) + " caught in " +

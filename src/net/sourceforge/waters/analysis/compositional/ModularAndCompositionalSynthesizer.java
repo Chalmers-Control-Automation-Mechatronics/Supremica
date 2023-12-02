@@ -44,6 +44,7 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethodFactory;
 import net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractSupervisorSynthesizer;
@@ -192,17 +193,17 @@ public class ModularAndCompositionalSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mModularSynthesizer != null) {
-      mModularSynthesizer.requestAbort();
+      mModularSynthesizer.requestAbort(sender);
     }
     if (mCompositionalSynthesizer != null) {
-      mCompositionalSynthesizer.requestAbort();
+      mCompositionalSynthesizer.requestAbort(sender);
     }
     if (mCompositionalConflictChecker != null) {
-      mCompositionalConflictChecker.requestAbort();
+      mCompositionalConflictChecker.requestAbort(sender);
     }
   }
 

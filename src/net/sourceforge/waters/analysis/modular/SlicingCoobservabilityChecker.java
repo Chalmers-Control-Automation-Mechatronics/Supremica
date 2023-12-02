@@ -37,6 +37,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.analysis.coobs.CoobservabilitySignature;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -191,11 +192,11 @@ public class SlicingCoobservabilityChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mNestedVerifier != null) {
-      mNestedVerifier.requestAbort();
+      mNestedVerifier.requestAbort(sender);
     }
   }
 

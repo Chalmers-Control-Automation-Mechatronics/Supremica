@@ -38,7 +38,7 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 
 
 /**
@@ -51,7 +51,7 @@ public class EFANonblockingChecker extends AbstractEFAAlgorithm
   //#########################################################################
   //# Invocation
   public boolean run(final AbstractEFATransitionRelation<?> tr)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = tr.getTransitionRelation();
     if (rel.getNumberOfPropositions() == 0) {

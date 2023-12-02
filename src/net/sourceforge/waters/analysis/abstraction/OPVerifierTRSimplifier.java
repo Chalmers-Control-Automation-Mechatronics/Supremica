@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
@@ -85,6 +86,7 @@ public class OPVerifierTRSimplifier
    *          The new state limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of states.
    */
+  @Override
   public void setStateLimit(final int limit)
   {
     mVerifierBuilder.setStateLimit(limit);
@@ -94,6 +96,7 @@ public class OPVerifierTRSimplifier
    * Gets the state limit.
    * @see #setStateLimit(int) setStateLimit()
    */
+  @Override
   public int getStateLimit()
   {
     return mVerifierBuilder.getStateLimit();
@@ -137,10 +140,10 @@ public class OPVerifierTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mVerifierBuilder.requestAbort();
+    super.requestAbort(sender);
+    mVerifierBuilder.requestAbort(sender);
   }
 
   @Override

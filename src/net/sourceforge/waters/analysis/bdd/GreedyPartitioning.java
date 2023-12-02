@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import net.sf.javabdd.BDDFactory;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 
 
 /**
@@ -65,7 +65,7 @@ class GreedyPartitioning<P extends PartitionBDD>
   //# Algorithm
   @Override
   void merge(final AutomatonBDD[] automatonBDDs)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final List<P> partitions = getFullPartition();
     final int limit = getPartitioningSizeLimit();
@@ -121,7 +121,7 @@ class GreedyPartitioning<P extends PartitionBDD>
   //#########################################################################
   //# Auxiliary Methods
   private P mergeAll(final AutomatonBDD[] automatonBDDs)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final BDDFactory factory = getBDDFactory();
     final List<P> partitions = getFullPartition();
@@ -143,7 +143,7 @@ class GreedyPartitioning<P extends PartitionBDD>
   private boolean mergeOnce(final Collection<PartitionBDD> input,
                             final Collection<PartitionBDD> output,
                             final AutomatonBDD[] automatonBDDs)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final BDDFactory factory = getBDDFactory();
     final int limit = getPartitioningSizeLimit();

@@ -41,7 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
@@ -246,7 +246,7 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
   }
 
   @Override
-  protected SafetyCounterExampleProxy computePOCounterExample() throws AnalysisAbortException
+  protected SafetyCounterExampleProxy computePOCounterExample() throws UserAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

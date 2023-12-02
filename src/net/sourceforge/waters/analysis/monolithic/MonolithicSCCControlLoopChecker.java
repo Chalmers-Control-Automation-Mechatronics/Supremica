@@ -46,6 +46,7 @@ import java.util.Stack;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
@@ -599,7 +600,7 @@ public class MonolithicSCCControlLoopChecker
   }
 
   private LoopCounterExampleProxy computeCounterExample()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -641,7 +642,7 @@ public class MonolithicSCCControlLoopChecker
       (tracename, des, tracelist, loopIndex);
   }
 
-  private Pair<ArrayList<EncodedStateTuple>, TIntArrayList> findLoop() throws AnalysisAbortException
+  private Pair<ArrayList<EncodedStateTuple>, TIntArrayList> findLoop() throws UserAbortException
   {
     EncodedStateTuple encodedCurrTuple = new EncodedStateTuple(mNumInts);
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
@@ -679,7 +680,7 @@ public class MonolithicSCCControlLoopChecker
         if (layeredList.size() != (indexList.get(indexSize-1)+1)) {
           indexList.add(layeredList.size()-1);
         } else {
-          throw new AnalysisAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
+          throw new UserAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
         }
       }
     final Pair<ArrayList<EncodedStateTuple>, TIntArrayList> output
@@ -721,7 +722,7 @@ public class MonolithicSCCControlLoopChecker
   }
 
   private Pair<ArrayList<EncodedStateTuple>,TIntArrayList> findCycle()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
     final THashSet<EncodedStateTuple> set = new THashSet<EncodedStateTuple>();
@@ -762,7 +763,7 @@ public class MonolithicSCCControlLoopChecker
       if (layeredList.size() != (indexList.get(indexSize-1)+1)) {
         indexList.add(layeredList.size()-1);
       } else {
-        throw new AnalysisAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
+        throw new UserAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
       }
     }
     final Pair<ArrayList<EncodedStateTuple>, TIntArrayList> output
@@ -789,7 +790,7 @@ public class MonolithicSCCControlLoopChecker
   private Set<TransitionProperty> getTransitionProxies
     (final List<EncodedStateTuple>layeredList,
      final TIntArrayList indexList)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final Set<TransitionProperty> output = new THashSet<TransitionProperty>();
     if (indexList.size() == 1) { // single cycle loop

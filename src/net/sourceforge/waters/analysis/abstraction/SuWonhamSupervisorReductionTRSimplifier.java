@@ -52,7 +52,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntPairStack;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.options.EnumOption;
@@ -219,7 +219,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Methods for Supervisor Reduction
   private ListBufferPartition checkMergibility(final int state1,
                                                final int state2)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferPartition partition;
     if (mSparePartition == null) {
@@ -430,7 +430,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //#########################################################################
   //# Partition
   private TRPartition createOneStatePartition()
-    throws OverflowException, AnalysisAbortException
+    throws OverflowException, UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (rel.getNumberOfReachableStates() <= 1 &&
@@ -593,7 +593,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   private interface PairOrderingHandler
   {
     public TRPartition mergeAllPairs()
-      throws AnalysisAbortException;
+      throws UserAbortException;
     public boolean hasFailedMergibilityCheck
       (int state1, int state2, final ListBufferPartition partition);
   }
@@ -606,7 +606,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     @Override
     public TRPartition mergeAllPairs()
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       ListBufferPartition result = new ListBufferPartition();
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -665,7 +665,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     @Override
     public TRPartition mergeAllPairs()
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       ListBufferPartition result = new ListBufferPartition();
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -728,7 +728,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     @Override
     public TRPartition mergeAllPairs()
-      throws AnalysisAbortException
+      throws UserAbortException
     {
       ListBufferPartition result = new ListBufferPartition();
       final ListBufferTransitionRelation rel = getTransitionRelation();

@@ -36,7 +36,6 @@ package net.sourceforge.waters.analysis.efa.efsm;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 
@@ -86,7 +85,7 @@ class EFSMUnfoldingCache
     EFSMTransitionRelation unfolded;
     try {
       unfolded = mUnfolder.unfold(var, system);
-    } catch (final EvalException | AnalysisException exception) {
+    } catch (final AnalysisException exception) {
       unfolded = null;
     }
     if (mFirstVariable == null) {

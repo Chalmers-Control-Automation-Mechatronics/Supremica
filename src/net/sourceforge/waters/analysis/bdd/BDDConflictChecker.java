@@ -38,9 +38,6 @@ import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
-import net.sourceforge.waters.model.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -60,6 +57,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PropositionOption;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -399,7 +399,7 @@ public class BDDConflictChecker
 
   @Override
   boolean containsBadState(final BDD reached)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     if (mBadStatesBDD != null) {
       final BDD bad = reached.and(mBadStatesBDD);
@@ -470,7 +470,7 @@ public class BDDConflictChecker
 
   private ConflictCounterExampleProxy computeCounterExample(final BDD bad,
                                                             final int index)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     if (isDetailedOutputEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad, index);
@@ -481,7 +481,7 @@ public class BDDConflictChecker
   }
 
   private ConflictCounterExampleProxy computeCounterExample(final BDD bad)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     if (isDetailedOutputEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad);

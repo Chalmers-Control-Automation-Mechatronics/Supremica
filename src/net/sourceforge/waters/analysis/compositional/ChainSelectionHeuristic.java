@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -130,14 +131,14 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     for (final SelectionHeuristic<T> step : mSteps) {
-      step.requestAbort();
+      step.requestAbort(sender);
     }
     if (mPreOrder != null) {
-      mPreOrder.requestAbort();
+      mPreOrder.requestAbort(sender);
     }
   }
 

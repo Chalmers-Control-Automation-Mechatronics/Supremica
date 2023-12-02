@@ -54,9 +54,10 @@ import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -191,23 +192,23 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mEFSMSynchronizer != null) {
-      mEFSMSynchronizer.requestAbort();
+      mEFSMSynchronizer.requestAbort(sender);
     }
     if (mVariablePartitionComputer != null) {
-      mVariablePartitionComputer.requestAbort();
+      mVariablePartitionComputer.requestAbort(sender);
     }
     if (mPartialUnfolder != null) {
-      mPartialUnfolder.requestAbort();
+      mPartialUnfolder.requestAbort(sender);
     }
     if (mSimplifier != null) {
-      mSimplifier.requestAbort();
+      mSimplifier.requestAbort(sender);
     }
     if (mNonblockingChecker != null) {
-      mNonblockingChecker.requestAbort();
+      mNonblockingChecker.requestAbort(sender);
     }
   }
 
@@ -675,7 +676,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   //# Debugging
   @SuppressWarnings("unused")
   private void checkBlocking(final EFSMTransitionRelation efsmTR)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     if (efsmTR != null) {
       final boolean nonblocking = mNonblockingChecker.run(efsmTR);

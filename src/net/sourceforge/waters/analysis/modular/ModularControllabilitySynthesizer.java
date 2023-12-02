@@ -45,10 +45,8 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.model.options.BooleanOption;
-import net.sourceforge.waters.model.options.LeafOptionPage;
-import net.sourceforge.waters.model.options.Option;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -63,6 +61,9 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.LeafOptionPage;
+import net.sourceforge.waters.model.options.Option;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -215,14 +216,14 @@ public class ModularControllabilitySynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mModularControllabilityChecker != null) {
-      mModularControllabilityChecker.requestAbort();
+      mModularControllabilityChecker.requestAbort(sender);
     }
     if (mMonolithicSynthesizer != null) {
-      mMonolithicSynthesizer.requestAbort();
+      mMonolithicSynthesizer.requestAbort(sender);
     }
   }
 

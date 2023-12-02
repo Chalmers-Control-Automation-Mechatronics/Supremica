@@ -45,7 +45,10 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -162,7 +165,7 @@ import org.xml.sax.SAXException;
  *
  * @author Robi Malik
  */
-public class ModuleCompiler extends AbortableCompiler
+public class ModuleCompiler extends AbstractAbortable
   implements Configurable
 {
 
@@ -269,11 +272,11 @@ public class ModuleCompiler extends AbortableCompiler
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mActiveAbortable != null) {
-      mActiveAbortable.requestAbort();
+      mActiveAbortable.requestAbort(sender);
     }
   }
 
@@ -371,7 +374,7 @@ public class ModuleCompiler extends AbortableCompiler
    *         exception when the first error is encountered.
    */
   public ProductDESProxy compile()
-    throws EvalException
+    throws AnalysisException
   {
     try
     {

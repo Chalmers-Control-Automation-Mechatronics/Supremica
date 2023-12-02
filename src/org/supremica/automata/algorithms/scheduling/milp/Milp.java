@@ -7,6 +7,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Arc;
@@ -3099,7 +3101,7 @@ public class Milp
     }
 
     @Override
-    public void requestAbort()
+    public void requestAbort(AbortRequester sender)
     {
         requestStop(false);
     }

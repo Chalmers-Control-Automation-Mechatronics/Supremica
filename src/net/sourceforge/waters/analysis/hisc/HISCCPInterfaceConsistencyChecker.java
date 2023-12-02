@@ -48,6 +48,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBu
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -328,15 +329,15 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
-    mConflictChecker.requestAbort();
+    super.requestAbort(sender);
+    mConflictChecker.requestAbort(sender);
     if (mSimplifier != null) {
-      mSimplifier.requestAbort();
+      mSimplifier.requestAbort(sender);
     }
     if (mConflictPreorderChecker != null) {
-      mConflictPreorderChecker.requestAbort();
+      mConflictPreorderChecker.requestAbort(sender);
     }
   }
 

@@ -39,6 +39,7 @@ import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -150,11 +151,11 @@ public class BDDDeadlockChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  public void requestAbort()
+  public void requestAbort(final AbortRequester sender)
   {
-    super.requestAbort();
+    super.requestAbort(sender);
     if (mDeadlockPartitioning != null) {
-      mDeadlockPartitioning.requestAbort();
+      mDeadlockPartitioning.requestAbort(sender);
     }
   }
 
@@ -243,7 +244,7 @@ public class BDDDeadlockChecker
 
   @Override
   boolean containsBadState(final BDD reached)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final BDD possibleDeadlock = reached.id();
     for (final BDD cond : mDeadlockBDDs) {
@@ -257,7 +258,7 @@ public class BDDDeadlockChecker
   }
 
   private ConflictCounterExampleProxy computeCounterExample()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     for (final BDD part : mDeadlockBDDs) {
       part.free();

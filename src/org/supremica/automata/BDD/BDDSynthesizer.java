@@ -50,7 +50,6 @@
 package org.supremica.automata.BDD;
 
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -65,13 +64,13 @@ public class BDDSynthesizer
         bddAutomata = new BDDAutomata(theAutomata);
     }
 
-    public void computeSupervisor() throws AnalysisAbortException, OverflowException
+    public void computeSupervisor() throws AnalysisAbortException
     {
         bddAutomata.getReachableAndCoreachableStates();
         //logger.info("Computing Nonblocking Supervisor Guards");
     }
 
-    public Automaton getSupervisor() throws AnalysisAbortException, OverflowException
+    public Automaton getSupervisor() throws AnalysisAbortException
     {
         return bddAutomata.getSupervisor();
     }

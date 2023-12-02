@@ -44,7 +44,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -175,7 +175,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
   //#########################################################################
   //# Auxiliary Methods
   private void createMarkingTR()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     if (!mMarkedVariables.isEmpty()) {
       try {

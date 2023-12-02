@@ -552,7 +552,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void setUpVerifier()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int numStates = mOriginalStates.length;
     mVerifierStatePairs = new TLongArrayList(numStates);
@@ -564,7 +564,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void rebuildVerifier()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     mVerifierStatePairs.clear();
     mVerifierStateMap.clear();
@@ -579,7 +579,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void buildVerifier()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final int numStates = mOriginalStates.length;
     for (int s = 0; s < numStates; s++) {
@@ -878,7 +878,7 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# OP-Search Algorithm
   private void doOPSearchStep()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     final OPSearchAutomatonResult result = getAnalysisResult();
     result.recordIteration();

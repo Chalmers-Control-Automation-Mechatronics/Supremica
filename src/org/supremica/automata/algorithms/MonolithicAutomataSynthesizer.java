@@ -2,6 +2,7 @@ package org.supremica.automata.algorithms;
 
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.apache.logging.log4j.LogManager;
@@ -229,10 +230,10 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 	}
 
 	@Override
-	public void requestAbort() {
+	public void requestAbort(final AbortRequester sender) {
 		stopRequested = true;
 		if (threadToStop != null) {
-			threadToStop.requestAbort();
+			threadToStop.requestAbort(sender);
 		}
 	}
 

@@ -3,6 +3,8 @@ package org.supremica.automata.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -137,11 +139,9 @@ public class SearchStates
     @Override
     public void stopTask()
     {
-
         // System.out.println("Stop requested");
         stopRequested = true;
-
-        syncher.requestAbort();
+        syncher.requestAbort(AbortRequester.USER);
     }
 
     @Override
@@ -258,4 +258,5 @@ public class SearchStates
     {
         return syncher.getAutomaton();
     }
+
 }

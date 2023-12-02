@@ -36,11 +36,11 @@ package net.sourceforge.waters.model.expr;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.WatersException;
 
 
-public class EvalException extends WatersException
+public class EvalException extends AnalysisException
 {
 
   //#########################################################################
@@ -134,13 +134,11 @@ public class EvalException extends WatersException
     }
   }
 
-  /**
-   * Returns all the exceptions associated with this instance. The default
-   * implementation returns a singleton list containing <CODE>this</CODE>,
-   * but a {@link MultiEvalException} may return several exceptions.
-   * @return The exceptions associated with this instance.
-   */
-  public List<EvalException> getAll()
+
+  //#########################################################################
+  //# Support for Multi Exceptions
+  @Override
+  public List<? extends EvalException> getLeafExceptions()
   {
     return Collections.singletonList(this);
   }
@@ -153,6 +151,6 @@ public class EvalException extends WatersException
 
   //#########################################################################
   //# Static Class Variables
-  public static final long serialVersionUID = 1;
+  private static final long serialVersionUID = -4434736943295920333L;
 
 }

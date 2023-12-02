@@ -49,7 +49,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -1049,7 +1049,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   }
 
   private SafetyCounterExampleProxy computePOCounterExample()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

@@ -45,7 +45,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.UserAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.EventKind;
 
@@ -220,7 +220,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
 
   @Override
   public void applyResultPartition()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TRPartition partition = getResultPartition();
@@ -302,7 +302,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   //# Auxiliary Methods
   private void findCoreachableStates(final BitSet coreachable,
                                      final BitSet badStates)
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
@@ -333,7 +333,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   }
 
   private boolean findMoreBadStates()
-    throws AnalysisAbortException
+    throws UserAbortException
   {
     boolean hasAdded = false;
     final BitSet oldBadStates = (BitSet) mBadStates.clone();

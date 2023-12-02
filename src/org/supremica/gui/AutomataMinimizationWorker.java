@@ -42,6 +42,7 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.ProxyTools;
 
@@ -109,7 +110,7 @@ public class AutomataMinimizationWorker
         if (errorMessage != null)
         {
             JOptionPane.showMessageDialog(frame, errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
-            requestAbort();
+            requestAbort(AbortRequester.USER);
             return;
         }
 
@@ -125,7 +126,7 @@ public class AutomataMinimizationWorker
         if (!options.getCompositionalMinimization())
         {
 			logger.debug("AutomataMinimizationWorker: non-compositional minimization");
-			
+
             if (theAutomata.size() > 1)
             {
                 executionDialog.initProgressBar(0, theAutomata.size());
@@ -182,8 +183,8 @@ public class AutomataMinimizationWorker
                                ": " + exception.getMessage());
                   logger.debug(exception.getStackTrace());
                 }
-				
-				// This should not be done before the minimized one has been added, 
+
+				// This should not be done before the minimized one has been added,
 				// else we might remove the old one while not adding the new minimized one
 //                if (!options.getKeepOriginal())
 //                {
@@ -192,7 +193,7 @@ public class AutomataMinimizationWorker
             }
         }
         else
-        {	
+        {
             // Compositional minimization!
 			logger.debug("AutomataMinimizationWorker: compositional minimization");
             try
@@ -222,10 +223,10 @@ public class AutomataMinimizationWorker
                 logger.error("Exception in AutomatonMinimizer when compositionally minimizing " +
                     theAutomata + " " + ex);
                 logger.debug(ex.getStackTrace());
-                requestAbort();
+                requestAbort(AbortRequester.USER);
             }
 
-			// This should not be done before the minimized one has been added, 
+			// This should not be done before the minimized one has been added,
 			// else we might remove the old one while not adding the new minimized one
 //            if (!options.getKeepOriginal())
 //            {
@@ -287,13 +288,13 @@ public class AutomataMinimizationWorker
      *@see  ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(final AbortRequester sender)
     {
         abortRequested = true;
 
         for (final Iterator<Abortable> exIt = threadsToAbort.iterator(); exIt.hasNext(); )
         {
-            exIt.next().requestAbort();
+            exIt.next().requestAbort(sender);
         }
         threadsToAbort.clear();
 
@@ -315,4 +316,5 @@ public class AutomataMinimizationWorker
     public void resetAbort(){
       abortRequested = false;
     }
+
 }

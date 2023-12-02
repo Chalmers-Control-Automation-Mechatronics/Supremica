@@ -55,6 +55,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AbortRequester;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.apache.logging.log4j.LogManager;
@@ -596,7 +597,7 @@ public class AutomatonSynthesizer
      * @see org.supremica.gui.ExecutionDialog
      */
     @Override
-    public void requestAbort()
+    public void requestAbort(AbortRequester sender)
     {
         abortRequested = true;
         logger.debug("AutomatonSynthesizer requested to stop.");

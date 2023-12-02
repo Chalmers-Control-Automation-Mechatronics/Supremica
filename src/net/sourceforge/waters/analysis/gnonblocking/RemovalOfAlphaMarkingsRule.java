@@ -69,7 +69,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                              final Collection<EventProxy> propositions)
   {
     super(factory, translator, propositions);
-    mIsAborting = false;
   }
 
 
@@ -83,27 +82,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   void setAlphaMarking(final EventProxy alphaMarking)
   {
     mAlphaMarking = alphaMarking;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
   }
 
 
@@ -193,30 +171,11 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
 
 
   //#######################################################################
-  //# Auxiliary Methods
-  /**
-   * Checks whether this simplifier has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any transition relation
-   * simplifier that supports being aborted by user request.
-   */
-  private void checkAbort()
-    throws AnalysisAbortException
-  {
-    if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
-      throw exception;
-    }
-  }
-
-
-  //#######################################################################
   //# Data Members
   private EventProxy mAlphaMarking;
   private AutomatonProxy mAutToAbstract;
   private StateProxy[] mOriginalIntToStateMap;
   private TObjectIntHashMap<StateProxy> mResultingStateToIntMap;
-  private boolean mIsAborting;
   private OldTransitionRelation mTR = null;
 
 }

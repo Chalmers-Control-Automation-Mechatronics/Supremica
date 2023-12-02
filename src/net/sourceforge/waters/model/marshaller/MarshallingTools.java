@@ -40,6 +40,7 @@ import java.util.Collection;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -47,7 +48,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -367,7 +367,7 @@ public class MarshallingTools
         new ModuleCompiler(docManager, desFactory, module);
       return compiler.compile();
     } catch (final SAXException | WatersUnmarshalException | IOException |
-                   EvalException | ParserConfigurationException exception) {
+             AnalysisException | ParserConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }

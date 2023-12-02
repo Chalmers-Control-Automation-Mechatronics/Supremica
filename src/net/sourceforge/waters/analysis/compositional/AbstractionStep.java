@@ -40,7 +40,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -151,7 +150,7 @@ abstract class AbstractionStep
   }
 
   void checkAbort()
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisAbortException
   {
     mAnalyzer.checkAbort();
   }

@@ -31,79 +31,46 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
-
-import net.sourceforge.waters.model.analysis.Abortable;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.base.VisitorException;
-
+package net.sourceforge.waters.model.analysis;
 
 /**
- * An implementation of the {@link Abortable} interface used by compilers.
- * Throws {@link EvalAbortException} when abort is requested.
+ * <P>Interface to characterise threads or objects that request an
+ * analysis operation to abort. This interface provides a method to create
+ * an exception that can be thrown in response to the abort which may
+ * include information about how the abort was triggered.</P>
+ *
+ * <P>Typical implementations of this interface will return a
+ * {@link UserAbortException} to indicate an abort by user request
+ * or an {@link OverflowException} to indicate a timeout, typically using a
+ * constructor call <CODE>new {@link
+ * OverflowException#OverflowException(OverflowKind, int)
+ * OverflowException}({@link OverflowKind}.{@link OverflowKind#TIME TIME},
+ * &lt;<I>seconds</I>&gt;)</CODE>.</P>
+ *
+ * <P>The static variable {@link #USER} is provided for convenience, to
+ * specify a user-requested abort.</P>
  *
  * @author Robi Malik
  */
 
-public class AbortableCompiler implements Abortable
+public interface AbortRequester
 {
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-
-  //#########################################################################
-  //# Aborting
   /**
-   * Checks whether this compiler has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any transition relation
-   * simplifier that supports being aborted by user request.
+   * Creates an exception to be thrown in response to an abort request.
    */
-  public void checkAbort()
-    throws EvalAbortException
-  {
-    if (mIsAborting) {
-      throw new EvalAbortException();
-    }
-  }
+  public AnalysisAbortException createAbortException();
 
   /**
-   * Checks whether this compiler has been requested to abort,
-   * and if so, performs the abort by throwing a {@link VisitorException}
-   * wrapped around an {@link AnalysisAbortException}. This method is used
-   * instead of {@link #checkAbort()} when inside a {@link
-   * net.sourceforge.waters.model.base.ProxyVisitor ProxyVisitor}.
+   * An object that implements the {@link AbortRequester} interface by
+   * return a {@link UserAbortException}.
    */
-  public void checkAbortInVisitor()
-    throws VisitorException
+  public static AbortRequester USER = new AbortRequester()
   {
-    if (mIsAborting) {
-      final EvalAbortException exception = new EvalAbortException();
-      throw new VisitorException(exception);
+    @Override
+    public UserAbortException createAbortException()
+    {
+      return new UserAbortException();
     }
-  }
 
-
-  //#########################################################################
-  //# Data Members
-  private volatile boolean mIsAborting;
-
+  };
 }
