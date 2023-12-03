@@ -37,7 +37,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbortRequester;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
@@ -176,29 +175,21 @@ public abstract class NativeModelAnalyzer
   public boolean run()
     throws AnalysisException
   {
-    if (getModel() == null) {
-      throw new AnalysisConfigurationException("Input model is NULL!");
-    } else {
-      clearAnalysisResult();
-      final long start = System.currentTimeMillis();
-      try {
-        final AnalysisResult result = runNativeAlgorithm();
-        final long stop = System.currentTimeMillis();
-        result.setRuntime(stop - start);
-        setAnalysisResult(result);
-        return result.isSatisfied();
-      } catch (AnalysisException exception) {
-        final long stop = System.currentTimeMillis();
-        if (exception instanceof NativeAbortException) {
-          final AbortRequester requester = getAbortRequester();
-          exception = requester.createAbortException();
-        }
-        final AnalysisResult result = createAnalysisResult();
-        result.setException(exception);
-        result.setRuntime(stop - start);
-        setAnalysisResult(result);
-        throw exception;
+    try {
+      setUp();
+      final AnalysisResult result = runNativeAlgorithm();
+      setAnalysisResult(result);
+      return result.isSatisfied();
+    } catch (AnalysisException exception) {
+      if (exception instanceof NativeAbortException) {
+        final AbortRequester requester = getAbortRequester();
+        exception = requester.createAbortException();
       }
+      final AnalysisResult result = getAnalysisResult();
+      result.setException(exception);
+      throw exception;
+    } finally {
+      tearDown();
     }
   }
 

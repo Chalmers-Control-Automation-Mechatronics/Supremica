@@ -512,7 +512,7 @@ public class CommandLineOptionContext implements OptionContext
                                  "Print statistics", "+stats", false));
       register(new PositiveIntOption(OPTION_CommandLineTool_Timeout, null,
                                      "Maximum allowed runtime in seconds",
-                                     "-timeout"));
+                                     "-ttimeout"));
       register(new BooleanOption(OPTION_CommandLineTool_Verbose, null,
                                  "Verbose log output",
                                  "+verbose|+v", false));

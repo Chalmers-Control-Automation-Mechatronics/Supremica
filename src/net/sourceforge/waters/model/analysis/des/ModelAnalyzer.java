@@ -173,10 +173,10 @@ public interface ModelAnalyzer
    * is exceeded, an {@link OverflowException} is thrown.
    * Many algorithms do not explicitly store any transitions and can ignore
    * this parameter.
-   * @param  limit  The new transition limit, or {@link Integer#MAX_VALUE} to
-   *                indicate that no transition limit is to be used. A value
-   *                of&nbsp;0 can be used to request that transitions should
-   *                not be stored explicitly.
+   * @param  limit   The new transition limit, or {@link Integer#MAX_VALUE} to
+   *                 indicate that no transition limit is to be used. A value
+   *                 of&nbsp;0 can be used to request that transitions should
+   *                 not be stored explicitly.
    */
   public void setTransitionLimit(final int limit);
 
@@ -187,6 +187,23 @@ public interface ModelAnalyzer
    * @see    #setTransitionLimit(int)
    */
   public int getTransitionLimit();
+
+  /**
+   * Sets the timeout for this model analyser.
+   * If set, every analysis run is limited not to take longer than the
+   * given number of seconds. If a run takes longer, it is aborted and an
+   * {@link OverflowException} is thrown.
+   * @param  timeout Timeout in seconds, or {@link Integer#MAX_VALUE} to
+   *                 run without timeout.
+   */
+  public void setTimeout(final int timeout);
+
+  /**
+   * Gets the timeout for this model analyser.
+   * @return The current timeout in seconds, or {@link Integer#MAX_VALUE} if
+   *         running without timeout.
+   */
+  public int getTimeout();
 
 
   //#########################################################################

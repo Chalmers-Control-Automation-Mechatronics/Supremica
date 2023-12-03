@@ -41,10 +41,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
+import net.sourceforge.waters.model.analysis.Watchdog;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -56,6 +58,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
+import net.sourceforge.waters.model.options.PositiveIntOption;
+import net.sourceforge.waters.model.options.StringListOption;
 
 
 /**
@@ -89,6 +93,7 @@ public abstract class AbstractModelAnalyzer
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
+    mTimeout = Integer.MAX_VALUE;
   }
 
   public AbstractModelAnalyzer(final AutomatonProxy aut,
@@ -110,6 +115,8 @@ public abstract class AbstractModelAnalyzer
       page.append(options, AbstractModelAnalyzerFactory.
                   OPTION_LanguageInclusionChecker_Property);
     }
+    page.append(options,  AbstractModelAnalyzerFactory.
+                OPTION_ModelAnalyzer_Timeout);
     return options;
   }
 
@@ -118,8 +125,8 @@ public abstract class AbstractModelAnalyzer
   {
     if (option.hasID(AbstractModelAnalyzerFactory.
                      OPTION_LanguageInclusionChecker_Property)) {
-      @SuppressWarnings("unchecked")
-      final Collection<String> props = (Collection<String>) option.getValue();
+      final StringListOption propOption = (StringListOption) option;
+      final Collection<String> props = propOption.getValue();
       if (!props.isEmpty()) {
         final LanguageInclusionChecker lchecker =
           (LanguageInclusionChecker) this;
@@ -127,6 +134,10 @@ public abstract class AbstractModelAnalyzer
           new PropertyKindTranslator(props);
         lchecker.setKindTranslator(translator);
       }
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_Timeout)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setTimeout(intOption.getIntValue());
     }
   }
 
@@ -209,6 +220,18 @@ public abstract class AbstractModelAnalyzer
   }
 
   @Override
+  public void setTimeout(final int timeout)
+  {
+    mTimeout = timeout;
+  }
+
+  @Override
+  public int getTimeout()
+  {
+    return mTimeout;
+  }
+
+  @Override
   public AnalysisResult getAnalysisResult()
   {
     return mAnalysisResult;
@@ -232,8 +255,15 @@ public abstract class AbstractModelAnalyzer
   protected void setUp()
     throws AnalysisException
   {
+    if (getModel() == null) {
+      throw new AnalysisConfigurationException("Input model is NULL!");
+    }
     mStartTime = System.currentTimeMillis();
     mAnalysisResult = createAnalysisResult();
+    if (mTimeout < Integer.MAX_VALUE) {
+      mWatchdog = new Watchdog(this, mTimeout);
+      mWatchdog.start();
+    }
     checkAbort();
   }
 
@@ -247,6 +277,10 @@ public abstract class AbstractModelAnalyzer
   protected void tearDown()
   {
     addStatistics();
+    if (mWatchdog != null) {
+      mWatchdog.terminate();
+      mWatchdog = null;
+    }
   }
 
   /**
@@ -447,10 +481,12 @@ public abstract class AbstractModelAnalyzer
   private ProductDESProxy mModel;
   private AnalysisResult mAnalysisResult;
   private KindTranslator mKindTranslator;
+  private Watchdog mWatchdog;
 
   private boolean mDetailedOutputEnabled;
   private int mNodeLimit;
   private int mTransitionLimit;
+  private int mTimeout;
   private long mStartTime;
 
 }

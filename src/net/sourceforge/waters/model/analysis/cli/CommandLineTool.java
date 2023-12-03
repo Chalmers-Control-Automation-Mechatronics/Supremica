@@ -227,9 +227,9 @@ public class CommandLineTool implements Configurable
         ctx.updateLoggers();
       }
 
-      final Watchdog watchdog = new Watchdog(mAnalyzer, mTimeout);
-      if (mTimeout > 0) {
-        watchdog.start();
+      if (mWatchdog != null) {
+        mWatchdog.addAbortable(mAnalyzer);
+        mWatchdog.start();
       }
 
       for (final String name : argList) {
@@ -255,7 +255,9 @@ public class CommandLineTool implements Configurable
           }
           mContext.configure(compiler);
           compiler.setOutputName(mOutputFile);
-          watchdog.addAbortable(compiler);
+          if (mWatchdog != null) {
+            mWatchdog.addAbortable(compiler);
+          }
           try {
             des = compiler.compile();
             final long stop = System.currentTimeMillis();
@@ -272,7 +274,9 @@ public class CommandLineTool implements Configurable
             writeCSV(fullName, result);
             continue;
           } finally {
-            watchdog.removeAbortable(compiler);
+            if (mWatchdog != null) {
+              mWatchdog.removeAbortable(compiler);
+            }
           }
         }
         if (mAnnotator != null) {
@@ -508,7 +512,7 @@ public class CommandLineTool implements Configurable
       final PositiveIntOption opt = (PositiveIntOption) option;
       final int timeout = opt.getIntValue();
       if (timeout < Integer.MAX_VALUE) {
-        mTimeout = timeout;
+        mWatchdog = new Watchdog(timeout);
       }
     } else if (option.hasID(CommandLineOptionContext.
                             OPTION_CommandLineTool_Verbose)) {
@@ -608,7 +612,6 @@ public class CommandLineTool implements Configurable
   //# Data Members
   private Level mVerbosity = Level.INFO;
   private boolean mStats = false;
-  private int mTimeout = -1;
   private int mRepetitions = 1;
   private PrintWriter mCsv = null;
   private EventAnnotator mAnnotator;
@@ -620,6 +623,7 @@ public class CommandLineTool implements Configurable
   private ProductDESProxyFactory mFactory;
   private CommandLineOptionContext mContext;
   private ModelAnalyzer mAnalyzer;
+  private Watchdog mWatchdog;
 
 
   //#########################################################################

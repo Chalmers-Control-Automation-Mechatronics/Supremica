@@ -178,6 +178,11 @@ public abstract class AbstractModelAnalyzerFactory
               "Internal transition limit",
               "Maximum number of transitions in intermediate abstraction steps.",
               "-itlimit"));
+    db.register(new PositiveIntOption
+             (OPTION_ModelAnalyzer_Timeout,
+              "Operation timeout in seconds",
+              "Abort analysis operations that take longer than this number of seconds.",
+              "-timeout"));
 
     db.register(new BooleanOption
              (OPTION_ModelVerifier_DetailedOutputEnabled,
@@ -363,6 +368,8 @@ public abstract class AbstractModelAnalyzerFactory
     "ModelAnalyzer.InternalStateLimit";
   public static final String OPTION_ModelAnalyzer_InternalTransitionLimit =
     "ModelAnalyzer.InternalTransitionLimit";
+  public static final String OPTION_ModelAnalyzer_Timeout =
+    "ModelAnalyzer.Timeout";
 
   public static final String OPTION_ModelVerifier_DetailedOutputEnabled =
     "ModelVerifier.DetailedOutputEnabled";
