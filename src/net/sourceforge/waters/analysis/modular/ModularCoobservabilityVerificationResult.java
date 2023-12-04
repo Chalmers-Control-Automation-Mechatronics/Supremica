@@ -85,6 +85,12 @@ public class ModularCoobservabilityVerificationResult
   }
 
   @Override
+  public void setNumberOfSites(final int numSites)
+  {
+    mNumberOfSites = numSites;
+  }
+
+  @Override
   public int getPeakNumberOfSites()
   {
     final CoobservabilityVerificationResult mono = getMonolithicResult();
@@ -99,14 +105,6 @@ public class ModularCoobservabilityVerificationResult
   public CoobservabilityCounterExampleProxy getCounterExample()
   {
     return (CoobservabilityCounterExampleProxy) super.getCounterExample();
-  }
-
-
-  //#########################################################################
-  //# Providing Statistics
-  public void setNumberOfSites(final int numSites)
-  {
-    mNumberOfSites = numSites;
   }
 
 
@@ -135,26 +133,26 @@ public class ModularCoobservabilityVerificationResult
   //#########################################################################
   //# Printing
   @Override
-  public void print(final PrintWriter writer)
+  protected void printPart1(final PrintWriter writer)
   {
+    super.printPart1(writer);
     if (mNumberOfSites >= 0) {
       writer.print("Number of supervisor sites in model: ");
       writer.println(mNumberOfSites);
     }
-    super.print(writer);
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(writer);
+    super.printCSVHorizontalHeadingsPart1(writer);
     writer.print(",NumSites");
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontal(writer);
+    super.printCSVHorizontalPart1(writer);
     writer.print(',');
     if (mNumberOfSites >= 0) {
       writer.print(mNumberOfSites);

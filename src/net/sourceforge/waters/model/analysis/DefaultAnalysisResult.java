@@ -217,6 +217,12 @@ public class DefaultAnalysisResult
   }
 
   @Override
+  public void setTotalNumberOfAutomata(final int numaut)
+  {
+    mTotalNumberOfAutomata = numaut;
+  }
+
+  @Override
   public void setNumberOfAutomata(final int numaut)
   {
     mTotalNumberOfAutomata = numaut;
@@ -419,7 +425,7 @@ public class DefaultAnalysisResult
   public void printCSVHorizontal(final PrintWriter writer)
   {
     if (mException != null) {
-      writer.print(ProxyTools.getShortClassName(mException));
+      mException.printCSVHorizontal(writer);
     } else {
       writer.print(mSatisfied);
     }

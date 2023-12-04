@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.base;
 
+import java.io.PrintWriter;
 
 public class WatersException extends Exception {
 
@@ -56,7 +57,7 @@ public class WatersException extends Exception {
   /**
    * Constructs a new exception with the specified detail message and cause.
    */
-  public WatersException(final String message, final Throwable cause) 
+  public WatersException(final String message, final Throwable cause)
   {
     super(message, cause);
   }
@@ -82,6 +83,14 @@ public class WatersException extends Exception {
   public RuntimeException getRuntimeException()
   {
     return new WatersRuntimeException(this);
+  }
+
+
+  //#########################################################################
+  //# Printing
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    writer.print(ProxyTools.getShortClassName(this));
   }
 
 

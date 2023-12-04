@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintWriter;
 
 /**
  * An exception indicating that an analysis algorithm has been aborted
@@ -139,7 +140,7 @@ public class OverflowException extends AnalysisAbortException {
 
 
   //#########################################################################
-  //# Overrides for Base Class java.lang.Exception
+  //# Overrides for java.lang.Exception
   @Override
   public String getMessage()
   {
@@ -148,6 +149,18 @@ public class OverflowException extends AnalysisAbortException {
     } else {
       return super.getMessage();
     }
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.base.WatersException
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    writer.print('(');
+    writer.print(mKind);
+    writer.print(')');
   }
 
 

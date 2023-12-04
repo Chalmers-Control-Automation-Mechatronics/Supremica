@@ -163,7 +163,7 @@ public interface AnalysisResult
    * </P>
    * <P>
    * <I>Note.</I> It does not make much sense to speak of the total number of
-   * nodes in BDD-based algorithms, as the final number of nodes often is much
+   * nodes in BDD-based algorithms, as the number of nodes often is much
    * smaller than the size of interim BDDs. Therefore, no total number of nodes
    * will be computed.
    * </P>
@@ -198,28 +198,28 @@ public interface AnalysisResult
    * @see #isSatisfied()
    * @see #isFinished()
    */
-  public void setSatisfied(final boolean sat);
+  public void setSatisfied(boolean sat);
 
   /**
    * Stores an exception on this analysis result. Setting the result also marks
    * the result run as 'finished'.
    * @see #isFinished()
    */
-  public void setException(final WatersException exception);
+  public void setException(WatersException exception);
 
   /**
    * Sets a runtime for this result.
    * @param time
    *          Time to be stored, in milliseconds.
    */
-  public void setRuntime(final long time);
+  public void setRuntime(long time);
 
   /**
    * Sets a compile for this result.
    * @param time
    *          Time to be stored, in milliseconds.
    */
-  public void setCompileTime(final long time);
+  public void setCompileTime(long time);
 
   /**
    * Updates the recorded memory usage.
@@ -228,63 +228,68 @@ public interface AnalysisResult
    * @param usage
    *          Amount of memory currently used, in bytes.
    */
-  public void updatePeakMemoryUsage(final long usage);
+  public void updatePeakMemoryUsage(long usage);
 
   /**
    * Specifies a value for both the peak and total number of states constructed
    * by the analysis.
    */
-  public void setNumberOfStates(final double numstates);
+  public void setNumberOfStates(double numstates);
+
+  /**
+   * Specifies a value for the total number of automata used by the analysis.
+   */
+  public void setTotalNumberOfAutomata(int numaut);
 
   /**
    * Specifies a value for the total number of automata used by the analysis.
    * Also updates the peak number of automata if it is smaller than the
    * argument.
    */
-  public void setNumberOfAutomata(final int numaut);
+  public void setNumberOfAutomata(int numaut);
 
   /**
    * Specifies a value for the total number of events considered by the
    * analysis algorithm.
    */
-  public void setTotalNumberOfEvents(final int numEvents);
+  public void setTotalNumberOfEvents(int numEvents);
 
   /**
    * Specifies a value for the total number of states constructed by the
    * analysis algorithm.
    */
-  public void setTotalNumberOfStates(final double numstates);
+  public void setTotalNumberOfStates(double numstates);
 
   /**
    * Specifies a value for the peak number of states constructed by the
    * analysis algorithm.
    */
-  public void setPeakNumberOfStates(final double numstates);
+  public void setPeakNumberOfStates(double numstates);
 
   /**
    * Specifies a value for both the peak and total number of transitions
    * constructed by the analysis.
    */
-  public void setNumberOfTransitions(final double numtrans);
+  public void setNumberOfTransitions(double numtrans);
 
   /**
    * Specifies a value for the total number of transitions constructed by the
    * analysis.
    */
-  public void setTotalNumberOfTransitions(final double numtrans);
+  public void setTotalNumberOfTransitions(double numtrans);
 
   /**
    * Specifies a value for the peak number of transitions constructed by the
    * analysis.
    */
-  public void setPeakNumberOfTransitions(final double numtrans);
+  public void setPeakNumberOfTransitions(double numtrans);
 
   /**
    * Specifies the maximum number of nodes used during analysis. A 'node' here
    * represents a basic unit of memory such as a state in a synchronous product
    * or a BDD node.
    */
-  public void setPeakNumberOfNodes(final int numnodes);
+  public void setPeakNumberOfNodes(int numnodes);
 
 
   //#########################################################################
@@ -308,17 +313,17 @@ public interface AnalysisResult
    *          to indicate that the two records merged are not of exactly the
    *          same type.
    */
-  public void merge(final AnalysisResult other);
+  public void merge(AnalysisResult other);
 
 
   //#########################################################################
   //# Printing
-  public void print(final PrintStream stream);
+  public void print(PrintStream stream);
 
-  public void print(final PrintWriter writer);
+  public void print(PrintWriter writer);
 
-  public void printCSVHorizontal(final PrintWriter writer);
+  public void printCSVHorizontal(PrintWriter writer);
 
-  public void printCSVHorizontalHeadings(final PrintWriter writer);
+  public void printCSVHorizontalHeadings(PrintWriter writer);
 
 }

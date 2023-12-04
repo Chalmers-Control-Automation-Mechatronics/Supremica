@@ -232,6 +232,7 @@ public class CommandLineTool implements Configurable
         mWatchdog.start();
       }
 
+      mainLoop:
       for (final String name : argList) {
         final long start0 = System.currentTimeMillis();
         final File filename = new File(name);
@@ -275,7 +276,11 @@ public class CommandLineTool implements Configurable
             continue;
           } finally {
             if (mWatchdog != null) {
-              mWatchdog.removeAbortable(compiler);
+              if (mWatchdog.isExpired()) {
+                break mainLoop;
+              } else {
+                mWatchdog.removeAbortable(compiler);
+              }
             }
           }
         }
@@ -298,6 +303,9 @@ public class CommandLineTool implements Configurable
         mAnalyzer.setModel(des);
         final long setUpTime = System.currentTimeMillis() - start0;
         for (int i = 0; i < mRepetitions; i++) {
+          if (mWatchdog != null && mWatchdog.isExpired()) {
+            break mainLoop;
+          }
           System.out.print(fullName + " ... ");
           final long start1 = System.currentTimeMillis();
 

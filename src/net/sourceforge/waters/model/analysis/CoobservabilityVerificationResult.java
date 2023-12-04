@@ -56,6 +56,11 @@ public interface CoobservabilityVerificationResult extends VerificationResult
   public int getNumberOfSites();
 
   /**
+   * Sets the number of supervisor sites found in the model to be verified.
+   */
+  public void setNumberOfSites(int numSites);
+
+  /**
    * Gets the peak number of supervisor sites considered during all
    * covered verification runs. This number may be less than {@link
    * #getNumberOfSites()} following optimisation.

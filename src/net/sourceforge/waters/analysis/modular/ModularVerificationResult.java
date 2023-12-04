@@ -175,13 +175,23 @@ public class ModularVerificationResult
   //#########################################################################
   //# Printing
   @Override
-  public void print(final PrintWriter writer)
+  public final void print(final PrintWriter writer)
   {
     super.print(writer);
+    printPart1(writer);
+    printPart2(writer);
+  }
+
+  protected void printPart1(final PrintWriter writer)
+  {
     if (mNumberOfMonolithicRuns >= 0) {
       writer.println("Number of monolithic verification runs: " +
                      mNumberOfMonolithicRuns);
     }
+  }
+
+  protected void printPart2(final PrintWriter writer)
+  {
     if (mMonolithicStats != null) {
       writer.println("--------------------------------------------------");
       mMonolithicStats.print(writer);
@@ -189,9 +199,19 @@ public class ModularVerificationResult
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  public final void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
+    printCSVHorizontalHeadingsPart1(writer);
+    printCSVHorizontalHeadingsPart2(writer);
+  }
+
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
+  {
+  }
+
+  protected void printCSVHorizontalHeadingsPart2(final PrintWriter writer)
+  {
     writer.print(",Monolithic");
     if (mMonolithicStats != null) {
       writer.print(',');
@@ -200,9 +220,19 @@ public class ModularVerificationResult
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  public final void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    printCSVHorizontalPart1(writer);
+    printCSVHorizontalPart2(writer);
+  }
+
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
+  {
+  }
+
+  protected void printCSVHorizontalPart2(final PrintWriter writer)
+  {
     writer.print(',');
     writer.print(mNumberOfMonolithicRuns);
     if (mMonolithicStats != null) {

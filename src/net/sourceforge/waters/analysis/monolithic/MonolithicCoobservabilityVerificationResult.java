@@ -85,6 +85,12 @@ public class MonolithicCoobservabilityVerificationResult
   }
 
   @Override
+  public void setNumberOfSites(final int numSites)
+  {
+    mPeakNumberOfSites = numSites;
+  }
+
+  @Override
   public int getPeakNumberOfSites()
   {
     return mPeakNumberOfSites;
@@ -99,11 +105,6 @@ public class MonolithicCoobservabilityVerificationResult
 
   //#########################################################################
   //# Providing Statistics
-  public void setNumberOfSites(final int numSites)
-  {
-    mPeakNumberOfSites = numSites;
-  }
-
   public void updatePeakNumberOfSites(final int numSites)
   {
     mPeakNumberOfSites = Math.max(mPeakNumberOfSites, numSites);

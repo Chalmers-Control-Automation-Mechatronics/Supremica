@@ -352,6 +352,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     createEventEncoding();
     final Map<EventProxy,? extends EventInfo> eventInfoMap = setUpEventEncoding();
     checkEventsInAutomta(eventInfoMap);
+    result.setTotalNumberOfEvents(eventInfoMap.size());
     if (result.isFinished()) {
       return;
     }

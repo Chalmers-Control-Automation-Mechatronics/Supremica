@@ -52,6 +52,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.CoobservabilityVerificationResult;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -281,6 +282,14 @@ public class CoobservabilitySignature
     }
   }
 
+
+  //###########################################################################
+  //# Stats Gathering
+  public void addStatistics(final CoobservabilityVerificationResult result)
+  {
+    result.setTotalNumberOfEvents(mEventMap.size());
+    result.setNumberOfSites(mSites.size());
+  }
 
   //###########################################################################
   //# Simplification

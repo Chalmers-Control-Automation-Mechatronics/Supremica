@@ -322,6 +322,17 @@ abstract class AbstractModularVerifier
         }
       }
     }
+    final ModularVerificationResult result = getAnalysisResult();
+    result.setTotalNumberOfAutomata(mAutomataMap.size());
+
+    int numEvents = 0;
+    for (final EventProxy event : des.getEvents()) {
+      final EventKind kind = translator.getEventKind(event);
+      if (kind == EventKind.CONTROLLABLE || kind == EventKind.UNCONTROLLABLE) {
+        numEvents++;
+      }
+    }
+    result.setTotalNumberOfEvents(numEvents);
 
     final HeuristicFactory factory = HeuristicFactory.getInstance();
     final HeuristicTraceChecker checker = createHeuristicTraceChecker();

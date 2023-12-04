@@ -47,7 +47,9 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.CoobservabilityChecker;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CoobservabilityCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -228,7 +230,17 @@ public class SlicingCoobservabilityChecker
         new CoobservabilitySignature(des, translator, mDefaultSiteName);
     }
     final ModularCoobservabilityVerificationResult result = getAnalysisResult();
-    result.setNumberOfSites(mSignature.getSites().size());
+    mSignature.addStatistics(result);
+
+    final KindTranslator translator = getKindTranslator();
+    int numAutomata = 0;
+    for (final AutomatonProxy aut : des.getAutomata()) {
+      final ComponentKind kind = translator.getComponentKind(aut);
+      if (kind == ComponentKind.PLANT || kind == ComponentKind.SPEC) {
+        numAutomata++;
+      }
+    }
+    result.setTotalNumberOfAutomata(numAutomata);
   }
 
   @Override
