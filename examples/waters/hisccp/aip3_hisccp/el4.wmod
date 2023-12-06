@@ -1,1751 +1,1751 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="el4" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Model of an automated manufacturing system 'Atelier Inter-établissement de Productique' (AIP) based on 'Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control' by Raoguang Song, MSc Thesis, McMaster University, Hamilton, ON, Canada.
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="el4">
+<B:Comment>Model of an automated manufacturing system 'Atelier Inter-établissement de Productique' (AIP) based on 'Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control' by Raoguang Song, MSc Thesis, McMaster University, Hamilton, ON, Canada.
 This model has been modified from the original version to use HISC-CP interfaces and reduced polling.
 This subsystem represents external loop 4 (I/O station).
-The model is controllable and nonblocking, and satisfies the HISC-CP interface consistency properties.</ns2:Comment>
-    <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="CplMvInPalletIO">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="CplMvOutPalletIO">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="IsPalletCL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletEL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletOutIO"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletType1InIO"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletType2InIO"/>
-        <EventDecl Kind="CONTROLLABLE" Name="LibPallet">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="MvInPalletType1IO">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="MvInPalletType2IO">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="MvOutPalletIO">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPallet"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletOutIO"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletType1InIO"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletType2InIO"/>
-        <EventDecl Kind="CONTROLLABLE" Name="NoTrnsfEL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="PalletRlsd">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="QPalletAtEL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="QPalletOutIO"/>
-        <EventDecl Kind="CONTROLLABLE" Name="QPalletType1InIO"/>
-        <EventDecl Kind="CONTROLLABLE" Name="QPalletType2InIO"/>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TrnsfCplToCL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TrnsfCplToEL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_p"/>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_n"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletEL"/>
-        <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="QPalletAtCL">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-    </EventDeclList>
-    <ComponentList>
-        <SimpleComponent Kind="PROPERTY" Name="iface_main">
-            <Graph Deterministic="false">
-                <NodeList>
-                    <SimpleNode Initial="true" Name="idle">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="224" Y="160"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="0" Y="27"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-35" Y="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="el">
-                        <PointGeometry>
-                            <Point X="112" Y="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-19" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="cl">
-                        <PointGeometry>
-                            <Point X="384" Y="160"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="rlsd">
-                        <PointGeometry>
-                            <Point X="384" Y="240"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="9" Y="-8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="cpl">
-                        <PointGeometry>
-                            <Point X="384" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="7" Y="-3"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="more">
-                        <PointGeometry>
-                            <Point X="112" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-39" Y="-18"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S0">
-                        <PointGeometry>
-                            <Point X="304" Y="160"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="more" Target="el">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau_p"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-37" Y="-4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="112" Y="96"/>
-                        </StartPointGeometry>
-                    </Edge>
-                    <Edge Source="S0" Target="cl">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="304" Y="160"/>
-                        </StartPointGeometry>
-                    </Edge>
-                    <Edge Source="el" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-42" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="176" Y="206"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="cl" Target="rlsd">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau_p"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="cpl" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-29"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="384" Y="80"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point X="269" Y="102"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="rlsd" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="PalletRlsd"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="293" Y="223"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="cl" Target="cpl">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau_p"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="idle" Target="more">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletAtEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-13"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="177" Y="113"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="more" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau_p"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="163" Y="139"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="idle" Target="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletAtCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="-13"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="264" Y="148"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="S0" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau_p"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-18" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="264" Y="174"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:Interface"/>
-            </ns2:AttributeMap>
-        </SimpleComponent>
-        <SimpleComponent Kind="PROPERTY" Name="iface_newpallet">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="idle">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="176" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="10" Y="-8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="new">
-                        <PointGeometry>
-                            <Point X="176" Y="160"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="9" Y="-5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="idle" Target="new">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau_n"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="192" Y="120"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="new" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-92" Y="-7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="120"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:Interface"/>
-            </ns2:AttributeMap>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="coordinator">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="224" Y="160"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="0" Y="27"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="112" Y="160"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="336" Y="160"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="336" Y="256"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="9" Y="-8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletAtEL"/>
-                            <SimpleIdentifier Name="NoPallet"/>
-                            <SimpleIdentifier Name="QPalletAtCL"/>
-                            <SimpleIdentifier Name="NoPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="-64"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="224" Y="112"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="168" Y="145"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="280" Y="147"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfELToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-55" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="112" Y="112"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="168" Y="174"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfToEL"/>
-                            <SimpleIdentifier Name="LibPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-37"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="336" Y="113"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="s2" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <SimpleIdentifier Name="PalletRlsd"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-35" Y="-3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="280" Y="174"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="PalletRlsd"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-27" Y="7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="267" Y="224"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="LibPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="17" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="336" Y="300"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="OFProtELpre">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="96" Y="96"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="-30" Y="0"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="192" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="288" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="384" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s10">
-                        <PointGeometry>
-                            <Point X="96" Y="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s11">
-                        <PointGeometry>
-                            <Point X="192" Y="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s12">
-                        <PointGeometry>
-                            <Point X="288" Y="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s10">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-13" Y="8"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="139" Y="99"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-34" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="96" Y="49"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-66" Y="-15"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="140" Y="79"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s11">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-15" Y="8"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="204" Y="145"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-38" Y="-3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="243" Y="109"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-35" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="198" Y="43"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-44" Y="-18"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="242" Y="83"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s12">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-14" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="307" Y="145"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-18" Y="-5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="342" Y="107"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="-21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="291" Y="49"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-18"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="342" Y="86"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="LibPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="383" Y="47"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s10" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="LibPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-24"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="68" Y="146"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s11" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="LibPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="177" Y="145"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s11" Target="s10">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-59" Y="6"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="140" Y="200"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s12" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="LibPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="-21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="284" Y="146"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s12" Target="s11">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="6"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="241" Y="200"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="OFProtELpost">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="96" Y="96"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="-37" Y="1"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="224" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="352" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="480" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="153" Y="81"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType1InIO"/>
-                            <SimpleIdentifier Name="QPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-49" Y="-30"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="99" Y="46"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-38" Y="-3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="153" Y="112"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="288" Y="84"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType1InIO"/>
-                            <SimpleIdentifier Name="QPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="-33"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="226" Y="48"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="288" Y="109"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="423" Y="81"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType1InIO"/>
-                            <SimpleIdentifier Name="QPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-49" Y="-31"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="353" Y="47"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="424" Y="112"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="ManageIO">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="256" Y="176"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="296" Y="76"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="151" Y="203"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="325" Y="255"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletOutIO"/>
-                            <SimpleIdentifier Name="NoPalletOutIO"/>
-                            <SimpleIdentifier Name="QPalletType1InIO"/>
-                            <SimpleIdentifier Name="QPalletType2InIO"/>
-                            <SimpleIdentifier Name="NoPalletType1InIO"/>
-                            <SimpleIdentifier Name="NoPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-107" Y="-83"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="224" Y="140"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-5" Y="9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="288" Y="126"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="202" Y="201"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-71" Y="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="285" Y="226"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MvInPalletType1IO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-68" Y="9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="315" Y="25"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="267" Y="118"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MvInPalletType2IO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-72" Y="-2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="98" Y="214"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-84" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="196" Y="179"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-115" Y="-14"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="361" Y="296"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="302" Y="211"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="AltMvInTypes">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <PointGeometry>
-                            <Point X="128" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-26" Y="-5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="128" Y="176"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-21" Y="4"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType1InIO"/>
-                            <SimpleIdentifier Name="NoPalletType1InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="172" Y="95"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-108" Y="-12"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="118" Y="136"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType2InIO"/>
-                            <SimpleIdentifier Name="NoPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-15"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="169" Y="176"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="5" Y="-8"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="137" Y="136"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="QueryPalletAtIO">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="150" Y="113"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="148" Y="211"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="237" Y="67"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="66" Y="61"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="166"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType1InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-5" Y="-4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="202" Y="98"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-69" Y="7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="98" Y="94"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletOutIO"/>
-                            <SimpleIdentifier Name="NoPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-88" Y="-15"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="137" Y="166"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType1InIO"/>
-                            <SimpleIdentifier Name="NoPalletType1InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-10" Y="-43"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="191" Y="78"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletType2InIO"/>
-                            <SimpleIdentifier Name="NoPalletType2InIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-59" Y="-42"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="110" Y="75"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="QueryPalletAtTU">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="176" Y="112"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="-1" Y="-21"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-10" Y="8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="80" Y="112"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-8" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="272" Y="112"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-6" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletAtEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-30" Y="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="128" Y="126"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s0" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="QPalletAtCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="226" Y="128"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoPallet"/>
-                            <SimpleIdentifier Name="IsPalletEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-33"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="128" Y="97"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletCL"/>
-                            <SimpleIdentifier Name="NoPallet"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-34"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="224" Y="98"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="CapELpre">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="48" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="144" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="240" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="336" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s4">
-                        <PointGeometry>
-                            <Point X="432" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-18"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="96" Y="81"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="192" Y="81"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-49" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="144" Y="47"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-62" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="94" Y="110"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="288" Y="81"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-38" Y="-24"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="243" Y="47"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-50" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="190" Y="109"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="384" Y="83"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-42" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="339" Y="49"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="287" Y="111"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s4" Target="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletOutIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="433" Y="47"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s4" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="384" Y="110"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="CapELpost">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="s0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="48" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s1">
-                        <PointGeometry>
-                            <Point X="160" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s2">
-                        <PointGeometry>
-                            <Point X="272" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s3">
-                        <PointGeometry>
-                            <Point X="384" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="s4">
-                        <PointGeometry>
-                            <Point X="496" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="s0" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-61" Y="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="104" Y="97"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="216" Y="64"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="32"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s1" Target="s0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-62" Y="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="104" Y="62"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-44" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="328" Y="65"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-35" Y="-21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="272" Y="33"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="-3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="216" Y="97"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="CplMvInPalletIO"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="-14"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="440" Y="63"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="384" Y="32"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s3" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="328" Y="99"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s4" Target="s4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletEL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="496" Y="33"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s4" Target="s3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToCL"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="440" Y="97"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <Instance ModuleName="tu4" Name="tu4">
-            <ParameterBinding Name=":accepting">
-                <SimpleIdentifier Name=":accepting"/>
-            </ParameterBinding>
-            <ParameterBinding Name="LibPallet">
-                <SimpleIdentifier Name="LibPallet"/>
-            </ParameterBinding>
-            <ParameterBinding Name="NoTrnsfEL">
-                <SimpleIdentifier Name="NoTrnsfEL"/>
-            </ParameterBinding>
-            <ParameterBinding Name="PalletRlsd">
-                <SimpleIdentifier Name="PalletRlsd"/>
-            </ParameterBinding>
-            <ParameterBinding Name="TrnsfCplToCL">
-                <SimpleIdentifier Name="TrnsfCplToCL"/>
-            </ParameterBinding>
-            <ParameterBinding Name="TrnsfCplToEL">
-                <SimpleIdentifier Name="TrnsfCplToEL"/>
-            </ParameterBinding>
-            <ParameterBinding Name="TrnsfELToCL">
-                <SimpleIdentifier Name="TrnsfELToCL"/>
-            </ParameterBinding>
-            <ParameterBinding Name="TrnsfToEL">
-                <SimpleIdentifier Name="TrnsfToEL"/>
-            </ParameterBinding>
-        </Instance>
-        <Instance ModuleName="io" Name="io">
-            <ParameterBinding Name=":accepting">
-                <SimpleIdentifier Name=":accepting"/>
-            </ParameterBinding>
-            <ParameterBinding Name="CplMvInPalletIO">
-                <SimpleIdentifier Name="CplMvInPalletIO"/>
-            </ParameterBinding>
-            <ParameterBinding Name="CplMvOutPalletIO">
-                <SimpleIdentifier Name="CplMvOutPalletIO"/>
-            </ParameterBinding>
-            <ParameterBinding Name="MvInPalletType1IO">
-                <SimpleIdentifier Name="MvInPalletType1IO"/>
-            </ParameterBinding>
-            <ParameterBinding Name="MvInPalletType2IO">
-                <SimpleIdentifier Name="MvInPalletType2IO"/>
-            </ParameterBinding>
-            <ParameterBinding Name="MvOutPalletIO">
-                <SimpleIdentifier Name="MvOutPalletIO"/>
-            </ParameterBinding>
-        </Instance>
-    </ComponentList>
+The model is controllable and nonblocking, and satisfies the HISC-CP interface consistency properties.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="IOCplMvInPallet">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="IOCplMvOutPallet">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="IsPalletCL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="IsPalletEL"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="IsPalletOutIO"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="IsPalletType1InIO"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="IsPalletType2InIO"/>
+<EventDecl Kind="CONTROLLABLE" Name="TULibPallet">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="IOMvInPalletType1">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="IOMvInPalletType2">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="IOMvOutPallet">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="NoPallet"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="NoPalletOutIO"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="NoPalletType1InIO"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="NoPalletType2InIO"/>
+<EventDecl Kind="CONTROLLABLE" Name="TUNoTrnsfEL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TUPalletRlsd">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="QPalletAtEL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="QPalletOutIO"/>
+<EventDecl Kind="CONTROLLABLE" Name="QPalletType1InIO"/>
+<EventDecl Kind="CONTROLLABLE" Name="QPalletType2InIO"/>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TUTrnsfCplToCL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TUTrnsfCplToEL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="TUTrnsfELToCL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="TUTrnsfToEL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_p"/>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_n"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="NoPalletEL"/>
+<EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="QPalletAtCL">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PROPERTY" Name="iface_main">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="27"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="el">
+<PointGeometry>
+<Point X="112" Y="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="cl">
+<PointGeometry>
+<Point X="384" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rlsd">
+<PointGeometry>
+<Point X="384" Y="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="cpl">
+<PointGeometry>
+<Point X="384" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="more">
+<PointGeometry>
+<Point X="112" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S0">
+<PointGeometry>
+<Point X="304" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="more" Target="el">
+<LabelBlock>
+<SimpleIdentifier Name="tau_p"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="112" Y="96"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="S0" Target="cl">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="304" Y="160"/>
+</StartPointGeometry>
+</Edge>
+<Edge Source="el" Target="idle">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="206"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="cl" Target="rlsd">
+<LabelBlock>
+<SimpleIdentifier Name="tau_p"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="cpl" Target="idle">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="384" Y="80"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point X="269" Y="102"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="rlsd" Target="idle">
+<LabelBlock>
+<SimpleIdentifier Name="TUPalletRlsd"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="293" Y="223"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="cl" Target="cpl">
+<LabelBlock>
+<SimpleIdentifier Name="tau_p"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="idle" Target="more">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletAtEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="177" Y="113"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="more" Target="idle">
+<LabelBlock>
+<SimpleIdentifier Name="tau_p"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="163" Y="139"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="idle" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletAtCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="264" Y="148"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S0" Target="idle">
+<LabelBlock>
+<SimpleIdentifier Name="tau_p"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="264" Y="174"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+<B:AttributeMap>
+<B:Attribute Name="HISC:Interface" Value=""/>
+</B:AttributeMap>
+</SimpleComponent>
+<SimpleComponent Kind="PROPERTY" Name="iface_newpallet">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="new">
+<PointGeometry>
+<Point X="176" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="idle" Target="new">
+<LabelBlock>
+<SimpleIdentifier Name="tau_n"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="120"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="new" Target="idle">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-92" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="120"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+<B:AttributeMap>
+<B:Attribute Name="HISC:Interface" Value=""/>
+</B:AttributeMap>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="coordinator">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="0" Y="27"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="112" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="336" Y="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="336" Y="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletAtEL"/>
+<SimpleIdentifier Name="NoPallet"/>
+<SimpleIdentifier Name="QPalletAtCL"/>
+<SimpleIdentifier Name="NoPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-64"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="168" Y="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="280" Y="147"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfELToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-55" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="168" Y="174"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfToEL"/>
+<SimpleIdentifier Name="TULibPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="336" Y="113"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="TUNoTrnsfEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<SimpleIdentifier Name="TUPalletRlsd"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="280" Y="174"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TUPalletRlsd"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="267" Y="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="TULibPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="17" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="336" Y="300"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="OFProtELpre">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-30" Y="0"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="192" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="288" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="384" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s10">
+<PointGeometry>
+<Point X="96" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s11">
+<PointGeometry>
+<Point X="192" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s12">
+<PointGeometry>
+<Point X="288" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s10">
+<LabelBlock>
+<SimpleIdentifier Name="TUNoTrnsfEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-13" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="139" Y="99"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="49"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-66" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="140" Y="79"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s11">
+<LabelBlock>
+<SimpleIdentifier Name="TUNoTrnsfEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="204" Y="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="243" Y="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="198" Y="43"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="242" Y="83"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s12">
+<LabelBlock>
+<SimpleIdentifier Name="TUNoTrnsfEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="307" Y="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="342" Y="107"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="291" Y="49"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="342" Y="86"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="TULibPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="383" Y="47"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s10" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TULibPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="68" Y="146"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s11" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TULibPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="177" Y="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s11" Target="s10">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="140" Y="200"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s12" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TULibPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="284" Y="146"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s12" Target="s11">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="241" Y="200"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="OFProtELpost">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-37" Y="1"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="224" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="352" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="480" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="153" Y="81"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType1InIO"/>
+<SimpleIdentifier Name="QPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-49" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="99" Y="46"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="153" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="288" Y="84"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType1InIO"/>
+<SimpleIdentifier Name="QPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="226" Y="48"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="288" Y="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="423" Y="81"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType1InIO"/>
+<SimpleIdentifier Name="QPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-49" Y="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="353" Y="47"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="424" Y="112"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="ManageIO">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="256" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="296" Y="76"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="151" Y="203"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="325" Y="255"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletOutIO"/>
+<SimpleIdentifier Name="NoPalletOutIO"/>
+<SimpleIdentifier Name="QPalletType1InIO"/>
+<SimpleIdentifier Name="QPalletType2InIO"/>
+<SimpleIdentifier Name="NoPalletType1InIO"/>
+<SimpleIdentifier Name="NoPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-107" Y="-83"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="140"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletType1InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="288" Y="126"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="202" Y="201"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-71" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="285" Y="226"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IOMvInPalletType1"/>
+<LabelGeometry Anchor="NW">
+<Point X="-68" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="315" Y="25"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="267" Y="118"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IOMvInPalletType2"/>
+<LabelGeometry Anchor="NW">
+<Point X="-72" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="98" Y="214"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-84" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="196" Y="179"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IOMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-115" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="361" Y="296"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="302" Y="211"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="AltMvInTypes">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="128" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="128" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType1InIO"/>
+<SimpleIdentifier Name="NoPalletType1InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="172" Y="95"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletType1InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-108" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="118" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType2InIO"/>
+<SimpleIdentifier Name="NoPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="169" Y="176"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="137" Y="136"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="QueryPalletAtIO">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="150" Y="113"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="148" Y="211"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="237" Y="67"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="66" Y="61"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="166"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType1InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-5" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="202" Y="98"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-69" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="98" Y="94"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletOutIO"/>
+<SimpleIdentifier Name="NoPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-88" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="137" Y="166"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletType1InIO"/>
+<SimpleIdentifier Name="NoPalletType1InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="191" Y="78"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletType2InIO"/>
+<SimpleIdentifier Name="NoPalletType2InIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="-42"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="110" Y="75"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="QueryPalletAtTU">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="-1" Y="-21"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="80" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="272" Y="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletAtEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="126"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="QPalletAtCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="226" Y="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="NoPallet"/>
+<SimpleIdentifier Name="IsPalletEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="97"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletCL"/>
+<SimpleIdentifier Name="NoPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="224" Y="98"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="CapELpre">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="240" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="336" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="432" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="81"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="81"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-49" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="144" Y="47"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="94" Y="110"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="288" Y="81"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="243" Y="47"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="190" Y="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="384" Y="83"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="339" Y="49"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="287" Y="111"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletOutIO"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="433" Y="47"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="384" Y="110"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="CapELpost">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="160" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="272" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="384" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="496" Y="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-61" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="97"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="216" Y="64"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="32"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="62"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="328" Y="65"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="272" Y="33"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="216" Y="97"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="440" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="384" Y="32"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="328" Y="99"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="IsPalletEL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="496" Y="33"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="440" Y="97"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<Instance ModuleName="io" Name="io">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="CplMvInPalletIO">
+<SimpleIdentifier Name="IOCplMvInPallet"/>
+</ParameterBinding>
+<ParameterBinding Name="CplMvOutPalletIO">
+<SimpleIdentifier Name="IOCplMvOutPallet"/>
+</ParameterBinding>
+<ParameterBinding Name="MvInPalletType1IO">
+<SimpleIdentifier Name="IOMvInPalletType1"/>
+</ParameterBinding>
+<ParameterBinding Name="MvInPalletType2IO">
+<SimpleIdentifier Name="IOMvInPalletType2"/>
+</ParameterBinding>
+<ParameterBinding Name="MvOutPalletIO">
+<SimpleIdentifier Name="IOMvOutPallet"/>
+</ParameterBinding>
+</Instance>
+<Instance ModuleName="tu4" Name="tu4">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="LibPallet">
+<SimpleIdentifier Name="TULibPallet"/>
+</ParameterBinding>
+<ParameterBinding Name="NoTrnsfEL">
+<SimpleIdentifier Name="TUNoTrnsfEL"/>
+</ParameterBinding>
+<ParameterBinding Name="PalletRlsd">
+<SimpleIdentifier Name="TUPalletRlsd"/>
+</ParameterBinding>
+<ParameterBinding Name="TrnsfCplToCL">
+<SimpleIdentifier Name="TUTrnsfCplToCL"/>
+</ParameterBinding>
+<ParameterBinding Name="TrnsfCplToEL">
+<SimpleIdentifier Name="TUTrnsfCplToEL"/>
+</ParameterBinding>
+<ParameterBinding Name="TrnsfELToCL">
+<SimpleIdentifier Name="TUTrnsfELToCL"/>
+</ParameterBinding>
+<ParameterBinding Name="TrnsfToEL">
+<SimpleIdentifier Name="TUTrnsfToEL"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
 </Module>

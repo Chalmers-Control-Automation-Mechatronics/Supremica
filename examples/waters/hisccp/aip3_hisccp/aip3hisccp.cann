@@ -1,0 +1,50 @@
+event [^\.]* COOBS:observer0 main
+event [^\.]* controllable HISC:EventType!=ANSWER COOBS:controller0 main
+event .*[AT][SU]1 COOBS:observer1 el1
+event .*[AT][SU]1 controllable HISC:EventType!=REQUEST COOBS:controller1 el1
+event .*[AT][SU]2 COOBS:observer2 el2
+event .*[AT][SU]2 controllable HISC:EventType!=REQUEST COOBS:controller2 el2
+event .*[TE][UL]3 COOBS:observer3 el3
+event .*[TE][UL]3 controllable HISC:EventType!=REQUEST COOBS:controller3 el3
+event .*TU4 COOBS:observer4 el4
+event .*TU4 controllable HISC:EventType!=REQUEST COOBS:controllable4 el4
+event el1\.[^\.]* COOBS:observer1 el1
+event el1\.[^\.]* controllable HISC:EventType!=ANSWER COOBS:controller1 el1
+event el1\.AS.* COOBS:observer1a el1.as
+event el1\.AS.* controllable HISC:EventType!=REQUEST COOBS:controller1a el1.as
+event el1\.TU.* COOBS:observer1t el1.tu
+event el1\.TU.* controllable HISC:EventType!=REQUEST COOBS:controller1t el1.tu
+event el1\.as\..* COOBS:observer1a el1.as
+event el1\.as\..* controllable HISC:EventType!=ANSWER COOBS:controller1a el1.as
+event el1\.tu\..* COOBS:observer1t el1.tu
+event el1\.tu\..* controllable HISC:EventType!=ANSWER COOBS:controller1t el1.tu
+event el2\.[^\.]* COOBS:observer2 el2
+event el2\.[^\.]* controllable HISC:EventType!=ANSWER COOBS:controller2 el2
+event el2\.AS.* COOBS:observer2a el2.as
+event el2\.AS.* controllable HISC:EventType!=REQUEST COOBS:controller2a el2.as
+event el2\.TU.* COOBS:observer2t el2.tu
+event el2\.TU.* controllable HISC:EventType!=REQUEST COOBS:controller2t el2.tu
+event el2\.as\..* COOBS:observer2a el2.as
+event el2\.as\..* controllable COOBS:controller2a el2.as
+event el2\.tu\..* COOBS:observer2t el2.tu
+event el2\.tu\..* controllable COOBS:controller2t el2.tu
+event el3\.[^\.]* COOBS:observer3 el3
+event el3\.[^\.]* controllable HISC:EventType!=ANSWER COOBS:controller3 el3
+event el3\.AS.* COOBS:observer3a el3.as
+event el3\.AS.* controllable HISC:EventType!=REQUEST COOBS:controller3a el3.as
+event el3\.TU.* COOBS:observer3t el3.tu
+event el3\.TU.* controllable HISC:EventType!=REQUEST COOBS:controller3t el3.tu
+event el3\.as3\..* COOBS:observer3a el3.as
+event el3\.as3\..* controllable HISC:EventType!=ANSWER COOBS:controller3a el3.as
+event el3\.tu3\..* COOBS:observer3t el3.tu
+event el3\.tu3\..* controllable HISC:EventType!=ANSWER COOBS:controller3t el3.tu
+event el4\.[^\.]* COOBS:observer4 el4
+event el4\.[^\.]* controllable HISC:EventType!=ANSWER COOBS:controller4 el4
+event el4\.IO.* COOBS:observer4i el4.io
+event el4\.IO.* controllable HISC:EventType!=REQUEST COOBS:controller4i el4.io
+event el4\.TU.* COOBS:observer4t el4.tu
+event el4\.TU.* controllable HISC:EventType!=REQUEST COOBS:controller4t el4.tu
+event el4\.io\..* COOBS:observer4i el4.io
+event el4\.io\..* controllable HISC:EventType!=ANSWER COOBS:controller4i el4.io
+event el4\.tu4\..* COOBS:observer4t el4.tu
+event el4\.tu4\..* controllable HISC:EventType!=ANSWER COOBS:controller4t el4.tu
