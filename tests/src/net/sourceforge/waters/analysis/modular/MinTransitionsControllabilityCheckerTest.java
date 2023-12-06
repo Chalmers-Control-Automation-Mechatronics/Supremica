@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * MinTransitions heuristic.
+ * {@link HeuristicFactory.Method#MinTransitions MinTransitions} heuristic.
  *
  * @author Simon Ware, Robi Malik
  */
@@ -53,7 +53,7 @@ public class MinTransitionsControllabilityCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+      new TestSuite(MinTransitionsControllabilityCheckerTest.class);
     return testSuite;
   }
 

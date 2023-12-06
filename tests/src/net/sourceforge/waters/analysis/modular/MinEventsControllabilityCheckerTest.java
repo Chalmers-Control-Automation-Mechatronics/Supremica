@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * MinEvents heuristic.
+ * {@link HeuristicFactory.Method#MinEvents MinEvents} heuristic.
  *
  * @author Simon Ware, Robi Malik
  */
@@ -53,7 +53,7 @@ public class MinEventsControllabilityCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+      new TestSuite(MinEventsControllabilityCheckerTest.class);
     return testSuite;
   }
 

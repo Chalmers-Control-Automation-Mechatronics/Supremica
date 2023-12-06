@@ -39,13 +39,13 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * 'One' heuristic that adds the first automaton found not to accept a
- * counterexample to the next subsystem.
+ * {@link HeuristicFactory.Method#First First} heuristic that adds the first
+ * automaton found not to accept a counterexample to the next subsystem.
  *
  * @author Simon Ware, Robi Malik
  */
 
-public class OneHeuristicControllabilityCheckerTest
+public class FirstHeuristicControllabilityCheckerTest
   extends AbstractModularControllabilityCheckerTest
 {
 
@@ -54,7 +54,7 @@ public class OneHeuristicControllabilityCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+      new TestSuite(FirstHeuristicControllabilityCheckerTest.class);
     return testSuite;
   }
 
@@ -70,7 +70,7 @@ public class OneHeuristicControllabilityCheckerTest
   @Override
   protected HeuristicFactory.Method getHeuristicMethod()
   {
-    return HeuristicFactory.Method.One;
+    return HeuristicFactory.Method.First;
   }
 
 }

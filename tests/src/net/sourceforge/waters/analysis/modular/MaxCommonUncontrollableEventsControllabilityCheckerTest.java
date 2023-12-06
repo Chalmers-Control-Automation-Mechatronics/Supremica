@@ -39,7 +39,8 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * MaxCommonUncontrollableEvents heuristic.
+ * {@link HeuristicFactory.Method#MaxCommonUncontrollableEvents
+ *  MaxCommonUncontrollableEvents} heuristic.
  *
  * @author Simon Ware, Robi Malik
  */
@@ -53,7 +54,7 @@ public class MaxCommonUncontrollableEventsControllabilityCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+      new TestSuite(MaxCommonUncontrollableEventsControllabilityCheckerTest.class);
     return testSuite;
   }
 

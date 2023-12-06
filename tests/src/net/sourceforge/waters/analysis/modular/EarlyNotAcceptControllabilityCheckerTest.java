@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * EarlyNotAccept heuristic.
+ * {@link HeuristicFactory.Method#EarlyNotAccept EarlyNotAccept} heuristic.
  *
  * @author Simon Ware, Robi Malik
  */

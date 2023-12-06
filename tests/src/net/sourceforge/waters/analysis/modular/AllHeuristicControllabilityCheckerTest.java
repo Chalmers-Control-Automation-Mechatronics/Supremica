@@ -39,8 +39,8 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * 'All' heuristic that adds all automata not accepting a counterexample
- * to the next subsystem.
+ * {@link HeuristicFactory.Method#All All} heuristic that adds all automata
+ * not accepting a counterexample to the next subsystem.
  *
  * @author Simon Ware, Robi Malik
  */
@@ -54,7 +54,7 @@ public class AllHeuristicControllabilityCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+      new TestSuite(AllHeuristicControllabilityCheckerTest.class);
     return testSuite;
   }
 

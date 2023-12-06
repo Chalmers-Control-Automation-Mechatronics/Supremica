@@ -139,6 +139,19 @@ public class HeuristicFactory
         return getListWithAlternatives(MinEvents, MinStates, MinTransitions);
       }
     },
+    First {
+      @Override
+      public HeuristicValueProvider createProvider()
+      {
+        return new DefaultHeuristicValueProvider(this) {
+          @Override
+          public CollectionMode getCollectionMode()
+          {
+            return CollectionMode.FIRST;
+          }
+        };
+      }
+    },
     LateNotAccept {
       @Override
       public HeuristicValueProvider createProvider()
@@ -289,19 +302,6 @@ public class HeuristicFactory
       public List<HeuristicValueProvider> getListWithAlternatives()
       {
         return getListWithAlternatives(MinEvents, MinStates);
-      }
-    },
-    One {
-      @Override
-      public HeuristicValueProvider createProvider()
-      {
-        return new DefaultHeuristicValueProvider(this) {
-          @Override
-          public CollectionMode getCollectionMode()
-          {
-            return CollectionMode.FIRST;
-          }
-        };
       }
     },
     Plant {

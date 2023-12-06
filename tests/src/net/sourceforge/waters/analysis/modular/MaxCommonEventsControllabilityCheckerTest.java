@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 
 /**
  * A test for the {@link ModularControllabilityChecker} with the
- * MaxCommonEvents heuristic.
+ * {@link HeuristicFactory.Method#MaxCommonEvents MaxCommonEvents} heuristic.
  *
  * @author Simon Ware, Robi Malik
  */
@@ -53,7 +53,7 @@ public class MaxCommonEventsControllabilityCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EarlyNotAcceptControllabilityCheckerTest.class);
+      new TestSuite(MaxCommonEventsControllabilityCheckerTest.class);
     return testSuite;
   }
 
