@@ -141,7 +141,7 @@ public class CoobservabilitySignature
       }
     }
     final Site site = siteMap.get(defaultSiteName);
-    if (site != null && site.getControlledEvents().isEmpty()) {
+    if (site != null && !site.hasControlledEvents()) {
       removeEmptySiteFromEvents(site);
       mSites.remove(site);
     }
@@ -291,6 +291,7 @@ public class CoobservabilitySignature
     result.setNumberOfSites(mSites.size());
   }
 
+
   //###########################################################################
   //# Simplification
   /**
@@ -303,11 +304,13 @@ public class CoobservabilitySignature
    *     from from all sites.</LI>
    * <LI>Control of events always enabled in all specifications is removed
    *     from all sites.</LI>
-   * <LI>If all automata are deterministic, then sites are identified as
-   *     <I>all-observing</I> if they observe all events that are not
-   *     selfloop-only in all automata. Control of events controlled by an
-   *     all-observing site (<I>totally controllable events</I>) is removed
-   *     from all sites</LI>
+   * <LI>If all specification automata are deterministic, then any events
+   *     that are selfloop-only in all automata are removed from the
+   *     observation capabilities of all sites. Furthermore, sites that
+   *     observe all events that are not selfloop-only in all automata are
+   *     are identified as <I>all-observing</I> and there controlled events
+   *     are marked as totally controllable, removed from sites, and
+   *     excluded from coobservability checking.</LI>
    * <LI>Sites that do not control any events are removed.</LI>
    * <UL>
    */
@@ -345,8 +348,9 @@ public class CoobservabilitySignature
       final EventEncoding enc = tr.getEventEncoding();
       final int numEvents = enc.getNumberOfProperEvents();
       final int[] count = new int[numEvents];
+      final ComponentKind kind = translator.getComponentKind(tr);
       final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-      det &= rel.isDeterministic();
+      det &= kind != ComponentKind.SPEC || rel.isDeterministic();
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       final int numStates = rel.getNumberOfStates();
       int numReachable = 0;
@@ -364,7 +368,6 @@ public class CoobservabilitySignature
           }
         }
       }
-      final ComponentKind kind = translator.getComponentKind(tr);
       for (int e = 0; e < numEvents; e++) {
         final boolean removable =
           kind == ComponentKind.PLANT ? count[e] == 0 : count[e] < numReachable;
@@ -401,20 +404,25 @@ public class CoobservabilitySignature
     }
 
     if (det) {
-      int numNeedsObserving = mEventMap.size();
       for (final TRAutomatonProxy tr : trs) {
         final EventEncoding enc = tr.getEventEncoding();
-        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-        if (numNeedsObserving > 0) {
+        int checkCount = enc.getNumberOfUsedProperEvents();
+        if (checkCount > 0) {
+          final int numEvents = enc.getNumberOfProperEvents();
+          final boolean[] checked = new boolean[numEvents];
+          final ListBufferTransitionRelation rel = tr.getTransitionRelation();
           final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
           while (iter.advance()) {
             if (iter.getCurrentFromState() != iter.getCurrentToState()) {
               final int e = iter.getCurrentEvent();
-              final EventProxy event = enc.getProperEvent(e);
-              final EventInfo info = event == null ? null : mEventMap.get(event);
-              if (info != null && info.setNeedsObserving()) {
-                numNeedsObserving--;
-                if (numNeedsObserving == 0) {
+              if (!checked[e]) {
+                checked[e] = true;
+                final EventProxy event = enc.getProperEvent(e);
+                final EventInfo info = event == null ? null : mEventMap.get(event);
+                if (info != null) {
+                  info.setNeedsObserving();
+                }
+                if (--checkCount == 0) {
                   break;
                 }
               }
@@ -422,17 +430,17 @@ public class CoobservabilitySignature
           }
         }
       }
-      if (numNeedsObserving > 0) {
-        final Iterator<Site> iter = mSites.iterator();
-        while (iter.hasNext()) {
-          final Site site = iter.next();
-          if (isAllObserving(site)) {
-            setTotalControl(site);
-            iter.remove();
-          }
+      final Iterator<Site> iter = mSites.iterator();
+      while (iter.hasNext()) {
+        final Site site = iter.next();
+        if (isAllObserving(site)) {
+          setTotalControl(site);
+          iter.remove();
+        } else {
+          removeNeedlessObservations(site);
         }
-        removeEmptySites();
       }
+      removeEmptySites();
     }
   }
 
@@ -477,48 +485,32 @@ public class CoobservabilitySignature
   }
 
   /**
-   * Removes subsumed sites.
-   * If the set events controlled and observed are both contained in the
-   * sets of events controlled and observed by another site, then the site
-   * with the smaller event sets is <I>subsumed</I> by the site with the larger
-   * event sets. This method removes such subsumed sites by merging them into
-   * a site that subsumes them.
+   * <P>Removes subsumed sites.</P>
+   * <P>If the set events observed by one site is contained in the set of
+   * events observed by another site, then the site with more observed events
+   * <I>subsumes</I> the other <I>subsumed</I> site. The controlled events of
+   * the subsuming site can be removed from the controlled events of the
+   * subsumed site.</P>
+   * <P>This method checks all pairs of sites and removes controlled whenever
+   * possible. Sites left without any controlled events are removed from the
+   * signature.</P>
    */
   public void subsume()
   {
-    final int numSites = mSites.size();
-    final Site[] sites = new Site[numSites];
-    mSites.toArray(sites);
-    Map<Site,Site> replacements = null;
-    for (int i = 0; i < numSites; i++) {
-      Site site1 = sites[i];
-      if (site1 != null) {
-        for (int j = 0; j < numSites; j++) {
-          final Site site2 = sites[j];
-          if (i != j && site2 != null && site1.subsumes(site2)) {
-            final Site site = site1.merge(site2);
-            sites[j] = null;
-            if (replacements == null) {
-              replacements = new HashMap<>(numSites);
-            }
-            replacements.put(site1, site);
-            replacements.put(site2, site);
-            site1 = site;
+    boolean removing = false;
+    for (final Site site1 : mSites) {
+      for (final Site site2 : mSites) {
+        if (site1 != site2 && site2.hasMoreObservationsThan(site1)) {
+          site1.removeControlledEvents(site2);
+          if (!site1.hasControlledEvents()) {
+            removing = true;
+            break;
           }
         }
-        sites[i] = site1;
       }
     }
-    if (replacements != null) {
-      mSites = new LinkedList<>();
-      for (final Site site : sites) {
-        if (site != null) {
-          mSites.add(site);
-        }
-      }
-      for (final EventInfo info : mEventMap.values()) {
-        info.replaceSites(replacements);
-      }
+    if (removing) {
+      removeEmptySites();
     }
   }
 
@@ -579,6 +571,19 @@ public class CoobservabilitySignature
     return true;
   }
 
+  private void removeNeedlessObservations(final Site site)
+  {
+    final Collection<EventProxy> observed = site.getObservedEvents();
+    final Iterator<EventProxy> iter = observed.iterator();
+    while (iter.hasNext()) {
+      final EventProxy event = iter.next();
+      final EventInfo info = mEventMap.get(event);
+      if (!info.needsObserving()) {
+        iter.remove();
+      }
+    }
+  }
+
   private void setTotalControl(final Site site)
   {
     final List<EventProxy> events = new ArrayList<>(site.getControlledEvents());
@@ -593,7 +598,7 @@ public class CoobservabilitySignature
     final Iterator<Site> iter = mSites.iterator();
     while (iter.hasNext()) {
       final Site site = iter.next();
-      if (site.getControlledEvents().isEmpty()) {
+      if (!site.hasControlledEvents()) {
         removeEmptySiteFromEvents(site);
         iter.remove();
       }
@@ -698,6 +703,11 @@ public class CoobservabilitySignature
       return mObservedEvents;
     }
 
+    public boolean hasControlledEvents()
+    {
+      return !mControlledEvents.isEmpty();
+    }
+
     public boolean isControlledEvent(final EventProxy event)
     {
       return mControlledEvents.contains(event);
@@ -723,16 +733,19 @@ public class CoobservabilitySignature
       return mControlledEvents.remove(event);
     }
 
+    private boolean removeControlledEvents(final Site site)
+    {
+      return mControlledEvents.removeAll(site.mControlledEvents);
+    }
+
     private boolean removeObservedEvent(final EventProxy event)
     {
       return mObservedEvents.remove(event);
     }
 
-    private boolean subsumes(final Site site)
+    private boolean hasMoreObservationsThan(final Site site)
     {
-      return
-        mControlledEvents.containsAll(site.mControlledEvents) &&
-        mObservedEvents.containsAll(site.mObservedEvents);
+      return mObservedEvents.containsAll(site.mObservedEvents);
     }
 
     //#########################################################################
@@ -1137,14 +1150,9 @@ public class CoobservabilitySignature
       }
     }
 
-    private boolean setNeedsObserving()
+    private void setNeedsObserving()
     {
-      if (mNeedsObserving) {
-        return false;
-      } else {
-        mNeedsObserving = true;
-        return true;
-      }
+      mNeedsObserving = true;
     }
 
     private void setTotallyControllable()

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="controllable_selfloop">
+<B:Comment>A test for coobservability verification.
+The model is coobservable as the controllable event c can be disabled in the correct states by a site observing u.
+To verify this, a site disabling c must be retained despite the event being selfloop-only.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Observable="false" Name="c"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="u"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="spec">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="192" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="-24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="304" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-26"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="c"/>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="179"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-3" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="248" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="248" Y="144"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

@@ -490,6 +490,24 @@ public class EventEncoding
   }
 
   /**
+   * Gets the number of proper events, i.e., non-proposition events,
+   * that are not marked as unused in this encoding. The number of proper
+   * events always includes the silent (tau) event, even if none has been
+   * specified.
+   */
+  public int getNumberOfUsedProperEvents()
+  {
+    int result = 0;
+    for (int e = 0; e < mProperEvents.size(); e++) {
+      final byte status = getProperEventStatus(e);
+      if ((status & EventStatus.STATUS_UNUSED) == 0) {
+        result++;
+      }
+    }
+    return result;
+  }
+
+  /**
    * Gets the number of proposition events in this encoding.
    */
   @Override

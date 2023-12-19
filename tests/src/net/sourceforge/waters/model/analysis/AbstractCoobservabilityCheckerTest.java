@@ -288,6 +288,13 @@ public abstract class AbstractCoobservabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- controllability via coobservability
+  public void testControllableSelfloop() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "controllable_selfloop.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testEmptySpec() throws Exception
   {
     final ProductDESProxy des =
