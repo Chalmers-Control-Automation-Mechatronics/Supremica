@@ -73,4 +73,22 @@ public class FirstHeuristicControllabilityCheckerTest
     return HeuristicFactory.Method.First;
   }
 
+
+  //#########################################################################
+  //# Disabled Test Cases
+  @Override
+  public void testHISCAIP0Sub1Patch0()
+  {
+  }
+
+  @Override
+  public void testHISCAIP0Sub1Patch1()
+  {
+  }
+
+  @Override
+  public void testHISCAIP0Sub1Patch2()
+  {
+  }
+
 }

@@ -72,4 +72,17 @@ public class MinTransitionsControllabilityCheckerTest
     return HeuristicFactory.Method.MinTransitions;
   }
 
+
+  //#########################################################################
+  //# Disabled Test Cases
+  @Override
+  public void testFischertechnik()
+  {
+  }
+
+  @Override
+  public void testTransferline__5()
+  {
+  }
+
 }

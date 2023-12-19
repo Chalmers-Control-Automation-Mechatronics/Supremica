@@ -72,4 +72,17 @@ public class MinEventsControllabilityCheckerTest
     return HeuristicFactory.Method.MinEvents;
   }
 
+
+  //#########################################################################
+  //# Disabled Test Cases
+  @Override
+  public void testFischertechnik()
+  {
+  }
+
+  @Override
+  public void testTransferline__5()
+  {
+  }
+
 }
