@@ -56,14 +56,14 @@ public class TRSynchronousProductStateMap
   //# Constructor
   public TRSynchronousProductStateMap(final AutomatonProxy[] inputAutomata,
                                       final StateTupleEncoding stateTupleEncoding,
-                                      final IntArrayBuffer stateSpace)
+                                      final StateTupleBuffer stateSpace)
   {
     this(Arrays.asList(inputAutomata), stateTupleEncoding, stateSpace);
   }
 
   public TRSynchronousProductStateMap(final List<AutomatonProxy> inputAutomata,
                                       final StateTupleEncoding stateTupleEncoding,
-                                      final IntArrayBuffer stateSpace)
+                                      final StateTupleBuffer stateSpace)
   {
     mInputAutomata = inputAutomata;
     mStateTupleEncoding = stateTupleEncoding;
@@ -157,7 +157,7 @@ public class TRSynchronousProductStateMap
   //# Data Members
   private final List<AutomatonProxy> mInputAutomata;
   private final StateTupleEncoding mStateTupleEncoding;
-  private final IntArrayBuffer mStateSpace;
+  private final StateTupleBuffer mStateSpace;
 
   private final int[] mEncodedTuple;
   private TObjectIntHashMap<AutomatonProxy> mAutomataMap;

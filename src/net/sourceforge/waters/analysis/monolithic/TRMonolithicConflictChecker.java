@@ -35,7 +35,7 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.TarjanControlStack;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -186,7 +186,7 @@ public class TRMonolithicConflictChecker
   private void expand(final int i) throws AnalysisException {
 
     final StateTupleEncoding ste = getStateTupleEncoding();
-    final IntArrayBuffer stateSpace = getStateSpace();
+    final StateTupleBuffer stateSpace = getStateSpace();
 
     final int dfsi = mCompStack.size() | EXPANDED;
     mControlStack.setLink(i, dfsi);

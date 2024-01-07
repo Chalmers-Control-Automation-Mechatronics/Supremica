@@ -33,16 +33,16 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
-
-public class MonolithicDeadlockCheckerTest extends
-    AbstractDeadlockCheckerTest
+public class TRMonolithicDeadlockCheckerTest
+  extends AbstractDeadlockCheckerTest
 {
 
   //#########################################################################
@@ -50,7 +50,7 @@ public class MonolithicDeadlockCheckerTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(MonolithicDeadlockCheckerTest.class);
+        new TestSuite(TRMonolithicDeadlockCheckerTest.class);
     return testSuite;
   }
 
@@ -67,8 +67,10 @@ public class MonolithicDeadlockCheckerTest extends
   protected DeadlockChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final DeadlockChecker checker = new TRMonolithicDeadlockChecker();
+    final TRMonolithicDeadlockChecker checker =
+      new TRMonolithicDeadlockChecker();
     checker.setNodeLimit(3000000);
+    checker.setTraceMode(AbstractTRMonolithicModelVerifier.TraceMode.REVERSE);
     return checker;
   }
 

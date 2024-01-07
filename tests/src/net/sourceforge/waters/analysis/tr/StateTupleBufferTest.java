@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.list.array.TIntArrayList;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -45,14 +46,14 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * @author Robi Malik
  */
 
-public class IntArrayBufferTest extends AbstractWatersTest
+public class StateTupleBufferTest extends AbstractWatersTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite testSuite = new TestSuite(IntArrayBufferTest.class);
+    final TestSuite testSuite = new TestSuite(StateTupleBufferTest.class);
     return testSuite;
   }
 
@@ -66,7 +67,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
   //# Test Cases
   public void testAddArrays() throws OverflowException
   {
-    final IntArrayBuffer buffer = new IntArrayBuffer(3);
+    final StateTupleBuffer buffer = new StateTupleBuffer(3);
     final int[] data1 = {1, 2, 3};
     final int[] data2 = {1, 2, 4};
     final int[] data3 = {2, 4, 6};
@@ -86,7 +87,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
 
   public void testAddArrayLists() throws OverflowException
   {
-    final IntArrayBuffer buffer = new IntArrayBuffer(4);
+    final StateTupleBuffer buffer = new StateTupleBuffer(4);
     final TIntArrayList data1 = new TIntArrayList(4);
     data1.add(1);
     data1.add(2);
@@ -119,28 +120,28 @@ public class IntArrayBufferTest extends AbstractWatersTest
   public void testSmallArray1() throws OverflowException
   {
     final int[] data = {1, 2, 3};
-    final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
+    final StateTupleBuffer buffer = new StateTupleBuffer(data.length);
     addArray(buffer, data);
   }
 
   public void testSmallArrayList1() throws OverflowException
   {
     final int[] data = {1, 2, 3};
-    final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
+    final StateTupleBuffer buffer = new StateTupleBuffer(data.length);
     addArrayList(buffer, data);
   }
 
   public void testSmallArray2() throws OverflowException
   {
     final int[] data = {0, 1, 2, 4, 9, 14, 15};
-    final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
+    final StateTupleBuffer buffer = new StateTupleBuffer(data.length);
     addArray(buffer, data);
   }
 
   public void testSmallArrayList2() throws OverflowException
   {
     final int[] data = {0, 1, 2, 4, 9, 14, 15};
-    final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
+    final StateTupleBuffer buffer = new StateTupleBuffer(data.length);
     addArrayList(buffer, data);
   }
 
@@ -166,14 +167,42 @@ public class IntArrayBufferTest extends AbstractWatersTest
        565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578,
        579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592,
        593, 594, 595, 596, 597, 598, 599};
-    final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
+    final StateTupleBuffer buffer = new StateTupleBuffer(data.length);
     addArray(buffer, data);
+  }
+
+  public void testExtraWords() throws OverflowException
+  {
+    final int SIZE = 3;
+    final int EXTRA = 2;
+    final StateTupleBuffer buffer = new StateTupleBuffer(SIZE, EXTRA);
+    final int[][] data = new int[][] {{1, 2, 3}, {-1, -2, 4}, {22, 44, 66}};
+    final int[] offsets = new int[3];
+    for (int i = 0; i < data.length; i++) {
+      offsets[i] = buffer.add(data[i]);
+      for (int j = 0; j < EXTRA; j++) {
+        final int w = 100 * i + j;
+        buffer.setExtraWord(i, j, w);
+      }
+    }
+    for (int i = 0; i < data.length; i++) {
+      final int offset = offsets[i];
+      final int[] fetch = new int[SIZE];
+      buffer.getContents(offset, fetch);
+      for (int j = 0; j < SIZE; j++) {
+        assertEquals("Unexpected tuple data fetched!", data[i][j], fetch[j]);
+      }
+      for (int j = 0; j < EXTRA; j++) {
+        final int w = buffer.getExtraWord(i, j);
+        assertEquals("Unexpected extra data fetched!", 100 * i + j, w);
+      }
+    }
   }
 
 
   //#########################################################################
   //# Auxiliary Method
-  private void addArray(final IntArrayBuffer buffer, final int[] data)
+  private void addArray(final StateTupleBuffer buffer, final int[] data)
     throws OverflowException
   {
     final int offset = buffer.add(data);
@@ -186,7 +215,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
     }
   }
 
-  private void addArrayList(final IntArrayBuffer buffer, final int[] data)
+  private void addArrayList(final StateTupleBuffer buffer, final int[] data)
     throws OverflowException
   {
     final TIntArrayList list = new TIntArrayList(data.length);

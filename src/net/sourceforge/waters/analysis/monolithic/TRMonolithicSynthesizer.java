@@ -37,7 +37,7 @@ import gnu.trove.list.array.TIntArrayList;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -240,7 +240,7 @@ public class TRMonolithicSynthesizer
 
     if (mTransitionMode == EXPANDING) {
       final StateTupleEncoding ste = getStateTupleEncoding();
-      final IntArrayBuffer stateSpace = getStateSpace();
+      final StateTupleBuffer stateSpace = getStateSpace();
 
       final int dfsi = mCompStack.size() | EXPANDED;
       mControlStack.setLink(i, dfsi);

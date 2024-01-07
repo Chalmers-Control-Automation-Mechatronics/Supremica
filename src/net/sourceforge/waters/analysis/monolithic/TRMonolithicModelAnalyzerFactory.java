@@ -37,7 +37,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.options.AnalysisOptionPage;
-import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
 
 
 /**
@@ -113,20 +113,25 @@ public class TRMonolithicModelAnalyzerFactory
   public void registerOptions(final AnalysisOptionPage db)
   {
     super.registerOptions(db);
-    db.register(new BooleanOption
-             (OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled,
-              "Use depth map",
-              "Use depth map rather than reverse transition expansion " +
-              "when computing counterexample " +
-              "(slower on average but guranteed linear worst case).",
-              "-dm",
-              true));
+    db.register(new EnumOption<AbstractTRMonolithicModelVerifier.TraceMode>
+             (OPTION_AbstractTRMonolithicModelVerifier_TraceMode,
+              "Counterexample computation mode",
+              AbstractTRMonolithicModelVerifier.TraceMode.STORED +
+              " is fast but requires 4 additional bytes per state; " +
+              AbstractTRMonolithicModelVerifier.TraceMode.DEPTHMAP +
+              " uses little extra memory but has linear runtime overhead; " +
+              AbstractTRMonolithicModelVerifier.TraceMode.REVERSE +
+              " uses no extra memory with fast runtime on average, " +
+              "but has a possible exponential worst case.",
+              "-tm",
+              AbstractTRMonolithicModelVerifier.TraceMode.values(),
+              AbstractTRMonolithicModelVerifier.TraceMode.STORED));
   }
 
 
   //#########################################################################
   //# Class Constants
   public static final String
-    OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled =
-    "AbstractTRMonolithicModelVerifier.DepthMapEnabled";
+    OPTION_AbstractTRMonolithicModelVerifier_TraceMode =
+    "AbstractTRMonolithicModelVerifier.TraceMode";
 }

@@ -40,7 +40,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -392,7 +392,7 @@ public abstract class AbstractTRSynchronousProductBuilder
   {
     if (isDetailedOutputEnabled()) {
       final EventEncoding outputEnc = getOutputEventEncoding();
-      final IntArrayBuffer stateSpace = getStateSpace();
+      final StateTupleBuffer stateSpace = getStateSpace();
       final int deadlockState = getDeadlockState();
       final ListBufferTransitionRelation rel;
       final int config = mCountingStates ?
@@ -445,7 +445,7 @@ public abstract class AbstractTRSynchronousProductBuilder
       if (mCountingStates) {
         final TRAutomatonProxy[] components = getTRAutomata();
         final int numComponents = components.length;
-        final int[] encoded = new int[stateSpace.getArraySize()];
+        final int[] encoded = new int[stateSpace.getRetrievedTupleSize()];
         final int[] decoded = new int[numComponents];
         // For each state tuple in the synchronous product,
         for (int tupleI = 0; tupleI < stateSpace.size(); tupleI++) {

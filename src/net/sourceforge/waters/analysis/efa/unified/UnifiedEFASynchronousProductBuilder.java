@@ -42,9 +42,9 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -244,7 +244,7 @@ public class UnifiedEFASynchronousProductBuilder
   private void exploreSynchronousProduct() throws AnalysisException
   {
     final int numTR = mInputTransitionRelations.size();
-    mStateSpace = new IntArrayBuffer(numTR, mStateLimit);
+    mStateSpace = new StateTupleBuffer(numTR, 0, mStateLimit);
     final int[] sourceTuple = new int[numTR];
     createInitialStates(sourceTuple, 0);
     mNumberOfInitialStates = mStateSpace.size();
@@ -619,7 +619,7 @@ public class UnifiedEFASynchronousProductBuilder
   private boolean mUsesTau;
   private TransitionIterator[] mTransitionIterators;
   private boolean[][] mDeadlockInfo;
-  private IntArrayBuffer mStateSpace;
+  private StateTupleBuffer mStateSpace;
   private PreTransitionBuffer mPreTransitionBuffer;
   private int mDumpStateIndex;
 

@@ -40,9 +40,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -58,6 +59,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.options.BooleanOption;
+import net.sourceforge.waters.model.options.EnumOption;
 import net.sourceforge.waters.model.options.LeafOptionPage;
 import net.sourceforge.waters.model.options.Option;
 
@@ -93,14 +95,14 @@ public abstract class AbstractTRMonolithicModelVerifier
 
   //#########################################################################
   //# Configuration
-  public void setDepthMapEnabled(final boolean enabled)
+  public void setTraceMode(final TraceMode mode)
   {
-    mDepthMapEnabled = enabled;
+    mTraceMode = mode;
   }
 
-  public boolean isDepthMapEnabled()
+  public TraceMode getTraceMode()
   {
-    return mDepthMapEnabled;
+    return mTraceMode;
   }
 
 
@@ -111,7 +113,7 @@ public abstract class AbstractTRMonolithicModelVerifier
   {
     final List<Option<?>> options = super.getOptions(db);
     db.prepend(options, TRMonolithicModelAnalyzerFactory.
-                        OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled);
+                        OPTION_AbstractTRMonolithicModelVerifier_TraceMode);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ModelVerifier_DetailedOutputEnabled);
     return options;
@@ -125,9 +127,10 @@ public abstract class AbstractTRMonolithicModelVerifier
       final BooleanOption boolOption = (BooleanOption) option;
       setDetailedOutputEnabled(boolOption.getBooleanValue());
     } else if (option.hasID(TRMonolithicModelAnalyzerFactory.
-                            OPTION_AbstractTRMonolithicModelVerifier_DepthMapEnabled)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setDepthMapEnabled(boolOption.getBooleanValue());
+                            OPTION_AbstractTRMonolithicModelVerifier_TraceMode)) {
+      @SuppressWarnings("unchecked")
+      final EnumOption<TraceMode> enumOption = (EnumOption<TraceMode>) option;
+      setTraceMode(enumOption.getValue());
     } else {
       super.setOption(option);
     }
@@ -243,15 +246,37 @@ public abstract class AbstractTRMonolithicModelVerifier
 
 
   //#########################################################################
-  //# Depth Map
+  //# Depth Map and Stored Transitions
   @Override
   protected void setUp()
     throws AnalysisException
   {
     super.setUp();
-    if (mDepthMapEnabled) {
-      mDepthMap = new TIntArrayList();
+    final AnalysisResult result = getAnalysisResult();
+    if (!result.isFinished()) {
+      switch (mTraceMode) {
+      case STORED:
+        final StateTupleBuffer stateSpace = getStateSpace();
+        mNextTargetStored = stateSpace.size();
+        break;
+      case DEPTHMAP:
+        mDepthMap = new TIntArrayList();
+        break;
+      case REVERSE:
+        break;
+      default:
+        throw new AnalysisConfigurationException
+          ("Unknown trace mode " + mTraceMode + "!");
+      }
     }
+  }
+
+  @Override
+  protected StateTupleBuffer createStateSpace(final int tupleSize)
+  {
+    final int extra = mTraceMode == TraceMode.STORED ? 1 : 0;
+    final int limit = getNodeLimit();
+    return new StateTupleBuffer(tupleSize, extra, limit, -1);
   }
 
   @Override
@@ -262,7 +287,7 @@ public abstract class AbstractTRMonolithicModelVerifier
       super.exploreStateSpace();
     } else {
       final AnalysisResult result = getAnalysisResult();
-      final IntArrayBuffer stateSpace = getStateSpace();
+      final StateTupleBuffer stateSpace = getStateSpace();
       mDepthMap.add(0);
       int current = 0;
       int nextLevel = storeInitialStates();
@@ -285,6 +310,19 @@ public abstract class AbstractTRMonolithicModelVerifier
     super.tearDown();
   }
 
+  @Override
+  protected void createTransition(final int event, final int target)
+    throws OverflowException
+  {
+    super.createTransition(event, target);
+    if (mTraceMode == TraceMode.STORED && target >= mNextTargetStored) {
+      final StateTupleBuffer stateSpace = getStateSpace();
+      final int source = getCurrentSource();
+      stateSpace.setExtraWord(target, 0, source);
+      mNextTargetStored++;
+    }
+  }
+
 
   //#########################################################################
   //# Counterexamples
@@ -292,12 +330,21 @@ public abstract class AbstractTRMonolithicModelVerifier
     throws AnalysisException
   {
     final CounterExampleCallback callback;
-    if (mDepthMap == null) {
+    switch (mTraceMode) {
+    case STORED:
+      callback = new StoredCounterExampleCallback();
+      break;
+    case DEPTHMAP:
+      final int depth = getTraceDepth(target);
+      callback = new DepthMapCounterExampleCallback(depth);
+      break;
+    case REVERSE:
       setUpReverseTransitions();
       callback = new BackwardCounterExampleCallback();
-    } else {
-      final int depth = getTraceDepth(target);
-      callback = new ForwardCounterExampleCallback(depth);
+      break;
+    default:
+      throw new AnalysisConfigurationException
+        ("Unknown trace mode " + mTraceMode + "!");
     }
     setStateCallback(callback);
     return callback;
@@ -371,6 +418,15 @@ public abstract class AbstractTRMonolithicModelVerifier
         break;
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Enumeration TraceMode
+  public enum TraceMode {
+    STORED,
+    DEPTHMAP,
+    REVERSE
   }
 
 
@@ -454,12 +510,68 @@ public abstract class AbstractTRMonolithicModelVerifier
 
 
   //#########################################################################
-  //# Inner Class ForwardCounterExampleCallback
-  private class ForwardCounterExampleCallback extends CounterExampleCallback
+  //# Inner Class StoredCounterExampleCallback
+  private class StoredCounterExampleCallback extends CounterExampleCallback
   {
     //#######################################################################
     //# Constructor
-    private ForwardCounterExampleCallback(final int depth)
+    private StoredCounterExampleCallback()
+    {
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.analysis.monolithic.
+    //# AbstractTRMonolithicModelVerifier.CounterExampleCallback
+    @Override
+    void findPredecessor(final int target)
+      throws AnalysisException
+    {
+      mTarget = target;
+      mFound = false;
+      final StateTupleBuffer stateSpace = getStateSpace();
+      final int source = stateSpace.getExtraWord(target, 0);
+      assert source >= 0;
+      final int[] encodedSource = getEncodedSource();
+      final int[] decodedSource = getDecodedSource();
+      getStateSpace().getContents(source, encodedSource);
+      getStateTupleEncoding().decode(encodedSource, decodedSource);
+      for (final EventInfo event : getEventInfo()) {
+        event.expandState(encodedSource, decodedSource);
+        if (mFound) {
+          setFound(source, event);
+          break;
+        }
+      }
+      assert mFound;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.monolithic.
+    //# TRAbstractModelAnalyzer.StateCallback
+    @Override
+    public boolean newState(final int[] decoded)
+      throws OverflowException
+    {
+      if (getStateIndex(decoded) == mTarget) {
+        mFound = true;
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private int mTarget;
+    private boolean mFound;
+  }
+
+
+  //#########################################################################
+  //# Inner Class DepthMapCounterExampleCallback
+  private class DepthMapCounterExampleCallback extends CounterExampleCallback
+  {
+    //#######################################################################
+    //# Constructor
+    private DepthMapCounterExampleCallback(final int depth)
     {
       mLevel = depth - 1;
     }
@@ -564,7 +676,8 @@ public abstract class AbstractTRMonolithicModelVerifier
 
   //#######################################################################
   //# Data Members
-  private boolean mDepthMapEnabled = true;
+  private TraceMode mTraceMode = TraceMode.STORED;
+  private int mNextTargetStored;
   private TIntArrayList mDepthMap;
 
 }

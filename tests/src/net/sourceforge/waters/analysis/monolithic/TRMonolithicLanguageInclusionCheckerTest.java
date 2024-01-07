@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.monolithic.AbstractTRMonolithicModelVerifier.TraceMode;
 import net.sourceforge.waters.model.analysis.
   AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
@@ -69,7 +70,7 @@ public class TRMonolithicLanguageInclusionCheckerTest
   {
     final TRMonolithicLanguageInclusionChecker checker =
       new TRMonolithicLanguageInclusionChecker();
-    checker.setDepthMapEnabled(false);
+    checker.setTraceMode(TraceMode.STORED);
     return checker;
   }
 

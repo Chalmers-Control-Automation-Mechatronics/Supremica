@@ -52,7 +52,7 @@ import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.analysis.coobs.CoobservabilityDiagnostics;
 import net.sourceforge.waters.analysis.coobs.CoobservabilitySignature;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -341,7 +341,7 @@ public class TRMonolithicCoobservabilityChecker
     throws AnalysisException
   {
     // Set up traces: reference plus one trace for each controlling site
-    final IntArrayBuffer stateSpace = getStateSpace();
+    final StateTupleBuffer stateSpace = getStateSpace();
     final StateTupleEncoding encoding = getStateTupleEncoding();
     final int numAut = mTRAutomataExtended.length;
     final int[] encoded = new int[encoding.getNumberOfWords()];

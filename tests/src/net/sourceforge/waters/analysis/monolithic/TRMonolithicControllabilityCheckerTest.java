@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.monolithic.AbstractTRMonolithicModelVerifier.TraceMode;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
@@ -67,7 +68,10 @@ public class TRMonolithicControllabilityCheckerTest
   protected ControllabilityChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new TRMonolithicControllabilityChecker();
+    final TRMonolithicControllabilityChecker checker =
+      new TRMonolithicControllabilityChecker();
+    checker.setTraceMode(TraceMode.DEPTHMAP);
+    return checker;
   }
 
 }

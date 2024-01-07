@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * The state tuple encoding class facilitates the conversion between
  * <I>decoded</I> tuples, where each automaton has its own array index, and
  * bit-packed <I>encoded</I> tuples. The encoded tuples are typically stored
- * in an {@link net.sourceforge.waters.analysis.tr.IntArrayBuffer
+ * in an {@link net.sourceforge.waters.analysis.tr.StateTupleBuffer
  * IntArrayBuffer}.</P>
  *
  * @author Fangqian Qiu, Robi Malik

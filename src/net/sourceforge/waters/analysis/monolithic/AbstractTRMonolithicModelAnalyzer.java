@@ -51,8 +51,8 @@ import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.EventStatusProvider;
-import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRKindTranslator;
@@ -437,14 +437,12 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     }
 
     mStateTupleEncoding = new StateTupleEncoding(sizes);
-    final int numWords = mStateTupleEncoding.getNumberOfWords();
-    final int stateLimit = getNodeLimit();
-    final int tableSize = Math.min(stateLimit, MAX_TABLE_SIZE);
-    mStateSpace = new IntArrayBuffer(numWords, stateLimit, tableSize, -1);
+    final int tupleSize = mStateTupleEncoding.getNumberOfWords();
+    mStateSpace = createStateSpace(tupleSize);
     mDecodedSource = new int[numAutomata];
-    mEncodedSource = new int[numWords];
+    mEncodedSource = new int[tupleSize];
     mDecodedTarget = new int[numAutomata];
-    mEncodedTarget = new int[numWords];
+    mEncodedTarget = new int[tupleSize];
     final MonolithicAnalysisResult result = getAnalysisResult();
     result.setEncodingSize(mStateTupleEncoding.getNumberOfUsedBits());
   }
@@ -866,7 +864,13 @@ public abstract class AbstractTRMonolithicModelAnalyzer
     return mTRAutomata.length;
   }
 
-  protected IntArrayBuffer getStateSpace()
+  protected StateTupleBuffer createStateSpace(final int tupleSize)
+  {
+    final int limit = getNodeLimit();
+    return new StateTupleBuffer(tupleSize, 0, limit, -1);
+  }
+
+  protected StateTupleBuffer getStateSpace()
   {
     return mStateSpace;
   }
@@ -1132,6 +1136,8 @@ public abstract class AbstractTRMonolithicModelAnalyzer
    * The default implementation increases the counter for explorer transitions
    * in the analysis result record (statistics) and should be called by
    * subclasses overriding this method.
+   * @param  event  Event number of the new transition.
+   * @param  target Target state number of the new transition.
    */
   protected void createTransition(final int event, final int target)
     throws OverflowException
@@ -2325,7 +2331,7 @@ public abstract class AbstractTRMonolithicModelAnalyzer
   private TRKindTranslator mTRKindTranslator;
   private Collection<EventInfo> mEventInfo;
   private StateTupleEncoding mStateTupleEncoding;
-  private IntArrayBuffer mStateSpace;
+  private StateTupleBuffer mStateSpace;
   private EventEncoding mOutputEventEncoding;
   private DeadlockInfo[] mDeadlockInfo;
   private int mNumberOfInitialStates;
@@ -2342,8 +2348,6 @@ public abstract class AbstractTRMonolithicModelAnalyzer
 
   //#########################################################################
   //# Class Constants
-  private static final int MAX_TABLE_SIZE = 500000;
-
   private static DefaultAutomatonEventInfoCamparator
     mDefaultAutomatonEventInfoComparator = null;
 
