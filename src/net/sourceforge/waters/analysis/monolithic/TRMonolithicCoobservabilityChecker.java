@@ -52,8 +52,8 @@ import net.sourceforge.waters.analysis.coobs.CoobservabilityAttributeFactory;
 import net.sourceforge.waters.analysis.coobs.CoobservabilityDiagnostics;
 import net.sourceforge.waters.analysis.coobs.CoobservabilitySignature;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateTupleBuffer;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -376,6 +376,7 @@ public class TRMonolithicCoobservabilityChecker
       } else {
         final CoobservabilitySignature.Site site = iter.next();
         siteInfo = mSiteInfoMap.get(site);
+        assert siteInfo != null;
       }
       final List<TraceStepProxy> list = new LinkedList<>();
       final TraceStepProxy step =

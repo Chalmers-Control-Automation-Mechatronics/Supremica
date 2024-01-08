@@ -308,7 +308,7 @@ public class CoobservabilitySignature
    *     that are selfloop-only in all automata are removed from the
    *     observation capabilities of all sites. Furthermore, sites that
    *     observe all events that are not selfloop-only in all automata are
-   *     are identified as <I>all-observing</I> and there controlled events
+   *     are identified as <I>all-observing</I> and their controlled events
    *     are marked as totally controllable, removed from sites, and
    *     excluded from coobservability checking.</LI>
    * <LI>Sites that do not control any events are removed.</LI>
@@ -317,6 +317,7 @@ public class CoobservabilitySignature
   public void filter(final TRAutomatonProxy[] trs,
                      final KindTranslator translator)
   {
+    //checkIntegrity();
     final Iterator<Map.Entry<EventProxy,EventInfo>> mapIter =
       mEventMap.entrySet().iterator();
     while (mapIter.hasNext()) {
@@ -340,6 +341,7 @@ public class CoobservabilitySignature
         mapIter.remove();
       }
     }
+    //checkIntegrity();
 
     int numNeedsChecking = mEventMap.size();
     boolean removedFromSites = false;
@@ -402,6 +404,7 @@ public class CoobservabilitySignature
     if (removedFromSites) {
       removeEmptySites();
     }
+    //checkIntegrity();
 
     if (det) {
       for (final TRAutomatonProxy tr : trs) {
@@ -435,12 +438,12 @@ public class CoobservabilitySignature
         final Site site = iter.next();
         if (isAllObserving(site)) {
           setTotalControl(site);
-          iter.remove();
         } else {
           removeNeedlessObservations(site);
         }
       }
       removeEmptySites();
+      //checkIntegrity();
     }
   }
 
@@ -452,6 +455,7 @@ public class CoobservabilitySignature
    */
   public void merge()
   {
+    //checkIntegrity();
     final int numSites = mSites.size();
     final Site[] sites = new Site[numSites];
     mSites.toArray(sites);
@@ -482,6 +486,7 @@ public class CoobservabilitySignature
         info.replaceSites(replacements);
       }
     }
+    //checkIntegrity();
   }
 
   /**
@@ -497,11 +502,14 @@ public class CoobservabilitySignature
    */
   public void subsume()
   {
+    //checkIntegrity();
     boolean removing = false;
     for (final Site site1 : mSites) {
       for (final Site site2 : mSites) {
         if (site1 != site2 && site2.hasMoreObservationsThan(site1)) {
-          site1.removeControlledEvents(site2);
+          for (final EventProxy event : site2.getControlledEvents()) {
+            removeControlledEvent(site1, event);
+          }
           if (!site1.hasControlledEvents()) {
             removing = true;
             break;
@@ -512,6 +520,7 @@ public class CoobservabilitySignature
     if (removing) {
       removeEmptySites();
     }
+    //checkIntegrity();
   }
 
   public SiteSet findMinimalSiteSet()
@@ -552,6 +561,7 @@ public class CoobservabilitySignature
       info.setTotallyControllable();
     }
     removeEmptySites();
+    //checkIntegrity();
   }
 
 
@@ -579,6 +589,7 @@ public class CoobservabilitySignature
       final EventProxy event = iter.next();
       final EventInfo info = mEventMap.get(event);
       if (!info.needsObserving()) {
+        info.removeObservingSite(site);
         iter.remove();
       }
     }
@@ -590,6 +601,17 @@ public class CoobservabilitySignature
     for (final EventProxy event : events) {
       final EventInfo info = mEventMap.get(event);
       info.setTotallyControllable();
+    }
+  }
+
+  private boolean removeControlledEvent(final Site site, final EventProxy event)
+  {
+    if (site.removeControlledEvent(event)) {
+      final EventInfo info = mEventMap.get(event);
+      info.removeControllingSite(site);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -641,6 +663,35 @@ public class CoobservabilitySignature
         if (replacement != null) {
           iter.set(replacement);
         }
+      }
+    }
+  }
+
+
+  //###########################################################################
+  //# Debugging
+  public void checkIntegrity()
+  {
+    for (final EventInfo info : mEventMap.values()) {
+      for (final Site site : info.getControllingSites()) {
+        assert mSites.contains(site);
+        assert info.getControllingSites().contains(site);
+      }
+      for (final Site site : info.getObservingSites()) {
+        assert mSites.contains(site);
+        assert info.getObservingSites().contains(site);
+      }
+    }
+    for (final Site site : mSites) {
+      for (final EventProxy event : site.getControlledEvents()) {
+        final EventInfo info = mEventMap.get(event);
+        assert info != null;
+        assert info.getControllingSites().contains(site);
+      }
+      for (final EventProxy event : site.getObservedEvents()) {
+        final EventInfo info = mEventMap.get(event);
+        assert info != null;
+        assert info.getObservingSites().contains(site);
       }
     }
   }
@@ -731,11 +782,6 @@ public class CoobservabilitySignature
     private boolean removeControlledEvent(final EventProxy event)
     {
       return mControlledEvents.remove(event);
-    }
-
-    private boolean removeControlledEvents(final Site site)
-    {
-      return mControlledEvents.removeAll(site.mControlledEvents);
     }
 
     private boolean removeObservedEvent(final EventProxy event)
@@ -1089,6 +1135,16 @@ public class CoobservabilitySignature
         mControllingSites = new LinkedList<>();
       }
       mControllingSites.add(site);
+    }
+
+    private void removeControllingSite(final Site site)
+    {
+      if (mControllingSites != null) {
+        mControllingSites.remove(site);
+        if (mControllingSites.isEmpty()) {
+          mControllingSites = null;
+        }
+      }
     }
 
     private List<Site> getObservingSites()
