@@ -87,7 +87,7 @@ public class MonolithicCoobservabilityVerificationResult
   @Override
   public void setNumberOfSites(final int numSites)
   {
-    mPeakNumberOfSites = numSites;
+    mNumberOfSites = numSites;
   }
 
   @Override
