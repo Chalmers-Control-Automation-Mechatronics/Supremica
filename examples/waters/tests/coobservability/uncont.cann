@@ -1,0 +1,2 @@
+event .* COOBS:observer0 total
+event .* uncontrollable COOBS:controller0 total
