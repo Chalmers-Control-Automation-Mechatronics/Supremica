@@ -101,6 +101,14 @@ public class Config
     ("fileSavePath", "Default Output File Path",
      "Default directory when creating log and other output files",
      null, getHomeDirectory(), FileOption.Type.DIRECTORY);
+  public static final FileOption FILE_SCRIPT_PATH = new FileOption
+  	("fileScriptPath", "Default script path",
+  	 "Default directory for scripts",
+  	 null, getHomeDirectory(), FileOption.Type.DIRECTORY);
+  public static final FileOption FILE_TEMP_PATH = new FileOption
+  	("fileTempPath", "Default TEMP path",
+  	 "Default directory for storing temporray files",
+  	 null, getTempDirectory(), FileOption.Type.DIRECTORY);
 
 
   //GUI_COMPILER
@@ -449,6 +457,15 @@ public class Config
     } else {
       return new File(".");
     }
+  }
+  private static File getTempDirectory()
+  {
+	  final String temp = System.getProperty("java.io.tmpdir");
+	  if (temp == null)
+	  	return new File(".");
+
+  	return new File(temp);
+
   }
 
 }

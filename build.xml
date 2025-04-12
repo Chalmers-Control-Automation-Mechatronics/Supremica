@@ -142,6 +142,9 @@
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
+        
+        <!-- Used by Lua scripting, Lupremica. MF -->
+        <unjar src="${lib}/luaj-jse-3.0.1.jar" dest="${lib}/${unjared}"/>
     </target>
 
     <target name="clean_build">

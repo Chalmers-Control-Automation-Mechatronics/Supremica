@@ -120,7 +120,7 @@ public class AutomataToHierarchyToDot
 
         if (aut.isSupervisor())
         {
-            return ",color = forestgreen";
+            return ", color = forestgreen";
         }
 
         if (aut.isSpecification())
@@ -150,6 +150,9 @@ public class AutomataToHierarchyToDot
     throws Exception
     {
         pw.println("graph structure {");
+		// pw.println("splines=ortho;"); // Experimenting with this, note xlabel below
+		// pw.println("forcelabels=true;"); // https://graphviz.org/docs/attrs/xlabel/
+		pw.println("\tsplines=spline;");
 
         // pw.println("\tcenter = true;");
         // Left to right or top to bottom?
@@ -182,7 +185,7 @@ public class AutomataToHierarchyToDot
         {
             Automaton currAutomaton = theAutomata.getAutomatonAt(i);
 
-            pw.print("\t\"" + currAutomaton.getName() + "\" [label = \"");
+            pw.print("\t\"" + currAutomaton.getName() + "\" [label=\"");
 
             if (withLabel)
             {
@@ -210,7 +213,8 @@ public class AutomataToHierarchyToDot
                     pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\" ");
 
 					int con = eventTotal-uncon;
-                    pw.println("[style=solid,label = \"" + con + "c+" + uncon + "u\"];");
+                    // pw.println("[style=solid, xlabel=\"" + con + "c+" + uncon + "u\"];");
+                    pw.println("[style=solid, label=\"" + con + "c+" + uncon + "u\"];");
                 }
             }
         }

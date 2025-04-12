@@ -28,7 +28,7 @@ public class ConfigPages
 
   public static final SimpleLeafOptionPage GENERAL_FILE =
     new SimpleLeafOptionPage("general.file", "File",
-                             FILE_OPEN_PATH, FILE_SAVE_PATH);
+                             FILE_OPEN_PATH, FILE_SAVE_PATH, FILE_SCRIPT_PATH, FILE_TEMP_PATH);
 
   public static final SimpleLeafOptionPage GUI_EDITOR =
     new SimpleLeafOptionPage("gui.editor", "Editor",

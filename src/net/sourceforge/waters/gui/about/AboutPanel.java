@@ -206,12 +206,12 @@ public class AboutPanel
     builder.append("<A HREF=\"release_notes.html\">What's new in this version</A>");
     builder.append("</STRONG></P>");
     builder.append("<P>Waters/Supremica is a joint project between the Department ");
-    builder.append("of Signals and Systems, Chalmers University of Technology, ");
-    builder.append("Sweden and the Department of Computer Science, University ");
+    builder.append("of Elecrical Engineering, Chalmers University of Technology, ");
+    builder.append("Sweden, and the Department of Computer Science, University ");
     builder.append("of Waikato, New Zealand.</P>");
-    builder.append("<P>Authors: Knut &Aring;kesson, Goran \u010Cengi\u0107, ");
-    builder.append("Martin Fabian, Hugo Flordal, Carly Hona, Tom Levy, Robi Malik, ");
-    builder.append("Markus Sk&ouml;ldstam, Arash Vahidi, and many others.</P>");
+    builder.append("<P>Authors: Knut &Aring;kesson, Robi Malik, Martin Fabian, ");
+    builder.append("Hugo Flordal, Sahar Mohajerani, Carly Hona, Tom Levy, ");
+    builder.append("Zhennan Fei, Markus Sk&ouml;ldstam, and many others.</P>");
     builder.append("<P>Waters is released under the ");
     builder.append("<A HREF=\"gpl2.html\">GNU General Public License, version&nbsp;2</A>.<BR>");
     builder.append("Supremica is released using the ");
@@ -239,9 +239,11 @@ public class AboutPanel
       }
       builder.append("<BR>");
     }
+    // Java version
     builder.append("Running in Java ");
     builder.append(version.getJavaVersionText());
     builder.append("<BR>");
+    // Graphiz/dot version
     if (Config.DOT_USE.getValue() &&
         !(Config.DOT_EXECUTE_COMMAND.getValue()).equals("")) {
       final String dotVersion = getDotVersion();
@@ -253,6 +255,11 @@ public class AboutPanel
         builder.append("<BR>");
       }
     }
+    // LuaJ version
+    final String luaj = getLuaJavaVersion();
+    if(luaj != null)
+	    builder.append("Using ").append(luaj).append("<BR>");
+
     builder.append("Maximum available memory: ");
     builder.append(Runtime.getRuntime().maxMemory() / 0x100000L);
     builder.append(" MiB</P>");
@@ -272,6 +279,15 @@ public class AboutPanel
     doc.setParagraphAttributes(0, doc.getLength(), attribs, false);
     return doc;
   }
+
+	private String getLuaJavaVersion()
+	{	// Have to write a small Lua script to get the _VERSION
+		org.luaj.vm2.Globals globals = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals();
+		final String script = "return _VERSION";
+		final org.luaj.vm2.LuaValue chunk = globals.load(script);
+		final org.luaj.vm2.LuaValue version = chunk.call();
+		return version.checkjstring();
+	}
 
   private String getDotVersion()
   {

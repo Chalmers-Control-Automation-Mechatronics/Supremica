@@ -501,7 +501,7 @@ public final class EditorSynthesizerOptions
     event = set;
   }
 
-  public String getOptVaribale()
+  public String getOptVariable()
   {
     return optVariable;
   }
