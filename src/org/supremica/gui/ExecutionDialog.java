@@ -98,7 +98,7 @@ public final class ExecutionDialog
     setSize(DEFAULT_DIALOG_SIZE);
 
     setTitle(title);
-    setSize(new Dimension(250, 120));
+    //setSize(new Dimension(250, 120)); //MF This has always been wrong... We cannot know the size beforehand
     setResizable(false);
 
     // Center the window
@@ -144,6 +144,9 @@ public final class ExecutionDialog
     contentPanel = (JPanel) getContentPane();
     contentPanel.add(operationPanel, BorderLayout.NORTH);
     contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+    // final int w = Math.max(Math.max(operationPanel.getWidth(), progressPanel.getWidth()), buttonPanel.getWidth());
+	// final int h = Math.max(operationPanel.getHeight()+buttonPanel.getHeight(), progressPanel.getHeight()+buttonPanel.getHeight());
+	setSize(200, 200); //setSize(w, h); //MF Why wont this work?
 
     // Hit it!
     setMode(ExecutionDialogMode.UNINITIALIZED);
