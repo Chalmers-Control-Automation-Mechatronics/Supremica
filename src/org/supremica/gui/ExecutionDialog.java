@@ -91,18 +91,19 @@ public final class ExecutionDialog
 
   private void init(final String title)
   {
-    final Rectangle bounds = getOwner().getBounds();
+/**MF This whole thing seems unnessecarily complicated, and it doesn't really work
+	final Rectangle bounds = getOwner().getBounds();
     final int x = bounds.x + (bounds.width - DEFAULT_DIALOG_SIZE.width) / 2;
     final int y = bounds.y + (bounds.height - DEFAULT_DIALOG_SIZE.height) / 2;
     setLocation(x, y);
     setSize(DEFAULT_DIALOG_SIZE);
 
     setTitle(title);
-    setSize(new Dimension(250, 120));
+    //setSize(new Dimension(250, 120)); //MF This has always been wrong... We cannot know the size beforehand
     setResizable(false);
 
     // Center the window
-    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //MF NOT multi-display aware
     final Dimension frameSize = getSize();
     if (frameSize.height > screenSize.height) {
       frameSize.height = screenSize.height;
@@ -112,7 +113,7 @@ public final class ExecutionDialog
     }
     setLocation((screenSize.width - frameSize.width) / 2,
                 (screenSize.height - frameSize.height) / 2);
-
+*/
     final JPanel operationPanel = new JPanel(new GridLayout(2, 1));
     operationHeader = new JLabel();
     operationHeader.setHorizontalAlignment(JLabel.LEFT);
@@ -144,6 +145,10 @@ public final class ExecutionDialog
     contentPanel = (JPanel) getContentPane();
     contentPanel.add(operationPanel, BorderLayout.NORTH);
     contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+	setTitle(title);
+	setSize(200, 200);
+	setLocationRelativeTo(getOwner());
 
     // Hit it!
     setMode(ExecutionDialogMode.UNINITIALIZED);
