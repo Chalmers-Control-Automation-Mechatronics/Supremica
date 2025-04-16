@@ -224,10 +224,22 @@ public class BackupGraphPanel
                                      mSecondaryGraph.getEdgesModifiable());
       mEmbedder.addObserver(this);
       final Thread thread = new Thread(mEmbedder);
-      final Frame frame = (Frame) getTopLevelAncestor();
+
+      //MF Need to make the SpringAbortDialog multi-display aware, so it opens on the correct monitor
+      final Frame frame = (Frame) getTopLevelAncestor(); //MF Returns null
+      final java.awt.GraphicsConfiguration gc = this.getGraphicsConfiguration(); //MF Also returns null
+      final java.awt.Container parent = this.getParent();	//MF Also returns null
       final JDialog dialog =
         new SpringAbortDialog(frame, name, mEmbedder, timeout);
-      dialog.setLocationRelativeTo(this);
+      // dialog.setLocationRelativeTo(this); //MF This was the original. Not multi-display aware
+      // dialog.setLocationRelativeTo(frame); //MF Not useful, frame == null
+      // dialog.setLocationRelativeTo(parent); //MF Not useful, parent == null
+      // dialog.setLocation(gc.getBounds().x + 200, gc.getBounds().y + 200); //MF Not useful, gc == null
+	//MF Tried several other things, none worked, it seems this panel and its dsecendants have no parenmt
+
+	// Using the globally available ide seems the only way to fix this
+	dialog.setLocationRelativeTo(org.supremica.gui.ide.IDE.getTheIDE());
+
       dialog.setVisible(true);
       thread.start();
     } catch (final GeometryAbsentException exception) {
