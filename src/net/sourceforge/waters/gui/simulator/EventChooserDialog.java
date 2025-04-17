@@ -66,7 +66,7 @@ public class EventChooserDialog extends JDialog
 
   public EventChooserDialog(final JFrame owner, final JLabel[] labels, final SimulatorStep[] correspondingEvent)
   {
-    super(owner, "Multiple Options available", true);
+    super(owner, "Multiple options available", true);
     cancelled = true;
     final JPanel panel = new JPanel();
     panel.setLayout(new BorderLayout());
@@ -112,13 +112,19 @@ public class EventChooserDialog extends JDialog
     topLabel.setIcon(IconAndFontLoader.ICON_EVENT);
     panel.add(topLabel, BorderLayout.NORTH);
     this.add(panel);
-    this.setLocation(DEFAULT_STARTING_LOCATION);
+    // this.setLocation(DEFAULT_STARTING_LOCATION); //MF Not multi-display aware
+    if(this.location == null)
+    	this.setLocationRelativeTo(owner);
+    else
+    	this.setLocation(location);
+
     selectButton.addMouseListener(new MouseAdapter()
     {
       public void mouseClicked(final MouseEvent evt)
       {
         if (EventChooserDialog.this.getSelectedStep() != null)
         {
+			location = getLocation();
           cancelled = false;
           EventChooserDialog.this.dispose();
         }
@@ -128,6 +134,7 @@ public class EventChooserDialog extends JDialog
     {
       public void mouseClicked(final MouseEvent evt)
       {
+		  location = getLocation();
         EventChooserDialog.this.dispose();
       }
     });
@@ -137,6 +144,7 @@ public class EventChooserDialog extends JDialog
       {
         if (evt.getClickCount() == 2 && EventChooserDialog.this.getSelectedStep() != null)
         {
+			location = getLocation();
           cancelled = false;
           EventChooserDialog.this.dispose();
         }
@@ -148,6 +156,7 @@ public class EventChooserDialog extends JDialog
       {
         if (e.getKeyCode() == 10) // <ENTER> Key
         {
+			location = getLocation();
           cancelled = false;
           EventChooserDialog.this.dispose();
         }
@@ -191,6 +200,7 @@ public class EventChooserDialog extends JDialog
   private static final long serialVersionUID = -4465845587624430860L;
   private static final int DEFAULT_LIST_WIDTH = 250;
   private static final int DEFAULT_ROW_HEIGHT = 20;
-  private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
+  //MF private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
   private static final int LIST_BORDER_SIZE = 5;
+    private static Point location = null; //MF To remember its position on the screen
 }
