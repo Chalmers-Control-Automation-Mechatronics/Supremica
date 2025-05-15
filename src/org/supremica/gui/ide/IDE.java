@@ -403,6 +403,7 @@ public class IDE
                   Runtime.getRuntime().freeMemory()/mb + "/" +
                   Runtime.getRuntime().totalMemory()/mb + "/" +
                   Runtime.getRuntime().maxMemory()/mb + " MiB");
+		logger.info("Branch: AutomataVariablesBDD");
     }
   }
 

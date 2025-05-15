@@ -562,8 +562,8 @@ public abstract class BDDAbstractManager {
        * @param updatedVariables A set in which variables with the next
        * operator applied to them in the expression are added.
        */
-      Expression2BDDBitVectorVisitor(
-                                     final HashSet<String> updatedVariables) {
+      Expression2BDDBitVectorVisitor(final HashSet<String> updatedVariables)
+      {
         this.updatedVariables = updatedVariables;
       }
 
@@ -595,6 +595,7 @@ public abstract class BDDAbstractManager {
        * A simple identifier shall be parsed. A simple identifier can be either
        * a variable identifier, i.e., a variable name, or it can be a named
        * constant identifier.
+       MF or it can be an automaton name or the label of a state
        * @param proxy The (sub-)expression to parse.
        * @return BDDOverflows or ResultOverflows depending on class.
        */
@@ -624,6 +625,7 @@ public abstract class BDDAbstractManager {
 
         } else {
           // These identifiers we cannot handle.
+          logger.error(varNameOrInstValue + " is not a known identifier.");
           throw new IllegalArgumentException(varNameOrInstValue + " is not a known identifier.");
         }
       }

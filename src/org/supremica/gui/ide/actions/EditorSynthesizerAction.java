@@ -117,7 +117,7 @@ public class EditorSynthesizerAction extends IDEAction
 
     final int nbrOfComponents = module.getComponentList().size();
     if (nbrOfComponents == 0) {
-      JOptionPane.showMessageDialog(ide.getFrame(), "Module is empty.");
+      JOptionPane.showMessageDialog(ide.getFrame(), "Module is empty!");
       return;
     }
 
@@ -138,6 +138,29 @@ public class EditorSynthesizerAction extends IDEAction
         return;
       }
     }
+
+	/***
+	 * Check if the Automaton Variables Compiler is enabled (Options > GUI > Compiler)
+	 * and if so check if there are any guards using automaton variables,
+	 * and if so, instruct the user to first do away with the automaton variables.
+	 * (See issue #132)
+	***/
+	if(net.sourceforge.waters.model.compiler.CompilerOptions.AUTOMATON_VARIABLES_COMPILER.getValue())
+	{
+		if(checkAutomatonVariableGuards(module.getComponentList()))
+		{
+			final String msg =	"Automaton Variables Compiler is active\n" +
+								"Currently the BDD-based synthesis cannot\n" +
+								"handle automaton variables, these must be\n" +
+								"first converted to ordinary variable-value\n" +
+								"comparisons";
+			JOptionPane.showMessageDialog(ide.getFrame(),
+											msg,
+											"Unable to handle...",
+											JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+	}
 
     // get the stored or default options
     final EditorSynthesizerOptions options = new EditorSynthesizerOptions();
@@ -459,4 +482,41 @@ public class EditorSynthesizerAction extends IDEAction
       }
     }
   }
+
+	/***
+	 * Check if there is at least one guard that includes an automaton variables expression,
+	 * that is, an expression like "A == q0" (or "A != q0"), where A is the name of an automaton
+	 * and q0 is the label of a location in that automaton. We only check if A is the name of an
+	 * automaton, not whether q0 actually is the label a location of that automaton.
+	 *
+	***/
+	private boolean checkAutomatonVariableGuards(List<Proxy> components)
+	{
+		for(Proxy proxy : components)
+		{
+			final net.sourceforge.waters.model.module.ComponentProxy component =
+				(net.sourceforge.waters.model.module.ComponentProxy)proxy;
+			final String name = component.getName();
+
+			if(component instanceof net.sourceforge.waters.model.module.SimpleComponentProxy)
+			{
+				final net.sourceforge.waters.model.module.SimpleComponentProxy scp =
+					(net.sourceforge.waters.model.module.SimpleComponentProxy)component;
+				System.err.println(name + " is simple component of kind " + scp.getKind().toString());
+			}
+			else if(component instanceof net.sourceforge.waters.model.module.VariableComponentProxy)
+			{
+				final net.sourceforge.waters.model.module.VariableComponentProxy vcp =
+					(net.sourceforge.waters.model.module.VariableComponentProxy)component;
+				System.err.println(name + " is variable component of type " + vcp.getType().toString() +
+					" and initial state predicate: " + vcp.getInitialStatePredicate().toString());
+			}
+			else
+			{
+				System.err.println("Unknown component proxy type");
+			}
+
+		}
+		return true;
+	}
 }
