@@ -70,6 +70,7 @@ import org.apache.logging.log4j.Logger;
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
+import org.supremica.automata.BDD.EFA.BDDPreprocessAV;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.external.tumses.GABlocksRemover;
@@ -79,6 +80,11 @@ import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
+//** MF
+//** Why is this file named EditorSyntehsizerAction? It implements the
+//** Editor > Analyze > Symbolic (BDD) Synthesis/Optimization on TEFAs... menu
+//** NOT a general synthesizer action. This file and class would be better named:
+//** EditorAnalyzeSymbolicSynthesis, or similar
 public class EditorSynthesizerAction extends IDEAction
 {
   private static final long serialVersionUID = 1L;
@@ -147,7 +153,8 @@ public class EditorSynthesizerAction extends IDEAction
 	***/
 	if(net.sourceforge.waters.model.compiler.CompilerOptions.AUTOMATON_VARIABLES_COMPILER.getValue())
 	{
-		if(checkAutomatonVariableGuards(module.getComponentList()))
+		final BDDPreprocessAV preprocAV = new BDDPreprocessAV(module.getComponentList());
+		if(preprocAV.checkAutomatonVariableGuards())
 		{
 			final String msg =	"Automaton Variables Compiler is active\n" +
 								"Currently the BDD-based synthesis cannot\n" +
@@ -482,41 +489,4 @@ public class EditorSynthesizerAction extends IDEAction
       }
     }
   }
-
-	/***
-	 * Check if there is at least one guard that includes an automaton variables expression,
-	 * that is, an expression like "A == q0" (or "A != q0"), where A is the name of an automaton
-	 * and q0 is the label of a location in that automaton. We only check if A is the name of an
-	 * automaton, not whether q0 actually is the label a location of that automaton.
-	 *
-	***/
-	private boolean checkAutomatonVariableGuards(List<Proxy> components)
-	{
-		for(Proxy proxy : components)
-		{
-			final net.sourceforge.waters.model.module.ComponentProxy component =
-				(net.sourceforge.waters.model.module.ComponentProxy)proxy;
-			final String name = component.getName();
-
-			if(component instanceof net.sourceforge.waters.model.module.SimpleComponentProxy)
-			{
-				final net.sourceforge.waters.model.module.SimpleComponentProxy scp =
-					(net.sourceforge.waters.model.module.SimpleComponentProxy)component;
-				System.err.println(name + " is simple component of kind " + scp.getKind().toString());
-			}
-			else if(component instanceof net.sourceforge.waters.model.module.VariableComponentProxy)
-			{
-				final net.sourceforge.waters.model.module.VariableComponentProxy vcp =
-					(net.sourceforge.waters.model.module.VariableComponentProxy)component;
-				System.err.println(name + " is variable component of type " + vcp.getType().toString() +
-					" and initial state predicate: " + vcp.getInitialStatePredicate().toString());
-			}
-			else
-			{
-				System.err.println("Unknown component proxy type");
-			}
-
-		}
-		return true;
-	}
 }
