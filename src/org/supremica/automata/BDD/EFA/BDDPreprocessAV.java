@@ -35,6 +35,9 @@
 
 package org.supremica.automata.BDD.EFA;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -56,9 +59,12 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 public class BDDPreprocessAV
 {
 	private final java.util.Map<String, GraphProxy> nameGraphMap = new java.util.HashMap<>();
+	// We search for patterns like "User_1 != U1" or "User_2 == R1"
+	private final Pattern pattern = Pattern.compile("(\\w+)\\s*[!=]=\\s*(\\w+)");
 
 	public BDDPreprocessAV(java.util.List<Proxy> components)
 	{
+		// Build the nameGraphMap (does such a map not exist already?)
 		for(Proxy proxy : components)
 		{
 			final ComponentProxy component = (ComponentProxy)proxy;
@@ -67,38 +73,43 @@ public class BDDPreprocessAV
 			if(component instanceof SimpleComponentProxy)
 			{
 				final SimpleComponentProxy scp = (SimpleComponentProxy)component;
-				System.err.println(name + " is simple component of kind " + scp.getKind().toString());
+				// System.err.println(name + " is simple component of kind " + scp.getKind().toString());
 				nameGraphMap.put(name, scp.getGraph());
 			}
-			else if(component instanceof VariableComponentProxy)
+/*			else if(component instanceof VariableComponentProxy)
 			{
 				final VariableComponentProxy vcp = (VariableComponentProxy)component;
-				System.err.println(name + " is variable component of type " + vcp.getType().toString() +
-					" and initial state predicate: " + vcp.getInitialStatePredicate().toString());
+				// System.err.println(name + " is variable component of type " + vcp.getType().toString() +
+				//	" and initial state predicate: " + vcp.getInitialStatePredicate().toString());
 			}
 			else
 			{
 				System.err.println("Unknown component proxy type");
 			}
+*/
 		}
 	}
 
 	/***
 	 * Check if there is at least one guard that includes an automaton variables expression,
-	 * that is, an expression like "A == q0" (or "A != q0"), where A is the name of an automaton
-	 * and q0 is the label of a location in that automaton. We only check if A is the name of an
-	 * automaton, not whether q0 actually is the label a location of that automaton.
+	 * that is, an expression like "A == q" (or "A != q"), where A is the name of an automaton
+	 * and q is the label of a location in that automaton.
 	 *
 	***/
 	public boolean checkAutomatonVariableGuards()
 	{
-		nameGraphMap.forEach((name, graph) -> checkGraph(graph));
-		return true;
+		// nameGraphMap.forEach((name, graph) -> {if (checkGraph(graph)) { return true; }});
+		for (final String name : nameGraphMap.keySet())
+		{
+			// System.err.println("Checking " + name);
+			if(checkGraph(nameGraphMap.get(name)))
+				return true; // Automaton variable expression found
+		}
+		return false;
 	}
 
 	private boolean checkGraph(final GraphProxy graph)
 	{
-		final java.util.Set<NodeProxy> nodeSet = graph.getNodes();
 		final java.util.Collection<EdgeProxy> edgeSet = graph.getEdges();
 		for (EdgeProxy edge : edgeSet)
 		{
@@ -108,12 +119,70 @@ public class BDDPreprocessAV
 				final java.util.List<SimpleExpressionProxy> guards = gaBlock.getGuards();
 				for (SimpleExpressionProxy sep : guards)
 				{
-					System.err.println(sep.toString());
+					// System.err.println("GuardAction block: " + sep.toString());
+					if (matchPattern(sep.toString()))
+					{
+						// System.err.println("Automaton variable found: " + sep.toString());
+						return true;
+					}
 				}
 			}
 		}
 
+		return false;	// No automaton variable expression found
+	}
 
-		return true;
+	/*
+	 * From https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html
+	 * the specification for the contains(Object o) method says: "returns true if and only if
+	 * this collection contains at least one element e such that (o==null ? e==null : o.equals(e))."
+	 * This specification should not be construed to imply that invoking Collection.contains
+	 * with a non-null argument o will cause o.equals(e) to be invoked for any element e.
+	 *
+	 * So... linear search it is then!
+	 */
+/*	private class locationComparator
+	{
+		final String locationName;
+		public locationComparator(final String loc)
+		{
+			this.locationName = loc;
+		}
+		public boolean equals(NodeProxy node)
+		{
+			System.err.println("Comparing " + locationName + " to " + node.getName());
+			return locationName.equals(node.getName());
+		}
+	}
+*/
+	private boolean matchPattern(String str)
+	{
+		final Matcher matcher = pattern.matcher(str);
+		while(matcher.find())
+		{
+			final String automatonName = matcher.group(1);	// Might not be automaton name
+			final String automatonLocation = matcher.group(2);	// Might not be location name
+			// System.err.println("autmatonName: " + automatonName + "; automatonLocation: " + automatonLocation);
+
+			final GraphProxy graph = nameGraphMap.get(automatonName);
+			if (graph != null) // then this was the name of an automaton
+			{
+				// System.err.println(automatonName + " found graph");
+
+				final java.util.Set<NodeProxy> locations = graph.getNodes();
+				// if (locations.contains(new locationComparator(automatonLocation)))
+				for (final NodeProxy node : locations)
+				{
+					if (automatonLocation.equals(node.getName()))
+					{
+						// We found an expression "A == q" or "A != q" where A is the
+						// name of an automaton, and q is the name of a location of A
+						// System.err.println("Automaton variable expression found: " + str);
+						return true;
+					}
+				}
+			}
+		}
+		return false; // No automaton variable expression found
 	}
 }
