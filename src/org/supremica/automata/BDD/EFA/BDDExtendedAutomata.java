@@ -152,7 +152,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDD[][] backwardTransAndNextValsForV;
     BDD[][] transWhereVisUpdatedWithoutDestClocks;
     BDD[][] transAndNextValsForVWithoutDestClocks;
-    private final String locaVarSuffix;
+    private final String localVarSuffix;
     EditorSynthesizerOptions options;
     SynthesisAlgorithm synType;
     List<ExtendedAutomaton> plants;
@@ -182,7 +182,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
-        locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
+        localVarSuffix = ExtendedAutomata.getLocVarSuffix();
         theIndexMap = new ExtendedAutomataIndexMap(orgExAutomata);
         theExAutomata = new PCGExtendedAutomataSorter().sortAutomata(orgExAutomata.getExtendedAutomataList());
 
@@ -814,7 +814,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public String getLocVarSuffix() {
-        return locaVarSuffix;
+        return localVarSuffix;
     }
 
     public String getAutVarName(final int var) {

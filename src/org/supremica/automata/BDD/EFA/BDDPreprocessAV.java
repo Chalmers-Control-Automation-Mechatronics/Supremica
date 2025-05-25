@@ -59,13 +59,15 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 public class BDDPreprocessAV
 {
 	private final java.util.Map<String, GraphProxy> nameGraphMap = new java.util.HashMap<>();
-	// We search for patterns like "User_1 != U1" or "User_2 == R1"
+	private final java.util.Map<String, VariableComponentProxy> nameVarMap = new java.util.HashMap<>();
+
+	// We search for patterns like "Efsm_1 != loc_1" or "efsm_2 == loc_x"
 	private final Pattern pattern = Pattern.compile("(\\w+)\\s*[!=]=\\s*(\\w+)");
 
 	public BDDPreprocessAV(java.util.List<Proxy> components)
 	{
-		// Build the nameGraphMap (does such a map not exist already?)
-		for(Proxy proxy : components)
+		// Build the nameGraphMap and nameVarMap (does such maps not exist already?)
+		for(final Proxy proxy : components)
 		{
 			final ComponentProxy component = (ComponentProxy)proxy;
 			final String name = component.getName();
@@ -76,19 +78,20 @@ public class BDDPreprocessAV
 				// System.err.println(name + " is simple component of kind " + scp.getKind().toString());
 				nameGraphMap.put(name, scp.getGraph());
 			}
-/*			else if(component instanceof VariableComponentProxy)
+			else if(component instanceof VariableComponentProxy)
 			{
 				final VariableComponentProxy vcp = (VariableComponentProxy)component;
-				// System.err.println(name + " is variable component of type " + vcp.getType().toString() +
-				//	" and initial state predicate: " + vcp.getInitialStatePredicate().toString());
+				nameVarMap.put(name, vcp);
 			}
-			else
+/*			else
 			{
 				System.err.println("Unknown component proxy type");
 			}
 */
 		}
 	}
+	private static final boolean FIND_ONE = true;
+	private static final boolean FIND_ALL = false;
 
 	/***
 	 * Check if there is at least one guard that includes an automaton variables expression,
@@ -111,7 +114,7 @@ public class BDDPreprocessAV
 	private boolean checkGraph(final GraphProxy graph)
 	{
 		final java.util.Collection<EdgeProxy> edgeSet = graph.getEdges();
-		for (EdgeProxy edge : edgeSet)
+		for (final EdgeProxy edge : edgeSet)
 		{
 			final GuardActionBlockProxy gaBlock = edge.getGuardActionBlock();
 			if (gaBlock != null)
@@ -119,16 +122,13 @@ public class BDDPreprocessAV
 				final java.util.List<SimpleExpressionProxy> guards = gaBlock.getGuards();
 				for (SimpleExpressionProxy sep : guards)
 				{
-					// System.err.println("GuardAction block: " + sep.toString());
 					if (matchPattern(sep.toString()))
 					{
-						// System.err.println("Automaton variable found: " + sep.toString());
 						return true;
 					}
 				}
 			}
 		}
-
 		return false;	// No automaton variable expression found
 	}
 
@@ -155,34 +155,80 @@ public class BDDPreprocessAV
 		}
 	}
 */
-	private boolean matchPattern(String str)
+	private boolean matchPattern(final String str)
 	{
 		final Matcher matcher = pattern.matcher(str);
 		while(matcher.find())
 		{
 			final String automatonName = matcher.group(1);	// Might not be automaton name
 			final String automatonLocation = matcher.group(2);	// Might not be location name
-			// System.err.println("autmatonName: " + automatonName + "; automatonLocation: " + automatonLocation);
 
 			final GraphProxy graph = nameGraphMap.get(automatonName);
 			if (graph != null) // then this was the name of an automaton
 			{
-				// System.err.println(automatonName + " found graph");
-
-				final java.util.Set<NodeProxy> locations = graph.getNodes();
-				// if (locations.contains(new locationComparator(automatonLocation)))
-				for (final NodeProxy node : locations)
+				if(searchForLocation(automatonLocation, graph.getNodes()))
 				{
-					if (automatonLocation.equals(node.getName()))
-					{
-						// We found an expression "A == q" or "A != q" where A is the
-						// name of an automaton, and q is the name of a location of A
-						// System.err.println("Automaton variable expression found: " + str);
-						return true;
-					}
+					// We found an expression "A == q" or "A != q" where A is the
+					// name of an automaton, and q is the name of a location of A
+					return true;
+				}
+				/**
+				 * If "A" is the name of an automaton but "q" is not a location of that automaton,
+				 * then we have not really found and automaton variable expression. But we have
+				 * found an illformed expression that should not be possible.
+				NO, NOT TRUE! q can be a variable that has location labels in its domain,
+				and then A == q is a proper AV expression, only "dynamically" so, not directly.
+				So this is more complicated than initially expected...
+				**/
+				final VariableComponentProxy vcp = nameVarMap.get(automatonLocation);
+				if (vcp != null) // then this was the name of an EFSM variable
+				{
+					// Found something that looks like "A == q" or "A != q", but where
+					// q is not the name of a location, but of a variable. This variable
+					// does not have to have location names in its domain, still we consider
+					// this to be an automaton variable expression.
+					return true;
+					/***
+					 * It appears that "automaton variables" simply means that the atomaton names
+					 * can be used as (implicit) variables that have the set of location names
+					 * as domain. It is even possible to have guards like "A' == q", which evaluates
+					 * to true if the automaton A is in its location q after the transition.
+					***/
+				}
+				else // q is neither a location of the automaton, nor the name of an EFSM variable
+				{
+					// Unclear what to do, this should not be possible
 				}
 			}
 		}
 		return false; // No automaton variable expression found
+	}
+	private boolean searchForLocation(final String location, final java.util.Set<NodeProxy> nodes)
+	{
+		for (final NodeProxy node : nodes)
+		{
+			if (location.equals(node.getName()))
+			{
+				// We found an expression "A == q" or "A != q" where A is the
+				// name of an automaton, and q is the name of a location of A
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean collectAutomatonLocationPairs()
+	{
+		return false;
+	}
+	/***
+	 * This function collects all <automaton, state> pairs of all automaton variable expressions
+	 *
+	***/
+
+
+	public boolean resolveAutomatonVariables()
+	{
+		return false;
 	}
 }

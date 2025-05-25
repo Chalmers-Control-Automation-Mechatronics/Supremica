@@ -181,7 +181,11 @@ public class EditorSynthesizerAction extends IDEAction
         eventNames.add(sigmaS.getName());
       }
     }
+	// Setup the "Generate guards for ALL controllable events" drop-down
+    final Vector<String> eventNamesForBox = new Vector<String>(eventNames);
+    eventNamesForBox.add(0, "Generate guards for ALL controllable events");
 
+	// Collect variable names for the "Optimize variable:" drop-down
     final Vector<String> variableNamesForBox = new Vector<String>();
     variableNamesForBox.add("No variable selected");
     for (final Proxy sub : module.getComponentList()) {
@@ -189,9 +193,6 @@ public class EditorSynthesizerAction extends IDEAction
         variableNamesForBox.add(((VariableComponentProxy) sub).getName());
       }
     }
-
-    final Vector<String> eventNamesForBox = new Vector<String>(eventNames);
-    eventNamesForBox.add(0, "Generate guards for ALL controllable events");
 
     final EditorSynthesizerDialog synthesizerDialog =
       new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options,
@@ -342,7 +343,8 @@ public class EditorSynthesizerAction extends IDEAction
         }
         // Format strings...
         final List<List<String>> guardInfoList = new ArrayList<>();
-        for(final String event: eventGeoInfo.keySet()) {
+        for(final String event: eventGeoInfo.keySet())
+        {
           final List<Entry<EdgeProxy, ExtendedAutomaton>> edge2AutMap =
             eventGeoInfo.get(event);
           final Map<EdgeProxy, String> edge2guardMap =
@@ -358,6 +360,8 @@ public class EditorSynthesizerAction extends IDEAction
             final String aut = e.getValue().getName();
             entry.add(aut);
             String guard = edge2guardMap.get(e.getKey());
+            // System.err.println("guard: " + guard); // Using _curr already here!
+
             final int nbrOfTerms =
               event2GuardGen.get(event).getGuard2NbrOfTerms().get(guard);
             if (guard.equals(BDDExtendedGuardGenerator.FALSE)) {
@@ -404,7 +408,7 @@ public class EditorSynthesizerAction extends IDEAction
         }
         // print guards in the console...
         if (options.getPrintGuard()) {
-          for (final List<String> e:guardInfoList) {
+          for (final List<String> e : guardInfoList) {
             if (e.get(2).equals("FALSE")) {
               logger.info("Edge " + e.get(0) + " in automaton \""
                 + e.get(1) + "\" is FORBIDDEN.");

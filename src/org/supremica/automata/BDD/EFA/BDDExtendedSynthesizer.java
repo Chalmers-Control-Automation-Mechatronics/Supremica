@@ -167,19 +167,21 @@ public class BDDExtendedSynthesizer
       cpyEventNames.add(options.getEvent());
     }
 
-    BDDExtendedGuardGenerator bddgg = null;
+    // BDDExtendedGuardGenerator bddgg = null;
 
-    event2GuardGen = new HashMap<String,BDDExtendedGuardGenerator>();
+    event2GuardGen = new HashMap<String, BDDExtendedGuardGenerator>();
 
     guardTimer = new ActionTimer();
 
     final Iterator<String> it = cpyEventNames.iterator();
     guardTimer.start();
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
       final String sigmaName = it.next();
       final HashMap<EdgeProxy, BDD> edgeToBDDMap =
-        bddAutomata.getEventName2EdgeBDDMap().get(sigmaName);
-      bddgg = new BDDExtendedGuardGenerator(bddAutomata,
+      					bddAutomata.getEventName2EdgeBDDMap().get(sigmaName);
+
+      final BDDExtendedGuardGenerator bddgg = new BDDExtendedGuardGenerator(bddAutomata,
                                             sigmaName,
                                             edgeToBDDMap,
                                             statesAfterSynthesis,
@@ -193,8 +195,8 @@ public class BDDExtendedSynthesizer
   /* Add generated guards into the model. */
   public void addGuardsToAutomata()
   {
-    for (final Map.Entry<String,BDDExtendedGuardGenerator> entry:
-      event2GuardGen.entrySet()) {
+    for (final Map.Entry<String,BDDExtendedGuardGenerator> entry: event2GuardGen.entrySet())
+    {
       final String eventName = entry.getKey();
       final BDDExtendedGuardGenerator currBDDGG = entry.getValue();
       final HashMap<EdgeProxy,String> edgesGuards =
@@ -269,42 +271,61 @@ public class BDDExtendedSynthesizer
     createAutVarsAndUpdates();
   }
 
-  private void createAutVarsAndUpdates()
-  {
-    for (final ExtendedAutomaton aut : this.autTobeDeclaredAsVars) {
-      final Set<String> markedValues = new HashSet<>();
-      for (final NodeProxy node : aut.getMarkedLocations())
-        markedValues.add(node.getName());
 
-      final String autVarName =
-        aut.getName() + ExtendedAutomata.getlocVarSuffix();
-      // Add automaton variables to extended automata
-      final ExtendedAutomata exAutomata = aut.getExAutomata();
-      exAutomata.addEnumerationVariable(autVarName,
-                                        aut.getNameToLocationMap().keySet(),
-                                        aut.getInitialLocation().getName(),
-                                        markedValues);
-      // add an action in the form of "A_curr = location"
-      final GraphSubject graph = aut.getComponent().getGraph();
-      for (final EdgeSubject edge : graph.getEdgesModifiable()) {
-        final String sourceState = edge.getSource().getName();
-        final String targetState = edge.getTarget().getName();
-        // No need to add assignment to self-loop
-        if (sourceState.equals(targetState))
-          continue;
-        if (edge.getGuardActionBlock() == null)
-          edge.setGuardActionBlock(new GuardActionBlockSubject());
-        final String assignment = autVarName + " = " + targetState;
-        SimpleExpressionProxy assignmentAsAction = null;
-        try {
-          assignmentAsAction = parser.parse(assignment);
-        } catch (final ParseException exception) {
-          exception.printStackTrace();
-        }
-        edge.getGuardActionBlock().getActionsModifiable()
-          .add((BinaryExpressionSubject) assignmentAsAction);
-      }
-    }
+	private void createAutVarsAndUpdates()
+	{
+		if(!net.sourceforge.waters.model.compiler.CompilerOptions.AUTOMATON_VARIABLES_COMPILER.getValue())
+		{
+			logger.warn("Automaton Variable Compiler is not engaged, falling back on \"fake\" automaton variables");
+			useFakeAutomatonVariables();
+		}
+	}
+	/**
+	 * Using real automaton variables means that there is no need to:
+	 * * generate new variables, just use the automaton name as is;
+	 * * generate assignments, this is handled behind-the-scenes;
+	 **/
+	/**
+	 * Use pre-v2.5 "fake" automaton variables
+	 **/
+	private void useFakeAutomatonVariables()
+	{
+		for (final ExtendedAutomaton aut : this.autTobeDeclaredAsVars)
+		{
+		  final Set<String> markedValues = new HashSet<>();
+		  for (final NodeProxy node : aut.getMarkedLocations())
+			markedValues.add(node.getName());
+
+		  final String autVarName =
+			aut.getName() + ExtendedAutomata.getLocVarSuffix();
+		  // Add automaton variables to extended automata
+		  final ExtendedAutomata exAutomata = aut.getExAutomata();
+		  exAutomata.addEnumerationVariable(autVarName,
+											aut.getNameToLocationMap().keySet(),
+											aut.getInitialLocation().getName(),
+											markedValues);
+		  // add an action in the form of "A_curr = location"
+		  final GraphSubject graph = aut.getComponent().getGraph();
+		  for (final EdgeSubject edge : graph.getEdgesModifiable())
+		  {
+			final String sourceState = edge.getSource().getName();
+			final String targetState = edge.getTarget().getName();
+			// No need to add assignment to self-loop
+			if (sourceState.equals(targetState))
+			  continue;
+			if (edge.getGuardActionBlock() == null)
+			  edge.setGuardActionBlock(new GuardActionBlockSubject());
+			final String assignment = autVarName + " = " + targetState;
+			SimpleExpressionProxy assignmentAsAction = null;
+			try {
+			  assignmentAsAction = parser.parse(assignment);
+			} catch (final ParseException exception) {
+			  exception.printStackTrace();
+			}
+			edge.getGuardActionBlock().getActionsModifiable()
+			  .add((BinaryExpressionSubject) assignmentAsAction);
+		  }
+		}
   }
 
   //#########################################################################
