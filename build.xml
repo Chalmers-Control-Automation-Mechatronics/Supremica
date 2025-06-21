@@ -696,7 +696,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="test_cli" depends="-run_test_cli,test_report"/>
     
     <target name="test_short" depends="-run_tests_short,test_report"
-     description="Runs unit tests and produces a test report. This is a shorter est that should take less than a minute."/>
+     description="Runs unit tests and produces a test report. This is a shorter test that should take less than a minute."/>
      
     <target name="test_bdd" depends="compile_supremica,-startfiles_supremica" 
             description="Run BDD specific tests, requires the BDD library for your architecture to be accessible">
@@ -891,6 +891,28 @@ Class-Path: ${manifest.pathlist}</echo>
             <classpath file="${dist}/SupremicaLib.jar"/>
             <option value="-Dapple.laf.useScreenMenuBar=true"/>
         </bundleapp>
+    </target>
+    
+    <!-- Use Git to get the name of the current branch into the currbranch property 
+        Why would you want to do this? To get the name of the current branch into
+        the compiled code to let us know which branch it comes from.
+    -->
+    <target name="gitbranch">
+        <exec executable="C:\Users\Fabian\Desktop\Portable\Git\git-cmd.exe" output="R:\branch.txt">
+            <arg value="git branch --show-current"/>
+        </exec>
+        <!-- For some reason the above command generates three lines of text,
+            of which only the first lien is the name of teh current branch. So
+            we filter...
+        -->
+        <loadfile property="currbranch" srcfile="R:\branch.txt">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.HeadFilter">
+                    <param name="lines" value="1" />
+                </filterreader>
+            </filterchain>
+        </loadfile>
+        <echo file="${src}/${supremica_basedir}/currentbranch.txt">${currbranch}</echo>
     </target>
 </project>
 

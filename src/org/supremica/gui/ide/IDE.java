@@ -403,7 +403,22 @@ public class IDE
                   Runtime.getRuntime().freeMemory()/mb + "/" +
                   Runtime.getRuntime().totalMemory()/mb + "/" +
                   Runtime.getRuntime().maxMemory()/mb + " MiB");
-		logger.info("Branch: AutomataVariablesBDD");
+//		java.io.File cb = new java.io.File("../src/org/supremica/currentbranch.txt");
+//		if(cb.exists() && !cb.isDirectory())
+//		{
+	try
+	{
+			java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader("../src/org/supremica/currentbranch.txt"));
+			final String branch = br.readLine();
+			br.close();
+			logger.info("Branch: " + branch);
+			//logger.info("Branch: AutomataVariablesBDD");
+	}
+	catch(java.io.IOException excp)
+	{
+		// Just silently ignore
+	}
+//		}
     }
   }
 
