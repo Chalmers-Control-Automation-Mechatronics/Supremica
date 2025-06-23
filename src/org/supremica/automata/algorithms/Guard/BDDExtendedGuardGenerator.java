@@ -542,19 +542,24 @@ public final class BDDExtendedGuardGenerator {
     final BDD careStatesBDD =
       edgesMustAllowedStates.get(edge).or(edgesMustForbiddenStates.get(edge));
 
-    if (states.equals(careStatesBDD)) {
+    if (states.equals(careStatesBDD))
+    {
       localGuard = allowedForbidden ? TRUE : FALSE;
       nbrOfTerms++;
-    } else if (states.satCount(automataBDD.getSourceStatesVarSet()) == 0) {
+    }
+    else if (states.satCount(automataBDD.getSourceStatesVarSet()) == 0)
+    {
       localGuard = allowedForbidden ? FALSE : TRUE;
       nbrOfTerms++;
-    } else {
+    }
+    else
+    {
       BDD goodBDD = states.simplify(careStatesBDD);
       if (states.nodeCount() <= goodBDD.nodeCount()) {
         goodBDD = states;
       }
-      if (goodBDD.nodeCount() > 0) {
-
+      if (goodBDD.nodeCount() > 0)
+      {
         final IDD goodIDD =
           automataBDD.generateIDD(goodBDD, safeStatesEnablingSigmaBDD);
         String fileName = "idd_" + eventName;
@@ -571,6 +576,7 @@ public final class BDDExtendedGuardGenerator {
         localGuard = generateExpression(goodIDD);
       }
     }
+    // System.err.println("localGuard: " + localGuard); // Using _curr already here!
     return localGuard;
   }
 
@@ -694,8 +700,15 @@ public final class BDDExtendedGuardGenerator {
     variable = variable.replaceAll(" ", "");
     int localNbrOfTerms = 0;
     String expr = "";
-    final String symbol = automataBDD.getLocVarSuffix();
     final boolean flag = allowedForbidden ^ isComp;
+    // final String symbol = automataBDD.getLocVarSuffix();
+    /**
+     * If the Automaton Variable Compiler is engaged, we should not use the "fake" automaton
+     * variables (see issue #149), so just wipe out the LOCAL_VAR_SUFFIX
+     **/
+    final String localVarSuffix =
+    	net.sourceforge.waters.model.compiler.CompilerOptions.AUTOMATON_VARIABLES_COMPILER.getValue() ?
+    		"" : automataBDD.getLocVarSuffix();
 
     ArrayList<String> incrementalSeq;
     final ArrayList<String> setTemp = new ArrayList<String>(set);
@@ -740,7 +753,7 @@ public final class BDDExtendedGuardGenerator {
 
     if (!set.isEmpty()) {
       final String ex =
-        variable + (isAutomaton ? symbol : "") + (flag ? EQUAL : NEQUAL)
+        variable + (isAutomaton ? localVarSuffix : "") + (flag ? EQUAL : NEQUAL)
                         + set.get(0).replaceAll(" ", "");
       if (expr.isEmpty()) {
         expr = ex;
@@ -750,7 +763,7 @@ public final class BDDExtendedGuardGenerator {
       localNbrOfTerms++;
     }
     for (int i = 1; i < set.size(); i++) {
-      expr += ((flag ? OR : AND) + variable + (isAutomaton ? symbol : "")
+      expr += ((flag ? OR : AND) + variable + (isAutomaton ? localVarSuffix : "")
                + (flag ? EQUAL : NEQUAL) + set.get(i).replaceAll(" ", ""));
       localNbrOfTerms++;
     }

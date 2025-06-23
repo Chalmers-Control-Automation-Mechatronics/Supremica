@@ -168,6 +168,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
         identifierNameToProxy = new HashMap<String,ConstantAliasProxy>();
+
+        logger.debug("ExtendedAutomata() init");
     }
 
     public ExtendedAutomata(final String name) {
@@ -183,31 +185,38 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         this(module, 0);
     }
 
-    public ExtendedAutomata(final ModuleSubject module, final int globalClockDomain) {
+    public ExtendedAutomata(final ModuleSubject module, final int globalClockDomain)
+    {
         this();
 
         this.module = module;
 
-        for (final EventDeclProxy e : module.getEventDeclList()) {
-            if (e.getKind() != EventKind.PROPOSITION) {
+        for (final EventDeclProxy e : module.getEventDeclList())
+        {
+			eventIdToProxyMap.put(e.getName(), e); // See (1) below
+            if (e.getKind() != EventKind.PROPOSITION)
+            {
                 unionAlphabet.add(e);
-                if (e.getKind() == EventKind.UNCONTROLLABLE) {
+                if (e.getKind() == EventKind.UNCONTROLLABLE)
+                {
                     uncontrollableAlphabet.add(e);
                 } else {
                     controllableAlphabet.add(e);
                 }
-                if (ForcibleEventAttributeFactory.isForcible(e.getAttributes())) {
+                if (ForcibleEventAttributeFactory.isForcible(e.getAttributes()))
+                {
                     forcibleAlphabet.add(e);
                 }
             }
         }
-
+/* (1) No need to do this separately, do it as above
         for (final EventDeclProxy e : module.getEventDeclList()) {
             eventIdToProxyMap.put(e.getName(), e);
         }
-
-        for (final ConstantAliasProxy constant : module.getConstantAliasList()) {
-          identifierNameToProxy.put(constant.getName(), constant);
+*/
+        for (final ConstantAliasProxy constant : module.getConstantAliasList())
+        {
+			identifierNameToProxy.put(constant.getName(), constant);
         }
 
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
@@ -219,9 +228,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
 
         // java.lang.ClassCastException
-
-        for (final Proxy sub : components) {
-            if (sub instanceof VariableComponentProxy) {
+/* Does not the loop below prform all of this and more...? (except for the negativeValuesIncluded)
+        for (final Proxy sub : components)
+        {
+            if (sub instanceof VariableComponentProxy)
+            {
                 final VariableComponentProxy var = (VariableComponentProxy) sub;
                 ExpressionProxy expr = var.getType();
 
@@ -229,124 +240,33 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
                 int lowerBound = 0;
 
-                if (expr instanceof BinaryExpressionProxy) {
+                if (expr instanceof BinaryExpressionProxy)
+                {
                   final BinaryExpressionProxy binExpr = (BinaryExpressionProxy) expr;
                   final BinaryOperator op = binExpr.getOperator();
-                  if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator())) {
+                  if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator()))
+                  {
                     final SimpleExpressionProxy left = binExpr.getLeft();
                     lowerBound = getExpressionValue(left);
                   }
                 }
 
-                if (lowerBound < 0) {
+                if (lowerBound < 0)
+                {
                     negativeValuesIncluded = true;
                     break;
                 }
             }
         }
-
+*/
         final Map<String, VariableComponentProxy> autCandidateName2Var = new HashMap<>();
 
-        for (final Proxy sub : components) {
-            if (sub instanceof VariableComponentProxy) {
-
-                final VariableComponentProxy var = (VariableComponentProxy) sub;
-
-                var2relatedVarsMap.put(var, new ArrayList<VariableComponentProxy>());
-
-                variables.add(var);
-
-                if (var.getName().startsWith(FlowerEFABuilder.STAGE_PREFIX)) {
-                    stageVars.add(var);
-                }
-
-                if (var.getName().startsWith(CLOCK_PREFIX)) {
-                    clocks.add(var);
-                }
-
-                if (var.getName().startsWith(PARAM_PREFIX)) {
-                    parameters.add(var);
-                }
-
-                ExpressionProxy expr = var.getType();
-                expr = expandNamedConstant(expr);
-
-                final String varName = var.getName();
-
-                int lowerBound = 0;
-                int upperBound = 0;
-
-                if (expr instanceof BinaryExpressionProxy) {
-                  final BinaryExpressionProxy binExpr = (BinaryExpressionProxy) expr;
-                  final BinaryOperator op = binExpr.getOperator();
-                  if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator())) {
-                    lowerBound = getExpressionValue(binExpr.getLeft());
-                    upperBound = getExpressionValue(binExpr.getRight());
-                  } else {
-                    throw new IllegalArgumentException("The variable domain is not defined!");
-                  }
-                } else if (expr instanceof EnumSetExpressionProxy) { // non-integer variable;
-                  nonIntegerVariables.add(varName);
-                  final EnumSetExpressionProxy enumExpr = (EnumSetExpressionProxy) expr;
-                  final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
-                  final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
-                  int mappedIntValue = 0;
-                  lowerBound = mappedIntValue;
-                  upperBound = enumExpr.getItems().size()-1;
-                  for (final SimpleIdentifierProxy identifier : enumExpr.getItems()) {
-                    final String instanceName = identifier.getName();
-                    final String intString = String.valueOf(mappedIntValue);
-                    varInstanceIntMap.put(instanceName, intString);
-                    varIntInstanceMap.put(intString, instanceName);
-                    mappedIntValue++;
-                  }
-
-                  nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
-                  nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
-
-                  if (varName.contains(LOCAL_VAR_SUFFIX)) {
-                    final String nonSuffix = varName.substring(0, varName.indexOf(LOCAL_VAR_SUFFIX));
-                    autCandidateName2Var.put(nonSuffix, var);
-                  }
-              } else {
-                  throw new IllegalArgumentException("The variable domain is not defined!");
-              }
-
-                final MinMax minMax = new MinMax(lowerBound, upperBound);
-                if (theoNbrOfReachableStates == 0) {
-                    theoNbrOfReachableStates = (Math.abs(upperBound - lowerBound + 1));
-                } else {
-                    theoNbrOfReachableStates *= (Math.abs(upperBound - lowerBound + 1));
-                }
-
-                if (!var2MinMaxValMap.containsKey(varName)) {
-                    var2MinMaxValMap.put(varName, minMax);
-                }
-
-                int currDomain = -1;
-                if (negativeValuesIncluded) {
-                    final double lb = Math.abs(lowerBound);
-                    final double ub = Math.abs(upperBound);
-
-                    if (ub >= lb) {
-                        currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(ub + 1) / Math.log(2)) + 1));
-                    } else {
-                        currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(lb) / Math.log(2)) + 1));
-                    }
-
-                } else {
-                    currDomain = upperBound + 1;
-                }
-
-                var2domainMap.put(var.getName(), currDomain);
-
-                if (currDomain > domain) {
-                    domain = currDomain;
-                }
-                if (clocks.contains(var) && currDomain > largestClockDomain) {
-                        largestClockDomain = currDomain;
-                }
-            }
+        for (final Proxy sub : components)
+        {
+            if (sub instanceof VariableComponentProxy)
+            {
+				handleVariableComponent((VariableComponentProxy) sub, autCandidateName2Var);
+			}
         }
 
         for (final AbstractSubject sub : module.getComponentListModifiable())
@@ -393,7 +313,126 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         nbrOfEFAsVars = variables.size() + theExAutomata.size();
     }
 
-    int getExpressionValue(final SimpleExpressionProxy expr)
+	private void handleVariableComponent(final VariableComponentProxy var,
+										final Map<String, VariableComponentProxy> autCandidateName2Var)
+	{
+		var2relatedVarsMap.put(var, new ArrayList<VariableComponentProxy>());
+
+		variables.add(var);
+		final String varName = var.getName();
+
+		if (varName.startsWith(FlowerEFABuilder.STAGE_PREFIX)) {
+			stageVars.add(var);
+		}
+
+		if (varName.startsWith(CLOCK_PREFIX)) {
+			clocks.add(var);
+		}
+
+		if (varName.startsWith(PARAM_PREFIX)) {
+			parameters.add(var);
+		}
+
+		ExpressionProxy expr = var.getType();
+		expr = expandNamedConstant(expr);
+
+		int lowerBound = 0;
+		int upperBound = 0;
+
+		if (expr instanceof BinaryExpressionProxy)
+		{
+		  final BinaryExpressionProxy binExpr = (BinaryExpressionProxy) expr;
+		  final BinaryOperator op = binExpr.getOperator();
+		  if (op.equals(CompilerOperatorTable.getInstance().getRangeOperator()))
+		  {
+			lowerBound = getExpressionValue(binExpr.getLeft());
+			upperBound = getExpressionValue(binExpr.getRight());
+		  }
+		  else // This should not be possible
+			throw new IllegalArgumentException("The variable domain is not defined!");
+
+		  if (lowerBound < 0)
+			negativeValuesIncluded = true;
+		}
+		else if (expr instanceof EnumSetExpressionProxy) // non-integer variable, map domain to integer
+		{
+		  nonIntegerVariables.add(varName);
+		  final EnumSetExpressionProxy enumExpr = (EnumSetExpressionProxy) expr;
+		  final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
+		  final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
+		  int mappedIntValue = 0;
+		  lowerBound = mappedIntValue;
+		  upperBound = enumExpr.getItems().size()-1;
+		  for (final SimpleIdentifierProxy identifier : enumExpr.getItems())
+		  {
+			final String instanceName = identifier.getName();
+			final String intString = String.valueOf(mappedIntValue);
+			varInstanceIntMap.put(instanceName, intString);
+			varIntInstanceMap.put(intString, instanceName);
+			mappedIntValue++;
+		  }
+
+		  nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
+		  nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
+
+		  if (varName.contains(LOCAL_VAR_SUFFIX))
+		  {
+			final String nonSuffix = varName.substring(0, varName.indexOf(LOCAL_VAR_SUFFIX));
+			autCandidateName2Var.put(nonSuffix, var);
+		  }
+		}
+		else // This should not be possible
+			throw new IllegalArgumentException("The variable domain is not defined!");
+
+		if (theoNbrOfReachableStates == 0)
+		{
+			theoNbrOfReachableStates = (Math.abs(upperBound - lowerBound + 1));
+		}
+		else
+		{
+			theoNbrOfReachableStates *= (Math.abs(upperBound - lowerBound + 1));
+		}
+
+		// final MinMax minMax = new MinMax(lowerBound, upperBound);
+		if (!var2MinMaxValMap.containsKey(varName))
+		{
+			var2MinMaxValMap.put(varName, new MinMax(lowerBound, upperBound));
+		}
+
+		// int currDomain = -1; // See (2) below
+		int currDomain = upperBound + 1;	// Assign the "else" value already here
+		if (negativeValuesIncluded)
+		{
+			final double lb = Math.abs(lowerBound);
+			final double ub = Math.abs(upperBound);
+
+			if (ub >= lb)
+			{
+				currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(ub + 1) / Math.log(2)) + 1));
+			}
+			else
+			{
+				currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(lb) / Math.log(2)) + 1));
+			}
+		}
+ /* (2) Assign the default value aready when defining teh variable (see above)
+ 		else // negative values not included
+		{
+			currDomain = upperBound + 1;
+		}
+ */
+
+		var2domainMap.put(var.getName(), currDomain);
+
+		if (currDomain > domain) {
+			domain = currDomain;
+		}
+		if (clocks.contains(var) && currDomain > largestClockDomain) {
+			largestClockDomain = currDomain;
+		}
+	}//
+
+    protected int getExpressionValue(final SimpleExpressionProxy expr)
     {
       int bound = 0;
       if (expr instanceof IntConstantProxy) {
@@ -404,7 +443,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
       return bound;
     }
 
-    ExpressionProxy expandNamedConstant(ExpressionProxy expr)
+    protected ExpressionProxy expandNamedConstant(ExpressionProxy expr)
     {
       if (expr instanceof SimpleIdentifierProxy && identifierNameToProxy.containsKey(((SimpleIdentifierProxy) expr).getName())) {
         expr = identifierNameToProxy.get(((SimpleIdentifierProxy) expr).getName()).getExpression();
@@ -481,7 +520,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         domain = d;
     }
 
-    public static String getlocVarSuffix() {
+    public static String getLocVarSuffix() {
         return LOCAL_VAR_SUFFIX;
     }
 

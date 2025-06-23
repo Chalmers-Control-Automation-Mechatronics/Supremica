@@ -70,6 +70,7 @@ import org.apache.logging.log4j.Logger;
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
+import org.supremica.automata.BDD.EFA.BDDPreprocessAV;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.external.tumses.GABlocksRemover;
@@ -79,6 +80,11 @@ import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
+//** MF
+//** Why is this file named EditorSyntehsizerAction? It implements the
+//** Editor > Analyze > Symbolic (BDD) Synthesis/Optimization on TEFAs... menu
+//** NOT a general synthesizer action. This file and class would be better named:
+//** EditorAnalyzeSymbolicSynthesis, or similar
 public class EditorSynthesizerAction extends IDEAction
 {
   private static final long serialVersionUID = 1L;
@@ -117,7 +123,7 @@ public class EditorSynthesizerAction extends IDEAction
 
     final int nbrOfComponents = module.getComponentList().size();
     if (nbrOfComponents == 0) {
-      JOptionPane.showMessageDialog(ide.getFrame(), "Module is empty.");
+      JOptionPane.showMessageDialog(ide.getFrame(), "Module is empty!");
       return;
     }
 
@@ -139,6 +145,30 @@ public class EditorSynthesizerAction extends IDEAction
       }
     }
 
+	/***
+	 * Check if the Automaton Variables Compiler is enabled (Options > GUI > Compiler)
+	 * and if so check if there are any guards using automaton variables,
+	 * and if so, instruct the user to first do away with the automaton variables.
+	 * (See issue #132)
+	***/
+	if(net.sourceforge.waters.model.compiler.CompilerOptions.AUTOMATON_VARIABLES_COMPILER.getValue())
+	{
+		final BDDPreprocessAV preprocAV = new BDDPreprocessAV(module.getComponentList());
+		if(preprocAV.checkAutomatonVariableGuards())
+		{
+			final String msg =	"Automaton Variables Compiler is active\n" +
+								"Currently the BDD-based synthesis cannot\n" +
+								"handle automaton variables, these must be\n" +
+								"first converted to ordinary variable-value\n" +
+								"comparisons";
+			JOptionPane.showMessageDialog(ide.getFrame(),
+											msg,
+											"Unable to handle...",
+											JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+	}
+
     // get the stored or default options
     final EditorSynthesizerOptions options = new EditorSynthesizerOptions();
 
@@ -151,8 +181,11 @@ public class EditorSynthesizerAction extends IDEAction
         eventNames.add(sigmaS.getName());
       }
     }
+	// Setup the "Generate guards for ALL controllable events" drop-down
+    final Vector<String> eventNamesForBox = new Vector<String>(eventNames);
+    eventNamesForBox.add(0, "Generate guards for ALL controllable events");
 
-	// Fill in the "Optimize variable" dropdown list
+	// Collect variable names for the "Optimize variable:" drop-down
     final Vector<String> variableNamesForBox = new Vector<String>();
     variableNamesForBox.add("No variable selected");
     for (final Proxy sub : module.getComponentList()) {
@@ -160,10 +193,6 @@ public class EditorSynthesizerAction extends IDEAction
         variableNamesForBox.add(((VariableComponentProxy) sub).getName());
       }
     }
-
-	// Set the list of events possible to generate guards for
-    final Vector<String> eventNamesForBox = new Vector<String>(eventNames);
-    eventNamesForBox.add(0, "Generate guards for ALL controllable events");
 
     final EditorSynthesizerDialog synthesizerDialog =
       new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options,
@@ -279,6 +308,7 @@ public class EditorSynthesizerAction extends IDEAction
         saveFile = getSaveFile(module.getName()); // might return null
         if (saveFile == null) // user canceled, don't save
           saveInFile = false;
+
       }
 
 
