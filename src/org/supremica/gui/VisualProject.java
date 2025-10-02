@@ -63,9 +63,9 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.properties.Config;
 import org.supremica.util.ResourceClassLoader;
 import org.supremica.util.SupremicaException;
+import org.supremica.gui.ide.IDE;
 
 import org.swixml.SwingEngine;
-
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -318,7 +318,7 @@ public class VisualProject
             msg = EncodingHelper.linebreakAdjust(msg);
 
             final Object[] options = { "Continue", "Abort" };
-            final int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+            final int response = JOptionPane.showOptionDialog(IDE.getTheIDE(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
             if(response == JOptionPane.NO_OPTION)
             {
                 return false; // user chose to "Abort"

@@ -403,22 +403,18 @@ public class IDE
                   Runtime.getRuntime().freeMemory()/mb + "/" +
                   Runtime.getRuntime().totalMemory()/mb + "/" +
                   Runtime.getRuntime().maxMemory()/mb + " MiB");
-//		java.io.File cb = new java.io.File("../src/org/supremica/currentbranch.txt");
-//		if(cb.exists() && !cb.isDirectory())
-//		{
-	try
-	{
-			java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader("../src/org/supremica/currentbranch.txt"));
+
+		try(java.io.FileReader fr = new java.io.FileReader("currentbranch.txt");
+			java.io.BufferedReader br = new java.io.BufferedReader(fr))
+		{
 			final String branch = br.readLine();
-			br.close();
+			// br.close(); // No need for this as we use try-with-resources
 			logger.info("Branch: " + branch);
-			//logger.info("Branch: AutomataVariablesBDD");
-	}
-	catch(java.io.IOException excp)
-	{
-		// Just silently ignore
-	}
-//		}
+		}
+		catch(java.io.IOException excp)
+		{
+			// Just silently ignore, AutoCloseable will auto-close
+		}
     }
   }
 

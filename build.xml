@@ -74,6 +74,10 @@
         </classpath>
     </taskdef>
     
+    <!-- For using Git in the gitbranch target -->
+    <property environment="env" />
+    <property name="gitpath" value="${env.GIT_HOME}" />
+    <property name="gitcmd" value="git-cmd.exe" />
 
     <!-- Build Instructions -->
     <!-- 
@@ -898,21 +902,22 @@ Class-Path: ${manifest.pathlist}</echo>
         the compiled code to let us know which branch it comes from.
     -->
     <target name="gitbranch">
-        <exec executable="C:\Users\Fabian\Desktop\Portable\Git\git-cmd.exe" output="R:\branch.txt">
+        <tempfile property="temp.file" deleteonexit="true" />
+        <exec executable="${gitpath}\${gitcmd}" output="${temp.file}">
             <arg value="git branch --show-current"/>
         </exec>
         <!-- For some reason the above command generates three lines of text,
-            of which only the first lien is the name of teh current branch. So
+            of which only the first line is the name of teh current branch. So
             we filter...
         -->
-        <loadfile property="currbranch" srcfile="R:\branch.txt">
+        <loadfile property="currbranch" srcfile="${temp.file}">
             <filterchain>
                 <filterreader classname="org.apache.tools.ant.filters.HeadFilter">
                     <param name="lines" value="1" />
                 </filterreader>
             </filterchain>
         </loadfile>
-        <echo file="${src}/${supremica_basedir}/currentbranch.txt">${currbranch}</echo>
+        <echo file="${dist}/currentbranch.txt">${currbranch}</echo>
     </target>
 </project>
 
