@@ -86,19 +86,20 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	JPanel traversing_algorithms;
 	private final JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
 	private final JRadioButton verticalButton = new JRadioButton("Vertical traversing");
+
+	private final String XCATMOUSE = "Ext Cat & Mouse";
 	private static Logger logger = LogManager.getLogger(ExtCatMousePanel.class);
 
 	public ExtCatMousePanel()
 	{
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
-		num_users
-				.add(new JLabel("     Number of levels: "), BorderLayout.NORTH);
+		num_users.add(new JLabel("     Number of levels: "), BorderLayout.NORTH);
 		num_users.add(int_num_levels, BorderLayout.NORTH);
 
 		final JPanel stepsL = new JPanel();
 		stepsL.add(new JLabel(
-				"stepL (increasement of number levels for each instance): "),
+				"stepL (increment of number levels for each instance): "),
 				BorderLayout.SOUTH);
 		stepsL.add(int_step_levels, BorderLayout.SOUTH);
 		int_step_levels.setEnabled(false);
@@ -176,7 +177,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	@Override
 	public void synthesizeSupervisor(final IDE ide) throws Exception
 	{
-		int number_of_cats = int_num.get();
+		int number_of_cats = num_cats.get();
 		int number_of_levels = int_num_levels.get();
 		final int number_of_instances = int_numberOfInstances.get();
 
@@ -210,14 +211,14 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 			finalNbrOfInstances = int_N.get() * int_K.get();
 			p = new Point[finalNbrOfInstances];
 			if (zigzagButton.isSelected())
-				util.zigzagTraversing(p, 0, int_num.get(),
-						int_num_levels.get(), 0, 1, int_num.get(),
+				util.zigzagTraversing(p, 0, num_cats.get(),
+						int_num_levels.get(), 0, 1, num_cats.get(),
 						int_num_levels.get(), int_N.get(), int_K.get(), true);
-			// util.zigzagTraversing(p,0,int_num.get(),int_num_levels.get(),-1,1,1,1,int_N.get(),int_K.get(),true);
+			// util.zigzagTraversing(p,0,num_cats.get(),int_num_levels.get(),-1,1,1,1,int_N.get(),int_K.get(),true);
 
 			if (verticalButton.isSelected())
-				util.verticalTraversing(p, 0, int_num.get(), int_num_levels
-						.get(), int_num.get(), int_num_levels.get(), int_N
+				util.verticalTraversing(p, 0, num_cats.get(), int_num_levels
+						.get(), num_cats.get(), int_num_levels.get(), int_N
 						.get(), int_K.get());
 		} else {
 			finalNbrOfInstances = number_of_instances;
@@ -237,7 +238,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 				number_of_cats = p[i].y;
 				number_of_levels = p[i].x;
 			} else {
-				number_of_cats = i * int_step_cats.get() + int_num.get();
+				number_of_cats = i * int_step_cats.get() + num_cats.get();
 				number_of_levels = i * int_step_levels.get()
 						+ int_num_levels.get();
 			}
@@ -251,7 +252,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 			result_text += " " + number_of_levels + "\t";
 
 			// INSTANCE GENERATION
-			final ExtCatMouse ecm = new ExtCatMouse(number_of_cats, number_of_levels);
+			final ExtCatMouse ecm = new ExtCatMouse(XCATMOUSE, number_of_cats, number_of_levels);
 			// INSTANCE GENERATION
 
 			if (chooseSynthesisAlgorithmManually.isSelected()) {
@@ -295,10 +296,20 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		result.setVisible(true);
 	}
 
-	@Override
-	public Project generateAutomata() throws Exception
+/*	@Override
+	public int howMany()
 	{
-		final ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
+		return int_numberOfInstances.get();
+	}*/ // Inherited from CatMousePanel, methinks
+
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
+		int cats = num_cats.get() + n*int_step_cats.get();
+		int levels = int_num_levels.get() + n*int_step_levels.get();
+		final String name = new String(XCATMOUSE + " (" + cats + ", " + levels + ")");
+
+		final ExtCatMouse cm = new ExtCatMouse(name, cats, levels);
 		return cm.getProject();
 	}
 
@@ -307,7 +318,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	{
 		final ExtCatMousePanel cmp = new ExtCatMousePanel();
 		javax.swing.JOptionPane.showMessageDialog(null, cmp, "CatMousePanel.java", javax.swing.JOptionPane.PLAIN_MESSAGE);
-		System.out.println("Number of cats (and mice): " + cmp.int_num.get());
+		System.out.println("Number of cats (and mice): " + cmp.num_cats.get());
 		System.out.println("Use forbidden self-loops: " + (cmp.selfloops.isSelected() ? "true" : "false"));
 		System.out.println("Multiple instances: " + (cmp.multiple.isSelected() ? "true" : "false"));
 		System.out.println("Step increment of number of cats (and mice): " + cmp.int_step_cats.get());

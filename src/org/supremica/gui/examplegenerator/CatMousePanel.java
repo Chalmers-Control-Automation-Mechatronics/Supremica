@@ -55,7 +55,7 @@ import org.supremica.testcases.CatMouse;
 class CatMousePanel extends JPanel implements TestCase, ActionListener
 {
 	private static final long serialVersionUID = 1L;
-	protected final IntegerField int_num = new IntegerField("1", 6);
+	protected final IntegerField num_cats = new IntegerField("1", 6);
 	protected final IntegerField int_step_cats = new IntegerField("0", 6);
 	protected final IntegerField int_numberOfInstances = new IntegerField("1", 6);
 	protected final JCheckBox multiple = new JCheckBox("Multiple instances", false);
@@ -64,6 +64,8 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 	private final JPanel steps;
 	protected final Box theBox;
 	protected final JPanel numberOfInstances;
+
+	private final String CATMOUSE = "Cat & Mouse";
 
 	private static final Logger logger = LogManager.getLogger(CatMousePanel.class);
 
@@ -75,7 +77,7 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 		num_users = new JPanel();
 		num_users.add(new JLabel("Number of cats (and mice): "),
 				BorderLayout.NORTH);
-		num_users.add(int_num, BorderLayout.NORTH);
+		num_users.add(num_cats, BorderLayout.NORTH);
 
 		final JPanel multiplePanel = new JPanel();
 		multiplePanel.add(selfloops);
@@ -86,10 +88,7 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 		multiple.addActionListener(this);
 
 		steps = new JPanel();
-		steps
-				.add(
-						new JLabel(
-								"step (increasement of number of cats (and mice) for each instance): "),
+		steps.add(new JLabel("step (increment of number of cats (and mice) for each instance): "),
 						BorderLayout.NORTH);
 		steps.add(int_step_cats, BorderLayout.SOUTH);
 		int_step_cats.setEnabled(false);
@@ -111,7 +110,7 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 	@Override
 	public void synthesizeSupervisor(final IDE ide) throws Exception {
 		// TODO: implement this one
-		logger.warn("Not implemented");
+		logger.warn("No direct synthesis for this test case.");
 	}
 
 	@Override
@@ -129,10 +128,23 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 		}
 	}
 
+
 	@Override
-	public Project generateAutomata() throws Exception
+	public int howMany()
 	{
-		final CatMouse cm = new CatMouse(int_num.get(), selfloops.isSelected());
+		return int_numberOfInstances.get();
+	}
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
+		String name = new String(CATMOUSE);
+		int cats = num_cats.get() + n*int_step_cats.get();
+
+		if(howMany() > 1)
+		{
+			name = new String(CATMOUSE + " (" + cats + ")");
+		}
+		final CatMouse cm = new CatMouse(name, cats, selfloops.isSelected());
 		return cm.getProject();
 	}
 
@@ -141,7 +153,7 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 	{
 		final CatMousePanel cmp = new CatMousePanel();
 		javax.swing.JOptionPane.showMessageDialog(null, cmp, "CatMousePanel.java", javax.swing.JOptionPane.PLAIN_MESSAGE);
-		System.out.println("Number of cats (and mice): " + cmp.int_num.get());
+		System.out.println("Number of cats (and mice): " + cmp.num_cats.get());
 		System.out.println("Use forbidden self-loops: " + (cmp.selfloops.isSelected() ? "true" : "false"));
 		System.out.println("Multiple instances: " + (cmp.multiple.isSelected() ? "true" : "false"));
 		System.out.println("Step increment of number of cats (and mice): " + cmp.int_step_cats.get());

@@ -251,8 +251,12 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 
 	}
 
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
 	@Override
-  public Project generateAutomata() throws Exception {
+  public Project generateAutomata(int n) throws Exception {
 		final ExtDiningPhilosophers dp = new ExtDiningPhilosophers(i_l_take
 				.isSelected(), int_num.get(), int_interm_num.get(), l_take
 				.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put

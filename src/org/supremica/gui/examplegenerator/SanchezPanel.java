@@ -43,6 +43,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.SanchezTestCase;
@@ -54,7 +57,10 @@ class SanchezPanel extends JPanel implements TestCase {
 	static final String[] choice_items = { "#1: Async prod", "#2: Synch prod",
 			"#3: SupC" };
 
-	public SanchezPanel() {
+	private static Logger logger = LogManager.getLogger(SanchezPanel.class);
+
+	public SanchezPanel()
+	{
 		final JPanel panel = new JPanel(new GridLayout(3, 2));
 
 		add(panel, BorderLayout.NORTH);
@@ -68,10 +74,19 @@ class SanchezPanel extends JPanel implements TestCase {
 		panel.add(choice = new JComboBox<String> (choice_items));
 	}
 
-	public void synthesizeSupervisor(final IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		final int p = int_blocks.get();
 		final int type = choice.getSelectedIndex();
 		final SanchezTestCase stc = new SanchezTestCase(p, type);

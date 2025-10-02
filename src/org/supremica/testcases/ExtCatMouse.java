@@ -65,21 +65,22 @@ class Level extends Room
 
 public class ExtCatMouse
 {
-    final Project project = new Project("Extended Cat Mouse");
+    final Project project; // = new Project("Extended Cat Mouse");
     final Automata theAutomata = new Automata();
     final int number_of_levels, number_of_cats;
 
     static int MODEL_ID = 4;
 
-	public ExtCatMouse(final int num, final int num_levels)
+	public ExtCatMouse(final String name, final int num, final int num_levels)
 		throws Exception
 	{
-		this(num, num_levels, false);
+		this(name, num, num_levels, false);
 	}
 
-    public ExtCatMouse(final int num, final int num_levels, final boolean use_selfloops)
+    public ExtCatMouse(final String name, final int num, final int num_levels, final boolean use_selfloops)
         throws Exception
     {
+		this.project = new Project(name);
         // Add comment
         project.setComment("Consider the cat and mouse problem. Assume this five rooms maze is just the first level of a tower composed by n identical levels. A controllable bidirectional passageway connects room j of level 5*i+j to room j of  5*i+j+1 (for i = 0, 1, 2   ..., and   j = 1, 2, 3, 4, 5). The first level is only connected with the second, the last level is only connected with the last-but-one. There are initially k cats in room 1 of the first level and k mice in room 5 of the last level.");
 
@@ -194,7 +195,7 @@ public class ExtCatMouse
 	{
 		try
 		{
-			final ExtCatMouse cm = new ExtCatMouse(1, 1, true);
+			final ExtCatMouse cm = new ExtCatMouse("Exte Cat & Mouse", 1, 1, true);
 			System.out.println(cm.project.toString());
 			for(int i = 0; i < cm.project.nbrOfAutomata(); i++)
 			{
