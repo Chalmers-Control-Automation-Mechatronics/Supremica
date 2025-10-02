@@ -136,7 +136,7 @@ class ExampleTab
         addTab("Philos", null, new PhilosPanel(), "Dininig philosophers");
         addTab("ExtPhilos", null, new ExtPhilosPanel(), "Extended Dininig philosophers");
         addTab("CatMouse", null, new CatMousePanel(), "Cat & Muuse");
-        addTab("ExtCatMouse", null, new ExtCatMousePanel(), "Extended Cat & Mouse");
+        addTab("ExtCatMouse", null, new ExtCatMousePanel(), "Extended Cat && Mouse");
         addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
         addTab("Sticks game", null, new StickGamePanel(), "Stick picking game");
         addTab("Transfer line", null, new TransferLinePanel(), "Transfer line");
@@ -303,25 +303,29 @@ public class TestCasesDialog
 
         // We know that this is actually also a TestCase (right?)
         final TestCase tc = (TestCase) comp;
+		int howmany = tc.howMany();
 
         setVisible(false);
 
-        project = tc.generateAutomata();    // Should return a Project (named)
+		for(int i = 0; i < howmany; i++)
+        {
+			project = tc.generateAutomata(i);    // Should return a Project (named)
 
 //        System.out.println("Name of project: "+project);
 
-        if (gui instanceof Gui)
-        {
-            ((Gui) gui).addProject(project);
-        }
-        else if (gui instanceof IDE)
-        {
-            final IDE ide = (IDE) gui;
-            final Project project = getProject();
-            final DocumentContainerManager manager =
-                ide.getDocumentContainerManager();
-	    manager.newContainer(project);
-        }
+			if (gui instanceof Gui)
+			{
+				((Gui) gui).addProject(project);
+			}
+			else if (gui instanceof IDE)
+			{
+				final IDE ide = (IDE) gui;
+				final Project project = getProject();
+				final DocumentContainerManager manager =
+					ide.getDocumentContainerManager();
+				manager.newContainer(project);
+			}
+		}
         dispose();
     }
 

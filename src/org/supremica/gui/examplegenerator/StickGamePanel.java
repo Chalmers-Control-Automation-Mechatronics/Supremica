@@ -41,6 +41,9 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.StickPickingGame;
@@ -49,6 +52,8 @@ class StickGamePanel extends JPanel implements TestCase {
 	private static final long serialVersionUID = 1L;
 	IntegerField num_players = new IntegerField("2", 6);
 	IntegerField num_sticks = new IntegerField("7", 6);
+
+	private static Logger logger = LogManager.getLogger(StickGamePanel.class);
 
 	StickGamePanel() {
 		JPanel panel = new JPanel(new GridLayout(2, 2));
@@ -60,10 +65,18 @@ class StickGamePanel extends JPanel implements TestCase {
 		panel.add(num_sticks);
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception {
 
 		// System.err.println("SticksGamePanel::doIt()");
 		StickPickingGame spg = new StickPickingGame(num_players.get(),

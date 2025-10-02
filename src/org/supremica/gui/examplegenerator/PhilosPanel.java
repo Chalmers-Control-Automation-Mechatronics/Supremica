@@ -43,6 +43,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.DiningPhilosophers;
@@ -59,6 +62,8 @@ class PhilosPanel extends JPanel implements TestCase {
 	JCheckBox memory = new JCheckBox("Forks have memory", false);
 	JCheckBox multiple = new JCheckBox("Multiple instances", false);
 	Util util = new Util();
+
+	private static Logger logger = LogManager.getLogger(PhilosPanel.class);
 
 	public PhilosPanel() {
 		// super(new GridLayout(2, 1, 10, 10));
@@ -89,10 +94,19 @@ class PhilosPanel extends JPanel implements TestCase {
 		add(theBox, BorderLayout.NORTH);
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis for this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take
 				.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put
 				.isSelected(), animation.isSelected(), memory.isSelected());

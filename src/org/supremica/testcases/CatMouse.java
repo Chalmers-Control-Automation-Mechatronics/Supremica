@@ -943,22 +943,23 @@ class Room implements RoomBuilder
 
 public class CatMouse
 {
-    private final Project project = new Project("Cat & Mouse");
+    private final Project project; // = new Project("Cat & Mouse");
     final static int NUMBER_OF_ROOMS = 5;
 	private final static String X_SPEC_NAME = "x:SpecC&M";
 
     // These are helpers for counting modulo num philos/forks
     // Note that we adjust for 0's, indices are from 1 to modulo
 
-	public CatMouse(final int num)
+	public CatMouse(final String name, final int num)
 		throws Exception
 	{
-		this(num, false); // Build the model with the Room specs (instead of self-looped forbidden states)
+		this(name, num, false); // Build the model with the Room specs (instead of self-looped forbidden states)
 	}
 
-	public CatMouse(final int num, final boolean use_selfloops)
+	public CatMouse(final String name, final int num, final boolean use_selfloops)
 		throws Exception
 	{
+		this.project = new Project(name);
         project.setComment("The cat and mouse problem. The cat and mouse must never be in the same room. " +
 			"This is specified 'locally', by the five specifications for the different rooms. " +
 			"Since this is a static specification, this can also be expressed 'globally' " +
@@ -1067,7 +1068,7 @@ public class CatMouse
     private static void testCatMouse()
 		throws Exception
 	{
-		final CatMouse cm = new CatMouse(1, true);
+		final CatMouse cm = new CatMouse("Cat & Mouse", 1, true);
 		System.out.println(cm.project.toString());
 		for(int i = 0; i < cm.project.nbrOfAutomata(); i++)
 		{

@@ -44,6 +44,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
@@ -57,7 +60,10 @@ class WarehousePanel extends JPanel implements TestCase {
 	SelectEventsWindow selectOperatorEventsWindow = null;
 	SelectEventsWindow selectUnobservableEventsWindow = null;
 
-	WarehousePanel() {
+	private static Logger logger = LogManager.getLogger(WarehousePanel.class);
+
+	WarehousePanel()
+	{
 		JPanel panel = new JPanel(new GridLayout(3, 2));
 
 		add(panel, BorderLayout.WEST);
@@ -108,10 +114,19 @@ class WarehousePanel extends JPanel implements TestCase {
 		panel.add(selectUnobservableEventsButton);
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		warehouse.setK(nbr_events_k.get());
 		warehouse.setM(nbr_events_m.get());
 
