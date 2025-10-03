@@ -394,15 +394,22 @@ public class IDE
   private void initializeLoggers(final boolean showVersionInLogPanel)
   {
     IDEAppender.configure(mLogPanel);
-    if (showVersionInLogPanel) {
-      final Logger logger = LogManager.getLogger();
-      logger.info(Version.getInstance().toString());
-      final int mb = 1024 * 1024;
-      logger.info("JVM:" + System.getProperty("java.version") +
-                  ", Free/Total/Max mem: " +
-                  Runtime.getRuntime().freeMemory()/mb + "/" +
-                  Runtime.getRuntime().totalMemory()/mb + "/" +
-                  Runtime.getRuntime().maxMemory()/mb + " MiB");
+    if (showVersionInLogPanel)
+    {
+		showVersionInfo();
+    }
+  }
+
+	public void showVersionInfo()
+	{
+	  final Logger logger = LogManager.getLogger();
+	  logger.info(Version.getInstance().toString());
+	  final int mb = 1024 * 1024;
+	  logger.info("JVM:" + System.getProperty("java.version") +
+				  ", Free/Total/Max mem: " +
+				  Runtime.getRuntime().freeMemory()/mb + "/" +
+				  Runtime.getRuntime().totalMemory()/mb + "/" +
+				  Runtime.getRuntime().maxMemory()/mb + " MiB");
 
 		try(java.io.FileReader fr = new java.io.FileReader("currentbranch.txt");
 			java.io.BufferedReader br = new java.io.BufferedReader(fr))
@@ -415,9 +422,7 @@ public class IDE
 		{
 			// Just silently ignore, AutoCloseable will auto-close
 		}
-    }
-  }
-
+	}
 
   //#########################################################################
   //# Main Program

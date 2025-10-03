@@ -71,6 +71,7 @@ public class LogClearAction
     final IDE ide = getIDE();
     final LogPanel panel = ide.getLogPanel();
     panel.clear();
+    getIDE().showVersionInfo();
   }
 
 
