@@ -46,6 +46,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.AllocationBatch;
@@ -56,7 +59,10 @@ class AllocationBatchPanel extends JPanel implements TestCase, ActionListener {
 	JTextField filename;
 	JButton browse;
 
-	AllocationBatchPanel() {
+	private static Logger logger = LogManager.getLogger(AllocationBatchPanel.class);
+
+	AllocationBatchPanel()
+	{
 		super(new BorderLayout(10, 10));
 
 		JPanel pCenter = new JPanel(new GridLayout(4, 2));
@@ -71,10 +77,17 @@ class AllocationBatchPanel extends JPanel implements TestCase, ActionListener {
 				BorderLayout.NORTH);
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
-
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception {
 		String file = filename.getText();
 
 		if (file.length() > 0) {
