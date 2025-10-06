@@ -41,7 +41,18 @@ import org.supremica.gui.ide.IDE;
 
 interface TestCase
 {
-  Project generateAutomata() throws Exception;
+	/*
+	 * Some test cases can generate multiple projects
+	 * For howMany() the test case returns how many projects
+	 * For generateAutomata(n), the test case returns project number n
+	 * It is guaranteed that 0 <= n < howMany()
+	 */
+	default int howMany() { return 1; }
+	Project generateAutomata(int n) throws Exception;
 
-  void synthesizeSupervisor(IDE ide) throws Exception;
+	/*
+	 * Multiple test cases do not work the same for direct synthesis
+	 * That case is left entirely up to the test case to handle
+	 */
+	void synthesizeSupervisor(IDE ide) throws Exception;
 }

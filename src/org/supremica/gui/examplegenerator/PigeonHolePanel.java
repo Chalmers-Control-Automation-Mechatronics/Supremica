@@ -42,6 +42,9 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.PigeonHole;
@@ -52,7 +55,10 @@ class PigeonHolePanel extends JPanel implements TestCase {
 	IntegerField int_pigeons = null;
 	IntegerField int_holes = null;
 
-	public PigeonHolePanel() {
+	private static Logger logger = LogManager.getLogger(ExtPhilosPanel.class);
+
+	public PigeonHolePanel()
+	{
 		Box theBox = Box.createVerticalBox();
 
 		add(theBox, BorderLayout.NORTH);
@@ -72,10 +78,19 @@ class PigeonHolePanel extends JPanel implements TestCase {
 		theBox.add(panel);
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		int p = int_pigeons.get();
 		int h = int_holes.get();
 

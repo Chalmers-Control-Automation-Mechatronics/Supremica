@@ -42,6 +42,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.TransferLine;
@@ -52,6 +55,8 @@ class TransferLinePanel extends JPanel implements TestCase {
 	IntegerField int_cap1 = null;
 	IntegerField int_cap2 = null;
 	IntegerField int_cells = null;
+
+	private static Logger logger = LogManager.getLogger(TransferLinePanel.class);
 
 	// <<<<<<< TestCasesDialog.java
 	// IntegerField int_caps = null; // Gromyko, Pistore, Traverno allow
@@ -77,10 +82,19 @@ class TransferLinePanel extends JPanel implements TestCase {
 		panel.add(int_cap2 = new IntegerField("1", 5));
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		int cap1 = int_cap1.get();
 		int cap2 = int_cap2.get();
 
@@ -89,7 +103,6 @@ class TransferLinePanel extends JPanel implements TestCase {
 		}
 
 		TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2, false);
-
 		return tl.getProject();
 	}
 }

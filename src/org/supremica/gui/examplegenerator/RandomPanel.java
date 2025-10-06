@@ -41,6 +41,9 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.RandomAutomata;
@@ -52,7 +55,10 @@ class RandomPanel extends JPanel implements TestCase {
 	IntegerField int_events = null;
 	DoubleField dbl_dens = null;
 
-	public RandomPanel() {
+	private static Logger logger = LogManager.getLogger(RandomPanel.class);
+
+	public RandomPanel()
+	{
 		JPanel panel = new JPanel(new GridLayout(4, 2));
 
 		add(panel, BorderLayout.WEST);
@@ -65,11 +71,19 @@ class RandomPanel extends JPanel implements TestCase {
 		panel.add(new JLabel("Deterministic transition-density: "));
 		panel.add(dbl_dens = new DoubleField("0.75", 6));
 	}
-
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		RandomAutomata ra = new RandomAutomata(int_num.get(), int_size.get(),
 				int_events.get(), dbl_dens.get());
 

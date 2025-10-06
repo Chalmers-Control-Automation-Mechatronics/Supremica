@@ -394,34 +394,35 @@ public class IDE
   private void initializeLoggers(final boolean showVersionInLogPanel)
   {
     IDEAppender.configure(mLogPanel);
-    if (showVersionInLogPanel) {
-      final Logger logger = LogManager.getLogger();
-      logger.info(Version.getInstance().toString());
-      final int mb = 1024 * 1024;
-      logger.info("JVM:" + System.getProperty("java.version") +
-                  ", Free/Total/Max mem: " +
-                  Runtime.getRuntime().freeMemory()/mb + "/" +
-                  Runtime.getRuntime().totalMemory()/mb + "/" +
-                  Runtime.getRuntime().maxMemory()/mb + " MiB");
-//		java.io.File cb = new java.io.File("../src/org/supremica/currentbranch.txt");
-//		if(cb.exists() && !cb.isDirectory())
-//		{
-	try
-	{
-			java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader("../src/org/supremica/currentbranch.txt"));
-			final String branch = br.readLine();
-			br.close();
-			logger.info("Branch: " + branch);
-			//logger.info("Branch: AutomataVariablesBDD");
-	}
-	catch(java.io.IOException excp)
-	{
-		// Just silently ignore
-	}
-//		}
+    if (showVersionInLogPanel)
+    {
+		showVersionInfo();
     }
   }
 
+	public void showVersionInfo()
+	{
+	  final Logger logger = LogManager.getLogger();
+	  logger.info(Version.getInstance().toString());
+	  final int mb = 1024 * 1024;
+	  logger.info("JVM:" + System.getProperty("java.version") +
+				  ", Free/Total/Max mem: " +
+				  Runtime.getRuntime().freeMemory()/mb + "/" +
+				  Runtime.getRuntime().totalMemory()/mb + "/" +
+				  Runtime.getRuntime().maxMemory()/mb + " MiB");
+
+		try(java.io.FileReader fr = new java.io.FileReader("currentbranch.txt");
+			java.io.BufferedReader br = new java.io.BufferedReader(fr))
+		{
+			final String branch = br.readLine();
+			// br.close(); // No need for this as we use try-with-resources
+			logger.info("Branch: " + branch);
+		}
+		catch(java.io.IOException excp)
+		{
+			// Just silently ignore, AutoCloseable will auto-close
+		}
+	}
 
   //#########################################################################
   //# Main Program

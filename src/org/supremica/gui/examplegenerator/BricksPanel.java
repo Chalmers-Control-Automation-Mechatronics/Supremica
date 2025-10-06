@@ -41,6 +41,9 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.BricksGame;
@@ -49,6 +52,8 @@ class BricksPanel extends JPanel implements TestCase {
 	private static final long serialVersionUID = 1L;
 	IntegerField num_rows = new IntegerField("4", 6);
 	IntegerField num_cols = new IntegerField("4", 6);
+
+	private static Logger logger = LogManager.getLogger(BricksPanel.class);
 
 	BricksPanel() {
 		JPanel panel = new JPanel(new GridLayout(2, 2));
@@ -60,12 +65,18 @@ class BricksPanel extends JPanel implements TestCase {
 		panel.add(num_cols);
 	}
 
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
-
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override	public Project generateAutomata(int n) throws Exception
+	{
 		BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
-
 		return bg.getProject();
 	}
 }

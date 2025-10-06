@@ -43,11 +43,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.Users;
 
-class UsersPanel extends JPanel implements TestCase 
+class UsersPanel extends JPanel implements TestCase
 {
 	private static final long serialVersionUID = 1L;
 	IntegerField int_num = null;
@@ -55,9 +58,10 @@ class UsersPanel extends JPanel implements TestCase
 	JCheckBox req = new JCheckBox("request (a)");
 	JCheckBox acc = new JCheckBox("access  (b)", true);
 	JCheckBox rel = new JCheckBox("release (c)");
+	private static Logger logger = LogManager.getLogger(UsersPanel.class);
 
 	public UsersPanel()
-        {
+    {
 		JPanel cont = new JPanel();
 
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
@@ -71,17 +75,25 @@ class UsersPanel extends JPanel implements TestCase
 		num_users.add(new JLabel("Number of users: "));
 		num_users.add(int_num = new IntegerField("3", 6));
 
-                Box theBox = Box.createVerticalBox();
+        Box theBox = Box.createVerticalBox();
 		theBox.add(cont);
 		theBox.add(num_users);
 		add(theBox, BorderLayout.NORTH);
 
 	}
-
-	public void synthesizeSupervisor(IDE ide) {
+	@Override
+	public void synthesizeSupervisor(IDE ide)
+	{
+		logger.warn("No direct synthesis in this test case");
 	}
 
-	public Project generateAutomata() throws Exception {
+	/*
+	 * Only one project is created, so we rely on default implementation of howMany()
+	 * and disregard the n sent to generateAutomata
+	 */
+	@Override
+	public Project generateAutomata(int n) throws Exception
+	{
 		Users users = new Users(int_num.get(), int_rsc.get(), req.isSelected(),
 				acc.isSelected(), rel.isSelected());
 
