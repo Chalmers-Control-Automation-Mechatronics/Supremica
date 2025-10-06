@@ -821,7 +821,7 @@ class CatMousePanel
     public Project doIt()
     throws Exception
     {
-        final CatMouse cm = new CatMouse(int_num.get());
+        final CatMouse cm = new CatMouse("Cat & Mouse", int_num.get());
 
         return cm.getProject();
     }
@@ -1009,7 +1009,7 @@ class ExtCatMousePanel
             result_text += " "+number_of_levels+"\t";
 
             //INSTANCE GENERATION
-            ecm = new ExtCatMouse(number_of_cats, number_of_levels);
+            ecm = new ExtCatMouse("Ext Cat & Mouse", number_of_cats, number_of_levels);
             //INSTANCE GENERATION
 
             if(synth_algorithm.isSelected())
@@ -1061,7 +1061,7 @@ class ExtCatMousePanel
     public Project doIt()
     throws Exception
     {
-        final ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
+        final ExtCatMouse cm = new ExtCatMouse("Ext Cat & Mouse", int_num.get(), int_num_levels.get());
         return cm.getProject();
     }
 
@@ -1593,7 +1593,12 @@ class ExampleTab
         //addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
     }
 }
-
+/** (MF)
+ * What is this org.supremica.gui.TestCasesDialog?
+ * It seems to do the same thing as
+ * org.supremica.gui.examplegenerator.TestCasesDialog
+ * Why do we need two? Is it ever called?
+ **/
 public class TestCasesDialog
     extends JDialog
 {
@@ -1610,7 +1615,7 @@ public class TestCasesDialog
 
         ComputeButton()
         {
-            super("Synthesize");
+            super("Synthesize!");
 
             setToolTipText("Run the example for multiple instances");
             addActionListener(new ActionListener()
@@ -1648,7 +1653,7 @@ public class TestCasesDialog
 
         DoitButton()
         {
-            super("Do it");
+            super("Do it!");
 
             setToolTipText("Go ahead and do it");
             addActionListener(new ActionListener()
