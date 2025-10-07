@@ -39,8 +39,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -326,6 +324,7 @@ public final class ExecutionDialog
 
   //#########################################################################
   //# Class Constants
+  @SuppressWarnings("unused")
   private static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(250, 120);
   private static final long serialVersionUID = 1L;
 

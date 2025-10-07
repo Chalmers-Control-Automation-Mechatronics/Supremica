@@ -1,696 +1,696 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="processing_test" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>Substem of faults3 model, created by Jeroen van Willigen, received 2018-11-03.
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="processing_test">
+<B:Comment>Subsystem of faults3 model, created by Jeroen van Willigen, received 2018-11-03.
 The subsystem is controllable and nonblocking and deadlock-free.
 Is is diagnosable.
-It has 56 reachable states and the diameter is 39.</ns2:Comment>
-    <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="p_repair"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="p_timer"/>
-        <EventDecl Kind="CONTROLLABLE" Name="pa_test.off"/>
-        <EventDecl Kind="CONTROLLABLE" Name="pa_test.on"/>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="pf_test_ok_on">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="FAULT"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="ps_test_ok.on"/>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="pv_allow_test">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="pv_testing_finished_not_ok">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="pv_testing_finished_ok">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-    </EventDeclList>
-    <ComponentList>
-        <SimpleComponent Kind="SPEC" Name="pi_test">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="154" Y="136"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-22" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="2">
-                        <PointGeometry>
-                            <Point X="345" Y="136"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="2" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_not_ok"/>
-                            <SimpleIdentifier Name="pv_testing_finished_ok"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-54" Y="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="246" Y="197"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_allow_test"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="-23"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="247" Y="71"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:Interface"/>
-            </ns2:AttributeMap>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="pr1_test_sequence">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="277" Y="92"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="2">
-                        <PointGeometry>
-                            <Point X="530" Y="92"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="12" Y="-14"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="3">
-                        <PointGeometry>
-                            <Point X="656" Y="218"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="4">
-                        <PointGeometry>
-                            <Point X="531" Y="343"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="5">
-                        <PointGeometry>
-                            <Point X="279" Y="342"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="6">
-                        <PointGeometry>
-                            <Point X="154" Y="218"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-30" Y="-17"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="3" Target="4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="p_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-1" Y="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="2" Target="3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="4" Target="5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-48" Y="6"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="1" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_allow_test"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="-27"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="5" Target="6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="p_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-54" Y="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="6" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_not_ok"/>
-                            <SimpleIdentifier Name="pv_testing_finished_ok"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-165" Y="-35"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="pr2_communicate_product_check">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="158" Y="119"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-26" Y="1"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="2">
-                        <PointGeometry>
-                            <Point X="347" Y="119"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="2" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_ok"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-63" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="252" Y="180"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_not_ok"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="158" Y="60"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ps_test_ok.on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-37" Y="-21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="252" Y="55"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="pr_repair">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="97" Y="159"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-18" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="316" Y="159"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="206" Y="316"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_ok"/>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="97" Y="100"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="0" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_not_ok"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-75" Y="-25"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="2" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="p_repair"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-73" Y="-7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_ok"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-88" Y="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="1" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pv_testing_finished_not_ok"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="4" Y="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="1" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="316" Y="100"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="p_stochastics">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="300" Y="201"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="159" Y="203"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="452" Y="197"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="1" Target="3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ps_test_ok.on"/>
-                            <SimpleIdentifier Name="pf_test_ok_on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-50" Y="11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="318" Y="300"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="3" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="387" Y="199"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="2" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="2" Target="3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ps_test_ok.on"/>
-                            <SimpleIdentifier Name="pf_test_ok_on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-45" Y="-40"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="381" Y="159"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="p_test_fault">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="158" Y="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="157" Y="287"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="346" Y="286"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="347" Y="95"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="2" Target="3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pf_test_ok_on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="2" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="p_repair"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-45"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="1" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pf_test_ok_on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-54" Y="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="1" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ps_test_ok.on"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="98" Y="284"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="0" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ps_test_ok.on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-92" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="3" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="p_repair"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-34" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="p_timer">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="extreme">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="143" Y="163"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-80" Y="-16"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="inbetween">
-                        <PointGeometry>
-                            <Point X="332" Y="164"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="9" Y="-14"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="inbetween" Target="extreme">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="p_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="237" Y="223"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="inbetween" Target="inbetween">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="332" Y="105"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="extreme" Target="inbetween">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-42" Y="-40"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="238" Y="100"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="pa_test">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="off">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="124" Y="129"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-39" Y="-16"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="on">
-                        <PointGeometry>
-                            <Point X="316" Y="127"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="12" Y="-16"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="off" Target="on">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-34" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="219" Y="63"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="on" Target="off">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="2"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="221" Y="187"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="ps_test_ok">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="159" Y="126"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="2">
-                        <PointGeometry>
-                            <Point X="349" Y="126"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="2" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pf_test_ok_on"/>
-                            <SimpleIdentifier Name="ps_test_ok.on"/>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="256" Y="186"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.on"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="255" Y="63"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="pa_test.off"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="159" Y="67"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-    </ComponentList>
+It has 56 reachable states and the diameter is 39.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="p_repair"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="p_timer"/>
+<EventDecl Kind="CONTROLLABLE" Name="pa_test.off"/>
+<EventDecl Kind="CONTROLLABLE" Name="pa_test.on"/>
+<EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="pf_test_ok_on">
+<B:AttributeMap>
+<B:Attribute Name="FAULT" Value=""/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ps_test_ok.on"/>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="pv_allow_test">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="pv_testing_finished_not_ok">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="pv_testing_finished_ok">
+<B:AttributeMap>
+<B:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</B:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="pi_test">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="154" Y="136"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="2">
+<PointGeometry>
+<Point X="345" Y="136"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="2" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_not_ok"/>
+<SimpleIdentifier Name="pv_testing_finished_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="246" Y="197"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="1" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="pv_allow_test"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="247" Y="71"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+<B:AttributeMap>
+<B:Attribute Name="HISC:Interface" Value=""/>
+</B:AttributeMap>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="pr1_test_sequence">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="277" Y="92"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="2">
+<PointGeometry>
+<Point X="530" Y="92"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="3">
+<PointGeometry>
+<Point X="656" Y="218"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="4">
+<PointGeometry>
+<Point X="531" Y="343"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="5">
+<PointGeometry>
+<Point X="279" Y="342"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="6">
+<PointGeometry>
+<Point X="154" Y="218"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-17"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="3" Target="4">
+<LabelBlock>
+<SimpleIdentifier Name="p_timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-1" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="2" Target="3">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.on"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="4" Target="5">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.off"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="1" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="pv_allow_test"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="5" Target="6">
+<LabelBlock>
+<SimpleIdentifier Name="p_timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="6" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_not_ok"/>
+<SimpleIdentifier Name="pv_testing_finished_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-165" Y="-35"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="pr2_communicate_product_check">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="158" Y="119"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="2">
+<PointGeometry>
+<Point X="347" Y="119"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="2" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="252" Y="180"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="1" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_not_ok"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="158" Y="60"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="1" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="ps_test_ok.on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="252" Y="55"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="pr_repair">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="97" Y="159"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="316" Y="159"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="206" Y="316"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="0" Target="0">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_ok"/>
+<SimpleIdentifier Name="pa_test.on"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="97" Y="100"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="0" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_not_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-75" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="2" Target="0">
+<LabelBlock>
+<SimpleIdentifier Name="p_repair"/>
+<LabelGeometry Anchor="NW">
+<Point X="-73" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="1" Target="0">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="-88" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="1" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="pv_testing_finished_not_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="1" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.on"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="316" Y="100"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="p_stochastics">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="300" Y="201"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="159" Y="203"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="452" Y="197"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="1" Target="3">
+<LabelBlock>
+<SimpleIdentifier Name="ps_test_ok.on"/>
+<SimpleIdentifier Name="pf_test_ok_on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="318" Y="300"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="3" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.off"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="387" Y="199"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="2" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.off"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="2" Target="3">
+<LabelBlock>
+<SimpleIdentifier Name="ps_test_ok.on"/>
+<SimpleIdentifier Name="pf_test_ok_on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="381" Y="159"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="p_test_fault">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="158" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="157" Y="287"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="346" Y="286"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="3">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="347" Y="95"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="2" Target="3">
+<LabelBlock>
+<SimpleIdentifier Name="pf_test_ok_on"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="2" Target="0">
+<LabelBlock>
+<SimpleIdentifier Name="p_repair"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-45"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="1" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="pf_test_ok_on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="1" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="ps_test_ok.on"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="98" Y="284"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="0" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="ps_test_ok.on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-92" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="3" Target="0">
+<LabelBlock>
+<SimpleIdentifier Name="p_repair"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="p_timer">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="extreme">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="143" Y="163"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-80" Y="-16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="inbetween">
+<PointGeometry>
+<Point X="332" Y="164"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="inbetween" Target="extreme">
+<LabelBlock>
+<SimpleIdentifier Name="p_timer"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="237" Y="223"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="inbetween" Target="inbetween">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.on"/>
+<SimpleIdentifier Name="pa_test.off"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="332" Y="105"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="extreme" Target="inbetween">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.on"/>
+<SimpleIdentifier Name="pa_test.off"/>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="238" Y="100"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="pa_test">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="off">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="124" Y="129"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on">
+<PointGeometry>
+<Point X="316" Y="127"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-16"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="off" Target="on">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="219" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on" Target="off">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.off"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="221" Y="187"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="ps_test_ok">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point X="159" Y="126"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="2">
+<PointGeometry>
+<Point X="349" Y="126"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="2" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pf_test_ok_on"/>
+<SimpleIdentifier Name="ps_test_ok.on"/>
+<SimpleIdentifier Name="pa_test.off"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="186"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="1" Target="2">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.on"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="255" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="1" Target="1">
+<LabelBlock>
+<SimpleIdentifier Name="pa_test.off"/>
+</LabelBlock>
+<SplineGeometry>
+<Point X="159" Y="67"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
 </Module>
