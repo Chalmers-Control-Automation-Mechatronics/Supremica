@@ -10,7 +10,7 @@ This version of Waters/Supremica IDE includes precompiled binaries
 for NNN-bit Linux. You will need a NNN-bit Java Virtual Machine
 (not necessarily NNN-bit Linux) to run this.
 
-For complete functionality of the analyser, you also need to
+For complete functionality of the Supremica analyser, you also need to
 install GraphViz, available from
   http://www.graphviz.org/
 Just make sure the dot executable is in your search path.
