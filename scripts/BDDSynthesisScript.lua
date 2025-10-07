@@ -26,44 +26,46 @@ options:setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHICBDD)
 -- options:setSynthesisAlgorithm(SynthesisAlgorithm.PARTITIONBDD)
 options:setExpressionType(options.ExpressionType.ADAPTIVE)
 options:setAddGuards(false)
+options:setPeakBDD(true)
 
--- For all open modules, perform synthesis
-local recent = manager:getRecent() -- java.util.List<DocumentContainer> of all open modules
-for i = 1, recent:size() do
-	local container = recent:get(i-1)
-	local name = container:getName()
-	if name ~= "New Module" then 
-		print("**** Synthesizing for: "..name)
-		local module = container:getEditorPanel():getModuleSubject()
-
-		-- collect the controllable events, only them can we assign guards to
-		local controllableEvents = luaj.newInstance("java.util.Vector")
-		local eventDeclList = module:getEventDeclListModifiable()
-		for i = 1, eventDeclList:size() do
-		  local event = eventDeclList:get(i-1)
-		  if event:getKind() == EventKind.CONTROLLABLE then
-			controllableEvents:add(event:getName())
-		  end
-		end
-
-		local exAutomata = luaj.newInstance("org.supremica.automata.ExtendedAutomata", module)
-		local bddSynthesizer = luaj.newInstance("org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer", exAutomata, options)
-		bddSynthesizer:synthesize(options)
-		bddSynthesizer:generateGuard(controllableEvents, options)
-
-		local saveFile = luaj.newInstance("java.io.File", getFileName("BDDoutput.txt"))
-		editorSynthesizerAction:saveOrPrintGuards(bddSynthesizer, controllableEvents,
-											options:getSaveInFile(), options:getPrintGuard(),
-											saveFile)
-
-		print("Synthesis took "..bddSynthesizer:getSynthesisTimer():toString())
-		print("Guards generated in "..bddSynthesizer:getGuardTimer():toString())
-		
-		if options:getAddGuards() then
-		  bddSynthesizer:addGuardsToAutomata()
-		end
-
-		-- Cleanup...
-		bddSynthesizer:done()
-	end
+-- For the currently open module, perform synthesis
+local container = manager:getActiveContainer()
+local name = container:getName()
+if name == "New Module" then 
+	print("Not synthesizing for empty or untitled module")
+	return
 end
+
+print("**** Synthesizing for: "..name)
+local module = container:getEditorPanel():getModuleSubject()
+
+-- collect the controllable events, only them can we assign guards to
+local controllableEvents = luaj.newInstance("java.util.Vector")
+local eventDeclList = module:getEventDeclListModifiable()
+for i = 1, eventDeclList:size() do
+  local event = eventDeclList:get(i-1)
+  if event:getKind() == EventKind.CONTROLLABLE then
+	controllableEvents:add(event:getName())
+  end
+end
+
+local exAutomata = luaj.newInstance("org.supremica.automata.ExtendedAutomata", module)
+local bddSynthesizer = luaj.newInstance("org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer", exAutomata, options)
+bddSynthesizer:synthesize(options)
+bddSynthesizer:generateGuard(controllableEvents, options)
+
+local saveFile = luaj.newInstance("java.io.File", getFileName("BDDoutput.txt"))
+editorSynthesizerAction:saveOrPrintGuards(bddSynthesizer, controllableEvents,
+									options:getSaveInFile(), options:getPrintGuard(),
+									saveFile)
+
+print("Synthesis took "..bddSynthesizer:getSynthesisTimer():toString())
+print("Guards generated in "..bddSynthesizer:getGuardTimer():toString())
+print("Peak BDD nodes: "..bddSynthesizer:peakBDDNodes())
+
+if options:getAddGuards() then
+  bddSynthesizer:addGuardsToAutomata()
+end
+
+-- Cleanup...
+bddSynthesizer:done()
