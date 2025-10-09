@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #############################################################################
-# USAGE:  distribute <host>  OR  distribute 552
+# USAGE:  distribute OR distribute <host>
 # Possible host: linux-labs.cms.waikato.ac.nz
 
 SUP_SRC=`dirname "$0"`/..
@@ -9,14 +9,9 @@ SUP_SRC=`readlink -f "$SUP_SRC"`
 SUP_DIST=$SUP_SRC/dist
 W_IN=distrib_inputs
 W_DIST_TMP=waters
-ARCHIVE_PREFIX=waterside271
+ARCHIVE_PREFIX=waterside28
 
 case "$1" in
-    552)
-	WWW=$HOME/public_html/compx552-20a
-	WWW_TMP=$WWW
-	INST_DIR=/home/compx452/lib
-	;;
     *.*)
 	WWWHOST=$1
 	WWW=$HOME/public_html/download_waters
@@ -43,19 +38,6 @@ rm -rf $JAR_TMP/dummy
 rm -rf $JAR_TMP/META-INF/MANIFEST.MF
 rm -rf $JAR_TMP/Thumbs.db
 rm -rf $JAR_TMP/manifest.txt
-
-#if [ "$1" = "552" ]
-#then
-#  rm -rf $JAR_TMP/includeInJarFile
-#  find $JAR_TMP/net/sourceforge/waters/analysis/bdd -name \*.class ! -name BDDPackage.class -exec rm -rf {} \;
-#  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/comp552
-#  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/compositional
-#  net/sourceforge/waters/analysis/hisc is needed by compiler.
-#  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/modular
-#  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/monolithic
-#  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/po
-#  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/trcomp
-#fi
 
 VPROPS=$JAR_TMP/net/sourceforge/waters/config/Version.properties
 cp $VPROPS $W_IN
