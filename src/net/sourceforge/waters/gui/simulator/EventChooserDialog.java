@@ -74,10 +74,11 @@ public class EventChooserDialog extends JDialog
     mList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     mList.setSelectedIndex(0);
     mList.setCellRenderer(new ListCellRenderer<JLabel>(){
+      @Override
       public Component getListCellRendererComponent(final JList<? extends JLabel> list, final JLabel value,
           final int index, final boolean isSelected, final boolean cellHasFocus)
       {
-        final JLabel output = (JLabel) value;
+        final JLabel output = value;
         output.setOpaque(true);
         if (isSelected)
           output.setBackground(EditorColor.BACKGROUND_FOCUSSED);
@@ -113,13 +114,14 @@ public class EventChooserDialog extends JDialog
     panel.add(topLabel, BorderLayout.NORTH);
     this.add(panel);
     // this.setLocation(DEFAULT_STARTING_LOCATION); //MF Not multi-display aware
-    if(this.location == null)
+    if (location == null)
     	this.setLocationRelativeTo(owner);
     else
     	this.setLocation(location);
 
     selectButton.addMouseListener(new MouseAdapter()
     {
+      @Override
       public void mouseClicked(final MouseEvent evt)
       {
         if (EventChooserDialog.this.getSelectedStep() != null)
@@ -132,6 +134,7 @@ public class EventChooserDialog extends JDialog
     });
     cancelButton.addMouseListener(new MouseAdapter()
     {
+      @Override
       public void mouseClicked(final MouseEvent evt)
       {
 		  location = getLocation();
@@ -140,6 +143,7 @@ public class EventChooserDialog extends JDialog
     });
     mList.addMouseListener(new MouseAdapter()
     {
+      @Override
       public void mouseClicked(final MouseEvent evt)
       {
         if (evt.getClickCount() == 2 && EventChooserDialog.this.getSelectedStep() != null)
@@ -152,6 +156,7 @@ public class EventChooserDialog extends JDialog
     });
     mList.addKeyListener(new KeyListener()
     {
+      @Override
       public void keyPressed(final KeyEvent e)
       {
         if (e.getKeyCode() == 10) // <ENTER> Key
@@ -162,11 +167,13 @@ public class EventChooserDialog extends JDialog
         }
       }
 
+      @Override
       public void keyReleased(final KeyEvent e)
       {
         // Do Nothing
       }
 
+      @Override
       public void keyTyped(final KeyEvent e)
       {
         // Do Nothing
@@ -181,7 +188,7 @@ public class EventChooserDialog extends JDialog
 
   public SimulatorStep getSelectedStep()
   {
-    return (SimulatorStep)eventList[mList.getSelectedIndex()];
+    return eventList[mList.getSelectedIndex()];
   }
   public boolean wasCancelled()
   {
@@ -202,5 +209,5 @@ public class EventChooserDialog extends JDialog
   private static final int DEFAULT_ROW_HEIGHT = 20;
   //MF private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
   private static final int LIST_BORDER_SIZE = 5;
-    private static Point location = null; //MF To remember its position on the screen
+  private static Point location = null; //MF To remember its position on the screen
 }

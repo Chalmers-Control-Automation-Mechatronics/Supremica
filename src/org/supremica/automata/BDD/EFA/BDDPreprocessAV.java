@@ -35,17 +35,17 @@
 
 package org.supremica.automata.BDD.EFA;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 /***
@@ -64,7 +64,7 @@ public class BDDPreprocessAV
 	// We search for patterns like "Efsm_1 != loc_1" or "efsm_2 == loc_x"
 	private final Pattern pattern = Pattern.compile("(\\w+)\\s*[!=]=\\s*(\\w+)");
 
-	public BDDPreprocessAV(java.util.List<Proxy> components)
+	public BDDPreprocessAV(final java.util.List<Proxy> components)
 	{
 		// Build the nameGraphMap and nameVarMap (does such maps not exist already?)
 		for(final Proxy proxy : components)
@@ -90,8 +90,12 @@ public class BDDPreprocessAV
 */
 		}
 	}
-	private static final boolean FIND_ONE = true;
-	private static final boolean FIND_ALL = false;
+
+
+	/* Unused variables commented out
+    private static final boolean FIND_ONE = true;
+    private static final boolean FIND_ALL = false;
+    */
 
 	/***
 	 * Check if there is at least one guard that includes an automaton variables expression,
@@ -120,7 +124,7 @@ public class BDDPreprocessAV
 			if (gaBlock != null)
 			{
 				final java.util.List<SimpleExpressionProxy> guards = gaBlock.getGuards();
-				for (SimpleExpressionProxy sep : guards)
+				for (final SimpleExpressionProxy sep : guards)
 				{
 					if (matchPattern(sep.toString()))
 					{
@@ -217,7 +221,8 @@ public class BDDPreprocessAV
 		return false;
 	}
 
-	private boolean collectAutomatonLocationPairs()
+	@SuppressWarnings("unused")
+    private boolean collectAutomatonLocationPairs()
 	{
 		return false;
 	}

@@ -116,11 +116,10 @@ public class AutomatonDisplayPane
                               final AutomatonInternalFrame parent)
     throws GeometryAbsentException
   {
-    super(graph, container.getModule());
+    super(graph, container);
     mParent = parent;
     mSim = sim;
     mAutomaton = aut;
-    mContainer = container;
     mToolTipVisitor = new GraphToolTipVisitor();
     mFocusedItem = null;
     final ModuleSubject module = container.getModule();
@@ -211,7 +210,8 @@ public class AutomatonDisplayPane
     if (proxyToFire != null) {
       final RenderingStatus status = getRenderingStatus(mFocusedItem);
       if (status != null && status.isEnabled()) {
-        final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
+        final ModuleContainer container = getModuleContainer();
+        final Map<Object,SourceInfo> infoMap = container.getSourceInfoMap();
         final List<SimulatorStep> possibleSteps =
           new ArrayList<SimulatorStep>();
         if (proxyToFire instanceof IdentifierProxy) {
@@ -407,7 +407,8 @@ public class AutomatonDisplayPane
           mAutomaton.getTransitions();
         final int size = states.size() + 2 * transitions.size();
         mRenderingStatusMap = new HashMap<Proxy,RenderingStatus>(size);
-        final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        final ModuleContainer container = getModuleContainer();
+        final Map<Object,SourceInfo> infomap = container.getSourceInfoMap();
         if (infomap != null) {
           final StateProxy currentState = mSim.getCurrentState(mAutomaton);
           for (final StateProxy state : states) {
@@ -548,8 +549,9 @@ public class AutomatonDisplayPane
     //# Constructor
     private SimulatorRenderingContext()
     {
-      super(mContainer.getModuleContext());
-      final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      super(getModuleContainer().getModuleContext());
+      final ModuleContainer container = getModuleContainer();
+      final Map<Object,SourceInfo> infomap = container.getSourceInfoMap();
       final Collection<StateProxy> states = mAutomaton.getStates();
       final int size = states.size();
       mStateMap = new HashMap<SimpleNodeProxy,StateProxy>(size);
@@ -563,8 +565,8 @@ public class AutomatonDisplayPane
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
     @Override
-    public PropositionIcon.ColorInfo getMarkingColorInfo(final GraphProxy graph,
-                                                  final SimpleNodeProxy node)
+    public PropositionIcon.ColorInfo getMarkingColorInfo
+      (final GraphProxy graph, final SimpleNodeProxy node)
     {
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
@@ -858,7 +860,6 @@ public class AutomatonDisplayPane
   private final AutomatonInternalFrame mParent;
   private final Simulation mSim;
   private final AutomatonProxy mAutomaton;
-  private final ModuleContainer mContainer;
   private final DisplayPanePopupFactory mPopupFactory;
   private final GraphToolTipVisitor mToolTipVisitor;
 

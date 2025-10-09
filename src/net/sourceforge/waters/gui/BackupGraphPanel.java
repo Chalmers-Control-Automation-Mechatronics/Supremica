@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Frame;
-
 import javax.swing.JDialog;
 
 import net.sourceforge.waters.gui.command.Command;
@@ -55,6 +53,8 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
+import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
 
 
@@ -91,20 +91,21 @@ public class BackupGraphPanel
 
   //#########################################################################
   //# Constructors
-  public BackupGraphPanel(final GraphSubject graph, final ModuleSubject module)
+  public BackupGraphPanel(final GraphSubject graph,
+                          final ModuleContainer container)
   {
-    super(graph, module);
+    super(graph, container.getModule(), container.getModuleContext());
+    mModuleContainer = container;
   }
 
-  public BackupGraphPanel(final GraphSubject graph,
-                          final ModuleSubject module,
-                          final ModuleContext context)
-  {
-    super(graph, module, context);
-  }
 
   //#########################################################################
   //# Simple Access
+  public ModuleContainer getModuleContainer()
+  {
+    return mModuleContainer;
+  }
+
   @Override
   public ModuleSubject getModule()
   {
@@ -224,22 +225,10 @@ public class BackupGraphPanel
                                      mSecondaryGraph.getEdgesModifiable());
       mEmbedder.addObserver(this);
       final Thread thread = new Thread(mEmbedder);
-
-      //MF Need to make the SpringAbortDialog multi-display aware, so it opens on the correct monitor
-      final Frame frame = (Frame) getTopLevelAncestor(); //MF Returns null
-      final java.awt.GraphicsConfiguration gc = this.getGraphicsConfiguration(); //MF Also returns null
-      final java.awt.Container parent = this.getParent();	//MF Also returns null
+      final IDE ide = mModuleContainer.getIDE();
       final JDialog dialog =
-        new SpringAbortDialog(frame, name, mEmbedder, timeout);
-      // dialog.setLocationRelativeTo(this); //MF This was the original. Not multi-display aware
-      // dialog.setLocationRelativeTo(frame); //MF Not useful, frame == null
-      // dialog.setLocationRelativeTo(parent); //MF Not useful, parent == null
-      // dialog.setLocation(gc.getBounds().x + 200, gc.getBounds().y + 200); //MF Not useful, gc == null
-	//MF Tried several other things, none worked, it seems this panel and its dsecendants have no parenmt
-
-	// Using the globally available ide seems the only way to fix this
-	dialog.setLocationRelativeTo(org.supremica.gui.ide.IDE.getTheIDE());
-
+        new SpringAbortDialog(ide, name, mEmbedder, timeout);
+      dialog.setLocationRelativeTo(ide);
       dialog.setVisible(true);
       thread.start();
     } catch (final GeometryAbsentException exception) {
@@ -355,6 +344,12 @@ public class BackupGraphPanel
 
   //#########################################################################
   //# Data Members
+  /**
+   * The module container holding the module containing the automaton
+   * being displaying. Used to access context information. Also provides
+   * access to IDE frame.
+   */
+  private final ModuleContainer mModuleContainer;
   /**
    * A temporary copy of the currently shown graph.  It contains the
    * uncommitted changes while the user is dragging some objects with the

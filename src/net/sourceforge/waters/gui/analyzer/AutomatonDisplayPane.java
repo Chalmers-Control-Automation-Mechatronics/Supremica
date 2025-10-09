@@ -69,8 +69,7 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     throws GeometryAbsentException
   {
 
-    super(graph, container.getModule());
-    mModuleContainer = container;
+    super(graph, container);
     final ModuleSubject module = container.getModule();
     final ModuleContext moduleContext = container.getModuleContext();
     final RenderingContext renderingContext =
@@ -79,17 +78,14 @@ public class AutomatonDisplayPane extends BackupGraphPanel
       new SubjectShapeProducer(graph, module, renderingContext, compiler,
                                bindings);
     setShapeProducer(producer);
-    if (!ensureGeometryExists())
+    if (!ensureGeometryExists()) {
       adjustSize();
+    }
   }
+
 
   //#########################################################################
   //# Simple Access
-  public ModuleContainer getModuleContainer()
-  {
-    return mModuleContainer;
-  }
-
   void adjustSize()
   {
     final int width;
@@ -101,6 +97,7 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
     setPreferredSize(new Dimension(width, height));
   }
+
 
   //#########################################################################
   //# Painting and Transforming
@@ -123,9 +120,10 @@ public class AutomatonDisplayPane extends BackupGraphPanel
 
   protected RenderingContext createRenderingContext()
   {
-    final ModuleContext moduleContext = mModuleContainer.getModuleContext();
+    final ModuleContext moduleContext = getModuleContext();
     return new ModuleRenderingContext(moduleContext);
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
@@ -139,9 +137,6 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     }
   }
 
-  //#########################################################################
-  //# Data Members
-  private final ModuleContainer mModuleContainer;
 
   //#########################################################################
   //# Class Constants

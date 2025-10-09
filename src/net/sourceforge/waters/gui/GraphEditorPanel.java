@@ -209,9 +209,8 @@ public class GraphEditorPanel
                           final WatersPopupActionManager manager)
     throws GeometryAbsentException
   {
-    super(graph, module, root.getModuleWindowInterface().getModuleContext());
+    super(graph, moduleContainer);
     mRoot = root;
-    mModuleContainer = moduleContainer;
     mToolbar = toolbar;
     mZoomFactor = 1.0;
     mAdjustedZoomFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
@@ -2294,9 +2293,9 @@ public class GraphEditorPanel
         } else if (mFocusedObject instanceof LabelBlockSubject) {
           handleLabelBlockDoubleClick(event);
         } else if (mFocusedObject instanceof NodeSubject) {
+          final ModuleContainer container = getModuleContainer();
           final NodeSubject node = (NodeSubject) mFocusedObject;
-          NodeEditorDialog.showDialog(mModuleContainer,
-                                      GraphEditorPanel.this, node);
+          NodeEditorDialog.showDialog(container, GraphEditorPanel.this, node);
         }
       }
     }
@@ -2438,9 +2437,9 @@ public class GraphEditorPanel
               (SimpleNodeSubject) mFocusedObject.getParent();
             editStateName(node);
           } else if (mFocusedObject instanceof SimpleNodeSubject) {
-            final SimpleNodeSubject node = (SimpleNodeSubject)mFocusedObject;
-            NodeEditorDialog.showDialog(mModuleContainer,
-                                        GraphEditorPanel.this, node);
+            final ModuleContainer container = getModuleContainer();
+            final SimpleNodeSubject node = (SimpleNodeSubject) mFocusedObject;
+            NodeEditorDialog.showDialog(container, GraphEditorPanel.this, node);
           }
         } else {
           mLastNodeCommand = null;
@@ -2514,9 +2513,9 @@ public class GraphEditorPanel
           event.getClickCount() == 2 &&
           mFocusedObject != null &&
           mFocusedObject instanceof GroupNodeSubject) {
+        final ModuleContainer container = getModuleContainer();
         final GroupNodeSubject node = (GroupNodeSubject) mFocusedObject;
-        NodeEditorDialog.showDialog(mModuleContainer,
-                                    GraphEditorPanel.this, node);
+        NodeEditorDialog.showDialog(container, GraphEditorPanel.this, node);
       }
     }
 
@@ -5310,7 +5309,6 @@ public class GraphEditorPanel
   //#########################################################################
   //# Data Members
   private final ComponentEditorPanel mRoot;
-  private final ModuleContainer mModuleContainer;
   private final IDEToolBar mToolbar;
 
   /**
