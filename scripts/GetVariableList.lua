@@ -6,9 +6,6 @@ local script, ide = ... -- grab the arguments passed from Java via LuaJ
 local Config = luaj.bindClass("org.supremica.properties.Config")
 local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
 
--- local VariableComponentProxy = luaj.bindClass("net.sourceforge.waters.model.module.VariableComponentProxy")
--- if not VariableComponentProxy then print("VariableComponentProxy not fond") return end
-
 local Helpers = luaj.bindClass("org.supremica.Lupremica.Helpers") 
 if not Helpers then print("Lupremica.Helpers not found") return end
 
