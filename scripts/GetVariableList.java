@@ -13,7 +13,7 @@ public class GetVariableList
 	throws ClassNotFoundException
 	{
 		final Logger logger = ide.getTheLog();
-		logger.info("Get variable list of current module 0");
+		logger.info("Get variable list of current module");
 
 		final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 		List<VariableComponentProxy> variableList = GetVariableList.getVariableComponentProxys(module);

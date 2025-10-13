@@ -21,6 +21,9 @@ local function saveFile(fname)
 	end
 end
 
+local Helpers = luaj.bindClass("org.supremica.Lupremica.Helpers") 
+if not Helpers then print("Lupremica.Helpers not found") return end
+
 local function processEFA(efa)
 
 end
@@ -39,47 +42,3 @@ local components = module:getComponentList()
 
 print(getFileName(name..".cif"))
 
--- It seems we cannot use reflection, so the reflection-based approach to get elements
--- of different types fail. This would need to be handled on the Java side, methinks...
-
--- Create a VariableComponentProxy (see EFSMsimpleCreate.lua)
-local ModuleSubjectFactory = luaj.bindClass("net.sourceforge.waters.subject.module.ModuleSubjectFactory")
-local CompilerOperatorTable = luaj.bindClass("net.sourceforge.waters.model.compiler.CompilerOperatorTable")
-local factory = ModuleSubjectFactory:getInstance()
-local optable = CompilerOperatorTable:getInstance()
-
-local function createIntegerVariable(name, min, max, init)
-  
-  local varName = factory:createSimpleIdentifierProxy(name)
-  local varMin = factory:createIntConstantProxy(min)
-  local varMax = factory:createIntConstantProxy(max)
-  local varRange = factory:createBinaryExpressionProxy(optable:getRangeOperator(), varMin, varMax)
-  local varRef = factory:createSimpleIdentifierProxy(name)
-  local varInitVal = factory:createIntConstantProxy(init)
-  local varInitPred = factory:createBinaryExpressionProxy(optable:getEqualsOperator(), varRef, varInitVal)
-  local var = factory:createVariableComponentProxy(varName, varRange, varInitPred)
-  
-  local pinterface = var:getProxyInterface()
-  local pclass = pinterface:getClass() -- "attempt to call nil"
-  local pname = pclass:getName()
-  print(pname)
-
-  return var
-  
-end
-
-local VariableComponentProxy vcp = createIntegerVariable("newVar", 0, 1, 0)
-
-for i = 1, components:size() do
-    local proxy = components:get(i-1)
-    if proxy == nil then print("Nil proxy!") return end
-    print("Non-nil proxy")
-    local proxyclass = proxy:getProxyInterface() -- return VariableComponentProxy.class
---    print(proxyclass:getName())
---    if proxyclass:getSimpleName():equals("VariableComponentProxy") then
-	if VariableComponentProxy.class:isInstance(proxyclass) then
-		print("var.getIdentifier(): " + proxy:getIdentifier())
-		print("var.getType().toString(): " + proxy:getType().toString())
-		print("var.getInitialStatePredicate().toString(): " + proxy:getInitialStatePredicate().toString())
-	end
-end
