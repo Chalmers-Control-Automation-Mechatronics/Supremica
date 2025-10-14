@@ -96,28 +96,54 @@ local function processSourceTarget(srctxt)
   return label, initial, acc, xxx
 end
 
-local function processGuardAction(gatxt)
+local function processGuardAction(gablock)
+  
+  if not gablock then return end -- not all edges have GA-blocks
+  
+  log:info(gablock:toString(), 0)
+  local gatxt = gablock:toString():gsub("\n", "")
   
   local function stripCurly(str)
     return str:match("{%s*(.+)%s*}")
   end
   
+  local function convertGuard(gstr)
+    if not gstr then return end
+    return gstr:gsub("&", "and")
+  end
+  
+  local function convertAction(astr)
+    if not astr then return end
+    return astr:gsub("=", ":=")
+  end
+
+  -- These are when \n has been removed
   -- [{  v_req==1 & v_in==0 & v_s2==1}]{{  v_out=1}}
   -- []{{  v_req = 1}}
+  -- []{{ v_req = 1 v_out = 0 }} -- This one needs a comma after 1
   
   local gcap, acap = gatxt:match("%[(.*)%]{(.*)}") 
-  return stripCurly(gcap), stripCurly(acap) -- either (or both) of these can be nil
+  return convertGuard(stripCurly(gcap)), convertAction(stripCurly(acap))
 end
 
-local function processEdge(edge)
-	local src, init, acc, xxx = processSourceTarget(edge:getSource():toString():gsub("\n", ""))
-	local trgt = processSourceTarget(edge:getTarget():toString():gsub("\n", "")) -- only care about label
-	local guard, action = processGuardAction(edge:getGuardActionBlock():toString():gsub("\n", ""))
+local function manageSourceTarget(srctrgt, efaDB)
+  local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
+  
+  if not efaDB.Locations[label] then
+    efaDB.Locations[label] = {"location "..label..";"}
+    if init then table.insert(efaDB.Locations[label], "\tinitial;") end
+    if acc then table.insert(efaDB.Locations[label], "\tmarked;") end
+  end
+  return label
+end
+
+local function processEdge(edge, efaDB)
+  
+	local src = manageSourceTarget(edge:getSource(), efaDB)
+  local trgt = manageSourceTarget(edge:getTarget(), efaDB)
+	local guard, action = processGuardAction(edge:getGuardActionBlock())
 	local evlist = edge:getLabelBlock():getEventIdentifierList()
   
-  print("location "..src..":")
-  if init then print("\tinitial;") end
-  if acc then print("\tmarked;") end
   local out = {}
 	for i = 1, evlist:size() do
 		local ev = evlist:get(i-1)
@@ -134,19 +160,26 @@ local function processEdge(edge)
     table.insert(out, "goto")
     table.insert(out, trgt)
     table.insert(out, ";")
-    print(table.concat(out, " "))
+    
+    table.insert(efaDB.Locations[src], table.concat(out, " "))
 	end
 end
 
 local function processEFA(efa)
+  local efaDB = {} -- holds stuff releated to this particular efa
+  efaDB.Locations = {} -- Holds the locations with events, guard, actions
+  
   local kind = efaKind[efa:getKind()]
-	print(kind.." "..efa:getName())
 	local graph = efa:getGraph()
 	local edges = graph:getEdges()
 	local iterator = edges:iterator()
 	while iterator:hasNext() do
-		processEdge(iterator:next())
+		processEdge(iterator:next(), efaDB)
 	end
+  print(kind.." "..efa:getName());
+  for src, body in pairs(efaDB.Locations) do
+    print(table.concat(body, "\n"))
+  end
 end
 
 for i = 1, efalist:size() do
