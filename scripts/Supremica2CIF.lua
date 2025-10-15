@@ -27,6 +27,7 @@ if not Helpers then print("Lupremica.Helpers not found") return end
 -- bindClass is like Java's import
 local EventKind = luaj.bindClass("net.sourceforge.waters.model.base.EventKind")
 local ComponentKind = luaj.bindClass("net.sourceforge.waters.model.base.ComponentKind")
+local VariableHelper = luaj.bindClass("org.supremica.automata.VariableHelper")
 local VariableComponentProxy = luaj.bindClass("net.sourceforge.waters.model.module.VariableComponentProxy")
 if not VariableComponentProxy then print("VariableComponentProxy not fond") return end
 
@@ -43,11 +44,14 @@ local pw = textframe:getPrintWriter();
 local function print(str) -- redefien print to write to the textframe
   pw:println(str)
 end
+local function loginfo(str)
+  if str then log:info(str, 0) else log:info("nil string", 0) end
+end
 
-local function getEvents(module)
+local function getEvents(project)
 	local controllable, uncontrollable = {}, {}
 	
-	local eventDeclList = module:getEventDeclList()
+	local eventDeclList = project:getEventDeclList()
 	for i = 1, eventDeclList:size() do
 	  local event = eventDeclList:get(i-1)
 	  local kind = event:getKind()
@@ -60,20 +64,84 @@ local function getEvents(module)
 	return controllable, uncontrollable
 end
 
+--[[ Things to consider:
+  * In CIF, variables are local, so for each EFA we need to know which variables it affects
+  * For non-int variable types we need to define specific types
+  * In CIF, two EFA cannot affect the same variable, to get around this we could synch all 
+    EFA that affect the same variable
+  * CIF has no +=, -= etc, these need to be converted to ordinary var = var + x expressions
+  * Supremica has implicit guards to protect for out-of-bounds assignment, CIF has not, so
+    such guards should be added when necessary
+  * CIF has no next-state value, so primed guards need to be converted to assignment actions
+--]]
+
 -- Process the currently open module into <name>.cif
 local manager = ide:getDocumentContainerManager() 
 local container = manager:getActiveContainer()
 local name = container:getName()
-local module = container:getEditorPanel():getModuleSubject()
-local components = module:getComponentList() 
+local project = container:getEditorPanel():getModuleSubject()
+local components = project:getComponentList() 
 
-print(getFileName(name..".cif"))
+local efalist = Helpers:getAutomatonList(project)
+local varlist = Helpers:getVariableList(project)
+local cevents, uevents = getEvents(project)
 
-local efalist = Helpers:getAutomatonList(module)
-local varlist = Helpers:getVariableList(module)
-local cevents, uevents = getEvents(module)
-if #cevents > 0 then print("controllable "..table.concat(cevents, ", ")..";") end
-if #uevents > 0 then print("uncontrollable "..table.concat(uevents, ", ")..";") end
+
+-- Preprocessing - Collect stuff necessary to be able to process
+local function preProcessMarkedValues(marklist)
+  local markings = {}
+  local mit = marklist:iterator()
+  while mit:hasNext() do
+    table.insert(markings, mit:next():getPredicate():toString())
+  end
+  return markings
+end
+
+local function getVariableInfo(var)
+  local kind = " is symbolic "
+  if VariableHelper:isBinary(var) then
+    kind = " is binary "
+  elseif VariableHelper:isInteger(var) then
+    kind = " is integer "
+  end
+  local range = var:getType():toString()
+  local initpred = var:getInitialStatePredicate():toString()
+  local markings = preProcessMarkedValues(var:getVariableMarkings())
+  local markstr = ""
+  if #markings > 0 then
+    markstr = "{"..table.concat(markings, ", ").."}"
+  end  
+  return kind, range, initpred, markstr
+end
+
+local function preProcessVariables()
+  local variables = {}
+  
+  local iterator = varlist:iterator()
+  while iterator:hasNext() do
+    local var = iterator:next()
+    local name = var:getName()
+    local kind, range, init, mark = getVariableInfo(var)
+    -- loginfo(name..kind..range..", <"..init..">, "..mark)
+    variables[name] = {kind = kind, range = range, init = init, mark = mark}
+
+  end
+  
+  return variables
+end
+
+local function preProcessing()
+  print("Preprocessing...")
+  local stuff = {}
+  stuff.Vars = preProcessVariables()
+  
+  -- Just checkin'...
+  for name, info in pairs(stuff.Vars) do
+    loginfo(name..info.kind..info.range..", <"..info.init..">, "..info.mark)
+  end
+  
+  return stuff
+end
 
 local function processSourceTarget(srctxt)
   -- initial S0 { :accepting}
@@ -182,7 +250,18 @@ local function processEFA(efa)
   print("end\n")
 end
 
-for i = 1, efalist:size() do
-	local efa = efalist:get(i-1)
-	processEFA(efa)
+local function processModule()
+  
+  print(getFileName(name..".cif"))
+
+  if #cevents > 0 then print("controllable "..table.concat(cevents, ", ")..";") end
+  if #uevents > 0 then print("uncontrollable "..table.concat(uevents, ", ")..";") end
+
+  for i = 1, efalist:size() do
+    local efa = efalist:get(i-1)
+    processEFA(efa)
+  end
 end
+
+preProcessing()
+--processModule(efalist)
