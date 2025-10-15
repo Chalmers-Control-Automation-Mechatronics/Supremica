@@ -72,8 +72,8 @@ print(getFileName(name..".cif"))
 local efalist = Helpers:getAutomatonList(module)
 local varlist = Helpers:getVariableList(module)
 local cevents, uevents = getEvents(module)
-print("controllable "..table.concat(cevents, ", ")..";")
-print("uncontrollable "..table.concat(uevents, ", ")..";")
+if #cevents > 0 then print("controllable "..table.concat(cevents, ", ")..";") end
+if #uevents > 0 then print("uncontrollable "..table.concat(uevents, ", ")..";") end
 
 local function processSourceTarget(srctxt)
   -- initial S0 { :accepting}
@@ -98,18 +98,15 @@ end
 
 local function processGuardAction(gablock)
   
-  if not gablock then return end -- not all edges have GA-blocks
-  
-  log:info(gablock:toString(), 0)
-  local gatxt = gablock:toString():gsub("\n", "")
+  if not gablock then return nil, nil end -- not all edges have GA-blocks
   
   local function stripCurly(str)
-    return str:match("{%s*(.+)%s*}")
+    return str:match("[{%s,]*(.+),}")
   end
   
   local function convertGuard(gstr)
     if not gstr then return end
-    return gstr:gsub("&", "and")
+    return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("!", "not ")
   end
   
   local function convertAction(astr)
@@ -117,12 +114,14 @@ local function processGuardAction(gablock)
     return astr:gsub("=", ":=")
   end
 
-  -- These are when \n has been removed
-  -- [{  v_req==1 & v_in==0 & v_s2==1}]{{  v_out=1}}
-  -- []{{  v_req = 1}}
-  -- []{{ v_req = 1 v_out = 0 }} -- This one needs a comma after 1
+-- Multiple actions on the same edge should be comma-separated in CIF
+  local gatxt = gablock:toString():gsub("\n", ",")
+  -- Replacing \n by , results in this type of expr:
+  -- [,{, v_req==1 & v_in==0 & v_s2==1,}],{,{, v_out=1,}},
+  -- [,{, v_out==1 & v_s2==0,}],{,},
+  -- [,],{,{, v_in = 0, v_out = 0,}},
   
-  local gcap, acap = gatxt:match("%[(.*)%]{(.*)}") 
+  local gcap, acap = gatxt:match("%[,(.*)%],{,(.*)},")
   return convertGuard(stripCurly(gcap)), convertAction(stripCurly(acap))
 end
 
@@ -180,6 +179,7 @@ local function processEFA(efa)
   for src, body in pairs(efaDB.Locations) do
     print(table.concat(body, "\n"))
   end
+  print("end\n")
 end
 
 for i = 1, efalist:size() do
