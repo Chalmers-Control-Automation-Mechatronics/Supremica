@@ -41,10 +41,10 @@ efaKind[ComponentKind.SUPERVISOR] = "supervisor"
 local textframe = luaj.newInstance("org.supremica.gui.texteditor.TextFrame", "CIF Export")
 local pw = textframe:getPrintWriter();
 
-local function print(str) -- redefien print to write to the textframe
+local function print(str) -- redefine print to write to the textframe
   pw:println(str)
 end
-local function loginfo(str)
+local function loginfo(str) -- helper to write to log
   if str then log:info(str, 0) else log:info("nil string", 0) end
 end
 
@@ -69,9 +69,13 @@ end
   * For non-int variable types we need to define specific types
   * In CIF, two EFA cannot affect the same variable, to get around this we could synch all 
     EFA that affect the same variable
-  * CIF has no +=, -= etc, these need to be converted to ordinary var = var + x expressions
+  * CIF has no +=, -= etc, these need to be rewritten to ordinary var = var + x expressions
   * Supremica has implicit guards to protect for out-of-bounds assignment, CIF has not, so
     such guards should be added when necessary
+    # Such guards can *always* be added, and handled syntactically:
+      disc int[0..5] var;
+      edge up when 0 <= var + x and var + x <= 5 do var := var + x
+      edge dn when 0 <= var - x and var - x <= 5 do var := var - x
   * CIF has no next-state value, so primed guards need to be converted to assignment actions
 --]]
 
@@ -86,7 +90,46 @@ local efalist = Helpers:getAutomatonList(project)
 local varlist = Helpers:getVariableList(project)
 local cevents, uevents = getEvents(project)
 
+local Stuff -- global accesspoint for basically everything, initialized by preProcessing
 
+-- Rewriting
+local pluseq = "+=" -- a += b into a = a + b
+local minuseq = "-=" -- a += b into a = a - b
+local multeq = "*="
+local diveq = "/="
+
+local patterns = {}
+-- capture lhs += rhs, lhs == rhs, lhs = rhs, etc
+-- expr patterns capture whole expressions, (lhs op rhs)
+-- detail patterns capture details (lhs)(op)(rhs)
+patterns.actiondetail = "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
+patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
+patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
+patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
+
+local rewrites = {}
+rewrites.doit = function(lhs, op, rhs)
+  local newlhs = lhs..op..rhs
+  return lhs.." := "..newlhs, newlhs
+end
+rewrites[pluseq] = function(lhs, rhs)
+  return rewrites.doit(lhs, " + ", rhs)
+end
+rewrites[minuseq] = function(lhs, rhs)
+  return rewrites.doit(lhs, " - ", rhs)
+end
+rewrites[multeq] = function(lhs, rhs)
+  return rewrites.doit(lhs, " * ", rhs)
+end
+-- Are these better handled by gsub on the original string?
+-- The expressions can look like "v_req==1 & v_in==0 & v_s2==1"
+rewrites["="] = function(lhs, rhs) 
+  return lhs.." := "..rhs
+end
+rewrites["=="] = function(lhs, rhs)
+  return lhs.." = "..rhs
+end
+  
 -- Preprocessing - Collect stuff necessary to be able to process
 local function preProcessMarkedValues(marklist)
   local markings = {}
@@ -97,12 +140,17 @@ local function preProcessMarkedValues(marklist)
   return markings
 end
 
+-- Global constants, do NOT assign!
+local IS_INTEGER = " is integer "
+local IS_BINARY = " is binary "
+local IS_ENUM = " is enum "
+
 local function getVariableInfo(var)
-  local kind = " is symbolic "
+  local kind = IS_ENUM
   if VariableHelper:isBinary(var) then
-    kind = " is binary "
+    kind = IS_BINARY
   elseif VariableHelper:isInteger(var) then
-    kind = " is integer "
+    kind = IS_INTEGER
   end
   local range = var:getType():toString()
   local initpred = var:getInitialStatePredicate():toString()
@@ -114,6 +162,12 @@ local function getVariableInfo(var)
   return kind, range, initpred, markstr
 end
 
+-- In Supremica, initial value predicates cannot be primed
+-- and initial value predicates cannot refer to other variables
+-- But they can be written as 0 == var
+-- In CIF, we write: disc int[0..1] var in any; initial var = 0 or var = 1; marked var = 1;
+-- Does CIF also allow 0 = var? YES! So we do not have to handle this
+
 local function preProcessVariables()
   local variables = {}
   
@@ -124,7 +178,6 @@ local function preProcessVariables()
     local kind, range, init, mark = getVariableInfo(var)
     -- loginfo(name..kind..range..", <"..init..">, "..mark)
     variables[name] = {kind = kind, range = range, init = init, mark = mark}
-
   end
   
   return variables
@@ -135,14 +188,15 @@ local function preProcessing()
   local stuff = {}
   stuff.Vars = preProcessVariables()
   
-  -- Just checkin'...
+  --[[ Just checkin'...
   for name, info in pairs(stuff.Vars) do
     loginfo(name..info.kind..info.range..", <"..info.init..">, "..info.mark)
   end
+  --]]
   
   return stuff
 end
-
+-- Preprocessing above, main processing below
 local function processSourceTarget(srctxt)
   -- initial S0 { :accepting}
   -- S1 { :forbidden :accepting}
@@ -164,6 +218,44 @@ local function processSourceTarget(srctxt)
   return label, initial, acc, xxx
 end
 
+local function convertGuard(gstr)
+  if not gstr then return end
+  return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("!", "not ")
+end
+  
+-- For each action guards should be added that gurantee no over- or underflow
+-- A primed guard must be turned into an action, which then requires to add guards!
+-- So, processAction must be able to generate guards, and
+-- processGuards must be able to generate actions!
+-- Also, processAction must have access to the currentEFA so that it can record and check
+-- that/if two different EFA assign the same variable, CIF does not allow this
+local function processAction(str)
+  -- str is a comma-separated sequence of actions, possibly empty
+  if not str or str == "" then return nil end
+  
+  local cifexpr = {}
+  
+  for cap in str:gmatch(patterns.actionexpr) do
+    local lhs, op, rhs = cap:match(patterns.actiondetail)
+    cifexpr[#cifexpr+1], newlhs = rewrites[op](lhs, rhs)
+    -- lhs is a variable name, should now add guard
+    -- (lhs.bottom <= newlhs and newlhs <= lhs.topper)
+    local var = Stuff.Vars[lhs]
+    if var.kind == IS_INTEGER then
+      -- local bottom = var.range[1]
+      -- local topper = var.range[2]
+      loginfo(lhs..IS_INTEGER..var.range..", <"..convertGuard(var.init)..">, "..convertGuard(var.mark))
+    end
+  end
+  return table.concat(cifexpr, ", ")
+end
+
+local function processGuard(str)
+  if not str or str == "" then return nil end
+  
+end
+
+
 local function processGuardAction(gablock)
   
   if not gablock then return nil, nil end -- not all edges have GA-blocks
@@ -171,26 +263,24 @@ local function processGuardAction(gablock)
   local function stripCurly(str)
     return str:match("[{%s,]*(.+),}")
   end
-  
-  local function convertGuard(gstr)
-    if not gstr then return end
-    return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("!", "not ")
-  end
-  
+
   local function convertAction(astr)
     if not astr then return end
     return astr:gsub("=", ":=")
   end
 
--- Multiple actions on the same edge should be comma-separated in CIF
+  -- Multiple actions on the same edge should be comma-separated in CIF
   local gatxt = gablock:toString():gsub("\n", ",")
   -- Replacing \n by , results in this type of expr:
   -- [,{, v_req==1 & v_in==0 & v_s2==1,}],{,{, v_out=1,}},
   -- [,{, v_out==1 & v_s2==0,}],{,},
   -- [,],{,{, v_in = 0, v_out = 0,}},
   
+  -- Get rid of commas and outer braces
   local gcap, acap = gatxt:match("%[,(.*)%],{,(.*)},")
-  return convertGuard(stripCurly(gcap)), convertAction(stripCurly(acap))
+  
+  -- return convertGuard(stripCurly(gcap)), convertAction(stripCurly(acap))
+  return convertGuard(stripCurly(gcap)), processAction(stripCurly(acap))
 end
 
 local function manageSourceTarget(srctrgt, efaDB)
@@ -263,5 +353,5 @@ local function processModule()
   end
 end
 
-preProcessing()
---processModule(efalist)
+Stuff = preProcessing()
+processModule(efalist)
