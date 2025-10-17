@@ -31,7 +31,7 @@ local VariableHelper = luaj.bindClass("org.supremica.automata.VariableHelper")
 local VariableComponentProxy = luaj.bindClass("net.sourceforge.waters.model.module.VariableComponentProxy")
 if not VariableComponentProxy then print("VariableComponentProxy not fond") return end
 
-local efaKind = {}
+local efaKind = {} -- lookup table for automata type conversion
 efaKind[ComponentKind.PLANT] = "plant"
 efaKind[ComponentKind.PROPERTY] = "property"
 efaKind[ComponentKind.SPEC] = "requirement"
@@ -56,9 +56,11 @@ local function getEvents(project)
 	  local event = eventDeclList:get(i-1)
 	  local kind = event:getKind()
 	  if kind == EventKind.CONTROLLABLE then
-	  	controllable[#controllable+1] = event:getName()
+	  	-- controllable[#controllable+1] = event:getName()
+      controllable[event:getName()] = true
 	  elseif kind ~= EventKind.PROPOSITION then
-	  	uncontrollable[#uncontrollable+1] = event:getName()
+	  	-- uncontrollable[#uncontrollable+1] = event:getName()
+      uncontrollable[event:getName()] = true
 	  end
 	end
 	return controllable, uncontrollable
@@ -91,6 +93,8 @@ local varlist = Helpers:getVariableList(project)
 local cevents, uevents = getEvents(project)
 
 local Stuff -- global accesspoint for basically everything, initialized by preProcessing
+local currentEFA -- Name of EFA currently processed (set by processEFA)
+local currentEdge -- Collects data for currently processed edge, (set by processEdge)
 
 -- Rewriting
 local pluseq = "+=" -- a += b into a = a + b
@@ -294,35 +298,68 @@ local function manageSourceTarget(srctrgt, efaDB)
   return label
 end
 
+local function getEdgeEvents(edge)
+  local evlist = edge:getLabelBlock():getEventIdentifierList()
+  local cevs, uevs = {}, {}
+  local iter = evlist:iterator()
+  
+  while iter:hasNext() do
+    local ev = iter:next():getName()
+    if cevents[ev] then 
+      table.insert(cevs, ev)
+    elseif uevents[ev] then
+      table.insert(uevs, ev)
+    else
+      assert(false, "Event "..ev.." not in project event list!")
+    end
+  end
+  
+  return cevs, uevs
+end
+
+local function makeEdge(target, events, guard, action)
+  
+  local out = {}
+  table.insert(out, "\tedge ")
+  table.insert(out, table.concat(events, ", "))
+  if guard then
+    table.insert(out, "when")
+    table.insert(out, guard)
+  end
+  if action then
+    table.insert(out, "do")      
+    table.insert(out, action)
+  end
+  table.insert(out, "goto")
+  table.insert(out, target)
+  table.insert(out, ";")
+  
+  return table.concat(out, " ")
+end
+
 local function processEdge(edge, efaDB)
   
+  -- Set up global edge data repo -- Maybe not needed? Only in processGuardAction?
+  currentEdge = {}
+  currentEdge.guards = {}
+  currentEdge.actions = {}
+  currentEdge.uevents = {}
+  currentEdge.cevents = {}
+    
 	local src = manageSourceTarget(edge:getSource(), efaDB)
   local trgt = manageSourceTarget(edge:getTarget(), efaDB)
 	local guard, action = processGuardAction(edge:getGuardActionBlock())
-	local evlist = edge:getLabelBlock():getEventIdentifierList()
+	local controllable, uncontrollable = getEdgeEvents(edge) -- edge:getLabelBlock():getEventIdentifierList()
   
-  local out = {}
-	for i = 1, evlist:size() do
-		local ev = evlist:get(i-1)
-		table.insert(out, "\tedge ")
-    table.insert(out, ev:toString())
-    if guard then
-      table.insert(out, "when")
-      table.insert(out, guard)
-    end
-    if action then
-      table.insert(out, "do")      
-      table.insert(out, action)
-    end
-    table.insert(out, "goto")
-    table.insert(out, trgt)
-    table.insert(out, ";")
-    
-    table.insert(efaDB.Locations[src], table.concat(out, " "))
-	end
+  table.insert(efaDB.Locations[src], makeEdge(trgt, controllable, guard, action))
+  table.insert(efaDB.Locations[src], makeEdge(trgt, uncontrollable, guard, action))
 end
 
 local function processEFA(efa)
+  
+  -- Set up global current EFA name holder
+  currentEFA = efa:getName()
+  
   local efaDB = {} -- holds stuff releated to this particular efa
   efaDB.Locations = {} -- Holds the locations with events, guard, actions
   
@@ -333,7 +370,7 @@ local function processEFA(efa)
 	while iterator:hasNext() do
 		processEdge(iterator:next(), efaDB)
 	end
-  print(kind.." "..efa:getName());
+  print(kind.." "..currentEFA);
   for src, body in pairs(efaDB.Locations) do
     print(table.concat(body, "\n"))
   end
