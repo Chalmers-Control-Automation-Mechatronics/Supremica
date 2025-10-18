@@ -21,10 +21,19 @@ local function saveFile(fname)
 	end
 end
 
+-- Show simple error dialog
+local function openIssueDialog(name, str)
+  local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")
+  JOptionPane:showMessageDialog(ide, str, name, JOptionPane.ERROR_MESSAGE)
+end
+
+openIssueDialog("Oops!", "Eggs are not supposed to be green.")
+openIssueDialog("Again!", "And neither are you!")
+
+-- bindClass is like Java's import
 local Helpers = luaj.bindClass("org.supremica.Lupremica.Helpers") 
 if not Helpers then print("Lupremica.Helpers not found") return end
 
--- bindClass is like Java's import
 local EventKind = luaj.bindClass("net.sourceforge.waters.model.base.EventKind")
 local ComponentKind = luaj.bindClass("net.sourceforge.waters.model.base.ComponentKind")
 local VariableHelper = luaj.bindClass("org.supremica.automata.VariableHelper")
@@ -92,9 +101,9 @@ local efalist = Helpers:getAutomatonList(project)
 local varlist = Helpers:getVariableList(project)
 local cevents, uevents = getEvents(project)
 
-local Stuff -- global accesspoint for basically everything, initialized by preProcessing
-local currentEFA -- Name of EFA currently processed (set by processEFA)
-local currentEdge -- Collects data for currently processed edge, (set by processEdge)
+local Variables -- Holds variable name, range, init, mark (filled by preProcess)
+local CurrentEFA -- Name of EFA currently processed (set by processEFA)
+local CurrentEdge -- Collects data for currently processed edge, (set by processEdge)
 
 -- Rewriting
 local pluseq = "+=" -- a += b into a = a + b
@@ -110,10 +119,14 @@ patterns.actiondetail = "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
 patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
+patterns.matchrange = "(%d+)%.%.(%d+)"
+-- https://www.lua.org/pil/20.2.html
+-- https://iamreiyn.github.io/lua-pattern-tester/
 
 local rewrites = {}
 rewrites.doit = function(lhs, op, rhs)
   local newlhs = lhs..op..rhs
+  -- loginfo("newlhs: "..newlhs)
   return lhs.." := "..newlhs, newlhs
 end
 rewrites[pluseq] = function(lhs, rhs)
@@ -128,10 +141,10 @@ end
 -- Are these better handled by gsub on the original string?
 -- The expressions can look like "v_req==1 & v_in==0 & v_s2==1"
 rewrites["="] = function(lhs, rhs) 
-  return lhs.." := "..rhs
+  return rewrites.doit(lhs, " := ", rhs)
 end
 rewrites["=="] = function(lhs, rhs)
-  return lhs.." = "..rhs
+  return rewrites.doit(lhs, " = ", rhs)
 end
   
 -- Preprocessing - Collect stuff necessary to be able to process
@@ -161,7 +174,8 @@ local function getVariableInfo(var)
   local markings = preProcessMarkedValues(var:getVariableMarkings())
   local markstr = ""
   if #markings > 0 then
-    markstr = "{"..table.concat(markings, ", ").."}"
+    -- markstr = "{"..table.concat(markings, ", ").."}"
+    markstr = table.concat(markings, ", ")
   end  
   return kind, range, initpred, markstr
 end
@@ -189,8 +203,8 @@ end
 
 local function preProcessing()
   print("Preprocessing...")
-  local stuff = {}
-  stuff.Vars = preProcessVariables()
+  
+  Variables = preProcessVariables()
   
   --[[ Just checkin'...
   for name, info in pairs(stuff.Vars) do
@@ -198,7 +212,6 @@ local function preProcessing()
   end
   --]]
   
-  return stuff
 end
 -- Preprocessing above, main processing below
 local function processSourceTarget(srctxt)
@@ -233,7 +246,7 @@ end
 -- processGuards must be able to generate actions!
 -- Also, processAction must have access to the currentEFA so that it can record and check
 -- that/if two different EFA assign the same variable, CIF does not allow this
-local function processAction(str)
+local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
   if not str or str == "" then return nil end
   
@@ -241,20 +254,23 @@ local function processAction(str)
   
   for cap in str:gmatch(patterns.actionexpr) do
     local lhs, op, rhs = cap:match(patterns.actiondetail)
-    cifexpr[#cifexpr+1], newlhs = rewrites[op](lhs, rhs)
+    local expr, newlhs = rewrites[op](lhs, rhs)
+    cifexpr[#cifexpr+1] = expr
     -- lhs is a variable name, should now add guard
     -- (lhs.bottom <= newlhs and newlhs <= lhs.topper)
-    local var = Stuff.Vars[lhs]
-    if var.kind == IS_INTEGER then
-      -- local bottom = var.range[1]
-      -- local topper = var.range[2]
-      loginfo(lhs..IS_INTEGER..var.range..", <"..convertGuard(var.init)..">, "..convertGuard(var.mark))
+    local var = Variables[lhs]
+    if var.kind == IS_INTEGER  then
+      local bottom, topper = var.range:match(patterns.matchrange)
+      local newguard = "("..tonumber(bottom).."<="..newlhs.." and "..newlhs.."<="..tonumber(topper)..")"
+      table.insert(gastore.guards, newguard)
     end
   end
   return table.concat(cifexpr, ", ")
 end
 
-local function processGuard(str)
+-- Primed guards are unknown to CIF, and so must be turned into actions
+-- 
+local function processGuard(str, gastore)
   if not str or str == "" then return nil end
   
 end
@@ -263,6 +279,9 @@ end
 local function processGuardAction(gablock)
   
   if not gablock then return nil, nil end -- not all edges have GA-blocks
+  
+  local gastore = {}
+  gastore.guards, gastore.actions = {}, {}
   
   local function stripCurly(str)
     return str:match("[{%s,]*(.+),}")
@@ -282,9 +301,10 @@ local function processGuardAction(gablock)
   
   -- Get rid of commas and outer braces
   local gcap, acap = gatxt:match("%[,(.*)%],{,(.*)},")
+  acap = stripCurly(acap)
+  gcap = stripCurly(gcap)
   
-  -- return convertGuard(stripCurly(gcap)), convertAction(stripCurly(acap))
-  return convertGuard(stripCurly(gcap)), processAction(stripCurly(acap))
+  return convertGuard(gcap, gastore), processAction(acap, gastore)
 end
 
 local function manageSourceTarget(srctrgt, efaDB)
@@ -340,12 +360,12 @@ end
 local function processEdge(edge, efaDB)
   
   -- Set up global edge data repo -- Maybe not needed? Only in processGuardAction?
-  currentEdge = {}
-  currentEdge.guards = {}
-  currentEdge.actions = {}
-  currentEdge.uevents = {}
-  currentEdge.cevents = {}
-    
+  CurrentEdge = {}
+  CurrentEdge.guards = {}
+  CurrentEdge.actions = {}
+  CurrentEdge.uevents = {}
+  CurrentEdge.cevents = {}
+
 	local src = manageSourceTarget(edge:getSource(), efaDB)
   local trgt = manageSourceTarget(edge:getTarget(), efaDB)
 	local guard, action = processGuardAction(edge:getGuardActionBlock())
@@ -358,7 +378,7 @@ end
 local function processEFA(efa)
   
   -- Set up global current EFA name holder
-  currentEFA = efa:getName()
+  CurrentEFA = efa:getName()
   
   local efaDB = {} -- holds stuff releated to this particular efa
   efaDB.Locations = {} -- Holds the locations with events, guard, actions
@@ -370,7 +390,7 @@ local function processEFA(efa)
 	while iterator:hasNext() do
 		processEdge(iterator:next(), efaDB)
 	end
-  print(kind.." "..currentEFA);
+  print(kind.." "..CurrentEFA);
   for src, body in pairs(efaDB.Locations) do
     print(table.concat(body, "\n"))
   end
@@ -390,5 +410,5 @@ local function processModule()
   end
 end
 
-Stuff = preProcessing()
+preProcessing()
 processModule(efalist)
