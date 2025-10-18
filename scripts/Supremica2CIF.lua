@@ -21,14 +21,22 @@ local function saveFile(fname)
 	end
 end
 
+-- Lua 5.2 and earlier do not have math.tointeger
+local function toint(val)
+  local num = tonumber(val)
+  if not num then return nil end
+  
+  return math.floor(num)
+end
+
 -- Show simple error dialog
-local function openIssueDialog(name, str)
+local function showIssueDialog(name, str)
   local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")
   JOptionPane:showMessageDialog(ide, str, name, JOptionPane.ERROR_MESSAGE)
 end
 
-openIssueDialog("Oops!", "Eggs are not supposed to be green.")
-openIssueDialog("Again!", "And neither are you!")
+--openIssueDialog("Oops!", "Eggs are not supposed to be green.")
+--openIssueDialog("Again!", "And neither are you!")
 
 -- bindClass is like Java's import
 local Helpers = luaj.bindClass("org.supremica.Lupremica.Helpers") 
@@ -119,15 +127,15 @@ patterns.actiondetail = "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
 patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
-patterns.matchrange = "(%d+)%.%.(%d+)"
+patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
+patterns.enumrange = "([_%a][%w]*)"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
 
 local rewrites = {}
 rewrites.doit = function(lhs, op, rhs)
-  local newlhs = lhs..op..rhs
-  -- loginfo("newlhs: "..newlhs)
-  return lhs.." := "..newlhs, newlhs
+  local newrhs = lhs..op..rhs
+  return lhs.." := "..newrhs, newrhs
 end
 rewrites[pluseq] = function(lhs, rhs)
   return rewrites.doit(lhs, " + ", rhs)
@@ -138,23 +146,36 @@ end
 rewrites[multeq] = function(lhs, rhs)
   return rewrites.doit(lhs, " * ", rhs)
 end
--- Are these better handled by gsub on the original string?
--- The expressions can look like "v_req==1 & v_in==0 & v_s2==1"
+-- Values outside the domain can be assigned a variable in Supremica
+-- so even in that case should we generate explicit guards in CIF
 rewrites["="] = function(lhs, rhs) 
-  return rewrites.doit(lhs, " := ", rhs)
+  return lhs.." := "..rhs, rhs
 end
 rewrites["=="] = function(lhs, rhs)
   return rewrites.doit(lhs, " = ", rhs)
 end
   
+local function convertGuard(gstr)
+  return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("![^=]", "not ")
+end
+
 -- Preprocessing - Collect stuff necessary to be able to process
 local function preProcessMarkedValues(marklist)
   local markings = {}
   local mit = marklist:iterator()
   while mit:hasNext() do
-    table.insert(markings, mit:next():getPredicate():toString())
+    local mstr = mit:next():getPredicate():toString()
+    local str = convertGuard(mstr)
+    table.insert(markings, str)
+--    table.insert(markings, convertGuard(mstr)) -- does work because gsub returns two values
+--    loginfo(mstr)
+--    loginfo(convertGuard(mstr))
   end
   return markings
+end
+
+local function preProcessInitPredicate(str)
+  return convertGuard(str)
 end
 
 -- Global constants, do NOT assign!
@@ -170,7 +191,7 @@ local function getVariableInfo(var)
     kind = IS_INTEGER
   end
   local range = var:getType():toString()
-  local initpred = var:getInitialStatePredicate():toString()
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
   local markings = preProcessMarkedValues(var:getVariableMarkings())
   local markstr = ""
   if #markings > 0 then
@@ -194,8 +215,8 @@ local function preProcessVariables()
     local var = iterator:next()
     local name = var:getName()
     local kind, range, init, mark = getVariableInfo(var)
-    -- loginfo(name..kind..range..", <"..init..">, "..mark)
-    variables[name] = {kind = kind, range = range, init = init, mark = mark}
+    --loginfo(name..kind..": "..range..", "..init..", "..mark)
+    variables[name] = {kind = kind, range = range, init = init, mark = mark, efa = {}}
   end
   
   return variables
@@ -213,7 +234,9 @@ local function preProcessing()
   --]]
   
 end
+----------------------------------------------
 -- Preprocessing above, main processing below
+----------------------------------------------
 local function processSourceTarget(srctxt)
   -- initial S0 { :accepting}
   -- S1 { :forbidden :accepting}
@@ -235,10 +258,101 @@ local function processSourceTarget(srctxt)
   return label, initial, acc, xxx
 end
 
-local function convertGuard(gstr)
-  if not gstr then return end
-  return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("!", "not ")
+-- Return the end values of the range (inclusive)
+local function getRangeLimits(range)
+  local bottom, topper = range:match(patterns.matchrange)
+  return toint(bottom), toint(topper)
 end
+
+-- Returns the full extension of an integer range given as bottom..topper
+-- restricted to the given limits (inclusive)
+local function unfoldRange(range, botlimit, toplimit)
+
+  local out = {}
+  local bottom, topper = getRangeLimits(range)
+  if botlimit then
+    bottom = math.max(bottom, botlimit)
+  end
+  if toplimit then
+    topper = math.min(topper, toplimit)
+  end
+  for i = bottom, topper do
+    table.insert(out, i)
+  end
+  
+  return out -- table like {bottom, bottom + 1, ..., topper - 1, topper}
+end
+
+local function isWithinRange(value, range)
+  -- value is int, range is string like "9..55"
+  local bottom, topper = getRangeLimits(range)
+  return bottom <= value and value <= topper
+end 
+
+local function protectIntBinary(range, newrhs)
+  -- First check a special case, newrhs single number
+  -- if that number is within the range, no need of protective guard
+  local val = toint(newrhs)
+  if val then -- newrhs is simply a number that can be checked
+    if isWithinRange(val, range) then -- no need to add guard
+      return nil
+    end
+  end
+  -- newrhs either not a number of not within range
+  local bottom, topper = range:match(patterns.matchrange)
+  -- newguard = (lhs.bottom <= newrhs and newrhs <= lhs.topper)
+  return "("..toint(bottom).." <= "..newrhs.." and "..newrhs.." <= "..toint(topper)..")"
+end
+
+local function protectEnums(range, newrhs)
+  -- For enums, the range looks like [e1, e2, e3]
+  -- the guard should check all values, and then disjunct them
+  -- Is there a better way in CIF?
+  -- Note that checking all values here will not work, since enum1 = enum2 is valid
+  local out = {}
+  for enumval in var.range:gmatch(patterns.enumrange) do
+    table.insert(out, newrhs.." = "..enumval)
+  end
+  return "("..table.concat(out, " or ")..")"
+end
+
+-- Supremica has implict guards that protect againts out-of-domain assignments
+-- These need to be explicitly added for CIF
+local function addProtectiveGuards(lhs, newrhs, gastore)
+    -- lhs is a variable name, newrhs is the rewritten rhs
+    local var = Variables[lhs]
+    if var.kind == IS_INTEGER or var.kind == IS_BINARY then
+      table.insert(gastore.guards, protectIntBinary(var.range, newrhs))
+    elseif var.kind == IS_ENUM then 
+      table.insert(gastore.guards, protectEnums(var.range, newrhs))
+    end
+  end
+  
+  -- The given variable is touched by this EFA
+  -- CIF does not allow multiple EFA touching the same variable
+  local function touchThisVariable(var)
+    
+    if #Variables[var].efa == 0 then -- no other yet touches this variable
+      table.insert(Variables[var].efa, CurrentEFA.name)
+      table.insert(CurrentEFA.variables, "\tdisc int["..Variables[var].range.."] "..var..";\n"..
+        "\tinitial "..Variables[var].init..";\n"..
+        "\tmarked "..Variables[var].mark..";\n")
+      return
+    end
+    -- else some efa already touched this variable
+    if #Variables[var].efa == 1 then -- might be the current one, no problem
+      if Variables[var].efa[1] == CurrentEFA.name then
+        return
+      end
+    end
+    -- Someone else touches this variable, and it isn't us
+    table.insert(Variables[var].efa, CurrentEFA.name)
+    local efas = table.concat(Variables[var].efa, ", ")
+    showIssueDialog("", "In CIF, two automata cannot assign the same variable. make\n"..
+      var.."\n(touched by "..efas..")\nbe assigned in a single automaton.\nQuitting...")
+    quit = true
+    assert(false, "ASSERT false! Multiple touch of same variable not allowed by CIF")
+  end
   
 -- For each action guards should be added that gurantee no over- or underflow
 -- A primed guard must be turned into an action, which then requires to add guards!
@@ -250,29 +364,54 @@ local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
   if not str or str == "" then return nil end
   
-  local cifexpr = {}
-  
   for cap in str:gmatch(patterns.actionexpr) do
     local lhs, op, rhs = cap:match(patterns.actiondetail)
-    local expr, newlhs = rewrites[op](lhs, rhs)
-    cifexpr[#cifexpr+1] = expr
-    -- lhs is a variable name, should now add guard
-    -- (lhs.bottom <= newlhs and newlhs <= lhs.topper)
-    local var = Variables[lhs]
-    if var.kind == IS_INTEGER  then
-      local bottom, topper = var.range:match(patterns.matchrange)
-      local newguard = "("..tonumber(bottom).."<="..newlhs.." and "..newlhs.."<="..tonumber(topper)..")"
-      table.insert(gastore.guards, newguard)
+    local expr, newrhs = rewrites[op](lhs, rhs)
+    table.insert(gastore.actions, expr)
+    if newrhs then -- only when necessary
+      addProtectiveGuards(lhs, newrhs, gastore)
     end
+    touchThisVariable(lhs)
   end
-  return table.concat(cifexpr, ", ")
 end
 
 -- Primed guards are unknown to CIF, and so must be turned into actions
--- 
 local function processGuard(str, gastore)
-  if not str or str == "" then return nil end
+  -- str is a logical operator separated sequence of predicates
+  -- Replacements can be done inline, see convertGuard()
+  -- The only(?) complication is primed guards, that CIF do not recognize
   
+  if not str or str == "" then return nil end
+  if not str:find("'") then -- simply convert syntactically and return
+    -- loginfo(str)
+    table.insert(gastore.guards, "("..convertGuard(str)..")")
+    return
+  end
+  -- Else we have a guard with at least one primed variable
+  -- This has to be turned into an action.
+  
+  -- guard like (varX' == 1) is trivially rewritten as action (varX := 1)
+  -- with protective guard (varX.bottom <= 1 and 1 <= varX.topper)
+  
+  -- guard like (varX' == varY), can in CIF be written as the action (varX := varY)
+  -- with protecting guard (varX.bottom <= varY and varY <= varX.topper)
+  
+  -- guard like (varX' < 2), can in CIF be written as (varX := {0, 1})
+  -- with the assignment set unfoldRange(varX.range, _, 2-1)
+  -- To determine the assignment range requires to know the operator (<, <=, >, >=)
+  -- No protective guard needed!
+  
+  -- guard like (1 < varX' & varX' < 4) can in CIF be written as (varX := {2, 3})
+  -- The assignment set being unfoldRange(varX.range, 1+1, 4-1)
+  -- No protective guard needed!
+  
+  -- guard like (varX' < varY), ...
+  -- To properly convert this requires knowing the current value of varY!
+  
+  -- guard like (varY' == 2 | varZ' == -7) should be turned into what?
+  -- It seems that Supremica itself has problems with this, see Issue #151
+  
+  showIssueDialog("\nSorry", "Currently this script does not handle primed guards. Please rewrite\n"..str.."\nas actions.\n")
 end
 
 
@@ -304,7 +443,10 @@ local function processGuardAction(gablock)
   acap = stripCurly(acap)
   gcap = stripCurly(gcap)
   
-  return convertGuard(gcap, gastore), processAction(acap, gastore)
+  processGuard(gcap, gastore)
+  processAction(acap, gastore)
+  return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", ")
+  -- return convertGuard(gcap, gastore), processAction(acap, gastore)
 end
 
 local function manageSourceTarget(srctrgt, efaDB)
@@ -338,15 +480,16 @@ local function getEdgeEvents(edge)
 end
 
 local function makeEdge(target, events, guard, action)
+  if #events == 0 then return nil end
   
   local out = {}
   table.insert(out, "\tedge ")
   table.insert(out, table.concat(events, ", "))
-  if guard then
+  if guard ~= "" then
     table.insert(out, "when")
     table.insert(out, guard)
   end
-  if action then
+  if action ~= "" then
     table.insert(out, "do")      
     table.insert(out, action)
   end
@@ -360,11 +503,11 @@ end
 local function processEdge(edge, efaDB)
   
   -- Set up global edge data repo -- Maybe not needed? Only in processGuardAction?
-  CurrentEdge = {}
-  CurrentEdge.guards = {}
-  CurrentEdge.actions = {}
-  CurrentEdge.uevents = {}
-  CurrentEdge.cevents = {}
+--  CurrentEdge = {}
+--  CurrentEdge.guards = {}
+--  CurrentEdge.actions = {}
+--  CurrentEdge.uevents = {}
+--  CurrentEdge.cevents = {}
 
 	local src = manageSourceTarget(edge:getSource(), efaDB)
   local trgt = manageSourceTarget(edge:getTarget(), efaDB)
@@ -378,7 +521,8 @@ end
 local function processEFA(efa)
   
   -- Set up global current EFA name holder
-  CurrentEFA = efa:getName()
+  CurrentEFA = {name = efa:getName()}
+  CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
   
   local efaDB = {} -- holds stuff releated to this particular efa
   efaDB.Locations = {} -- Holds the locations with events, guard, actions
@@ -390,19 +534,33 @@ local function processEFA(efa)
 	while iterator:hasNext() do
 		processEdge(iterator:next(), efaDB)
 	end
-  print(kind.." "..CurrentEFA);
+  print(kind.." "..CurrentEFA.name);
+  print(table.concat(CurrentEFA.variables, "\n"))
   for src, body in pairs(efaDB.Locations) do
     print(table.concat(body, "\n"))
   end
   print("end\n")
 end
 
+local function getEventTable(ev)
+  local out = {}
+  for k, v in pairs(ev) do
+    table.insert(out, k)
+  end
+  return out
+end
+
+local function outputEvents()
+  local c = getEventTable(cevents)
+  local u = getEventTable(uevents)
+  print("controllable "..table.concat(c, ", ")..";")
+  print("controllable "..table.concat(u, ", ")..";\n")
+end
+
 local function processModule()
   
-  print(getFileName(name..".cif"))
-
-  if #cevents > 0 then print("controllable "..table.concat(cevents, ", ")..";") end
-  if #uevents > 0 then print("uncontrollable "..table.concat(uevents, ", ")..";") end
+  print(getFileName(name..".cif\n"))
+  outputEvents()
 
   for i = 1, efalist:size() do
     local efa = efalist:get(i-1)
