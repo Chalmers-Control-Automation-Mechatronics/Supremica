@@ -8,10 +8,16 @@ local Config = luaj.bindClass("org.supremica.properties.Config")
 local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
 
 -- Helper functions
-local function saveFile(fname)
-	local fc = luaj.newInstance("javax.swing.JFileChooser")
+local function saveFile(fname, fpath, contents)
+	local fc = luaj.newInstance("javax.swing.JFileChooser", fpath)
 	fc:setDialogTitle("Give CIF File")
-	local retval = fc:showOpenDialog()
+  -- Unclear why this does not work, maybe the varargs
+  -- local ff = luaj.newInstance("javax.swing.filechooser.FileNameExtensionFilter", "CIF file", "cif")
+  -- fc:setFileFilter(ff)
+  local suggestion = luaj.newInstance("java.io.File", fname)
+  fc:setSelectedFile(suggestion)
+  fc:setApproveButtonText("Save")
+	local retval = fc:showOpenDialog(ide)
 	if retval == fc.APPROVE_OPTION then
 		local fname = fc:getSelectedFile():getPath() -- does not work on Java > 8
 		-- local fname = fc:getName(fc:getSelectedFile()) -- this works for Java > 8
@@ -22,7 +28,7 @@ local function saveFile(fname)
 end
 
 -- Lua 5.2 and earlier do not have math.tointeger
-local function toint(val)
+local function tointeger(val)
   local num = tonumber(val)
   if not num then return nil end
   
@@ -34,9 +40,6 @@ local function showIssueDialog(name, str)
   local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")
   JOptionPane:showMessageDialog(ide, str, name, JOptionPane.ERROR_MESSAGE)
 end
-
---openIssueDialog("Oops!", "Eggs are not supposed to be green.")
---openIssueDialog("Again!", "And neither are you!")
 
 -- bindClass is like Java's import
 local Helpers = luaj.bindClass("org.supremica.Lupremica.Helpers") 
@@ -56,7 +59,7 @@ efaKind[ComponentKind.SUPERVISOR] = "supervisor"
 
 --local TextFrame = luaj.bindClass("org.supremica.gui.texteditor.TextFrame")
 local textframe = luaj.newInstance("org.supremica.gui.texteditor.TextFrame", "CIF Export")
-local pw = textframe:getPrintWriter();
+local pw = textframe:getPrintWriter()
 
 local function print(str) -- redefine print to write to the textframe
   pw:println(str)
@@ -111,7 +114,8 @@ local cevents, uevents = getEvents(project)
 
 local Variables -- Holds variable name, range, init, mark (filled by preProcess)
 local CurrentEFA -- Name of EFA currently processed (set by processEFA)
-local CurrentEdge -- Collects data for currently processed edge, (set by processEdge)
+local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
+local FileName -- The filename to save under (set by processModule)
 
 -- Rewriting
 local pluseq = "+=" -- a += b into a = a + b
@@ -223,7 +227,7 @@ local function preProcessVariables()
 end
 
 local function preProcessing()
-  print("Preprocessing...")
+  -- print("Preprocessing...")
   
   Variables = preProcessVariables()
   
@@ -261,7 +265,7 @@ end
 -- Return the end values of the range (inclusive)
 local function getRangeLimits(range)
   local bottom, topper = range:match(patterns.matchrange)
-  return toint(bottom), toint(topper)
+  return tointeger(bottom), tointeger(topper)
 end
 
 -- Returns the full extension of an integer range given as bottom..topper
@@ -292,7 +296,7 @@ end
 local function protectIntBinary(range, newrhs)
   -- First check a special case, newrhs single number
   -- if that number is within the range, no need of protective guard
-  local val = toint(newrhs)
+  local val = tointeger(newrhs)
   if val then -- newrhs is simply a number that can be checked
     if isWithinRange(val, range) then -- no need to add guard
       return nil
@@ -301,7 +305,7 @@ local function protectIntBinary(range, newrhs)
   -- newrhs either not a number of not within range
   local bottom, topper = range:match(patterns.matchrange)
   -- newguard = (lhs.bottom <= newrhs and newrhs <= lhs.topper)
-  return "("..toint(bottom).." <= "..newrhs.." and "..newrhs.." <= "..toint(topper)..")"
+  return "("..tointeger(bottom).." <= "..newrhs.." and "..newrhs.." <= "..tointeger(topper)..")"
 end
 
 local function protectEnums(range, newrhs)
@@ -414,7 +418,6 @@ local function processGuard(str, gastore)
   showIssueDialog("\nSorry", "Currently this script does not handle primed guards. Please rewrite\n"..str.."\nas actions.\n")
 end
 
-
 local function processGuardAction(gablock)
   
   if not gablock then return nil, nil end -- not all edges have GA-blocks
@@ -485,11 +488,11 @@ local function makeEdge(target, events, guard, action)
   local out = {}
   table.insert(out, "\tedge ")
   table.insert(out, table.concat(events, ", "))
-  if guard ~= "" then
+  if guard and guard ~= "" then
     table.insert(out, "when")
     table.insert(out, guard)
   end
-  if action ~= "" then
+  if action and action ~= "" then
     table.insert(out, "do")      
     table.insert(out, action)
   end
@@ -553,19 +556,31 @@ end
 local function outputEvents()
   local c = getEventTable(cevents)
   local u = getEventTable(uevents)
-  print("controllable "..table.concat(c, ", ")..";")
-  print("controllable "..table.concat(u, ", ")..";\n")
+  if #c > 0 then print("controllable "..table.concat(c, ", ")..";") end
+  if #u > 0 then print("uncontrollable "..table.concat(u, ", ")..";\n") end
 end
 
 local function processModule()
   
-  print(getFileName(name..".cif\n"))
+  local filename, filepath = getFileName(name..".cif")
+  print("/***")
+  print(" * CIF model generated from Supremica by Supremica2CIT.lua script")
+  print(" * "..os.date("%Y-%m-%d, %H:%M"))
+  print(" * Supremica model: "..name)
+  print(" * Saved to: "..filename)
+  print("***/")
   outputEvents()
 
   for i = 1, efalist:size() do
     local efa = efalist:get(i-1)
     processEFA(efa)
   end
+  
+  local textpanel = textframe:getTextPanel()
+  local textarea = textpanel:getTextArea()
+  local text = textarea:getText()
+  saveFile(name..".cif", filepath, text)
+  
 end
 
 preProcessing()

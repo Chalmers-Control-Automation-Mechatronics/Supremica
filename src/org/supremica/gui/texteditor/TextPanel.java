@@ -44,7 +44,7 @@ public class TextPanel
 {
     private static final long serialVersionUID = 1L;
 
-	JTextArea textarea = null;
+	private JTextArea textarea = null;
 
 	public TextPanel()
 	{
@@ -69,7 +69,7 @@ public class TextPanel
 		textarea.append(str);
 	}
 
-	JTextArea getTextArea()
+	public JTextArea getTextArea()
 	{
 		return textarea;
 	}

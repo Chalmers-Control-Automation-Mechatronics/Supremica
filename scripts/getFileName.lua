@@ -9,7 +9,7 @@ local function getFileName(fname)
     if lastch == '/' or lastch == '\\' then
         sep = ""
     end
-    return tempdir..sep..fname
+    return tempdir..sep..fname, tempdir
 end
 
 return getFileName

@@ -44,7 +44,7 @@ public class TextFrame
 	extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	TextPanel textpanel = null;
+	private TextPanel textpanel = null;
 	static final int WIDTH = 500;
 	static final int HEIGHT = 600;
 
@@ -61,7 +61,7 @@ public class TextFrame
 		setVisible(true);
 	}
 
-	TextPanel getTextPanel()
+	public TextPanel getTextPanel()
 	{
 		return textpanel;
 	}
