@@ -7,8 +7,7 @@ local script, ide, log = ... -- grab the arguments passed from Java via LuaJ
 local Config = luaj.bindClass("org.supremica.properties.Config")
 local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
 
--- Helper functions
-local function saveFile(fname, fpath, contents)
+local function showFileChooser(fname, fpath)
 	local fc = luaj.newInstance("javax.swing.JFileChooser", fpath)
 	fc:setDialogTitle("Give CIF File")
   -- Unclear why this does not work, maybe the varargs
@@ -17,14 +16,25 @@ local function saveFile(fname, fpath, contents)
   local suggestion = luaj.newInstance("java.io.File", fname)
   fc:setSelectedFile(suggestion)
   fc:setApproveButtonText("Save")
-	local retval = fc:showOpenDialog(ide)
-	if retval == fc.APPROVE_OPTION then
+  local retval = fc:showOpenDialog(ide) 
+  if retval== fc.APPROVE_OPTION then
 		local fname = fc:getSelectedFile():getPath() -- does not work on Java > 8
 		-- local fname = fc:getName(fc:getSelectedFile()) -- this works for Java > 8
-		print("File: "..fname)
+    return fname
+  else
+    return nil
+  end
+end
+
+local function saveFile(fname, fpath, contents)
+
+	local filename = showFileChooser(fname, fpath)
+  if filename then
+		print("File: "..filename)
 	else
 		print("User cancelled")
 	end
+  
 end
 
 -- Lua 5.2 and earlier do not have math.tointeger
@@ -113,7 +123,7 @@ local varlist = Helpers:getVariableList(project)
 local cevents, uevents = getEvents(project)
 
 local Variables -- Holds variable name, range, init, mark (filled by preProcess)
-local CurrentEFA -- Name of EFA currently processed (set by processEFA)
+local CurrentEFA -- EFA currently processed (set by processEFA, contains .name and .variables)
 local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
 local FileName -- The filename to save under (set by processModule)
 
@@ -337,10 +347,15 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
   local function touchThisVariable(var)
     
     if #Variables[var].efa == 0 then -- no other yet touches this variable
-      table.insert(Variables[var].efa, CurrentEFA.name)
-      table.insert(CurrentEFA.variables, "\tdisc int["..Variables[var].range.."] "..var..";\n"..
-        "\tinitial "..Variables[var].init..";\n"..
-        "\tmarked "..Variables[var].mark..";\n")
+      table.insert(Variables[var].efa, CurrentEFA.name) -- Remember that we touch this variable
+      local out = {}
+      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var)
+      table.insert(out, "\tinitial "..Variables[var].init)
+      if Variables[var].mark and Variables[var].mark ~= "" then
+        table.insert(out, "\tmarked "..Variables[var].mark)
+      end
+      table.insert(CurrentEFA.variables, table.concat(out, ";\n")..";\n")
+        
       return
     end
     -- else some efa already touched this variable
@@ -352,10 +367,12 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     -- Someone else touches this variable, and it isn't us
     table.insert(Variables[var].efa, CurrentEFA.name)
     local efas = table.concat(Variables[var].efa, ", ")
-    showIssueDialog("", "In CIF, two automata cannot assign the same variable. make\n"..
-      var.."\n(touched by "..efas..")\nbe assigned in a single automaton.\nQuitting...")
-    quit = true
+    showIssueDialog("Multiple EFA assign same variable...", "In CIF, two automata cannot assign the same variable.\n"..
+      var.."\nis assigned by "..efas..".\nMake it be assigned in a single EFA.\nQuitting...")
+    
+    textframe:setVisible(false)
     assert(false, "ASSERT false! Multiple touch of same variable not allowed by CIF")
+    
   end
   
 -- For each action guards should be added that gurantee no over- or underflow
@@ -415,7 +432,10 @@ local function processGuard(str, gastore)
   -- guard like (varY' == 2 | varZ' == -7) should be turned into what?
   -- It seems that Supremica itself has problems with this, see Issue #151
   
-  showIssueDialog("\nSorry", "Currently this script does not handle primed guards. Please rewrite\n"..str.."\nas actions.\n")
+  showIssueDialog("Cannot handle primed guards...", "Currently this script does not handle primed guards. Please rewrite\n"..str..
+      " in "..CurrentEFA.name.."\nas action(s).\n")
+  textframe:setVisible(false)
+  assert(false, "Supremica2CIF cannot handle primed guards")
 end
 
 local function processGuardAction(gablock)
@@ -449,14 +469,14 @@ local function processGuardAction(gablock)
   processGuard(gcap, gastore)
   processAction(acap, gastore)
   return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", ")
-  -- return convertGuard(gcap, gastore), processAction(acap, gastore)
+
 end
 
 local function manageSourceTarget(srctrgt, efaDB)
   local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
   
   if not efaDB.Locations[label] then
-    efaDB.Locations[label] = {"location "..label..";"}
+    efaDB.Locations[label] = {"location "..label..":"}
     if init then table.insert(efaDB.Locations[label], "\tinitial;") end
     if acc then table.insert(efaDB.Locations[label], "\tmarked;") end
   end
@@ -505,20 +525,14 @@ end
 
 local function processEdge(edge, efaDB)
   
-  -- Set up global edge data repo -- Maybe not needed? Only in processGuardAction?
---  CurrentEdge = {}
---  CurrentEdge.guards = {}
---  CurrentEdge.actions = {}
---  CurrentEdge.uevents = {}
---  CurrentEdge.cevents = {}
-
 	local src = manageSourceTarget(edge:getSource(), efaDB)
   local trgt = manageSourceTarget(edge:getTarget(), efaDB)
 	local guard, action = processGuardAction(edge:getGuardActionBlock())
-	local controllable, uncontrollable = getEdgeEvents(edge) -- edge:getLabelBlock():getEventIdentifierList()
+	local controllable, uncontrollable = getEdgeEvents(edge)
   
   table.insert(efaDB.Locations[src], makeEdge(trgt, controllable, guard, action))
   table.insert(efaDB.Locations[src], makeEdge(trgt, uncontrollable, guard, action))
+  
 end
 
 local function processEFA(efa)
@@ -537,9 +551,12 @@ local function processEFA(efa)
 	while iterator:hasNext() do
 		processEdge(iterator:next(), efaDB)
 	end
-  print(kind.." "..CurrentEFA.name);
+  print(kind.." "..CurrentEFA.name..":");
   print(table.concat(CurrentEFA.variables, "\n"))
   for src, body in pairs(efaDB.Locations) do
+    if #body == 1 then -- no initial, marking, or edges, change : to ;
+      body[1] = "location "..src..";"
+    end
     print(table.concat(body, "\n"))
   end
   print("end\n")
