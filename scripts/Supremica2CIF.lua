@@ -7,6 +7,9 @@ local script, ide, log = ... -- grab the arguments passed from Java via LuaJ
 local Config = luaj.bindClass("org.supremica.properties.Config")
 local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
 
+-- Some useful Java classes
+local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")
+
 local function showFileChooser(fname, fpath)
 	local fc = luaj.newInstance("javax.swing.JFileChooser", fpath)
 	fc:setDialogTitle("Give CIF File")
@@ -26,15 +29,39 @@ local function showFileChooser(fname, fpath)
   end
 end
 
-local function saveFile(fname, fpath, contents)
+local function fileExists(filename)
+  local file = io.open(filename, "r")
+  if file then
+    file:close()
+    return true
+  end
+  return false
+end
 
+local function checkFileExists(filename)
+  local reply = JOptionPane.YES_OPTION
+  if fileExists(filename) then
+    reply = JOptionPane:showConfirmDialog(ide, filename.."\nOverwrite?", "File exists", JOptionPane.YES_NO_OPTION)
+  end
+  return reply == JOptionPane.YES_OPTION
+end
+
+local function saveFile(filename, contents)
+  local reply = checkFileExists(filename)
+  if reply then
+    print("Saving to: "..filename)
+  else
+    print("Not saving model")
+  end
+end
+
+local function saveModel(fname, fpath, contents)
 	local filename = showFileChooser(fname, fpath)
   if filename then
-		print("File: "..filename)
+    saveFile(filename, contents)
 	else
 		print("User cancelled")
 	end
-  
 end
 
 -- Lua 5.2 and earlier do not have math.tointeger
@@ -47,7 +74,6 @@ end
 
 -- Show simple error dialog
 local function showIssueDialog(name, str)
-  local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")
   JOptionPane:showMessageDialog(ide, str, name, JOptionPane.ERROR_MESSAGE)
 end
 
@@ -70,6 +96,7 @@ efaKind[ComponentKind.SUPERVISOR] = "supervisor"
 --local TextFrame = luaj.bindClass("org.supremica.gui.texteditor.TextFrame")
 local textframe = luaj.newInstance("org.supremica.gui.texteditor.TextFrame", "CIF Export")
 local pw = textframe:getPrintWriter()
+textframe:setVisible(true)
 
 local function print(str) -- redefine print to write to the textframe
   pw:println(str)
@@ -204,7 +231,7 @@ local function getVariableInfo(var)
   elseif VariableHelper:isInteger(var) then
     kind = IS_INTEGER
   end
-  local range = var:getType():toString()
+  local range = var:getType():toString():gsub("^%[", ""):gsub("%]$", "") -- for enums, remove [ and ]
   local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
   local markings = preProcessMarkedValues(var:getVariableMarkings())
   local markstr = ""
@@ -324,7 +351,10 @@ local function protectEnums(range, newrhs)
   -- Is there a better way in CIF?
   -- Note that checking all values here will not work, since enum1 = enum2 is valid
   local out = {}
-  for enumval in var.range:gmatch(patterns.enumrange) do
+  for enumval in range:gmatch(patterns.enumrange) do
+    if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
+      return nil
+    end
     table.insert(out, newrhs.." = "..enumval)
   end
   return "("..table.concat(out, " or ")..")"
@@ -582,7 +612,7 @@ local function processModule()
   local filename, filepath = getFileName(name..".cif")
   print("/***")
   print(" * CIF model generated from Supremica by Supremica2CIT.lua script")
-  print(" * "..os.date("%Y-%m-%d, %H:%M"))
+  print(" * Generated: "..os.date("%Y-%m-%d, %H:%M"))
   print(" * Supremica model: "..name)
   print(" * Saved to: "..filename)
   print("***/")
@@ -596,7 +626,7 @@ local function processModule()
   local textpanel = textframe:getTextPanel()
   local textarea = textpanel:getTextArea()
   local text = textarea:getText()
-  saveFile(name..".cif", filepath, text)
+  saveModel(name..".cif", filepath, text)
   
 end
 
