@@ -126,6 +126,7 @@ end
 --[[ Things to consider:
   * In CIF, variables are local, so for each EFA we need to know which variables it affects
   * For non-int variable types we need to define specific types
+  * Supremica allows to compare two enums of different "types", CIF does not
   * In CIF, two EFA cannot affect the same variable, to get around this we could synch all 
     EFA that affect the same variable
   * CIF has no +=, -= etc, these need to be rewritten to ordinary var = var + x expressions
@@ -154,6 +155,15 @@ local CurrentEFA -- EFA currently processed (set by processEFA, contains .name a
 local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
 local FileName -- The filename to save under (set by processModule)
 
+--[[
+  Supremica allows to compare two enums of different types, basically checking if the
+  identifiers are equal when compared as strings. This is not allowed by CIF, only enums 
+  of the same type can be compared. To get around this, we put all Supremica enums in
+  one big Enums type, being careful to remove duplicates, while still keeping the enum
+  ranges (expanded) for each Supremica enum variable. This set is built by processVariables()
+--]]
+local Enums = {}
+
 -- Rewriting
 local pluseq = "+=" -- a += b into a = a + b
 local minuseq = "-=" -- a += b into a = a - b
@@ -170,6 +180,7 @@ patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
 patterns.enumrange = "([_%a][%w]*)"
+patterns.identifier = "([_%a][%w]*)"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
 
@@ -224,7 +235,52 @@ local IS_INTEGER = " is integer "
 local IS_BINARY = " is binary "
 local IS_ENUM = " is enum "
 
+-- Binary variables are in Supremica just 0-1 integers
+local function getIntBinaryInfo(var)
+  
+  local range = var:getType():toString()
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
+  local markings = preProcessMarkedValues(var:getVariableMarkings())
+  local markstr = ""
+  if #markings > 0 then
+    -- markstr = "{"..table.concat(markings, ", ").."}"
+    markstr = table.concat(markings, ", ")
+  end  
+  return IS_INTEGER, range, initpred, markstr  
+  
+end
+
+local function addToEnums(ident)
+  if not Enums[ident] then
+    Enums[ident] = true
+  end
+end
+
+local function getEnumInfo(var)
+  
+  local range = {}
+  for ident in var:getType():toString():gmatch(patterns.identifier) do
+    range[#range + 1] = ident
+    addToEnums(ident)
+  end
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
+  local markings = preProcessMarkedValues(var:getVariableMarkings())
+  local markstr = ""
+  if #markings > 0 then
+    -- markstr = "{"..table.concat(markings, ", ").."}"
+    markstr = table.concat(markings, ", ")
+  end  
+  return IS_ENUM, range, initpred, markstr  
+  
+end
+ 
 local function getVariableInfo(var)
+  if VariableHelper:isBinary(var) or VariableHelper:isInteger(var) then
+    return getIntBinaryInfo(var)
+  else -- it is an enum
+    return getEnumInfo(var)
+  end
+  --[[
   local kind = IS_ENUM
   if VariableHelper:isBinary(var) then
     kind = IS_BINARY
@@ -240,6 +296,7 @@ local function getVariableInfo(var)
     markstr = table.concat(markings, ", ")
   end  
   return kind, range, initpred, markstr
+  --]]
 end
 
 -- In Supremica, initial value predicates cannot be primed
@@ -346,12 +403,14 @@ local function protectIntBinary(range, newrhs)
 end
 
 local function protectEnums(range, newrhs)
-  -- For enums, the range looks like [e1, e2, e3]
+  -- For enums, the range looks like {e1, e2, e3}
   -- the guard should check all values, and then disjunct them
   -- Is there a better way in CIF?
   -- Note that checking all values here will not work, since enum1 = enum2 is valid
   local out = {}
-  for enumval in range:gmatch(patterns.enumrange) do
+  -- for enumval in range:gmatch(patterns.enumrange) do
+  for i = 1, #range do
+    local enumval = range[i]
     if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
       return nil
     end
@@ -372,6 +431,14 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     end
   end
   
+  local function makeVarDef(var)
+    if Variables[var].kind == IS_ENUM then
+      return "\tdisc Enums "..var
+    else -- IS_INTEGER, IS_BINARY
+      return "\tdisc int["..Variables[var].range.."] "..var
+    end
+  end
+  
   -- The given variable is touched by this EFA
   -- CIF does not allow multiple EFA touching the same variable
   local function touchThisVariable(var)
@@ -379,7 +446,8 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     if #Variables[var].efa == 0 then -- no other yet touches this variable
       table.insert(Variables[var].efa, CurrentEFA.name) -- Remember that we touch this variable
       local out = {}
-      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var)
+      -- table.insert(out, "\tdisc int["..Variables[var].range.."] "..var)
+      table.insert(out, makeVarDef(var))
       table.insert(out, "\tinitial "..Variables[var].init)
       if Variables[var].mark and Variables[var].mark ~= "" then
         table.insert(out, "\tmarked "..Variables[var].mark)
@@ -607,6 +675,18 @@ local function outputEvents()
   if #u > 0 then print("uncontrollable "..table.concat(u, ", ")..";\n") end
 end
 
+local function outputEnums()
+  local out = {}
+  for e, _ in pairs(Enums) do
+    out[#out + 1] = e
+  end
+  if #out > 0 then
+    print("// All Supremica enums are put in a single CIF enum type, since")
+    print("// in Supremica enums of different types can be compared.")
+    print("enum Enums = "..table.concat(out, ", ")..";\n")
+  end
+end
+
 local function processModule()
   
   local filename, filepath = getFileName(name..".cif")
@@ -617,7 +697,8 @@ local function processModule()
   print(" * Saved to: "..filename)
   print("***/")
   outputEvents()
-
+  outputEnums()
+  
   for i = 1, efalist:size() do
     local efa = efalist:get(i-1)
     processEFA(efa)
