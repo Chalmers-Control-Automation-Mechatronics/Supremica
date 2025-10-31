@@ -156,6 +156,7 @@ local cevents, uevents = getEvents(project)
 local Variables -- Holds variable name, range, init, mark (filled by preProcess)
 local CurrentEFA -- EFA currently processed (set by processEFA, contains .name and .variables)
 local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
+local Storage = {} -- holds the generated EFA for delayed output (see outputEFA)
 local FileName -- The filename to save under (set by processModule)
 
 --[[
@@ -182,8 +183,8 @@ patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
-patterns.enumrange = "([_%a][%w]*)"
-patterns.identifier = "([_%a][%w]*)"
+-- patterns.enumrange = "([_%a][%w]*)"
+patterns.identifier = "([_%a][_%w]*)"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
 
@@ -209,7 +210,7 @@ end
 rewrites["=="] = function(lhs, rhs)
   return rewrites.doit(lhs, " = ", rhs)
 end
-  
+
 local function convertGuard(gstr)
   return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("![^=]", "not ")
 end
@@ -318,6 +319,8 @@ local function preProcessVariables()
     local kind, range, init, mark = getVariableInfo(var)
     --loginfo(name..kind..": "..range..", "..init..", "..mark)
     variables[name] = {kind = kind, range = range, init = init, mark = mark, efa = {}}
+    -- 1. Rename "efa" at the end to "owner". 
+    -- 2. Owner does not have to be table, there can be only one!
   end
   
   return variables
@@ -329,8 +332,12 @@ local function preProcessing()
   Variables = preProcessVariables()
   
   --[[ Just checkin'...
-  for name, info in pairs(stuff.Vars) do
-    loginfo(name..info.kind..info.range..", <"..info.init..">, "..info.mark)
+  for name, info in pairs(Variables) do
+    if info.kind == IS_ENUM then
+      loginfo(name..info.kind.."["..table.concat(info.range, ",").."], <"..info.init..">, "..info.mark)
+    else
+      loginfo(name..info.kind..info.range..", <"..info.init..">, "..info.mark)
+    end
   end
   --]]
   
@@ -411,7 +418,7 @@ local function protectEnums(range, newrhs)
   -- Is there a better way in CIF?
   -- Note that checking all values here will not work, since enum1 = enum2 is valid
   local out = {}
-  -- for enumval in range:gmatch(patterns.enumrange) do
+  -- for enumval in range:gmatch(patterns.identifier) do
   for i = 1, #range do
     local enumval = range[i]
     if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
@@ -449,7 +456,6 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     if #Variables[var].efa == 0 then -- no other yet touches this variable
       table.insert(Variables[var].efa, CurrentEFA.name) -- Remember that we touch this variable
       local out = {}
-      -- table.insert(out, "\tdisc int["..Variables[var].range.."] "..var)
       table.insert(out, makeVarDef(var))
       table.insert(out, "\tinitial "..Variables[var].init)
       if Variables[var].mark and Variables[var].mark ~= "" then
@@ -497,6 +503,44 @@ local function processAction(str, gastore)
   end
 end
 
+-- Syntactic replacement of operators is not enough, as guards and actions include
+-- variables, and in CIF these need to be prefixed by their owner names
+local function prefixvariables(str)
+  local orphans = {}
+  -- For identifiers that are variable names, if possible prefix with owner
+  for ident in str:gmatch(patterns.identifier) do
+    local var = Variables[ident]
+    if var then -- this is a variable
+      if #var.efa > 0 then -- owned by someone
+        if CurrentEFA.name ~= var.efa[1] then -- not owned by us
+          -- loginfo("Variable "..ident.." is used by "..CurrentEFA.name..", but owned by "..var.efa[1])
+          -- Prefix with the owner
+          str = str:gsub(ident, var.efa[1].."."..ident)
+        end
+      else
+        -- This variable is not yet owned by anyone. 
+        -- Need to remember this to do the prefixing later
+        orphans[#orphans+1] = ident
+      end
+    end
+  end  
+  return str, orphans
+end
+-- Why does this not work for Enums?
+local function manageGuard(gstr)
+  
+  local newstr = convertGuard(gstr)
+  local prefxd, orphans = prefixvariables(newstr)
+  if #orphans > 0 then
+    loginfo(CurrentEFA.name..", orphans: ")
+    for i = 1, #orphans do
+      loginfo(orphans[i])
+    end
+  end
+  return prefxd
+
+end
+
 -- Primed guards are unknown to CIF, and so must be turned into actions
 local function processGuard(str, gastore)
   -- str is a logical operator separated sequence of predicates
@@ -506,7 +550,7 @@ local function processGuard(str, gastore)
   if not str or str == "" then return nil end
   if not str:find("'") then -- simply convert syntactically and return
     -- loginfo(str)
-    table.insert(gastore.guards, "("..convertGuard(str)..")")
+    table.insert(gastore.guards, "("..manageGuard(str)..")")
     return
   end
   -- Else we have a guard with at least one primed variable
@@ -573,13 +617,13 @@ local function processGuardAction(gablock)
 
 end
 
-local function manageSourceTarget(srctrgt, efaDB)
+local function manageSourceTarget(srctrgt)
   local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
   
-  if not efaDB.Locations[label] then
-    efaDB.Locations[label] = {"location "..label..":"}
-    if init then table.insert(efaDB.Locations[label], "\tinitial;") end
-    if acc then table.insert(efaDB.Locations[label], "\tmarked;") end
+  if not CurrentEFA.locations[label] then
+    CurrentEFA.locations[label] = {"location "..label..":"}
+    if init then table.insert(CurrentEFA.locations[label], "\tinitial;") end
+    if acc then table.insert(CurrentEFA.locations[label], "\tmarked;") end
   end
   return label
 end
@@ -624,43 +668,42 @@ local function makeEdge(target, events, guard, action)
   return table.concat(out, " ")
 end
 
-local function processEdge(edge, efaDB)
+local function processEdge(edge)
   
-	local src = manageSourceTarget(edge:getSource(), efaDB)
-  local trgt = manageSourceTarget(edge:getTarget(), efaDB)
+	local src = manageSourceTarget(edge:getSource())
+  local trgt = manageSourceTarget(edge:getTarget())
 	local guard, action = processGuardAction(edge:getGuardActionBlock())
 	local controllable, uncontrollable = getEdgeEvents(edge)
   
-  table.insert(efaDB.Locations[src], makeEdge(trgt, controllable, guard, action))
-  table.insert(efaDB.Locations[src], makeEdge(trgt, uncontrollable, guard, action))
+  table.insert(CurrentEFA.locations[src], makeEdge(trgt, controllable, guard, action))
+  table.insert(CurrentEFA.locations[src], makeEdge(trgt, uncontrollable, guard, action))
   
 end
 
 local function processEFA(efa)
   
-  -- Set up global current EFA name holder
+  -- Set up global current EFA holder
   CurrentEFA = {name = efa:getName()}
   CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
+  CurrentEFA.locations = {} -- Holds the locations with events, guard, actions
+  CurrentEFA.kind = efaKind[efa:getKind()]
   
-  local efaDB = {} -- holds stuff releated to this particular efa
-  efaDB.Locations = {} -- Holds the locations with events, guard, actions
-  
-  local kind = efaKind[efa:getKind()]
+  -- Get edge iterator from Supremica
 	local graph = efa:getGraph()
 	local edges = graph:getEdges()
 	local iterator = edges:iterator()
 	while iterator:hasNext() do
-		processEdge(iterator:next(), efaDB)
+		processEdge(iterator:next())
 	end
-  print(kind.." "..CurrentEFA.name..":");
-  print(table.concat(CurrentEFA.variables, "\n"))
-  for src, body in pairs(efaDB.Locations) do
-    if #body == 1 then -- no initial, marking, or edges, change : to ;
-      body[1] = "location "..src..";"
-    end
-    print(table.concat(body, "\n"))
-  end
-  print("end\n")
+--  print(kind.." "..CurrentEFA.name..":");
+--  print(table.concat(CurrentEFA.variables, "\n"))
+--  for src, body in pairs(CurrentEFA.locations) do
+--    if #body == 1 then -- no initial, marking, or edges, change : to ;
+--      body[1] = "location "..src..";"
+--    end
+--    print(table.concat(body, "\n"))
+--  end
+--  print("end\n")
 end
 
 local function getEventTable(ev)
@@ -690,6 +733,22 @@ local function outputEnums()
   end
 end
 
+-- Must delay the output of the EFA, until we know which EFA touches which variable
+-- This so, since we need to prefix other EFA's variables with their toucher's name
+-- This applies to both guards and actions, as we could have an action varX := varY,
+-- which if varY is owned by efa2 needs to be converted to varX := efa2.varY
+local function outputEFA()
+  print(CurrentEFA.kind.." "..CurrentEFA.name..":");
+  print(table.concat(CurrentEFA.variables, "\n"))
+  for src, body in pairs(CurrentEFA.locations) do
+    if #body == 1 then -- no initial, marking, or edges, change : to ;
+      body[1] = "location "..src..";"
+    end
+    print(table.concat(body, "\n"))
+  end
+  print("end\n")
+end
+
 local function processModule()
   
   local filename, filepath = getFileName(name..".cif")
@@ -705,6 +764,13 @@ local function processModule()
   for i = 1, efalist:size() do
     local efa = efalist:get(i-1)
     processEFA(efa)
+    Storage[#Storage+1] = CurrentEFA
+  end
+  -- Now all EFAs have been processed, so we know which variable belongs to which EFA
+  -- Outputting EFA now can prefix variables in guards with the respective EFA owner 
+  for i = 1, #Storage do
+    CurrentEFA = Storage[i]
+    outputEFA()
   end
   
   local textpanel = textframe:getTextPanel()
