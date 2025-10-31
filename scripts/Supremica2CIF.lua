@@ -50,6 +50,9 @@ local function saveFile(filename, contents)
   local reply = checkFileExists(filename)
   if reply then
     print("Saving to: "..filename)
+    local file = io.open(filename, "w")
+    file:write(contents)
+    file:close()
   else
     print("Not saving model")
   end
