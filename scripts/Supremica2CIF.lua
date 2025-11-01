@@ -789,6 +789,17 @@ local function outputEnums()
   end
 end
 
+-- In Supremica, variables are not owned by any specific EFA, they are free for all
+-- In CIF, variables MUST be owned by some EFA
+-- In the conversion, the first EFA to assign a variable is considered its owner
+-- 1. Multiple EFA assigning the same variable cannot be allowed, see ownThisVariable()
+-- 2. A variable not assigned by any EFA, but always keeping its initial value, is replaced
+-- by its initial value. BUT! In Supremica the initial value can be nondeterministic!
+local function handleOrphanedVariable(var, str)
+  local initexpr = Variables[var].init -- can look like "var == X | var == y"
+  return str:gsub(var, "_global."..var) -- This wont work for CIF, but...
+end
+
 local function outputEdge(edge, name)
 --  print(edge)
   local str = edge[1]
@@ -797,7 +808,9 @@ local function outputEdge(edge, name)
 
   for var, _ in pairs(orphans) do
     local owner = Variables[var].owner
-    if owner ~= name then
+    if not owner then
+      str = handleOrphanedVariable(var, str)
+    elseif owner ~= name then -- sometimes self-owned variables in actions are added to orphans. BUG!
       str = str:gsub(var, owner.."."..var)
     end
   end
@@ -824,7 +837,7 @@ local function outputEFA(efa)
       end
     end
   end
-  print("end\n")
+  print("end // "..efa.name.."\n")
 end
 
 local function processModule()
@@ -844,7 +857,17 @@ local function processModule()
     processEFA(efa)
     Storage[#Storage+1] = CurrentEFA
   end
-  -- Now all EFAs have been processed, so we know which variable belongs to which EFA
+  
+  -- here, some variables may not be owned by any EFA. This is not allowed in CIF
+  -- So we go through all variables and assigne orphans to an arbitrary EFA
+  for var, body in pairs(Variables) do
+    if not body.owner then
+      -- loginfo(var.." has no owner, assign: "..CurrentEFA.name)
+      ownThisVariable(var)
+    end
+  end
+  
+  -- Now all EFAs have been processed, so we know which variable is owned by which EFA
   -- Outputting EFA can now owner-prefix variables in guards and actions
   -- But we only need to handle the orphans, all other have already been prefixed
   for i = 1, #Storage do
