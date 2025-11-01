@@ -548,7 +548,7 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
 -- if two different EFA assign the same variable, CIF does not allow this
 local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
-  if not str or str == "" then return nil end
+  if not str or str == "" then return {} end
   local orphans = {}
   for cap in str:gmatch(patterns.actionexpr) do
     local lhs, op, rhs = cap:match(patterns.actiondetail)
