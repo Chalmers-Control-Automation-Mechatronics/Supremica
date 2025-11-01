@@ -318,7 +318,7 @@ local function preProcessVariables()
     local name = var:getName()
     local kind, range, init, mark = getVariableInfo(var)
     --loginfo(name..kind..": "..range..", "..init..", "..mark)
-    variables[name] = {kind = kind, range = range, init = init, mark = mark, efa = {}}
+    variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil} -- efa = {}}
     -- 1. Rename "efa" at the end to "owner". 
     -- 2. Owner does not have to be table, there can be only one!
   end
@@ -366,8 +366,36 @@ local function processSourceTarget(srctxt)
   return label, initial, acc, xxx
 end
 
--- Return the end values of the range (inclusive)
-local function getRangeLimits(range)
+-- Pure syntactic replacement of operators is not enough, as guards and actions include
+-- variables, and in CIF these need to be prefixed by their owner names
+-- Calling this function during processing will not fix all prefixing
+local function prefixOwner(str)
+  local orphans = {}
+  -- For identifiers that are variable names, if possible prefix with owner
+  for ident in str:gmatch(patterns.identifier) do
+    local var = Variables[ident]
+    if var then -- this is a variable
+      if var.owner then -- someone already owns this variable, is it us?
+        if CurrentEFA.name ~= var.owner then -- owned by someone but not us
+          -- Prefix with the owner
+          str = str:gsub(ident, var.owner.."."..ident)
+        end
+      else
+        -- This variable is not yet owned by anyone
+        -- Need to remember this to do the prefixing later
+        orphans[#orphans+1] = ident
+      end
+    end
+  end  
+  return str, orphans
+end
+-- The above code relies on the fact that Supremica does not implement proper namespaces
+-- Variable names, enum values, automata names, must be all distinct from each other
+-- But note! Events can have the same label as enum value, variable name, automata name
+-- Also, we cannot have things like "X.ident", for which the code above would wreak havoc 
+
+-- Return the end values of an integer range (inclusive)
+local function getIntRangeLimits(range)
   local bottom, topper = range:match(patterns.matchrange)
   return tointeger(bottom), tointeger(topper)
 end
@@ -377,7 +405,7 @@ end
 local function unfoldRange(range, botlimit, toplimit)
 
   local out = {}
-  local bottom, topper = getRangeLimits(range)
+  local bottom, topper = getIntRangeLimits(range)
   if botlimit then
     bottom = math.max(bottom, botlimit)
   end
@@ -393,7 +421,7 @@ end
 
 local function isWithinRange(value, range)
   -- value is int, range is string like "9..55"
-  local bottom, topper = getRangeLimits(range)
+  local bottom, topper = getIntRangeLimits(range)
   return bottom <= value and value <= topper
 end 
 
@@ -403,13 +431,14 @@ local function protectIntBinary(range, newrhs)
   local val = tointeger(newrhs)
   if val then -- newrhs is simply a number that can be checked
     if isWithinRange(val, range) then -- no need to add guard
-      return nil
+      return 
     end
   end
-  -- newrhs either not a number of not within range
-  local bottom, topper = range:match(patterns.matchrange)
+  -- newrhs either not a number or not within range
+  local bottom, topper = getIntRangeLimits(range) -- range:match(patterns.matchrange)
   -- newguard = (lhs.bottom <= newrhs and newrhs <= lhs.topper)
-  return "("..tointeger(bottom).." <= "..newrhs.." and "..newrhs.." <= "..tointeger(topper)..")"
+  local owned, orphans = prefixOwner(newrhs)
+  return "("..bottom.." <= "..owned.." and "..owned.." <= "..topper..")"
 end
 
 local function protectEnums(range, newrhs)
@@ -424,7 +453,8 @@ local function protectEnums(range, newrhs)
     if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
       return nil
     end
-    table.insert(out, newrhs.." = "..enumval)
+    local owned, orphans = prefixOwner(newrhs)
+    table.insert(out, owned.." = "..enumval)
   end
   return "("..table.concat(out, " or ")..")"
 end
@@ -453,8 +483,8 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
   -- CIF does not allow multiple EFA touching the same variable
   local function touchThisVariable(var)
     
-    if #Variables[var].efa == 0 then -- no other yet touches this variable
-      table.insert(Variables[var].efa, CurrentEFA.name) -- Remember that we touch this variable
+    if not Variables[var].owner then -- this variable is still orphan
+      Variables[var].owner = CurrentEFA.name -- remember the owner of this variable
       local out = {}
       table.insert(out, makeVarDef(var))
       table.insert(out, "\tinitial "..Variables[var].init)
@@ -462,32 +492,28 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
         table.insert(out, "\tmarked "..Variables[var].mark)
       end
       table.insert(CurrentEFA.variables, table.concat(out, ";\n")..";\n")
-        
       return
     end
-    -- else some efa already touched this variable
-    if #Variables[var].efa == 1 then -- might be the current one, no problem
-      if Variables[var].efa[1] == CurrentEFA.name then
-        return
-      end
+    -- else some efa already owns this variable, it might be us
+    if Variables[var].owner == CurrentEFA.name then -- we are the owner, all is fine
+      return
     end
-    -- Someone else touches this variable, and it isn't us
-    table.insert(Variables[var].efa, CurrentEFA.name)
-    local efas = table.concat(Variables[var].efa, ", ")
+    -- Someone else already owns this variable, and it isn't us
+    local owners = Variables[var].owner.." and "..CurrentEFA.name
     showIssueDialog("Multiple EFA assign same variable...", "In CIF, two automata cannot assign the same variable.\n"..
-      var.."\nis assigned by "..efas..".\nMake it be assigned in a single EFA.\nQuitting...")
+      var.."\nis assigned by "..owners..".\nMake it be assigned in a single EFA.\nQuitting...")
     
     textframe:setVisible(false)
-    assert(false, "ASSERT false! Multiple touch of same variable not allowed by CIF")
+    assert(false, "Different EFA assigning the same variable is not allowed by CIF")
     
   end
   
--- For each action guards should be added that gurantee no over- or underflow
+-- For each action, guards should be added that gurantee no over- or underflow
 -- A primed guard must be turned into an action, which then requires to add guards!
 -- So, processAction must be able to generate guards, and
 -- processGuards must be able to generate actions!
 -- Also, processAction must have access to the currentEFA so that it can record and check
--- that/if two different EFA assign the same variable, CIF does not allow this
+-- if two different EFA assign the same variable, CIF does not allow this
 local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
   if not str or str == "" then return nil end
@@ -495,7 +521,9 @@ local function processAction(str, gastore)
   for cap in str:gmatch(patterns.actionexpr) do
     local lhs, op, rhs = cap:match(patterns.actiondetail)
     local expr, newrhs = rewrites[op](lhs, rhs)
-    table.insert(gastore.actions, expr)
+    local action, orphans = prefixOwner(expr)
+    -- loginfo("expr: "..expr..", newrhs: "..newrhs..", action: "..action)
+    table.insert(gastore.actions, action)
     if newrhs then -- only when necessary
       addProtectiveGuards(lhs, newrhs, gastore)
     end
@@ -503,40 +531,19 @@ local function processAction(str, gastore)
   end
 end
 
--- Syntactic replacement of operators is not enough, as guards and actions include
--- variables, and in CIF these need to be prefixed by their owner names
-local function prefixvariables(str)
-  local orphans = {}
-  -- For identifiers that are variable names, if possible prefix with owner
-  for ident in str:gmatch(patterns.identifier) do
-    local var = Variables[ident]
-    if var then -- this is a variable
-      if #var.efa > 0 then -- owned by someone
-        if CurrentEFA.name ~= var.efa[1] then -- not owned by us
-          -- loginfo("Variable "..ident.." is used by "..CurrentEFA.name..", but owned by "..var.efa[1])
-          -- Prefix with the owner
-          str = str:gsub(ident, var.efa[1].."."..ident)
-        end
-      else
-        -- This variable is not yet owned by anyone. 
-        -- Need to remember this to do the prefixing later
-        orphans[#orphans+1] = ident
-      end
-    end
-  end  
-  return str, orphans
-end
 -- Why does this not work for Enums?
 local function manageGuard(gstr)
   
   local newstr = convertGuard(gstr)
-  local prefxd, orphans = prefixvariables(newstr)
+  local prefxd, orphans = prefixOwner(newstr)
+  --[[
   if #orphans > 0 then
     loginfo(CurrentEFA.name..", orphans: ")
     for i = 1, #orphans do
       loginfo(orphans[i])
     end
   end
+  --]]
   return prefxd
 
 end
@@ -680,6 +687,9 @@ local function processEdge(edge)
   
 end
 
+-- For each edge, after processing, there will be a set of orphans that need to 
+-- be owner-prefixed when the edge is output
+
 local function processEFA(efa)
   
   -- Set up global current EFA holder
@@ -695,6 +705,7 @@ local function processEFA(efa)
 	while iterator:hasNext() do
 		processEdge(iterator:next())
 	end
+--  -- Moved to outputEFA  
 --  print(kind.." "..CurrentEFA.name..":");
 --  print(table.concat(CurrentEFA.variables, "\n"))
 --  for src, body in pairs(CurrentEFA.locations) do
@@ -737,6 +748,8 @@ end
 -- This so, since we need to prefix other EFA's variables with their toucher's name
 -- This applies to both guards and actions, as we could have an action varX := varY,
 -- which if varY is owned by efa2 needs to be converted to varX := efa2.varY
+-- So, for each edge there will be a set of orphans thet need to be owner-prefixed 
+-- before the edge is output
 local function outputEFA()
   print(CurrentEFA.kind.." "..CurrentEFA.name..":");
   print(table.concat(CurrentEFA.variables, "\n"))
