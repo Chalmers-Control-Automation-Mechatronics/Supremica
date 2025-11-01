@@ -185,6 +185,7 @@ patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
 -- patterns.enumrange = "([_%a][%w]*)"
 patterns.identifier = "([_%a][_%w]*)"
+patterns.colonatend = ":$"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
 
@@ -215,7 +216,29 @@ local function convertGuard(gstr)
   return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("![^=]", "not ")
 end
 
+local function debugOrphans(name, orphans)
+  for k, v in pairs(orphans) do
+    loginfo(name..": "..k)
+  end
+end
+
+-- The orphans are collected in a simple map
+local function mergeOrphans(orph1, orph2)
+  assert(orph1, "orph1 is nil")
+  assert(orph2, "orph2 is nil")
+--  for k, v in pairs(orph1) do
+--    loginfo(k..", "..(v and "true" or "false"))
+--  end
+  
+  for k, v in pairs(orph2) do
+    orph1[k] = v
+  end
+  return orph1
+end
+
+-----------------------------------------------------------------
 -- Preprocessing - Collect stuff necessary to be able to process
+-----------------------------------------------------------------
 local function preProcessMarkedValues(marklist)
   local markings = {}
   local mit = marklist:iterator()
@@ -223,7 +246,7 @@ local function preProcessMarkedValues(marklist)
     local mstr = mit:next():getPredicate():toString()
     local str = convertGuard(mstr)
     table.insert(markings, str)
---    table.insert(markings, convertGuard(mstr)) -- does work because gsub returns two values
+--    table.insert(markings, convertGuard(mstr)) -- does not work because gsub returns two values
 --    loginfo(mstr)
 --    loginfo(convertGuard(mstr))
   end
@@ -319,8 +342,6 @@ local function preProcessVariables()
     local kind, range, init, mark = getVariableInfo(var)
     --loginfo(name..kind..": "..range..", "..init..", "..mark)
     variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil} -- efa = {}}
-    -- 1. Rename "efa" at the end to "owner". 
-    -- 2. Owner does not have to be table, there can be only one!
   end
   
   return variables
@@ -383,10 +404,11 @@ local function prefixOwner(str)
       else
         -- This variable is not yet owned by anyone
         -- Need to remember this to do the prefixing later
-        orphans[#orphans+1] = ident
+        orphans[ident] = true -- need a map for quick lookup and avoiding dupicates
       end
     end
   end  
+  assert(orphans, "8. Oprhans nil!")
   return str, orphans
 end
 -- The above code relies on the fact that Supremica does not implement proper namespaces
@@ -431,14 +453,15 @@ local function protectIntBinary(range, newrhs)
   local val = tointeger(newrhs)
   if val then -- newrhs is simply a number that can be checked
     if isWithinRange(val, range) then -- no need to add guard
-      return 
+      return nil, {} -- second element here is orphans, should it be empty?
     end
   end
   -- newrhs either not a number or not within range
   local bottom, topper = getIntRangeLimits(range) -- range:match(patterns.matchrange)
   -- newguard = (lhs.bottom <= newrhs and newrhs <= lhs.topper)
   local owned, orphans = prefixOwner(newrhs)
-  return "("..bottom.." <= "..owned.." and "..owned.." <= "..topper..")"
+  assert(orphans, "9. Oprhans nil!")
+  return "("..bottom.." <= "..owned.." and "..owned.." <= "..topper..")", orphans
 end
 
 local function protectEnums(range, newrhs)
@@ -446,17 +469,20 @@ local function protectEnums(range, newrhs)
   -- the guard should check all values, and then disjunct them
   -- Is there a better way in CIF?
   -- Note that checking all values here will not work, since enum1 = enum2 is valid
-  local out = {}
+  local out, orphans = {}, {}
   -- for enumval in range:gmatch(patterns.identifier) do
   for i = 1, #range do
     local enumval = range[i]
     if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
       return nil
     end
-    local owned, orphans = prefixOwner(newrhs)
+    local owned, orph = prefixOwner(newrhs)
+    assert(orph, "42: Orph is nil!")
     table.insert(out, owned.." = "..enumval)
+    orphans = mergeOrphans(orphans, orph)
   end
-  return "("..table.concat(out, " or ")..")"
+  assert(orphans, "10. Oprhans nil!")
+  return "("..table.concat(out, " or ")..")", orphans
 end
 
 -- Supremica has implict guards that protect againts out-of-domain assignments
@@ -465,9 +491,15 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     -- lhs is a variable name, newrhs is the rewritten rhs
     local var = Variables[lhs]
     if var.kind == IS_INTEGER or var.kind == IS_BINARY then
-      table.insert(gastore.guards, protectIntBinary(var.range, newrhs))
+      local guard, orphans = protectIntBinary(var.range, newrhs)
+      table.insert(gastore.guards, guard)
+      assert(orphans, "1. Oprhans nil!")
+      return orphans
     elseif var.kind == IS_ENUM then 
-      table.insert(gastore.guards, protectEnums(var.range, newrhs))
+      local guard, orphans = protectEnums(var.range, newrhs)
+      table.insert(gastore.guards, guard)
+      assert(orphans, "2. Oprhans nil!")
+      return orphans
     end
   end
   
@@ -479,9 +511,9 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     end
   end
   
-  -- The given variable is touched by this EFA
-  -- CIF does not allow multiple EFA touching the same variable
-  local function touchThisVariable(var)
+  -- The given variable is assigned by this EFA, so it owns it
+  -- CIF does not allow multiple EFA owning the same variable
+  local function ownThisVariable(var)
     
     if not Variables[var].owner then -- this variable is still orphan
       Variables[var].owner = CurrentEFA.name -- remember the owner of this variable
@@ -517,18 +549,22 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
 local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
   if not str or str == "" then return nil end
-  
+  local orphans = {}
   for cap in str:gmatch(patterns.actionexpr) do
     local lhs, op, rhs = cap:match(patterns.actiondetail)
     local expr, newrhs = rewrites[op](lhs, rhs)
-    local action, orphans = prefixOwner(expr)
-    -- loginfo("expr: "..expr..", newrhs: "..newrhs..", action: "..action)
+    local action, orph1 = prefixOwner(expr)
+    orphans = mergeOrphans(orphans, orph1)
+--    loginfo("expr: "..expr..", newrhs: "..newrhs..", action: "..action)
     table.insert(gastore.actions, action)
+    ownThisVariable(lhs)
     if newrhs then -- only when necessary
-      addProtectiveGuards(lhs, newrhs, gastore)
+      local orph2 = addProtectiveGuards(lhs, newrhs, gastore)
+      orphans = mergeOrphans(orphans, orph2)
     end
-    touchThisVariable(lhs)
   end
+  assert(orphans, "3. Oprhans nil!")
+  return orphans
 end
 
 -- Why does this not work for Enums?
@@ -537,14 +573,10 @@ local function manageGuard(gstr)
   local newstr = convertGuard(gstr)
   local prefxd, orphans = prefixOwner(newstr)
   --[[
-  if #orphans > 0 then
-    loginfo(CurrentEFA.name..", orphans: ")
-    for i = 1, #orphans do
-      loginfo(orphans[i])
-    end
-  end
+    debugOrphans(CurrentEFA.name, orphans)
   --]]
-  return prefxd
+  assert(orphans, "4. Oprhans nil!")
+  return prefxd, orphans
 
 end
 
@@ -554,11 +586,14 @@ local function processGuard(str, gastore)
   -- Replacements can be done inline, see convertGuard()
   -- The only(?) complication is primed guards, that CIF do not recognize
   
-  if not str or str == "" then return nil end
+  if not str or str == "" then return {} end
+  
   if not str:find("'") then -- simply convert syntactically and return
     -- loginfo(str)
-    table.insert(gastore.guards, "("..manageGuard(str)..")")
-    return
+    local prefixed, orphans = manageGuard(str)
+    table.insert(gastore.guards, "("..prefixed..")")
+    assert(orphans, "5. Orphans nil!")
+    return orphans
   end
   -- Else we have a guard with at least one primed variable
   -- This has to be turned into an action.
@@ -584,15 +619,16 @@ local function processGuard(str, gastore)
   -- guard like (varY' == 2 | varZ' == -7) should be turned into what?
   -- It seems that Supremica itself has problems with this, see Issue #151
   
-  showIssueDialog("Cannot handle primed guards...", "Currently this script does not handle primed guards. Please rewrite\n"..str..
-      " in "..CurrentEFA.name.."\nas action(s).\n")
+  showIssueDialog("Cannot handle primed guards...", 
+    "Currently this script does not handle primed guards. Please rewrite\n"..str..
+    " in "..CurrentEFA.name.."\nas action(s).\n")
   textframe:setVisible(false)
   assert(false, "Supremica2CIF cannot handle primed guards")
 end
 
 local function processGuardAction(gablock)
   
-  if not gablock then return nil, nil end -- not all edges have GA-blocks
+  if not gablock then return nil, nil, {} end -- not all edges have GA-blocks
   
   local gastore = {}
   gastore.guards, gastore.actions = {}, {}
@@ -618,9 +654,11 @@ local function processGuardAction(gablock)
   acap = stripCurly(acap)
   gcap = stripCurly(gcap)
   
-  processGuard(gcap, gastore)
-  processAction(acap, gastore)
-  return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", ")
+  local orph1 = processGuard(gcap, gastore) assert(orph1, "657: orph1 is nil")
+  local orph2 = processAction(acap, gastore) assert(orph2, "658: orph2 is nil")
+  local orphans = mergeOrphans(orph1, orph2)
+  assert(orphans, "6. Oprhans nil!")
+  return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
 
 end
 
@@ -628,9 +666,13 @@ local function manageSourceTarget(srctrgt)
   local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
   
   if not CurrentEFA.locations[label] then
-    CurrentEFA.locations[label] = {"location "..label..":"}
-    if init then table.insert(CurrentEFA.locations[label], "\tinitial;") end
-    if acc then table.insert(CurrentEFA.locations[label], "\tmarked;") end
+    local out = {"location "..label..":"}
+    if init then table.insert(out, "\tinitial;") end
+    if acc then table.insert(out, "\tmarked;") end
+    CurrentEFA.locations[label] = { table.concat(out, "\n") }
+--    CurrentEFA.locations[label] = {"location "..label..":"}
+--    if init then table.insert(CurrentEFA.locations[label], "\tinitial;") end
+--    if acc then table.insert(CurrentEFA.locations[label], "\tmarked;") end
   end
   return label
 end
@@ -679,12 +721,24 @@ local function processEdge(edge)
   
 	local src = manageSourceTarget(edge:getSource())
   local trgt = manageSourceTarget(edge:getTarget())
-	local guard, action = processGuardAction(edge:getGuardActionBlock())
-	local controllable, uncontrollable = getEdgeEvents(edge)
+	local guard, action, orphans = processGuardAction(edge:getGuardActionBlock())
+  assert(orphans, "7. Oprhans nil!")
+	local cevents, uevents = getEdgeEvents(edge)
   
-  table.insert(CurrentEFA.locations[src], makeEdge(trgt, controllable, guard, action))
-  table.insert(CurrentEFA.locations[src], makeEdge(trgt, uncontrollable, guard, action))
-  
+  -- Make different edges for controllable and uncontrollable events
+--  if #controllable > 0 then 
+--    table.insert(CurrentEFA.locations[src], makeEdge(trgt, controllable, guard, action))
+--  end
+--  if #uncontrollable > 0 then
+--    table.insert(CurrentEFA.locations[src], makeEdge(trgt, uncontrollable, guard, action))
+--  end
+
+  if #cevents > 0 then
+    table.insert(CurrentEFA.locations[src], {makeEdge(trgt, cevents, guard, action), orphans})
+  end
+  if #uevents > 0 then
+    table.insert(CurrentEFA.locations[src], {makeEdge(trgt, uevents, guard, action), orphans})
+  end  
 end
 
 -- For each edge, after processing, there will be a set of orphans that need to 
@@ -694,9 +748,9 @@ local function processEFA(efa)
   
   -- Set up global current EFA holder
   CurrentEFA = {name = efa:getName()}
+  CurrentEFA.kind = efaKind[efa:getKind()]
   CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
   CurrentEFA.locations = {} -- Holds the locations with events, guard, actions
-  CurrentEFA.kind = efaKind[efa:getKind()]
   
   -- Get edge iterator from Supremica
 	local graph = efa:getGraph()
@@ -705,16 +759,7 @@ local function processEFA(efa)
 	while iterator:hasNext() do
 		processEdge(iterator:next())
 	end
---  -- Moved to outputEFA  
---  print(kind.." "..CurrentEFA.name..":");
---  print(table.concat(CurrentEFA.variables, "\n"))
---  for src, body in pairs(CurrentEFA.locations) do
---    if #body == 1 then -- no initial, marking, or edges, change : to ;
---      body[1] = "location "..src..";"
---    end
---    print(table.concat(body, "\n"))
---  end
---  print("end\n")
+
 end
 
 local function getEventTable(ev)
@@ -744,20 +789,40 @@ local function outputEnums()
   end
 end
 
+local function outputEdge(edge, name)
+--  print(edge)
+  local str = edge[1]
+  local orphans = edge[2]
+  -- print(edge[1])
+
+  for var, _ in pairs(orphans) do
+    local owner = Variables[var].owner
+    if owner ~= name then
+      str = str:gsub(var, owner.."."..var)
+    end
+  end
+  print(str)
+  
+end
+
 -- Must delay the output of the EFA, until we know which EFA touches which variable
 -- This so, since we need to prefix other EFA's variables with their toucher's name
 -- This applies to both guards and actions, as we could have an action varX := varY,
 -- which if varY is owned by efa2 needs to be converted to varX := efa2.varY
 -- So, for each edge there will be a set of orphans thet need to be owner-prefixed 
 -- before the edge is output
-local function outputEFA()
-  print(CurrentEFA.kind.." "..CurrentEFA.name..":");
-  print(table.concat(CurrentEFA.variables, "\n"))
-  for src, body in pairs(CurrentEFA.locations) do
-    if #body == 1 then -- no initial, marking, or edges, change : to ;
-      body[1] = "location "..src..";"
+local function outputEFA(efa)
+  print(efa.kind.." "..efa.name..":");
+  print(table.concat(efa.variables, "\n"))
+  for src, body in pairs(efa.locations) do
+    if #body == 1 then -- no edges, might also not have "initial" or "marked"
+      print(body[1]:gsub(patterns.colonatend, ";")) -- change : to ; if : is the last char
+    else
+      print(body[1])
+      for i = 2, #body do
+        outputEdge(body[i], efa.name)
+      end
     end
-    print(table.concat(body, "\n"))
   end
   print("end\n")
 end
@@ -780,10 +845,10 @@ local function processModule()
     Storage[#Storage+1] = CurrentEFA
   end
   -- Now all EFAs have been processed, so we know which variable belongs to which EFA
-  -- Outputting EFA now can prefix variables in guards with the respective EFA owner 
+  -- Outputting EFA can now owner-prefix variables in guards and actions
+  -- But we only need to handle the orphans, all other have already been prefixed
   for i = 1, #Storage do
-    CurrentEFA = Storage[i]
-    outputEFA()
+    outputEFA(Storage[i])
   end
   
   local textpanel = textframe:getTextPanel()
