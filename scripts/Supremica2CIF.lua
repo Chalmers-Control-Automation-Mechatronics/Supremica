@@ -140,6 +140,8 @@ end
       edge up when 0 <= var + x and var + x <= 5 do var := var + x
       edge dn when 0 <= var - x and var - x <= 5 do var := var - x
   * CIF has no next-state value, so primed guards need to be converted to assignment actions
+  * Boolean variables cannot be considered as 0..1 variables when converting t0 PLC code! 
+    Codesys complains that "cannot conver type DINT to type BOOL". Supremica has no BOOL type...
 --]]
 
 -- Process the currently open module into <name>.cif
@@ -236,6 +238,11 @@ local function mergeOrphans(orph1, orph2)
   return orph1
 end
 
+-- Return the end values of an integer range (inclusive)
+local function getIntRangeLimits(range)
+  local bottom, topper = range:match(patterns.matchrange)
+  return tointeger(bottom), tointeger(topper)
+end
 -----------------------------------------------------------------
 -- Preprocessing - Collect stuff necessary to be able to process
 -----------------------------------------------------------------
@@ -261,9 +268,22 @@ end
 local IS_INTEGER = " is integer "
 local IS_BINARY = " is binary "
 local IS_ENUM = " is enum "
+local IS_BOOL = " is bool "
 
--- Binary variables are in Supremica just 0-1 integers
-local function getIntBinaryInfo(var)
+--[[ There are no Boolean variables in Supremica, only 0-1 integers
+  Three options to deal with these:
+  1. Convert them to "disc int[0..1]" in CIF. This allows to do arithmetic on them. However, 
+    this creates a problem with PLC code generation! When a variable is defined to be 
+    disc int[0..1], then it is not converted by CIF into a bool in the PLC code, but remains
+    integer, which makes sense, but then its mapping to boolean I/O is refused by Codesys.
+  2. Convert then to "disc bool" in CIF. This has the problem of not allowing arithemetic on
+    them, which is typical with 0-1 variables
+  3. If an enum variable has the range "true,false" or "false,true", then we treat this as a
+    bool on the CIF side. Then Supremica's binary and integer types are treated the same
+    
+  Option 3 is implemented here.
+--]]
+local function getIntegerInfo(var)
   
   local range = var:getType():toString()
   local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
@@ -276,20 +296,52 @@ local function getIntBinaryInfo(var)
   return IS_INTEGER, range, initpred, markstr  
   
 end
-
-local function addToEnums(ident)
-  if not Enums[ident] then
-    Enums[ident] = true
-  end
+local function getBinaryInfo(var)
+  local kind, range, initpred, markstr = getIntegerInfo(var)
+  -- Should we always (or never?) treat 0-1 variables as bool?
+  local bottom, topper = getIntRangeLimits(range)
+  assert(bottom == 0 and topper == 1, "Unexpected range "..bottom..".."..topper.." for binary variable")
+  
+  return IS_BINARY, range, initpred, markstr
 end
 
+-- A special type of Supremica enums ar ethose with range [true,false] or [false,true]
+-- Those are treated as booleans on the CIF side.
+-- Note that we could in Supremica have an enum with range [true,middle,false]
+-- or even a degenerate one with single lement range [false]
+-- Such cannot be allowd to slip through to CIF
 local function getEnumInfo(var)
+  
+  local kind = IS_ENUM -- this is the default assumption
+  local lookup = {} -- for looking up the Boolean values
+  lookup["true"] = true
+  lookup["false"] = true
   
   local range = {}
   for ident in var:getType():toString():gmatch(patterns.identifier) do
     range[#range + 1] = ident
-    addToEnums(ident)
+    Enums[ident] = true -- addToEnums(ident)
   end
+  
+  if #range == 2 then -- this might be a bool
+    if lookup[range[1]] and lookup[range[2]] then -- the two values were "true" and "false", this is a bool
+      kind = IS_BOOL
+      -- loginfo(var:getName()..IS_BOOL)
+      Enums["true"] = nil   -- remove from the set of enums
+      Enums["false"] = nil
+    end
+  else -- check that true or false are not used as enum values in any other way
+    for i = 1, #range do
+      if lookup[range[i]] then
+        showIssueDialog("Boolean values used as enum values...", 
+          "Non-boolean enums cannot use \"true\" or \"false\" as enum values\n"..
+          var:getName().."\nhas one or both of these in its range\nPlease avoid this.\nQuitting...")
+        textframe:setVisible(false)
+        assert(false, "Non-Boolean use of \"true\" or \"false\" is not allowed by CIF")
+      end
+    end
+  end
+  
   local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
   local markings = preProcessMarkedValues(var:getVariableMarkings())
   local markstr = ""
@@ -297,13 +349,15 @@ local function getEnumInfo(var)
     -- markstr = "{"..table.concat(markings, ", ").."}"
     markstr = table.concat(markings, ", ")
   end  
-  return IS_ENUM, range, initpred, markstr  
+  return kind, range, initpred, markstr  
   
 end
  
 local function getVariableInfo(var)
-  if VariableHelper:isBinary(var) or VariableHelper:isInteger(var) then
-    return getIntBinaryInfo(var)
+  if VariableHelper:isBinary(var) then
+    return getBinaryInfo(var)
+  elseif VariableHelper:isInteger(var) then
+    return getIntegerInfo(var)
   else -- it is an enum
     return getEnumInfo(var)
   end
@@ -416,12 +470,6 @@ end
 -- But note! Events can have the same label as enum value, variable name, automata name
 -- Also, we cannot have things like "X.ident", for which the code above would wreak havoc 
 
--- Return the end values of an integer range (inclusive)
-local function getIntRangeLimits(range)
-  local bottom, topper = range:match(patterns.matchrange)
-  return tointeger(bottom), tointeger(topper)
-end
-
 -- Returns the full extension of an integer range given as bottom..topper
 -- restricted to the given limits (inclusive)
 local function unfoldRange(range, botlimit, toplimit)
@@ -474,7 +522,7 @@ local function protectEnums(range, newrhs)
   for i = 1, #range do
     local enumval = range[i]
     if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
-      return nil
+      return nil, {}
     end
     local owned, orph = prefixOwner(newrhs)
     assert(orph, "42: Orph is nil!")
@@ -495,20 +543,24 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
       table.insert(gastore.guards, guard)
       assert(orphans, "1. Oprhans nil!")
       return orphans
-    elseif var.kind == IS_ENUM then 
+    elseif var.kind == IS_ENUM or var.kind == IS_BOOL then 
       local guard, orphans = protectEnums(var.range, newrhs)
       table.insert(gastore.guards, guard)
       assert(orphans, "2. Oprhans nil!")
       return orphans
     end
+    assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
   end
   
   local function makeVarDef(var)
     if Variables[var].kind == IS_ENUM then
       return "\tdisc Enums "..var
-    else -- IS_INTEGER, IS_BINARY
+    elseif Variables[var].kind == IS_BOOL then
+      return "\tdisc bool "..var
+    elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
       return "\tdisc int["..Variables[var].range.."] "..var
     end
+    assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
   end
   
   -- The given variable is assigned by this EFA, so it owns it
@@ -554,12 +606,14 @@ local function processAction(str, gastore)
     local lhs, op, rhs = cap:match(patterns.actiondetail)
     local expr, newrhs = rewrites[op](lhs, rhs)
     local action, orph1 = prefixOwner(expr)
+    assert(orph1, "22. orph1 nil")
     orphans = mergeOrphans(orphans, orph1)
 --    loginfo("expr: "..expr..", newrhs: "..newrhs..", action: "..action)
     table.insert(gastore.actions, action)
     ownThisVariable(lhs)
     if newrhs then -- only when necessary
       local orph2 = addProtectiveGuards(lhs, newrhs, gastore)
+      assert(orph2, "23. orph2 nil")
       orphans = mergeOrphans(orphans, orph2)
     end
   end
