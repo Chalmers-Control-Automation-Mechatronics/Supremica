@@ -116,11 +116,10 @@ local function getEvents(project)
 	  local event = eventDeclList:get(i-1)
 	  local kind = event:getKind()
 	  if kind == EventKind.CONTROLLABLE then
-	  	-- controllable[#controllable+1] = event:getName()
       controllable[event:getName()] = true
 	  elseif kind ~= EventKind.PROPOSITION then
-	  	-- uncontrollable[#uncontrollable+1] = event:getName()
       uncontrollable[event:getName()] = true
+    -- else -- is proposition, unclear how to deal with that
 	  end
 	end
 	return controllable, uncontrollable
@@ -185,7 +184,6 @@ patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
--- patterns.enumrange = "([_%a][%w]*)"
 patterns.identifier = "([_%a][_%w]*)"
 patterns.colonatend = ":$"
 -- https://www.lua.org/pil/20.2.html
@@ -228,9 +226,6 @@ end
 local function mergeOrphans(orph1, orph2)
   assert(orph1, "orph1 is nil")
   assert(orph2, "orph2 is nil")
---  for k, v in pairs(orph1) do
---    loginfo(k..", "..(v and "true" or "false"))
---  end
   
   for k, v in pairs(orph2) do
     orph1[k] = v
@@ -253,9 +248,6 @@ local function preProcessMarkedValues(marklist)
     local mstr = mit:next():getPredicate():toString()
     local str = convertGuard(mstr)
     table.insert(markings, str)
---    table.insert(markings, convertGuard(mstr)) -- does not work because gsub returns two values
---    loginfo(mstr)
---    loginfo(convertGuard(mstr))
   end
   return markings
 end
@@ -270,6 +262,11 @@ local IS_BINARY = " is binary "
 local IS_ENUM = " is enum "
 local IS_BOOL = " is bool "
 
+-- for looking up the Boolean values (see getEnumInfo())
+local TFlookup = {} 
+TFlookup["true"] = true
+TFlookup["false"] = true
+  
 --[[ There are no Boolean variables in Supremica, only 0-1 integers
   Three options to deal with these:
   1. Convert them to "disc int[0..1]" in CIF. This allows to do arithmetic on them. However, 
@@ -279,7 +276,8 @@ local IS_BOOL = " is bool "
   2. Convert then to "disc bool" in CIF. This has the problem of not allowing arithemetic on
     them, which is typical with 0-1 variables
   3. If an enum variable has the range "true,false" or "false,true", then we treat this as a
-    bool on the CIF side. Then Supremica's binary and integer types are treated the same
+    bool on the CIF side. In this case Booleans are treated as a special variant of enums,
+    and Supremica's binary and integer types are both treated as integer. 
     
   Option 3 is implemented here.
 --]]
@@ -290,7 +288,6 @@ local function getIntegerInfo(var)
   local markings = preProcessMarkedValues(var:getVariableMarkings())
   local markstr = ""
   if #markings > 0 then
-    -- markstr = "{"..table.concat(markings, ", ").."}"
     markstr = table.concat(markings, ", ")
   end  
   return IS_INTEGER, range, initpred, markstr  
@@ -313,9 +310,6 @@ end
 local function getEnumInfo(var)
   
   local kind = IS_ENUM -- this is the default assumption
-  local lookup = {} -- for looking up the Boolean values
-  lookup["true"] = true
-  lookup["false"] = true
   
   local range = {}
   for ident in var:getType():toString():gmatch(patterns.identifier) do
@@ -324,7 +318,7 @@ local function getEnumInfo(var)
   end
   
   if #range == 2 then -- this might be a bool
-    if lookup[range[1]] and lookup[range[2]] then -- the two values were "true" and "false", this is a bool
+    if TFlookup[range[1]] and TFlookup[range[2]] then -- the two values were "true" and "false", this is a bool
       kind = IS_BOOL
       -- loginfo(var:getName()..IS_BOOL)
       Enums["true"] = nil   -- remove from the set of enums
@@ -332,7 +326,7 @@ local function getEnumInfo(var)
     end
   else -- check that true or false are not used as enum values in any other way
     for i = 1, #range do
-      if lookup[range[i]] then
+      if TFlookup[range[i]] then
         showIssueDialog("Boolean values used as enum values...", 
           "Non-boolean enums cannot use \"true\" or \"false\" as enum values\n"..
           var:getName().."\nhas one or both of these in its range\nPlease avoid this.\nQuitting...")
@@ -346,7 +340,6 @@ local function getEnumInfo(var)
   local markings = preProcessMarkedValues(var:getVariableMarkings())
   local markstr = ""
   if #markings > 0 then
-    -- markstr = "{"..table.concat(markings, ", ").."}"
     markstr = table.concat(markings, ", ")
   end  
   return kind, range, initpred, markstr  
@@ -361,23 +354,6 @@ local function getVariableInfo(var)
   else -- it is an enum
     return getEnumInfo(var)
   end
-  --[[
-  local kind = IS_ENUM
-  if VariableHelper:isBinary(var) then
-    kind = IS_BINARY
-  elseif VariableHelper:isInteger(var) then
-    kind = IS_INTEGER
-  end
-  local range = var:getType():toString():gsub("^%[", ""):gsub("%]$", "") -- for enums, remove [ and ]
-  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
-  local markings = preProcessMarkedValues(var:getVariableMarkings())
-  local markstr = ""
-  if #markings > 0 then
-    -- markstr = "{"..table.concat(markings, ", ").."}"
-    markstr = table.concat(markings, ", ")
-  end  
-  return kind, range, initpred, markstr
-  --]]
 end
 
 -- In Supremica, initial value predicates cannot be primed
@@ -394,7 +370,6 @@ local function preProcessVariables()
     local var = iterator:next()
     local name = var:getName()
     local kind, range, init, mark = getVariableInfo(var)
-    --loginfo(name..kind..": "..range..", "..init..", "..mark)
     variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil} -- efa = {}}
   end
   
@@ -402,7 +377,6 @@ local function preProcessVariables()
 end
 
 local function preProcessing()
-  -- print("Preprocessing...")
   
   Variables = preProcessVariables()
   
@@ -518,7 +492,6 @@ local function protectEnums(range, newrhs)
   -- Is there a better way in CIF?
   -- Note that checking all values here will not work, since enum1 = enum2 is valid
   local out, orphans = {}, {}
-  -- for enumval in range:gmatch(patterns.identifier) do
   for i = 1, #range do
     local enumval = range[i]
     if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
@@ -608,7 +581,6 @@ local function processAction(str, gastore)
     local action, orph1 = prefixOwner(expr)
     assert(orph1, "22. orph1 nil")
     orphans = mergeOrphans(orphans, orph1)
---    loginfo("expr: "..expr..", newrhs: "..newrhs..", action: "..action)
     table.insert(gastore.actions, action)
     ownThisVariable(lhs)
     if newrhs then -- only when necessary
@@ -621,7 +593,6 @@ local function processAction(str, gastore)
   return orphans
 end
 
--- Why does this not work for Enums?
 local function manageGuard(gstr)
   
   local newstr = convertGuard(gstr)
@@ -724,9 +695,6 @@ local function manageSourceTarget(srctrgt)
     if init then table.insert(out, "\tinitial;") end
     if acc then table.insert(out, "\tmarked;") end
     CurrentEFA.locations[label] = { table.concat(out, "\n") }
---    CurrentEFA.locations[label] = {"location "..label..":"}
---    if init then table.insert(CurrentEFA.locations[label], "\tinitial;") end
---    if acc then table.insert(CurrentEFA.locations[label], "\tmarked;") end
   end
   return label
 end
@@ -780,13 +748,6 @@ local function processEdge(edge)
 	local cevents, uevents = getEdgeEvents(edge)
   
   -- Make different edges for controllable and uncontrollable events
---  if #controllable > 0 then 
---    table.insert(CurrentEFA.locations[src], makeEdge(trgt, controllable, guard, action))
---  end
---  if #uncontrollable > 0 then
---    table.insert(CurrentEFA.locations[src], makeEdge(trgt, uncontrollable, guard, action))
---  end
-
   if #cevents > 0 then
     table.insert(CurrentEFA.locations[src], {makeEdge(trgt, cevents, guard, action), orphans})
   end
@@ -847,24 +808,24 @@ end
 -- In CIF, variables MUST be owned by some EFA
 -- In the conversion, the first EFA to assign a variable is considered its owner
 -- 1. Multiple EFA assigning the same variable cannot be allowed, see ownThisVariable()
--- 2. A variable not assigned by any EFA, but always keeping its initial value, is replaced
--- by its initial value. BUT! In Supremica the initial value can be nondeterministic!
+-- 2. A variable not assigned by any EFA, but always keeping its initial value, could be replaced
+-- by its initial value, and CIF warns about this. BUT! The initial value can be nondeterministic!
 local function handleOrphanedVariable(var, str)
   local initexpr = Variables[var].init -- can look like "var == X | var == y"
   return str:gsub(var, "_global."..var) -- This wont work for CIF, but...
 end
 
 local function outputEdge(edge, name)
---  print(edge)
+  
   local str = edge[1]
   local orphans = edge[2]
-  -- print(edge[1])
 
   for var, _ in pairs(orphans) do
     local owner = Variables[var].owner
-    if not owner then
-      str = handleOrphanedVariable(var, str)
-    elseif owner ~= name then -- sometimes self-owned variables in actions are added to orphans. BUG!
+--    if not owner then -- this will never happen, since we set owners to all orphaned variables
+--      str = handleOrphanedVariable(var, str)
+--    else
+    if owner ~= name then -- sometimes self-owned variables in actions are added to orphans. BUG!
       str = str:gsub(var, owner.."."..var)
     end
   end
@@ -898,7 +859,7 @@ local function processModule()
   
   local filename, filepath = getFileName(name..".cif")
   print("/***")
-  print(" * CIF model generated from Supremica by Supremica2CIT.lua script")
+  print(" * CIF model generated from Supremica by Supremica2CIF.lua script")
   print(" * Generated: "..os.date("%Y-%m-%d, %H:%M"))
   print(" * Supremica model: "..name)
   print(" * Saved to: "..filename)
@@ -913,7 +874,7 @@ local function processModule()
   end
   
   -- here, some variables may not be owned by any EFA. This is not allowed in CIF
-  -- So we go through all variables and assigne orphans to an arbitrary EFA
+  -- So we go through all variables and assign orphans to an arbitrary EFA
   for var, body in pairs(Variables) do
     if not body.owner then
       -- loginfo(var.." has no owner, assign: "..CurrentEFA.name)
