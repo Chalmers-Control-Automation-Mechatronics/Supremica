@@ -810,10 +810,6 @@ end
 -- 1. Multiple EFA assigning the same variable cannot be allowed, see ownThisVariable()
 -- 2. A variable not assigned by any EFA, but always keeping its initial value, could be replaced
 -- by its initial value, and CIF warns about this. BUT! The initial value can be nondeterministic!
-local function handleOrphanedVariable(var, str)
-  local initexpr = Variables[var].init -- can look like "var == X | var == y"
-  return str:gsub(var, "_global."..var) -- This wont work for CIF, but...
-end
 
 local function outputEdge(edge, name)
   
@@ -822,9 +818,6 @@ local function outputEdge(edge, name)
 
   for var, _ in pairs(orphans) do
     local owner = Variables[var].owner
---    if not owner then -- this will never happen, since we set owners to all orphaned variables
---      str = handleOrphanedVariable(var, str)
---    else
     if owner ~= name then -- sometimes self-owned variables in actions are added to orphans. BUG!
       str = str:gsub(var, owner.."."..var)
     end
@@ -837,7 +830,7 @@ end
 -- This so, since we need to prefix other EFA's variables with their toucher's name
 -- This applies to both guards and actions, as we could have an action varX := varY,
 -- which if varY is owned by efa2 needs to be converted to varX := efa2.varY
--- So, for each edge there will be a set of orphans thet need to be owner-prefixed 
+-- So, for each edge there will be a set of orphans that need to be owner-prefixed 
 -- before the edge is output
 local function outputEFA(efa)
   print(efa.kind.." "..efa.name..":");
@@ -873,7 +866,7 @@ local function processModule()
     Storage[#Storage+1] = CurrentEFA
   end
   
-  -- here, some variables may not be owned by any EFA. This is not allowed in CIF
+  -- Here, some variables may not be owned by any EFA. This is not allowed in CIF
   -- So we go through all variables and assign orphans to an arbitrary EFA
   for var, body in pairs(Variables) do
     if not body.owner then
@@ -897,4 +890,4 @@ local function processModule()
 end
 
 preProcessing()
-processModule(efalist)
+processModule()
