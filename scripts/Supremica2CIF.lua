@@ -257,10 +257,13 @@ local function preProcessInitPredicate(str)
 end
 
 -- Global constants, do NOT assign!
-local IS_INTEGER = " is integer "
+local IS_INTEGER = " is integer " -- types of variables
 local IS_BINARY = " is binary "
 local IS_ENUM = " is enum "
 local IS_BOOL = " is bool "
+
+local IS_MARKED = "\tmarked;" -- fro locations
+local IS_INITIAL = "\tinitial;"
 
 -- for looking up the Boolean values (see getEnumInfo())
 local TFlookup = {} 
@@ -686,14 +689,25 @@ local function processGuardAction(gablock)
   return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
 
 end
-
+--[[
+    In Supremica, if no locatiosn are marked, then all locatison are considered to be marked
+    The reasoning behind this is that:
+    1. In cases, like dealing only with controllability, where it does not matter if no locations
+      are marked, it also does not matter if all locatiosn are marked;
+    2. In cases, like dealing with nonblocking, where it matters if locations are merked, modeling
+      a system with no marked locations is meaningless
+    So, if some location is marked, we set the allmarked flag false
+--]]
 local function manageSourceTarget(srctrgt)
   local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
   
   if not CurrentEFA.locations[label] then
     local out = {"location "..label..":"}
-    if init then table.insert(out, "\tinitial;") end
-    if acc then table.insert(out, "\tmarked;") end
+    if init then table.insert(out, IS_INITIAL) end
+    if acc then 
+      table.insert(out, IS_MARKED)
+      CurrentEFA.allmarked = false 
+    end
     CurrentEFA.locations[label] = { table.concat(out, "\n") }
   end
   return label
@@ -764,6 +778,7 @@ local function processEFA(efa)
   -- Set up global current EFA holder
   CurrentEFA = {name = efa:getName()}
   CurrentEFA.kind = efaKind[efa:getKind()]
+  CurrentEFA.allmarked = true -- In Supremica, if no location explcictly marked, all locations are marked
   CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
   CurrentEFA.locations = {} -- Holds the locations with events, guard, actions
   
@@ -789,7 +804,8 @@ local function outputEvents()
   local c = getEventTable(cevents)
   local u = getEventTable(uevents)
   if #c > 0 then print("controllable "..table.concat(c, ", ")..";") end
-  if #u > 0 then print("uncontrollable "..table.concat(u, ", ")..";\n") end
+  if #u > 0 then print("uncontrollable "..table.concat(u, ", ")..";") end
+  print("")
 end
 
 local function outputEnums()
@@ -804,12 +820,14 @@ local function outputEnums()
   end
 end
 
--- In Supremica, variables are not owned by any specific EFA, they are free for all
--- In CIF, variables MUST be owned by some EFA
--- In the conversion, the first EFA to assign a variable is considered its owner
--- 1. Multiple EFA assigning the same variable cannot be allowed, see ownThisVariable()
--- 2. A variable not assigned by any EFA, but always keeping its initial value, could be replaced
--- by its initial value, and CIF warns about this. BUT! The initial value can be nondeterministic!
+--[[
+    In Supremica, variables are not owned by any specific EFA, they are free for all
+    In CIF, variables MUST be owned by some EFA
+    In the conversion, the first EFA to assign a variable is considered its owner
+    1. Multiple EFA assigning the same variable cannot be allowed, see ownThisVariable()
+    2. A variable not assigned by any EFA, but always keeping its initial value, could be replaced
+      by its initial value, and CIF warns about this. BUT! The initial value can be nondeterministic!
+--]]
 
 local function outputEdge(edge, name)
   
@@ -818,7 +836,10 @@ local function outputEdge(edge, name)
 
   for var, _ in pairs(orphans) do
     local owner = Variables[var].owner
-    if owner ~= name then -- sometimes self-owned variables in actions are added to orphans. BUG!
+    -- self-owned variables may be incorrectly classified as orphans,
+    -- if it is not known at the time of prefixing, see prefixOwner(), 
+    -- that the variable is owned by the current efa
+    if owner ~= name then 
       str = str:gsub(var, owner.."."..var)
     end
   end
@@ -837,9 +858,16 @@ local function outputEFA(efa)
   print(table.concat(efa.variables, "\n"))
   for src, body in pairs(efa.locations) do
     if #body == 1 then -- no edges, might also not have "initial" or "marked"
+      if efa.allmarked then
+        print(body[1])
+        print(IS_MARKED)
+      end
       print(body[1]:gsub(patterns.colonatend, ";")) -- change : to ; if : is the last char
     else
       print(body[1])
+      if efa.allmarked then
+        print(IS_MARKED)
+      end
       for i = 2, #body do
         outputEdge(body[i], efa.name)
       end
