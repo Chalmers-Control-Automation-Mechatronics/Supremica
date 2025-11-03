@@ -108,6 +108,33 @@ local function loginfo(str) -- helper to write to log
   if str then log:info(str, 0) else log:info("nil string", 0) end
 end
 
+-- In Supremica, identifiers can include colon (:) Events, EFA names, variable names, 
+-- enum labels, all of those can include one or more colons. Forinstnace "var:X:Y:Z"
+-- is a valid identifier in Supremica, as is "e::::1", and "Cat:0", "Room:4", etc
+-- This is an unfortunate historical accident, and of course, CIF does not allow this
+-- So, all such identifiers must be sanitized at input (or at least before output)
+-- And we must guarantee unique sanitized ouput for unique un-sanitized input!
+-- So we keep a double-directed map with both the sanitized and un-sanitized as keys
+local Sanity = {} -- map for sanitation
+local function sanitize(unsanitized)
+  
+  -- If this has already been sanitized, just return that result
+  if Sanity[unsanitized] then return Sanity[unsanitized] end
+  
+  -- Now we replace all colons by longer and longer strings of underscores
+  -- starting with length 0, until we find something that is not in our map
+  local sanitized = nil
+  local i = 0
+  repeat
+    sanitized = unsanitized:gsub(":+", string.rep("_", i))
+    i = i + 1
+  until not Sanity[sanitized]
+  Sanity[sanitized] = unsanitized
+  Sanity[unsanitized] = sanitized
+  return sanitized
+
+end
+
 local function getEvents(project)
 	local controllable, uncontrollable = {}, {}
 	
@@ -184,7 +211,7 @@ patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
-patterns.identifier = "([_%a][_%w]*)"
+patterns.identifier = "([_%a][_%w]*)" -- this paattern does not catch colon, see sanitize()
 patterns.colonatend = ":$"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
