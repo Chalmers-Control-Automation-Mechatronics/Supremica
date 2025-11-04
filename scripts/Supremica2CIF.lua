@@ -115,24 +115,46 @@ end
 -- So, all such identifiers must be sanitized at input (or at least before output)
 -- And we must guarantee unique sanitized ouput for unique un-sanitized input!
 -- So we keep a double-directed map with both the sanitized and un-sanitized as keys
-local Sanity = {} -- map for sanitation
-local function sanitize(unsanitized)
+local Sanity, Insanity = {}, {} -- maps for sanitation
+
+-- To desanitize means to make sure that some sane input does not clash
+-- with some sanitized input, like "var:X" sanitizwes to "varX", and then
+-- later an actual input is "varX". This input must be made unique.
+local function desanitize(input)
+  assert(not input:find(":"), "Unsanitized input!")
+  local desanitized = nil
+  local i = 1
+  repeat
+    desanitized = input.."_"..i
+  until not Insanity[desanitized]
+  Sanity[input] = desanitized
+  Insanity[desanitized] = input
+  return desanitized
+end
+
+local function sanitize(input)
   
   -- If this has already been sanitized, just return that result
-  if Sanity[unsanitized] then return Sanity[unsanitized] end
+  if Sanity[input] then return Sanity[input] end
+  
+  -- Do we have (sane) input that some insane input already maps to?
+  -- If so, we need to do something to make it unique
+  if Insanity[input] then 
+    -- assert(false, Insanity[input].." is already mapped to "..input)
+    return desanitize(input)
+  end
   
   -- Now we replace all colons by longer and longer strings of underscores
   -- starting with length 0, until we find something that is not in our map
   local sanitized = nil
   local i = 0
   repeat
-    sanitized = unsanitized:gsub(":+", string.rep("_", i))
+    sanitized = input:gsub(":+", string.rep("_", i))
     i = i + 1
-  until not Sanity[sanitized]
-  Sanity[sanitized] = unsanitized
-  Sanity[unsanitized] = sanitized
+  until not Insanity[sanitized]
+  Insanity[sanitized] = input
+  Sanity[input] = sanitized
   return sanitized
-
 end
 
 local function getEvents(project)
@@ -143,9 +165,9 @@ local function getEvents(project)
 	  local event = eventDeclList:get(i-1)
 	  local kind = event:getKind()
 	  if kind == EventKind.CONTROLLABLE then
-      controllable[event:getName()] = true
+      controllable[event:getName()] = true  -- should be sanitized
 	  elseif kind ~= EventKind.PROPOSITION then
-      uncontrollable[event:getName()] = true
+      uncontrollable[event:getName()] = true  -- should be sanitized
     -- else -- is proposition, unclear how to deal with that
 	  end
 	end
@@ -184,7 +206,7 @@ local cevents, uevents = getEvents(project)
 local Variables -- Holds variable name, range, init, mark (filled by preProcess)
 local CurrentEFA -- EFA currently processed (set by processEFA, contains .name and .variables)
 local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
-local Storage = {} -- holds the generated EFA for delayed output (see outputEFA)
+local Storage = {} -- holds the generated EFA for delayed output (see processModule)
 local FileName -- The filename to save under (set by processModule)
 
 --[[
