@@ -147,7 +147,11 @@ local function sanitize(input)
   -- Now we replace all colons by longer and longer strings of underscores
   -- starting with length 0, until we find something that is not in our map
   local sanitized = nil
-  local i = 0
+  local i = 1 -- was 0
+  -- Starting from 0 was a nice idea to get shorter strings, but
+  -- it maps a single colon to the empty string, which does not work
+  -- At least sequences of : are mapped to possibly shorter sequences of _
+  -- With i = 1, colon-infested input sanitizes to something with underscore
   repeat
     sanitized = input:gsub(":+", string.rep("_", i))
     i = i + 1
@@ -156,6 +160,8 @@ local function sanitize(input)
   Sanity[input] = sanitized
   return sanitized
 end
+-- Note that CIF itself exploits this "feature" in Supremica when it generates
+-- *.wmod from *.cif, see for instance, button_lamp.cif
 
 local function getEvents(project)
 	local controllable, uncontrollable = {}, {}
@@ -195,7 +201,7 @@ end
 -- Process the currently open module into <name>.cif
 local manager = ide:getDocumentContainerManager() 
 local container = manager:getActiveContainer()
-local name = container:getName()
+local name = container:getName()  -- should be sanitized
 local project = container:getEditorPanel():getModuleSubject()
 local components = project:getComponentList() 
 
@@ -233,7 +239,8 @@ patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
-patterns.identifier = "([_%a][_%w]*)" -- this paattern does not catch colon, see sanitize()
+patterns.identifier = "([_%a][_%w]*)" -- this pattern does not catch colon, see sanitize()
+patterns.colonifier = "([_:%a][_:%w]*)" -- this will catch also colon
 patterns.colonatend = ":$"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
@@ -261,7 +268,11 @@ rewrites["=="] = function(lhs, rhs)
   return rewrites.doit(lhs, " = ", rhs)
 end
 
+-- Probably have to sanitize identifiers here, and replace inline
 local function convertGuard(gstr)
+--  for w in gstr:gmatch(patterns.colonifier) do
+--    loginfo(w)
+--  end
   return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("![^=]", "not ")
 end
 
@@ -294,14 +305,14 @@ local function preProcessMarkedValues(marklist)
   local markings = {}
   local mit = marklist:iterator()
   while mit:hasNext() do
-    local mstr = mit:next():getPredicate():toString()
+    local mstr = mit:next():getPredicate():toString()  -- should be sanitized
     local str = convertGuard(mstr)
     table.insert(markings, str)
   end
   return markings
 end
 
-local function preProcessInitPredicate(str)
+local function preProcessInitPredicate(str)  -- should be sanitized
   return convertGuard(str)
 end
 
@@ -365,8 +376,8 @@ local function getEnumInfo(var)
   
   local range = {}
   for ident in var:getType():toString():gmatch(patterns.identifier) do
-    range[#range + 1] = ident
-    Enums[ident] = true -- addToEnums(ident)
+    range[#range + 1] = ident  -- should be sanitized, and patterns.colonifier used
+    Enums[ident] = true
   end
   
   if #range == 2 then -- this might be a bool
@@ -420,9 +431,9 @@ local function preProcessVariables()
   local iterator = varlist:iterator()
   while iterator:hasNext() do
     local var = iterator:next()
-    local name = var:getName()
+    local name = var:getName()  -- should be sanitized
     local kind, range, init, mark = getVariableInfo(var)
-    variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil} -- efa = {}}
+    variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil}
   end
   
   return variables
@@ -825,7 +836,7 @@ end
 local function processEFA(efa)
   
   -- Set up global current EFA holder
-  CurrentEFA = {name = efa:getName()}
+  CurrentEFA = {name = efa:getName()} -- should be sanitized
   CurrentEFA.kind = efaKind[efa:getKind()]
   CurrentEFA.allmarked = true -- In Supremica, if no location explcictly marked, all locations are marked
   CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
