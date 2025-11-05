@@ -171,9 +171,9 @@ local function getEvents(project)
 	  local event = eventDeclList:get(i-1)
 	  local kind = event:getKind()
 	  if kind == EventKind.CONTROLLABLE then
-      controllable[event:getName()] = true  -- should be sanitized
+      controllable[sanitize(event:getName())] = true  -- should be sanitized
 	  elseif kind ~= EventKind.PROPOSITION then
-      uncontrollable[event:getName()] = true  -- should be sanitized
+      uncontrollable[sanitize(event:getName())] = true  -- should be sanitized
     -- else -- is proposition, unclear how to deal with that
 	  end
 	end
@@ -201,7 +201,7 @@ end
 -- Process the currently open module into <name>.cif
 local manager = ide:getDocumentContainerManager() 
 local container = manager:getActiveContainer()
-local name = container:getName()  -- should be sanitized
+local name = sanitize(container:getName())  -- should be sanitized? Windows does not allo : in filenames, *ix might od!
 local project = container:getEditorPanel():getModuleSubject()
 local components = project:getComponentList() 
 
@@ -234,8 +234,8 @@ local patterns = {}
 -- capture lhs += rhs, lhs == rhs, lhs = rhs, etc
 -- expr patterns capture whole expressions, (lhs op rhs)
 -- detail patterns capture details (lhs)(op)(rhs)
-patterns.actiondetail = "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
-patterns.actionexpr = "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
+patterns.actiondetail = "([_:%a][_:%w]*)%s*([%+%-%*/=]+)%s*([_:%w]+)" -- "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
+patterns.actionexpr = "([_:%a][_:%w]*%s*[%+%-%*/=]+%s*[_:%w]+)"-- "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
@@ -270,9 +270,10 @@ end
 
 -- Probably have to sanitize identifiers here, and replace inline
 local function convertGuard(gstr)
---  for w in gstr:gmatch(patterns.colonifier) do
---    loginfo(w)
---  end
+  for w in gstr:gmatch(patterns.colonifier) do
+    gstr = gstr:gsub(w, sanitize(w))
+--    loginfo(w.." -> "..gstr)
+  end
   return gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or "):gsub("![^=]", "not ")
 end
 
@@ -305,14 +306,14 @@ local function preProcessMarkedValues(marklist)
   local markings = {}
   local mit = marklist:iterator()
   while mit:hasNext() do
-    local mstr = mit:next():getPredicate():toString()  -- should be sanitized
+    local mstr = mit:next():getPredicate():toString()  -- is sanitized by convertGuard
     local str = convertGuard(mstr)
     table.insert(markings, str)
   end
   return markings
 end
 
-local function preProcessInitPredicate(str)  -- should be sanitized
+local function preProcessInitPredicate(str)  -- is sanitized by convertGuard
   return convertGuard(str)
 end
 
@@ -322,7 +323,7 @@ local IS_BINARY = " is binary "
 local IS_ENUM = " is enum "
 local IS_BOOL = " is bool "
 
-local IS_MARKED = "\tmarked;" -- fro locations
+local IS_MARKED = "\tmarked;" -- for locations
 local IS_INITIAL = "\tinitial;"
 
 -- for looking up the Boolean values (see getEnumInfo())
@@ -347,8 +348,8 @@ TFlookup["false"] = true
 local function getIntegerInfo(var)
   
   local range = var:getType():toString()
-  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
-  local markings = preProcessMarkedValues(var:getVariableMarkings())
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())-- sanitized by convertGiuard
+  local markings = preProcessMarkedValues(var:getVariableMarkings())-- sanitized by convertGiuard
   local markstr = ""
   if #markings > 0 then
     markstr = table.concat(markings, ", ")
@@ -375,9 +376,10 @@ local function getEnumInfo(var)
   local kind = IS_ENUM -- this is the default assumption
   
   local range = {}
-  for ident in var:getType():toString():gmatch(patterns.identifier) do
-    range[#range + 1] = ident  -- should be sanitized, and patterns.colonifier used
-    Enums[ident] = true
+  for ident in var:getType():toString():gmatch(patterns.colonifier) do  -- should be sanitized, and patterns.colonifier used
+    local saneident = sanitize(ident)
+    range[#range + 1] = saneident
+    Enums[saneident] = true
   end
   
   if #range == 2 then -- this might be a bool
@@ -399,8 +401,8 @@ local function getEnumInfo(var)
     end
   end
   
-  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
-  local markings = preProcessMarkedValues(var:getVariableMarkings())
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString()) -- sanitized by convertGuard
+  local markings = preProcessMarkedValues(var:getVariableMarkings())  -- sanitized by convertGuard
   local markstr = ""
   if #markings > 0 then
     markstr = table.concat(markings, ", ")
@@ -431,7 +433,7 @@ local function preProcessVariables()
   local iterator = varlist:iterator()
   while iterator:hasNext() do
     local var = iterator:next()
-    local name = var:getName()  -- should be sanitized
+    local name = sanitize(var:getName())  -- should be sanitized
     local kind, range, init, mark = getVariableInfo(var)
     variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil}
   end
@@ -484,7 +486,7 @@ end
 local function prefixOwner(str)
   local orphans = {}
   -- For identifiers that are variable names, if possible prefix with owner
-  for ident in str:gmatch(patterns.identifier) do
+  for ident in str:gmatch(patterns.identifier) do -- using patterns.identifier, since all should be sanitized
     local var = Variables[ident]
     if var then -- this is a variable
       if var.owner then -- someone already owns this variable, is it us?
@@ -640,6 +642,8 @@ local function processAction(str, gastore)
   local orphans = {}
   for cap in str:gmatch(patterns.actionexpr) do
     local lhs, op, rhs = cap:match(patterns.actiondetail)
+    lhs = sanitize(lhs)
+    rhs = sanitize(rhs)
     local expr, newrhs = rewrites[op](lhs, rhs)
     local action, orph1 = prefixOwner(expr)
     assert(orph1, "22. orph1 nil")
@@ -658,7 +662,7 @@ end
 
 local function manageGuard(gstr)
   
-  local newstr = convertGuard(gstr)
+  local newstr = convertGuard(gstr) -- sanitizes its input
   local prefxd, orphans = prefixOwner(newstr)
   --[[
     debugOrphans(CurrentEFA.name, orphans)
@@ -741,7 +745,7 @@ local function processGuardAction(gablock)
   local gcap, acap = gatxt:match("%[,(.*)%],{,(.*)},")
   acap = stripCurly(acap)
   gcap = stripCurly(gcap)
-  
+
   local orph1 = processGuard(gcap, gastore) assert(orph1, "657: orph1 is nil")
   local orph2 = processAction(acap, gastore) assert(orph2, "658: orph2 is nil")
   local orphans = mergeOrphans(orph1, orph2)
@@ -761,6 +765,8 @@ end
 local function manageSourceTarget(srctrgt)
   local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
   
+  label = sanitize(label)
+  
   if not CurrentEFA.locations[label] then
     local out = {"location "..label..":"}
     if init then table.insert(out, IS_INITIAL) end
@@ -779,7 +785,7 @@ local function getEdgeEvents(edge)
   local iter = evlist:iterator()
   
   while iter:hasNext() do
-    local ev = iter:next():getName()
+    local ev = sanitize(iter:next():getName())  -- should be sanitized
     if cevents[ev] then 
       table.insert(cevs, ev)
     elseif uevents[ev] then
@@ -836,7 +842,7 @@ end
 local function processEFA(efa)
   
   -- Set up global current EFA holder
-  CurrentEFA = {name = efa:getName()} -- should be sanitized
+  CurrentEFA = {name = sanitize(efa:getName())} -- should be sanitized
   CurrentEFA.kind = efaKind[efa:getKind()]
   CurrentEFA.allmarked = true -- In Supremica, if no location explcictly marked, all locations are marked
   CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
