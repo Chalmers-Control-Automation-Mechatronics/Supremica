@@ -108,6 +108,27 @@ local function loginfo(str) -- helper to write to log
   if str then log:info(str, 0) else log:info("nil string", 0) end
 end
 
+-- These are for the Cylinders lab. They will be converted to "input bool <varname>;"
+-- Do we not need something similar for outputs? It seems not
+local Inputs = {}
+Inputs.ixStart = "bool"
+Inputs.ixB1 = "bool"
+Inputs.ixStart = "bool"
+Inputs.ixStop = "bool"
+Inputs.ixReset = "bool"
+Inputs.ixReset = "bool"
+Inputs.ixB1 = "bool"
+Inputs.ixB2 = "bool"
+Inputs.ixIN10 = "bool"
+Inputs.ixIN11 = "bool"
+Inputs.ixCylinder1In = "bool"
+Inputs.ixCylinder1Out = "bool"
+Inputs.ixCylinder2In = "bool"
+Inputs.ixCylinder2Out = "bool"
+Inputs.ixCylinder3In = "bool"
+Inputs.ixCylinder3Out = "bool"
+Inputs.ixEmergencyStop = "bool"
+
 -- In Supremica, identifiers can include colon (:) Events, EFA names, variable names, 
 -- enum labels, all of those can include one or more colons. Forinstnace "var:X:Y:Z"
 -- is a valid identifier in Supremica, as is "e::::1", and "Cat:0", "Room:4", etc
@@ -590,15 +611,31 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
   end
   
+  -- Inputs need special treatment, as they cannot have initial values
+  -- CIF itself does not forbid this, but the PLC code generator chokes
   local function makeVarDef(var)
-    if Variables[var].kind == IS_ENUM then
-      return "\tdisc Enums "..var
-    elseif Variables[var].kind == IS_BOOL then
-      return "\tdisc bool "..var
-    elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
-      return "\tdisc int["..Variables[var].range.."] "..var
+    local out = {}
+    
+    if Inputs[var] then
+      table.insert(out, "\tinput "..Inputs[var].." "..var)
+      return out
     end
-    assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
+    
+    if Variables[var].kind == IS_ENUM then
+      table.insert(out, "\tdisc Enums "..var)
+    elseif Variables[var].kind == IS_BOOL then
+      table.insert(out, "\tdisc bool "..var)
+    elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
+      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var)
+    else
+      assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
+    end
+    
+    table.insert(out, "\tinitial "..Variables[var].init)
+    if Variables[var].mark and Variables[var].mark ~= "" then
+      table.insert(out, "\tmarked "..Variables[var].mark)
+    end
+    return out
   end
   
   -- The given variable is assigned by this EFA, so it owns it
@@ -607,12 +644,7 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     
     if not Variables[var].owner then -- this variable is still orphan
       Variables[var].owner = CurrentEFA.name -- remember the owner of this variable
-      local out = {}
-      table.insert(out, makeVarDef(var))
-      table.insert(out, "\tinitial "..Variables[var].init)
-      if Variables[var].mark and Variables[var].mark ~= "" then
-        table.insert(out, "\tmarked "..Variables[var].mark)
-      end
+      local out = makeVarDef(var)
       table.insert(CurrentEFA.variables, table.concat(out, ";\n")..";\n")
       return
     end
