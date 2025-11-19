@@ -190,7 +190,7 @@ public class TestCasesDialog
                     catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
-                        logger.debug(ex.getStackTrace());
+                        logger.debug(ex.getStackTrace().toString());
 
                         // what are we supposed to do?
                     }
@@ -223,7 +223,8 @@ public class TestCasesDialog
                     catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
-                        logger.debug(ex.getStackTrace());
+                        logger.debug(ex.getStackTrace()[0].toString());
+                        logger.debug(ex.getStackTrace()[1].toString());
 
                         // what are we supposed to do?
                     }

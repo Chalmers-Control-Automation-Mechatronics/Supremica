@@ -87,6 +87,8 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	private final JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
 	private final JRadioButton verticalButton = new JRadioButton("Vertical traversing");
 
+  private int variantID = 1;
+  
 	private final String XCATMOUSE = "Ext Cat & Mouse";
 	private static Logger logger = LogManager.getLogger(ExtCatMousePanel.class);
 
@@ -145,6 +147,37 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		theBox.add(traversing_algorithms);
 		theBox.add(NK);
 
+    final Border variantBorder = BorderFactory.createTitledBorder("Variant:");
+    final JPanel variantPanel = new JPanel();
+    variantPanel.setBorder(variantBorder);
+    final ButtonGroup variantGroup = new ButtonGroup();
+    final JRadioButton one = new JRadioButton("1", variantID == 1);
+    final JRadioButton two = new JRadioButton("2", variantID == 2);
+    final JRadioButton three = new JRadioButton("3", variantID == 3);
+    final JRadioButton four = new JRadioButton("4", variantID == 4);
+    final ActionListener variantActionListener = new ActionListener() 
+                { public void actionPerformed(ActionEvent event) 
+                  {
+                    try // parseInt may throw but here it never will
+                    { 
+                      variantID = Integer.parseInt(event.getActionCommand());
+                      // System.err.println(event.getActionCommand());
+                    } catch (final Exception ignore) {}
+                  }
+                };
+    one.addActionListener(variantActionListener);
+    two.addActionListener(variantActionListener);
+    three.addActionListener(variantActionListener);
+    four.addActionListener(variantActionListener);
+    variantGroup.add(one);
+    variantGroup.add(two);
+    variantGroup.add(three);
+    variantGroup.add(four);
+    variantPanel.add(one);
+    variantPanel.add(two);
+    variantPanel.add(three);
+    variantPanel.add(four);
+    theBox.add(variantPanel);
 	}
 
 	@Override
@@ -307,9 +340,9 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	{
 		int cats = num_cats.get() + n*int_step_cats.get();
 		int levels = int_num_levels.get() + n*int_step_levels.get();
-		final String name = new String(XCATMOUSE + " (" + cats + ", " + levels + ")");
+		final String name = new String(XCATMOUSE + " (" + cats + ", " + levels + ") v." + variantID);
 
-		final ExtCatMouse cm = new ExtCatMouse(name, cats, levels);
+		final ExtCatMouse cm = new ExtCatMouse(name, cats, levels, variantID);
 		return cm.getProject();
 	}
 

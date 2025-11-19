@@ -188,8 +188,8 @@ public class State
     }
 
     /**
-     * This is an ugly method that only is needed when dealing
-     * with automataIndexForm. All methods that works with index
+     * This is an ugly method that is only needed when dealing
+     * with automataIndexForm. All methods that work with index
      * needs special initialisation that is not automatically done.
      * This method is not recommended for general use.
      */
@@ -235,7 +235,14 @@ public class State
 
         return name;
     }
-
+    
+    /**
+     * Setting the name of a state is dangerous if the state is already part
+     * of a state set, as the name is used as the key to index into the set.
+     * To properly rename such a state, first it should be removed from the 
+     * state set, then have its name changed, and then be added to the set.
+     * Not doing this will break Automaton.getStateWithName(), and others.
+     */
     public void setName(final String name)
     {
         Args.checkForContent(name);
