@@ -164,7 +164,12 @@ public class Users
 	public Users(final int num_users, final int num_resources, final boolean a, final boolean b, final boolean c)
 		throws Exception
 	{
-		project.setComment("Users competing for mutual resources. Each user can request any of the resources. The 'Fifo' specifications specifies that the users get access to the resources in the order they request them and the 'Mutex' specifications specifies that each resource is accessed by at most one user at a time. The specifications apply pairwise between users.");
+    final String rscrs_label = (num_resources > 1) ? " Resources" : " Resource";
+    project.setName(num_users + " Users, " + num_resources + rscrs_label);
+		project.setComment("Users competing for mutual resources. Each user can request any of the resources. " +
+          "The 'Fifo' specifications specifies that the users get access to the resources in the order they " +
+          "request them and the 'Mutex' specifications specifies that each resource is accessed by at most " +
+          "one user at a time. The specifications apply pairwise between users.");
 
 		// first generate the users - numbered 1...n
 		for (int i = 0; i < num_users; ++i)
