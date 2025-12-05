@@ -6,7 +6,7 @@ public class SanchezTestCase
 	extends Automata
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Project project;
 	@SuppressWarnings("unused")
 	private int blocks;
@@ -14,11 +14,13 @@ public class SanchezTestCase
 	public SanchezTestCase(int blocks, int type)
 	{
 		this.blocks = blocks;
-		project = new Project("Benchmark example");
+		project = new Project("Sanchez Test Case #" + (type+1));
 
 		if (type == 0)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for asynchronous product.");
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+				"For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
+				"for asynchronous product.");
 
 			for (int i = 0; i < blocks; i++)
 			{
@@ -27,7 +29,9 @@ public class SanchezTestCase
 		}
 		else if (type == 1)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for synchronous product.");
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+				"For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
+				"for synchronous product.");
 
 			for (int i = 0; i < blocks; i++)
 			{
@@ -36,10 +40,11 @@ public class SanchezTestCase
 		}
 		else if (type == 2)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for supremal controllable sublanguage.");
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+				"For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
+				"for supremal controllable sublanguage.");
 
 			TransferLine tl = new TransferLine(blocks, 1, 1, true);
-
 			project = tl.getProject();
 		}
 		else
@@ -51,14 +56,14 @@ public class SanchezTestCase
 	// --[ benchmark # 1] ---------------------------------------------------
 	private void createAsyncProduct(int n)
 	{
-		LabeledEvent e11 = new LabeledEvent("11" + n);
-		LabeledEvent e12 = new LabeledEvent("12" + n);
-		LabeledEvent e21 = new LabeledEvent("21" + n);
-		LabeledEvent e22 = new LabeledEvent("22" + n);
-		LabeledEvent e31 = new LabeledEvent("31" + n);
-		LabeledEvent e32 = new LabeledEvent("32" + n);
-		LabeledEvent e33 = new LabeledEvent("33" + n);
-		LabeledEvent e34 = new LabeledEvent("34" + n);
+		LabeledEvent e11 = new LabeledEvent("e11" + n);
+		LabeledEvent e12 = new LabeledEvent("e12" + n);
+		LabeledEvent e21 = new LabeledEvent("e21" + n);
+		LabeledEvent e22 = new LabeledEvent("e22" + n);
+		LabeledEvent e31 = new LabeledEvent("e31" + n);
+		LabeledEvent e32 = new LabeledEvent("e32" + n);
+		LabeledEvent e33 = new LabeledEvent("e33" + n);
+		LabeledEvent e34 = new LabeledEvent("e34" + n);
 
 		e21.setControllable(false);
 		e22.setControllable(false);
@@ -124,10 +129,10 @@ public class SanchezTestCase
 	// --[ benchmark # 2] ---------------------------------------------------
 	private void createExactSyncProduct(int n)
 	{
-		LabeledEvent e11 = new LabeledEvent("11" + n);
-		LabeledEvent e12 = new LabeledEvent("12" + n);
-		LabeledEvent e13 = new LabeledEvent("13" + n);
-		LabeledEvent e14 = new LabeledEvent("14" + n);
+		LabeledEvent e11 = new LabeledEvent("e11" + n);
+		LabeledEvent e12 = new LabeledEvent("e12" + n);
+		LabeledEvent e13 = new LabeledEvent("e13" + n);
+		LabeledEvent e14 = new LabeledEvent("e14" + n);
 		Automaton m1 = new Automaton("M1" + n);
 		Automaton m2 = new Automaton("M2" + n);
 
@@ -140,10 +145,10 @@ public class SanchezTestCase
 		m2.getAlphabet().addEvent(e13);
 		m2.getAlphabet().addEvent(e14);
 
-		State s10 = new State("10");
-		State s11 = new State("11");
-		State s12 = new State("12");
-		State s13 = new State("13");
+		State s10 = new State("s10");
+		State s11 = new State("s11");
+		State s12 = new State("s12");
+		State s13 = new State("s13");
 
 		s10.setInitial(true);
 		m1.addState(s10);
@@ -159,8 +164,8 @@ public class SanchezTestCase
 		m1.addArc(new Arc(s11, s10, e14));
 		m1.addArc(new Arc(s10, s11, e13));
 
-		State s20 = new State("20");
-		State s21 = new State("21");
+		State s20 = new State("s20");
+		State s21 = new State("s21");
 
 		s20.setInitial(true);
 		m2.addState(s20);
@@ -170,6 +175,10 @@ public class SanchezTestCase
 		m2.addArc(new Arc(s20, s20, e12));
 		m2.addArc(new Arc(s20, s20, e13));
 		m2.addArc(new Arc(s20, s20, e14));
+
+		m1.invertMarking(); // Without these, :accepting: becmoes a blocked event
+		m2.invertMarking();
+
 		m1.setType(AutomatonType.PLANT);
 		m2.setType(AutomatonType.PLANT);
 		project.addAutomaton(m1);

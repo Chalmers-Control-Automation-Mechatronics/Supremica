@@ -15,8 +15,11 @@ public class RoundRobin
 		throws Exception
 	{
 		project = new Project("Round robin access");
-
-		project.setComment("Adapted from 'Compositional Minimization of Finite State Systems' by S. Graf and B. Steffen. Round robin access by token passing, the token starts at Process 1. The system is mutually but not globally nonblocking and the behaviour of the plants does not violate the specification (language inclusion).");
+		project.setComment("Adapted from 'Compositional Minimization of Finite State " +
+			"Systems' by S. Graf and B. Steffen. Round robin access by token passing, " +
+			"the token starts at Process 1. The system is mutually but not globally " +
+			"nonblocking and the behaviour of the plants does not violate the " +
+			"specification (language inclusion).");
 
 		Automaton resource = buildResource(processes);
 		Automata buffers = buildBuffers(processes);
@@ -41,7 +44,7 @@ public class RoundRobin
 
 		for (int i = 1; i <= processes; i++)
 		{
-			State state = new State("" + i);
+			State state = new State("q" + i);
 
 			resource.addState(state);
 
@@ -65,15 +68,15 @@ public class RoundRobin
 
 		for (int i = 1; i <= processes; i++)
 		{
-			Automaton buffer = new Automaton("Buffer " + i);
+			Automaton buffer = new Automaton("Buffer:" + i);
 			Alphabet alpha = buffer.getAlphabet();
-			State initialState = new State("0");
+			State initialState = new State("q0");
 
 			initialState.setAccepting(true);
 			buffer.addState(initialState);
 			buffer.setInitialState(initialState);
 
-			State otherState = new State("1");
+			State otherState = new State("q1");
 
 			buffer.addState(otherState);
 
@@ -97,16 +100,16 @@ public class RoundRobin
 
 		for (int i = 1; i <= processes; i++)
 		{
-			Automaton proc = new Automaton("Process " + i);
+			Automaton proc = new Automaton("Process:" + i);
 			Alphabet alpha = proc.getAlphabet();
 			State initialState = new State("Idle");
 
 			initialState.setAccepting(true);
 
-			State state1 = new State("1");
-			State state2 = new State("2");
-			State state3 = new State("3");
-			State state4 = new State("4");
+			State state1 = new State("q1");
+			State state2 = new State("q2");
+			State state3 = new State("q3");
+			State state4 = new State("q4");
 
 			proc.addState(initialState);
 			proc.addState(state1);
@@ -157,7 +160,7 @@ public class RoundRobin
 
 	private Automaton buildSpecification(int processes)
 	{
-		Automaton spec = new Automaton("Token passing");
+		Automaton spec = new Automaton("TokenPassing");
 		Alphabet alpha = spec.getAlphabet();
 		State initialState = new State("P1");
 

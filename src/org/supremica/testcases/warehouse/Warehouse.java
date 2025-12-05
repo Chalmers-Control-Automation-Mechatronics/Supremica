@@ -45,7 +45,7 @@ class Resource
     {
         this.x = x;
         this.y = y;
-        this.identity = Integer.toString(x) + Integer.toString(y);
+        this.identity = "R" + Integer.toString(x) + Integer.toString(y);
         this.exclusive = exclusive;
         this.u1 = u1;
         this.u2 = u2;
@@ -54,7 +54,6 @@ class Resource
         theAutomaton.setType(AutomatonType.SPECIFICATION);
 
         final State initialState = theAutomaton.createUniqueState("idle");
-
         initialState.setInitial(true);
         initialState.setAccepting(true);
         theAutomaton.addState(initialState);
@@ -112,14 +111,14 @@ class Resource
         final State usedByAGV = theAutomaton.createUniqueState("qagv");
         final State usedByTruck = theAutomaton.createUniqueState("qtruck");
 
-        if (getIdentity().equals("16"))
+        if (getIdentity().equals("R16"))
         {
             usedByTruck.setInitial(true);
             usedByTruck.setAccepting(true);
             orgInitialState.setInitial(false);
             orgInitialState.setAccepting(false);
         }
-        else if (getIdentity().equals("41"))
+        else if (getIdentity().equals("R41"))
         {
             usedByAGV.setInitial(true);
             usedByAGV.setAccepting(true);
@@ -134,114 +133,115 @@ class Resource
         final Alphabet truckAlphabet = warehouse.getTruckAlphabet();
         final Alphabet thisAlphabet = theAutomaton.getAlphabet();
 
-        {
+		addAGVallocationEvent(agvAlphabet, usedByAGV);
+		addAGVdeallocationEvents(agvAlphabet, usedByAGV);
+		addTruckAllocationEvent(truckAlphabet, usedByTruck);
+		addTruckDeallocationEvents(truckAlphabet, usedByTruck);
+	}
 
-            // Add agv allocation event
-            final LabeledEvent agvAllocationEvent = agvAlphabet.getEvent("agv" + getIdentity());
-            final LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
-            thisAGVAllocationEvent.setOperatorReset(true);
+	private void addAGVallocationEvent(final Alphabet agvAlphabet, final State usedByAGV)
+	{
+		final LabeledEvent agvAllocationEvent = agvAlphabet.getEvent("agv" + getIdentity());
+		final LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
+		thisAGVAllocationEvent.setOperatorReset(true);
 
-            thisAlphabet.addEvent(thisAGVAllocationEvent);
+		this.theAutomaton.getAlphabet().addEvent(thisAGVAllocationEvent);
 
-            final Arc agvAllocationArc = new Arc(orgInitialState, usedByAGV, thisAGVAllocationEvent);
+		final Arc agvAllocationArc = new Arc(orgInitialState, usedByAGV, thisAGVAllocationEvent);
 
-            try
-            {
-                theAutomaton.addArc(agvAllocationArc);
-            }
-            catch (final Exception ex)
-            {
-                logger.error("Could not add arc." + ex);
-            }
-        }
+		try
+		{
+			theAutomaton.addArc(agvAllocationArc);
+		}
+		catch (final Exception ex)
+		{
+			logger.error("Could not add arc: " + agvAllocationArc.toString() + ex);
+		}
+	}
 
-        {
+	private void addAGVdeallocationEvents(final Alphabet agvAlphabet, final State usedByAGV)
+	{
+		// for (final Iterator<Resource> nextResIt = u1NextResources.iterator(); nextResIt.hasNext(); )
+		for(final Resource nextResource : u1NextResources)
+		{
+			// final Resource nextResource = nextResIt.next();
+			final String nextIdentity = nextResource.getIdentity();
+			final LabeledEvent agvDeallocationEvent = agvAlphabet.getEvent("agv" + nextIdentity);
+			final LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
 
-            // Add agv deallocation events
-            for (final Iterator<Resource> nextResIt = u1NextResources.iterator();
-            nextResIt.hasNext(); )
-            {
-                final Resource nextResource = nextResIt.next();
-                final String nextIdentity = nextResource.getIdentity();
-                final LabeledEvent agvDeallocationEvent = agvAlphabet.getEvent("agv" + nextIdentity);
-                final LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
+			thisAGVDeallocationEvent.setPrioritized(false);
+			thisAGVDeallocationEvent.setOperatorReset(true);
 
-                thisAGVDeallocationEvent.setPrioritized(false);
-                thisAGVDeallocationEvent.setOperatorReset(true);
+			this.theAutomaton.getAlphabet().addEvent(thisAGVDeallocationEvent);
 
-                thisAlphabet.addEvent(thisAGVDeallocationEvent);
+			final Arc agvDeallocationArc = new Arc(usedByAGV, orgInitialState, thisAGVDeallocationEvent);
 
-                final Arc agvDeallocationArc = new Arc(usedByAGV, orgInitialState, thisAGVDeallocationEvent);
+			try
+			{
+				theAutomaton.addArc(agvDeallocationArc);
+			}
+			catch (final Exception ex)
+			{
+				logger.error("Could not add arc: " + agvDeallocationArc.toString() + ex);
+			}
+		}
+	}
 
-                try
-                {
-                    theAutomaton.addArc(agvDeallocationArc);
-                }
-                catch (final Exception ex)
-                {
-                    logger.error("Could not add arc." + ex);
-                }
-            }
-        }
+	private void addTruckAllocationEvent(final Alphabet truckAlphabet, final State usedByTruck)
+	{
+		final String truckAllocationString = "truck" + getIdentity();
+		final LabeledEvent truckAllocationEvent = truckAlphabet.getEvent(truckAllocationString);
 
-        {
+		if (truckAllocationEvent == null)
+		{
+			logger.debug("Could not find event " + truckAllocationString);
+		}
+		else
+		{
+			final LabeledEvent thisTruckAllocationEvent = new LabeledEvent(truckAllocationEvent);
+			truckAllocationEvent.setOperatorIncrease(true);
 
-            // Add truck allocation event
-            final String truckAllocationString = "truck" + getIdentity();
-            final LabeledEvent truckAllocationEvent = truckAlphabet.getEvent(truckAllocationString);
+			this.theAutomaton.getAlphabet().addEvent(thisTruckAllocationEvent);
 
-            if (truckAllocationEvent == null)
-            {
-                logger.debug("Could not find event " + truckAllocationString);
-            }
-            else
-            {
-                final LabeledEvent thisTruckAllocationEvent = new LabeledEvent(truckAllocationEvent);
-                truckAllocationEvent.setOperatorIncrease(true);
+			final Arc truckAllocationArc = new Arc(this.orgInitialState, usedByTruck, thisTruckAllocationEvent);
 
-                thisAlphabet.addEvent(thisTruckAllocationEvent);
+			try
+			{
+				theAutomaton.addArc(truckAllocationArc);
+			}
+			catch (final Exception ex)
+			{
+				logger.error("Could not add arc: " + truckAllocationArc.toString() + ex);
+			}
+		}
+	}
 
-                final Arc truckAllocationArc = new Arc(orgInitialState, usedByTruck, thisTruckAllocationEvent);
+    private void addTruckDeallocationEvents(final Alphabet truckAlphabet, final State usedByTruck)
+    {
+		// for (final Iterator<Resource> nextResIt = u2NextResources.iterator(); nextResIt.hasNext(); )
+		for(final Resource nextResource : u2NextResources)
+		{
+			//final Resource nextResource = nextResIt.next();
+			final String nextIdentity = nextResource.getIdentity();
+			final LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
+			final LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
+			truckDeallocationEvent.setOperatorIncrease(true);
 
-                try
-                {
-                    theAutomaton.addArc(truckAllocationArc);
-                }
-                catch (final Exception ex)
-                {
-                    logger.error("Could not add arc." + ex);
-                }
-            }
-        }
+			thisTruckDeallocationEvent.setPrioritized(false);
+			this.theAutomaton.getAlphabet().addEvent(thisTruckDeallocationEvent);
 
-        {
+			final Arc truckDeallocationArc = new Arc(usedByTruck, orgInitialState, thisTruckDeallocationEvent);
 
-            // Add truck deallocation events
-            for (final Iterator<Resource> nextResIt = u2NextResources.iterator();
-            nextResIt.hasNext(); )
-            {
-                final Resource nextResource = nextResIt.next();
-                final String nextIdentity = nextResource.getIdentity();
-                final LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
-                final LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
-                truckDeallocationEvent.setOperatorIncrease(true);
-
-                thisTruckDeallocationEvent.setPrioritized(false);
-                thisAlphabet.addEvent(thisTruckDeallocationEvent);
-
-                final Arc truckDeallocationArc = new Arc(usedByTruck, orgInitialState, thisTruckDeallocationEvent);
-
-                try
-                {
-                    theAutomaton.addArc(truckDeallocationArc);
-                }
-                catch (final Exception ex)
-                {
-                    logger.error("Could not add arc." + ex);
-                }
-            }
-        }
-    }
+			try
+			{
+				theAutomaton.addArc(truckDeallocationArc);
+			}
+			catch (final Exception ex)
+			{
+				logger.error("Could not add arc: " + truckDeallocationArc.toString() + ex);
+			}
+		}
+	}
 }
 
 class User
@@ -310,13 +310,13 @@ class User
             //resourceState.setAccepting(true);
             //resourceState.setId(resource.getIdentity());
             //resourceState.setName(resource.getIdentity());
-            if (identity.equals("truck") && resource.getIdentity().equals("16"))
+            if (identity.equals("truck") && resource.getIdentity().equals("R16"))
             {
                 resourceState.setInitial(true);
                 resourceState.setAccepting(true);
             }
 
-            if (identity.equals("agv") && resource.getIdentity().equals("41"))
+            if (identity.equals("agv") && resource.getIdentity().equals("R41"))
             {
                 resourceState.setInitial(true);
                 resourceState.setAccepting(true);
@@ -466,7 +466,7 @@ public class Warehouse
     {
         this.k = k;
         this.m = m;
-        theProject = new Project("Warehouse");
+        theProject = new Project("Warehouse(" + k + "," + m + ")");
 
         final User u1 = new User("agv", true, theProject);
         final User u2 = new User("truck", false, theProject);
@@ -547,6 +547,8 @@ public class Warehouse
 
         theProject.addAutomaton(agvAutomaton);
         theProject.addAutomaton(truckAutomaton);
+        // System.err.println(agvAutomaton.toCode());
+        // System.err.println(truckAutomaton.toCode());
     }
 
     public void setK(final int k)
@@ -619,6 +621,7 @@ public class Warehouse
 
             //newAutomaton.setName("Extender");
             theProject.addAutomaton(newAutomaton);
+            // System.err.println(newAutomaton.toCode());
         }
         catch (final Exception ex)
         {
