@@ -192,11 +192,17 @@ class Players
 
 public class StickPickingGame
 {
-    Project project = new Project("Stick picking game");
+    Project project;
 
     public StickPickingGame(final int players, final int sticks)
     throws Exception
     {
+        if(players < 1)
+          throw new java.lang.IllegalArgumentException("Requires at least one player");
+        if(sticks < 3)
+          throw new java.lang.IllegalArgumentException("Requires at least three sticks");
+          
+        this.project = new Project("Stick Picking (" + players + ", " + sticks + ")");
         project.setComment("A number of players alternatingly take one, two or three sticks. The player who takes the last stick loses. If you take the first turn, can you guarantee that you will not lose? In this model, not losing is equivalent to reaching a marked state, and only your own moves are controllable. Try to synthesize a controllable and nonblocking supervisor!");
 
         try

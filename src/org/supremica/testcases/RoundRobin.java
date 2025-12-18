@@ -12,9 +12,12 @@ public class RoundRobin
 	private Project project;
 
 	public RoundRobin(final int processes)
-		throws Exception
+  throws Exception
 	{
-		project = new Project("Round robin access");
+    if(processes < 2)
+      throw new java.lang.IllegalArgumentException("The number of processes must be at least 2");
+    
+		project = new Project("Round Robin (" + processes + ")");
 		project.setComment("Adapted from 'Compositional Minimization of Finite State " +
 			"Systems' by S. Graf and B. Steffen. Round robin access by token passing, " +
 			"the token starts at Process 1. The system is mutually but not globally " +

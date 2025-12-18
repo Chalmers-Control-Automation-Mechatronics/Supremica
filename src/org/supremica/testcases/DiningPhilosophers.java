@@ -506,7 +506,7 @@ class MemoryChopstick
 
 public class DiningPhilosophers
 {
-    Project project = new Project("Dining philosophers");
+    Project project;
     
     // These are helpers for counting modulo num philos/forks
     // Note that we adjust for 0's, indices are from 1 to modulo
@@ -543,7 +543,7 @@ public class DiningPhilosophers
         boolean l_put, boolean r_put, boolean animation, boolean forkmemory)
         throws Exception
     {
-        // Add comment
+        this.project = new Project("Dining Philosophers (" + num + ")");
         project.setComment("The classical dining philosophers problem, here with " + num + " philosophers.");
         
         int idLength = ("" + num).length();

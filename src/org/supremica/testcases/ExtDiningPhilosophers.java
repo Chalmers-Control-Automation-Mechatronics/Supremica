@@ -202,7 +202,7 @@ class ExtEatingPhilosopher
 
 public class ExtDiningPhilosophers{
     
-    Project project = new Project("Extended Dining philosophers");
+    Project project;
     Automata theAutomata = new Automata();
     final static String LABEL_SEP = ":";
     
@@ -239,8 +239,15 @@ public class ExtDiningPhilosophers{
         boolean l_put, boolean r_put, boolean animation, boolean forkmemory)
         throws Exception
     {        
-        // Add comment
-        project.setComment("Extended Dining Philosophers (parameters: n = # philosophers, k = #  intermediate states of each philosopher). \nConsider the dining philosophers problem where the number of intermediates states (after taking the fork on the left and before taking the fork on the right) may vary. This means that each philosopher, from the idles state takes the fork on his left reaching intermediate state 1, executes k-1 intermediate events reaching intermediate state k, takes his right fork entering a state where he eats, and when he is done goes back to the idle state. The uncontrollable events are \"philosopher i takes the left fork\" for i even. There are n philosophers around the table. Design a maximally permissive nonblocking supervisor.");
+        this.project = new Project("Extended Dining Philosophers (" + num + ", " + numInterm + ")");
+        project.setComment("Extended Dining Philosophers (" + num + " philosophers, " + numInterm + " intermediate states for each philosopher).\n" +
+          "Consider the dining philosophers problem where the number of intermediates states " +
+          "(after taking the fork on the left and before taking the fork on the right) may vary. " +
+          "This means that each philosopher, from the idle state takes the fork on his left reaching " +
+          "intermediate state 1, executes k-1 intermediate events reaching intermediate state k, takes " +
+          "his right fork entering a state where he eats, and when he is done goes back to the idle state. " +
+          "The uncontrollable events are \"philosopher i takes the left fork\" for i even. " +
+          "There are n philosophers around the table. Design a maximally permissive nonblocking supervisor.");
         
         int idLength = ("" + num).length();
         

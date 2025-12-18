@@ -11,7 +11,7 @@ public class RandomAutomata
     private static final long serialVersionUID = 1L;
 
     private Project project;
-    private static boolean first = true;
+    // private static boolean first = true;
     
     private class TransitionStruct
     {
@@ -20,19 +20,14 @@ public class RandomAutomata
 
     public RandomAutomata(int num, int states, int events, double dens)
     {
-        project = new Project("Random automata");
-        
-        if (first)
-        {
-            project.setComment("Random automata...");
-        }
-        
-        first = false;
-        
         if (dens > 1.0)
-        {
             dens = 1.0;
-        }
+        
+        final String name = "Random automata (" + num + ", " + states + ", " + events + ", " + dens + ")";
+        this.project = new Project(name);
+        project.setComment(name + "\nwith " + num + " number of automata, each with " + states +
+          " number of states, and " + events + " number of events, with deterministic transition-density " + 
+          dens + ". States are randomly marked");
         
         LabeledEvent[] events_vector = new LabeledEvent[events];
         boolean[] events_used = new boolean[events];
@@ -54,7 +49,7 @@ public class RandomAutomata
         
         for (int i = 0; i < num; ++i)
         {
-            Automaton random = new Automaton("random" + (i + 1));
+            Automaton random = new Automaton("Random" + (i + 1));
             State[] state_vector = new State[states];
             
             for (int s = 0; s < states; s++)
@@ -98,7 +93,6 @@ public class RandomAutomata
             
             for (int s = 0; s < transitions.length; s++)
             {
-                
                 //System.out.println(""+ transitions[s].s0 + ", " +  transitions[s].event + " -> " + transitions[s].s1);
                 random.addArc(new Arc(state_vector[transitions[s].s0], state_vector[transitions[s].s1], events_vector[transitions[s].event]));
             }
