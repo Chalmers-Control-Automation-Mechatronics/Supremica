@@ -46,7 +46,11 @@ public final class Args
             throw new NullPointerException();
         }
     }
-
+	public static void checkForNull(final Object theObject, final String theMessage)
+	{
+		if(theObject == null)
+			throw new NullPointerException(theMessage);
+	}
      /**
      * Throws an <code>IllegalArgumentException</code> if <code>aObject</code> is
      * not of type theClass.

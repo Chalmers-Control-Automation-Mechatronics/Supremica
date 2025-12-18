@@ -145,11 +145,14 @@ public class Automaton
         comment = orgAut.comment == null ? "" : orgAut.comment;
 
         // Create all states
+        final java.util.HashMap<String, State> stateMap = new java.util.HashMap<>();
         for (final State orgState : orgAut.iterableStates())
         {
             final State newState = new State(orgState);
-
             addState(newState);
+            stateMap.put(newState.getName(), newState);
+            // System.err.println("Copying " + orgState.getName() + " to " + newState.getName());
+
         }
 
         for (final Arc arc : orgAut.iterableArcs())
@@ -157,8 +160,10 @@ public class Automaton
             // We can use indices which is much faster, since the indices can not have changed!
             // No, we cannot! Inexplicably, the indices do change sometimes. If indices are used,
             // which is nice, AutomataIndexMap should be used in some form. /AK
-            final State fromState = getStateWithName(arc.getFromState().getName());
-            final State toState = getStateWithName(arc.getToState().getName());
+//            final State fromState = getStateWithName(arc.getFromState().getName());
+//            final State toState = getStateWithName(arc.getToState().getName());
+			final State fromState = stateMap.get(arc.getFromState().getName());
+			final State toState = stateMap.get(arc.getToState().getName());
             //State fromState = getStateWithIndex(arc.getFromState().getIndex());
             //State toState = getStateWithIndex(arc.getToState().getIndex());
             final LabeledEvent event = alphabet.getEvent(arc.getEvent().getLabel());
@@ -2658,12 +2663,39 @@ public class Automaton
 //    }
 //
 //}
+	// This function was implemented to help find a nasty bug in building
+	// the ExtCatMouse MODEL_ID 1. Some Arc had a from-state that was not
+	// in the State-set, or could not be found by name
+	// This function tries to check all such kinds of things, not very
+	// efficiently, but may be helpful in finding similar bugs.
+	public void sanityCheck()
+	{
+    boolean all_ok = true;
+		// Check that all Arc states are in the State set
+		// We rely on Arcs not having null elements, since they checkForNull
+		for(final Arc arc: this.iterableArcs())
+		{
+			final String sourceName = arc.getFromState().getName();
+			final String targetName = arc.getToState().getName();
+			final State fromState = this.getStateWithName(sourceName);
+			final State toState = this.getStateWithName(targetName);
 
+			if(fromState == null)
+      { 
+        all_ok = false;
+				System.err.println("from-state " + sourceName + " is not found!");
+      }
 
-
-
-
-
-
+			if(toState == null)
+      {
+        all_ok = false;
+				System.err.println("to-state " + targetName + " is not found!");
+      }
+		}
+    if(all_ok)
+    {
+      System.err.println(this.getName() + " passed sanityCheck");
+    }
+	}
 }
 

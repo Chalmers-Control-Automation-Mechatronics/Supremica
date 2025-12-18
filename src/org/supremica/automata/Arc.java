@@ -78,9 +78,9 @@ public class Arc
 
     public Arc(final State from, final State to, final LabeledEvent event)
     {
-        Args.checkForNull(from);
-        Args.checkForNull(to);
-        Args.checkForNull(event);
+        Args.checkForNull(from, "Arc: from state cannot be null");
+        Args.checkForNull(to, "Arc: to state cannot be null");
+        Args.checkForNull(event, "Arc; event cannot be null");
 
         this.fromState = from;
         this.toState = to;

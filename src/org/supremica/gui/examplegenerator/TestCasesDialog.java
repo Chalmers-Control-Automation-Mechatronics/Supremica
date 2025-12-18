@@ -62,39 +62,38 @@ import org.supremica.gui.Utility;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
-
-class TextArea extends JFrame {
-
+class TextArea extends JFrame 
+{
 	private static final long serialVersionUID = 1L;
 
 	JTextArea _resultArea = new JTextArea(20, 70);
-     public TextArea(final String text) {
-        //... Set textarea's initial text, scrolling, and border.
-        _resultArea.setText(text);
-         _resultArea.setEditable(false);
-        final JScrollPane scrollingArea = new JScrollPane(_resultArea);
+  
+  public TextArea(final String text) 
+  {
+    //... Set textarea's initial text, scrolling, and border.
+    _resultArea.setText(text);
+    _resultArea.setEditable(false);
+    final JScrollPane scrollingArea = new JScrollPane(_resultArea);
+    
+    //... Get the content pane, set layout, add to center
+    final JPanel content = new JPanel();
+    content.setLayout(new BorderLayout());
+    content.add(scrollingArea, BorderLayout.CENTER);
+    
+    //... Set window characteristics.
+    this.setContentPane(content);
+    this.setTitle("Results");
+    this.pack();
+  }
 
-        //... Get the content pane, set layout, add to center
-        final JPanel content = new JPanel();
-        content.setLayout(new BorderLayout());
-        content.add(scrollingArea, BorderLayout.CENTER);
-
-
-        //... Set window characteristics.
-        this.setContentPane(content);
-        this.setTitle("Results");
-        this.pack();
-    }
-
-     public void setText(final String text)
-     {
-        _resultArea.setText(text);
-     }
+  public void setText(final String text)
+  {
+    _resultArea.setText(text);
+  }
  }
 
 // should perform integer validation - see Horstmann
-class IntegerField
-    extends JTextField
+class IntegerField extends JTextField
 {
     private static final long serialVersionUID = 1L;
 
@@ -109,8 +108,7 @@ class IntegerField
     }
 }
 
-class DoubleField
-    extends JTextField
+class DoubleField extends JTextField
 {
     private static final long serialVersionUID = 1L;
 
@@ -125,8 +123,7 @@ class DoubleField
     }
 }
 
-class ExampleTab
-    extends JTabbedPane
+class ExampleTab extends JTabbedPane
 {
     private static final long serialVersionUID = 1L;
 
@@ -152,8 +149,7 @@ class ExampleTab
     }
 }
 
-public class TestCasesDialog
-    extends JDialog
+public class TestCasesDialog extends JDialog
 {
     private static final long serialVersionUID = 1L;
     private static Logger logger = LogManager.getLogger(TestCasesDialog.class);
@@ -161,8 +157,7 @@ public class TestCasesDialog
     private Project project = null;
     private final Object gui;
 
-    public class ComputeButton
-        extends JButton
+    public class ComputeButton extends JButton
     {
         private static final long serialVersionUID = 1L;
 
@@ -175,7 +170,6 @@ public class TestCasesDialog
             {
                 @Override
                 public void actionPerformed(final ActionEvent e)
-
                 // throws Exception // cannot do this - what the f**k!
                 {
                     try
@@ -190,8 +184,7 @@ public class TestCasesDialog
                     catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
-                        logger.debug(ex.getStackTrace());
-
+                        logger.debug(ex.getStackTrace().toString());
                         // what are we supposed to do?
                     }
                 }
@@ -199,8 +192,7 @@ public class TestCasesDialog
         }
     }
 
-    class DoitButton
-        extends JButton
+    class DoitButton extends JButton
     {
         private static final long serialVersionUID = 1L;
 
@@ -208,23 +200,23 @@ public class TestCasesDialog
         {
             super("Generate Automata");
 
-            setToolTipText("Generate automata and close this dialog");
+            setToolTipText("Generate automata and close (hold shift not to close)");
             addActionListener(new ActionListener()
             {
                 @Override
                 public void actionPerformed(final ActionEvent e)
-
                 // throws Exception // cannot do this - what the f**k!
                 {
                     try
-                    {
-                        generateAutomata();
+                    {   
+                        final boolean shiftDown = (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
+                        generateAutomata(shiftDown);
                     }
                     catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
-                        logger.debug(ex.getStackTrace());
-
+                        logger.debug(ex.getStackTrace()[0].toString());
+                        logger.debug(ex.getStackTrace()[1].toString());
                         // what are we supposed to do?
                     }
                 }
@@ -232,29 +224,22 @@ public class TestCasesDialog
         }
     }
 
-    class CancelButton
-        extends JButton
+    class CancelButton extends JButton
     {
         private static final long serialVersionUID = 1L;
 
         CancelButton()
         {
-            super("Cancel");
-
+            super("Close");
             setToolTipText("Enough of this");
             addActionListener(new ActionListener()
             {
                 @Override
                 public void actionPerformed(final ActionEvent e)
                 {
-                    action();
+                    dispose();
                 }
             });
-        }
-
-        void action()
-        {
-            dispose();
         }
     }
 
@@ -266,7 +251,6 @@ public class TestCasesDialog
         HelpButton()
         {
             super("Help");
-
             setToolTipText("Want some help?");
             addActionListener(new ActionListener()
             {
@@ -277,11 +261,11 @@ public class TestCasesDialog
                 }
             });
         }
-
+        
         void action()
         {}
     }
-
+   
     void synthesizeSupervisor(final IDE ide)
     throws Exception
     {
@@ -296,37 +280,41 @@ public class TestCasesDialog
     }
 
 
-    void generateAutomata()
+    void generateAutomata(final boolean shiftDown)
     throws Exception
     {
         final Component comp = extab.getSelectedComponent();
 
         // We know that this is actually also a TestCase (right?)
         final TestCase tc = (TestCase) comp;
-		int howmany = tc.howMany();
+        int howmany = tc.howMany();
 
-        setVisible(false);
+        // setVisible(false);
 
-		for(int i = 0; i < howmany; i++)
+        for(int i = 0; i < howmany; i++)
         {
-			project = tc.generateAutomata(i);    // Should return a Project (named)
+          project = tc.generateAutomata(i);    // Should return a Project (named)
 
-//        System.out.println("Name of project: "+project);
+    //        System.out.println("Name of project: "+project);
 
-			if (gui instanceof Gui)
-			{
-				((Gui) gui).addProject(project);
-			}
-			else if (gui instanceof IDE)
-			{
-				final IDE ide = (IDE) gui;
-				final Project project = getProject();
-				final DocumentContainerManager manager =
-					ide.getDocumentContainerManager();
-				manager.newContainer(project);
-			}
-		}
-        dispose();
+          if (gui instanceof Gui)
+          {
+            ((Gui) gui).addProject(project);
+          }
+          else if (gui instanceof IDE)
+          {
+            final IDE ide = (IDE) gui;
+            final Project project = getProject();
+            final DocumentContainerManager manager =
+              ide.getDocumentContainerManager();
+            manager.newContainer(project);
+          }
+        }
+        
+        if(!shiftDown) 
+        { setVisible(false);
+          dispose();
+        }
     }
 
     public Project getProject()
@@ -344,6 +332,9 @@ public class TestCasesDialog
 
         pane.setLayout(new BorderLayout(10, 10));
 
+        // Set KeyListener to catch SHIFT being held down (or not) when button is clicked
+        // this.addKeyListener(new KeyChecker());
+        
         // Utility.setupFrame(this, 400, 200);
         // Dimension size = new Dimension(400, 200);
         // Point point = Utility.getPosForCenter(size);
@@ -363,7 +354,6 @@ public class TestCasesDialog
         pack();
 
         final Point point = Utility.getPosForCenter(getSize());
-
         setLocation(point);
     }
 }
