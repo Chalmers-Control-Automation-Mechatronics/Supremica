@@ -26,13 +26,13 @@ public class TransferLine
         length = ("" + cells).length();
         
         this.sanchez_models = sanchez_models;
-        project = new Project("Transfer line");
+        project = new Project("Transfer line (" + cells + ", " + cap1 + ", " + cap2 + ")");
         if (!sanchez_models)
         {
             project.setComment("This testcase is based on the Transfer Line " +
                 "example from 'Notes on Control of Discrete-Event Systems' " +
                 "my W.M Wonham. Here with " + cells + " serially connected, " +
-                "identical cells.");
+                "identical cells with two buffers each of capacity " + cap1 + " and " + cap2 + ", respectively.");
         }
         else
         {
@@ -47,6 +47,18 @@ public class TransferLine
         {
             events_vector = new LabeledEvent[cells + 1];
             
+            events_vector[0] = new LabeledEvent("start");
+            
+            for (int i = 1; i < cells; i++)
+            {
+              events_vector[i] = new LabeledEvent("transfer_" + i);
+              events_vector[i].setControllable(false);
+            }
+            
+            events_vector[cells] = new LabeledEvent("finish");
+            events_vector[cells].setControllable(false);
+            
+            /**
             for (int i = 0; i <= cells; i++)
             {
                 if (i == 0)
@@ -67,6 +79,7 @@ public class TransferLine
                     events_vector[i].setControllable(false);
                 }
             }
+            **/
         }
         
         for (int i = 0; i < cells; i++)
@@ -89,9 +102,9 @@ public class TransferLine
         Automaton m1 = new Automaton("M1_" + idString);
         Automaton m2 = new Automaton("M2_" + idString);
         Automaton tu = new Automaton("TU_" + idString);
-        LabeledEvent e2 = new LabeledEvent("M1_" + idString + "_finished");
-        LabeledEvent e3 = new LabeledEvent("M2_" + idString + "_started");
-        LabeledEvent e4 = new LabeledEvent("M2_" + idString + "_finished");
+        LabeledEvent e2 = new LabeledEvent("M1_" + idString + "_finish");
+        LabeledEvent e3 = new LabeledEvent("M2_" + idString + "_start");
+        LabeledEvent e4 = new LabeledEvent("M2_" + idString + "_finish");
         LabeledEvent e5 = new LabeledEvent("TU_" + idString + "_take");
         LabeledEvent e8 = new LabeledEvent("TU_" + idString + "_reject");
         LabeledEvent e1, e6;

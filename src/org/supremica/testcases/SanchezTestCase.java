@@ -14,14 +14,13 @@ public class SanchezTestCase
 	public SanchezTestCase(int blocks, int type)
 	{
 		this.blocks = blocks;
-		project = new Project("Sanchez Test Case #" + (type+1));
-
+		project = new Project("Sanchez BM (#" + (type+1) + ", " + blocks + ")");
+    project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+      "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
+      "for asynchronous product.");
+      
 		if (type == 0)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
-				"For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
-				"for asynchronous product.");
-
 			for (int i = 0; i < blocks; i++)
 			{
 				createAsyncProduct(i);
@@ -29,10 +28,6 @@ public class SanchezTestCase
 		}
 		else if (type == 1)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
-				"For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
-				"for synchronous product.");
-
 			for (int i = 0; i < blocks; i++)
 			{
 				createExactSyncProduct(i);
@@ -40,10 +35,6 @@ public class SanchezTestCase
 		}
 		else if (type == 2)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
-				"For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
-				"for supremal controllable sublanguage.");
-
 			TransferLine tl = new TransferLine(blocks, 1, 1, true);
 			project = tl.getProject();
 		}

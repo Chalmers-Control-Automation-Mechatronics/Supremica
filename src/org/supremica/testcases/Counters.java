@@ -14,7 +14,7 @@ public class Counters
 
     public Counters(int num, int states)
     {
-        project = new Project("Counters");
+        project = new Project("Counters (" + num + ", " + states + ")");
         project.setComment("Independent counters. Used to produce huge state spaces " +
                 "with no interaction.");
 

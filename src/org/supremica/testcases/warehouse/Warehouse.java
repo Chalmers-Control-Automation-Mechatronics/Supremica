@@ -466,7 +466,7 @@ public class Warehouse
     {
         this.k = k;
         this.m = m;
-        theProject = new Project("Warehouse(" + k + "," + m + ")");
+        theProject = new Project("Warehouse (" + k + ", " + m + ")");
 
         final User u1 = new User("agv", true, theProject);
         final User u2 = new User("truck", false, theProject);

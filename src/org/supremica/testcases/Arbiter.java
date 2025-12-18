@@ -24,7 +24,7 @@ public class Arbiter
     public Arbiter(int nbrOfUsers, boolean doSynchronize)
     throws Exception
     {
-        project = new Project("Arbiter tree structure");
+        project = new Project("Arbiter (" + nbrOfUsers + ")");
         project.setComment("Tree arbiter cell structure adapted from " +
         	"'Compositional Model Checking' by E.M. Clarke et. al. " +
         	"Each arbiter cell has three communication channels, " +

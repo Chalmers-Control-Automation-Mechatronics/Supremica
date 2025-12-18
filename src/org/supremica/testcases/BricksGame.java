@@ -188,11 +188,12 @@ class BrickBuilder
 
 public class BricksGame
 {
-	private Project project = new Project("Bricks game");
+	private Project project;
 
 	public BricksGame(int rows, int cols)
 		throws Exception
 	{
+    this.project = new Project("Bricks (" + rows + ", " + cols + ")");
 		BrickBuilder builder = new BrickBuilder(rows, cols);
 
 		// Create rows*cols-1 utomata. Note cols-1, the last one is special (the 0-brick)
