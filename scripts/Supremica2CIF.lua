@@ -255,13 +255,16 @@ local patterns = {}
 -- capture lhs += rhs, lhs == rhs, lhs = rhs, etc
 -- expr patterns capture whole expressions, (lhs op rhs)
 -- detail patterns capture details (lhs)(op)(rhs)
-patterns.actiondetail = "([_:%a][_:%w]*)%s*([%+%-%*/=]+)%s*([_:%w]+)" -- "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
-patterns.actionexpr = "([_:%a][_:%w]*%s*[%+%-%*/=]+%s*[_:%w]+)"-- "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
+patterns.operator = "([%+%-%*/=]+)"
+-- patterns.actiondetail = "([_:%a][_:%w]*)%s*([%+%-%*/=]+)%s*([_:%w]+)" -- "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
+-- patterns.actionexpr = "([_:%a][_:%w]*%s*[%+%-%*/=]+%s*[_:%w]+)"-- "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
+patterns.identifier = "([_%a][_%w]*)" -- this pattern does not catch colon, see sanitize()
+patterns.colonifier = "([_:%a][_:%w]*)" -- identifiers can include colon
+patterns.commasep = "%s*(.-)[,]"
+patterns.operatorsep = "%s*"..patterns.colonifier.."%s*"..patterns.operator.."%s*(.*)"
 patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
-patterns.identifier = "([_%a][_%w]*)" -- this pattern does not catch colon, see sanitize()
-patterns.colonifier = "([_:%a][_:%w]*)" -- this will catch also colon
 patterns.colonatend = ":$"
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
@@ -685,10 +688,13 @@ local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
   if not str or str == "" then return {} end
   local orphans = {}
-  for cap in str:gmatch(patterns.actionexpr) do
-    local lhs, op, rhs = cap:match(patterns.actiondetail)
+  str = str..","
+  for cap in str:gmatch(patterns.commasep) do -- (patterns.actionexpr) do
+    
+    local lhs, op, rhs = cap:match(patterns.operatorsep) -- (patterns.actiondetail)
     lhs = sanitize(lhs)
     rhs = sanitize(rhs)
+    
     local expr, newrhs = rewrites[op](lhs, rhs)
     local action, orph1 = prefixOwner(expr)
     assert(orph1, "22. orph1 nil")
