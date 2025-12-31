@@ -305,13 +305,9 @@ local function convertGuard(gstr)
     gstr = gstr:gsub(w, sanitize(w))
 --    loginfo(w.." -> "..gstr)
   end
-  print("*** gstr:\n"..gstr)
   
   local convstr = gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or ") -- gsub("![^=]", "not ")
   convstr = handleNot(convstr)
-  
-  print("*** convstr:\n"..convstr)
-  
   return convstr
 end
 
@@ -712,9 +708,6 @@ end
 local function manageGuard(gstr)
   
   local newstr = convertGuard(gstr) -- sanitizes its input
-  
-  print("*** newstr:\n"..newstr)
-  
   local prefxd, orphans = prefixOwner(newstr)
   --[[
     debugOrphans(CurrentEFA.name, orphans)
@@ -774,8 +767,6 @@ local function processGuardAction(gablock)
   
   if not gablock then return nil, nil, {} end -- not all edges have GA-blocks
   
-  print("*** gablock:\n"..gablock:toString())
-  
   local gastore = {}
   gastore.guards, gastore.actions = {}, {}
   
@@ -795,21 +786,15 @@ local function processGuardAction(gablock)
   -- [,{, v_out==1 & v_s2==0,}],{,},
   -- [,],{,{, v_in = 0, v_out = 0,}},
   
-  print("*** gatxt:\n"..gatxt)
-  
   -- Get rid of commas and outer braces
   local gcap, acap = gatxt:match("%[,(.*)%],{,(.*)},")
   acap = stripCurly(acap)
   gcap = stripCurly(gcap)
 
-  print("*** gcap:\n"..gcap)
-  
   local orph1 = processGuard(gcap, gastore) assert(orph1, "657: orph1 is nil")
   local orph2 = processAction(acap, gastore) assert(orph2, "658: orph2 is nil")
   local orphans = mergeOrphans(orph1, orph2)
   assert(orphans, "6. Oprhans nil!")
-  
-  print("*** gastore.guards:\n"..table.concat(gastore.guards))
   
   return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
 
