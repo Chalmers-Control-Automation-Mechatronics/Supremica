@@ -38,8 +38,16 @@ package org.supremica.gui.examplegenerator;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,19 +58,56 @@ import org.supremica.testcases.StickPickingGame;
 
 class StickGamePanel extends JPanel implements TestCase {
 	private static final long serialVersionUID = 1L;
+	private static String defaultCount = "Down";
 	IntegerField num_players = new IntegerField("2", 6);
 	IntegerField num_sticks = new IntegerField("7", 6);
+	private String variantID = defaultCount;
+
+	private final Box theBox;
 
 	private static Logger logger = LogManager.getLogger(StickGamePanel.class);
+
+
 
 	StickGamePanel() {
 		JPanel panel = new JPanel(new GridLayout(2, 2));
 
-		add(panel, BorderLayout.WEST);
+		// add(panel, BorderLayout.WEST);
 		panel.add(new JLabel("Number of players: "));
 		panel.add(num_players);
 		panel.add(new JLabel("Number of sticks: "));
 		panel.add(num_sticks);
+
+		final JPanel variantPanel = new JPanel();
+		final Border variantBorder = BorderFactory.createTitledBorder("Up Down Count:");
+		variantPanel.setBorder(variantBorder);
+		final ButtonGroup variantGroup = new ButtonGroup();
+		final JRadioButton upButton = new JRadioButton("Up", variantID.equals("Up"));
+		final JRadioButton dnButton = new JRadioButton(this.defaultCount, variantID.equals(defaultCount));
+
+		final ActionListener variantActionListener = new ActionListener()
+					{ public void actionPerformed(ActionEvent event)
+					  {
+						try // parseInt may throw but here it never will
+						{
+						  variantID = event.getActionCommand(); // Integer.parseInt(event.getActionCommand());
+						  // System.err.println(event.getActionCommand());
+						} catch (final Exception ignore) {}
+					  }
+					};
+		upButton.addActionListener(variantActionListener);
+		dnButton.addActionListener(variantActionListener);
+		variantGroup.add(upButton);
+		variantGroup.add(dnButton);
+		variantPanel.add(upButton);
+		variantPanel.add(dnButton);
+
+		theBox = Box.createVerticalBox();
+		theBox.add(panel);
+		theBox.add(variantPanel);
+
+		add(theBox, BorderLayout.NORTH);
+
 	}
 
 	@Override
@@ -76,11 +121,16 @@ class StickGamePanel extends JPanel implements TestCase {
 	 * and disregard the n sent to generateAutomata
 	 */
 	@Override
-	public Project generateAutomata(int n) throws Exception {
+	public Project generateAutomata(int n) throws Exception
+	{
+		if(num_sticks.get() < 4)
+		{
+			JOptionPane.showMessageDialog(null, "The stick-picking game is no fun with lessa than four sticks.");
+			return null;
+		}
 
-		// System.err.println("SticksGamePanel::doIt()");
 		StickPickingGame spg = new StickPickingGame(num_players.get(),
-				num_sticks.get());
+				num_sticks.get(), variantID.equals("Down") );
 
 		return spg.getProject();
 	}

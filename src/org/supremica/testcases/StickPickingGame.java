@@ -38,58 +38,109 @@ class Sticks
 {
     State[] sticks;    // we have to cache the states ourselves
 
-    public Sticks(final int num, final int players)
+    public Sticks(final int numsticks, final int numplayers, final boolean countdown)
     throws Exception
     {
-        super("Sticks:" + num);
+        super("Sticks:" + numsticks);
 
         setType(AutomatonType.PLANT);
 
-        sticks = new State[num + 1];    // one more state than sticks
-        sticks[0] = new State("S" + Integer.toString(num));    // starting at "num" and counting down
-
-        sticks[0].setInitial(true);    // first state is initial
-        addState(sticks[0]);
-
-        for (int i = 1; i < num + 1; ++i)
+        sticks = new State[numsticks + 1];    // one more state than sticks
+		for(int i = 0; i < numsticks + 1; i++)
         {
-            sticks[i] = new State("S" + Integer.toString(num - i));
-
+            sticks[i] = new State("S" + Integer.toString(numsticks - i));
             addState(sticks[i]);
         }
 
-        sticks[num].setAccepting(true);    // last state is accepting
-
-        for (int player = 0; player < players; ++player)
+        if(countdown)
         {
-            // Note, we assume _at_least_ 5 sticks here!
+			// There is no (easy) way to invert arcs, so instead... more code
+			doStandardCountDown(sticks, numsticks, numplayers);
+		}
+		else
+		{
+			doNonstandardCountUp(sticks, numsticks, numplayers);
+		}
+	}
+
+	private void doNonstandardCountUp(final State[] sticks, final int numsticks, final int numplayers)
+	{
+		// Just copy all of the standard arcs, and invert them
+		sticks[numsticks].setInitial(true);    // last state is initial
+		sticks[0].setAccepting(true);    // first state is accepting
+
+        for (int player = 0; player < numplayers; ++player)
+        {
             State s0 = sticks[0];
             State s1 = sticks[0 + 1];
             State s2 = sticks[0 + 2];
             State s3 = sticks[0 + 3];
-            final PlayerEvents pe = new PlayerEvents(player);
 
+            final PlayerEvents pe = new PlayerEvents(player);
             getAlphabet().addEvent(pe.a1);
             getAlphabet().addEvent(pe.a2);
             getAlphabet().addEvent(pe.a3);
 
-//                      addArc(new Arc(s0, s1, pe.a1.getId()));
-//                      addArc(new Arc(s0, s2, pe.a2.getId()));
-//                      addArc(new Arc(s0, s3, pe.a3.getId()));
-            addArc(new Arc(s0, s1, pe.a1));
-            addArc(new Arc(s0, s2, pe.a2));
-            addArc(new Arc(s0, s3, pe.a3));
+            addArc(new Arc(s1, s0, pe.a1));
+            addArc(new Arc(s2, s0, pe.a2));
+            addArc(new Arc(s3, s0, pe.a3));
 
-            for (int i = 1; i < num - 2; ++i)
+            for (int i = 1; i < numsticks - 2; ++i)
             {
                 s0 = s1;
                 s1 = s2;
                 s2 = s3;
                 s3 = sticks[i + 3];
 
-//                              addArc(new Arc(s0, s1, pe.a1.getId()));
-//                              addArc(new Arc(s0, s2, pe.a2.getId()));
-//                              addArc(new Arc(s0, s3, pe.a3.getId()));
+                addArc(new Arc(s1, s0, pe.a1));
+                addArc(new Arc(s2, s0, pe.a2));
+                addArc(new Arc(s3, s0, pe.a3));
+            }
+
+            s0 = s1;
+            s1 = s2;
+            s2 = s3;    // sticks[num-1];
+
+
+            addArc(new Arc(s1, s0, pe.a1));
+            addArc(new Arc(s2, s0, pe.a2));
+
+            s0 = s1;
+            s1 = s2;
+
+            addArc(new Arc(s1, s0, pe.a1));
+        }
+	}
+
+	private void doStandardCountDown(final State[] sticks, final int numsticks, final int numplayers)
+	{
+        sticks[0].setInitial(true);    // first state is initial
+        sticks[numsticks].setAccepting(true);    // last state is accepting
+
+        for (int player = 0; player < numplayers; ++player)
+        {
+            // Note, we assume _at_least_ 5 sticks here!
+            State s0 = sticks[0];
+            State s1 = sticks[0 + 1];
+            State s2 = sticks[0 + 2];
+            State s3 = sticks[0 + 3];
+
+            final PlayerEvents pe = new PlayerEvents(player);
+            getAlphabet().addEvent(pe.a1);
+            getAlphabet().addEvent(pe.a2);
+            getAlphabet().addEvent(pe.a3);
+
+            addArc(new Arc(s0, s1, pe.a1));
+            addArc(new Arc(s0, s2, pe.a2));
+            addArc(new Arc(s0, s3, pe.a3));
+
+            for (int i = 1; i < numsticks - 2; ++i)
+            {
+                s0 = s1;
+                s1 = s2;
+                s2 = s3;
+                s3 = sticks[i + 3];
+
                 addArc(new Arc(s0, s1, pe.a1));
                 addArc(new Arc(s0, s2, pe.a2));
                 addArc(new Arc(s0, s3, pe.a3));
@@ -99,19 +150,18 @@ class Sticks
             s1 = s2;
             s2 = s3;    // sticks[num-1];
 
-//                      addArc(new Arc(s0, s1, pe.a1.getId()));
-//                      addArc(new Arc(s0, s2, pe.a2.getId()));
+
             addArc(new Arc(s0, s1, pe.a1));
             addArc(new Arc(s0, s2, pe.a2));
 
             s0 = s1;
             s1 = s2;
 
-//                      addArc(new Arc(s0, s1, pe.a1.getId()));
             addArc(new Arc(s0, s1, pe.a1));
         }
-
-        sticks = null;    // done with the cache
+		// compiler error: final parameter sticks may not be assigned
+        //* sticks = null;    // done with the cache
+		// How the f*** can that be an error?!
     }
 }
 
@@ -194,21 +244,23 @@ public class StickPickingGame
 {
     Project project;
 
-    public StickPickingGame(final int players, final int sticks)
+    public StickPickingGame(final int players, final int sticks, final boolean countdown)
     throws Exception
     {
         if(players < 1)
           throw new java.lang.IllegalArgumentException("Requires at least one player");
         if(sticks < 3)
           throw new java.lang.IllegalArgumentException("Requires at least three sticks");
-          
+
         this.project = new Project("Stick Picking (" + players + ", " + sticks + ")");
         project.setComment("A number of players alternatingly take one, two or three sticks. The player who takes the last stick loses. If you take the first turn, can you guarantee that you will not lose? In this model, not losing is equivalent to reaching a marked state, and only your own moves are controllable. Try to synthesize a controllable and nonblocking supervisor!");
 
         try
         {
-            project.addAutomaton(new Players(players));
-            project.addAutomaton(new Sticks(sticks, players));
+			final Automaton plyrs = new Players(players);
+			final Automaton stcks = new Sticks(sticks, players, countdown);
+			project.addAutomaton(plyrs);
+            project.addAutomaton(stcks);
         }
         catch (final Exception excp)
         {
