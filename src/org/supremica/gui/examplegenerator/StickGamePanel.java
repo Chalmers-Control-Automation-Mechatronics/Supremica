@@ -67,8 +67,6 @@ class StickGamePanel extends JPanel implements TestCase {
 
 	private static Logger logger = LogManager.getLogger(StickGamePanel.class);
 
-
-
 	StickGamePanel() {
 		JPanel panel = new JPanel(new GridLayout(2, 2));
 
@@ -86,15 +84,11 @@ class StickGamePanel extends JPanel implements TestCase {
 		final JRadioButton dnButton = new JRadioButton(this.defaultCount, variantID.equals(defaultCount));
 
 		final ActionListener variantActionListener = new ActionListener()
-					{ public void actionPerformed(ActionEvent event)
-					  {
-						try // parseInt may throw but here it never will
-						{
-						  variantID = event.getActionCommand(); // Integer.parseInt(event.getActionCommand());
-						  // System.err.println(event.getActionCommand());
-						} catch (final Exception ignore) {}
-					  }
-					};
+		{ 	public void actionPerformed(ActionEvent event)
+			{
+				variantID = event.getActionCommand();
+			}
+		};
 		upButton.addActionListener(variantActionListener);
 		dnButton.addActionListener(variantActionListener);
 		variantGroup.add(upButton);
