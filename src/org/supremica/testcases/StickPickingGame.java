@@ -61,6 +61,8 @@ class Sticks
 		{
 			doNonstandardCountUp(sticks, numsticks, numplayers);
 		}
+
+		sticks = null;    // done with the cache
 	}
 
 	private void doNonstandardCountUp(final State[] sticks, final int numsticks, final int numplayers)
@@ -159,9 +161,6 @@ class Sticks
 
             addArc(new Arc(s0, s1, pe.a1));
         }
-		// compiler error: final parameter sticks may not be assigned
-        //* sticks = null;    // done with the cache
-		// How the f*** can that be an error?!
     }
 }
 
@@ -179,8 +178,6 @@ class Players
 
         // One state for each player
         // First player is special (initial and accepting)
-        // All other states except for the one immediately after the first player
-        // has made a move should be marked (player 1 must not take the last stick)!
         players = new State[num];
         players[0] = new State("P" + PlayerEvents.getPlayerId(0));
         players[0].setInitial(true);
@@ -201,13 +198,6 @@ class Players
             // ...to this one
             players[i + 1] = new State("P" + PlayerEvents.getPlayerId(i + 1));
             final State to = players[i + 1];
-
-            // All but one state should be accepting!
-            if (i != 0)
-            {
-                to.setAccepting(true);
-            }
-
             addState(to);
 
             addArc(new Arc(from, to, pe.a1));
@@ -229,20 +219,31 @@ class Players
         addArc(new Arc(from, to, pe.a2));
         addArc(new Arc(from, to, pe.a3));
 
-		// If we're counting down, the loser is the one who takes the last stick
-		// If we're counting up, the winner is the one who takes the last stick
-		if(countdown)
-			players[0].setAccepting(true);
-		else
-			players[num-1].setAccepting(true);
 
-        // players = null;    // done with the cache
+		// Default is Player 1 to win, Player 1's events are controllable
+		if(countdown)
+		{	// If we're counting down, the loser is the one who takes the last stick
+			// Mark all states except the state reached from the Player~1 state
+			for(final State player : players)
+				player.setAccepting(true);
+
+			players[1].setAccepting(false);
+		}
+		else
+		{	// If we're counting up, the winner is the one who takes the last stick
+			// Mark the state reached from the Player~1 state
+			players[1].setAccepting(true);
+		}
+
+        players = null;    // done with the cache
     }
 }
 
 public class StickPickingGame
 {
     Project project;
+	final static String upwin = "The player who takes the last stick wins the game. ";
+	final static String dnlose = "The player who takes the last stick loses the game. ";
 
     public StickPickingGame(final int players, final int sticks, final boolean countdown)
     throws Exception
@@ -252,8 +253,22 @@ public class StickPickingGame
         if(sticks < 3)
           throw new java.lang.IllegalArgumentException("Requires at least three sticks");
 
-        this.project = new Project("Stick Picking (" + players + ", " + sticks + ")");
-        project.setComment("A number of players alternatingly take one, two or three sticks. The player who takes the last stick loses. If you take the first turn, can you guarantee that you will not lose? In this model, not losing is equivalent to reaching a marked state, and only your own moves are controllable. Try to synthesize a controllable and nonblocking supervisor!");
+		final String count = countdown ? "dn" : "up";
+        this.project = new Project("Stick Picking (" + players + ", " + sticks + ", " + count + ")");
+        project.setComment(
+		"A number of players take turns to pick 1, 2, or 3 sticks." +
+		(countdown ? dnlose : upwin) +
+		"This is an example of a user-interactive DES, that for " +
+		"certain configurations (number of players, number of sticks, " +
+		"counting up or down) exhibit bias towards or against player(s)." +
+		"The existence of a supervisor reveals such bias." +
+		"By setting a certain player's events controllable, and marking the " +
+		"state where that player wins, positive bias towards that player can " +
+		"be revealed. By setting a certain player's events uncontrollable " +
+		"(and the other player's events uncontrollable), and marking the states " +
+		"where that player loses the game, negative bias against that player " +
+		"can be revealed."
+		);
 
         try
         {
@@ -265,7 +280,6 @@ public class StickPickingGame
         catch (final Exception excp)
         {
             excp.printStackTrace();
-
             throw excp;
         }
     }
