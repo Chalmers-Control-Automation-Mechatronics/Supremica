@@ -62,24 +62,24 @@ import org.supremica.gui.Utility;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
-class TextArea extends JFrame 
+class TextArea extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 
 	JTextArea _resultArea = new JTextArea(20, 70);
-  
-  public TextArea(final String text) 
+
+  public TextArea(final String text)
   {
     //... Set textarea's initial text, scrolling, and border.
     _resultArea.setText(text);
     _resultArea.setEditable(false);
     final JScrollPane scrollingArea = new JScrollPane(_resultArea);
-    
+
     //... Get the content pane, set layout, add to center
     final JPanel content = new JPanel();
     content.setLayout(new BorderLayout());
     content.add(scrollingArea, BorderLayout.CENTER);
-    
+
     //... Set window characteristics.
     this.setContentPane(content);
     this.setTitle("Results");
@@ -208,7 +208,7 @@ public class TestCasesDialog extends JDialog
                 // throws Exception // cannot do this - what the f**k!
                 {
                     try
-                    {   
+                    {
                         final boolean shiftDown = (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
                         generateAutomata(shiftDown);
                     }
@@ -261,11 +261,11 @@ public class TestCasesDialog extends JDialog
                 }
             });
         }
-        
+
         void action()
         {}
     }
-   
+
     void synthesizeSupervisor(final IDE ide)
     throws Exception
     {
@@ -294,7 +294,10 @@ public class TestCasesDialog extends JDialog
         for(int i = 0; i < howmany; i++)
         {
           project = tc.generateAutomata(i);    // Should return a Project (named)
-
+			if(project == null)
+			{
+				break;
+			}
     //        System.out.println("Name of project: "+project);
 
           if (gui instanceof Gui)
@@ -310,8 +313,8 @@ public class TestCasesDialog extends JDialog
             manager.newContainer(project);
           }
         }
-        
-        if(!shiftDown) 
+
+        if(!shiftDown)
         { setVisible(false);
           dispose();
         }
@@ -334,7 +337,7 @@ public class TestCasesDialog extends JDialog
 
         // Set KeyListener to catch SHIFT being held down (or not) when button is clicked
         // this.addKeyListener(new KeyChecker());
-        
+
         // Utility.setupFrame(this, 400, 200);
         // Dimension size = new Dimension(400, 200);
         // Point point = Utility.getPosForCenter(size);

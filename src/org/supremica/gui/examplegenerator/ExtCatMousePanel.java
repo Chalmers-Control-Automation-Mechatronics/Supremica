@@ -88,7 +88,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	private final JRadioButton verticalButton = new JRadioButton("Vertical traversing");
 
   private int variantID = 1;
-  
+
 	private final String XCATMOUSE = "Ext Cat & Mouse";
 	private static Logger logger = LogManager.getLogger(ExtCatMousePanel.class);
 
@@ -155,11 +155,11 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
     final JRadioButton two = new JRadioButton("2", variantID == 2);
     final JRadioButton three = new JRadioButton("3", variantID == 3);
     final JRadioButton four = new JRadioButton("4", variantID == 4);
-    final ActionListener variantActionListener = new ActionListener() 
-                { public void actionPerformed(ActionEvent event) 
+    final ActionListener variantActionListener = new ActionListener()
+                { public void actionPerformed(ActionEvent event)
                   {
                     try // parseInt may throw but here it never will
-                    { 
+                    {
                       variantID = Integer.parseInt(event.getActionCommand());
                       // System.err.println(event.getActionCommand());
                     } catch (final Exception ignore) {}
