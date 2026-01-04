@@ -170,7 +170,7 @@ class Players
 {
     private State[] players;    // have to cache the states ourselves
 
-    public Players(final int num)
+    public Players(final int num, final boolean countdown)
     throws Exception
     {
         super("Players:" + num);
@@ -184,7 +184,6 @@ class Players
         players = new State[num];
         players[0] = new State("P" + PlayerEvents.getPlayerId(0));
         players[0].setInitial(true);
-        players[0].setAccepting(true);
         addState(players[0]);
 
         final Alphabet alpha = getAlphabet();
@@ -211,9 +210,6 @@ class Players
 
             addState(to);
 
-//                      addArc(new Arc(from, to, pe.a1.getId()));
-//                      addArc(new Arc(from, to, pe.a2.getId()));
-//                      addArc(new Arc(from, to, pe.a3.getId()));
             addArc(new Arc(from, to, pe.a1));
             addArc(new Arc(from, to, pe.a2));
             addArc(new Arc(from, to, pe.a3));
@@ -229,14 +225,18 @@ class Players
         final State from = players[num - 1];    // from this guy...
         final State to = players[0];    // ...to this one
 
-//              addArc(new Arc(from, to, pe.a1.getId()));
-//              addArc(new Arc(from, to, pe.a2.getId()));
-//              addArc(new Arc(from, to, pe.a3.getId()));
         addArc(new Arc(from, to, pe.a1));
         addArc(new Arc(from, to, pe.a2));
         addArc(new Arc(from, to, pe.a3));
 
-        players = null;    // done with the cache
+		// If we're counting down, the loser is the one who takes the last stick
+		// If we're counting up, the winner is the one who takes the last stick
+		if(countdown)
+			players[0].setAccepting(true);
+		else
+			players[num-1].setAccepting(true);
+
+        // players = null;    // done with the cache
     }
 }
 
@@ -257,7 +257,7 @@ public class StickPickingGame
 
         try
         {
-			final Automaton plyrs = new Players(players);
+			final Automaton plyrs = new Players(players, countdown);
 			final Automaton stcks = new Sticks(sticks, players, countdown);
 			project.addAutomaton(plyrs);
             project.addAutomaton(stcks);
