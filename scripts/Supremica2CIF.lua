@@ -713,7 +713,7 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     -- Someone else already owns this variable, and it isn't us
     local owners = Variables[var].owner.." and "..CurrentEFA.name
     showIssueDialog("Multiple EFA assign same variable...", "In CIF, two automata cannot assign the same variable.\n"..
-      var.."\nis assigned by "..owners..".\nMake it be assigned in a single EFA.\nQuitting...")
+      var.."\nis assigned by "..owners..".\nMake it be assigned in a single EFA.\nAnd note that primed variables are assigned\nQuitting...")
     
     textframe:setVisible(false)
     assert(false, "Different EFA assigning the same variable is not allowed by CIF")
@@ -776,6 +776,7 @@ local function collectPrimedVars(guard)
   local out = {}
   for var in guard:gmatch(patterns.primedident) do
     table.insert(out, var)
+    ownThisVariable(var) -- primed variables are written, so own them
   end
   return out
 end
@@ -825,13 +826,13 @@ local function getGuardTruthValue(guard)
   
 end
 -- For primed guard expressions new transitiosn need to be generated
--- This function retruns a set of guard-action pairs, with evaluation result if possible
+-- This function returns a set of guard-action pairs, with evaluation result if possible
 local function generateGuardActionSet(expr)
   -- Here, Supremicas &, |, !  have been converted to "and", "or", "not"
   -- Each "or" clause can be handled as a new transition
   local vars = collectPrimedVars(expr)
   local gtemp, atemp = generateTemplate(expr, vars)
-  local out = {}
+  local out = {guards={}, actions={}, values={}}
   
   local function instantiateTemplate(collection, indices)
     local guard = gtemp
@@ -845,7 +846,10 @@ local function generateGuardActionSet(expr)
       action = action:gsub(unique, val)
     end
     local value = getGuardTruthValue(guard)
-    table.insert(out, {guard, action, value})
+    -- table.insert(out, {guard, action, value})
+    table.insert(out.guards, guard)
+    table.insert(out.actions, action)
+    table.insert(out.values, value)
   end
   
   -- collect the variable domains
@@ -856,7 +860,6 @@ local function generateGuardActionSet(expr)
     if Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
       range = unfoldRange(range)
     end
-    -- loginfo("range: "..table.concat(range, ", "))
     collection[i] =  range
   end
   DNL.setup(collection) -- for DNL, see lines 2078--2123 above
@@ -868,10 +871,13 @@ end
 local function handlePrimedExpression(expr)
   loginfo("Primed expr: "..expr)
   local gaset = generateGuardActionSet(expr)
-  for i = 1, #gaset do
-    local gapair = gaset[i]
-    loginfo("when ("..gapair[1]..") do "..gapair[2]..gapair[3])
+  for i = 1, #gaset.guards do
+    local guard = gaset.guards[i]
+    local action = gaset.actions[i]
+    local value = gaset.values[i]
+--    loginfo("when ("..guard..") do "..action..value)
   end
+  return gaset
 end
 
 local function processGuard(str, gastore)
@@ -886,7 +892,11 @@ local function processGuard(str, gastore)
     -- loginfo(str)
     local prefixed, orphans = manageGuard(str)
     if prefixed:find("'") then
-      handlePrimedExpression(prefixed)
+      local gaset = generateGuardActionSet(prefixed)
+      table.insert(gastore.guards, gaset.guards)
+      table.insert(gastore.actions, gaset.actions)
+      assert(orphans, "897. Orphans nil!")
+      return orphans
     end -- simply convert syntactically and return    
       table.insert(gastore.guards, "("..prefixed..")")
       assert(orphans, "5. Orphans nil!")
