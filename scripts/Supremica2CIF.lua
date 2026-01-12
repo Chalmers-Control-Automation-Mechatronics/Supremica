@@ -814,13 +814,19 @@ end
 -- Some guards, like "2 != 3", can be evaluated
 -- true guards can be eliminated, only keep the actions
 -- false guards can be eliminated including removing the actions
+-- This is an optimization that is not yet done, but prepared for
 local function getGuardTruthValue(guard)
   
   if not isEvaluatable(guard) then
     return ""
   end
-  -- Else this guard can be directly evaluated
-  local subguard = guard:gsub("!=", "~=") -- Guarantee Lua syntax
+  -- Else this guard can be directly evaluated but needs change of operators
+  -- Supremica	!=	==	=
+  --  CIF			  !=	=	  :=
+  --  Lua			  ~=	==	=
+  -- First replace all = by ¤, then replace !¤ and :¤ and replace ¤ last
+  local subguard = guard:gsub("=", "¤"):gsub("!¤", "~="):gsub(":¤", "="):gsub("¤", "==") 
+  -- loginfo("subguard: "..subguard)
   local eval, err = load("return "..subguard)
   return eval() and " (true)" or " (false)"
   
@@ -845,8 +851,7 @@ local function generateGuardActionSet(expr)
       guard = guard:gsub(unique, val)
       action = action:gsub(unique, val)
     end
-    local value = getGuardTruthValue(guard)
-    -- table.insert(out, {guard, action, value})
+    local value = "" -- getGuardTruthValue(guard) -- premature eoptimization at this point
     table.insert(out.guards, guard)
     table.insert(out.actions, action)
     table.insert(out.values, value)
@@ -887,22 +892,17 @@ local function processGuard(str, gastore)
   
   if not str or str == "" then return {} end
   
-  -- if not str:find("'") then 
-  if true then
-    -- loginfo(str)
-    local prefixed, orphans = manageGuard(str)
-    if prefixed:find("'") then
-      local gaset = generateGuardActionSet(prefixed)
-      table.insert(gastore.guards, gaset.guards)
-      table.insert(gastore.actions, gaset.actions)
-      assert(orphans, "897. Orphans nil!")
-      return orphans
-    end -- simply convert syntactically and return    
-      table.insert(gastore.guards, "("..prefixed..")")
-      assert(orphans, "5. Orphans nil!")
-      return orphans
-    --end
+  local prefixed, orphans = manageGuard(str)
+  if prefixed:find("'") then -- handle primed variables in the guard
+    local gaset = generateGuardActionSet(prefixed)
+    table.insert(gastore.guards, gaset.guards)
+    table.insert(gastore.actions, gaset.actions)
+  else -- simply convert syntactically and return    
+    table.insert(gastore.guards, "("..prefixed..")")
   end
+  assert(orphans, "5. Orphans nil!")
+  return orphans
+
   --[[ Text below is from before not even trying to handle primed guards 
   -- We have a guard with primed variable, for now assume it is varX' < varY
   -- foreach value v in DomX
@@ -1058,7 +1058,7 @@ local function getTable(set)
   return tab, ord
 end
 -- There are at most one table in each set, and 
--- if there is in one it should be in the other
+-- if there is in one there should be in the other
 local function findTables(gset, aset)
   local gtab, gord = getTable(gset)
   local atab, aord = getTable(aset)
@@ -1077,8 +1077,10 @@ local function addEdges(src, trgt, events, guards, actions, orphans)
   if not gtable then -- need to check only one here, due the assert above
     local edge = makeEdge(trgt, events, table.concat(gordinary, " and "), table.concat(aordinary, ", "))
     table.insert(CurrentEFA.locations[src], {edge, orphans})
-  else -- we have to handle with the tables
-    assert(#gtable == #atable, "Sizes of the two tables shoudl match")
+  else -- we have to handle the tables
+    assert(#gtable == #atable, "Sizes of the two tables should match")
+    -- For each pair from gtable and atable, merge with the ordinary guards and actions
+    -- make a new edge and add it to the source location
     for i = 1, #gtable do
       local newguard = doInsert(gordinary, gtable[i])
       local newact = doInsert(aordinary, atable[i])
