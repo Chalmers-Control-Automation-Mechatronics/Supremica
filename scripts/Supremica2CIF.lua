@@ -403,6 +403,7 @@ local IS_BOOL = " is bool "
 
 local IS_MARKED = "\tmarked;" -- for locations
 local IS_INITIAL = "\tinitial;"
+local IN_ANY = " in any"
 
 -- for looking up the Boolean values (see getEnumInfo())
 local TFlookup = {} 
@@ -679,11 +680,11 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     end
     
     if Variables[var].kind == IS_ENUM then
-      table.insert(out, "\tdisc Enums "..var)
+      table.insert(out, "\tdisc Enums "..var..IN_ANY)
     elseif Variables[var].kind == IS_BOOL then
-      table.insert(out, "\tdisc bool "..var)
+      table.insert(out, "\tdisc bool "..var..IN_ANY)
     elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
-      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var.." in any")
+      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var..IN_ANY)
     else
       assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
     end
@@ -766,48 +767,133 @@ end
 
 -- Primed guards are unknown to CIF, and so must be turned into actions
 -- This is not trivial...
-  local function findPrime(str)
-    -- There can be multiple primes
-    -- Even if there are spece between the variable and the prime in the input
-    -- Supremica removes that space, so it can be assumed not there
-    local out = {}
-    local PRIME = "'"
-    local primeindx = str:find(PRIME)
-    while primeindx do
-      table.insert(out, primeindx)
-      primeindx = str:find(PRIME, primeindx+1, true)
-    end
-    return out
+
+patterns.primedident = "([_:%a][_:%w]*)'" -- matches supremica identifier, can include colon
+-- Supremica guarantees that there is no space between end of variable
+-- name and the prime (if manual input had it)
+
+local function collectPrimedVars(guard)
+  local out = {}
+  for var in guard:gmatch(patterns.primedident) do
+    table.insert(out, var)
   end
+  return out
+end
+
+-- Generate unique identifier for each primed var, the template
+local function getUnique(i)
+  return "#"..i
+end
+
+-- Check if this guard contains only numbers and operators
+-- If so it can be evaluated, typical case "1 < 2"
+-- This only happens in the special case that two primed
+-- variables are compared, like "varX' < varY'"
+-- And we do not check for evaluatable parts of primed guards
+local function isEvaluatable(guard)
+  -- If we find letters then it cannot be evaluated
+  -- This will not work for guards that have been CIF'ed as those
+  -- can contain "and", "or", "not", so are falsely flagged as
+  -- not evaluatable by this check
+  return not guard:find("%a")
+end
+
+-- In guard, replace each primed variable with a unique string
+local function generateTemplate(guard, vars)
+  local actions = {}
+  -- Does multiple passes through the string, and generates each time
+  -- a new string. Cannot replace multiple vars simultaneously(?)
+  for i = 1, #vars do
+    local unique = getUnique(i)
+    guard = guard:gsub(vars[i].."'", unique)
+    table.insert(actions, vars[i].." := "..unique)
+  end
+  return guard, table.concat(actions, ", ")
+end
+-- Some guards, like "2 != 3", can be evaluated
+-- true guards can be eliminated, only keep the actions
+-- false guards can be eliminated including removing the actions
+local function getGuardTruthValue(guard)
+  
+  if not isEvaluatable(guard) then
+    return ""
+  end
+  -- Else this guard can be directly evaluated
+  local subguard = guard:gsub("!=", "~=") -- Guarantee Lua syntax
+  local eval, err = load("return "..subguard)
+  return eval() and " (true)" or " (false)"
+  
+end
+-- For primed guard expressions new transitiosn need to be generated
+-- This function retruns a set of guard-action pairs, with evaluation result if possible
+local function generateGuardActionSet(expr)
+  -- Here, Supremicas &, |, !  have been converted to "and", "or", "not"
+  -- Each "or" clause can be handled as a new transition
+  local vars = collectPrimedVars(expr)
+  local gtemp, atemp = generateTemplate(expr, vars)
+  local out = {}
+  
+  local function instantiateTemplate(collection, indices)
+    local guard = gtemp
+    local action = atemp
+    for i = 1, #collection do
+      local set = collection[i]
+      local indx = indices[i]
+      local val = set[indx]
+      local unique = getUnique(i)
+      guard = guard:gsub(unique, val)
+      action = action:gsub(unique, val)
+    end
+    local value = getGuardTruthValue(guard)
+    table.insert(out, {guard, action, value})
+  end
+  
+  -- collect the variable domains
+  local collection = {}
+  for i = 1, #vars do
+    local var = vars[i]
+    local range = Variables[var].range
+    if Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
+      range = unfoldRange(range)
+    end
+    -- loginfo("range: "..table.concat(range, ", "))
+    collection[i] =  range
+  end
+  DNL.setup(collection) -- for DNL, see lines 2078--2123 above
+  DNL.iterate(instantiateTemplate)
+  
+  return out
+end
 
 local function handlePrimedExpression(expr)
-  -- Here, Supremicas &, | have been converted to "and", "or"
-  -- Each "or" clause can be handled as new transition(s)
-  loginfo("Primed expression: "..expr)
-  local primes = findPrime(expr)
-  for i = 1, #primes do
-    loginfo("prime at: "..primes[i])
+  loginfo("Primed expr: "..expr)
+  local gaset = generateGuardActionSet(expr)
+  for i = 1, #gaset do
+    local gapair = gaset[i]
+    loginfo("when ("..gapair[1]..") do "..gapair[2]..gapair[3])
   end
 end
 
 local function processGuard(str, gastore)
   -- str is a logical operator separated sequence of predicates
   -- Replacements can be done inline, see convertGuard()
-  -- The only(?) complication is primed guards, that CIF do not recognize
+  -- A complication is primed guards, that CIF do not recognize
   
   if not str or str == "" then return {} end
   
-  -- if not str:find("'") then -- simply convert syntactically and return
+  -- if not str:find("'") then 
   if true then
     -- loginfo(str)
     local prefixed, orphans = manageGuard(str)
     if prefixed:find("'") then
       handlePrimedExpression(prefixed)
-    end    
-    table.insert(gastore.guards, "("..prefixed..")")
-    assert(orphans, "5. Orphans nil!")
-    return orphans
+    end -- simply convert syntactically and return    
+      table.insert(gastore.guards, "("..prefixed..")")
+      assert(orphans, "5. Orphans nil!")
+      return orphans
+    --end
   end
+  --[[ Text below is from before not even trying to handle primed guards 
   -- We have a guard with primed variable, for now assume it is varX' < varY
   -- foreach value v in DomX
   -- add transition with guard: v < varY, and action varX := v
@@ -841,6 +927,7 @@ local function processGuard(str, gastore)
     " in "..CurrentEFA.name.."\nas action(s).\n")
   textframe:setVisible(false)
   assert(false, "Supremica2CIF cannot handle primed guards")
+  ]]--
 end
 
 local function processGuardAction(gablock)
@@ -867,16 +954,17 @@ local function processGuardAction(gablock)
   -- [,],{,{, v_in = 0, v_out = 0,}},
   
   -- Get rid of commas and outer braces
-  local gcap, acap = gatxt:match("%[,(.*)%],{,(.*)},")
-  acap = stripCurly(acap)
-  gcap = stripCurly(gcap)
+  local gexpr, aexpr = gatxt:match("%[,(.*)%],{,(.*)},")
+  aexpr = stripCurly(aexpr)
+  gexpr = stripCurly(gexpr)
 
-  local orph1 = processGuard(gcap, gastore) assert(orph1, "657: orph1 is nil")
-  local orph2 = processAction(acap, gastore) assert(orph2, "658: orph2 is nil")
+  local orph1 = processGuard(gexpr, gastore) assert(orph1, "657: orph1 is nil")
+  local orph2 = processAction(aexpr, gastore) assert(orph2, "658: orph2 is nil")
   local orphans = mergeOrphans(orph1, orph2)
   assert(orphans, "6. Oprhans nil!")
   
-  return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
+  -- return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
+  return gastore.guards, gastore.actions, orphans
 
 end
 --[[
@@ -945,6 +1033,51 @@ local function makeEdge(target, events, guard, action)
   return table.concat(out, " ")
 end
 
+-- Search the given set for a table, and assert that there is max one
+local function getTable(set)
+  local tab = nil
+  local ord = {}
+  for i = 1, #set do
+    if type(set[i]) == "table" then
+      assert(tab == nil, "There should be max one table")
+      tab = set[i]
+    else
+      table.insert(ord, set[i])
+    end
+  end
+  return tab, ord
+end
+-- There are at most one table in each set, and 
+-- if there is in one it should be in the other
+local function findTables(gset, aset)
+  local gtab, gord = getTable(gset)
+  local atab, aord = getTable(aset)
+  assert((gtab and atab) or (not gtab and not atab), "Should have either no tables or one of each")
+  return gtab, atab, gord, aord
+end
+-- Create a new table and insert elem into it
+local function doInsert(tab, elem)
+  local newtab = {table.unpack(tab)} -- copy, we know the elements are not tables
+  newtab[#newtab+1] = elem
+  return newtab
+end
+  
+local function addEdges(src, trgt, events, guards, actions, orphans)
+  local gtable, atable, gordinary, aordinary = findTables(guards, actions)
+  if not gtable then -- need to check only one here, due the assert above
+    local edge = makeEdge(trgt, events, table.concat(gordinary, " and "), table.concat(aordinary, ", "))
+    table.insert(CurrentEFA.locations[src], {edge, orphans})
+  else -- we have to handle with the tables
+    assert(#gtable == #atable, "Sizes of the two tables shoudl match")
+    for i = 1, #gtable do
+      local newguard = doInsert(gordinary, gtable[i])
+      local newact = doInsert(aordinary, atable[i])
+      local edge = makeEdge(trgt, events, table.concat(newguard, " and "), table.concat(newact, ", "))
+      table.insert(CurrentEFA.locations[src], {edge, orphans})      
+    end
+  end
+end
+
 local function processEdge(edge)
   
 	local src = manageSourceTarget(edge:getSource())
@@ -955,10 +1088,10 @@ local function processEdge(edge)
   
   -- Make different edges for controllable and uncontrollable events
   if #cevents > 0 then
-    table.insert(CurrentEFA.locations[src], {makeEdge(trgt, cevents, guard, action), orphans})
+    addEdges(src, trgt, cevents, guard, action, orphans)
   end
   if #uevents > 0 then
-    table.insert(CurrentEFA.locations[src], {makeEdge(trgt, uevents, guard, action), orphans})
+    addEdges(src, trgt, uevents, guard, action, orphans)
   end  
 end
 
