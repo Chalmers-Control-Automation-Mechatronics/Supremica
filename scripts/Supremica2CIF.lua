@@ -129,6 +129,47 @@ Inputs.ixCylinder3In = "bool"
 Inputs.ixCylinder3Out = "bool"
 Inputs.ixEmergencyStop = "bool"
 
+-- For processing primed guard expressions, we need dynamic nested loops
+-- to evaluate all combinations of variable values 
+-- This part contains a dynamic nested loop imiplementation
+local DNL = { hasnext = true, collection = {}, indexes = {}, bounds = {}, }
+-- collection is a set of sets to loop over
+DNL.setup = function(collection)
+  DNL.collection = collection
+  DNL.indexes = {}
+  DNL.bounds = {}
+  -- Set up loop bounds, and indexes
+  for i = 1, #collection do
+    DNL.bounds[i] = #collection[i]
+    DNL.indexes[i] = 1 -- all indices start at 1
+  end
+  DNL.hasnext = #collection > 0 and #collection[1] > 0
+end
+
+-- Count up the right-most index, if it reaches its bound
+-- set it back to 1 and increment the next right-most, etc
+DNL.incrementIndexes = function()
+  
+  local cntr = #DNL.indexes
+  
+  while cntr ~= 0 do
+    local val = DNL.indexes[cntr] + 1
+    DNL.indexes[cntr] = val
+    if val <= DNL.bounds[cntr] then return true end
+    -- else the bound was exhausted for the cntr variable, adjust the outer one(s)
+    DNL.indexes[cntr] = 1
+    cntr = cntr - 1
+  end
+  return false
+end
+
+DNL.iterate = function(callback)
+  while DNL.hasnext do
+    callback(DNL.collection, DNL.indexes)
+    DNL.hasnext = DNL.incrementIndexes() -- (DNL.indexes, DNL.bounds)
+  end
+end
+
 -- In Supremica, identifiers can include colon (:) Events, EFA names, variable names, 
 -- enum labels, all of those can include one or more colons. Forinstnace "var:X:Y:Z"
 -- is a valid identifier in Supremica, as is "e::::1", and "Cat:0", "Room:4", etc
@@ -642,7 +683,7 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
     elseif Variables[var].kind == IS_BOOL then
       table.insert(out, "\tdisc bool "..var)
     elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
-      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var)
+      table.insert(out, "\tdisc int["..Variables[var].range.."] "..var.." in any")
     else
       assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
     end
@@ -724,6 +765,31 @@ local function manageGuard(gstr)
 end
 
 -- Primed guards are unknown to CIF, and so must be turned into actions
+-- This is not trivial...
+  local function findPrime(str)
+    -- There can be multiple primes
+    -- Even if there are spece between the variable and the prime in the input
+    -- Supremica removes that space, so it can be assumed not there
+    local out = {}
+    local PRIME = "'"
+    local primeindx = str:find(PRIME)
+    while primeindx do
+      table.insert(out, primeindx)
+      primeindx = str:find(PRIME, primeindx+1, true)
+    end
+    return out
+  end
+
+local function handlePrimedExpression(expr)
+  -- Here, Supremicas &, | have been converted to "and", "or"
+  -- Each "or" clause can be handled as new transition(s)
+  loginfo("Primed expression: "..expr)
+  local primes = findPrime(expr)
+  for i = 1, #primes do
+    loginfo("prime at: "..primes[i])
+  end
+end
+
 local function processGuard(str, gastore)
   -- str is a logical operator separated sequence of predicates
   -- Replacements can be done inline, see convertGuard()
@@ -731,13 +797,21 @@ local function processGuard(str, gastore)
   
   if not str or str == "" then return {} end
   
-  if not str:find("'") then -- simply convert syntactically and return
+  -- if not str:find("'") then -- simply convert syntactically and return
+  if true then
     -- loginfo(str)
     local prefixed, orphans = manageGuard(str)
+    if prefixed:find("'") then
+      handlePrimedExpression(prefixed)
+    end    
     table.insert(gastore.guards, "("..prefixed..")")
     assert(orphans, "5. Orphans nil!")
     return orphans
   end
+  -- We have a guard with primed variable, for now assume it is varX' < varY
+  -- foreach value v in DomX
+  -- add transition with guard: v < varY, and action varX := v
+  
   -- Else we have a guard with at least one primed variable
   -- This has to be turned into an action.
   
