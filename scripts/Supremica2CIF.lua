@@ -1043,9 +1043,9 @@ local function makeEdge(target, events, guard, action)
   local multi, var = checkMultiAssignment(action)
   if multi then 
     showIssueDialog("Multiple assignment of "..var, 
-      "CIF does not allow multiple assignments of the same variable\n"..
-      "in actions. The variable\n"..var..
-      "\nis assigned multipel times in "..CurrentEFA.name)
+      "CIF does not allow multiple assignments of\n"..
+      "the same variable in actions. The variable\n"..var..
+      "\nis assigned multiple times in "..CurrentEFA.name)
     textframe:setVisible(false)
     assert(false, "CIF does not allow multiple assignment of same variable in an action")
   end
