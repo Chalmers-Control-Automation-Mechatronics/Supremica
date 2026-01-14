@@ -307,6 +307,7 @@ patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
 patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
 patterns.colonatend = ":$"
+patterns.multiassign = "([_%a][_%w]*)%s*:="
 -- https://www.lua.org/pil/20.2.html
 -- https://iamreiyn.github.io/lua-pattern-tester/
 
@@ -978,11 +979,11 @@ local function processGuardAction(gablock)
 
 end
 --[[
-    In Supremica, if no locatiosn are marked, then all locatison are considered to be marked
+    In Supremica, if no locations are marked, then all locations are considered to be marked
     The reasoning behind this is that:
     1. In cases, like dealing only with controllability, where it does not matter if no locations
-      are marked, it also does not matter if all locatiosn are marked;
-    2. In cases, like dealing with nonblocking, where it matters if locations are merked, modeling
+      are marked, it also does not matter if all locations are marked;
+    2. In cases, like dealing with nonblocking, where it matters if locations are marked, modeling
       a system with no marked locations is meaningless
     So, if some location is marked, we set the allmarked flag false
 --]]
@@ -1021,9 +1022,33 @@ local function getEdgeEvents(edge)
   
   return cevs, uevs
 end
-
+-- Check an actio for multiple assignment of the same variable
+-- This is not allowed in CIF, but fine in Supremica (see ConflictingAssignment.wmod)
+local function checkMultiAssignment(action)
+  
+  local cache = {}
+  for var in action:gmatch(patterns.multiassign) do
+    if not cache[var] then
+      cache[var] = true
+    else
+      return true, var -- there are multiple assignments to this variable
+    end
+  end
+  return false -- there are no multiple assignments
+end
+  
 local function makeEdge(target, events, guard, action)
   if #events == 0 then return nil end
+  
+  local multi, var = checkMultiAssignment(action)
+  if multi then 
+    showIssueDialog("Multiple assignment of "..var, 
+      "CIF does not allow multiple assignments of the same variable\n"..
+      "in actions. The variable\n"..var..
+      "\nis assigned multipel times in "..CurrentEFA.name)
+    textframe:setVisible(false)
+    assert(false, "CIF does not allow multiple assignment of same variable in an action")
+  end
   
   local out = {}
   table.insert(out, "\tedge ")
