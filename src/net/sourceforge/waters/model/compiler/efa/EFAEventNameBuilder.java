@@ -82,7 +82,6 @@ public class EFAEventNameBuilder {
                              final CompilerOperatorTable optable,
                              final VariableContext context)
   {
-    mOperatorTable = optable;
     mComparator = new ExpressionComparator(optable);
     mEquality = new ModuleEqualityVisitor(false);
     mHashCodeVisitor = ModuleHashCodeVisitor.getInstance(false);
@@ -518,7 +517,6 @@ public class EFAEventNameBuilder {
 
   //#########################################################################
   //# Data Members
-  private final CompilerOperatorTable mOperatorTable;
   private final VariableCollectVisitor mCollector;
   private final ExpressionComparator mComparator;
   private final ModuleEqualityVisitor mEquality;
