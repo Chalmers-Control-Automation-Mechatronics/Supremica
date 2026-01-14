@@ -9,15 +9,8 @@
 **/
 package org.supremica.testcases;
 
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.ForbiddenEvent;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.Project;
-import org.supremica.automata.State;
 
 public class Floor // extends Room
 {
@@ -30,7 +23,7 @@ public class Floor // extends Room
   {
     this.floor = new Automata();
     this.floor_id = floor_id;
-    
+
     for (int room_id = 0; room_id < CatMouse.NUMBER_OF_ROOMS; ++room_id)
     {
       final Room room = new Room(room_id, num_cats);
@@ -48,13 +41,13 @@ public class Floor // extends Room
   {
     final Automata sm = new Automata(this.floor);
     final Automaton[] rooms = new Automaton[CatMouse.NUMBER_OF_ROOMS];
-    
+
     for(int room_id = 0; room_id < CatMouse.NUMBER_OF_ROOMS; room_id++)
     {
       rooms[room_id] = sm.getAutomatonAt(room_id);
       sm.renameAutomaton(rooms[room_id], FLOOR_LABEL + this.floor_id + Room.NAME_SEP + rooms[room_id].getName());
     }
-    
+
     return sm;
   }
 

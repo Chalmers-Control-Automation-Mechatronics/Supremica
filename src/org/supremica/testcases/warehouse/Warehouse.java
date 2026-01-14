@@ -131,6 +131,7 @@ class Resource
 
         final Alphabet agvAlphabet = warehouse.getAGVAlphabet();
         final Alphabet truckAlphabet = warehouse.getTruckAlphabet();
+        @SuppressWarnings("unused")
         final Alphabet thisAlphabet = theAutomaton.getAlphabet();
 
 		addAGVallocationEvent(agvAlphabet, usedByAGV);

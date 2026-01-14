@@ -37,17 +37,17 @@ package org.supremica.gui.examplegenerator;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButton;
-import javax.swing.border.Border;
-import javax.swing.BorderFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.border.Border;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,7 +68,7 @@ class StickGamePanel extends JPanel implements TestCase {
 	private static Logger logger = LogManager.getLogger(StickGamePanel.class);
 
 	StickGamePanel() {
-		JPanel panel = new JPanel(new GridLayout(2, 2));
+		final JPanel panel = new JPanel(new GridLayout(2, 2));
 
 		// add(panel, BorderLayout.WEST);
 		panel.add(new JLabel("Number of players: "));
@@ -81,10 +81,11 @@ class StickGamePanel extends JPanel implements TestCase {
 		variantPanel.setBorder(variantBorder);
 		final ButtonGroup variantGroup = new ButtonGroup();
 		final JRadioButton upButton = new JRadioButton("Up", variantID.equals("Up"));
-		final JRadioButton dnButton = new JRadioButton(this.defaultCount, variantID.equals(defaultCount));
+		final JRadioButton dnButton = new JRadioButton(defaultCount, variantID.equals(defaultCount));
 
 		final ActionListener variantActionListener = new ActionListener()
-		{ 	public void actionPerformed(ActionEvent event)
+		{ 	@Override
+    public void actionPerformed(final ActionEvent event)
 			{
 				variantID = event.getActionCommand();
 			}
@@ -105,7 +106,7 @@ class StickGamePanel extends JPanel implements TestCase {
 	}
 
 	@Override
-	public void synthesizeSupervisor(IDE ide)
+	public void synthesizeSupervisor(final IDE ide)
 	{
 		logger.warn("No direct synthesis in this test case");
 	}
@@ -115,7 +116,7 @@ class StickGamePanel extends JPanel implements TestCase {
 	 * and disregard the n sent to generateAutomata
 	 */
 	@Override
-	public Project generateAutomata(int n) throws Exception
+	public Project generateAutomata(final int n) throws Exception
 	{
 		if(num_sticks.get() < 4)
 		{
@@ -123,7 +124,7 @@ class StickGamePanel extends JPanel implements TestCase {
 			return null;
 		}
 
-		StickPickingGame spg = new StickPickingGame(num_players.get(),
+		final StickPickingGame spg = new StickPickingGame(num_players.get(),
 				num_sticks.get(), variantID.equals("Down") );
 
 		return spg.getProject();

@@ -8,13 +8,10 @@
 **/
 package org.supremica.testcases;
 
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.Project;
 import org.supremica.automata.State;
 import org.supremica.automata.StateSet;
 
@@ -28,51 +25,51 @@ public class Room
 	final static String NAME_SEP = ":";
 
 	private Automaton room;
-	private int number_of_states;
-	private int num_cats;
-	private State[] states;
-	private LabeledEvent[][] events;
-	private Arc[][][] arcs;
+	private final int number_of_states;
+	private final int num_cats;
+	private final State[] states;
+	private final LabeledEvent[][] events;
+	private final Arc[][][] arcs;
 
 	private final int RE = 0; // empty room index
-	private int[] RC;
-	private int[] RM;
-	private int room_id;
+	private final int[] RC;
+	private final int[] RM;
+	private final int room_id;
 
 	public Room(final int room_id, final int num_cats)
 	throws Exception
 	{
 		this.room_id = room_id;
 		this.num_cats = num_cats;
-    
+
 		this.number_of_states = 1 + 2*this.num_cats;
 		this.states = new State[this.number_of_states];
-    
+
 		this.RC = new int[this.num_cats+1];
 		this.RM = new int[this.num_cats+1];
 		this.states[RE] = new State(ROOM_ID + room_id + "e");
-    
+
 		this.events = new LabeledEvent[this.num_cats][];
-		this.arcs = new Arc[num_cats][this.num_cats][];    
-    
+		this.arcs = new Arc[num_cats][this.num_cats][];
+
     // First the template is built, then the user calls this.build to alter the template
     buildTemplate();
   }
-  
+
   private void buildTemplate()
   {
 		this.room = new Automaton("Room template");
 		this.room.setType(AutomatonType.SPECIFICATION);
-  
+
 		for(int i = 1; i <= num_cats; i++)
 		{
 			RC[i] = i;
 			RM[i] = i + num_cats;
-      
+
 			states[RC[i]] = new State(ROOM_ID + room_id + LABEL_SEP + i + CAT_ID);
 			states[RM[i]] = new State(ROOM_ID + room_id + LABEL_SEP + i + MOUSE_ID);
 		}
-    
+
 		switch(room_id)
 		{
 			case 0:
@@ -139,7 +136,7 @@ public class Room
           arcs[k-1][i][1] = new Arc(states[RE], states[RC[k]], events[i][1]);
           arcs[k-1][i][2] = new Arc(states[RC[k]], states[RE], events[i][2]);
           arcs[k-1][i][3] = new Arc(states[RC[k]], states[RE], events[i][3]);
-          
+
           arcs[k-1][i][4] = new Arc(states[RE], states[RM[k]], events[i][4]);
           arcs[k-1][i][5] = new Arc(states[RE], states[RM[k]], events[i][5]);
           arcs[k-1][i][6] = new Arc(states[RM[k]], states[RE], events[i][6]);
@@ -151,49 +148,49 @@ public class Room
           arcs[k-1][i][1] = new Arc(states[RC[k-1]], states[RC[k]], events[i][1]);
           arcs[k-1][i][2] = new Arc(states[RC[k]], states[RC[k-1]], events[i][2]);
           arcs[k-1][i][3] = new Arc(states[RC[k]], states[RC[k-1]], events[i][3]);
-          
+
           arcs[k-1][i][4] = new Arc(states[RM[k-1]], states[RM[k]], events[i][4]);
           arcs[k-1][i][5] = new Arc(states[RM[k-1]], states[RM[k]], events[i][5]);
           arcs[k-1][i][6] = new Arc(states[RM[k]], states[RM[k-1]], events[i][6]);
           arcs[k-1][i][7] = new Arc(states[RM[k]], states[RM[k-1]], events[i][7]);
         }
       }
-    }  
+    }
   }
-  
+
   private void buildRoom1()
   {
     states[RE].setInitial(true);
     states[RE].setAccepting(true);
-    
+
     for(int i = 0; i < num_cats; i++)
     {
       events[i] = new LabeledEvent[5];
 
       events[i][0] = new LabeledEvent(CAT_ID+i+LABEL_SEP+0);
       events[i][1] = new LabeledEvent(CAT_ID+i+LABEL_SEP+1);
-      
+
       events[i][2] = new LabeledEvent(MOUSE_ID+i+LABEL_SEP+1);
       events[i][3] = new LabeledEvent(MOUSE_ID+i+LABEL_SEP+2);
-      
+
       events[i][4] = new LabeledEvent(CAT_ID+i+LABEL_SEP+6);
-      
+
       for(int j=0; j<(events[i].length-1);j++)
         events[i][j].setControllable(true);
-      
+
       events[i][(events[i].length-1)].setControllable(false);
-      
+
       for(int k = 1; k <= num_cats; k++)
       {
         arcs[k-1][i] = new Arc[6];
-        
+
         if(k==1)
         {
           arcs[k-1][i][0] = new Arc(states[RE], states[RC[k]], events[i][0]);
           arcs[k-1][i][1] = new Arc(states[RE], states[RC[k]], events[i][4]);
           arcs[k-1][i][2] = new Arc(states[RC[k]], states[RE], events[i][1]);
           arcs[k-1][i][3] = new Arc(states[RC[k]], states[RE], events[i][4]);
-          
+
           arcs[k-1][i][4] = new Arc(states[RE], states[RM[k]], events[i][2]);
           arcs[k-1][i][5] = new Arc(states[RM[k]], states[RE], events[i][3]);
         }
@@ -203,36 +200,36 @@ public class Room
           arcs[k-1][i][1] = new Arc(states[RC[k-1]], states[RC[k]], events[i][4]);
           arcs[k-1][i][2] = new Arc(states[RC[k]], states[RC[k-1]], events[i][1]);
           arcs[k-1][i][3] = new Arc(states[RC[k]], states[RC[k-1]], events[i][4]);
-          
+
           arcs[k-1][i][4] = new Arc(states[RM[k-1]], states[RM[k]], events[i][2]);
           arcs[k-1][i][5] = new Arc(states[RM[k]], states[RM[k-1]], events[i][3]);
         }
       }
-    }  
+    }
   }
-  
+
   private void buildRoom2()
   {
     states[RC[num_cats]].setInitial(true);
     states[RC[num_cats]].setAccepting(true);
-    
+
     for(int i = 0; i < num_cats; i++)
     {
       events[i] = new LabeledEvent[4];
-      
+
       events[i][0] = new LabeledEvent(CAT_ID + i + LABEL_SEP + 2);
       events[i][1] = new LabeledEvent(MOUSE_ID + i + LABEL_SEP + 0);
-      
+
       events[i][2] = new LabeledEvent(MOUSE_ID + i + LABEL_SEP + 1);
       events[i][3] = new LabeledEvent(CAT_ID + i + LABEL_SEP + 1);
-      
+
       for(int j = 0; j < events[i].length; j++)
         events[i][j].setControllable(true);
-      
+
       for(int k = 1; k <= num_cats; k++)
       {
         arcs[k-1][i] = new Arc[4];
-        
+
         if(k==1)
         {
           arcs[k-1][i][0] = new Arc(states[RC[k]], states[RE], events[i][0]);
@@ -269,7 +266,7 @@ public class Room
 
       for(int j = 0; j < (events[i].length-1); j++)
         events[i][j].setControllable(true);
-      
+
       events[i][(events[i].length-1)].setControllable(false);
 
       for(int k = 1; k <= num_cats; k++)
@@ -299,7 +296,7 @@ public class Room
       }
     }
   }
-  
+
   private void buildRoom4()
   {
     states[RM[num_cats]].setInitial(true);
@@ -308,20 +305,20 @@ public class Room
     for(int i = 0; i < num_cats; i++)
     {
       events[i] = new LabeledEvent[4];
-      
+
       events[i][0] = new LabeledEvent(MOUSE_ID+i+LABEL_SEP+4);
       events[i][1] = new LabeledEvent(CAT_ID+i+LABEL_SEP+4);
-      
+
       events[i][2] = new LabeledEvent(CAT_ID+i+LABEL_SEP+5);
       events[i][3] = new LabeledEvent(MOUSE_ID+i+LABEL_SEP+3);
-      
+
       for(int j = 0; j < events[i].length; j++)
         events[i][j].setControllable(true);
-      
+
       for(int k = 1; k <= num_cats; k++)
       {
         arcs[k-1][i] = new Arc[4];
-        
+
         if(k==1)
         {
           arcs[k-1][i][0] = new Arc(states[RM[k]], states[RE], events[i][0]);
@@ -345,9 +342,9 @@ public class Room
 	throws Exception
 	{
     // Copy template for this floor
-		final Automaton sm = new Automaton(thisRoom); 
+		final Automaton sm = new Automaton(thisRoom);
 		sm.setName(ROOM_NAME + NAME_SEP + room_id);
-    
+
     // For only one floor (even with multiple cats/mice), the template is fine as is, no need to expand
     if(num_floors == 1)
     {
@@ -361,7 +358,7 @@ public class Room
    * The original renameStates() did not work correctly, since it generated a new State, which
    * left all Arcs dangling with references to the old states. Here, the old state is renamed
    * "inline" so that all Arc references remain valid and referring to the renamed state.
-   * 
+   *
    * Before being renamed the state has to be removed from the the state set, and then after
    * being renamed it has to be inserted again into the state set, as the state set uses the
    * state names as keys.
@@ -374,26 +371,26 @@ public class Room
     {
       final State state = stateIt.next();
       final String old_name = state.getName();
-      
+
       stateSet.remove(state);
-      
+
       state.setName(FLOOR_LABEL + curr_floor + LABEL_SEP + old_name);
       stateSet.add(state);
-    }    
+    }
   }
-  
+
   /*
    The following part should indeed be in the build() function belonging to Floor, however, then the 'waters' package
    would give an exception while drawing the automata. This is because some of the names for events and states
    created in the Room class will be modified which is apparently not accpeted by 'waters'.
   *///MF I have no clue what this comment means...
-  
+
   private Automaton expandTemplate(final Automaton sm, final int curr_floor, final int num_floors)
   {
     final String FLOOR_LABEL = Floor.getFloorLabel();
 
     renameStates(sm, FLOOR_LABEL, curr_floor);
-    
+
     if((curr_floor % (CatMouse.NUMBER_OF_ROOMS)) == room_id )
     {
       if((curr_floor+1) < num_floors && num_cats > 1)
@@ -411,7 +408,7 @@ public class Room
           sm.getAlphabet().addEvent(lec[h]);
           sm.getAlphabet().addEvent(lem[h]);
         }
-        
+
         for(int k = 1; k <= num_cats; k++)
         {
           final State init_state = sm.getInitialState();
@@ -422,7 +419,7 @@ public class Room
               sm.addArc(new Arc(init_state, sm.getStateWithIndex(RC[k]), lec[h]));
               sm.addArc(new Arc(sm.getStateWithIndex(RC[k]), init_state, lec[h]));
               // System.err.println("new Arc(" + init_state.getName() + ", " + sm.getStateWithIndex(RC[k]).getName() + ", " + lec[h].getName() + ")");
-                
+
               if(room_id != 2 && room_id != 4)
               {
                 sm.addArc(new Arc(init_state, sm.getStateWithIndex(RM[k]), lem[h]));
