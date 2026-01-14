@@ -114,7 +114,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * on a variable within an array index is proposed. Index splitting takes
  * precedence over splitting on other variables.</DD>
  * <DT>Variable split.</DT>
- * <DD>If the constraint list contains a element that uses more than one
+ * <DD>If the constraint list contains an element that uses more than one
  * variable, then a split over one of the variables in that element is
  * proposed. Here, if a formula contains a variable both in its current
  * and next-state (primed) form, this counts as only one variable.</DD>

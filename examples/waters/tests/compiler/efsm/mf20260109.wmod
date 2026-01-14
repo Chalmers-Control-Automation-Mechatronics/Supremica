@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="mf20260109">
+<B:Comment>A test for event naming after spliiting a disjunction.
+When the compiler splits the disjunction varY'==6 | varZ'==9 to produce two events, it uses auxiliary terms like varY'==varY' to ensure that variables remain changeable.
+This test case checks whether such auxiliary terms are avoided when naming the events.
+Pointed out by Martin Fabian on 9 January 2026.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e1"/>
+<EventDecl Kind="CONTROLLABLE" Name="e2"/>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Name="varY">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="5"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="varY"/>
+<IntConstant Value="5"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="varZ">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="7"/>
+<IntConstant Value="9"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="varZ"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT" Name="A">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point X="-576" Y="-384"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point X="-432" Y="-384"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="S0" Target="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e1"/>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="-49"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-504" Y="-402"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="-432" Y="-384"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="|">
+<BinaryExpression Operator="==">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="varY"/>
+</UnaryExpression>
+<IntConstant Value="6"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<UnaryExpression Operator="'">
+<SimpleIdentifier Name="varZ"/>
+</UnaryExpression>
+<IntConstant Value="9"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point X="-55" Y="-26"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Source="S1" Target="S0">
+<LabelBlock>
+<SimpleIdentifier Name="e2"/>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="-504" Y="-365"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
