@@ -240,7 +240,7 @@ public class Workbench
     public static void main(final String args[])
     throws Exception
     {
-        final StickPickingGame game = new StickPickingGame(2, 7);
+        final StickPickingGame game = new StickPickingGame(2, 7, true);
         final Workbench wb = new Workbench(null, game.getProject());
         wb.setVisible(true);
     }
