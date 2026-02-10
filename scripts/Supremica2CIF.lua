@@ -108,27 +108,6 @@ local function loginfo(str) -- helper to write to log
   if str then log:info(str, 0) else log:info("nil string", 0) end
 end
 
--- These are for the Cylinders lab. They will be converted to "input bool <varname>;"
--- Do we not need something similar for outputs? It seems not
-local Inputs = {}
-Inputs.ixStart = "bool"
-Inputs.ixB1 = "bool"
-Inputs.ixStart = "bool"
-Inputs.ixStop = "bool"
-Inputs.ixReset = "bool"
-Inputs.ixReset = "bool"
-Inputs.ixB1 = "bool"
-Inputs.ixB2 = "bool"
-Inputs.ixIN10 = "bool"
-Inputs.ixIN11 = "bool"
-Inputs.ixCylinder1In = "bool"
-Inputs.ixCylinder1Out = "bool"
-Inputs.ixCylinder2In = "bool"
-Inputs.ixCylinder2Out = "bool"
-Inputs.ixCylinder3In = "bool"
-Inputs.ixCylinder3Out = "bool"
-Inputs.ixEmergencyStop = "bool"
-
 -- For processing primed guard expressions, we need dynamic nested loops
 -- to evaluate all combinations of variable values 
 -- This part contains a dynamic nested loop imiplementation
@@ -675,7 +654,7 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
   local function makeVarDef(var)
     local out = {}
     
-    if Inputs[var] then
+    if Inputs and Inputs[var] then
       table.insert(out, "\tinput "..Inputs[var].." "..var)
       return out
     end
