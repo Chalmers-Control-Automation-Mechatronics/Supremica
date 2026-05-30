@@ -53,7 +53,42 @@ public class TextPanel
 
 	public TextPanel(String str)
 	{
-		this.textarea = new JTextArea(str);
+		this.textarea = new JTextArea(str)
+    {
+        private void adjustFontSize(int adjust)
+        {
+          java.awt.Font font = getFont();
+          int size = font.getSize();
+          setFont(new Font(font.getName(), font.getStyle(), font.getSize() + adjust));
+        }
+        
+        @Override
+        protected void processKeyEvent(java.awt.event.KeyEvent event)
+        {
+          if(event.getID() == java.awt.event.KeyEvent.KEY_TYPED)
+          {
+/* On Windows (MF's machine at least) Ctrl+ and Ctrl- do not work as expected.
+    Nor does Shift+ or Shift- work. Alt+ and Alt- behave as expected.
+    These lines are there for testing...
+              if(event.isControlDown())
+                System.err.println("Ctrl is down");
+              if(event.isShiftDown())
+                System.err.println("Sfift is down");
+              if(event.isAltDown())
+                System.err.println("Alt is down");
+*/// For now, plain + and - adjust the font size in the text panel
+              if(event.getKeyChar() == '+')
+              {
+                adjustFontSize(1);
+              }
+              else if(event.getKeyChar() == '-')
+              {
+                adjustFontSize(-1);
+              }
+          }
+          super.processKeyEvent(event);
+        }
+    };
 
 		textarea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		textarea.setLineWrap(true);
