@@ -33,11 +33,11 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -45,9 +45,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -272,6 +274,25 @@ public class EFAEventNameBuilder {
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      final ModuleProxyPrinter printer = new ModuleProxyPrinter(writer);
+      writer.append('(');
+      try {
+        printer.pprint(mLiteral);
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+      writer.append(',');
+      writer.append(Integer.toString(mOccurrences));
+      writer.append(')');
+      return writer.toString();
+    }
+
+    //#######################################################################
     //# Data Members
     private SimpleExpressionProxy mLiteral;
     private int mOccurrences;
@@ -420,17 +441,24 @@ public class EFAEventNameBuilder {
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
+      final BinaryOperator op = expr.getOperator();
       final SimpleExpressionProxy lhs = expr.getLeft();
-      lhs.acceptVisitor(this);
-      switch (mOccurrenceKind) {
-      case NONE:
-      case CURRENT:
-      case NEXT:
-        final SimpleExpressionProxy rhs = expr.getRight();
-        rhs.acceptVisitor(this);
-        break;
-      default:
-        break;
+      final SimpleExpressionProxy rhs = expr.getRight();
+      if (op == mOperatorTable.getEqualsOperator() &&
+          mEquality.equals(lhs, rhs)) {
+        mIdentifier = null;
+        mOccurrenceKind = OccurrenceKind.MIXED;
+      } else {
+        lhs.acceptVisitor(this);
+        switch (mOccurrenceKind) {
+        case NONE:
+        case CURRENT:
+        case NEXT:
+          rhs.acceptVisitor(this);
+          break;
+        default:
+          break;
+        }
       }
       return false;
     }
@@ -490,7 +518,7 @@ public class EFAEventNameBuilder {
   //#########################################################################
   //# Data Members
   private final VariableCollectVisitor mCollector;
-  private final Comparator<SimpleExpressionProxy> mComparator;
+  private final ExpressionComparator mComparator;
   private final ModuleEqualityVisitor mEquality;
   private final ModuleHashCodeVisitor mHashCodeVisitor;
 

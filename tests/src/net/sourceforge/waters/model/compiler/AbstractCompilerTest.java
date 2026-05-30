@@ -761,6 +761,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_mf20260109()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "mf20260109");
+    testCompile(module);
+  }
+
   public void testCompile_nondetvar1()
     throws IOException, WatersException
   {

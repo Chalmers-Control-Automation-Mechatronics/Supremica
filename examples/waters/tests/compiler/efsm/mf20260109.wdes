@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="mf20260109">
+<B:Comment>A test for event naming after spliiting a disjunction.
+When the compiler splits the disjunction varY'==6 | varZ'==9 to produce two events, it uses auxiliary terms like varY'==varY' to ensure that variables remain changeable.
+This test case checks whether such auxiliary terms are avoided when naming the events.
+Pointed out by Martin Fabian on 9 January 2026.</B:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="e1.{varY'==6}"/>
+<Event Kind="CONTROLLABLE" Name="e1.{varZ'==9}"/>
+<Event Kind="CONTROLLABLE" Name="e2"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="varY">
+<EventRefList>
+<EventRef Name="e1.{varY'==6}"/>
+<EventRef Name="e1.{varZ'==9}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="5"/>
+<State Name="6"/>
+</StateList>
+<TransitionList>
+<Transition Source="5" Event="e1.{varZ'==9}" Target="5"/>
+<Transition Source="5" Event="e1.{varY'==6}" Target="6"/>
+<Transition Source="5" Event="e1.{varZ'==9}" Target="6"/>
+<Transition Source="6" Event="e1.{varZ'==9}" Target="5"/>
+<Transition Source="6" Event="e1.{varY'==6}" Target="6"/>
+<Transition Source="6" Event="e1.{varZ'==9}" Target="6"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="varZ">
+<EventRefList>
+<EventRef Name="e1.{varY'==6}"/>
+<EventRef Name="e1.{varZ'==9}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="7"/>
+<State Name="8"/>
+<State Name="9"/>
+</StateList>
+<TransitionList>
+<Transition Source="7" Event="e1.{varY'==6}" Target="7"/>
+<Transition Source="7" Event="e1.{varY'==6}" Target="8"/>
+<Transition Source="7" Event="e1.{varY'==6}" Target="9"/>
+<Transition Source="7" Event="e1.{varZ'==9}" Target="9"/>
+<Transition Source="8" Event="e1.{varY'==6}" Target="7"/>
+<Transition Source="8" Event="e1.{varY'==6}" Target="8"/>
+<Transition Source="8" Event="e1.{varY'==6}" Target="9"/>
+<Transition Source="8" Event="e1.{varZ'==9}" Target="9"/>
+<Transition Source="9" Event="e1.{varY'==6}" Target="7"/>
+<Transition Source="9" Event="e1.{varY'==6}" Target="8"/>
+<Transition Source="9" Event="e1.{varY'==6}" Target="9"/>
+<Transition Source="9" Event="e1.{varZ'==9}" Target="9"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="A">
+<EventRefList>
+<EventRef Name="e1.{varY'==6}"/>
+<EventRef Name="e1.{varZ'==9}"/>
+<EventRef Name="e2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="e1.{varY'==6}" Target="S1"/>
+<Transition Source="S0" Event="e1.{varZ'==9}" Target="S1"/>
+<Transition Source="S1" Event="e2" Target="S0"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

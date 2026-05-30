@@ -46,7 +46,7 @@ class Cat
     private State[][] states;
 
     private final static int NUMBER_OF_EVENTS = 7;
-    private LabeledEvent[] events;
+    private final LabeledEvent[] events;
 
     private Automaton cat;
 
@@ -55,16 +55,16 @@ class Cat
     {
         this.events = new LabeledEvent[NUMBER_OF_EVENTS];
         this.states = new State[1][NUMBER_OF_STATES];
-        
+
         for(int i = 0; i < NUMBER_OF_STATES; i++)
             states[0][i] = new State(CAT_ID + i);
-            
+
         for(int i = 0; i < NUMBER_OF_EVENTS; i++)
             events[i] = new LabeledEvent(CAT_ID + i);
-            
+
       buildSimpleTemplate();
     }
-    
+
     private void buildSimpleTemplate()
     {
         this.cat = new Automaton(CAT_NAME);
@@ -79,7 +79,7 @@ class Cat
 
         for(int i = 0; i < (events.length-1);i++)
             events[i].setControllable(true);
-            
+
         events[(events.length-1)].setControllable(false);
 
         for (int i = 0; i < events.length; ++i)
@@ -109,7 +109,7 @@ class Cat
         {
             events[i] = new LabeledEvent(CAT_ID + id + Seps.LABEL_SEP + i);
             events[i].setControllable(true);
-            
+
             if(i == NUMBER_OF_EVENTS - 1)
                 events[i].setControllable(false);
 
@@ -183,8 +183,8 @@ class Cat
             }
         }
     }
-    
-    private void addArcs(int in_floor)
+
+    private void addArcs(final int in_floor)
     {
       cat.addArc(new Arc(states[in_floor][2], states[in_floor][0], events[2]));
       cat.addArc(new Arc(states[in_floor][0], states[in_floor][1], events[0]));
@@ -195,7 +195,7 @@ class Cat
       cat.addArc(new Arc(states[in_floor][1], states[in_floor][3], events[6]));
       cat.addArc(new Arc(states[in_floor][3], states[in_floor][1], events[6]));
     }
-    
+
     public Automaton getCat()
     {
         return cat;
@@ -228,7 +228,7 @@ class Cat
             st = new StringTokenizer(events[i].getLabel(), CAT_ID);
             renameEvent(sm, i, CAT_ID + id + Seps.LABEL_SEP + st.nextToken());
         }
-        
+
         return sm;
     }
 
@@ -247,14 +247,15 @@ class Mouse
     public final static String MOUSE_ID = "m";
 
     private final int number_of_states = 5;
-    private State[][] states;
+    private final State[][] states;
 
     private final int number_of_events = 6;
-    private LabeledEvent[] events;
-    private int[] event_indices;
+    private final LabeledEvent[] events;
+    private final int[] event_indices;
 
     private Automaton mouse;
 
+    @SuppressWarnings("unused")
     private int length;
 
     public Mouse()
@@ -263,7 +264,7 @@ class Mouse
         this.states = new State[1][number_of_states];
         this.events = new LabeledEvent[number_of_events];
         this.event_indices = new int[number_of_events];
-        
+
         for(int i = 0; i < number_of_states; i++)
             states[0][i] = new State(MOUSE_ID+i);
 
@@ -273,10 +274,10 @@ class Mouse
         //indices into events
         for(int i = 0; i < number_of_events; i++)
             event_indices[i] = i;
-        
+
         buildSimpleTemplate();
     }
-    
+
     private void buildSimpleTemplate()
     {
         mouse = new Automaton(MOUSE_NAME);
@@ -297,7 +298,7 @@ class Mouse
         {
             mouse.getAlphabet().addEvent(events[i]);
         }
-        addArcs(0);   
+        addArcs(0);
     }
 
     public Mouse(final int id, final int num_floors)
@@ -400,9 +401,9 @@ class Mouse
       mouse.addArc(new Arc(states[in_floor][0], states[in_floor][2], events[0]));
       mouse.addArc(new Arc(states[in_floor][2], states[in_floor][1], events[1]));
       mouse.addArc(new Arc(states[in_floor][1], states[in_floor][0], events[2]));
-      mouse.addArc(new Arc(states[in_floor][0], states[in_floor][4], events[3]));  
+      mouse.addArc(new Arc(states[in_floor][0], states[in_floor][4], events[3]));
     }
-    
+
     public Automaton getMouse()
     {
         return mouse;
