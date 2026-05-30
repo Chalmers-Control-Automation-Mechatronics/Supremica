@@ -1051,6 +1051,10 @@ end
 local function getTable(set)
   local tab = nil
   local ord = {}
+  
+  -- For transitiosn with no guard and no action, set is nil here
+  if set == nil then return tab, ord end
+  
   for i = 1, #set do
     if type(set[i]) == "table" then
       assert(tab == nil, "There should be max one table")
