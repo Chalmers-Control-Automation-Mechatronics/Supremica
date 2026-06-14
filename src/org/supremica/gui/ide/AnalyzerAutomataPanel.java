@@ -101,7 +101,24 @@ public class AnalyzerAutomataPanel
     {
         analyzerTableModel = getActiveProject().getAnalyzerTableModel();
         theTableSorter = new TableSorter(analyzerTableModel);
-        theAutomatonTable = new JTable(theTableSorter);
+        theAutomatonTable = new JTable(theTableSorter)
+        {
+			// Syntehsis may generate automata with no initial state
+			// Make such automata stand out in the table by pink background
+			public java.awt.Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column)
+			{
+				java.awt.Component c = super.prepareRenderer(renderer, row, column);
+
+				final int orgIndex = theTableSorter.getOriginalRowIndex(row);
+				final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+				if(!currAutomaton.hasInitialState())
+					c.setBackground(java.awt.Color.PINK);
+				else if(!isRowSelected(row))
+					c.setBackground(java.awt.Color.WHITE);
+
+				return c;
+			}
+		};
         final Font font = theAutomatonTable.getFont();
         final int height = (int) Math.ceil(1.5f * font.getSize2D());
         theAutomatonTable.setRowHeight(height);
@@ -110,7 +127,7 @@ public class AnalyzerAutomataPanel
 			private static final long serialVersionUID = 1L;
 
 			@Override
-      public String getToolTipText(final MouseEvent e)
+      		public String getToolTipText(final MouseEvent e)
             {
                 final int i = columnAtPoint(e.getPoint());
                 if (i == TABLE_NAME_COLUMN)
