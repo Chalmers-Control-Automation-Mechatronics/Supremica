@@ -46,7 +46,7 @@ public class DivisionByZeroException extends EvalException {
    */
   public DivisionByZeroException()
   {
-    super("Division by zero in expression!");
+    super(MESSAGE);
   }
 
   /**
@@ -55,12 +55,15 @@ public class DivisionByZeroException extends EvalException {
    */
   public DivisionByZeroException(final Proxy expr)
   {
-    super("Division by zero in expression!", expr);
+    super(MESSAGE, expr);
   }
 
 
   //#########################################################################
   //# Static Class Variables
-  public static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 1027780173937461878L;
+
+  private static final String MESSAGE =
+    "Expression may result in division by zero.";
 
 }
