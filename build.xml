@@ -4,8 +4,9 @@
     
     <!-- property name="ant.build.javac.source" value="1.8"/ -->
     <!-- property name="ant.build.javac.target" value="1.8"/ -->
-	<property name="ant.build.javac.release" value="8"/>
-	
+    <property name="ant.build.javac.release" value="8"/>
+    <echo>java version: ${ant.java.version}</echo>
+    
     <property name="arch.properties" location="arch.properties"/>
 
     <property file="build.properties"/>
