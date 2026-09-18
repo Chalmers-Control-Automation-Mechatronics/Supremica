@@ -71,6 +71,8 @@ public abstract class WatersActionManager implements Observer
     addAction(new AnalyzerSimplificationAction(ide));
     addAction(new AnalyzerHideAction(ide));
     addAction(new EditEventLabelAction(ide));
+    addAction(new ExportToCIFAction(ide));
+    addAction(new ExportToPLCAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));
     addAction(new GraphSavePDFAction(ide));

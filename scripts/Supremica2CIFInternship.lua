@@ -1,0 +1,1395 @@
+-- Supremica2CIF.lua, Lua script to convert Supremica models to CIF
+-- Meant to be run as a script inside Supremica (with LuaJ embedded)
+local luaj = luajava -- just shorthand 
+--local script, ide, log = ... -- grab the arguments passed from Java via LuaJ
+local script, ide, log = "Supremica2CIF.lua", IDE_GLOBAL, LOG_GLOBAL -- grab the arguments passed from Java via LuaJ
+
+-- Get convenience function to generate file name
+local Config = luaj.bindClass("org.supremica.properties.Config")
+--local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
+local getFileName = dofile("scripts/getFileName.lua")
+
+-- Some useful Java classes
+local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")
+
+local function showFileChooser(fname, fpath)
+	local fc = luaj.newInstance("javax.swing.JFileChooser", fpath)
+	fc:setDialogTitle("Give CIF File")
+  -- Unclear why this does not work, maybe the varargs
+  -- local ff = luaj.newInstance("javax.swing.filechooser.FileNameExtensionFilter", "CIF file", "cif")
+  -- fc:setFileFilter(ff)
+  local suggestion = luaj.newInstance("java.io.File", fname)
+  fc:setSelectedFile(suggestion)
+  fc:setApproveButtonText("Save")
+  local retval = fc:showOpenDialog(ide) 
+  if retval== fc.APPROVE_OPTION then
+		local fname = fc:getSelectedFile():getPath() -- does not work on Java > 8
+		-- local fname = fc:getName(fc:getSelectedFile()) -- this works for Java > 8
+    return fname
+  else
+    return nil
+  end
+end
+
+local function fileExists(filename)
+  local file = io.open(filename, "r")
+  if file then
+    file:close()
+    return true
+  end
+  return false
+end
+
+local function checkFileExists(filename)
+  local reply = JOptionPane.YES_OPTION
+  if fileExists(filename) then
+    reply = JOptionPane:showConfirmDialog(ide, filename.."\nOverwrite?", "File exists", JOptionPane.YES_NO_OPTION)
+  end
+  return reply == JOptionPane.YES_OPTION
+end
+
+local function saveFile(filename, contents)
+  local reply = checkFileExists(filename)
+  if reply then
+    print("Saving to: "..filename)
+    local file = io.open(filename, "w")
+    file:write(contents)
+    file:close()
+  else
+    print("Not saving model")
+  end
+end
+
+local function saveModel(fname, fpath, contents)
+	local filename = showFileChooser(fname, fpath)
+  if filename then
+    saveFile(filename, contents)
+	else
+		print("User cancelled")
+	end
+end
+
+-- Lua 5.2 and earlier do not have math.tointeger
+local function tointeger(val)
+  local num = tonumber(val)
+  if not num then return nil end
+  
+  return math.floor(num)
+end
+
+-- Show simple error dialog
+local function showIssueDialog(name, str)
+  JOptionPane:showMessageDialog(ide, str, name, JOptionPane.ERROR_MESSAGE)
+end
+
+-- bindClass is like Java's import
+local Helpers = luaj.bindClass("org.supremica.Lupremica.Helpers") 
+if not Helpers then print("Lupremica.Helpers not found") return end
+
+local EventKind = luaj.bindClass("net.sourceforge.waters.model.base.EventKind")
+local ComponentKind = luaj.bindClass("net.sourceforge.waters.model.base.ComponentKind")
+local VariableHelper = luaj.bindClass("org.supremica.automata.VariableHelper")
+local VariableComponentProxy = luaj.bindClass("net.sourceforge.waters.model.module.VariableComponentProxy")
+if not VariableComponentProxy then print("VariableComponentProxy not fond") return end
+
+local efaKind = {} -- lookup table for automata type conversion
+efaKind[ComponentKind.PLANT] = "plant"
+efaKind[ComponentKind.PROPERTY] = "property"
+efaKind[ComponentKind.SPEC] = "requirement"
+efaKind[ComponentKind.SUPERVISOR] = "supervisor"
+
+--local TextFrame = luaj.bindClass("org.supremica.gui.texteditor.TextFrame")
+local textframe = luaj.newInstance("org.supremica.gui.texteditor.TextFrame", "CIF Export")
+local pw = textframe:getPrintWriter()
+textframe:setVisible(true)
+
+local function print(str) -- redefine print to write to the textframe
+  pw:println(str)
+end
+local function loginfo(str) -- helper to write to log
+  if str then log:info(str, 0) else log:info("nil string", 0) end
+end
+
+-- For processing primed guard expressions, we need dynamic nested loops
+-- to evaluate all combinations of variable values 
+-- This part contains a dynamic nested loop imiplementation
+local DNL = { hasnext = true, collection = {}, indexes = {}, bounds = {}, }
+-- collection is a set of sets to loop over
+DNL.setup = function(collection)
+  DNL.collection = collection
+  DNL.indexes = {}
+  DNL.bounds = {}
+  -- Set up loop bounds, and indexes
+  for i = 1, #collection do
+    DNL.bounds[i] = #collection[i]
+    DNL.indexes[i] = 1 -- all indices start at 1
+  end
+  DNL.hasnext = #collection > 0 and #collection[1] > 0
+end
+
+-- Count up the right-most index, if it reaches its bound
+-- set it back to 1 and increment the next right-most, etc
+DNL.incrementIndexes = function()
+  
+  local cntr = #DNL.indexes
+  
+  while cntr ~= 0 do
+    local val = DNL.indexes[cntr] + 1
+    DNL.indexes[cntr] = val
+    if val <= DNL.bounds[cntr] then return true end
+    -- else the bound was exhausted for the cntr variable, adjust the outer one(s)
+    DNL.indexes[cntr] = 1
+    cntr = cntr - 1
+  end
+  return false
+end
+
+DNL.iterate = function(callback)
+  while DNL.hasnext do
+    callback(DNL.collection, DNL.indexes)
+    DNL.hasnext = DNL.incrementIndexes() -- (DNL.indexes, DNL.bounds)
+  end
+end
+
+-- In Supremica, identifiers can include colon (:) Events, EFA names, variable names, 
+-- enum labels, all of those can include one or more colons. Forinstnace "var:X:Y:Z"
+-- is a valid identifier in Supremica, as is "e::::1", and "Cat:0", "Room:4", etc
+-- This is an unfortunate historical accident, and of course, CIF does not allow this
+-- So, all such identifiers must be sanitized at input (or at least before output)
+-- And we must guarantee unique sanitized ouput for unique un-sanitized input!
+-- So we keep a double-directed map with both the sanitized and un-sanitized as keys
+local Sanity, Insanity = {}, {} -- maps for sanitation
+local NameChanges = {}
+
+-- To desanitize means to make sure that some sane input does not clash
+-- with some sanitized input, like "var:X" sanitizwes to "varX", and then
+-- later an actual input is "varX". This input must be made unique.
+local function desanitize(input, category)
+  category = category or "general"
+  local cacheKey = category .. "_" .. input
+  assert(not input:find(":"), "Unsanitized input!")
+  local desanitized = nil
+  local i = 1
+  repeat
+    desanitized = input.."_"..i
+	i = i + 1
+  until not Insanity[desanitized]
+  Sanity[cacheKey] = desanitized
+  Insanity[desanitized] = input
+  table.insert(NameChanges, "//" .. category .. ":" .. input .. "-->" .. desanitized)
+  return desanitized
+end
+
+local function sanitize(input, category)
+  category = category or "general"
+  local cacheKey = category .. "_" .. input
+  -- If this has already been sanitized, just return that result
+  if Sanity[cacheKey] then return Sanity[cacheKey] end
+  
+  -- Do we have (sane) input that some insane input already maps to?
+  -- If so, we need to do something to make it unique
+  if Insanity[input] then 
+    -- assert(false, Insanity[input].." is already mapped to "..input)
+    return desanitize(input, category)
+  end
+  
+  -- Now we replace all colons by longer and longer strings of underscores
+  -- starting with length 0, until we find something that is not in our map
+  local sanitized = nil
+  local i = 1 -- was 0
+  -- Starting from 0 was a nice idea to get shorter strings, but
+  -- it maps a single colon to the empty string, which does not work
+  -- At least sequences of : are mapped to possibly shorter sequences of _
+  -- With i = 1, colon-infested input sanitizes to something with underscore
+  repeat
+    sanitized = input:gsub(":+", string.rep("_", i))
+    i = i + 1
+  until not Insanity[sanitized]
+  Insanity[sanitized] = input
+  --Sanity[input] = sanitized
+  Sanity[cacheKey] = sanitized
+  if input ~= sanitized then
+	table.insert(NameChanges, "//" .. category .. ":" .. input .. "-->" .. sanitized)
+  end
+  return sanitized
+end
+-- Note that CIF itself exploits this "feature" in Supremica when it generates
+-- *.wmod from *.cif, see for instance, button_lamp.cif
+
+local function getEvents(project)
+	local controllable, uncontrollable = {}, {}
+	
+	local eventDeclList = project:getEventDeclList()
+	for i = 1, eventDeclList:size() do
+	  local event = eventDeclList:get(i-1)
+	  local kind = event:getKind()
+	  if kind == EventKind.CONTROLLABLE then
+      controllable[sanitize(event:getName(), "event")] = true  -- should be sanitized
+	  elseif kind ~= EventKind.PROPOSITION then
+      uncontrollable[sanitize(event:getName(), "event")] = true  -- should be sanitized
+    -- else -- is proposition, unclear how to deal with that
+	  end
+	end
+	return controllable, uncontrollable
+end
+
+local function getBlockedEvents(project)
+    local blockedEventsCIF = {}
+	efalist = Helpers:getAutomatonList(project)
+    for i = 1, efalist:size() do
+        local efa = efalist:get(i-1)
+        
+        --local success, blockedEvents = pcall(function() 
+        --    return efa:getGraph():getBlockedEvents() 
+        --end)
+        local blockedEvents = efa:getGraph():getBlockedEvents()
+        if blockedEvents ~= nil then
+            local eventList = blockedEvents:getEventIdentifierList()
+            
+            if eventList ~= nil then
+                for j = 0, eventList:size() - 1 do
+                    local eventObj = eventList:get(j)                   
+                    blockedEventsCIF[sanitize(eventObj:getName(), "event")] = true
+                end
+            end
+        end
+    end
+
+    return blockedEventsCIF
+end
+
+--[[ Things to consider:
+  * In CIF, variables are local, so for each EFA we need to know which variables it affects
+  * For non-int variable types we need to define specific types
+  * Supremica allows to compare two enums of different "types", CIF does not
+  * In CIF, two EFA cannot affect the same variable, to get around this we could synch all 
+    EFA that affect the same variable
+  * CIF has no +=, -= etc, these need to be rewritten to ordinary var = var + x expressions
+  * Supremica has implicit guards to protect for out-of-bounds assignment, CIF has not, so
+    such guards should be added when necessary
+    # Such guards can *always* be added, and handled syntactically:
+      disc int[0..5] var;
+      edge up when 0 <= var + x and var + x <= 5 do var := var + x
+      edge dn when 0 <= var - x and var - x <= 5 do var := var - x
+  * CIF has no next-state value, so primed guards need to be converted to assignment actions
+  * Boolean variables cannot be considered as 0..1 variables when converting t0 PLC code! 
+    Codesys complains that "cannot conver type DINT to type BOOL". Supremica has no BOOL type...
+--]]
+
+-- Process the currently open module into <name>.cif
+local manager = ide:getDocumentContainerManager() 
+local container = manager:getActiveContainer()
+local name = sanitize(container:getName(), "module")  -- should be sanitized? Windows does not allo : in filenames, *ix might od!
+local project = container:getEditorPanel():getModuleSubject()
+local components = project:getComponentList() 
+
+local efalist = Helpers:getAutomatonList(project)
+local varlist = Helpers:getVariableList(project)
+
+-- Prioritize variable names to stay the same, then location names, and lastly event names
+local vIter = varlist:iterator()
+while vIter:hasNext() do sanitize(vIter:next():getName(), "variable") end
+
+-- 2. Reserve Location names second
+for i = 1, efalist:size() do
+  local efa = efalist:get(i-1)
+  sanitize(efa:getName(), "automaton")
+  local nodes = efalist:get(i-1):getGraph():getNodes():iterator()
+  while nodes:hasNext() do
+    local rawText = nodes:next():toString():gsub("\n", "")
+    for capture in rawText:gmatch("(%w+)") do
+      if capture ~= "initial" and capture ~= "forbidden" and capture ~= "accepting" then
+        sanitize(capture, "location")
+        break
+      end
+    end
+  end
+end
+local cevents, uevents = getEvents(project)
+local blockedEvents = getBlockedEvents(project)
+
+local Variables -- Holds variable name, range, init, mark (filled by preProcess)
+local CurrentEFA -- EFA currently processed (set by processEFA, contains .name and .variables)
+local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
+local Storage = {} -- holds the generated EFA for delayed output (see processModule)
+local FileName -- The filename to save under (set by processModule)
+
+--[[
+  Supremica allows to compare two enums of different types, basically checking if the
+  identifiers are equal when compared as strings. This is not allowed by CIF, only enums 
+  of the same type can be compared. To get around this, we put all Supremica enums in
+  one big Enums type, being careful to remove duplicates, while still keeping the enum
+  ranges (expanded) for each Supremica enum variable. This set is built by processVariables()
+--]]
+local Enums = {}
+
+-- Rewriting
+local pluseq = "+=" -- a += b into a = a + b
+local minuseq = "-=" -- a += b into a = a - b
+local multeq = "*="
+local diveq = "/="
+
+local patterns = {}
+-- capture lhs += rhs, lhs == rhs, lhs = rhs, etc
+-- expr patterns capture whole expressions, (lhs op rhs)
+-- detail patterns capture details (lhs)(op)(rhs)
+patterns.operator = "([%+%-%*/=]+)"
+-- patterns.actiondetail = "([_:%a][_:%w]*)%s*([%+%-%*/=]+)%s*([_:%w]+)" -- "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
+-- patterns.actionexpr = "([_:%a][_:%w]*%s*[%+%-%*/=]+%s*[_:%w]+)"-- "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
+patterns.identifier = "([_%a][_%w]*)" -- this pattern does not catch colon, see sanitize()
+patterns.colonifier = "([_:%a][_:%w]*)" -- identifiers can include colon
+patterns.commasep = "%s*(.-)[,]"
+patterns.operatorsep = "%s*"..patterns.colonifier.."%s*"..patterns.operator.."%s*(.*)"
+patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
+patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
+patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
+patterns.colonatend = ":$"
+patterns.multiassign = "([_%a][_%w]*)%s*:="
+-- https://www.lua.org/pil/20.2.html
+-- https://iamreiyn.github.io/lua-pattern-tester/
+
+local rewrites = {}
+rewrites.doit = function(lhs, op, rhs)
+  local newrhs = lhs..op..rhs
+  return lhs.." := "..newrhs, newrhs
+end
+rewrites[pluseq] = function(lhs, rhs)
+  return rewrites.doit(lhs, " + ", rhs)
+end
+rewrites[minuseq] = function(lhs, rhs)
+  return rewrites.doit(lhs, " - ", rhs)
+end
+rewrites[multeq] = function(lhs, rhs)
+  return rewrites.doit(lhs, " * ", rhs)
+end
+-- Values outside the domain can be assigned a variable in Supremica
+-- so even in that case should we generate explicit guards in CIF
+rewrites["="] = function(lhs, rhs) 
+  return lhs.." := "..rhs, rhs
+end
+rewrites["=="] = function(lhs, rhs)
+  return rewrites.doit(lhs, " = ", rhs)
+end
+
+-- When converting "!" to "not", need to be careful not to convert "!=" to "not="
+-- First convert "!=" to a safe string, then convert "!", then convert the safe string back
+local function handleNot(str)
+  local safestr = "#="
+  local convstr = str:gsub("!=", safestr)
+  convstr = convstr:gsub("!", " not ")
+  convstr= convstr:gsub(safestr, "!=")
+  return convstr
+end
+
+-- Probably have to sanitize identifiers here, and replace inline
+local function convertGuard(gstr)
+  for w in gstr:gmatch(patterns.colonifier) do
+	local replacement = w
+	    
+    -- Smart lookup: Check what this word actually is in our memory cache!
+    if Sanity["variable_" .. w] then
+        replacement = Sanity["variable_" .. w]
+    elseif Sanity["location_" .. w] then
+        replacement = Sanity["location_" .. w]
+    elseif Sanity["automaton_" .. w] then
+        replacement = Sanity["automaton_" .. w]
+    else
+        -- If it's completely unknown, default to variable logic
+        replacement = sanitize(w, "variable") 
+    end
+    
+    -- Swap the word in the string
+    gstr = gstr:gsub(w, replacement)
+    --gstr = gstr:gsub(w, sanitize(w, "variable"))
+--    loginfo(w.." -> "..gstr)
+  end
+  
+  local convstr = gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or ") -- gsub("![^=]", "not ")
+  convstr = handleNot(convstr)
+  return convstr
+end
+
+local function debugOrphans(name, orphans)
+  for k, v in pairs(orphans) do
+    loginfo(name..": "..k)
+  end
+end
+
+-- The orphans are collected in a simple map
+local function mergeOrphans(orph1, orph2)
+  assert(orph1, "orph1 is nil")
+  assert(orph2, "orph2 is nil")
+  
+  for k, v in pairs(orph2) do
+    orph1[k] = v
+  end
+  return orph1
+end
+
+-- Return the end values of an integer range (inclusive)
+local function getIntRangeLimits(range)
+  local bottom, topper = range:match(patterns.matchrange)
+  return tointeger(bottom), tointeger(topper)
+end
+-----------------------------------------------------------------
+-- Preprocessing - Collect stuff necessary to be able to process
+-----------------------------------------------------------------
+local function preProcessMarkedValues(marklist)
+  local markings = {}
+  local mit = marklist:iterator()
+  while mit:hasNext() do
+    local mstr = mit:next():getPredicate():toString()  -- is sanitized by convertGuard
+    local str = convertGuard(mstr)
+    table.insert(markings, str)
+  end
+  return markings
+end
+
+local function preProcessInitPredicate(str)  -- is sanitized by convertGuard
+  return convertGuard(str)
+end
+
+-- Global constants, do NOT assign!
+local IS_INTEGER = " is integer " -- types of variables
+local IS_BINARY = " is binary "
+local IS_ENUM = " is enum "
+local IS_BOOL = " is bool "
+
+local IS_MARKED = "\tmarked;" -- for locations
+local IS_INITIAL = "\tinitial;"
+local IN_ANY = " in any"
+
+-- for looking up the Boolean values (see getEnumInfo())
+local TFlookup = {} 
+TFlookup["true"] = true
+TFlookup["false"] = true
+  
+--[[ There are no Boolean variables in Supremica, only 0-1 integers
+  Three options to deal with these:
+  1. Convert them to "disc int[0..1]" in CIF. This allows to do arithmetic on them. However, 
+    this creates a problem with PLC code generation! When a variable is defined to be 
+    disc int[0..1], then it is not converted by CIF into a bool in the PLC code, but remains
+    integer, which makes sense, but then its mapping to boolean I/O is refused by Codesys.
+  2. Convert then to "disc bool" in CIF. This has the problem of not allowing arithemetic on
+    them, which is typical with 0-1 variables
+  3. If an enum variable has the range "true,false" or "false,true", then we treat this as a
+    bool on the CIF side. In this case Booleans are treated as a special variant of enums,
+    and Supremica's binary and integer types are both treated as integer. 
+    
+  Option 3 is implemented here.
+--]]
+local function getIntegerInfo(var)
+  
+  local range = var:getType():toString()
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())-- sanitized by convertGiuard
+  local markings = preProcessMarkedValues(var:getVariableMarkings())-- sanitized by convertGiuard
+  local markstr = ""
+  if #markings > 0 then
+    markstr = table.concat(markings, ", ")
+  end  
+  return IS_INTEGER, range, initpred, markstr  
+  
+end
+local function getBinaryInfo(var)
+  local kind, range, initpred, markstr = getIntegerInfo(var)
+  -- Should we always (or never?) treat 0-1 variables as bool?
+  local bottom, topper = getIntRangeLimits(range)
+  assert(bottom == 0 and topper == 1, "Unexpected range "..bottom..".."..topper.." for binary variable")
+  
+  return IS_BINARY, range, initpred, markstr
+end
+
+-- A special type of Supremica enums ar ethose with range [true,false] or [false,true]
+-- Those are treated as booleans on the CIF side.
+-- Note that we could in Supremica have an enum with range [true,middle,false]
+-- or even a degenerate one with single lement range [false]
+-- Such cannot be allowd to slip through to CIF
+local function getEnumInfo(var)
+  
+  local kind = IS_ENUM -- this is the default assumption
+  
+  local range = {}
+  for ident in var:getType():toString():gmatch(patterns.colonifier) do  -- should be sanitized, and patterns.colonifier used
+    local saneident = sanitize(ident, "variable")
+    range[#range + 1] = saneident
+    Enums[saneident] = true
+  end
+  
+  if #range == 2 then -- this might be a bool
+    if TFlookup[range[1]] and TFlookup[range[2]] then -- the two values were "true" and "false", this is a bool
+      kind = IS_BOOL
+      -- loginfo(var:getName()..IS_BOOL)
+      Enums["true"] = nil   -- remove from the set of enums
+      Enums["false"] = nil
+    end
+  else -- check that true or false are not used as enum values in any other way
+    for i = 1, #range do
+      if TFlookup[range[i]] then
+        showIssueDialog("Boolean values used as enum values...", 
+          "Non-boolean enums cannot use \"true\" or \"false\" as enum values\n"..
+          var:getName().."\nhas one or both of these in its range\nPlease avoid this.\nQuitting...")
+        textframe:setVisible(false)
+        assert(false, "Non-Boolean use of \"true\" or \"false\" is not allowed by CIF")
+      end
+    end
+  end
+  
+  local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString()) -- sanitized by convertGuard
+  local markings = preProcessMarkedValues(var:getVariableMarkings())  -- sanitized by convertGuard
+  local markstr = ""
+  if #markings > 0 then
+    markstr = table.concat(markings, ", ")
+  end  
+  return kind, range, initpred, markstr  
+  
+end
+ 
+local function getVariableInfo(var)
+  if VariableHelper:isBinary(var) then
+    return getBinaryInfo(var)
+  elseif VariableHelper:isInteger(var) then
+    return getIntegerInfo(var)
+  else -- it is an enum
+    return getEnumInfo(var)
+  end
+end
+
+-- In Supremica, initial value predicates cannot be primed
+-- and initial value predicates cannot refer to other variables
+-- But they can be written as 0 == var
+-- In CIF, we write: disc int[0..1] var in any; initial var = 0 or var = 1; marked var = 1;
+-- Does CIF also allow 0 = var? YES! So we do not have to handle this
+
+local function preProcessVariables()
+  local variables = {}
+  
+  local iterator = varlist:iterator()
+  while iterator:hasNext() do
+    local var = iterator:next()
+    local name = sanitize(var:getName(), "variable")  -- should be sanitized
+    local kind, range, init, mark = getVariableInfo(var)
+    variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil}
+  end
+  
+  return variables
+end
+
+local function preProcessing()
+  
+  Variables = preProcessVariables()
+  
+  --[[ Just checkin'...
+  for name, info in pairs(Variables) do
+    if info.kind == IS_ENUM then
+      loginfo(name..info.kind.."["..table.concat(info.range, ",").."], <"..info.init..">, "..info.mark)
+    else
+      loginfo(name..info.kind..info.range..", <"..info.init..">, "..info.mark)
+    end
+  end
+  --]]
+  
+end
+----------------------------------------------
+-- Preprocessing above, main processing below
+----------------------------------------------
+local function processSourceTarget(srctxt)
+  -- initial S0 { :accepting}
+  -- S1 { :forbidden :accepting}
+  local initial, label, acc, xxx
+  
+  -- This is fugly! Find a better way
+  -- Note that this does not catch user-defined propositions
+  for capture in srctxt:gmatch("(%w+)") do
+    if capture == "initial" then
+      initial = true
+    elseif capture == "forbidden" then
+      xxx = true
+    elseif capture == "accepting" then
+      acc = true
+    else
+      label = capture
+    end
+  end
+  return label, initial, acc, xxx
+end
+
+-- Pure syntactic replacement of operators is not enough, as guards and actions include
+-- variables, and in CIF these need to be prefixed by their owner names
+-- Calling this function during processing will not fix all prefixing
+local function prefixOwner(str)
+  local orphans = {}
+  -- For identifiers that are variable names, if possible prefix with owner
+  for ident in str:gmatch(patterns.identifier) do -- using patterns.identifier, since all should be sanitized
+    local var = Variables[ident]
+    if var then -- this is a variable
+      if var.owner then -- someone already owns this variable, is it us?
+        if CurrentEFA.name ~= var.owner then -- owned by someone but not us
+          -- Prefix with the owner
+          str = str:gsub(ident, var.owner.."."..ident)
+        end
+      else
+        -- This variable is not yet owned by anyone
+        -- Need to remember this to do the prefixing later
+        orphans[ident] = true -- need a map for quick lookup and avoiding dupicates
+      end
+    end
+  end  
+  assert(orphans, "8. Oprhans nil!")
+  return str, orphans
+end
+-- The above code relies on the fact that Supremica does not implement proper namespaces
+-- Variable names, enum values, automata names, must be all distinct from each other
+-- But note! Events can have the same label as enum value, variable name, automata name
+-- Also, we cannot have things like "X.ident", for which the code above would wreak havoc 
+
+-- Returns the full extension of an integer range given as bottom..topper
+-- restricted to the given limits (inclusive)
+local function unfoldRange(range, botlimit, toplimit)
+
+  local out = {}
+  local bottom, topper = getIntRangeLimits(range)
+  if botlimit then
+    bottom = math.max(bottom, botlimit)
+  end
+  if toplimit then
+    topper = math.min(topper, toplimit)
+  end
+  for i = bottom, topper do
+    table.insert(out, i)
+  end
+  
+  return out -- table like {bottom, bottom + 1, ..., topper - 1, topper}
+end
+
+local function isWithinRange(value, range)
+  -- value is int, range is string like "9..55"
+  local bottom, topper = getIntRangeLimits(range)
+  return bottom <= value and value <= topper
+end 
+
+local function protectIntBinary(range, newrhs)
+  -- First check a special case, newrhs single number
+  -- if that number is within the range, no need of protective guard
+  local val = tointeger(newrhs)
+  if val then -- newrhs is simply a number that can be checked
+    if isWithinRange(val, range) then -- no need to add guard
+      return nil, {} -- second element here is orphans, should it be empty?
+    end
+  end
+  -- newrhs either not a number or not within range
+  local bottom, topper = getIntRangeLimits(range) -- range:match(patterns.matchrange)
+  -- newguard = (lhs.bottom <= newrhs and newrhs <= lhs.topper)
+  local owned, orphans = prefixOwner(newrhs)
+  assert(orphans, "9. Oprhans nil!")
+  return "("..bottom.." <= "..owned.." and "..owned.." <= "..topper..")", orphans
+end
+
+local function protectEnums(range, newrhs)
+  -- For enums, the range looks like {e1, e2, e3}
+  -- the guard should check all values, and then disjunct them
+  -- Is there a better way in CIF?
+  -- Note that checking all values here will not work, since enum1 = enum2 is valid
+  local out, orphans = {}, {}
+  for i = 1, #range do
+    local enumval = range[i]
+    if newrhs == enumval then -- assignment is of an existing enum value, no need to guard
+      return nil, {}
+    end
+    local owned, orph = prefixOwner(newrhs)
+    assert(orph, "42: Orph is nil!")
+    table.insert(out, owned.." = "..enumval)
+    orphans = mergeOrphans(orphans, orph)
+  end
+  assert(orphans, "10. Oprhans nil!")
+  return "("..table.concat(out, " or ")..")", orphans
+end
+
+-- Supremica has implict guards that protect againts out-of-domain assignments
+-- These need to be explicitly added for CIF
+local function addProtectiveGuards(lhs, newrhs, gastore)
+    -- lhs is a variable name, newrhs is the rewritten rhs
+    local var = Variables[lhs]
+    if var.kind == IS_INTEGER or var.kind == IS_BINARY then
+      local guard, orphans = protectIntBinary(var.range, newrhs)
+      table.insert(gastore.guards, guard)
+      assert(orphans, "1. Oprhans nil!")
+      return orphans
+    elseif var.kind == IS_ENUM or var.kind == IS_BOOL then 
+      local guard, orphans = protectEnums(var.range, newrhs)
+      table.insert(gastore.guards, guard)
+      assert(orphans, "2. Oprhans nil!")
+      return orphans
+    end
+    assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
+  end
+  
+  -- Inputs need special treatment, as they cannot have initial values
+  -- CIF itself does not forbid this, but the PLC code generator chokes
+  local function makeVarDef(var)
+    local out = {}
+    
+    if Inputs and Inputs[var] then
+      table.insert(out, "\tinput "..Inputs[var].." "..var)
+      return out
+    end
+	
+	local initValue = nil
+	if Variables[var].init and Variables[var].init ~= "" then
+	  initValue = Variables[var].init:match("=%s*(.+)")
+	end
+    
+    --if Variables[var].kind == IS_ENUM then
+    --  table.insert(out, "\tdisc Enums "..var..IN_ANY)
+    --elseif Variables[var].kind == IS_BOOL then
+    --  table.insert(out, "\tdisc bool "..var..IN_ANY)
+    --elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
+    --  table.insert(out, "\tdisc int["..Variables[var].range.."] "..var..IN_ANY)
+    --else
+    --  assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
+    --end
+	
+	local declaration
+	if Variables[var].kind == IS_ENUM then
+	  declaration = "\tdisc Enums "..var
+	elseif Variables[var].kind == IS_BOOL then
+	  declaration = "\tdisc bool "..var
+	elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
+	  declaration = "\tdisc int["..Variables[var].range.."] "..var
+	else
+	  assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
+	end
+	  
+	-- If an initial value exists, assign it strictly for PLC compatibility.
+	-- If it does not exist, append 'in any' for pure CIF theoretical modeling.
+	if initValue then
+	  declaration = declaration .. " = " .. initValue
+	else
+	  declaration = declaration .. " in any"
+	end
+    
+    --table.insert(out, "\tinitial "..Variables[var].init)
+    --if Variables[var].mark and Variables[var].mark ~= "" then
+    --  table.insert(out, "\tmarked "..Variables[var].mark)
+    --end
+	table.insert(out, declaration)
+	if Variables[var].mark and Variables[var].mark ~= "" then
+	  table.insert(out, "\tmarked "..Variables[var].mark)
+	end
+    return out
+  end
+  
+  -- The given variable is assigned by this EFA, so it owns it
+  -- CIF does not allow multiple EFA owning the same variable
+  local function ownThisVariable(var)
+    
+    if not Variables[var].owner then -- this variable is still orphan
+      Variables[var].owner = CurrentEFA.name -- remember the owner of this variable
+      local out = makeVarDef(var)
+      table.insert(CurrentEFA.variables, table.concat(out, ";\n")..";\n")
+      return
+    end
+    -- else some efa already owns this variable, it might be us
+    if Variables[var].owner == CurrentEFA.name then -- we are the owner, all is fine
+      return
+    end
+    -- Someone else already owns this variable, and it isn't us
+    local owners = Variables[var].owner.." and "..CurrentEFA.name
+    showIssueDialog("Multiple EFA assign same variable...", "In CIF, two automata cannot assign the same variable.\n"..
+      var.."\nis assigned by "..owners..".\nMake it be assigned in a single EFA.\nAnd note that primed variables are assigned\nQuitting...")
+    
+    textframe:setVisible(false)
+    assert(false, "Different EFA assigning the same variable is not allowed by CIF")
+    
+  end
+  
+-- For each action, guards should be added that gurantee no over- or underflow
+-- A primed guard must be turned into an action, which then requires to add guards!
+-- So, processAction must be able to generate guards, and
+-- processGuards must be able to generate actions!
+-- Also, processAction must have access to the currentEFA so that it can record and check
+-- if two different EFA assign the same variable, CIF does not allow this
+local function processAction(str, gastore)
+  -- str is a comma-separated sequence of actions, possibly empty
+  if not str or str == "" then return {} end
+  local orphans = {}
+  str = str..","
+  for cap in str:gmatch(patterns.commasep) do -- (patterns.actionexpr) do
+    
+    local lhs, op, rhs = cap:match(patterns.operatorsep) -- (patterns.actiondetail)
+    lhs = sanitize(lhs, "variable")
+    rhs = sanitize(rhs, "variable")
+    
+    local expr, newrhs = rewrites[op](lhs, rhs)
+    local action, orph1 = prefixOwner(expr)
+    assert(orph1, "22. orph1 nil")
+    orphans = mergeOrphans(orphans, orph1)
+    table.insert(gastore.actions, action)
+    ownThisVariable(lhs)
+    if newrhs then -- only when necessary
+      local orph2 = addProtectiveGuards(lhs, newrhs, gastore)
+      assert(orph2, "23. orph2 nil")
+      orphans = mergeOrphans(orphans, orph2)
+    end
+  end
+  assert(orphans, "3. Oprhans nil!")
+  return orphans
+end
+
+local function manageGuard(gstr)
+  
+  local newstr = convertGuard(gstr) -- sanitizes its input
+  local prefxd, orphans = prefixOwner(newstr)
+  --[[
+    debugOrphans(CurrentEFA.name, orphans)
+  --]]
+  assert(orphans, "4. Oprhans nil!")
+  return prefxd, orphans
+
+end
+
+-- Primed guards are unknown to CIF, and so must be turned into actions
+-- This is not trivial...
+
+patterns.primedident = "([_:%a][_:%w]*)'" -- matches supremica identifier, can include colon
+-- Supremica guarantees that there is no space between end of variable
+-- name and the prime (if manual input had it)
+
+local function collectPrimedVars(guard)
+  local out = {}
+  for var in guard:gmatch(patterns.primedident) do
+    table.insert(out, var)
+    ownThisVariable(var) -- primed variables are written, so own them
+  end
+  return out
+end
+
+-- Generate unique identifier for each primed var, the template
+local function getUnique(i)
+  return "#"..i
+end
+
+-- Check if this guard contains only numbers and operators
+-- If so it can be evaluated, typical case "1 < 2"
+-- This only happens in the special case that two primed
+-- variables are compared, like "varX' < varY'"
+-- And we do not check for evaluatable parts of primed guards
+local function isEvaluatable(guard)
+  -- If we find letters then it cannot be evaluated
+  -- This will not work for guards that have been CIF'ed as those
+  -- can contain "and", "or", "not", so are falsely flagged as
+  -- not evaluatable by this check
+  return not guard:find("%a")
+end
+
+-- In guard, replace each primed variable with a unique string
+local function generateTemplate(guard, vars)
+  local actions = {}
+  -- Does multiple passes through the string, and generates each time
+  -- a new string. Cannot replace multiple vars simultaneously(?)
+  for i = 1, #vars do
+    local unique = getUnique(i)
+    guard = guard:gsub(vars[i].."'", unique)
+    table.insert(actions, vars[i].." := "..unique)
+  end
+  return guard, table.concat(actions, ", ")
+end
+-- Some guards, like "2 != 3", can be evaluated
+-- true guards can be eliminated, only keep the actions
+-- false guards can be eliminated including removing the actions
+-- This is an optimization that is not yet done, but prepared for
+local function getGuardTruthValue(guard)
+  
+  if not isEvaluatable(guard) then
+    return ""
+  end
+  -- Else this guard can be directly evaluated but needs change of operators
+  -- Supremica	!=	==	=
+  --  CIF			  !=	=	  :=
+  --  Lua			  ~=	==	=
+  -- First replace all = by ¤, then replace !¤ and :¤ and replace ¤ last
+  local subguard = guard:gsub("=", "¤"):gsub("!¤", "~="):gsub(":¤", "="):gsub("¤", "==") 
+  -- loginfo("subguard: "..subguard)
+  local eval, err = load("return "..subguard)
+  return eval() and " (true)" or " (false)"
+  
+end
+-- For primed guard expressions new transitiosn need to be generated
+-- This function returns a set of guard-action pairs, with evaluation result if possible
+local function generateGuardActionSet(expr)
+  -- Here, Supremicas &, |, !  have been converted to "and", "or", "not"
+  -- Each "or" clause can be handled as a new transition
+  local vars = collectPrimedVars(expr)
+  local gtemp, atemp = generateTemplate(expr, vars)
+  local out = {guards={}, actions={}, values={}}
+  
+  local function instantiateTemplate(collection, indices)
+    local guard = gtemp
+    local action = atemp
+    for i = 1, #collection do
+      local set = collection[i]
+      local indx = indices[i]
+      local val = set[indx]
+      local unique = getUnique(i)
+      guard = guard:gsub(unique, val)
+      action = action:gsub(unique, val)
+    end
+    local value = "" -- getGuardTruthValue(guard) -- premature eoptimization at this point
+    table.insert(out.guards, guard)
+    table.insert(out.actions, action)
+    table.insert(out.values, value)
+  end
+  
+  -- collect the variable domains
+  local collection = {}
+  for i = 1, #vars do
+    local var = vars[i]
+    local range = Variables[var].range
+    if Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
+      range = unfoldRange(range)
+    end
+    collection[i] =  range
+  end
+  DNL.setup(collection) -- for DNL, see lines 2078--2123 above
+  DNL.iterate(instantiateTemplate)
+  
+  return out
+end
+
+local function handlePrimedExpression(expr)
+  loginfo("Primed expr: "..expr)
+  local gaset = generateGuardActionSet(expr)
+  for i = 1, #gaset.guards do
+    local guard = gaset.guards[i]
+    local action = gaset.actions[i]
+    local value = gaset.values[i]
+--    loginfo("when ("..guard..") do "..action..value)
+  end
+  return gaset
+end
+
+local function processGuard(str, gastore)
+  -- str is a logical operator separated sequence of predicates
+  -- Replacements can be done inline, see convertGuard()
+  -- A complication is primed guards, that CIF do not recognize
+  
+  if not str or str == "" then return {} end
+  
+  local prefixed, orphans = manageGuard(str)
+  if prefixed:find("'") then -- handle primed variables in the guard
+    local gaset = generateGuardActionSet(prefixed)
+    table.insert(gastore.guards, gaset.guards)
+    table.insert(gastore.actions, gaset.actions)
+  else -- simply convert syntactically and return    
+    table.insert(gastore.guards, "("..prefixed..")")
+  end
+  assert(orphans, "5. Orphans nil!")
+  return orphans
+
+  --[[ Text below is from before not even trying to handle primed guards 
+  -- We have a guard with primed variable, for now assume it is varX' < varY
+  -- foreach value v in DomX
+  -- add transition with guard: v < varY, and action varX := v
+  
+  -- Else we have a guard with at least one primed variable
+  -- This has to be turned into an action.
+  
+  -- guard like (varX' == 1) is trivially rewritten as action (varX := 1)
+  -- with protective guard (varX.bottom <= 1 and 1 <= varX.topper)
+  
+  -- guard like (varX' == varY), can in CIF be written as the action (varX := varY)
+  -- with protecting guard (varX.bottom <= varY and varY <= varX.topper)
+  
+  -- guard like (varX' < 2), can in CIF be written as (varX := {0, 1})
+  -- with the assignment set unfoldRange(varX.range, _, 2-1)
+  -- To determine the assignment range requires to know the operator (<, <=, >, >=)
+  -- No protective guard needed!
+  
+  -- guard like (1 < varX' & varX' < 4) can in CIF be written as (varX := {2, 3})
+  -- The assignment set being unfoldRange(varX.range, 1+1, 4-1)
+  -- No protective guard needed!
+  
+  -- guard like (varX' < varY), ...
+  -- To properly convert this requires knowing the current value of varY!
+  
+  -- guard like (varY' == 2 | varZ' == -7) should be turned into what?
+  -- It seems that Supremica itself has problems with this, see Issue #151
+  
+  showIssueDialog("Cannot handle primed guards...", 
+    "Currently this script does not handle primed guards. Please rewrite\n"..str..
+    " in "..CurrentEFA.name.."\nas action(s).\n")
+  textframe:setVisible(false)
+  assert(false, "Supremica2CIF cannot handle primed guards")
+  ]]--
+end
+
+local function processGuardAction(gablock)
+  
+  if not gablock then return nil, nil, {} end -- not all edges have GA-blocks
+  
+  local gastore = {}
+  gastore.guards, gastore.actions = {}, {}
+  
+  local function stripCurly(str)
+    return str:match("[{%s,]*(.+),}")
+  end
+
+  local function convertAction(astr)
+    if not astr then return end
+    return astr:gsub("=", ":=")
+  end
+
+  -- Multiple actions on the same edge should be comma-separated in CIF
+  local gatxt = gablock:toString():gsub("\n", ",")
+  -- Replacing \n by , results in this type of expr:
+  -- [,{, v_req==1 & v_in==0 & v_s2==1,}],{,{, v_out=1,}},
+  -- [,{, v_out==1 & v_s2==0,}],{,},
+  -- [,],{,{, v_in = 0, v_out = 0,}},
+  
+  -- Get rid of commas and outer braces
+  local gexpr, aexpr = gatxt:match("%[,(.*)%],{,(.*)},")
+  aexpr = stripCurly(aexpr)
+  gexpr = stripCurly(gexpr)
+
+  local orph1 = processGuard(gexpr, gastore) assert(orph1, "657: orph1 is nil")
+  local orph2 = processAction(aexpr, gastore) assert(orph2, "658: orph2 is nil")
+  local orphans = mergeOrphans(orph1, orph2)
+  assert(orphans, "6. Oprhans nil!")
+  
+  -- return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
+  return gastore.guards, gastore.actions, orphans
+
+end
+--[[
+    In Supremica, if no locations are marked, then all locations are considered to be marked
+    The reasoning behind this is that:
+    1. In cases, like dealing only with controllability, where it does not matter if no locations
+      are marked, it also does not matter if all locations are marked;
+    2. In cases, like dealing with nonblocking, where it matters if locations are marked, modeling
+      a system with no marked locations is meaningless
+    So, if some location is marked, we set the allmarked flag false
+--]]
+local function manageSourceTarget(srctrgt)
+  local label, init, acc, xxx = processSourceTarget(srctrgt:toString():gsub("\n", ""))
+  
+  label = sanitize(label, "location")
+  
+  if not CurrentEFA.locations[label] then
+    local out = {"location "..label..":"}
+    if init then table.insert(out, IS_INITIAL) end
+    if acc then 
+      table.insert(out, IS_MARKED)
+      CurrentEFA.allmarked = false 
+    end
+    CurrentEFA.locations[label] = { table.concat(out, "\n") }
+  end
+  return label
+end
+
+local function getEdgeEvents(edge)
+  local evlist = edge:getLabelBlock():getEventIdentifierList()
+  local cevs, uevs = {}, {}
+  local iter = evlist:iterator()
+  
+  while iter:hasNext() do
+    local ev = sanitize(iter:next():getName(), "event")  -- should be sanitized
+    if cevents[ev] then 
+      table.insert(cevs, ev)
+    elseif uevents[ev] then
+      table.insert(uevs, ev)
+    else
+      assert(false, "Event "..ev.." not in project event list!")
+    end
+  end
+  
+  return cevs, uevs
+end
+-- Check an actio for multiple assignment of the same variable
+-- This is not allowed in CIF, but fine in Supremica (see ConflictingAssignment.wmod)
+local function checkMultiAssignment(action)
+  
+  local cache = {}
+  for var in action:gmatch(patterns.multiassign) do
+    if not cache[var] then
+      cache[var] = true
+    else
+      return true, var -- there are multiple assignments to this variable
+    end
+  end
+  return false -- there are no multiple assignments
+end
+  
+local function makeEdge(target, events, guard, action)
+  if #events == 0 then return nil end
+  
+  local multi, var = checkMultiAssignment(action)
+  if multi then 
+    showIssueDialog("Multiple assignment of "..var, 
+      "CIF does not allow multiple assignments of\n"..
+      "the same variable in actions. The variable\n"..var..
+      "\nis assigned multiple times in "..CurrentEFA.name)
+    textframe:setVisible(false)
+    assert(false, "CIF does not allow multiple assignment of same variable in an action")
+  end
+  
+  local out = {}
+  table.insert(out, "\tedge ")
+  table.insert(out, table.concat(events, ", "))
+  if guard and guard ~= "" then
+    table.insert(out, "when")
+    table.insert(out, guard)
+  end
+  if action and action ~= "" then
+    table.insert(out, "do")      
+    table.insert(out, action)
+  end
+  table.insert(out, "goto")
+  table.insert(out, target)
+  table.insert(out, ";")
+  
+  return table.concat(out, " ")
+end
+
+-- Search the given set for a table, and assert that there is max one
+local function getTable(set)
+  local tab = nil
+  local ord = {}
+  
+  -- For transitiosn with no guard and no action, set is nil here
+  if set == nil then return tab, ord end
+  
+  for i = 1, #set do
+    if type(set[i]) == "table" then
+      assert(tab == nil, "There should be max one table")
+      tab = set[i]
+    else
+      table.insert(ord, set[i])
+    end
+  end
+  return tab, ord
+end
+-- There are at most one table in each set, and 
+-- if there is in one there should be in the other
+local function findTables(gset, aset)
+  local gtab, gord = getTable(gset)
+  local atab, aord = getTable(aset)
+  assert((gtab and atab) or (not gtab and not atab), "Should have either no tables or one of each")
+  return gtab, atab, gord, aord
+end
+-- Create a new table and insert elem into it
+local function doInsert(tab, elem)
+  local newtab = {table.unpack(tab)} -- copy, we know the elements are not tables
+  newtab[#newtab+1] = elem
+  return newtab
+end
+  
+local function addEdges(src, trgt, events, guards, actions, orphans)
+  local gtable, atable, gordinary, aordinary = findTables(guards, actions)
+  if not gtable then -- need to check only one here, due the assert above
+    local edge = makeEdge(trgt, events, table.concat(gordinary, " and "), table.concat(aordinary, ", "))
+    table.insert(CurrentEFA.locations[src], {edge, orphans})
+  else -- we have to handle the tables
+    assert(#gtable == #atable, "Sizes of the two tables should match")
+    -- For each pair from gtable and atable, merge with the ordinary guards and actions
+    -- make a new edge and add it to the source location
+    for i = 1, #gtable do
+      local newguard = doInsert(gordinary, gtable[i])
+      local newact = doInsert(aordinary, atable[i])
+      local edge = makeEdge(trgt, events, table.concat(newguard, " and "), table.concat(newact, ", "))
+      table.insert(CurrentEFA.locations[src], {edge, orphans})      
+    end
+  end
+end
+
+local function processEdge(edge)
+  
+	local src = manageSourceTarget(edge:getSource())
+  local trgt = manageSourceTarget(edge:getTarget())
+	local guard, action, orphans = processGuardAction(edge:getGuardActionBlock())
+  assert(orphans, "7. Oprhans nil!")
+	local cevents, uevents = getEdgeEvents(edge)
+  
+  -- Make different edges for controllable and uncontrollable events
+  if #cevents > 0 then
+    addEdges(src, trgt, cevents, guard, action, orphans)
+  end
+  if #uevents > 0 then
+    addEdges(src, trgt, uevents, guard, action, orphans)
+  end  
+end
+
+-- For each edge, after processing, there will be a set of orphans that need to 
+-- be owner-prefixed when the edge is output
+
+local function processEFA(efa)
+  
+  -- Set up global current EFA holder
+  CurrentEFA = {name = sanitize(efa:getName(), "automaton")} -- should be sanitized
+  CurrentEFA.kind = efaKind[efa:getKind()]
+  CurrentEFA.allmarked = true -- In Supremica, if no location explcictly marked, all locations are marked
+  CurrentEFA.variables = {} -- in CIF, variables are local to EFA, need to collect
+  CurrentEFA.locations = {} -- Holds the locations with events, guard, actions
+  
+  -- Get edge iterator from Supremica
+	local graph = efa:getGraph()
+	local edges = graph:getEdges()
+	local nodes = graph:getNodes()
+	
+	local nodeIterator = nodes:iterator()
+	while nodeIterator:hasNext() do
+		manageSourceTarget(nodeIterator:next())
+	end
+	
+	local edgeIterator = edges:iterator()
+	while edgeIterator:hasNext() do
+		processEdge(edgeIterator:next())
+	end
+
+end
+
+local function getEventTable(ev)
+  local out = {}
+  for k, v in pairs(ev) do
+    table.insert(out, k)
+  end
+  return out
+end
+
+local function outputEvents()
+  local c = getEventTable(cevents)
+  local u = getEventTable(uevents)
+  if #c > 0 then print("controllable "..table.concat(c, ", ")..";") end
+  if #u > 0 then print("uncontrollable "..table.concat(u, ", ")..";") end
+  print("")
+end
+
+local function outputBlockedEvents()
+    local blockedArray = getEventTable(blockedEvents)
+    table.sort(blockedArray)
+    
+    if #blockedArray > 0 then
+        for _, eventName in ipairs(blockedArray) do
+            print("requirement invariant " .. eventName .. " needs false;")
+        end
+    end
+	print("")
+end
+
+
+local function outputEnums()
+  local out = {}
+  for e, _ in pairs(Enums) do
+    out[#out + 1] = e
+  end
+  if #out > 0 then
+    print("// All Supremica enums are put in a single CIF enum type, since")
+    print("// in Supremica enums of different types can be compared.")
+    print("enum Enums = "..table.concat(out, ", ")..";\n")
+  end
+end
+
+--[[
+    In Supremica, variables are not owned by any specific EFA, they are free for all
+    In CIF, variables MUST be owned by some EFA
+    In the conversion, the first EFA to assign a variable is considered its owner
+    1. Multiple EFA assigning the same variable cannot be allowed, see ownThisVariable()
+    2. A variable not assigned by any EFA, but always keeping its initial value, could be replaced
+      by its initial value, and CIF warns about this. BUT! The initial value can be nondeterministic!
+--]]
+
+local function outputEdge(edge, name)
+  
+  local str = edge[1]
+  local orphans = edge[2]
+
+  for var, _ in pairs(orphans) do
+    local owner = Variables[var].owner
+    -- self-owned variables may be incorrectly classified as orphans,
+    -- if it is not known at the time of prefixing, see prefixOwner(), 
+    -- that the variable is owned by the current efa
+    if owner ~= name then 
+      str = str:gsub(var, owner.."."..var)
+    end
+  end
+  print(str)
+  
+end
+
+-- Must delay the output of the EFA, until we know which EFA touches which variable
+-- This so, since we need to prefix other EFA's variables with their toucher's name
+-- This applies to both guards and actions, as we could have an action varX := varY,
+-- which if varY is owned by efa2 needs to be converted to varX := efa2.varY
+-- So, for each edge there will be a set of orphans that need to be owner-prefixed 
+-- before the edge is output
+local function outputEFA(efa)
+  print(efa.kind.." "..efa.name..":");
+  print(table.concat(efa.variables, "\n"))
+  for src, body in pairs(efa.locations) do
+    if #body == 1 then -- no edges, might also not have "initial" or "marked"
+      if efa.allmarked then
+        print(body[1])
+        print(IS_MARKED)
+      end
+      print(body[1]:gsub(patterns.colonatend, ";")) -- change : to ; if : is the last char
+    else
+      print(body[1])
+      if efa.allmarked then
+        print(IS_MARKED)
+      end
+      for i = 2, #body do
+        outputEdge(body[i], efa.name)
+      end
+    end
+  end
+  print("end // "..efa.name.."\n")
+end
+
+local function processModule()
+  
+  local filename, filepath = getFileName(name..".cif")
+  print("/***")
+  print(" * CIF model generated from Supremica by Supremica2CIF.lua script")
+  print(" * Generated: "..os.date("%Y-%m-%d, %H:%M"))
+  print(" * Supremica model: "..name)
+  print(" * Saved to: "..filename)
+  print("***/")
+  outputEvents()
+  outputBlockedEvents()
+  outputEnums()
+  
+  for i = 1, efalist:size() do
+    local efa = efalist:get(i-1)
+    processEFA(efa)
+    Storage[#Storage+1] = CurrentEFA
+  end
+  
+  -- Here, some variables may not be owned by any EFA. This is not allowed in CIF
+  -- So we go through all variables and assign orphans to an arbitrary EFA
+  for var, body in pairs(Variables) do
+    if not body.owner then
+      -- loginfo(var.." has no owner, assign: "..CurrentEFA.name)
+      ownThisVariable(var)
+    end
+  end
+  
+  -- Now all EFAs have been processed, so we know which variable is owned by which EFA
+  -- Outputting EFA can now owner-prefix variables in guards and actions
+  -- But we only need to handle the orphans, all other have already been prefixed
+  for i = 1, #Storage do
+    outputEFA(Storage[i])
+  end
+  print("// Automatic naming conlficts resolved")
+  if #NameChanges > 0 then
+	for i = 1, #NameChanges do
+		print(NameChanges[i])
+	end
+  end
+  
+  local textpanel = textframe:getTextPanel()
+  local textarea = textpanel:getTextArea()
+  local text = textarea:getText()
+  saveModel(name..".cif", filepath, text)
+  
+end
+
+preProcessing()
+processModule()

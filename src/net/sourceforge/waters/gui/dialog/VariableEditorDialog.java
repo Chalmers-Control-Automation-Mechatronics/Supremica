@@ -64,6 +64,7 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -195,6 +196,7 @@ public class VariableEditorDialog
       public void documentChanged(final DocumentEvent event)
       {
         updateOkButtonStatus();
+        updateInputCheckboxState();
       }
     };
     final ActionListener commitHandler = new ActionListener() {
@@ -231,6 +233,17 @@ public class VariableEditorDialog
     mInitialInput = new InitialStatePredicateCell();
     mInitialInput.addActionListener(commitHandler);
     mInitialInput.addSimpleDocumentListener(okEnablement);
+
+    mInputCheckBox = new JCheckBox("Input Boolean");
+    mInputCheckBox.setToolTipText("Check if this variable is a global input for PLC conversion.");
+
+
+ // Set the initial visual state when the window opens
+    if (mVariable != null) {
+      // Note: This assumes you have added the isInput() method to your Variable model!
+      mInputCheckBox.setSelected(mVariable.isInput());
+    }
+    updateInputCheckboxState();
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -454,6 +467,14 @@ public class VariableEditorDialog
     constraints.fill = GridBagConstraints.BOTH;
     layout.setConstraints(mMarkingsPanel, constraints);
     contents.add(mMarkingsPanel);
+
+
+    final JPanel checkboxWrapper = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+    checkboxWrapper.add(mInputCheckBox);
+    constraints.weighty = 0.0;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    layout.setConstraints(checkboxWrapper, constraints);
+    contents.add(checkboxWrapper);
     constraints.weighty = 0.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mErrorPanel, constraints);
@@ -461,6 +482,23 @@ public class VariableEditorDialog
     layout.setConstraints(mButtonsPanel, constraints);
     contents.add(mButtonsPanel);
     pack();
+  }
+
+  private void updateInputCheckboxState() {
+    if (mTypeInput != null && mInputCheckBox != null) {
+      // Get the text and remove all spaces so "[true, false]" becomes "[true,false]"
+      final String typeText = mTypeInput.getText().replaceAll("\\s+", "");
+
+      // Check if it matches our allowed boolean formats
+      final boolean isBool = typeText.equals("[true,false]") || typeText.equals("[false,true]");
+
+      mInputCheckBox.setEnabled(isBool);
+
+      // If it's not a boolean, force it to uncheck so invalid data isn't saved
+      if (!isBool) {
+        mInputCheckBox.setSelected(false);
+      }
+    }
   }
 
 
@@ -709,8 +747,9 @@ public class VariableEditorDialog
         type.getParent() == null ? type : type.clone();
       final SimpleExpressionSubject tInitial =
         initial.getParent() == null ? initial : initial.clone();
+      final boolean isInputFlag = mInputCheckBox.isSelected();
       final VariableComponentSubject template =
-        new VariableComponentSubject(tIdent, tType, tInitial, markings);
+        new VariableComponentSubject(tIdent, tType, tInitial, markings, isInputFlag);
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
       if (mVariable == null) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
@@ -1069,6 +1108,7 @@ public class VariableEditorDialog
   private SimpleExpressionInputCell mTypeInput;
   private JLabel mInitialLabel;
   private InitialStatePredicateCell mInitialInput;
+  private JCheckBox mInputCheckBox;
 
   private JPanel mMarkingsPanel;
   private VariableMarkingTableModel mMarkingsModel;

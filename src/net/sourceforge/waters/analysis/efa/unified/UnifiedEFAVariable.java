@@ -65,6 +65,7 @@ public class UnifiedEFAVariable
                      final CompilerOperatorTable op)
   {
     super(var, range, factory, op);
+    mIsInput = var.isInput();
     mMarkedStatePredicate = null;
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     for (final VariableMarkingProxy marking : var.getVariableMarkings()) {
@@ -83,9 +84,15 @@ public class UnifiedEFAVariable
     return mMarkedStatePredicate;
   }
 
+  public boolean isInput()
+  {
+    return mIsInput;
+  }
+
 
   //#########################################################################
   //# Data Members
   private SimpleExpressionProxy mMarkedStatePredicate;
+  private final boolean mIsInput;
 
 }

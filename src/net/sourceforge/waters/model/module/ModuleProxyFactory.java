@@ -691,7 +691,8 @@ public interface ModuleProxyFactory
       (IdentifierProxy identifier,
        SimpleExpressionProxy type,
        SimpleExpressionProxy initialStatePredicate,
-       Collection<? extends VariableMarkingProxy> variableMarkings);
+       Collection<? extends VariableMarkingProxy> variableMarkings,
+       final boolean isInput);
 
   /**
    * Creates a new variable using default values.

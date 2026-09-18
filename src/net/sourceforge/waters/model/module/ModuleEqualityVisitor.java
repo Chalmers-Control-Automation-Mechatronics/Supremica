@@ -113,10 +113,12 @@ public class ModuleEqualityVisitor
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.base.AbstractEqualityVisitor
+  @Override
   public ModuleHashCodeVisitor getHashCodeVisitor()
   {
     return mHashCodeVisitor;
   }
+  @Override
   public ModuleEqualityVisitor getNonReportingEqualityVisitor()
   {
     return mNonReportingEqualityVisitor;
@@ -125,6 +127,7 @@ public class ModuleEqualityVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Boolean visitAliasProxy
     (final AliasProxy proxy)
     throws VisitorException
@@ -143,6 +146,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitBinaryExpressionProxy
     (final BinaryExpressionProxy proxy)
     throws VisitorException
@@ -171,6 +175,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitBoxGeometryProxy
     (final BoxGeometryProxy proxy)
     throws VisitorException
@@ -188,6 +193,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitColorGeometryProxy
     (final ColorGeometryProxy proxy)
     throws VisitorException
@@ -206,6 +212,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitComponentProxy
     (final ComponentProxy proxy)
     throws VisitorException
@@ -213,6 +220,7 @@ public class ModuleEqualityVisitor
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public Boolean visitConditionalProxy
     (final ConditionalProxy proxy)
     throws VisitorException
@@ -230,6 +238,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitConstantAliasProxy
     (final ConstantAliasProxy proxy)
     throws VisitorException
@@ -248,6 +257,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitEdgeProxy
     (final EdgeProxy proxy)
     throws VisitorException
@@ -302,6 +312,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitEnumSetExpressionProxy
     (final EnumSetExpressionProxy proxy)
     throws VisitorException
@@ -320,6 +331,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitEventAliasProxy
     (final EventAliasProxy proxy)
     throws VisitorException
@@ -327,6 +339,7 @@ public class ModuleEqualityVisitor
     return visitAliasProxy(proxy);
   }
 
+  @Override
   public Boolean visitEventDeclProxy
     (final EventDeclProxy proxy)
     throws VisitorException
@@ -371,6 +384,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitEventListExpressionProxy
     (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -391,6 +405,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitExpressionProxy
     (final ExpressionProxy proxy)
     throws VisitorException
@@ -398,6 +413,7 @@ public class ModuleEqualityVisitor
     return visitProxy(proxy);
   }
 
+  @Override
   public Boolean visitForeachProxy
     (final ForeachProxy proxy)
     throws VisitorException
@@ -420,6 +436,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitFunctionCallExpressionProxy
     (final FunctionCallExpressionProxy proxy)
     throws VisitorException
@@ -443,6 +460,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitGraphProxy
     (final GraphProxy proxy)
     throws VisitorException
@@ -476,6 +494,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitGroupNodeProxy
     (final GroupNodeProxy proxy)
     throws VisitorException
@@ -502,6 +521,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitGuardActionBlockProxy
     (final GuardActionBlockProxy proxy)
     throws VisitorException
@@ -532,6 +552,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitIdentifiedProxy
     (final IdentifiedProxy proxy)
     throws VisitorException
@@ -550,6 +571,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitIdentifierProxy
     (final IdentifierProxy proxy)
     throws VisitorException
@@ -557,6 +579,7 @@ public class ModuleEqualityVisitor
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Boolean visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy proxy)
     throws VisitorException
@@ -580,6 +603,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitInstanceProxy
     (final InstanceProxy proxy)
     throws VisitorException
@@ -603,6 +627,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitIntConstantProxy
     (final IntConstantProxy proxy)
     throws VisitorException
@@ -620,6 +645,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitLabelBlockProxy
     (final LabelBlockProxy proxy)
     throws VisitorException
@@ -639,6 +665,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitLabelGeometryProxy
     (final LabelGeometryProxy proxy)
     throws VisitorException
@@ -662,6 +689,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitModuleProxy
     (final ModuleProxy proxy)
     throws VisitorException
@@ -696,6 +724,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitModuleSequenceProxy
     (final ModuleSequenceProxy proxy)
     throws VisitorException
@@ -714,6 +743,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitNestedBlockProxy
     (final NestedBlockProxy proxy)
     throws VisitorException
@@ -732,6 +762,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitNodeProxy
     (final NodeProxy proxy)
     throws VisitorException
@@ -755,6 +786,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitParameterBindingProxy
     (final ParameterBindingProxy proxy)
     throws VisitorException
@@ -773,6 +805,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitPlainEventListProxy
     (final PlainEventListProxy proxy)
     throws VisitorException
@@ -780,6 +813,7 @@ public class ModuleEqualityVisitor
     return visitEventListExpressionProxy(proxy);
   }
 
+  @Override
   public Boolean visitPointGeometryProxy
     (final PointGeometryProxy proxy)
     throws VisitorException
@@ -798,6 +832,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy proxy)
     throws VisitorException
@@ -823,6 +858,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitSimpleComponentProxy
     (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -851,6 +887,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitSimpleExpressionProxy
     (final SimpleExpressionProxy proxy)
     throws VisitorException
@@ -871,6 +908,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitSimpleIdentifierProxy
     (final SimpleIdentifierProxy proxy)
     throws VisitorException
@@ -889,6 +927,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitSimpleNodeProxy
     (final SimpleNodeProxy proxy)
     throws VisitorException
@@ -925,6 +964,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitSplineGeometryProxy
     (final SplineGeometryProxy proxy)
     throws VisitorException
@@ -948,6 +988,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitUnaryExpressionProxy
     (final UnaryExpressionProxy proxy)
     throws VisitorException
@@ -971,6 +1012,7 @@ public class ModuleEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitVariableComponentProxy
     (final VariableComponentProxy proxy)
     throws VisitorException
@@ -997,12 +1039,16 @@ public class ModuleEqualityVisitor
       if (!compareLists(variableMarkings1, variableMarkings2)) {
         return false;
       }
+      if (proxy.isInput()!=expected.isInput()) {
+        return reportAttributeMismatch("Is Input Boolean", proxy.isInput(), expected.isInput());
+      }
       return true;
     } else {
       return false;
     }
   }
 
+  @Override
   public Boolean visitVariableMarkingProxy
     (final VariableMarkingProxy proxy)
     throws VisitorException

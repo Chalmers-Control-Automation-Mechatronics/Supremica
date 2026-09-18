@@ -82,7 +82,8 @@ public final class VariableComponentSubject
   public VariableComponentSubject(final IdentifierProxy identifier,
                                   final SimpleExpressionProxy type,
                                   final SimpleExpressionProxy initialStatePredicate,
-                                  final Collection<? extends VariableMarkingProxy> variableMarkings)
+                                  final Collection<? extends VariableMarkingProxy> variableMarkings,
+                                  final boolean isInput)
   {
     super(identifier);
     mType = (SimpleExpressionSubject) type;
@@ -96,6 +97,7 @@ public final class VariableComponentSubject
         (variableMarkings, VariableMarkingSubject.class);
     }
     mVariableMarkings.setParent(this);
+    this.mIsInput = isInput;
   }
 
   /**
@@ -113,7 +115,8 @@ public final class VariableComponentSubject
     this(identifier,
          type,
          initialStatePredicate,
-         null);
+         null,
+         false);
   }
 
 
@@ -145,6 +148,9 @@ public final class VariableComponentSubject
         mInitialStatePredicate.setParent(null);
         mInitialStatePredicate = (SimpleExpressionSubject) newValue;
         mInitialStatePredicate.setParent(this);
+        return ModelChangeEvent.createStateChanged(this);
+      case 4:
+        mIsInput = (Boolean) newValue;
         return ModelChangeEvent.createStateChanged(this);
       default:
         return null;
@@ -183,6 +189,12 @@ public final class VariableComponentSubject
         new ReplacementUndoInfo(3, mInitialStatePredicate, clone3);
       info.add(step3);
     }
+
+    if (mIsInput != downcast.mIsInput) {
+      final UndoInfo stepInput =
+        new ReplacementUndoInfo(4, mIsInput, downcast.mIsInput);
+      info.add(stepInput);
+    }
     final UndoInfo step4 =
       mVariableMarkings.createUndoInfo(downcast.mVariableMarkings, boundary);
     if (step4 != null) {
@@ -193,6 +205,7 @@ public final class VariableComponentSubject
 
   //#########################################################################
   //# Comparing
+  @Override
   public Class<VariableComponentProxy> getProxyInterface()
   {
     return VariableComponentProxy.class;
@@ -201,6 +214,7 @@ public final class VariableComponentSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -211,16 +225,19 @@ public final class VariableComponentSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.VariableComponentProxy
+  @Override
   public SimpleExpressionSubject getType()
   {
     return mType;
   }
 
+  @Override
   public SimpleExpressionSubject getInitialStatePredicate()
   {
     return mInitialStatePredicate;
   }
 
+  @Override
   public List<VariableMarkingProxy> getVariableMarkings()
   {
     final List<?> precast = mVariableMarkings;
@@ -269,11 +286,27 @@ public final class VariableComponentSubject
     return mVariableMarkings;
   }
 
+  @Override
+  public boolean isInput()
+  {
+    return mIsInput;
+  }
+
+  public void setInput(final boolean isInput)
+  {
+    if (mIsInput == isInput) {
+      return;
+    }
+    mIsInput = isInput;
+    fireStateChanged();
+  }
+
 
   //#########################################################################
   //# Data Members
   private SimpleExpressionSubject mType;
   private SimpleExpressionSubject mInitialStatePredicate;
   private ListSubject<VariableMarkingSubject> mVariableMarkings;
+  private boolean mIsInput;
 
 }

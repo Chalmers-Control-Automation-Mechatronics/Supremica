@@ -1115,9 +1115,10 @@ public class ModuleInstanceCompiler
             newMarkings.add(newMarking);
           }
         }
+        final boolean isInputFlag = var.isInput();
         final VariableComponentProxy newVar =
           mFactory.createVariableComponentProxy(fullName, value,
-                                                newInit, newMarkings);
+                                                newInit, newMarkings, isInputFlag);
         mNameSpace.addComponent(suffix, newVar);
         linkCompilationInfo(newVar, var, mContext);
         return newVar;

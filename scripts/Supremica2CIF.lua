@@ -1,11 +1,13 @@
 -- Supremica2CIF.lua, Lua script to convert Supremica models to CIF
 -- Meant to be run as a script inside Supremica (with LuaJ embedded)
 local luaj = luajava -- just shorthand 
-local script, ide, log = ... -- grab the arguments passed from Java via LuaJ
+--local script, ide, log = ... -- grab the arguments passed from Java via LuaJ
+local script, ide, log = "Supremica2CIF.lua", IDE_GLOBAL, LOG_GLOBAL -- grab the arguments passed from Java via LuaJ
 
 -- Get convenience function to generate file name
 local Config = luaj.bindClass("org.supremica.properties.Config")
-local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
+--local getFileName = dofile(Config.FILE_SCRIPT_PATH:getValue():getPath().."/getFileName.lua")
+local getFileName = dofile("scripts/getFileName.lua")
 
 -- Some useful Java classes
 local JOptionPane = luaj.bindClass("javax.swing.JOptionPane")

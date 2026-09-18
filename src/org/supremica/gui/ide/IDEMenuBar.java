@@ -63,6 +63,8 @@ import net.sourceforge.waters.gui.actions.AnalyzerSimplificationAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.AnalyzerWorkbenchAction;
+import net.sourceforge.waters.gui.actions.ExportToCIFAction;
+import net.sourceforge.waters.gui.actions.ExportToPLCAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.GraphSavePDFAction;
@@ -145,10 +147,10 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
-import org.supremica.gui.ide.actions.RunScriptAction;
 import org.supremica.gui.ide.actions.OpenFTAction;
 import org.supremica.gui.ide.actions.OpenFTSpecAction;
 import org.supremica.gui.ide.actions.OpenRASAction;
+import org.supremica.gui.ide.actions.RunScriptAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.gui.simulator.ExternalEventExecuter;
@@ -496,6 +498,10 @@ public class IDEMenuBar
       menu.add(instantiation);
       final Action recompile = actions.getAction(RecompileAction.class);
       menu.add(recompile);
+      final Action exportcif = actions.getAction(ExportToCIFAction.class);
+      menu.add(exportcif);
+      final Action exportplc = actions.getAction(ExportToPLCAction.class);
+      menu.add(exportplc);
     }
     add(menu);
   }

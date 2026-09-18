@@ -1,0 +1,177 @@
+Signature-Version: 1.0
+Created-By: 11.0.24 (Eclipse Adoptium)
+SHA-256-Digest-Manifest: R+aWI1nFvegcByO1NSLKZHRZEg0djh5a+98dQm6v0ug=
+SHA-256-Digest-Manifest-Main-Attributes: 7v8uRSpaLXNEkpyrThqTdhRGHEMszey
+ Odjf8WCrLz7M=
+
+Name: about.properties
+SHA-256-Digest: QlyrZnTE31831hMuP74NytyrB4jUQQHPYVcFDmgNbwo=
+
+Name: macosx_narrow_book.css
+SHA-256-Digest: 1bLPCEdb34ntnU/DzhPR0HKfNmGhazXit1FfEuihNM8=
+
+Name: narrow_book.css
+SHA-256-Digest: t48tLOTvriuVtxeOpW9ky0eBYIXZoI68BbjLj6WnnWo=
+
+Name: plugin.xml
+SHA-256-Digest: a9L5e3jHdGiE61i6Tc0RECdv9Hh/9x8AoWjGvNX0bKI=
+
+Name: images/topiclabel/arrow_light.svg
+SHA-256-Digest: kNOtPGSC8MS3noI04Deth0PCtg96c4Algpu+f4jajW8=
+
+Name: intro/whatsnewExtensionContent3.xml
+SHA-256-Digest: 0HB2+sNzSEdpYlN9huuxySYhnd3YZumD3auGfgu6jWQ=
+
+Name: images/topiclabel/wn_eclcommunity48.svg
+SHA-256-Digest: ovBHkojWiMiF/NZJhdP2u8Z8i9Hjgho61IE2WQ5Z7no=
+
+Name: eclipse64.png
+SHA-256-Digest: twnDDy9avWXXWNWTr1gVaGEGL+vd4Q6EDb4O6azs2WY=
+
+Name: helpData.xml
+SHA-256-Digest: vsSRfC9uclBm6jcvFfVEW4GDfC4tXatbTMirc9jGqGc=
+
+Name: plugin_customization.properties
+SHA-256-Digest: JQ/pEnbc5izHRsek8AAPDVLK3gT9YO3XOl0hDZNS3Vc=
+
+Name: eclipse48.png
+SHA-256-Digest: kEswZnwk7p67eMXQdPGWgb+G5D1fq0WeVvIozlqdhPY=
+
+Name: keys/platform.asc
+SHA-256-Digest: TnDETDocpDGoNhEAAetbdhXGMqSYtTrwHZtC/z0uzpE=
+
+Name: platform.jar
+SHA-256-Digest: Mii5coFN9PghRzSLqmPn6c51WAxJeEvzjEoWteDjLDw=
+
+Name: book.css
+SHA-256-Digest: ZSYoLZhXj9+bPdnzsDc0umGXSGIErwl1q+6cNB9J358=
+
+Name: splash.png
+SHA-256-Digest: GNMULQ5sxAmV38Qcf7mkOgA0wx5TLm12+esqPRqkWew=
+
+Name: about.ini
+SHA-256-Digest: 0PfB8MVACfkPz7F2IziJGe3QYrKNJ1szPmFB96YR5wQ=
+
+Name: eclipse32.svg
+SHA-256-Digest: ZbgBJyg1biFTFiwQaGyl7agU6Ys6Q8NN4DV6LQ+wXpc=
+
+Name: eclipse22.png
+SHA-256-Digest: hCemVOiTUf+LcK65wb/0BEqgsA80AJ8utyuSsSBdbhU=
+
+Name: plugin.properties
+SHA-256-Digest: 0tZqAeNsdz+wYZ0wnDE0Q53KYoN4/K7VvnwoSJC6Rcw=
+
+Name: plugin_customization.ini
+SHA-256-Digest: 7dSa/xLKMsPT1vuXLZkK8plbff8/UnS068m0Qg7jcu4=
+
+Name: intro/css/overview.css
+SHA-256-Digest: 6eL01OTFHjk1QDSngfqEhTazq3KpNANjIhsa4maV1sU=
+
+Name: images/topiclabel/wn_eclplatform48.svg
+SHA-256-Digest: VOyN4eMdtA3jW2VEJU9jqUfiGCU7YHqZ6Coz6JouTUU=
+
+Name: intro/overviewExtensionContent.xml
+SHA-256-Digest: 7DV7OKOGaL+U77U+PR+ywni6cO8o4Vg2QR07IZOUpaM=
+
+Name: eclipse1024.png
+SHA-256-Digest: 9nzj3iarTBjCrKHvC9eY90UljcfaG+oL6TUrUQG8ELY=
+
+Name: intro/css/whatsnew.css
+SHA-256-Digest: 5SGA4oSYOCyYgcrQ6Z1F7kDJtkH6Na/ia67WzM7VEu0=
+
+Name: eclipse_lg.png
+SHA-256-Digest: fycHrw3NQoMNzdR0Lwk7L+VUs6nzOt3cdAYkiuD3KnM=
+
+Name: eclipse_lg@2x.png
+SHA-256-Digest: RS6XOjWM0N1DVpvkjkgLX0gpeuhxxeyV/knnmuE0B9w=
+
+Name: intro/whatsnewExtensionContent2.xml
+SHA-256-Digest: MUX7PBKg89+W8jIH6ZvMAChYhOQAsjEYnwcg6viQFs0=
+
+Name: intro/css/migrate.properties
+SHA-256-Digest: hZeZ/7c1MrL2Uc/G2CFT9e6nOkya/Ttpao9juA6eUOs=
+
+Name: eclipse24.png
+SHA-256-Digest: 3O/MKPYHivVJQnA63IPRvMEiWAQmhKBxKfd63VtzHDs=
+
+Name: intro/migrateExtensionContent.xml
+SHA-256-Digest: PXbvTzd+fGz39QurDSCbCmIDSbhcUOZsWPDNQobC+kA=
+
+Name: icons/etool16/cheatsheet_view.png
+SHA-256-Digest: uBWx8cPMdrZQEZNrOh8CRoRx1FFGWmfJ3nCilSl7bgU=
+
+Name: eclipse16.svg
+SHA-256-Digest: q/Irv0Mt8VcwSwzxrC9ttq/zTeOz2PLDdmiGkU6iOgE=
+
+Name: intro/whatsnewExtensionContent1.xml
+SHA-256-Digest: PIi0d3eJZKIYFnROTf7voKL1zZYS97BRiaqElk3WiYY=
+
+Name: keys/orbit.asc
+SHA-256-Digest: BV1C8C547det6dvCxIye9PzClMnKX+RVqGWoIN7pTMo=
+
+Name: LegacyIDE.e4xmi
+SHA-256-Digest: ktnoQ0NmsiAx6QnwaEzzuTQfVc7fn0SeEe3aNj4UzNs=
+
+Name: intro/css/overview.properties
+SHA-256-Digest: qiEN3qSz2I2RoGoP1J23wCJj9VxMXjE+weReAvQ0M4Q=
+
+Name: images/topiclabel/wn_migrate48.svg
+SHA-256-Digest: fKgF2sfBp73kxMEUuRbtzXawmDijG4QQgHG8BTXoTCs=
+
+Name: about.mappings
+SHA-256-Digest: XYS9dsL36IP/aalOGGEO6sZmSeXyVkKH/tl3rDFofpE=
+
+Name: images/topiclabel/wn_updates48.svg
+SHA-256-Digest: zNrOisgl6oqjpNhcABIDqsitnXY+8w2Ta0nzfx/2b9E=
+
+Name: eclipse48.svg
+SHA-256-Digest: gETV6C3gfERf1eN2dLNNd2M3wutVIYSiXAeWt9hXFok=
+
+Name: intro-eclipse.svg
+SHA-256-Digest: QP/Y7dAN3AUPOE4Dtgt816Z/chpK4Ncf81M0yaSEdCg=
+
+Name: introData.xml
+SHA-256-Digest: RbYXlJqGBzLBqt0UOQUjI+cIOheEAvkTNSGEatIWvG8=
+
+Name: about.html
+SHA-256-Digest: ncO+WCNUIJ0JLCOl/ot53yopwTqvvtVu0qSgblesdYo=
+
+Name: icons/etool16/cheatsheet_view@2x.png
+SHA-256-Digest: WB1y8sIznDYE3UZyx4GdDyqpQtV0tZFmrZYsMnB7esI=
+
+Name: icons/etool16/cheatsheet_view.svg
+SHA-256-Digest: JYCPxjtggXr4eTC8Kv223D1EG9iQQkOz2dCUeptc6uU=
+
+Name: images/topiclabel/arrow.svg
+SHA-256-Digest: 7IDTBu0xgIKRjjLPAOYk0zl4KLYYhnfV4wZknmJDWHQ=
+
+Name: intro/css/migrate.css
+SHA-256-Digest: T5oYBUyiMIkJ8YxnnTK/QvtOWbJPwGyGFYdzFV90F+s=
+
+Name: eclipse512.png
+SHA-256-Digest: Mwo3+9RYlBax0xkqe9jt8Fl841Tt+z+Gci6tKhlrO0o=
+
+Name: eclipse32.png
+SHA-256-Digest: 4Vi6RhGrdWsIEJf2umgsolfDHPhCntdl7133+BjuodY=
+
+Name: org.eclipse.ui.intro.universal.solstice/intro-eclipse.svg
+SHA-256-Digest: Xa/1SuIS1rBk5beaZV82czskxgXJGuhTFf3Kj+Bc2PM=
+
+Name: images/topiclabel/ov_wbbasics48.svg
+SHA-256-Digest: vipYae1etn5O2iVIKu4Qctq+C03jPELSGRGaTdzhMlE=
+
+Name: intro/css/whatsnew.properties
+SHA-256-Digest: A/DoJb5fly4T2e10hD4aI1vocIiu5y8K1NoVw98tSFk=
+
+Name: eclipse128.png
+SHA-256-Digest: eBFkPeIXWqaMSeOP0ZcKCGSy3yKlJ/nTXjTkhA3fp2U=
+
+Name: eclipse16.png
+SHA-256-Digest: AarETtJJL/I+MaW+NI7iR01+dhPsYH2fc4wOZIunUmw=
+
+Name: eclipse256.png
+SHA-256-Digest: ukiWOBEZ1tJILDZU6qXIUcPlD33ZNX4ZL8YL2LWhkqw=
+
+Name: disabled_book.css
+SHA-256-Digest: YtMtWOk7vxqVvWWLLEoSUC0ETssW0mWD8Bu6CMB2WuA=
+

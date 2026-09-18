@@ -249,7 +249,8 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
     return factory.createVariableComponentProxy(iden,
                                                 type,
                                                 initialStatePredicate,
-                                                variableMarkings);
+                                                variableMarkings,
+                                                isInput());
   }
 
   @Override

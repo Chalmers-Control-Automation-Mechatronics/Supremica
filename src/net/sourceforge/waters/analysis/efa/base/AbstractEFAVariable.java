@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.efa.base;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.Collection;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -45,8 +47,6 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-
-import gnu.trove.set.hash.THashSet;
 
 /**
  * A representation of an EFA variable for use in compositional analysis.
@@ -65,6 +65,7 @@ public abstract class AbstractEFAVariable<L>
                              final CompilerOperatorTable op)
   {
     mComponent = var;
+    mIsInput = var.isInput();
     mRange = range;
     final ModuleProxyCloner cloner = factory.getCloner();
     final IdentifierProxy ident = var.getIdentifier();
@@ -126,6 +127,11 @@ public abstract class AbstractEFAVariable<L>
     return mInitialStatePredicate;
   }
 
+  public boolean isInput()
+  {
+    return mIsInput;
+  }
+
 
   /**
    * Returns a collection containing all events in the system using this
@@ -154,5 +160,6 @@ public abstract class AbstractEFAVariable<L>
   private final UnaryExpressionProxy mPrimedVariableName;
   private final SimpleExpressionProxy mInitialStatePredicate;
   private final THashSet<EventDeclProxy> mEventDecls;
+  private final boolean mIsInput;
 
 }

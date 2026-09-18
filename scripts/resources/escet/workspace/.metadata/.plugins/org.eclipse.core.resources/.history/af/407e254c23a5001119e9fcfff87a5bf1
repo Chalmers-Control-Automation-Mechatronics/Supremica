@@ -1,0 +1,151 @@
+import "Plant_Final.cif";
+
+const real c1 = 27.0; // the absolute value of c, will change sign based on flow direction
+alg real c = if SeaLevel.l_s < FjordLevel.l_f: c1
+             elif SeaLevel.l_s > FjordLevel.l_f: -c1
+             else 0.0 end;
+
+plant def Gate_height(alg real u; uncontrollable u_at_0, u_between_0_and_3, u_at_3, u_between_3_and_6, u_at_6): // Gate height per gate modelled as an automaton to allow for discrete events
+    cont h der u;
+    alg real Q = c*h;
+
+    location Closed:
+        initial;
+        marked;
+        edge u_between_0_and_3 when h > 0.1 goto BetweenClosedAndHalf;
+
+    location BetweenClosedAndHalf:
+        marked;
+        edge u_at_0 when h <= 0.1 goto Closed;
+        edge u_at_3 when h >= 2.9 goto HalfOpen;
+
+    location HalfOpen:
+        marked;
+        edge u_between_3_and_6 when h > 3.1 goto BetweenHalfAndOpen;
+        edge u_between_0_and_3 when h < 2.9 goto BetweenClosedAndHalf;
+
+    location BetweenHalfAndOpen:
+        marked;
+        edge u_at_3 when h <= 3.1 goto HalfOpen;
+        edge u_at_6 when h >= 5.9 goto Open;
+
+    location Open:
+        marked;
+        edge u_between_3_and_6 when h < 5.9 goto BetweenHalfAndOpen;
+end
+
+Gate1_height: Gate_height(Actuator1.u,Sensor1.u_at_0, Sensor1.u_between_0_and_3, Sensor1.u_at_3,
+                     Sensor1.u_between_3_and_6, Sensor1.u_at_6);
+Gate2_height: Gate_height(Actuator2.u,Sensor2.u_at_0, Sensor2.u_between_0_and_3, Sensor2.u_at_3,
+                      Sensor2.u_between_3_and_6, Sensor2.u_at_6);
+Gate3_height: Gate_height(Actuator3.u,Sensor3.u_at_0, Sensor3.u_between_0_and_3, Sensor3.u_at_3,
+                      Sensor3.u_between_3_and_6, Sensor3.u_at_6);
+Gate4_height: Gate_height(Actuator4.u,Sensor4.u_at_0, Sensor4.u_between_0_and_3, Sensor4.u_at_3,
+                      Sensor4.u_between_3_and_6, Sensor4.u_at_6);
+
+const real A_f = 300000000; // in [m^2]. The area of the fjord is around 300 km^2 according to Wikipedia
+const int Rain = 250; // constant 250 m^3/s inflow (is 5*average)
+alg real Q = Gate1_height.Q+Gate2_height.Q+Gate3_height.Q+Gate4_height.Q;
+
+plant LevelTracker:
+    uncontrollable u_increment, u_decrement;                   //Replaces LevelTracker in plant when merging.
+    cont l_f = 2.5 der 1/A_f*(Rain-Q);
+    disc int[-1..343] volume = 172;
+    const real x = 0.75/342.0;
+
+    location:
+        initial; marked;
+
+        edge FjordLevel.u_above_10,
+             FjordLevel.u_above_20,
+             FjordLevel.u_above_30,
+             FjordLevel.u_above_40
+             do volume := 0;
+       edge  FjordLevel.u_below_10,
+             FjordLevel.u_below_20,
+             FjordLevel.u_below_30,
+             FjordLevel.u_below_40
+             do volume := 342 ;
+
+        edge u_increment when ((l_f-floor(l_f)) - volume/342.0) > x do volume := volume +1;
+        edge u_decrement when ((l_f-floor(l_f)) - volume/342.0) < -x do volume := volume -1;
+end
+
+plant FjordLevel:                           // Replaces Fjord level in platn when merging
+    uncontrollable u_above_10, u_below_10,
+                   u_above_20, u_below_20,
+                   u_above_30, u_below_30,
+                   u_above_40, u_below_40;
+
+    alg real l_f = LevelTracker.l_f;
+
+    location Low:
+        edge u_above_10 when l_f > 1.0 goto NearLow;
+
+    location NearLow:
+        edge u_below_10 when l_f <= 1.0 goto Low;
+        edge u_above_20 when l_f > 2.0 goto Normal;
+
+    location Normal:
+        initial; marked;
+        edge u_below_20 when l_f <= 2.0 goto NearLow;
+        edge u_above_30 when l_f > 3.0 goto NearHigh;
+
+    location NearHigh:
+        edge u_below_30 when l_f <= 3.0 goto Normal;
+        edge u_above_40 when l_f > 4.0 goto High;
+
+    location High:
+        edge u_below_40 when l_f <= 4.0 goto NearHigh;
+end
+
+
+automaton SeaLevel:
+    uncontrollable u_SeaLevel_rise, u_SeaLevel_lower;
+    const real PI = 3.141592653589793;
+    alg real l_s = 2.5 - 2.5 * sin((4.0 * PI * time) / 86400.0);
+    alg real l_f = LevelTracker.l_f;
+    disc int[0..1] ticks = 0;
+
+   location Low: // Sea < Fjord
+        initial; marked;
+        edge when l_s < 0.1 and ticks = 0 do ticks := 1;  //to indicate lower point of tide, needed by supervisor
+        edge u_SeaLevel_rise when l_s>l_f do ticks := 0 goto High;
+
+    location High: // Sea > Fjord
+        marked;
+        edge u_SeaLevel_rise when l_s>4.5 goto Peak;
+        edge u_SeaLevel_lower when l_s<l_f goto Low;
+
+    location Peak: // Sea > 4.5m (thus also assumed Sea>Fjord)
+        marked;
+        edge u_SeaLevel_lower when l_s<4.5 goto High;
+end
+
+automaton PhysicalStartupPower:
+    alg real u = if StartupPower.active: 1.0 else 0.0 end;
+    cont t = 0.0 der u;
+
+    location:
+        initial;
+        edge StartupPower.u_delayPassed when t>= 5.0 do t := 0.0;
+        edge Actuator1.c_Raise, Actuator1.c_Lower,
+             Actuator2.c_Raise, Actuator2.c_Lower,
+             Actuator3.c_Raise, Actuator3.c_Lower,
+             Actuator4.c_Raise, Actuator4.c_Lower do t:=0.0;
+end
+
+automaton PLCCycle:
+    controllable c_EndCycle;
+    uncontrollable u_StartCycle;
+    cont t = 0 der 1;
+
+    location SupervisorTurn:
+        initial; marked;
+        urgent;         //block time, in order to force action: supervisor can block c_EndCycle untill certain actions are done, thus forcing an action
+        edge c_EndCycle goto EnvironmentTurn;
+
+    location EnvironmentTurn:
+        edge u_StartCycle when t>600 do t:=0 goto SupervisorTurn; //time can run unblocked for 10 minutes(otherwhise auto input wil keep triggering this event)
+end
+

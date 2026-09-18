@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config date="1774599758968" transient="false" version="3.0">
+<site enabled="true" policy="USER-EXCLUDE" updateable="true" url="platform:/base/">
+<feature id="org.eclipse.equinox.p2.user.ui" url="features/org.eclipse.equinox.p2.user.ui_2.4.2900.v20250729-0655/" version="2.4.2900.v20250729-0655">
+</feature>
+<feature id="org.eclipse.help" plugin-identifier="org.eclipse.help.base" url="features/org.eclipse.help_2.3.2300.v20250905-0730/" version="2.3.2300.v20250905-0730">
+</feature>
+<feature id="org.eclipse.equinox.p2.extras.feature" url="features/org.eclipse.equinox.p2.extras.feature_1.4.2900.v20250729-0655/" version="1.4.2900.v20250729-0655">
+</feature>
+<feature id="org.eclipse.jdt" url="features/org.eclipse.jdt_3.20.300.v20250905-1111/" version="3.20.300.v20250905-1111">
+</feature>
+<feature id="org.eclipse.equinox.p2.core.feature" url="features/org.eclipse.equinox.p2.core.feature_1.7.800.v20250729-0655/" version="1.7.800.v20250729-0655">
+</feature>
+<feature id="org.eclipse.rcp" url="features/org.eclipse.rcp_4.37.0.v20250905-0730/" version="4.37.0.v20250905-0730">
+</feature>
+<feature id="org.eclipse.equinox.p2.discovery.feature" url="features/org.eclipse.equinox.p2.discovery.feature_1.3.900.v20250616-0711/" version="1.3.900.v20250616-0711">
+</feature>
+<feature id="org.eclipse.equinox.p2.rcp.feature" url="features/org.eclipse.equinox.p2.rcp.feature_1.4.2900.v20250729-0655/" version="1.4.2900.v20250729-0655">
+</feature>
+<feature id="org.eclipse.escet.chi.feature" plugin-identifier="org.eclipse.escet.product.branding" url="features/org.eclipse.escet.chi.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.escet.cif.feature" plugin-identifier="org.eclipse.escet.product.branding" url="features/org.eclipse.escet.cif.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.epp.mpc" plugin-identifier="org.eclipse.epp.mpc.ui" url="features/org.eclipse.epp.mpc_1.13.0.v20250816-1241/" version="1.13.0.v20250816-1241">
+</feature>
+<feature id="org.eclipse.platform" url="features/org.eclipse.platform_4.37.0.v20250905-0730/" version="4.37.0.v20250905-0730">
+</feature>
+<feature id="org.eclipse.escet.product.headless.feature" url="features/org.eclipse.escet.product.headless.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.justj.openjdk.hotspot.jre.full" url="features/org.eclipse.justj.openjdk.hotspot.jre.full_21.0.4.v20240802-1551/" version="21.0.4.v20240802-1551">
+</feature>
+<feature id="org.eclipse.escet.common.feature" plugin-identifier="org.eclipse.escet.product.branding" url="features/org.eclipse.escet.common.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.escet.setext.feature" plugin-identifier="org.eclipse.escet.product.branding" url="features/org.eclipse.escet.setext.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.escet.tooldef.feature" plugin-identifier="org.eclipse.escet.product.branding" url="features/org.eclipse.escet.tooldef.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.escet.product.feature" plugin-identifier="org.eclipse.escet.product.branding" url="features/org.eclipse.escet.product.feature_10.0.0.v20251219-075055/" version="10.0.0.v20251219-075055">
+</feature>
+<feature id="org.eclipse.e4.rcp" url="features/org.eclipse.e4.rcp_4.37.0.v20250828-1028/" version="4.37.0.v20250828-1028">
+</feature>
+</site>
+</config>

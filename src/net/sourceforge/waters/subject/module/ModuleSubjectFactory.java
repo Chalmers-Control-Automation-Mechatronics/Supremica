@@ -105,11 +105,13 @@ public class ModuleSubjectFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyFactory
+  @Override
   public ModuleProxyCloner getCloner()
   {
     return getCloningInstance();
   }
 
+  @Override
   public BinaryExpressionSubject createBinaryExpressionProxy
       (final String plainText,
        final BinaryOperator operator,
@@ -122,6 +124,7 @@ public class ModuleSubjectFactory
                                        right);
   }
 
+  @Override
   public BinaryExpressionSubject createBinaryExpressionProxy
       (final BinaryOperator operator,
        final SimpleExpressionProxy left,
@@ -132,23 +135,27 @@ public class ModuleSubjectFactory
                                        right);
   }
 
+  @Override
   public BoxGeometrySubject createBoxGeometryProxy
       (final Rectangle2D rectangle)
   {
     return new BoxGeometrySubject(rectangle);
   }
 
+  @Override
   public ColorGeometrySubject createColorGeometryProxy
       (final Collection<? extends Color> colorSet)
   {
     return new ColorGeometrySubject(colorSet);
   }
 
+  @Override
   public ColorGeometrySubject createColorGeometryProxy()
   {
     return new ColorGeometrySubject();
   }
 
+  @Override
   public ConditionalSubject createConditionalProxy
       (final Collection<? extends Proxy> body,
        final SimpleExpressionProxy guard)
@@ -157,12 +164,14 @@ public class ModuleSubjectFactory
                                   guard);
   }
 
+  @Override
   public ConditionalSubject createConditionalProxy
       (final SimpleExpressionProxy guard)
   {
     return new ConditionalSubject(guard);
   }
 
+  @Override
   public ConstantAliasSubject createConstantAliasProxy
       (final IdentifierProxy identifier,
        final ExpressionProxy expression,
@@ -173,6 +182,7 @@ public class ModuleSubjectFactory
                                     scope);
   }
 
+  @Override
   public ConstantAliasSubject createConstantAliasProxy
       (final IdentifierProxy identifier,
        final ExpressionProxy expression)
@@ -181,6 +191,7 @@ public class ModuleSubjectFactory
                                     expression);
   }
 
+  @Override
   public EdgeSubject createEdgeProxy
       (final NodeProxy source,
        final NodeProxy target,
@@ -199,11 +210,13 @@ public class ModuleSubjectFactory
                            endPoint);
   }
 
+  @Override
   public EdgeSubject createEdgeProxy()
   {
     return new EdgeSubject();
   }
 
+  @Override
   public EnumSetExpressionSubject createEnumSetExpressionProxy
       (final String plainText,
        final Collection<? extends SimpleIdentifierProxy> items)
@@ -212,12 +225,14 @@ public class ModuleSubjectFactory
                                         items);
   }
 
+  @Override
   public EnumSetExpressionSubject createEnumSetExpressionProxy
       (final Collection<? extends SimpleIdentifierProxy> items)
   {
     return new EnumSetExpressionSubject(items);
   }
 
+  @Override
   public EventAliasSubject createEventAliasProxy
       (final IdentifierProxy identifier,
        final ExpressionProxy expression)
@@ -226,6 +241,7 @@ public class ModuleSubjectFactory
                                  expression);
   }
 
+  @Override
   public EventDeclSubject createEventDeclProxy
       (final IdentifierProxy identifier,
        final EventKind kind,
@@ -244,6 +260,7 @@ public class ModuleSubjectFactory
                                 attributes);
   }
 
+  @Override
   public EventDeclSubject createEventDeclProxy
       (final IdentifierProxy identifier,
        final EventKind kind)
@@ -252,6 +269,7 @@ public class ModuleSubjectFactory
                                 kind);
   }
 
+  @Override
   public ForeachSubject createForeachProxy
       (final Collection<? extends Proxy> body,
        final String name,
@@ -262,6 +280,7 @@ public class ModuleSubjectFactory
                               range);
   }
 
+  @Override
   public ForeachSubject createForeachProxy
       (final String name,
        final SimpleExpressionProxy range)
@@ -270,6 +289,7 @@ public class ModuleSubjectFactory
                               range);
   }
 
+  @Override
   public FunctionCallExpressionSubject createFunctionCallExpressionProxy
       (final String plainText,
        final String functionName,
@@ -280,6 +300,7 @@ public class ModuleSubjectFactory
                                              arguments);
   }
 
+  @Override
   public FunctionCallExpressionSubject createFunctionCallExpressionProxy
       (final String functionName,
        final Collection<? extends SimpleExpressionProxy> arguments)
@@ -288,6 +309,7 @@ public class ModuleSubjectFactory
                                              arguments);
   }
 
+  @Override
   public GraphSubject createGraphProxy
       (final boolean deterministic,
        final LabelBlockProxy blockedEvents,
@@ -300,11 +322,13 @@ public class ModuleSubjectFactory
                             edges);
   }
 
+  @Override
   public GraphSubject createGraphProxy()
   {
     return new GraphSubject();
   }
 
+  @Override
   public GroupNodeSubject createGroupNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
@@ -319,12 +343,14 @@ public class ModuleSubjectFactory
                                 geometry);
   }
 
+  @Override
   public GroupNodeSubject createGroupNodeProxy
       (final String name)
   {
     return new GroupNodeSubject(name);
   }
 
+  @Override
   public GuardActionBlockSubject createGuardActionBlockProxy
       (final Collection<? extends SimpleExpressionProxy> guards,
        final Collection<? extends BinaryExpressionProxy> actions,
@@ -335,11 +361,13 @@ public class ModuleSubjectFactory
                                        geometry);
   }
 
+  @Override
   public GuardActionBlockSubject createGuardActionBlockProxy()
   {
     return new GuardActionBlockSubject();
   }
 
+  @Override
   public IndexedIdentifierSubject createIndexedIdentifierProxy
       (final String plainText,
        final String name,
@@ -350,6 +378,7 @@ public class ModuleSubjectFactory
                                         indexes);
   }
 
+  @Override
   public IndexedIdentifierSubject createIndexedIdentifierProxy
       (final String name,
        final Collection<? extends SimpleExpressionProxy> indexes)
@@ -358,6 +387,7 @@ public class ModuleSubjectFactory
                                         indexes);
   }
 
+  @Override
   public InstanceSubject createInstanceProxy
       (final IdentifierProxy identifier,
        final String moduleName,
@@ -368,6 +398,7 @@ public class ModuleSubjectFactory
                                bindingList);
   }
 
+  @Override
   public InstanceSubject createInstanceProxy
       (final IdentifierProxy identifier,
        final String moduleName)
@@ -376,6 +407,7 @@ public class ModuleSubjectFactory
                                moduleName);
   }
 
+  @Override
   public IntConstantSubject createIntConstantProxy
       (final String plainText,
        final int value)
@@ -384,12 +416,14 @@ public class ModuleSubjectFactory
                                   value);
   }
 
+  @Override
   public IntConstantSubject createIntConstantProxy
       (final int value)
   {
     return new IntConstantSubject(value);
   }
 
+  @Override
   public LabelBlockSubject createLabelBlockProxy
       (final Collection<? extends Proxy> eventIdentifierList,
        final LabelGeometryProxy geometry)
@@ -398,11 +432,13 @@ public class ModuleSubjectFactory
                                  geometry);
   }
 
+  @Override
   public LabelBlockSubject createLabelBlockProxy()
   {
     return new LabelBlockSubject();
   }
 
+  @Override
   public LabelGeometrySubject createLabelGeometryProxy
       (final Point2D offset,
        final AnchorPosition anchor)
@@ -411,12 +447,14 @@ public class ModuleSubjectFactory
                                     anchor);
   }
 
+  @Override
   public LabelGeometrySubject createLabelGeometryProxy
       (final Point2D offset)
   {
     return new LabelGeometrySubject(offset);
   }
 
+  @Override
   public ModuleSubject createModuleProxy
       (final String name,
        final String comment,
@@ -435,6 +473,7 @@ public class ModuleSubjectFactory
                              componentList);
   }
 
+  @Override
   public ModuleSubject createModuleProxy
       (final String name,
        final URI location)
@@ -443,6 +482,7 @@ public class ModuleSubjectFactory
                              location);
   }
 
+  @Override
   public ModuleSequenceSubject createModuleSequenceProxy
       (final String name,
        final String comment,
@@ -455,6 +495,7 @@ public class ModuleSubjectFactory
                                      modules);
   }
 
+  @Override
   public ModuleSequenceSubject createModuleSequenceProxy
       (final String name,
        final URI location)
@@ -463,6 +504,7 @@ public class ModuleSubjectFactory
                                      location);
   }
 
+  @Override
   public ParameterBindingSubject createParameterBindingProxy
       (final String name,
        final ExpressionProxy expression)
@@ -471,23 +513,27 @@ public class ModuleSubjectFactory
                                        expression);
   }
 
+  @Override
   public PlainEventListSubject createPlainEventListProxy
       (final Collection<? extends Proxy> eventIdentifierList)
   {
     return new PlainEventListSubject(eventIdentifierList);
   }
 
+  @Override
   public PlainEventListSubject createPlainEventListProxy()
   {
     return new PlainEventListSubject();
   }
 
+  @Override
   public PointGeometrySubject createPointGeometryProxy
       (final Point2D point)
   {
     return new PointGeometrySubject(point);
   }
 
+  @Override
   public QualifiedIdentifierSubject createQualifiedIdentifierProxy
       (final String plainText,
        final IdentifierProxy baseIdentifier,
@@ -498,6 +544,7 @@ public class ModuleSubjectFactory
                                           componentIdentifier);
   }
 
+  @Override
   public QualifiedIdentifierSubject createQualifiedIdentifierProxy
       (final IdentifierProxy baseIdentifier,
        final IdentifierProxy componentIdentifier)
@@ -506,6 +553,7 @@ public class ModuleSubjectFactory
                                           componentIdentifier);
   }
 
+  @Override
   public SimpleComponentSubject createSimpleComponentProxy
       (final IdentifierProxy identifier,
        final ComponentKind kind,
@@ -518,6 +566,7 @@ public class ModuleSubjectFactory
                                       attributes);
   }
 
+  @Override
   public SimpleComponentSubject createSimpleComponentProxy
       (final IdentifierProxy identifier,
        final ComponentKind kind,
@@ -528,6 +577,7 @@ public class ModuleSubjectFactory
                                       graph);
   }
 
+  @Override
   public SimpleIdentifierSubject createSimpleIdentifierProxy
       (final String plainText,
        final String name)
@@ -536,12 +586,14 @@ public class ModuleSubjectFactory
                                        name);
   }
 
+  @Override
   public SimpleIdentifierSubject createSimpleIdentifierProxy
       (final String name)
   {
     return new SimpleIdentifierSubject(name);
   }
 
+  @Override
   public SimpleNodeSubject createSimpleNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
@@ -560,12 +612,14 @@ public class ModuleSubjectFactory
                                  labelGeometry);
   }
 
+  @Override
   public SimpleNodeSubject createSimpleNodeProxy
       (final String name)
   {
     return new SimpleNodeSubject(name);
   }
 
+  @Override
   public SplineGeometrySubject createSplineGeometryProxy
       (final Collection<? extends Point2D> points,
        final SplineKind kind)
@@ -574,11 +628,13 @@ public class ModuleSubjectFactory
                                      kind);
   }
 
+  @Override
   public SplineGeometrySubject createSplineGeometryProxy()
   {
     return new SplineGeometrySubject();
   }
 
+  @Override
   public UnaryExpressionSubject createUnaryExpressionProxy
       (final String plainText,
        final UnaryOperator operator,
@@ -589,6 +645,7 @@ public class ModuleSubjectFactory
                                       subTerm);
   }
 
+  @Override
   public UnaryExpressionSubject createUnaryExpressionProxy
       (final UnaryOperator operator,
        final SimpleExpressionProxy subTerm)
@@ -597,18 +654,22 @@ public class ModuleSubjectFactory
                                       subTerm);
   }
 
+  @Override
   public VariableComponentSubject createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
        final SimpleExpressionProxy initialStatePredicate,
-       final Collection<? extends VariableMarkingProxy> variableMarkings)
+       final Collection<? extends VariableMarkingProxy> variableMarkings,
+       final boolean isInput)
   {
     return new VariableComponentSubject(identifier,
                                         type,
                                         initialStatePredicate,
-                                        variableMarkings);
+                                        variableMarkings,
+                                        isInput);
   }
 
+  @Override
   public VariableComponentSubject createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
@@ -619,6 +680,7 @@ public class ModuleSubjectFactory
                                         initialStatePredicate);
   }
 
+  @Override
   public VariableMarkingSubject createVariableMarkingProxy
       (final IdentifierProxy proposition,
        final SimpleExpressionProxy predicate)

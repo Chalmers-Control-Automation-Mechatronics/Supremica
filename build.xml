@@ -55,6 +55,7 @@
     <path id="other.jars.classpath">
         <pathelement location="${dist}/${log4j2.api.jar}"/>
         <pathelement location="${dist}/${log4j2.core.jar}"/>
+    	<pathelement location="${dist}/luaj-jse-3.0.1.jar"/>
     </path>
     
     <path id="supremica.classpath">
@@ -282,6 +283,7 @@
         </jar>
     <copy file="${lib}/${log4j2.api.jar}" todir="${dist}"/>
     <copy file="${lib}/${log4j2.core.jar}" todir="${dist}"/>
+    <copy file="${lib}/luaj-jse-3.0.1.jar" todir="${dist}"/>
     </target>
     
     <target name="downloads_supremica">

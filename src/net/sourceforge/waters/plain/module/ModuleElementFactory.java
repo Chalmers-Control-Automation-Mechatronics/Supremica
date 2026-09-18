@@ -105,11 +105,13 @@ public class ModuleElementFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyFactory
+  @Override
   public ModuleProxyCloner getCloner()
   {
     return getCloningInstance();
   }
 
+  @Override
   public BinaryExpressionElement createBinaryExpressionProxy
       (final String plainText,
        final BinaryOperator operator,
@@ -122,6 +124,7 @@ public class ModuleElementFactory
                                        right);
   }
 
+  @Override
   public BinaryExpressionElement createBinaryExpressionProxy
       (final BinaryOperator operator,
        final SimpleExpressionProxy left,
@@ -132,23 +135,27 @@ public class ModuleElementFactory
                                        right);
   }
 
+  @Override
   public BoxGeometryElement createBoxGeometryProxy
       (final Rectangle2D rectangle)
   {
     return new BoxGeometryElement(rectangle);
   }
 
+  @Override
   public ColorGeometryElement createColorGeometryProxy
       (final Collection<? extends Color> colorSet)
   {
     return new ColorGeometryElement(colorSet);
   }
 
+  @Override
   public ColorGeometryElement createColorGeometryProxy()
   {
     return new ColorGeometryElement();
   }
 
+  @Override
   public ConditionalElement createConditionalProxy
       (final Collection<? extends Proxy> body,
        final SimpleExpressionProxy guard)
@@ -157,12 +164,14 @@ public class ModuleElementFactory
                                   guard);
   }
 
+  @Override
   public ConditionalElement createConditionalProxy
       (final SimpleExpressionProxy guard)
   {
     return new ConditionalElement(guard);
   }
 
+  @Override
   public ConstantAliasElement createConstantAliasProxy
       (final IdentifierProxy identifier,
        final ExpressionProxy expression,
@@ -173,6 +182,7 @@ public class ModuleElementFactory
                                     scope);
   }
 
+  @Override
   public ConstantAliasElement createConstantAliasProxy
       (final IdentifierProxy identifier,
        final ExpressionProxy expression)
@@ -181,6 +191,7 @@ public class ModuleElementFactory
                                     expression);
   }
 
+  @Override
   public EdgeElement createEdgeProxy
       (final NodeProxy source,
        final NodeProxy target,
@@ -199,11 +210,13 @@ public class ModuleElementFactory
                            endPoint);
   }
 
+  @Override
   public EdgeElement createEdgeProxy()
   {
     return new EdgeElement();
   }
 
+  @Override
   public EnumSetExpressionElement createEnumSetExpressionProxy
       (final String plainText,
        final Collection<? extends SimpleIdentifierProxy> items)
@@ -212,12 +225,14 @@ public class ModuleElementFactory
                                         items);
   }
 
+  @Override
   public EnumSetExpressionElement createEnumSetExpressionProxy
       (final Collection<? extends SimpleIdentifierProxy> items)
   {
     return new EnumSetExpressionElement(items);
   }
 
+  @Override
   public EventAliasElement createEventAliasProxy
       (final IdentifierProxy identifier,
        final ExpressionProxy expression)
@@ -226,6 +241,7 @@ public class ModuleElementFactory
                                  expression);
   }
 
+  @Override
   public EventDeclElement createEventDeclProxy
       (final IdentifierProxy identifier,
        final EventKind kind,
@@ -244,6 +260,7 @@ public class ModuleElementFactory
                                 attributes);
   }
 
+  @Override
   public EventDeclElement createEventDeclProxy
       (final IdentifierProxy identifier,
        final EventKind kind)
@@ -252,6 +269,7 @@ public class ModuleElementFactory
                                 kind);
   }
 
+  @Override
   public ForeachElement createForeachProxy
       (final Collection<? extends Proxy> body,
        final String name,
@@ -262,6 +280,7 @@ public class ModuleElementFactory
                               range);
   }
 
+  @Override
   public ForeachElement createForeachProxy
       (final String name,
        final SimpleExpressionProxy range)
@@ -270,6 +289,7 @@ public class ModuleElementFactory
                               range);
   }
 
+  @Override
   public FunctionCallExpressionElement createFunctionCallExpressionProxy
       (final String plainText,
        final String functionName,
@@ -280,6 +300,7 @@ public class ModuleElementFactory
                                              arguments);
   }
 
+  @Override
   public FunctionCallExpressionElement createFunctionCallExpressionProxy
       (final String functionName,
        final Collection<? extends SimpleExpressionProxy> arguments)
@@ -288,6 +309,7 @@ public class ModuleElementFactory
                                              arguments);
   }
 
+  @Override
   public GraphElement createGraphProxy
       (final boolean deterministic,
        final LabelBlockProxy blockedEvents,
@@ -300,11 +322,13 @@ public class ModuleElementFactory
                             edges);
   }
 
+  @Override
   public GraphElement createGraphProxy()
   {
     return new GraphElement();
   }
 
+  @Override
   public GroupNodeElement createGroupNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
@@ -319,12 +343,14 @@ public class ModuleElementFactory
                                 geometry);
   }
 
+  @Override
   public GroupNodeElement createGroupNodeProxy
       (final String name)
   {
     return new GroupNodeElement(name);
   }
 
+  @Override
   public GuardActionBlockElement createGuardActionBlockProxy
       (final Collection<? extends SimpleExpressionProxy> guards,
        final Collection<? extends BinaryExpressionProxy> actions,
@@ -335,11 +361,13 @@ public class ModuleElementFactory
                                        geometry);
   }
 
+  @Override
   public GuardActionBlockElement createGuardActionBlockProxy()
   {
     return new GuardActionBlockElement();
   }
 
+  @Override
   public IndexedIdentifierElement createIndexedIdentifierProxy
       (final String plainText,
        final String name,
@@ -350,6 +378,7 @@ public class ModuleElementFactory
                                         indexes);
   }
 
+  @Override
   public IndexedIdentifierElement createIndexedIdentifierProxy
       (final String name,
        final Collection<? extends SimpleExpressionProxy> indexes)
@@ -358,6 +387,7 @@ public class ModuleElementFactory
                                         indexes);
   }
 
+  @Override
   public InstanceElement createInstanceProxy
       (final IdentifierProxy identifier,
        final String moduleName,
@@ -368,6 +398,7 @@ public class ModuleElementFactory
                                bindingList);
   }
 
+  @Override
   public InstanceElement createInstanceProxy
       (final IdentifierProxy identifier,
        final String moduleName)
@@ -376,6 +407,7 @@ public class ModuleElementFactory
                                moduleName);
   }
 
+  @Override
   public IntConstantElement createIntConstantProxy
       (final String plainText,
        final int value)
@@ -384,12 +416,14 @@ public class ModuleElementFactory
                                   value);
   }
 
+  @Override
   public IntConstantElement createIntConstantProxy
       (final int value)
   {
     return new IntConstantElement(value);
   }
 
+  @Override
   public LabelBlockElement createLabelBlockProxy
       (final Collection<? extends Proxy> eventIdentifierList,
        final LabelGeometryProxy geometry)
@@ -398,11 +432,13 @@ public class ModuleElementFactory
                                  geometry);
   }
 
+  @Override
   public LabelBlockElement createLabelBlockProxy()
   {
     return new LabelBlockElement();
   }
 
+  @Override
   public LabelGeometryElement createLabelGeometryProxy
       (final Point2D offset,
        final AnchorPosition anchor)
@@ -411,12 +447,14 @@ public class ModuleElementFactory
                                     anchor);
   }
 
+  @Override
   public LabelGeometryElement createLabelGeometryProxy
       (final Point2D offset)
   {
     return new LabelGeometryElement(offset);
   }
 
+  @Override
   public ModuleElement createModuleProxy
       (final String name,
        final String comment,
@@ -435,6 +473,7 @@ public class ModuleElementFactory
                              componentList);
   }
 
+  @Override
   public ModuleElement createModuleProxy
       (final String name,
        final URI location)
@@ -443,6 +482,7 @@ public class ModuleElementFactory
                              location);
   }
 
+  @Override
   public ModuleSequenceElement createModuleSequenceProxy
       (final String name,
        final String comment,
@@ -455,6 +495,7 @@ public class ModuleElementFactory
                                      modules);
   }
 
+  @Override
   public ModuleSequenceElement createModuleSequenceProxy
       (final String name,
        final URI location)
@@ -463,6 +504,7 @@ public class ModuleElementFactory
                                      location);
   }
 
+  @Override
   public ParameterBindingElement createParameterBindingProxy
       (final String name,
        final ExpressionProxy expression)
@@ -471,23 +513,27 @@ public class ModuleElementFactory
                                        expression);
   }
 
+  @Override
   public PlainEventListElement createPlainEventListProxy
       (final Collection<? extends Proxy> eventIdentifierList)
   {
     return new PlainEventListElement(eventIdentifierList);
   }
 
+  @Override
   public PlainEventListElement createPlainEventListProxy()
   {
     return new PlainEventListElement();
   }
 
+  @Override
   public PointGeometryElement createPointGeometryProxy
       (final Point2D point)
   {
     return new PointGeometryElement(point);
   }
 
+  @Override
   public QualifiedIdentifierElement createQualifiedIdentifierProxy
       (final String plainText,
        final IdentifierProxy baseIdentifier,
@@ -498,6 +544,7 @@ public class ModuleElementFactory
                                           componentIdentifier);
   }
 
+  @Override
   public QualifiedIdentifierElement createQualifiedIdentifierProxy
       (final IdentifierProxy baseIdentifier,
        final IdentifierProxy componentIdentifier)
@@ -506,6 +553,7 @@ public class ModuleElementFactory
                                           componentIdentifier);
   }
 
+  @Override
   public SimpleComponentElement createSimpleComponentProxy
       (final IdentifierProxy identifier,
        final ComponentKind kind,
@@ -518,6 +566,7 @@ public class ModuleElementFactory
                                       attributes);
   }
 
+  @Override
   public SimpleComponentElement createSimpleComponentProxy
       (final IdentifierProxy identifier,
        final ComponentKind kind,
@@ -528,6 +577,7 @@ public class ModuleElementFactory
                                       graph);
   }
 
+  @Override
   public SimpleIdentifierElement createSimpleIdentifierProxy
       (final String plainText,
        final String name)
@@ -536,12 +586,14 @@ public class ModuleElementFactory
                                        name);
   }
 
+  @Override
   public SimpleIdentifierElement createSimpleIdentifierProxy
       (final String name)
   {
     return new SimpleIdentifierElement(name);
   }
 
+  @Override
   public SimpleNodeElement createSimpleNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
@@ -560,12 +612,14 @@ public class ModuleElementFactory
                                  labelGeometry);
   }
 
+  @Override
   public SimpleNodeElement createSimpleNodeProxy
       (final String name)
   {
     return new SimpleNodeElement(name);
   }
 
+  @Override
   public SplineGeometryElement createSplineGeometryProxy
       (final Collection<? extends Point2D> points,
        final SplineKind kind)
@@ -574,11 +628,13 @@ public class ModuleElementFactory
                                      kind);
   }
 
+  @Override
   public SplineGeometryElement createSplineGeometryProxy()
   {
     return new SplineGeometryElement();
   }
 
+  @Override
   public UnaryExpressionElement createUnaryExpressionProxy
       (final String plainText,
        final UnaryOperator operator,
@@ -589,6 +645,7 @@ public class ModuleElementFactory
                                       subTerm);
   }
 
+  @Override
   public UnaryExpressionElement createUnaryExpressionProxy
       (final UnaryOperator operator,
        final SimpleExpressionProxy subTerm)
@@ -597,18 +654,22 @@ public class ModuleElementFactory
                                       subTerm);
   }
 
+  @Override
   public VariableComponentElement createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
        final SimpleExpressionProxy initialStatePredicate,
-       final Collection<? extends VariableMarkingProxy> variableMarkings)
+       final Collection<? extends VariableMarkingProxy> variableMarkings,
+       final boolean isInput)
   {
     return new VariableComponentElement(identifier,
                                         type,
                                         initialStatePredicate,
-                                        variableMarkings);
+                                        variableMarkings,
+                                        isInput);
   }
 
+  @Override
   public VariableComponentElement createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
@@ -616,9 +677,12 @@ public class ModuleElementFactory
   {
     return new VariableComponentElement(identifier,
                                         type,
-                                        initialStatePredicate);
+                                        initialStatePredicate,
+                                        null,
+                                        false);
   }
 
+  @Override
   public VariableMarkingElement createVariableMarkingProxy
       (final IdentifierProxy proposition,
        final SimpleExpressionProxy predicate)

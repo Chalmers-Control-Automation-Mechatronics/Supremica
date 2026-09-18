@@ -37,6 +37,7 @@
 package net.sourceforge.waters.model.module;
 
 import gnu.trove.set.hash.THashSet;
+
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -86,7 +87,7 @@ public class ModuleProxyCloner
    * @param  factory  The factory used to create cloned objects.
    * @param  geo      Whether cloned objects retain geometry information.
    */
-  public ModuleProxyCloner(final ModuleProxyFactory factory, boolean geo)
+  public ModuleProxyCloner(final ModuleProxyFactory factory, final boolean geo)
   {
     mFactory = factory;
     mCloningGeometry = geo;
@@ -96,6 +97,7 @@ public class ModuleProxyCloner
 
   //#########################################################################
   //# Invocation
+  @Override
   public Proxy getClone(final Proxy proxy)
   {
     if (proxy == null) {
@@ -109,6 +111,7 @@ public class ModuleProxyCloner
     }
   }
 
+  @Override
   public <P extends Proxy>
   List<P> getClonedList(final Collection<? extends P> collection)
   {
@@ -124,6 +127,7 @@ public class ModuleProxyCloner
     return cast;
   }
 
+  @Override
   public <P extends Proxy>
   Set<P> getClonedSet(final Collection<? extends P> collection)
   {
@@ -142,7 +146,7 @@ public class ModuleProxyCloner
   /**
    * Creates a clone of the given graph using two factories.
    * This methods creates a clone of a graph's nodes and edges using
-   * the standard factory of this cloner, then creates a new graph 
+   * the standard factory of this cloner, then creates a new graph
    * using another factory given as an argument.
    * @param  proxy    The graph to be duplicated.
    * @param  factory  The factory used to create the new graph.
@@ -785,10 +789,12 @@ public class ModuleProxyCloner
       proxy.getVariableMarkings();
     final Collection<VariableMarkingProxy> variableMarkings =
       cloneProxyCollection(variableMarkings0);
+    final boolean isInput = proxy.isInput();
     return mFactory.createVariableComponentProxy(identifier,
                                                  type,
                                                  initialStatePredicate,
-                                                 variableMarkings);
+                                                 variableMarkings,
+                                                 isInput);
   }
 
   @Override
@@ -861,6 +867,7 @@ public class ModuleProxyCloner
     }
     final Collection<?> precast = result;
     @SuppressWarnings("unchecked")
+    final
     Collection<P> cast = (Collection<P>) precast;
     return cast;
   }

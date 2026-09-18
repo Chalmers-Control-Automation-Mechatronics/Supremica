@@ -635,6 +635,9 @@ public class StAXModuleWriter
     throws VisitorException
   {
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_VariableComponent);
+    if (var.isInput()) {
+      writeAttribute("isInput", "true");
+    }
     visitIdentifiedProxy(var);
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_VariableRange);
     var.getType().acceptVisitor(this);

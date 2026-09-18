@@ -362,6 +362,7 @@ public class UnifiedEFASystemImporter
     final SimpleExpressionProxy initialStatePredicate =
       variable.getInitialStatePredicate();
     List<VariableMarkingProxy> markings = null;
+    final boolean isInputFlag = variable.isInput();
     final SimpleExpressionProxy markedStatePredicate =
       variable.getMarkedStatePredicate();
     if (markedStatePredicate != null) {
@@ -370,10 +371,11 @@ public class UnifiedEFASystemImporter
       final VariableMarkingProxy marking =
         mFactory.createVariableMarkingProxy(markingIdent, markedStatePredicate);
       markings = Collections.singletonList(marking);
+
     }
     final VariableComponentProxy var =
       mFactory.createVariableComponentProxy
-        (identifier, type, initialStatePredicate, markings);
+        (identifier, type, initialStatePredicate, markings, isInputFlag);
     compList.add(var);
   }
 

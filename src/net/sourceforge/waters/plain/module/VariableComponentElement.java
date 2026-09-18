@@ -73,7 +73,8 @@ public final class VariableComponentElement
   public VariableComponentElement(final IdentifierProxy identifier,
                                   final SimpleExpressionProxy type,
                                   final SimpleExpressionProxy initialStatePredicate,
-                                  final Collection<? extends VariableMarkingProxy> variableMarkings)
+                                  final Collection<? extends VariableMarkingProxy> variableMarkings,
+                                  final boolean isInput)
   {
     super(identifier);
     mType = type;
@@ -86,6 +87,7 @@ public final class VariableComponentElement
       mVariableMarkings =
         Collections.unmodifiableList(variableMarkingsModifiable);
     }
+    mIsInput = isInput;
   }
 
   /**
@@ -103,7 +105,8 @@ public final class VariableComponentElement
     this(identifier,
          type,
          initialStatePredicate,
-         null);
+         null,
+         false);
   }
 
 
@@ -118,6 +121,7 @@ public final class VariableComponentElement
 
   //#########################################################################
   //# Comparing
+  @Override
   public Class<VariableComponentProxy> getProxyInterface()
   {
     return VariableComponentProxy.class;
@@ -126,6 +130,7 @@ public final class VariableComponentElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -136,19 +141,28 @@ public final class VariableComponentElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.VariableComponentProxy
+  @Override
   public SimpleExpressionProxy getType()
   {
     return mType;
   }
 
+  @Override
   public SimpleExpressionProxy getInitialStatePredicate()
   {
     return mInitialStatePredicate;
   }
 
+  @Override
   public List<VariableMarkingProxy> getVariableMarkings()
   {
     return mVariableMarkings;
+  }
+
+  @Override
+  public boolean isInput()
+  {
+    return mIsInput;
   }
 
 
@@ -157,7 +171,7 @@ public final class VariableComponentElement
   private final SimpleExpressionProxy mType;
   private final SimpleExpressionProxy mInitialStatePredicate;
   private final List<VariableMarkingProxy> mVariableMarkings;
-
+  private final boolean mIsInput;
 
   //#########################################################################
   //# Class Constants

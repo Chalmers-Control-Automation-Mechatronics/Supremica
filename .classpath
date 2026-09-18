@@ -3,7 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="waters/java/src"/>
 	<classpathentry kind="src" path="tests/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="dist/SupremicaLib.jar" sourcepath="">
 		<attributes>
 			<attribute name="javadoc_location" value="http://javabdd.sourceforge.net/apidocs/"/>
@@ -12,5 +16,32 @@
 	<classpathentry kind="lib" path="dist/Supremica.jar" sourcepath="src"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.17.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.17.1.jar"/>
+	<classpathentry kind="lib" path="lib/ant-contrib-1.0b3.jar"/>
+	<classpathentry kind="lib" path="lib/appbundler-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="lib/cplex.jar"/>
+	<classpathentry kind="lib" path="lib/fsa2sat-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/grappa.jar"/>
+	<classpathentry kind="lib" path="lib/help.jar"/>
+	<classpathentry kind="lib" path="lib/itext.jar"/>
+	<classpathentry kind="lib" path="lib/javabdd-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/javailp-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/jel.jar"/>
+	<classpathentry kind="lib" path="lib/jhall.jar"/>
+	<classpathentry kind="lib" path="lib/jlfgr-1_0.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/lpsolve55j.jar"/>
+	<classpathentry kind="lib" path="lib/luaj-jse-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/natutil.jar"/>
+	<classpathentry kind="lib" path="lib/org.sat4j.core.jar"/>
+	<classpathentry kind="lib" path="lib/org.sat4j.csp.jar"/>
+	<classpathentry kind="lib" path="lib/org.sat4j.csp.xmlparser.jar"/>
+	<classpathentry kind="lib" path="lib/org.sat4j.pb.jar"/>
+	<classpathentry kind="lib" path="lib/scenebeans.jar"/>
+	<classpathentry kind="lib" path="lib/scenebeansXmlCompability.jar"/>
+	<classpathentry kind="lib" path="lib/swixml.jar"/>
+	<classpathentry kind="lib" path="lib/trove-3.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/xmlgraphics-commons-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -86,4 +86,9 @@ public interface VariableComponentProxy extends ComponentProxy {
    */
   public List<VariableMarkingProxy> getVariableMarkings();
 
+  /**
+   * Gets whether a boolean variable is designed as input for PLC coding
+   */
+  public boolean isInput();
+
 }

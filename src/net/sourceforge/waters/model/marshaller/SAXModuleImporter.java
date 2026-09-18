@@ -2446,13 +2446,23 @@ public class SAXModuleImporter
     }
 
     @Override
+    void setAttribute(final String localName, final String value)
+      throws SAXParseException
+    {
+      if (localName.equals("isInput")) {
+        mIsInput = Boolean.parseBoolean(value);
+      } else {
+        super.setAttribute(localName, value);
+      }
+    }
+    @Override
     VariableComponentProxy getResult()
     {
       final IdentifierProxy ident = getIdentifier();
       final SimpleExpressionProxy range = mRangeHandler.getResult();
       final SimpleExpressionProxy init = mInitHandler.getResult();
       return mFactory.createVariableComponentProxy(ident, range,
-                                                   init, mMarkings);
+                                                   init, mMarkings, mIsInput);
     }
 
     //#######################################################################
@@ -2461,6 +2471,7 @@ public class SAXModuleImporter
     private SingletonHandler<SimpleExpressionProxy> mInitHandler;
     private VariableMarkingProxyHandler mMarkingHandler = null;
     private List<VariableMarkingProxy> mMarkings = null;
+    private boolean mIsInput = false;
   }
 
 
