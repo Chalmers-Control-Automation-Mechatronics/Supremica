@@ -39,7 +39,8 @@ public class ADSConverter {
         this.uri = uri;
     }
 
-    public ExtendedAutomaton getExtendedAutomaton() throws IOException{
+    public ExtendedAutomaton getExtendedAutomaton() throws IOException
+    {
         final URL mURL = uri.toURL();
         final InputStream stream = mURL.openStream();
         final Reader raw = new InputStreamReader(stream);
@@ -51,7 +52,7 @@ public class ADSConverter {
         String s = reader.readLine();
 
         // if first line is CTCT ADS, then the next line is the name
-        // if first line not CTCT ADS, then we assuem first line is the name
+        // if first line not CTCT ADS, then we assume first line is the name
         if(s.contains("CTCT ADS"))
         {
 			reader.readLine();
