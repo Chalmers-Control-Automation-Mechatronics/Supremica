@@ -967,12 +967,22 @@ public class EFSMCompiler extends AbstractAbortable
     boolean eval(final ConstraintList constraints)
       throws EvalException
     {
+      EvalException fault = null;
       for (final SimpleExpressionProxy constraint : constraints.getConstraints()) {
-        final SimpleExpressionProxy value =
-          mSimpleExpressionCompiler.eval(constraint, this);
-        if (!SimpleExpressionCompiler.getBooleanValue(value)) {
-          return false;
+        try {
+          final SimpleExpressionProxy value =
+            mSimpleExpressionCompiler.eval(constraint, this);
+          if (!SimpleExpressionCompiler.getBooleanValue(value)) {
+            return false;
+          }
+        } catch (final EvalException exception) {
+          if (fault == null) {
+            fault = exception;
+          }
         }
+      }
+      if (fault != null) {
+        throw fault;
       }
       return true;
     }

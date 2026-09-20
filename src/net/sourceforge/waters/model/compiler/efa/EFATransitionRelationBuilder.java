@@ -490,6 +490,22 @@ class EFATransitionRelationBuilder extends AbstractAbortable
       return true;
     }
 
+    boolean otherLiteralsCouldBeTrue(final BindingContext context)
+    {
+      for (final SimpleExpressionProxy literal : mOtherLiterals) {
+        try {
+          final SimpleExpressionProxy value =
+            mSimpleExpressionCompiler.eval(literal, context);
+          if (!SimpleExpressionCompiler.getBooleanValue(value)) {
+            return false;
+          }
+        } catch (final EvalException exception) {
+          // ignore
+        }
+      }
+      return true;
+    }
+
     //#######################################################################
     //# Overrides
     abstract EFAVariableTransitionRelationPart createTransitionRelationPart()
@@ -603,16 +619,18 @@ class EFATransitionRelationBuilder extends AbstractAbortable
         for (final SimpleExpressionProxy outervalue : values) {
           final BindingContext outercontext =
             new SingleBindingContext(outervar, outervalue, mContext);
-          final SimpleExpressionProxy innervalue =
-            mSimpleExpressionCompiler.eval(expr, outercontext);
-          if (range.contains(innervalue)) {
-            final BindingContext innercontext =
-              new SingleBindingContext(innervar, innervalue, outercontext);
-            if (evalOtherLiterals(innercontext)) {
-              if (forward) {
-                result.addTransition(outervalue, innervalue);
-              } else {
-                result.addTransition(innervalue, outervalue);
+          if (otherLiteralsCouldBeTrue(outercontext)) {
+            final SimpleExpressionProxy innervalue =
+              mSimpleExpressionCompiler.eval(expr, outercontext);
+            if (range.contains(innervalue)) {
+              final BindingContext innercontext =
+                new SingleBindingContext(innervar, innervalue, outercontext);
+              if (evalOtherLiterals(innercontext)) {
+                if (forward) {
+                  result.addTransition(outervalue, innervalue);
+                } else {
+                  result.addTransition(innervalue, outervalue);
+                }
               }
             }
           }

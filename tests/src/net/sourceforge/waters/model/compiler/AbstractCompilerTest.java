@@ -597,6 +597,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_divzer2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "divzer2");
+    testCompile(module);
+  }
+
   public void testCompile_dosingtankEFA()
     throws IOException, WatersException
   {
@@ -1165,6 +1172,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "bad_enum");
     compileError(module, TypeMismatchException.class, "'2'");
+  }
+
+  public void testCompile_divzer1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "divzer1");
+    compileError(module, DivisionByZeroException.class);
   }
 
   public void testCompile_error_double_prime()
