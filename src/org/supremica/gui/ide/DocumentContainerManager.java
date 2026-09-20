@@ -244,8 +244,17 @@ public class DocumentContainerManager
     return container;
   }
 
+	/* If we get a list of files, should we not add the elements
+	 * of those files to the same module? That does not happen now,
+	 * instead each element appears in a module of its own.
+	 * It would be good if the user had some control over this...
+	 */ //MF
   public boolean openContainers(final Iterable<File> files)
   {
+//	  // https://stackoverflow.com/questions/11598977/get-size-of-an-iterable-in-java
+//	  final long numfiles = files.spliterator().getExactSizeIfKnown();
+//	  System.err.println("Your are opening " + numfiles + " files");
+
     mWasCancelled = false;
     final Iterator<File> iter = files.iterator();
     while (iter.hasNext() && !mWasCancelled) {

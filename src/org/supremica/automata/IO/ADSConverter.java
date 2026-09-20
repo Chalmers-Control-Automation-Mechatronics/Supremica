@@ -47,26 +47,36 @@ public class ADSConverter {
         String name;
         final HashSet<String> markedStates = new HashSet<String>();
         final HashSet<String[]> transitions = new HashSet<String[]>();
-        String s;
-        s=reader.readLine();
-        if(!s.contains("CTCT ADS")){
-            logger.error("The file format is not CTCT ADS");
-            return null;
+//        String s;
+        String s = reader.readLine();
+
+        // if first line is CTCT ADS, then the next line is the name
+        // if first line not CTCT ADS, then we assuem first line is the name
+        if(s.contains("CTCT ADS"))
+        {
+			reader.readLine();
+			name = reader.readLine();
+		}
+        else
+        {
+			logger.warn("File is not in CTCT ADS format, assuming PiTCT format");
+			name = s;
         }
-        reader.readLine();
-        name = reader.readLine();
 
         int step = 0;
-        while((s=reader.readLine())!=null){
+        while((s=reader.readLine())!=null)
+        {
             if(s.contains("#") || s.contains(":"))
                 continue;
 
-            if(s.isEmpty()){
+            if(s.isEmpty())
+            {
                 step++;
                 continue;
             }
 
-            switch(step){
+            switch(step)
+            {
                 case 1:
                     break;
                 case 2:
@@ -94,8 +104,8 @@ public class ADSConverter {
             final String event = t[1];
             final String target = t[2];
 
-            isInitial = (Integer.parseInt(source) == 0)?true:false;
-            isMark = (markedStates.contains(source))?true:false;
+            isInitial = (Integer.parseInt(source) == 0) ? true : false;
+            isMark = (markedStates.contains(source)) ? true : false;
             ex.addState(source, isMark, isInitial, false);
 
             isInitial = (Integer.parseInt(target) == 0)?true:false;

@@ -17,10 +17,10 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 
 /**
- * ADSConverter class to import ADS files. This original ADSUnmarshaller class 
- * is replace with this since the former doesn't work for most of the files! 
+ * ADSConverter class to import ADS files. This original ADSUnmarshaller class
+ * is replace with this since the former doesn't work for most of the files!
  * If one fixes the original class then this can be ignored.
- * 
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
@@ -34,7 +34,9 @@ public class ADSUnmarshaller2 implements ProxyUnmarshaller<ModuleProxy>{
         this.manager = null;
     }
 
-    public ModuleProxy unmarshal(URI uri) throws WatersUnmarshalException, IOException {
+    public ModuleProxy unmarshal(URI uri) throws WatersUnmarshalException, IOException
+    {
+		System.err.println(uri);
         String file = uri.toURL().getFile();
         String name = file.substring(file.lastIndexOf('/')+1, file.lastIndexOf('.'));
         module = new ModuleSubject(name, uri);
@@ -69,5 +71,5 @@ public class ADSUnmarshaller2 implements ProxyUnmarshaller<ModuleProxy>{
     public void setDocumentManager(DocumentManager manager) {
         this.manager = manager;
     }
-    
+
 }
