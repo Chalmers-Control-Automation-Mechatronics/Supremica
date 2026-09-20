@@ -169,7 +169,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
         identifierNameToProxy = new HashMap<String,ConstantAliasProxy>();
 
-        logger.debug("ExtendedAutomata() init");
+        // logger.debug("ExtendedAutomata() init");
     }
 
     public ExtendedAutomata(final String name) {

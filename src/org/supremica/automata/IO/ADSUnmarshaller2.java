@@ -36,7 +36,6 @@ public class ADSUnmarshaller2 implements ProxyUnmarshaller<ModuleProxy>{
 
     public ModuleProxy unmarshal(URI uri) throws WatersUnmarshalException, IOException
     {
-		System.err.println(uri);
         String file = uri.toURL().getFile();
         String name = file.substring(file.lastIndexOf('/')+1, file.lastIndexOf('.'));
         module = new ModuleSubject(name, uri);
