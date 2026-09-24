@@ -56,6 +56,7 @@ import org.supremica.automata.IO.AutomataToSTS;
 import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomatonToDsx;
+import org.supremica.automata.IO.AutomatonToADS;
 import org.supremica.automata.IO.AutomatonToFSM;
 import org.supremica.automata.IO.AutomataToSMV;
 import org.supremica.automata.IO.FileFormats;
@@ -215,6 +216,28 @@ public class AnalyzerExportAction
             return;
         }
 
+		// PiTCT .ads format, output to debug view
+		if (exportMode == ExportFormat.ADS_DEBUG)
+		{
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
+            autIt.hasNext(); )
+            {
+                final Automaton currAutomaton = autIt.next();
+                final AutomatonToADS exporter = new AutomatonToADS(currAutomaton);
+                final TextFrame textframe = new TextFrame("ADS debug output");
+
+                try
+                {
+                    exporter.serialize(textframe.getPrintWriter());
+                }
+                catch (final Exception ex)
+                {
+                    logger.debug(ex.getStackTrace());
+                }
+            }
+            return;
+		}
+
         if (exportMode == ExportFormat.FSM_DEBUG)
         {
             for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
@@ -251,10 +274,10 @@ public class AnalyzerExportAction
 			{
 				logger.debug(ex.getStackTrace());
 			}
-			
-            return;			
+
+            return;
 		}
-		
+
         if (exportMode == ExportFormat.PCG_DEBUG)
         {
             final AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
@@ -328,9 +351,10 @@ public class AnalyzerExportAction
                                                 return;
                                                 }
                  */
-		
+
 		// These modes export automata to individual files, one for each automaton
-        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || 
+        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) ||
+        	(exportMode == ExportFormat.ADS) ||
 			(exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
         {
             for (final Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -457,6 +481,11 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.DSX);
         }
+        else if (exportMode == ExportFormat.ADS)
+        {
+			// fileExporter = FileDialogs.getExportFileChooser(FileFormats.ADS);
+			fileExporter = FileDialogs.getADSFileExporter(currAutomaton.getName());
+		}
         else if (exportMode == ExportFormat.FSM)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
@@ -475,7 +504,7 @@ public class AnalyzerExportAction
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
         }
   */
-	
+
         else
         {
             return;
@@ -511,6 +540,11 @@ public class AnalyzerExportAction
                             final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
+                        else if (exportMode == ExportFormat.ADS)
+                        {
+                            final AutomatonToADS exporter = new AutomatonToADS(currAutomaton);
+                            exporter.serialize(currFile.getAbsolutePath());
+						}
                         else if (exportMode == ExportFormat.FSM)
                         {
                             final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
@@ -528,7 +562,7 @@ public class AnalyzerExportAction
                             final Automata currAutomata = new Automata();
                             currAutomata.addAutomaton(currAutomaton);
                             final AutomataToSMV exporter = new AutomataToSMV(currAutomata);
-                            exporter.serialize(currFile.getAbsolutePath());							
+                            exporter.serialize(currFile.getAbsolutePath());
 						}
 /*
                         else if (exportMode == ExportFormat.SP)

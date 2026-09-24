@@ -67,6 +67,7 @@ public class FileFormats
 	// Output only
 	public static final FileFormats RCP = new FileFormats(false, true, "RCP", ".rcp", "RCP files (*.rcp)");
 	public static final FileFormats DSX = new FileFormats(false, true, "DSX", ".dsx", "Desco files (*.dsx)");
+	public static final FileFormats ADS = new FileFormats(false, true, "ADS", ".ads", "PiTCT files (*.ads)");
 	public static final FileFormats SMC = new FileFormats(false, true, "SMC", ".sm", "SMC files (*.sm)");
 	public static final FileFormats DOT = new FileFormats(false, true, "DOT", ".dot", "Graphviz files (*.dot)");
 	public static final FileFormats EPS = new FileFormats(false, true, "EPS", ".eps", "Encapsulated Postscript (*.eps)");
