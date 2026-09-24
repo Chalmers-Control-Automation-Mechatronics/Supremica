@@ -74,6 +74,7 @@ public class FileDialogs
     private FileFilter hybFilter = null;
     private FileFilter hiscFilter = null;
     private FileFilter dsxFilter = null;
+    private FileFilter adsFilter = null;
 	private FileFilter smvFilter = null;
     @SuppressWarnings("unused")
     private final FileFilter smcFilter = null;
@@ -303,6 +304,18 @@ public class FileDialogs
 
         return fileExporter;
     }
+
+	// Different from the other getXXXFileExporter, this one *is* used
+	public static JFileChooser getADSFileExporter(final String automatonName)
+	{
+		final JFileChooser fileExporter = fd.getFileExporter();
+
+        fileExporter.resetChoosableFileFilters();
+        fileExporter.setFileFilter(fd.getADSFilter());
+		fileExporter.setSelectedFile(new java.io.File(automatonName + ".ads"));
+
+        return fileExporter;
+	}
 
     public static JFileChooser getDOTFileExporter()
     {
@@ -628,6 +641,16 @@ public class FileDialogs
 
         return dsxFilter;
     }
+
+	private FileFilter getADSFilter()
+	{
+        if (this.adsFilter == null)
+        {
+            this.adsFilter = makeFileFilter(".ads", "PiTCT files (*.ads)");
+        }
+
+        return this.adsFilter;
+	}
 
     private FileFilter getDOTFilter()
     {

@@ -50,6 +50,7 @@ public class ExportDialog
     private static final String spString = "sp";
 	private static final String dotString = "dot";
 	private static final String dsxString = "dsx";
+	private static final String adsString = "ads";
 	private static final String htmlString = "html";
 	private static final String fsmString = "fsm";
 	private static final String pcgString = "pcg";
@@ -57,15 +58,16 @@ public class ExportDialog
     private static final String stsString = "sts";
 	private static final String smcString = "smc";
 	private static final String smvString = "smv";	// The NuSMV model checker format
-	private static final Object[] possibleValues = { xmlString, // spString,
-	dotString, dsxString,
-	fsmString,
-	htmlString,
-	pcgString,
-	sspcString,
-    stsString,
-	smcString,
-	smvString,
+	private static final Object[] possibleValues = {
+		xmlString, // spString,
+		dotString, dsxString, adsString,
+		fsmString,
+		htmlString,
+		pcgString,
+		sspcString,
+		stsString,
+		smcString,
+		smvString,
 	};
 	private JOptionPane pane = null;
 	private JDialog dialog = null;
@@ -144,6 +146,15 @@ public class ExportDialog
 			}
 
 			return ExportFormat.DSX;    // Should return a DsxExporter object
+		}
+		else if (selectedValue == adsString)
+		{
+			if (checkbox.isSelected())
+			{
+				return ExportFormat.ADS_DEBUG;
+			}
+
+			return ExportFormat.ADS;    // Should return a AdsExporter object
 		}
 		else if (selectedValue == fsmString)
 		{
