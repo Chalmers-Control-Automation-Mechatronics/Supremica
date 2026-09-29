@@ -308,13 +308,13 @@ public class FileDialogs
 	// Different from the other getXXXFileExporter, this one *is* used
 	public static JFileChooser getADSFileExporter(final String automatonName)
 	{
-		final JFileChooser fileExporter = fd.getFileExporter();
+		final JFileChooser fileChooser = fd.getFileExporter();
 
-        fileExporter.resetChoosableFileFilters();
-        fileExporter.setFileFilter(fd.getADSFilter());
-		fileExporter.setSelectedFile(new java.io.File(automatonName + ".ads"));
+        fileChooser.resetChoosableFileFilters();
+        fileChooser.setFileFilter(fd.getADSFilter());
+		fileChooser.setSelectedFile(new java.io.File(automatonName + ".ads"));
 
-        return fileExporter;
+        return fileChooser;
 	}
 
     public static JFileChooser getDOTFileExporter()

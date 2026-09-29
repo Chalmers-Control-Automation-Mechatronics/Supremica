@@ -219,11 +219,12 @@ public class AnalyzerExportAction
 		// PiTCT .ads format, output to debug view
 		if (exportMode == ExportFormat.ADS_DEBUG)
 		{
+			boolean reset = true;
             for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
-            autIt.hasNext(); )
+            	autIt.hasNext(); )
             {
                 final Automaton currAutomaton = autIt.next();
-                final AutomatonToADS exporter = new AutomatonToADS(currAutomaton);
+                final AutomatonToADS exporter = new AutomatonToADS(currAutomaton, reset);
                 final TextFrame textframe = new TextFrame("ADS debug output");
 
                 try
@@ -234,6 +235,7 @@ public class AnalyzerExportAction
                 {
                     logger.debug(ex.getStackTrace());
                 }
+                reset = false;
             }
             return;
 		}
@@ -354,7 +356,6 @@ public class AnalyzerExportAction
 
 		// These modes export automata to individual files, one for each automaton
         if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) ||
-        	(exportMode == ExportFormat.ADS) ||
 			(exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
         {
             for (final Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -363,6 +364,63 @@ public class AnalyzerExportAction
                 automatonExport(exportMode, currAutomaton);
             }
         }
+        // .ads gets special treatment, since with multiple automata selected, same-labeled events
+        // must have the same index in all files (this is managed by the reset argument to AutomatonToADS)
+        else if(exportMode == ExportFormat.ADS)
+        {
+			boolean reset = true;
+			for (final Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+            {
+				final Automaton currAutomaton = autIt.next();
+				JFileChooser fileChooser = FileDialogs.getADSFileExporter(currAutomaton.getName());
+				fileChooser.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
+
+				// Some vibe coding to distinguish between Cancel and Close
+				final boolean[] cancelClicked = { false };
+		        // 1. Listen for the internal Cancel button action
+		        fileChooser.addActionListener(new java.awt.event.ActionListener()
+		        {
+					// @Override
+					public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+						if (JFileChooser.CANCEL_SELECTION.equals(e.getActionCommand()))
+						{
+							cancelClicked[0] = true;
+						}
+					}
+        		});
+				// End of vide coding
+
+				if (fileChooser.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
+				{
+					final File currFile = fileChooser.getSelectedFile();
+					if (currFile != null && !currFile.isDirectory())
+					{
+						try
+						{
+							final AutomatonToADS exporter = new AutomatonToADS(currAutomaton, reset);
+							exporter.serialize(currFile.getAbsolutePath());
+							reset = false;
+						}
+						catch (final Exception ex)
+						{
+							logger.error("Exception while exporting (as .ads) " + currFile.getAbsolutePath(), ex);
+							logger.debug(ex.getStackTrace());
+						}
+					}
+				}
+				else // Cancel or Closed was clicked, act accordingly
+				{
+					if(!cancelClicked[0]) // then it was Close, abort the rest
+					{
+						return;
+					}
+				}
+				// The above JFileChooser now distinguis between clicking Cancel, which skips the current save,
+				// and Close, which aborts the whole save process skipping teh rest of the saves
+			}
+			return;
+		}
         else	// These modes export whole projects, one or more automata in a single file
         {
             JFileChooser fileExporter = null;
@@ -481,11 +539,12 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.DSX);
         }
-        else if (exportMode == ExportFormat.ADS)
+/*        else if (exportMode == ExportFormat.ADS)
         {
 			// fileExporter = FileDialogs.getExportFileChooser(FileFormats.ADS);
 			fileExporter = FileDialogs.getADSFileExporter(currAutomaton.getName());
 		}
+*/
         else if (exportMode == ExportFormat.FSM)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
@@ -540,11 +599,13 @@ public class AnalyzerExportAction
                             final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
-                        else if (exportMode == ExportFormat.ADS)
+/*
+						else if (exportMode == ExportFormat.ADS)
                         {
-                            final AutomatonToADS exporter = new AutomatonToADS(currAutomaton);
+                            final AutomatonToADS exporter = new AutomatonToADS(currAutomaton, true);
                             exporter.serialize(currFile.getAbsolutePath());
 						}
+*/
                         else if (exportMode == ExportFormat.FSM)
                         {
                             final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
