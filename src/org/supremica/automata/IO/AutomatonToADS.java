@@ -1,6 +1,6 @@
 /******************* AutomatonToADS.java **********************
  * Conversion from Supremica format to PiTCT .ads format
- * Called from AnalyzerExportAction
+ * Called from AutomataToADS
  */
 package org.supremica.automata.IO;
 
@@ -17,32 +17,21 @@ public class AutomatonToADS
 {
 	// PiTCT assumes that the (single!) initial state has index 0
 	// So we create a map that guarantees that this is the case
-	private final Map<State, Integer> stateMap = new HashMap<>();
+	private final Map<State, Integer> stateMap;
 
 	// PiTCT has controllable events as odd integers, and uncontrollable events as even
 	// In addition, when converting a set of Supremica automata we need to guarantee
 	// that same-labeled events correspond to the same integer in all automata
-	// So, we build a static map that survives between instantiations of this class
-	// We also use the label (not the event itself) as the key
-	private static Map<String, Integer> eventMap;
-	private static int controllableInt;
-	private static int uncontrollableInt;
+	// So, the event map is passed to us from AutomataToADS
+	private Map<String, Integer> eventMap;
 
 	private final Automaton aut;
 
-	public AutomatonToADS(final Automaton aut, final boolean reset)
+	public AutomatonToADS(final Automaton aut, final Map<String, Integer> unionMap)
 	{
 		this.aut = aut;
-
-		if(reset)
-		{
-			this.controllableInt = 11;
-			this.uncontrollableInt = 10;
-			this.eventMap = new HashMap<>();
-		}
-
-		buildStateMap();	// Need to build maps, since PiTCT uses numbers for states and events
-		buildEventMap();	// 0 for initial state, odd numbers for controllable events
+		this.eventMap = unionMap;
+		this.stateMap = buildStateMap();
 	}
 
 	@Override
@@ -68,7 +57,7 @@ public class AutomatonToADS
 	}
 
 	@Override
-	public void serialize(String fileName)
+	public void serialize(final String fileName)
 		throws Exception
 	{
 		final PrintWriter pw = new PrintWriter(new FileWriter(fileName));
@@ -94,36 +83,11 @@ public class AutomatonToADS
 		}
 	}
 
-	private void buildEventMap()
+	// This is a bit ugly, but we must guarantee that the (single!) initial state
+	// is numbered 0 and the other states are numbered consecutively 1..num_states-1
+	private Map<State, Integer> buildStateMap()
 	{
-		int countOdd = 11;	// PiTCT considers controllable events to be odd numbers
-		int countEven = 10;	// Uncontrollabel events are even numbers
-
-		final Iterator<LabeledEvent> events = aut.eventIterator();
-		while (events.hasNext())
-		{
-			final LabeledEvent event = events.next();
-			final String label = event.getLabel();
-			if(eventMap.get(label) == null) // only add if it does not yet exist
-			{
-				if (event.isControllable())
-				{
-					this.eventMap.put(label, this.controllableInt);
-					this.controllableInt += 2;
-				}
-				else
-				{
-					this.eventMap.put(label, this.uncontrollableInt);
-					this.uncontrollableInt += 2;
-				}
-			}
-		}
-	}
-
-	// This is ugly, but we must guarantee that the (single!) initial state is numbered 0
-	// and the other states are numbered consequtively 1..num_states-1
-	private void buildStateMap()
-	{
+		final Map<State, Integer> stateMap = new HashMap<>();
 		final State initState = aut.getInitialState();
 		stateMap.put(initState, 0);
 		int countStates = 1;
@@ -135,6 +99,8 @@ public class AutomatonToADS
 			if(state != initState)
 				stateMap.put(state, countStates++);
 		}
+
+		return stateMap;
 	}
 
 	private void printTransitions(final PrintWriter pw)

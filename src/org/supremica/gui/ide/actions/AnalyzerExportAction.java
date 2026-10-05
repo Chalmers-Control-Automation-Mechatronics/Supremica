@@ -50,12 +50,15 @@ import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.IO.AutomataSSPCExporter;
 import org.supremica.automata.IO.AutomataToCommunicationGraph;
 import org.supremica.automata.IO.AutomataToSTS;
 import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomatonToDsx;
+import org.supremica.automata.IO.AutomataToADS;
 import org.supremica.automata.IO.AutomatonToADS;
 import org.supremica.automata.IO.AutomatonToFSM;
 import org.supremica.automata.IO.AutomataToSMV;
@@ -219,25 +222,17 @@ public class AnalyzerExportAction
 		// PiTCT .ads format, output to debug view
 		if (exportMode == ExportFormat.ADS_DEBUG)
 		{
-			boolean reset = true;
-            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
-            	autIt.hasNext(); )
-            {
-                final Automaton currAutomaton = autIt.next();
-                final AutomatonToADS exporter = new AutomatonToADS(currAutomaton, reset);
-                final TextFrame textframe = new TextFrame("ADS debug output");
+			final AutomataToADS toADS = new AutomataToADS(selectedAutomata);
+			try
+			{
+				toADS.doDebugView();
+			}
+			catch (final Exception ex)
+			{
+				logger.debug(ex.getStackTrace());
+			}
 
-                try
-                {
-                    exporter.serialize(textframe.getPrintWriter());
-                }
-                catch (final Exception ex)
-                {
-                    logger.debug(ex.getStackTrace());
-                }
-                reset = false;
-            }
-            return;
+			return;
 		}
 
         if (exportMode == ExportFormat.FSM_DEBUG)
@@ -364,62 +359,23 @@ public class AnalyzerExportAction
                 automatonExport(exportMode, currAutomaton);
             }
         }
-        // .ads gets special treatment, since with multiple automata selected, same-labeled events
-        // must have the same index in all files (this is managed by the reset argument to AutomatonToADS)
+        // .ads gets special treatment, since with multiple automata selected,
+        // same-labeled events must have the same index in all files
+        // In addition, if all event labels are already numeric, those numeric
+        // labels are retained (probably came from .ads file originally)
         else if(exportMode == ExportFormat.ADS)
         {
-			boolean reset = true;
-			for (final Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
-            {
-				final Automaton currAutomaton = autIt.next();
-				JFileChooser fileChooser = FileDialogs.getADSFileExporter(currAutomaton.getName());
-				fileChooser.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
-
-				// Some vibe coding to distinguish between Cancel and Close
-				final boolean[] cancelClicked = { false };
-		        // 1. Listen for the internal Cancel button action
-		        fileChooser.addActionListener(new java.awt.event.ActionListener()
-		        {
-					// @Override
-					public void actionPerformed(java.awt.event.ActionEvent e)
-					{
-						if (JFileChooser.CANCEL_SELECTION.equals(e.getActionCommand()))
-						{
-							cancelClicked[0] = true;
-						}
-					}
-        		});
-				// End of vide coding
-
-				if (fileChooser.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
-				{
-					final File currFile = fileChooser.getSelectedFile();
-					if (currFile != null && !currFile.isDirectory())
-					{
-						try
-						{
-							final AutomatonToADS exporter = new AutomatonToADS(currAutomaton, reset);
-							exporter.serialize(currFile.getAbsolutePath());
-							reset = false;
-						}
-						catch (final Exception ex)
-						{
-							logger.error("Exception while exporting (as .ads) " + currFile.getAbsolutePath(), ex);
-							logger.debug(ex.getStackTrace());
-						}
-					}
-				}
-				else // Cancel or Closed was clicked, act accordingly
-				{
-					if(!cancelClicked[0]) // then it was Close, abort the rest
-					{
-						return;
-					}
-				}
-				// The above JFileChooser now distinguis between clicking Cancel, which skips the current save,
-				// and Close, which aborts the whole save process skipping teh rest of the saves
+			final AutomataToADS toADS = new AutomataToADS(selectedAutomata);
+			try
+			{
+				toADS.doSave();
 			}
-			return;
+			catch(final Exception excp)
+			{
+				logger.error("Exception while exporting (as .ads) ", excp);
+				logger.debug(excp.getStackTrace());
+			}
+
 		}
         else	// These modes export whole projects, one or more automata in a single file
         {

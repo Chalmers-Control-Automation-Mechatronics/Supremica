@@ -48,7 +48,7 @@ public class ADSConverter {
         String name;
         final HashSet<String> markedStates = new HashSet<String>();
         final HashSet<String[]> transitions = new HashSet<String[]>();
-//        String s;
+
         String s = reader.readLine();
 
         // if first line is CTCT ADS, then the next line is the name
@@ -78,19 +78,20 @@ public class ADSConverter {
 
             switch(step)
             {
-                case 1:
+                case 1:	// state size
+                	// System.err.println("State size: " + s);
                     break;
-                case 2:
-                    try{
-                        markedStates.add(s);
-                        break;
-                    } catch(final NumberFormatException e){
-                        logger.error("There is problem in marker states part");
-                        return null;
-                    }
-                case 3:
+                case 2:	// marked states
+					final String[] mstates = s.split("\\s+");
+					for(String state : mstates)
+					{
+						markedStates.add(state);
+					}
+					break;
+                 case 3:	// Vocal states
+                	// System.err.println(s);
                     break;
-                case 4:
+                case 4:	// Transitions
                     final String[] split = s.split("\\s+");
                     transitions.add(split);
                     break;
@@ -100,7 +101,8 @@ public class ADSConverter {
         final ExtendedAutomaton ex = new ExtendedAutomaton(name, ComponentKind.PLANT);
         boolean isInitial, isMark;
 
-        for(final String[] t:transitions){
+        for(final String[] t : transitions)
+        {
             final String source = t[0];
             final String event = t[1];
             final String target = t[2];
@@ -114,11 +116,13 @@ public class ADSConverter {
 
             ex.addState(target, isMark, isInitial, false);
 
-            final boolean isObservable = (Integer.parseInt(event) == 1000)?false:true;
-            String kind;
-            if(isObservable)
-                kind = (Integer.parseInt(event)%2 != 0)?EventKind.CONTROLLABLE.toString():EventKind.UNCONTROLLABLE.toString();
-            else
+            final boolean isObservable = (Integer.parseInt(event) == 1000) ? false : true;
+            String kind =
+            	(Integer.parseInt(event)%2 != 0) ?
+               	EventKind.CONTROLLABLE.toString() :
+               	EventKind.UNCONTROLLABLE.toString();
+
+            if(!isObservable)
                 kind = EventKind.CONTROLLABLE.toString();
 
             ex.addEvent(event, kind, isObservable);
