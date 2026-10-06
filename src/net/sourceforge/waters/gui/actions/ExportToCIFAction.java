@@ -64,7 +64,7 @@ public class ExportToCIFAction extends WatersAction {
         // 3. Load the Lua script from Eclipse 'src/scripts/' folder
         // final java.io.InputStream luaStream = getClass().getResourceAsStream("/scripts/Supremica2CIF.lua");
         try {
-          luaStream = new java.io.FileInputStream("scripts/Supremica2CIFInternship2.lua");
+          luaStream = new java.io.FileInputStream("scripts/Supremica2CIF.lua");
         } catch (final java.io.FileNotFoundException ex) {
           ex.printStackTrace();
         }

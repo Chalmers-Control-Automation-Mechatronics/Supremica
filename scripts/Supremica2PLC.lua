@@ -17,6 +17,10 @@ local CurrentEFA -- EFA currently processed (set by processEFA, contains .name a
 local CurrentEdge -- Collects data for currently processed edge (set by processEdge)
 local Storage = {} -- holds the generated EFA for delayed output (see processModule)
 local FileName -- The filename to save under (set by processModule)
+local ConstantRanges = {}
+local GlobalActionMap = {}
+local SharedVariables = {}
+local Manager_variables = {}
 
 local function loginfo(str) -- helper to write to log
   if str then log:info(str, 0) else log:info("nil string", 0) end
@@ -241,7 +245,7 @@ end
 -- Lua 5.2 and earlier do not have math.tointeger
 local function tointeger(val)
   local num = tonumber(val)
-  if not num then return nil end
+  if not num then return val end
   
   return math.floor(num)
 end
@@ -260,63 +264,65 @@ local ComponentKind = luaj.bindClass("net.sourceforge.waters.model.base.Componen
 local VariableHelper = luaj.bindClass("org.supremica.automata.VariableHelper")
 local VariableComponentProxy = luaj.bindClass("net.sourceforge.waters.model.module.VariableComponentProxy")
 if not VariableComponentProxy then print("VariableComponentProxy not fond") return end
+local DocumentManager = luaj.bindClass("net.sourceforge.waters.model.marshaller.DocumentManager")
+local ProductDESElementFactory = luaj.bindClass("net.sourceforge.waters.plain.des.ProductDESElementFactory")
+local ModuleCompiler = luaj.bindClass("net.sourceforge.waters.model.compiler.ModuleCompiler")
+local SupremicaBuilder = luaj.bindClass("org.supremica.automata.waters.SupremicaSynchronousProductBuilder")
 
 local efaKind = {} -- lookup table for automata type conversion
 efaKind[ComponentKind.PLANT] = "plant"
-efaKind[ComponentKind.PROPERTY] = "property"
+efaKind[ComponentKind.PROPERTY] = "requirement"
 efaKind[ComponentKind.SPEC] = "requirement"
 efaKind[ComponentKind.SUPERVISOR] = "supervisor"
 
 --local TextFrame = luaj.bindClass("org.supremica.gui.texteditor.TextFrame")
 local textframe = luaj.newInstance("org.supremica.gui.texteditor.TextFrame", "CIF Export")
 local pw = textframe:getPrintWriter()
-textframe:setVisible(true)
+textframe:setVisible(false)
 
 local function print(str) -- redefine print to write to the textframe
   pw:println(str)
 end
-
+local function loginfo(str) -- helper to write to log
+  if str then log:info(str, 0) else log:info("nil string", 0) end
+end
 
 -- For processing primed guard expressions, we need dynamic nested loops
 -- to evaluate all combinations of variable values 
 -- This part contains a dynamic nested loop imiplementation
-local DNL = { hasnext = true, collection = {}, indexes = {}, bounds = {}, }
--- collection is a set of sets to loop over
-DNL.setup = function(collection)
-  DNL.collection = collection
-  DNL.indexes = {}
-  DNL.bounds = {}
-  -- Set up loop bounds, and indexes
-  for i = 1, #collection do
-    DNL.bounds[i] = #collection[i]
-    DNL.indexes[i] = 1 -- all indices start at 1
-  end
-  DNL.hasnext = #collection > 0 and #collection[1] > 0
-end
 
--- Count up the right-most index, if it reaches its bound
--- set it back to 1 and increment the next right-most, etc
-DNL.incrementIndexes = function()
-  
-  local cntr = #DNL.indexes
-  
-  while cntr ~= 0 do
-    local val = DNL.indexes[cntr] + 1
-    DNL.indexes[cntr] = val
-    if val <= DNL.bounds[cntr] then return true end
-    -- else the bound was exhausted for the cntr variable, adjust the outer one(s)
-    DNL.indexes[cntr] = 1
-    cntr = cntr - 1
-  end
-  return false
-end
 
-DNL.iterate = function(callback)
-  while DNL.hasnext do
-    callback(DNL.collection, DNL.indexes)
-    DNL.hasnext = DNL.incrementIndexes() -- (DNL.indexes, DNL.bounds)
-  end
-end
+-- All build in functions in CIF. Automaton, locations, events, and variables are not allowed to be named like this
+local CIFReserved = {
+    ["abs"]=true, ["acos"]=true, ["acosh"]=true, ["alg"]=true, ["alphabet"]=true,
+    ["and"]=true, ["any"]=true, ["asin"]=true, ["asinh"]=true, ["atan"]=true,
+    ["atanh"]=true, ["attr"]=true, ["automaton"]=true, ["bernoulli"]=true,
+    ["beta"]=true, ["binomial"]=true, ["break"]=true, ["case"]=true, ["cbrt"]=true,
+    ["ceil"]=true, ["const"]=true, ["constant"]=true, ["cont"]=true, ["continue"]=true,
+    ["controllable"]=true, ["cos"]=true, ["cosh"]=true, ["def"]=true, ["del"]=true,
+    ["der"]=true, ["dict"]=true, ["disables"]=true, ["disc"]=true, ["dist"]=true,
+    ["div"]=true, ["do"]=true, ["edge"]=true, ["elif"]=true, ["else"]=true,
+    ["empty"]=true, ["end"]=true, ["enum"]=true, ["equation"]=true, ["erlang"]=true,
+    ["event"]=true, ["exp"]=true, ["exponential"]=true, ["false"]=true, ["file"]=true,
+    ["final"]=true, ["floor"]=true, ["fmt"]=true, ["for"]=true, ["func"]=true,
+    ["gamma"]=true, ["geometric"]=true, ["goto"]=true, ["group"]=true, ["id"]=true,
+    ["if"]=true, ["import"]=true, ["in"]=true, ["initial"]=true, ["input"]=true,
+    ["int"]=true, ["invariant"]=true, ["list"]=true, ["ln"]=true, ["location"]=true,
+    ["log"]=true, ["lognormal"]=true, ["macro"]=true, ["marked"]=true, ["max"]=true,
+    ["min"]=true, ["mod"]=true, ["monitor"]=true, ["namespace"]=true, ["needs"]=true,
+    ["normal"]=true, ["not"]=true, ["now"]=true, ["or"]=true, ["plant"]=true,
+    ["poisson"]=true, ["pop"]=true, ["post"]=true, ["pow"]=true, ["pre"]=true,
+    ["print"]=true, ["printfile"]=true, ["random"]=true, ["real"]=true,
+    ["requirement"]=true, ["return"]=true, ["round"]=true, ["sample"]=true,
+    ["scale"]=true, ["self"]=true, ["set"]=true, ["sign"]=true, ["sin"]=true,
+    ["sinh"]=true, ["size"]=true, ["sqrt"]=true, ["state"]=true, ["string"]=true,
+    ["sub"]=true, ["supervisor"]=true, ["svgcopy"]=true, ["svgfile"]=true,
+    ["svgin"]=true, ["svgmove"]=true, ["svgout"]=true, ["switch"]=true, ["tan"]=true,
+    ["tanh"]=true, ["tau"]=true, ["text"]=true, ["time"]=true, ["tobool"]=true,
+    ["triangle"]=true, ["true"]=true, ["tuple"]=true, ["type"]=true,
+    ["uncontrollable"]=true, ["uniform"]=true, ["urgent"]=true, ["value"]=true,
+    ["void"]=true, ["weibull"]=true, ["when"]=true, ["while"]=true
+}
 
 -- In Supremica, identifiers can include colon (:) Events, EFA names, variable names, 
 -- enum labels, all of those can include one or more colons. Forinstnace "var:X:Y:Z"
@@ -349,15 +355,45 @@ end
 
 local function sanitize(input, category)
   category = category or "general"
+  if category == "event" and input:find("%.{") then
+    input = input:gsub("%.{.*", "")
+  end
+  input = input:gsub("%[", "_"):gsub("%]", "")
   local cacheKey = category .. "_" .. input
   -- If this has already been sanitized, just return that result
   if Sanity[cacheKey] then return Sanity[cacheKey] end
+  -- Convert brackets into underscores (e.g. a[0] -> a_0), this happens when a Foreach block is used
+ -- local cleanInput = input:gsub("%[", "_"):gsub("%]", "")
+  local cleanInput = input
+  if CIFReserved[cleanInput] then
+    if category == "location" then cleanInput = "Loc_" .. cleanInput
+    elseif category == "event" then cleanInput = "Ev_" .. cleanInput
+    elseif category == "automaton" then cleanInput = "Aut_" .. cleanInput
+    else cleanInput = "Id_" .. cleanInput end
+  end
+  if cleanInput:match("^%d") then
+    if category == "location" then
+      cleanInput = "Loc_" .. cleanInput
+    elseif category == "event" then
+      cleanInput = "Ev_" .. cleanInput
+    elseif category == "automaton" then
+      cleanInput = "Aut_" .. cleanInput
+    else
+      cleanInput = "Id_" .. cleanInput
+    end
+  end
+  
+  if category == "variable" then
+    if cleanInput:match("^c_") or cleanInput:match("^u_") or cleanInput:match("^e_") then
+        cleanInput = "var_" .. cleanInput
+    end
+  end
   
   -- Do we have (sane) input that some insane input already maps to?
   -- If so, we need to do something to make it unique
-  if Insanity[input] then 
+  if Insanity[cleanInput] then 
     -- assert(false, Insanity[input].." is already mapped to "..input)
-    return desanitize(input, category)
+    return desanitize(cleanInput, category)
   end
   
   -- Now we replace all colons by longer and longer strings of underscores
@@ -369,7 +405,7 @@ local function sanitize(input, category)
   -- At least sequences of : are mapped to possibly shorter sequences of _
   -- With i = 1, colon-infested input sanitizes to something with underscore
   repeat
-    sanitized = input:gsub(":+", string.rep("_", i))
+    sanitized = cleanInput:gsub(":+", string.rep("_", i))
     i = i + 1
   until not Insanity[sanitized]
   Insanity[sanitized] = input
@@ -380,29 +416,243 @@ local function sanitize(input, category)
   end
   return sanitized
 end
+
+local function sanitizeMathExpression(expr)
+    if not expr then return "" end
+	expr = expr:gsub("\\max", "max"):gsub("\\min", "min"):gsub("%%", " mod ")
+	local mathFuncs = {["min"]=true, ["max"]=true, ["abs"]=true, ["pow"]=true, ["sqrt"]=true, ["ceil"]=true, ["floor"]=true, ["round"]=true, ["sign"]=true, ["div"]=true, ["mod"]=true, ["true"]=true, ["false"]=true}
+    -- Find every individual word in the equation
+    for w in expr:gmatch("([_:%a][_:%w%[%]]*)") do
+        -- If the word is a raw number (like "1" or "24"), skip it completely!
+        if not tonumber(w) and not mathFuncs[w] then
+            local replacement
+            if Sanity["variable_" .. w] then 
+                replacement = Sanity["variable_" .. w]
+            else 
+                replacement = sanitize(w, "variable") 
+            end
+            
+            -- Escape brackets so Lua can replace them safely inside the math string
+            local escaped_w = w:gsub("%[", "%%["):gsub("%]", "%%]")
+            expr = expr:gsub(escaped_w, replacement)
+        end
+    end
+    
+    
+    return expr
+end
 -- Note that CIF itself exploits this "feature" in Supremica when it generates
 -- *.wmod from *.cif, see for instance, button_lamp.cif
-
-local function getEvents(project)
-	local controllable, uncontrollable = {}, {}
-	
-	local eventDeclList = project:getEventDeclList()
-	for i = 1, eventDeclList:size() do
-	  local event = eventDeclList:get(i-1)
-	  local kind = event:getKind()
-	  if kind == EventKind.CONTROLLABLE then
-      controllable[sanitize(event:getName(), "event")] = true  -- should be sanitized
-	  elseif kind ~= EventKind.PROPOSITION then
-      uncontrollable[sanitize(event:getName(), "event")] = true  -- should be sanitized
-    -- else -- is proposition, unclear how to deal with that
-	  end
-	end
-	return controllable, uncontrollable
+local function getAutomataSafe(proj)
+  -- Try the GUI Helpers first
+  local success, list = pcall(function() return Helpers:getAutomatonList(proj) end)
+  if success then return list end
+  
+  -- If it crashes (because it's a compiled Plain module), extract them manually!
+  local plainList = luaj.newInstance("java.util.ArrayList")
+  local comps = proj:getComponentList()
+  for i = 1, comps:size() do
+    local comp = comps:get(i-1)
+    if tostring(comp:getClass()):find("SimpleComponent") then
+      plainList:add(comp)
+    end
+  end
+  return plainList
 end
 
-local function getBlockedEvents(project)
+local function getVariablesSafe(proj)
+  -- Try the GUI Helpers first
+  local success, list = pcall(function() return Helpers:getVariableList(proj) end)
+  if success then return list end
+  
+  -- If it crashes, extract manually!
+  local plainList = luaj.newInstance("java.util.ArrayList")
+  local comps = proj:getComponentList()
+  for i = 1, comps:size() do
+    local comp = comps:get(i-1)
+    if tostring(comp:getClass()):find("VariableComponent") then
+      plainList:add(comp)
+    end
+  end
+  return plainList
+end
+
+local Enums = {}
+
+-- Rewriting
+local pluseq = "+=" -- a += b into a = a + b
+local minuseq = "-=" -- a += b into a = a - b
+local multeq = "*="
+local diveq = "/="
+
+local patterns = {}
+-- capture lhs += rhs, lhs == rhs, lhs = rhs, etc
+-- expr patterns capture whole expressions, (lhs op rhs)
+-- detail patterns capture details (lhs)(op)(rhs)
+--patterns.operator = "([%+%-%*/=]+)"
+patterns.operator = "([%+%-%*/=%%]+)"
+-- patterns.actiondetail = "([_:%a][_:%w]*)%s*([%+%-%*/=]+)%s*([_:%w]+)" -- "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
+-- patterns.actionexpr = "([_:%a][_:%w]*%s*[%+%-%*/=]+%s*[_:%w]+)"-- "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
+patterns.identifier = "([_%a][_%w]*)" -- this pattern does not catch colon, see sanitize()
+--patterns.colonifier = "([_:%a][_:%w]*)" -- identifiers can include colon
+patterns.colonifier = "([_:%a][_:%w%[%]]*)"
+patterns.commasep = "%s*(.-)[,]"
+patterns.operatorsep = "%s*"..patterns.colonifier.."%s*"..patterns.operator.."%s*(.*)"
+patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
+patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
+-- patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
+patterns.matchrange = "(%-?[%w_]+)%.%.(%-?[%w_]+)"
+patterns.colonatend = ":$"
+patterns.multiassign = "([_%a][_%w]*)%s*:="
+-- https://www.lua.org/pil/20.2.html
+-- https://iamreiyn.github.io/lua-pattern-tester/
+
+
+
+local function preScanModel(project, efalist)
+    local controllable, uncontrollable, arrayChildrenMap = {}, {}, {}
+    local seenRawEvents = {}
+    local varOwners = {} -- Tracks who owns variables for conflict detection
+
+    -- 1. Grab Base Event Declarations
+    local eventDeclList = project:getEventDeclList()
+    for i = 1, eventDeclList:size() do
+        local event = eventDeclList:get(i-1)
+        local kind = event:getKind()
+        if kind == EventKind.CONTROLLABLE then
+            controllable[sanitize(event:getName(), "event")] = true
+        elseif kind ~= EventKind.PROPOSITION then
+            uncontrollable[sanitize(event:getName(), "event")] = true
+        end
+    end
+
+    -- 2. The SINGLE PASS over all automata and edges
+    for i = 1, efalist:size() do
+        local efa = efalist:get(i-1)
+        local efaName = sanitize(efa:getName(), "automaton")
+        local edges = efa:getGraph():getEdges():iterator()
+
+        while edges:hasNext() do
+            local edge = edges:next()
+            
+            -- A) Process Events on this edge
+            local evlist = edge:getLabelBlock():getEventIdentifierList():iterator()
+            local currentEdgeEvents = {} -- Needed for GlobalActionMap
+            
+            while evlist:hasNext() do
+                local rawName = evlist:next():toString()
+                local evName = sanitize(rawName, "event")
+                table.insert(currentEdgeEvents, evName)
+
+                if not seenRawEvents[rawName] then
+                    seenRawEvents[rawName] = true
+                    local baseName_raw = rawName:match("^([^%[]+)%[")
+                    if baseName_raw then
+                        local baseName = sanitize(baseName_raw, "event")
+                        if controllable[baseName] then
+                            controllable[evName] = true
+                            arrayChildrenMap[baseName] = arrayChildrenMap[baseName] or {}
+                            table.insert(arrayChildrenMap[baseName], evName)
+                        elseif uncontrollable[baseName] then
+                            uncontrollable[evName] = true
+                            arrayChildrenMap[baseName] = arrayChildrenMap[baseName] or {}
+                            table.insert(arrayChildrenMap[baseName], evName)
+                        end
+                    elseif not controllable[evName] and not uncontrollable[evName] then
+                        local baseName_raw = rawName:match("^([^%[]+)")
+                        if baseName_raw then
+                            local baseName = sanitize(baseName_raw, "event")
+                            if controllable[baseName] then controllable[evName] = true
+                            elseif uncontrollable[baseName] then uncontrollable[evName] = true end
+                        end
+                    end
+                end
+            end
+
+            -- B) Process Guards/Actions on this edge (Shared Vars & Global Map)
+            local gablock = edge:getGuardActionBlock()
+            if gablock then
+                local gatxt = gablock:toString():gsub("\n", ",")
+                local _, aexpr = gatxt:match("%[,(.*)%],{,(.*)},")
+                
+                if aexpr then
+                    aexpr = aexpr:match("[{%s,]*(.+),}")
+                    if aexpr and aexpr ~= "" then
+                        local str = aexpr .. ","
+                        for cap in str:gmatch(patterns.commasep) do
+                            local op, op_start, op_end
+                            for _, vop in ipairs({"+=", "-=", "*=", "/=", "%=", "==", "="}) do
+                                op_start, op_end = cap:find(vop, 1, true)
+                                if op_start then op = vop; break end
+                            end
+
+                            if op then
+                                local lhs_raw = cap:sub(1, op_start - 1):match("^%s*(.-)%s*$")
+                                if lhs_raw then
+                                    local lhs = sanitize(lhs_raw, "variable")
+
+                                    -- CHECK 1: Shared Variables
+                                    if not varOwners[lhs] then
+                                        varOwners[lhs] = efaName
+                                    elseif varOwners[lhs] ~= efaName then
+                                        SharedVariables[lhs] = true
+                                        if Variables and Variables[lhs] then
+                                            Variables[lhs].owner = "Manager_" .. lhs
+                                        end
+                                    end
+
+                                    -- CHECK 2: Global Action Map (Only if primes exist)
+                                    
+                                    local rhs = cap:sub(op_end + 1):match("^%s*(.-)%s*$")
+                                    rhs = sanitizeMathExpression(rhs)
+
+                                    if op == "+=" then rhs = lhs .. " + " .. rhs
+                                    elseif op == "-=" then rhs = lhs .. " - " .. rhs
+                                    elseif op == "*=" then rhs = lhs .. " * " .. rhs
+                                    end
+
+                                    -- Get source location
+                                    local rawText = edge:getSource():toString():gsub("\n", "")
+                                    local srcLoc
+                                    for capture in rawText:gmatch("(%w+)") do
+                                        if capture ~= "initial" and capture ~= "forbidden" and capture ~= "accepting" then
+                                            srcLoc = sanitize(capture, "location")
+                                            break
+                                        end
+                                    end
+
+                                    -- Store in global map
+                                    for _, evName in ipairs(currentEdgeEvents) do
+                                        GlobalActionMap[evName] = GlobalActionMap[evName] or {}
+                                        GlobalActionMap[evName][efaName] = GlobalActionMap[evName][efaName] or {}
+                                        GlobalActionMap[evName][efaName][lhs] = GlobalActionMap[evName][efaName][lhs] or {}
+                                        table.insert(GlobalActionMap[evName][efaName][lhs], {location = srcLoc, math = rhs})
+                                    end
+                                   
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- Cleanup Array Parents
+    for base, _ in pairs(arrayChildrenMap) do
+        controllable[base] = nil
+        uncontrollable[base] = nil
+    end
+
+    return controllable, uncontrollable, arrayChildrenMap
+end
+
+
+
+local function getBlockedEvents(efalist)
     local blockedEventsCIF = {}
-	efalist = Helpers:getAutomatonList(project)
+--	efalist = Helpers:getAutomatonList(project)
+--	efalist = getAutomataSafe(project)
     for i = 1, efalist:size() do
         local efa = efalist:get(i-1)
         
@@ -415,8 +665,12 @@ local function getBlockedEvents(project)
             
             if eventList ~= nil then
                 for j = 0, eventList:size() - 1 do
-                    local eventObj = eventList:get(j)                   
-                    blockedEventsCIF[sanitize(eventObj:getName(), "event")] = true
+                    local eventObj = eventList:get(j)           
+					local rawName = eventObj:toString()        
+                    --blockedEventsCIF[sanitize(eventObj:getName(), "event")] = true
+					if rawName ~= ":accepting" and rawName ~= ":forbidden" and rawName ~= ":initial" then
+					  blockedEventsCIF[sanitize(eventObj:toString(), "event")] = true
+					end
                 end
             end
         end
@@ -447,11 +701,85 @@ end
 local manager = ide:getDocumentContainerManager() 
 local container = manager:getActiveContainer()
 local name = sanitize(container:getName(), "module")  -- should be sanitized? Windows does not allo : in filenames, *ix might od!
-local project = container:getEditorPanel():getModuleSubject()
-local components = project:getComponentList() 
+local raw_project = container:getEditorPanel():getModuleSubject()
 
-local efalist = Helpers:getAutomatonList(project)
-local varlist = Helpers:getVariableList(project)
+local function containsForeach(componentList)
+  if not componentList then return false end
+  
+  for i = 1, componentList:size() do
+    local comp = componentList:get(i-1)
+    
+    -- 1. Explicitly target the ForeachSubject class
+    local success, className = pcall(function() return tostring(comp:getClass()) end)
+    if success and className:find("ForeachSubject") then
+      return true
+    end
+    
+    -- 2. If not a Foreach, check if it contains child components and recurse
+    local hasChildren, childList = pcall(function() return comp:getComponentList() end)
+    if hasChildren and childList and childList:size() > 0 then
+      if containsForeach(childList) then 
+        return true 
+      end
+    end
+  end
+  return false
+end
+
+
+
+local function instantiateProjectNatively(proj_module)
+  -- 1. Create a blank DocumentManager
+  local doc_manager = luaj.newInstance("net.sourceforge.waters.model.marshaller.DocumentManager")
+  
+  -- 2. Try to instantiate the ModuleInstanceCompiler
+  local compiler
+  local success, res = pcall(luaj.newInstance, "net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler", doc_manager, proj_module)
+  
+  if success and res then
+     compiler = res
+  else
+     -- Fallback: If it requires the ModuleElementFactory explicitly
+     local factory = luaj.newInstance("net.sourceforge.waters.plain.module.ModuleElementFactory")
+     compiler = luaj.newInstance("net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler", doc_manager, factory, proj_module)
+  end
+  
+  -- 3. Run the compiler to unroll the Foreach blocks and Instances
+  local compile_success, unrolled_module = pcall(function() return compiler:compile() end)
+  
+  if compile_success and unrolled_module then
+      print("// Foreach loops and Instances successfully unrolled by Java API.")
+      return unrolled_module
+  else
+      print("// WARNING: Native unrolling failed. Proceeding with raw project.")
+      return proj_module
+  end
+end
+
+-- Detect if flattening is needed
+local needsInstantiation = containsForeach(raw_project:getComponentList())
+local comps = raw_project:getComponentList() 
+for i = 1, comps:size() do
+  if tostring(comps:get(i-1):getClass()):find("ForeachComponent") then
+    needsInstantiation = true
+    break
+  end
+end
+
+
+-- Ensure 'project' is the final, flat model before proceeding
+local project = raw_project
+if needsInstantiation then
+  project = instantiateProjectNatively(raw_project)
+end 
+
+
+
+efalist = getAutomataSafe(project)
+varlist = getVariablesSafe(project)
+
+
+--local components = project:getComponentList() 
 
 -- Prioritize variable names to stay the same, then location names, and lastly event names
 local vIter = varlist:iterator()
@@ -460,20 +788,34 @@ while vIter:hasNext() do sanitize(vIter:next():getName(), "variable") end
 -- 2. Reserve Location names second
 for i = 1, efalist:size() do
   local efa = efalist:get(i-1)
-  sanitize(efa:getName(), "automaton")
-  local nodes = efalist:get(i-1):getGraph():getNodes():iterator()
-  while nodes:hasNext() do
-    local rawText = nodes:next():toString():gsub("\n", "")
-    for capture in rawText:gmatch("(%w+)") do
-      if capture ~= "initial" and capture ~= "forbidden" and capture ~= "accepting" then
-        sanitize(capture, "location")
-        break
+  local rawAutName = efa:getName()
+  if type(rawAutName) == "userdata" then rawAutName = rawAutName:getName() end
+  sanitize(rawAutName, "automaton")
+  --sanitize(efa:getName(), "automaton")
+--[[  if needsFlattening then
+	local states = efa:getStates():iterator()
+	while states:hasNext() do
+      local state = states:next()
+      local rawStateName = state:getName()
+      if type(rawStateName) == "userdata" then rawStateName = rawStateName:getName() end
+      sanitize(rawStateName, "location")
+    end --]]
+  --else
+    local nodes = efalist:get(i-1):getGraph():getNodes():iterator()
+    while nodes:hasNext() do
+      local rawText = nodes:next():toString():gsub("\n", "")
+      for capture in rawText:gmatch("(%w+)") do
+        if capture ~= "initial" and capture ~= "forbidden" and capture ~= "accepting" then
+          sanitize(capture, "location")
+          break
+        end
       end
     end
-  end
+  --end
 end
-local cevents, uevents = getEvents(project)
-local blockedEvents = getBlockedEvents(project)
+local cevents, uevents, arrayEventMap = preScanModel(project, efalist)
+local blockedEvents = getBlockedEvents(efalist)
+
 
 
 
@@ -484,32 +826,7 @@ local blockedEvents = getBlockedEvents(project)
   one big Enums type, being careful to remove duplicates, while still keeping the enum
   ranges (expanded) for each Supremica enum variable. This set is built by processVariables()
 --]]
-local Enums = {}
 
--- Rewriting
-local pluseq = "+=" -- a += b into a = a + b
-local minuseq = "-=" -- a += b into a = a - b
-local multeq = "*="
-local diveq = "/="
-
-local patterns = {}
--- capture lhs += rhs, lhs == rhs, lhs = rhs, etc
--- expr patterns capture whole expressions, (lhs op rhs)
--- detail patterns capture details (lhs)(op)(rhs)
-patterns.operator = "([%+%-%*/=]+)"
--- patterns.actiondetail = "([_:%a][_:%w]*)%s*([%+%-%*/=]+)%s*([_:%w]+)" -- "([_%a][_%w]*)%s*([%+%-%*/=]+)%s*([_%w]+)"
--- patterns.actionexpr = "([_:%a][_:%w]*%s*[%+%-%*/=]+%s*[_:%w]+)"-- "([_%a][_%w]*%s*[%+%-%*/=]+%s*[_%w]+)"
-patterns.identifier = "([_%a][_%w]*)" -- this pattern does not catch colon, see sanitize()
-patterns.colonifier = "([_:%a][_:%w]*)" -- identifiers can include colon
-patterns.commasep = "%s*(.-)[,]"
-patterns.operatorsep = "%s*"..patterns.colonifier.."%s*"..patterns.operator.."%s*(.*)"
-patterns.primedexpr = "([_%a][_%w]*'%s*[%+%-%*=/]+%s*[_%w]+)"
-patterns.guardexpr = "([_%a][_%w]*%s*[%+%-%*=/]+%s*[_%w]+)"
-patterns.matchrange = "(%-?%d+)%.%.(%-?%d+)"
-patterns.colonatend = ":$"
-patterns.multiassign = "([_%a][_%w]*)%s*:="
--- https://www.lua.org/pil/20.2.html
--- https://iamreiyn.github.io/lua-pattern-tester/
 
 local rewrites = {}
 rewrites.doit = function(lhs, op, rhs)
@@ -541,26 +858,40 @@ local function handleNot(str)
   local convstr = str:gsub("!=", safestr)
   convstr = convstr:gsub("!", " not ")
   convstr= convstr:gsub(safestr, "!=")
+  convstr = convstr:gsub("%%", " mod ")
   return convstr
 end
 
+
+-- SMART CONVERSION: Global Event-Action Map
+
+
+
 -- Probably have to sanitize identifiers here, and replace inline
 local function convertGuard(gstr)
+  gstr = gstr:gsub("\\max", "max"):gsub("\\min", "min")
+  local mathFuncs = {["min"]=true, ["max"]=true, ["abs"]=true, ["pow"]=true, ["sqrt"]=true, ["ceil"]=true, ["floor"]=true, ["round"]=true, ["sign"]=true, ["div"]=true, ["mod"]=true, ["true"]=true, ["false"]=true}
   for w in gstr:gmatch(patterns.colonifier) do
---  In case locations are allowed in the guard, this code will automatically sanitize the right type
 	local replacement = w
-	if Sanity["variable_" .. w] then
-		replacement = Sanity["variable_" .. w]
-	elseif Sanity["location_" .. w] then
+	    
+    -- Smart lookup: Check what this word actually is in our memory cache!
+	if mathFuncs[w] then
+		replacement = w
+    elseif Sanity["variable_" .. w] then
+        replacement = Sanity["variable_" .. w]
+    elseif Sanity["location_" .. w] then
         replacement = Sanity["location_" .. w]
     elseif Sanity["automaton_" .. w] then
         replacement = Sanity["automaton_" .. w]
-    else
+	else
         -- If it's completely unknown, default to variable logic
         replacement = sanitize(w, "variable") 
     end
-    gstr = gstr:gsub(w, replacement)
-	
+    
+    -- Swap the word in the string
+	local escaped_w = w:gsub("%[", "%%["):gsub("%]", "%%]")
+	gstr = gstr:gsub(escaped_w, replacement)
+    --gstr = gstr:gsub(w, replacement)
     --gstr = gstr:gsub(w, sanitize(w, "variable"))
 --    loginfo(w.." -> "..gstr)
   end
@@ -591,6 +922,32 @@ end
 local function getIntRangeLimits(range)
   local bottom, topper = range:match(patterns.matchrange)
   return tointeger(bottom), tointeger(topper)
+end
+
+local function buildLocalActionDictionary(aexpr)
+  local actDict = {}
+  if not aexpr or aexpr == "" then return actDict end
+  
+  local str = aexpr .. ","
+  for cap in str:gmatch(patterns.commasep) do
+	local op, op_start, op_end
+	for _, vop in ipairs ({"+=", "-=", "*=", "/=", "%=", "==", "="}) do
+		op_start, op_end = cap:find(vop, 1, true)
+		if op_start then op = vop; break end
+	end
+	if op then
+	  local lhs = cap:sub(1, op_start - 1):match("^%s*(.-)%s*$")
+	  local rhs = cap:sub(op_end + 1):match("^%s*(.-)%s*$")
+      lhs = sanitize(lhs, "variable")
+	  rhs = sanitizeMathExpression(rhs)
+      if op == "+=" then rhs = lhs .. " + " .. rhs
+      elseif op == "-=" then rhs = lhs .. " - " .. rhs
+      elseif op == "*=" then rhs = lhs .. " * " .. rhs
+      end
+      actDict[lhs] = rhs
+    end
+  end
+  return actDict
 end
 -----------------------------------------------------------------
 -- Preprocessing - Collect stuff necessary to be able to process
@@ -642,6 +999,9 @@ TFlookup["false"] = true
 local function getIntegerInfo(var)
   
   local range = var:getType():toString()
+  if ConstantRanges[range] then
+	range = ConstantRanges[range]
+  end
   local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())-- sanitized by convertGiuard
   local markings = preProcessMarkedValues(var:getVariableMarkings())-- sanitized by convertGiuard
   local markstr = ""
@@ -670,10 +1030,22 @@ local function getEnumInfo(var)
   local kind = IS_ENUM -- this is the default assumption
   
   local range = {}
-  for ident in var:getType():toString():gmatch(patterns.colonifier) do  -- should be sanitized, and patterns.colonifier used
-    local saneident = sanitize(ident, "variable")
+  
+  local typeStr = var:getType():toString()
+  if ConstantRanges[typeStr] then
+	typeStr = ConstantRanges[typeStr]
+  end
+  typeStr = typeStr:gsub("%[", ""):gsub("%]", ""):gsub("{", ""):gsub("}", "")
+  for ident in typeStr:gmatch("([_:%a][_:%w]*)") do  -- should be sanitized, and patterns.colonifier used
+	local saneident
+	if ident == "true" or ident == "false" then
+	  saneident = ident -- Keep them exactly as they are for CIF logic
+	else
+      saneident = sanitize(ident, "variable")
+	  Enums[saneident] = true
+	end
     range[#range + 1] = saneident
-    Enums[saneident] = true
+    
   end
   
   if #range == 2 then -- this might be a bool
@@ -704,12 +1076,62 @@ local function getEnumInfo(var)
   return kind, range, initpred, markstr  
   
 end
+
+local function preProcessConstants()
+  local success, constList = pcall(function() return raw_project:getConstantAliasList() end)
+  if success and constList then
+    for i = 1, constList:size() do
+      local comp = constList:get(i-1)
+      
+      local rawName = comp:getName()
+      if type(rawName) == "userdata" then pcall(function() rawName = rawName:getName() end) end
+      local nameStr = tostring(rawName)
+      
+      local valSuccess, cVal = pcall(function() return comp:getConstantAliasExpression():toString() end)
+      if not valSuccess then
+         valSuccess, cVal = pcall(function() return comp:getExpression():toString() end)
+      end
+      
+      -- If it has a range, store it in the memory map
+      if valSuccess and cVal  then
+		local cStr = cVal .. ""
+		if cStr:find("%.%.") or cStr:find("%[") then
+         ConstantRanges[nameStr] = cStr
+	    elseif cStr:find("%[") then
+			for word in cStr:gmatch("([a-zA-Z_][%w_]*)") do
+				if not tonumber(word) then
+					Enums[sanitize(word, "variable")] = true
+				end
+			end
+		end
+      end
+    end
+  end
+end
  
 local function getVariableInfo(var)
-  if VariableHelper:isBinary(var) then
-    return getBinaryInfo(var)
-  elseif VariableHelper:isInteger(var) then
-    return getIntegerInfo(var)
+  local rawTypeStr = var:getType():toString()
+  
+  local typeStr = rawTypeStr
+  if ConstantRanges[rawTypeStr] then
+	typeStr = ConstantRanges[rawTypeStr]
+  end
+--[[  if typeStr:lower() == "boolean" or typeStr:lower() == "bool" then
+    local initpred = preProcessInitPredicate(var:getInitialStatePredicate():toString())
+    local markings = preProcessMarkedValues(var:getVariableMarkings())
+    local markstr = ""
+    if #markings > 0 then
+        markstr = table.concat(markings, ", ")
+    end
+    return IS_BINARY, "0..1", initpred, markstr
+  end --]]
+  if typeStr:find("%.%.") then
+	local bottom, topper = typeStr:match(patterns.matchrange)
+	if bottom == "0" and topper == "1" then
+		return getBinaryInfo(var)
+	else
+		return getIntegerInfo(var)
+	end
   else -- it is an enum
     return getEnumInfo(var)
   end
@@ -729,8 +1151,6 @@ local function preProcessVariables()
     local var = iterator:next()
     local name = sanitize(var:getName(), "variable")  -- should be sanitized
     local kind, range, init, mark = getVariableInfo(var)
-	
-	-- Check for Supremica comment "INPUT"
 	local is_input = false
 	if var:isInput() and kind == IS_BOOL then
 		is_input = true
@@ -741,8 +1161,10 @@ local function preProcessVariables()
   return variables
 end
 
+
+
 local function preProcessing()
-  
+  preProcessConstants()
   Variables = preProcessVariables()
   
   --[[ Just checkin'...
@@ -762,20 +1184,22 @@ end
 local function processSourceTarget(srctxt)
   -- initial S0 { :accepting}
   -- S1 { :forbidden :accepting}
-  local initial, label, acc, xxx
-  
-  -- This is fugly! Find a better way
-  -- Note that this does not catch user-defined propositions
-  for capture in srctxt:gmatch("(%w+)") do
-    if capture == "initial" then
-      initial = true
-    elseif capture == "forbidden" then
-      xxx = true
-    elseif capture == "accepting" then
-      acc = true
-    else
-      label = capture
-    end
+  local initial = false
+  if srctxt:match("^%s*initial%s+") then
+    initial = true
+    srctxt = srctxt:gsub("^%s*initial%s+", "")
+  end
+
+    -- 2. Check for other standard properties
+  local acc = srctxt:find(":accepting") ~= nil or srctxt:find("{.-accepting.-}") ~= nil
+  local xxx = srctxt:find(":forbidden") ~= nil or srctxt:find("{.-forbidden.-}") ~= nil
+    
+    -- 3. Extract the clean location name (everything before the '{' bracket)
+  local label = srctxt:match("^(.-)%s*{")
+    
+    -- If there is no bracket, the whole remaining string is the label
+  if not label then
+    label = srctxt:match("^%s*(.-)%s*$")
   end
   return label, initial, acc, xxx
 end
@@ -785,15 +1209,20 @@ end
 -- Calling this function during processing will not fix all prefixing
 local function prefixOwner(str)
   local orphans = {}
+  local processed = {}
+  
+  local padded = " " .. str .. " "
   -- For identifiers that are variable names, if possible prefix with owner
   for ident in str:gmatch(patterns.identifier) do -- using patterns.identifier, since all should be sanitized
     local var = Variables[ident]
-    if var then -- this is a variable
-	  if var.is_input then -- Input booleans do not need prefixes and are not orphans
+    if var and not processed[ident] then -- this is a variable
+	  processed[ident] = true
+	  if var.is_input then
+		
       elseif var.owner then -- someone already owns this variable, is it us?
         if CurrentEFA.name ~= var.owner then -- owned by someone but not us
           -- Prefix with the owner
-          str = str:gsub(ident, var.owner.."."..ident)
+		  padded = padded:gsub("([^%w_%.])(" .. ident .. ")([^%w_])", "%1" .. var.owner .. ".%2%3")
         end
       else
         -- This variable is not yet owned by anyone
@@ -802,6 +1231,7 @@ local function prefixOwner(str)
       end
     end
   end  
+  str = padded:sub(2,-2)
   assert(orphans, "8. Oprhans nil!")
   return str, orphans
 end
@@ -832,6 +1262,7 @@ end
 local function isWithinRange(value, range)
   -- value is int, range is string like "9..55"
   local bottom, topper = getIntRangeLimits(range)
+  if type(value) ~= "number" or type(bottom) ~= "number" or type(topper) ~= "number" then return false end
   return bottom <= value and value <= topper
 end 
 
@@ -905,16 +1336,6 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
 	if Variables[var].init and Variables[var].init ~= "" then
 	  initValue = Variables[var].init:match("=%s*(.+)")
 	end
-    
-    --if Variables[var].kind == IS_ENUM then
-    --  table.insert(out, "\tdisc Enums "..var..IN_ANY)
-    --elseif Variables[var].kind == IS_BOOL then
-    --  table.insert(out, "\tdisc bool "..var..IN_ANY)
-    --elseif Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
-    --  table.insert(out, "\tdisc int["..Variables[var].range.."] "..var..IN_ANY)
-    --else
-    --  assert(false, "Unknown variable type: "..Variables[var].kind.." (variable: "..var..")")
-    --end
 	
 	local declaration
 	if Variables[var].kind == IS_ENUM then
@@ -949,27 +1370,24 @@ local function addProtectiveGuards(lhs, newrhs, gastore)
   -- The given variable is assigned by this EFA, so it owns it
   -- CIF does not allow multiple EFA owning the same variable
   local function ownThisVariable(var)
-	
-	if Variables[var].is_input then return end -- Input booleans cannot be owned by an automaton
-    
-    if not Variables[var].owner then -- this variable is still orphan
-      Variables[var].owner = CurrentEFA.name -- remember the owner of this variable
+	if not Variables[var] then return end
+	if Variables[var].is_input then return end
+    if SharedVariables[var] then
+        Variables[var].owner = "Manager_" .. var
+        if not Variables[var].decl then
+            local out = makeVarDef(var)
+            Variables[var].decl = table.concat(out, ";\n")..";\n"
+        end
+        return
+    end
+
+    if not Variables[var].owner then
+      Variables[var].owner = CurrentEFA.name 
       local out = makeVarDef(var)
-      table.insert(CurrentEFA.variables, table.concat(out, ";\n")..";\n")
+      Variables[var].decl = table.concat(out, ";\n")..";\n"
+      table.insert(CurrentEFA.variables, Variables[var].decl)
       return
     end
-    -- else some efa already owns this variable, it might be us
-    if Variables[var].owner == CurrentEFA.name then -- we are the owner, all is fine
-      return
-    end
-    -- Someone else already owns this variable, and it isn't us
-    local owners = Variables[var].owner.." and "..CurrentEFA.name
-    showIssueDialog("Multiple EFA assign same variable...", "In CIF, two automata cannot assign the same variable.\n"..
-      var.."\nis assigned by "..owners..".\nMake it be assigned in a single EFA.\nAnd note that primed variables are assigned\nQuitting...")
-    
-    textframe:setVisible(false)
-    assert(false, "Different EFA assigning the same variable is not allowed by CIF")
-    
   end
   
 -- For each action, guards should be added that gurantee no over- or underflow
@@ -982,24 +1400,37 @@ local function processAction(str, gastore)
   -- str is a comma-separated sequence of actions, possibly empty
   if not str or str == "" then return {} end
   local orphans = {}
+  str = str:gsub("%(([^,]+),([^%)]+)%)", "(%1_COMMA_%2)")
   str = str..","
   for cap in str:gmatch(patterns.commasep) do -- (patterns.actionexpr) do
+	cap = cap:gsub("_COMMA_", ",")
     
-    local lhs, op, rhs = cap:match(patterns.operatorsep) -- (patterns.actiondetail)
-    lhs = sanitize(lhs, "variable")
-    rhs = sanitize(rhs, "variable")
-    
-    local expr, newrhs = rewrites[op](lhs, rhs)
-    local action, orph1 = prefixOwner(expr)
-    assert(orph1, "22. orph1 nil")
-    orphans = mergeOrphans(orphans, orph1)
-    table.insert(gastore.actions, action)
-    ownThisVariable(lhs)
-    if newrhs then -- only when necessary
-      local orph2 = addProtectiveGuards(lhs, newrhs, gastore)
-      assert(orph2, "23. orph2 nil")
-      orphans = mergeOrphans(orphans, orph2)
-    end
+    --local lhs, op, rhs = cap:match(patterns.operatorsep) -- (patterns.actiondetail)
+	local op, op_start, op_end
+	for _, vop in ipairs ({"+=", "-=", "*=", "/=", "%=", "==", "="}) do
+		op_start, op_end = cap:find(vop, 1, true)
+		if op_start then op = vop; break end
+	end
+	if op then
+		local lhs = cap:sub(1, op_start - 1):match("^%s*(.-)%s*$")
+		local rhs = cap:sub(op_end + 1):match("^%s*(.-)%s*$")
+		
+	    lhs = sanitize(lhs, "variable")
+		rhs = sanitizeMathExpression(rhs)
+
+		
+	    local expr, newrhs = rewrites[op](lhs, rhs)
+	    local action, orph1 = prefixOwner(expr)
+	    assert(orph1, "22. orph1 nil")
+	    orphans = mergeOrphans(orphans, orph1)
+	    table.insert(gastore.actions, action)
+	    ownThisVariable(lhs)
+	    if newrhs then -- only when necessary
+	      local orph2 = addProtectiveGuards(lhs, newrhs, gastore)
+	      assert(orph2, "23. orph2 nil")
+	      orphans = mergeOrphans(orphans, orph2)
+	    end
+	end
   end
   assert(orphans, "3. Oprhans nil!")
   return orphans
@@ -1024,119 +1455,6 @@ patterns.primedident = "([_:%a][_:%w]*)'" -- matches supremica identifier, can i
 -- Supremica guarantees that there is no space between end of variable
 -- name and the prime (if manual input had it)
 
-local function collectPrimedVars(guard)
-  local out = {}
-  for var in guard:gmatch(patterns.primedident) do
-    table.insert(out, var)
-    ownThisVariable(var) -- primed variables are written, so own them
-  end
-  return out
-end
-
--- Generate unique identifier for each primed var, the template
-local function getUnique(i)
-  return "#"..i
-end
-
--- Check if this guard contains only numbers and operators
--- If so it can be evaluated, typical case "1 < 2"
--- This only happens in the special case that two primed
--- variables are compared, like "varX' < varY'"
--- And we do not check for evaluatable parts of primed guards
-local function isEvaluatable(guard)
-  -- If we find letters then it cannot be evaluated
-  -- This will not work for guards that have been CIF'ed as those
-  -- can contain "and", "or", "not", so are falsely flagged as
-  -- not evaluatable by this check
-  return not guard:find("%a")
-end
-
--- In guard, replace each primed variable with a unique string
-local function generateTemplate(guard, vars)
-  local actions = {}
-  -- Does multiple passes through the string, and generates each time
-  -- a new string. Cannot replace multiple vars simultaneously(?)
-  for i = 1, #vars do
-    local unique = getUnique(i)
-    guard = guard:gsub(vars[i].."'", unique)
-    table.insert(actions, vars[i].." := "..unique)
-  end
-  return guard, table.concat(actions, ", ")
-end
--- Some guards, like "2 != 3", can be evaluated
--- true guards can be eliminated, only keep the actions
--- false guards can be eliminated including removing the actions
--- This is an optimization that is not yet done, but prepared for
-local function getGuardTruthValue(guard)
-  
-  if not isEvaluatable(guard) then
-    return ""
-  end
-  -- Else this guard can be directly evaluated but needs change of operators
-  -- Supremica	!=	==	=
-  --  CIF			  !=	=	  :=
-  --  Lua			  ~=	==	=
-  -- First replace all = by ¤, then replace !¤ and :¤ and replace ¤ last
-  local subguard = guard:gsub("=", "¤"):gsub("!¤", "~="):gsub(":¤", "="):gsub("¤", "==") 
-  -- loginfo("subguard: "..subguard)
-  local eval, err = load("return "..subguard)
-  return eval() and " (true)" or " (false)"
-  
-end
--- For primed guard expressions new transitiosn need to be generated
--- This function returns a set of guard-action pairs, with evaluation result if possible
-local function generateGuardActionSet(expr)
-  -- Here, Supremicas &, |, !  have been converted to "and", "or", "not"
-  -- Each "or" clause can be handled as a new transition
-  local vars = collectPrimedVars(expr)
-  local gtemp, atemp = generateTemplate(expr, vars)
-  local out = {guards={}, actions={}, values={}}
-  
-  local function instantiateTemplate(collection, indices)
-    local guard = gtemp
-    local action = atemp
-    for i = 1, #collection do
-      local set = collection[i]
-      local indx = indices[i]
-      local val = set[indx]
-      local unique = getUnique(i)
-      guard = guard:gsub(unique, val)
-      action = action:gsub(unique, val)
-    end
-    local value = "" -- getGuardTruthValue(guard) -- premature eoptimization at this point
-    table.insert(out.guards, guard)
-    table.insert(out.actions, action)
-    table.insert(out.values, value)
-  end
-  
-  -- collect the variable domains
-  local collection = {}
-  for i = 1, #vars do
-    local var = vars[i]
-    local range = Variables[var].range
-    if Variables[var].kind == IS_INTEGER or Variables[var].kind == IS_BINARY then
-      range = unfoldRange(range)
-    end
-    collection[i] =  range
-  end
-  DNL.setup(collection) -- for DNL, see lines 2078--2123 above
-  DNL.iterate(instantiateTemplate)
-  
-  return out
-end
-
-local function handlePrimedExpression(expr)
-  loginfo("Primed expr: "..expr)
-  local gaset = generateGuardActionSet(expr)
-  for i = 1, #gaset.guards do
-    local guard = gaset.guards[i]
-    local action = gaset.actions[i]
-    local value = gaset.values[i]
---    loginfo("when ("..guard..") do "..action..value)
-  end
-  return gaset
-end
-
 local function processGuard(str, gastore)
   -- str is a logical operator separated sequence of predicates
   -- Replacements can be done inline, see convertGuard()
@@ -1145,13 +1463,13 @@ local function processGuard(str, gastore)
   if not str or str == "" then return {} end
   
   local prefixed, orphans = manageGuard(str)
-  if prefixed:find("'") then -- handle primed variables in the guard
-    local gaset = generateGuardActionSet(prefixed)
-    table.insert(gastore.guards, gaset.guards)
-    table.insert(gastore.actions, gaset.actions)
-  else -- simply convert syntactically and return    
-    table.insert(gastore.guards, "("..prefixed..")")
-  end
+--  if prefixed:find("'") then -- handle primed variables in the guard
+--    local gaset = generateGuardActionSet(prefixed)
+--    table.insert(gastore.guards, gaset.guards)
+ --   table.insert(gastore.actions, gaset.actions)
+--  else -- simply convert syntactically and return    
+  table.insert(gastore.guards, "("..prefixed..")")
+--  end
   assert(orphans, "5. Orphans nil!")
   return orphans
 
@@ -1192,9 +1510,117 @@ local function processGuard(str, gastore)
   ]]--
 end
 
-local function processGuardAction(gablock)
+-- SMART CONVERSION: Substitute based on Global Event Map
+local function smartProcessPrimedGuard(gexpr, cevents, uevents, gastore, localDict)
+  local newGuard = gexpr
   
-  if not gablock then return nil, nil, {} end -- not all edges have GA-blocks
+  local allEvents = {}
+  for _, ev in ipairs(cevents) do table.insert(allEvents, ev) end
+  for _, ev in ipairs(uevents) do table.insert(allEvents, ev) end
+  
+  for baseVar in gexpr:gmatch("([_%a][_%w]*)'") do
+    local safeBase = sanitize(baseVar, "variable")
+    local primedVar = baseVar .. "'" 
+	
+	local op, rhs = newGuard:match(primedVar .. "%s*([=!<>]+)%s*([%-%w_]+)")
+	local escapedRhs = rhs and rhs:gsub("%-", "%%-") or nil
+	
+	local cifOp = op
+	if op == "==" then cifOp = "=" end
+    
+    local substitutionMath = nil
+    local substitutionParts = {}
+    
+    -- PRIORITY 1: Check the local edge's action first
+    if localDict and localDict[safeBase] then
+	  if op and rhs then
+		table.insert(substitutionParts, "(" .. localDict[safeBase] .. " " .. cifOp .. " " .. rhs .. ")")
+	  else
+        table.insert(substitutionParts, "(" .. localDict[safeBase] .. ")")
+	  end
+    else
+      -- PRIORITY 2: Check global map for external automata
+      for _, evName in ipairs(allEvents) do
+        if GlobalActionMap[evName] then
+          for efaName, varMap in pairs(GlobalActionMap[evName]) do
+            if efaName ~= CurrentEFA.name and varMap[safeBase] then
+              local actionList = varMap[safeBase]
+              
+              -- YOUR BRILLIANT LOGIC: Only one action = no location check needed!
+              if #actionList == 1 then
+				if op and rhs then
+				  table.insert(substitutionParts, "(" .. actionList[1].math .. " " .. cifOp .. " " .. rhs .. ")")
+				else
+                  table.insert(substitutionParts, "(" .. actionList[1].math .. ")")
+				end
+              else
+                -- Multiple actions = check the location
+                for _, act in ipairs(actionList) do
+				  if op and rhs then
+					table.insert(substitutionParts, "(" .. efaName .. "." .. act.location .. " and (" .. act.math .. " " .. cifOp .. " " .. rhs .. "))")
+				  else
+                    table.insert(substitutionParts, "(" .. efaName .. "." .. act.location .. " and (" .. act.math .. "))")
+				  end
+                end
+              end
+            end
+          end
+        end
+		if #substitutionParts > 0 then break end
+      end
+    end
+    
+    if #substitutionParts > 0 then
+      -- Join multiple possibilities with OR
+      substitutionMath = table.concat(substitutionParts, " or ")
+	  if op and rhs then
+		local escapePattern = primedVar .. "%s*" .. op .. "%s*" .. escapedRhs
+		newGuard = newGuard:gsub(escapePattern, "(" .. substitutionMath .. ")")
+	  else
+      	newGuard = newGuard:gsub(primedVar, "(" .. substitutionMath .. ")")
+	  end
+    else
+      -- PRIORITY 3: Orphan handling
+      local eqPattern = primedVar .. "%s*==%s*([%-%w_]+)"
+      local eqMatch = newGuard:match(eqPattern)
+      
+      if eqMatch then
+        table.insert(gastore.actions, safeBase .. " := " .. eqMatch)
+		ownThisVariable(safeBase)
+        newGuard = newGuard:gsub(primedVar .. "%s*==%s*[%-%w_]+'?", "true")
+      else
+        newGuard = newGuard:gsub(primedVar, baseVar)
+      end
+    end
+  end
+  newGuard = newGuard:gsub("'", "")
+  return newGuard
+end
+
+local function processGuardAction(gablock, cevs, uevs)
+  if not gablock then return nil, nil, {} end 
+  
+  local function resolveNaked(matchVar, isNot)
+      if matchVar == "true" or matchVar == "false" then
+          return isNot and ("not " .. matchVar) or matchVar
+      end
+      
+  	local baseVar = matchVar:gsub("%[.*%]", "")
+  	baseVar = baseVar:match("([^%.]+)$") or baseVar
+      local isRealBool = false
+      
+      if Variables and Variables[baseVar] and Variables[baseVar].decl then
+          if Variables[baseVar].decl:find("bool") then
+              isRealBool = true
+          end
+      end
+      
+      if isRealBool then
+          return isNot and ("not " .. matchVar) or matchVar
+      else
+          return isNot and (matchVar .. " = 0") or (matchVar .. " = 1")
+      end
+  end
   
   local gastore = {}
   gastore.guards, gastore.actions = {}, {}
@@ -1203,31 +1629,155 @@ local function processGuardAction(gablock)
     return str:match("[{%s,]*(.+),}")
   end
 
-  local function convertAction(astr)
-    if not astr then return end
-    return astr:gsub("=", ":=")
-  end
-
-  -- Multiple actions on the same edge should be comma-separated in CIF
   local gatxt = gablock:toString():gsub("\n", ",")
-  -- Replacing \n by , results in this type of expr:
-  -- [,{, v_req==1 & v_in==0 & v_s2==1,}],{,{, v_out=1,}},
-  -- [,{, v_out==1 & v_s2==0,}],{,},
-  -- [,],{,{, v_in = 0, v_out = 0,}},
-  
-  -- Get rid of commas and outer braces
   local gexpr, aexpr = gatxt:match("%[,(.*)%],{,(.*)},")
   aexpr = stripCurly(aexpr)
   gexpr = stripCurly(gexpr)
+  
+  if aexpr then
+    local cleanActions = {}
+    for action in aexpr:gmatch("([^,]+)") do
+        -- STRICT REGEX: Only match standard assignments like 'x = y'. 
+        -- This safely ignores compound operators like '-=', '+='!
+        local lhs, rhs = action:match("^%s*([a-zA-Z_][%w_%.]*)%s*=%s*(.+)%s*$")
+        
+        if lhs and rhs then
+            -- 1. Handle logical NOT (!var or not var) by converting to integer subtraction
+            local function resolveNot(var)
+                local baseVar = var:match("([^%.]+)$") or var
+                local isRealBool = false
+                
+                if Variables and Variables[baseVar] and Variables[baseVar].decl then
+                    if Variables[baseVar].decl:find("bool") then
+                        isRealBool = true
+                    end
+                end
+                
+                if isRealBool then
+                    return "not " .. var
+                else
+                    return "1 - " .. var
+                end
+            end
+            
+            rhs = rhs:gsub("!%s*([a-zA-Z_][%w_%.]*)", resolveNot)
+            rhs = rhs:gsub("not%s+([a-zA-Z_][%w_%.]*)", resolveNot)
+            
+            -- 2. Handle bitwise OR/AND
+            if rhs:find("|") or rhs:find("&") then
+                rhs = rhs:gsub("|", "+")
+                rhs = rhs:gsub("&", "*")
+                rhs = "min(1, " .. rhs .. ")"
+            end
+            
+            table.insert(cleanActions, lhs .. " = " .. rhs)
+        else
+            -- If it's something like 'sticks-=2', it lands here completely untouched!
+            table.insert(cleanActions, action)
+        end
+    end
+    aexpr = table.concat(cleanActions, ", ")
+  end
+  
+  if gexpr then
+    local cleanGuards = {}
+    for clause in gexpr:gmatch("([^,]+)") do
+        if clause:match("%S") then -- Ignore empty chunks
+			local trimmed = clause:match("^%s*(.-)%s*$")
+            
+            -- FIX: Translate Supremica's literal 0 and 1 into CIF booleans
+            if trimmed == "0" then
+                trimmed = "false"
+            elseif trimmed == "1" then
+                trimmed = "true"
+            end
+            table.insert(cleanGuards, trimmed)
+        end
+    end
+	-- 2. NEW MODULAR STEP: Format the booleans inside the clean table
+	if #cleanGuards > 0 then
+	    -- Dynamic dictionary lookup for true CIF type
 
-  local orph1 = processGuard(gexpr, gastore) assert(orph1, "657: orph1 is nil")
-  local orph2 = processAction(aexpr, gastore) assert(orph2, "658: orph2 is nil")
+	
+	    -- Format each clause individually using Context-Aware scanning
+	    for i, clause in ipairs(cleanGuards) do
+	        
+	        -- A) Handle explicit negations first: 'not var' or '!var'
+	        clause = clause:gsub("not%s+([a-zA-Z_][%w_%.%[%]]*)", function(v)
+	            return resolveNaked(v, true)
+	        end)
+	        clause = clause:gsub("!%s*([a-zA-Z_][%w_%.%[%]]*)", function(v)
+	            return resolveNaked(v, true)
+	        end)
+	        
+	        -- B) Handle positive naked variables embedded inside larger sentences
+	        local offset = 1
+	        while true do
+	            -- Find the next word that looks like a variable
+	            local s, e, var = clause:find("([a-zA-Z_][%w_%.%[%]]*)", offset)
+	            if not s then break end
+	            
+	            local keywords = {
+	                ["and"]=true, ["or"]=true, ["not"]=true, 
+	                ["true"]=true, ["false"]=true, ["min"]=true, 
+	                ["max"]=true, ["div"]=true, ["mod"]=true
+	            }
+	            
+	            if not keywords[var] then
+	                -- Look at the first non-space character before and after the variable
+	                local pre = clause:sub(1, s - 1)
+	                local post = clause:sub(e + 1)
+	                local pre_char = pre:match("([^%s])%s*$")
+	                local post_char = post:match("^%s*([^%s])")
+	                
+					local comp_chars = {
+	                  ["="]=true, ["<"]=true, [">"]=true, ["!"]=true,
+	                  ["+"]=true, ["-"]=true, ["*"]=true, ["/"]=true, ["%"]=true, ["'"]=true
+	                }
+	                
+	                -- If it does NOT touch a comparison character, it is naked!
+	                if not ((pre_char and comp_chars[pre_char]) or (post_char and comp_chars[post_char])) then
+	                    local replacement = resolveNaked(var, false)
+	                    -- Inject the formatted variable back into the sentence
+	                    clause = clause:sub(1, s - 1) .. replacement .. clause:sub(e + 1)
+	                    -- Shift the offset so we don't scan the inserted '= 1' again
+	                    e = s - 1 + #replacement 
+	                end
+	            end
+	            offset = e + 1
+	        end
+	        
+	        cleanGuards[i] = clause
+	    end
+	end
+    gexpr = table.concat(cleanGuards, " and ")
+  end
+  
+  if gexpr then
+
+    -- gsub calls the resolveNaked function for every match it finds!
+    gexpr = gexpr:gsub("not%s+([a-zA-Z_][%w_%.%[%]]*)", function(v) return resolveNaked(v, true) end)
+    gexpr = gexpr:gsub("!%s*([a-zA-Z_][%w_%.%[%]]*)", function(v) return resolveNaked(v, true) end)
+    gexpr = gexpr:gsub("%(%s*([a-zA-Z_][%w_%.%[%]]+)%s*%)", function(v)
+        return "(" .. resolveNaked(v, false) .. ")"
+    end)
+  end
+
+  -- --- NEW SMART LOGIC INTERCEPTION ---
+  if gexpr and gexpr:find("'") then
+	local localDict = buildLocalActionDictionary(aexpr)
+	gexpr = smartProcessPrimedGuard(gexpr, cevs, uevs, gastore, localDict)
+  end
+  -- ------------------------------------
+
+  local orph1 = processGuard(gexpr, gastore) 
+  assert(orph1, "657: orph1 is nil")
+  local orph2 = processAction(aexpr, gastore) 
+  assert(orph2, "658: orph2 is nil")
   local orphans = mergeOrphans(orph1, orph2)
   assert(orphans, "6. Oprhans nil!")
   
-  -- return table.concat(gastore.guards, " and "), table.concat(gastore.actions, ", "), orphans
   return gastore.guards, gastore.actions, orphans
-
 end
 --[[
     In Supremica, if no locations are marked, then all locations are considered to be marked
@@ -1261,7 +1811,17 @@ local function getEdgeEvents(edge)
   local iter = evlist:iterator()
   
   while iter:hasNext() do
-    local ev = sanitize(iter:next():getName(), "event")  -- should be sanitized
+   -- local ev = sanitize(iter:next():getName(), "event")  -- should be sanitized
+   local ev = sanitize(iter:next():toString(), "event")
+   if arrayEventMap and arrayEventMap[ev] then
+       for _, childEv in ipairs(arrayEventMap[ev]) do
+           if cevents[childEv] then 
+             table.insert(cevs, childEv)
+           elseif uevents[childEv] then
+             table.insert(uevs, childEv)
+           end
+       end
+   else
     if cevents[ev] then 
       table.insert(cevs, ev)
     elseif uevents[ev] then
@@ -1269,6 +1829,7 @@ local function getEdgeEvents(edge)
     else
       assert(false, "Event "..ev.." not in project event list!")
     end
+   end
   end
   
   return cevs, uevs
@@ -1288,29 +1849,71 @@ local function checkMultiAssignment(action)
   return false -- there are no multiple assignments
 end
   
-local function makeEdge(target, events, guard, action)
+local function makeEdge(source, target, events, guard, action)
   if #events == 0 then return nil end
-  
-  local multi, var = checkMultiAssignment(action)
-  if multi then 
-    showIssueDialog("Multiple assignment of "..var, 
-      "CIF does not allow multiple assignments of\n"..
-      "the same variable in actions. The variable\n"..var..
-      "\nis assigned multiple times in "..CurrentEFA.name)
-    textframe:setVisible(false)
-    assert(false, "CIF does not allow multiple assignment of same variable in an action")
+  local local_actions = {}
+    
+  if action and action ~= "" then
+      local act_str = action .. ","
+      for act in act_str:gmatch("%s*(.-)%s*,") do
+          if act ~= "" then
+			-- Find the operator to isolate the Left-Hand Side
+              local op_start
+              for _, vop in ipairs({"+=", "-=", "*=", "/=", "%=", ":=", "="}) do
+                  op_start = act:find(vop, 1, true)
+                  if op_start then break end
+              end
+              
+              if op_start then
+                  -- Extract the full LHS (e.g., "Manager_v2_0.v2_0" or "v1_0")
+                  local prefixedLHS = act:sub(1, op_start - 1):match("^%s*(.-)%s*$")
+                  local coreVar = prefixedLHS
+                  
+                  -- EXACTLY YOUR LOGIC: Look for the dot, take what's after it
+                  local dotPos = prefixedLHS:find("%.")
+                  if dotPos then
+                      coreVar = prefixedLHS:sub(dotPos + 1)
+                  end
+                  
+                  -- Check if it is strictly in the SharedVariables registry
+                  if SharedVariables[coreVar] then
+                      
+                      -- Route to manager registry
+                      if not Manager_variables[coreVar] then Manager_variables[coreVar] = {} end
+                      
+                      local managerGuard = CurrentEFA.name .. "." .. source
+                      if guard and guard ~= "" then
+                          managerGuard = managerGuard .. " and (" .. guard .. ")"
+                      end
+                      
+                      local eventStr = table.concat(events, ", ")
+                      local managerEdge = "\tedge " .. eventStr .. " when " .. managerGuard .. " do " .. act .. " ;"
+                      table.insert(Manager_variables[coreVar], managerEdge)
+                      
+                      -- NOTE: We DO NOT insert it into `local_actions`. 
+                      -- This is how it gets successfully deleted from the original EFA!
+                  else
+                      table.insert(local_actions, act)
+                  end
+              else
+                  table.insert(local_actions, act)
+              end
+          end
+      end
   end
-  
   local out = {}
   table.insert(out, "\tedge ")
   table.insert(out, table.concat(events, ", "))
   if guard and guard ~= "" then
     table.insert(out, "when")
     table.insert(out, guard)
-  end
-  if action and action ~= "" then
+  end 
+ --[[ if action and action ~= "" then
     table.insert(out, "do")      
     table.insert(out, action)
+  end --]]
+  if #local_actions > 0 then
+    table.insert(out, "do " .. table.concat(local_actions, ", "))
   end
   table.insert(out, "goto")
   table.insert(out, target)
@@ -1355,7 +1958,7 @@ end
 local function addEdges(src, trgt, events, guards, actions, orphans)
   local gtable, atable, gordinary, aordinary = findTables(guards, actions)
   if not gtable then -- need to check only one here, due the assert above
-    local edge = makeEdge(trgt, events, table.concat(gordinary, " and "), table.concat(aordinary, ", "))
+    local edge = makeEdge(src, trgt, events, table.concat(gordinary, " and "), table.concat(aordinary, ", "))
     table.insert(CurrentEFA.locations[src], {edge, orphans})
   else -- we have to handle the tables
     assert(#gtable == #atable, "Sizes of the two tables should match")
@@ -1364,7 +1967,7 @@ local function addEdges(src, trgt, events, guards, actions, orphans)
     for i = 1, #gtable do
       local newguard = doInsert(gordinary, gtable[i])
       local newact = doInsert(aordinary, atable[i])
-      local edge = makeEdge(trgt, events, table.concat(newguard, " and "), table.concat(newact, ", "))
+      local edge = makeEdge(src, trgt, events, table.concat(newguard, " and "), table.concat(newact, ", "))
       table.insert(CurrentEFA.locations[src], {edge, orphans})      
     end
   end
@@ -1372,11 +1975,12 @@ end
 
 local function processEdge(edge)
   
-	local src = manageSourceTarget(edge:getSource())
+  local src = manageSourceTarget(edge:getSource())
   local trgt = manageSourceTarget(edge:getTarget())
-	local guard, action, orphans = processGuardAction(edge:getGuardActionBlock())
+  local cevents, uevents = getEdgeEvents(edge)
+  local guard, action, orphans = processGuardAction(edge:getGuardActionBlock(), cevents, uevents)
   assert(orphans, "7. Oprhans nil!")
-	local cevents, uevents = getEdgeEvents(edge)
+
   
   -- Make different edges for controllable and uncontrollable events
   if #cevents > 0 then
@@ -1387,8 +1991,47 @@ local function processEdge(edge)
   end  
 end
 
+local function resolveNode(node)
+    local className = tostring(node:getClass())
+    
+    while className:find("NodeRef") do
+        local success = pcall(function() node = node:getNode() end)
+        if not success then break end
+        className = tostring(node:getClass())
+    end
+    
+    return node, className
+end
 -- For each edge, after processing, there will be a set of orphans that need to 
 -- be owner-prefixed when the edge is output
+local function getLeafNodes(rawNode)
+    local leaves = {}
+    
+    -- 1. Fully resolve any pointers first
+    local node, className = resolveNode(rawNode)
+
+    -- 2. Check the resolved concrete class
+    if className:find("GroupNode") then
+        local success, children = pcall(function() return node:getImmediateChildNodes() end)
+        if not success or not children then 
+            success, children = pcall(function() return node:getNodeList() end) 
+        end
+        if success and children then
+            local iter = children:iterator()
+            while iter:hasNext() do
+                for _, leaf in ipairs(getLeafNodes(iter:next())) do
+                    table.insert(leaves, leaf)
+                end
+            end
+        end
+    else
+        -- It is now guaranteed to be a resolved SimpleNode
+        table.insert(leaves, node)
+    end
+    return leaves
+end
+
+
 
 local function processEFA(efa)
   
@@ -1406,15 +2049,56 @@ local function processEFA(efa)
 	
 	local nodeIterator = nodes:iterator()
 	while nodeIterator:hasNext() do
-		manageSourceTarget(nodeIterator:next())
+		local rawNode = nodeIterator:next()
+		local actualNode, nodeClass = resolveNode(rawNode)
+		if not nodeClass:find("GroupNode") then
+		  manageSourceTarget(actualNode)
+		else
+			local leaves = getLeafNodes(actualNode)
+			for _, leaf in ipairs(leaves) do
+				manageSourceTarget(leaf)
+			end
+		end
 	end
 	
-	local edgeIterator = edges:iterator()
+	--[[local edgeIterator = edges:iterator()
 	while edgeIterator:hasNext() do
 		processEdge(edgeIterator:next())
-	end
-
+	end--]]
+	
+	local groupEdgeIter = graph:getEdges():iterator()
+    while groupEdgeIter:hasNext() do
+        local edge = groupEdgeIter:next()
+        
+        -- RESOLVE the pointers before checking the class!
+        local actualSrc, srcClass = resolveNode(edge:getSource())
+        local actualTgt, tgtClass = resolveNode(edge:getTarget())
+        
+        local isSrcGroup = srcClass:find("GroupNode") ~= nil
+        local isTgtGroup = tgtClass:find("GroupNode") ~= nil
+        
+        -- If the edge touches a group (or a pointer to a group), wire the transitions!
+        if isSrcGroup or isTgtGroup then
+            local srcLeaves = getLeafNodes(actualSrc)
+            local tgtLeaves = getLeafNodes(actualTgt)
+            
+            local cevents, uevents = getEdgeEvents(edge)
+            local guard, action, orphans = processGuardAction(edge:getGuardActionBlock(), cevents, uevents)
+            
+            for _, sLeaf in ipairs(srcLeaves) do
+                local sName = manageSourceTarget(sLeaf)
+                for _, tLeaf in ipairs(tgtLeaves) do
+                    local tName = manageSourceTarget(tLeaf)
+                    if #cevents > 0 then addEdges(sName, tName, cevents, guard, action, orphans) end
+                    if #uevents > 0 then addEdges(sName, tName, uevents, guard, action, orphans) end
+                end
+            end
+		else 
+			processEdge(edge)
+        end
+    end
 end
+
 
 local function getEventTable(ev)
   local out = {}
@@ -1444,6 +2128,7 @@ local function outputBlockedEvents()
 	print("")
 end
 
+
 local function outputEnums()
   local out = {}
   for e, _ in pairs(Enums) do
@@ -1456,6 +2141,51 @@ local function outputEnums()
   end
 end
 
+local function outputConstants()
+  local declared = {}
+  local hasConstants = false
+  
+  -- 1. Ask the Java API directly for the exact Constant Alias List
+  local success, constList = pcall(function() return raw_project:getConstantAliasList() end)
+  
+  if success and constList then
+    for i = 1, constList:size() do
+      local comp = constList:get(i-1)
+      
+      -- Extract the name (e.g., "size")
+      local rawName = comp:getName()
+      if type(rawName) == "userdata" then pcall(function() rawName = rawName:getName() end) end
+      local nameStr = tostring(rawName)
+      local cleanName = sanitize(nameStr, "variable")
+      
+      -- Extract the value from the ConstantAliasExpression
+      local valSuccess, cVal = pcall(function() return comp:getConstantAliasExpression():toString() end)
+      
+      -- Fallback just in case it's stored under a generic getExpression()
+      if not valSuccess then
+         valSuccess, cVal = pcall(function() return comp:getExpression():toString() end)
+      end
+      
+      if valSuccess and cVal then
+		cVal = tostring(cVal)
+		if not ConstantRanges[nameStr] then
+			-- Only print single elements (Booleans, Single Enums, or Standard Integers)
+          if cStr == "true" or cStr == "false" then
+              print("const bool " .. cleanName .. " = " .. cStr .. ";")
+          elseif Enums[cStr] then
+              print("const Enums " .. cleanName .. " = " .. cStr .. ";")
+          else
+              print("const int " .. cleanName .. " = " .. cStr .. ";")
+          end
+          
+          hasConstants = true
+		end
+      end
+    end
+  end
+  
+  if hasConstants then print("") end
+end
 --[[
     In Supremica, variables are not owned by any specific EFA, they are free for all
     In CIF, variables MUST be owned by some EFA
@@ -1464,11 +2194,27 @@ end
     2. A variable not assigned by any EFA, but always keeping its initial value, could be replaced
       by its initial value, and CIF warns about this. BUT! The initial value can be nondeterministic!
 --]]
+local function outputInputs()
+  local hasInputs = false
+  for name, info in pairs(Variables) do
+    if info.is_input then
+      if not hasInputs then
+        print("// Global input variables")
+        hasInputs = true
+      end
+      -- Since is_input is strictly checked, we can just print the bool declaration
+      print("input bool " .. name .. ";")
+    end
+  end
+  if hasInputs then print("") end
+end
 
 local function outputEdge(edge, name)
   
   local str = edge[1]
   local orphans = edge[2]
+  
+  local padded = " " .. str .. " "
 
   for var, _ in pairs(orphans) do
     local owner = Variables[var].owner
@@ -1476,9 +2222,10 @@ local function outputEdge(edge, name)
     -- if it is not known at the time of prefixing, see prefixOwner(), 
     -- that the variable is owned by the current efa
     if owner ~= name then 
-      str = str:gsub(var, owner.."."..var)
+		padded = padded:gsub("([^%w_%.])(" .. var .. ")([^%w_])", "%1" .. owner .. ".%2%3")
     end
   end
+  str = padded:sub(2, -2)
   print(str)
   
 end
@@ -1497,8 +2244,9 @@ local function outputEFA(efa)
       if efa.allmarked then
         print(body[1])
         print(IS_MARKED)
-      end
-      print(body[1]:gsub(patterns.colonatend, ";")) -- change : to ; if : is the last char
+	  else
+        print(body[1]:gsub(patterns.colonatend, ";")) -- change : to ; if : is the last char
+	  end
     else
       print(body[1])
       if efa.allmarked then
@@ -1512,19 +2260,70 @@ local function outputEFA(efa)
   print("end // "..efa.name.."\n")
 end
 
-local function outputInputs()
-  local hasInputs = false
-  for name, info in pairs(Variables) do
-    if info.is_input then
-      if not hasInputs then
-        print("// Global input variables")
-        hasInputs = true
-      end
-      -- Since is_input is strictly checked, we can just print the bool declaration
-      print("input bool " .. name .. ";")
+local function outputVariableManagers()
+    for varName, edges in pairs(Manager_variables) do
+        print("automaton Manager_" .. varName .. ":")
+        
+        local monitorEvents = {}
+        local seenEvents = {}
+        for _, edgeStr in ipairs(edges) do
+            local evs = edgeStr:match("edge%s+(.-)%s+when") or edgeStr:match("edge%s+(.-)%s+do")
+            if evs then
+                for ev in evs:gmatch("([^,]+)") do
+                    ev = ev:match("^%s*(.-)%s*$")
+                    if not seenEvents[ev] then
+                        table.insert(monitorEvents, ev)
+                        seenEvents[ev] = true
+                    end
+                end
+            end
+        end
+        
+        if #monitorEvents > 0 then
+            print("\tmonitor " .. table.concat(monitorEvents, ", ") .. ";")
+        end
+        
+        if Variables[varName] and Variables[varName].decl then
+            print("\t" .. Variables[varName].decl)
+        end
+        
+        print("\n\tlocation:")
+        print("\t\tinitial; marked;")
+		for _, edgeStr in ipairs(edges) do
+            -- 1. Strip the redundant self-prefix (e.g., "Manager_t_0.")
+            local redundantPrefix = "Manager_" .. varName .. "%."
+            local cleanEdge = edgeStr:gsub(redundantPrefix, "")
+            
+            -- 2. ORPHAN SWEEP: Resolve variables whose owners were unknown during extraction
+            local padded = " " .. cleanEdge .. " "
+			local seenVars = {}
+            for ident in padded:gmatch("([_%a][_%w]*)") do
+				if not seenVars[ident] then
+					seenVars[ident] = true
+	                local owner = nil
+	                
+	                -- YOUR LOGIC: If it's a shared variable, we absolutely know its future owner
+	                if SharedVariables[ident] then
+	                    owner = "Manager_" .. ident
+	                -- Otherwise, rely on the global registry which should now be fully populated
+	                elseif Variables and Variables[ident] and Variables[ident].owner then
+	                    owner = Variables[ident].owner
+	                end
+	                
+	                if owner then
+	                    -- If the variable belongs to another plant/manager, safely prefix it!
+	                    if owner ~= "Manager_" .. varName then
+	                        padded = padded:gsub("([^%w_%.])(" .. ident .. ")([^%w_])", "%1" .. owner .. ".%2%3")
+	                    end
+	                end
+				end
+            end
+            cleanEdge = padded:sub(2, -2)
+            
+            print("\t\t" .. cleanEdge)
+        end
+        print("end // Manager_" .. varName .. "\n")
     end
-  end
-  if hasInputs then print("") end
 end
 
 local function processModule()
@@ -1539,11 +2338,16 @@ local function processModule()
   outputEvents()
   outputBlockedEvents()
   outputEnums()
+  outputConstants()
   outputInputs()
   
   for i = 1, efalist:size() do
     local efa = efalist:get(i-1)
+--[[	if needsFlattening then
+		processFlattenedEFA(efa)
+	else --]]
     processEFA(efa)
+	--end
     Storage[#Storage+1] = CurrentEFA
   end
   
@@ -1563,10 +2367,12 @@ local function processModule()
     outputEFA(Storage[i])
   end
   
+  outputVariableManagers()
+  
   if #NameChanges > 0 then
 	print("// Automatic naming conlficts resolved")
 	for i = 1, #NameChanges do
-	  print(NameChanges[i])
+		print(NameChanges[i])
 	end
   end
   
@@ -1575,8 +2381,10 @@ local function processModule()
   local text = textarea:getText()
   local tempCifPath, filename = saveModel(name..".cif", filepath, text)
   if tempCifPath and filename then
-	savePLC(tempCifPath, filename)
+  savePLC(tempCifPath, filename)
   end
+  
+  textframe:dispose()
   
 end
 
