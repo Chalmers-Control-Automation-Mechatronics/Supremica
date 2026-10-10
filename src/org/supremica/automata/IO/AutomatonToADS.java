@@ -6,15 +6,23 @@ package org.supremica.automata.IO;
 
 import java.util.*;
 import java.io.*;
+import javax.swing.filechooser.FileFilter;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 
 public class AutomatonToADS
 	implements AutomataSerializer
 {
+	public static StandardExtensionFileFilter getFileFilter()
+	{
+		return new StandardExtensionFileFilter("PiTCT files (*.ads)", ".ads");
+	}
+
 	// PiTCT assumes that the (single!) initial state has index 0
 	// So we create a map that guarantees that this is the case
 	private final Map<State, Integer> stateMap;

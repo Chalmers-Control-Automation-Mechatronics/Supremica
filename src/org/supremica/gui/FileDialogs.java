@@ -305,7 +305,6 @@ public class FileDialogs
         return fileExporter;
     }
 
-	// Different from the other getXXXFileExporter, this one *is* used
 	public static JFileChooser getADSFileExporter(final String automatonName)
 	{
 		final JFileChooser fileChooser = fd.getFileExporter();
