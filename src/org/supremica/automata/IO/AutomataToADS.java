@@ -22,10 +22,6 @@ import org.supremica.gui.FileDialogs;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.SaveFileChooser;
 
-// import javax.swing.JFileChooser;
-// import java.util.concurrent.atomic.AtomicBoolean;
-import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
-
 public class AutomataToADS
 {
 	private final Automata automata;
@@ -57,7 +53,7 @@ public class AutomataToADS
 		for(final Automaton currAutomaton : this.automata)
 		{
 			sfc.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
-			sfc.setSelectedFile(currAutomaton.getName());
+			sfc.setSelectedFile(sanitizeFileName(currAutomaton.getName()));
 
 			int ret = sfc.showSaveDialog(IDE.getTheIDE());
 			if(ret == SaveFileChooser.APPROVE_OPTION)
@@ -139,72 +135,12 @@ public class AutomataToADS
 		// System.err.println("allEventsNumeric: " + (allEventsNumeric ? "true" : "false"));
 		return allEventsNumeric;
 	}
-}
-/***
-// Specific version of a FileChooser that distinguishes between Cancel and Close
-// so different actions can be taken for each of them
-// Clicking Cancel returns JFileChooser.CANCEL_OPTION
-// Clicking Close returns JFileChooser.ERROR_OPTION
-class SaveFileChooser
-{
-	private JFileChooser jfc;
-	private StandardExtensionFileFilter filter;
-	private AtomicBoolean cancelClicked;
 
-	public static final int APPROVE_OPTION = JFileChooser.APPROVE_OPTION;
-	public static final int CANCEL_OPTION = JFileChooser.CANCEL_OPTION;
-	public static final int ERROR_OPTION = JFileChooser.ERROR_OPTION;
-
-	public SaveFileChooser(final StandardExtensionFileFilter filter)
+	// This should be a globally available method, but for now...
+	// Beware if the filename includes a path, back- and fore-slash will be replaced
+	public static String sanitizeFileName(final String fname)
 	{
-		this.filter = filter;
-		this.jfc = new JFileChooser();
-		//// Some vibe coding to distinguish between Cancel and Close
-		// 1. Thread-safe object wrapper that works inside Lambdas
-		this.cancelClicked = new AtomicBoolean(false);
-		// 2. Listen for the internal Cancel button action
-		jfc.addActionListener(e ->
-		{
-			if (JFileChooser.CANCEL_SELECTION.equals(e.getActionCommand()))
-			{
-				cancelClicked.set(true);
-			}
-		});
-		//// End of vide coding
-        jfc.resetChoosableFileFilters();
-        jfc.setFileFilter(filter);
-	}
-
-	public void setDialogTitle(final String dlgTitle)
-	{
-		jfc.setDialogTitle(dlgTitle);
-	}
-	public int showSaveDialog(java.awt.Component parent)
-	{
-		this.cancelClicked.set(false);
-		if(jfc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
-		{
-			return JFileChooser.APPROVE_OPTION;
-		}
-		else // either Cancel or Close
-		{
-			if(this.cancelClicked.get())
-			{
-				return JFileChooser.CANCEL_OPTION;
-			}
-			else // Close was clicked - not sure this is the best return value, but for now...
-			{
-				return JFileChooser.ERROR_OPTION;
-			}
-		}
-	}
-	public void setSelectedFile(final String name)
-	{
-		jfc.setSelectedFile(new java.io.File(name + this.filter.getExtension()));
-	}
-	public java.io.File getSelectedFile()
-	{
-		return jfc.getSelectedFile();
+		final String replacement = "-";
+		return fname.replaceAll("[^0-9_a-zA-Z\\(\\)\\%\\-\\.]", replacement);
 	}
 }
-***/
