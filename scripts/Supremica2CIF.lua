@@ -165,6 +165,8 @@ local CIFReserved = {
 -- So we keep a double-directed map with both the sanitized and un-sanitized as keys
 local Sanity, Insanity = {}, {} -- maps for sanitation
 local NameChanges = {}
+local isAutomaton = {}
+local isLocation = {}
 
 -- To desanitize means to make sure that some sane input does not clash
 -- with some sanitized input, like "var:X" sanitizwes to "varX", and then
@@ -639,13 +641,15 @@ for i = 1, efalist:size() do
   local efa = efalist:get(i-1)
   local rawAutName = efa:getName()
   if type(rawAutName) == "userdata" then rawAutName = rawAutName:getName() end
-  sanitize(rawAutName, "automaton")
+  local saneAut = sanitize(rawAutName, "automaton")
+  isAutomaton[saneAut] = true
     local nodes = efalist:get(i-1):getGraph():getNodes():iterator()
     while nodes:hasNext() do
       local rawText = nodes:next():toString():gsub("\n", "")
       for capture in rawText:gmatch("(%w+)") do
         if capture ~= "initial" and capture ~= "forbidden" and capture ~= "accepting" then
-          sanitize(capture, "location")
+			local saneLoc = sanitize(capture, "location")
+			isLocation[saneLoc] = true
           break
         end
       end
@@ -693,6 +697,10 @@ end
 -- When converting "!" to "not", need to be careful not to convert "!=" to "not="
 -- First convert "!=" to a safe string, then convert "!", then convert the safe string back
 local function handleNot(str)
+  str = str:gsub("!=%s*true", "= false")
+  str = str:gsub("!=%s*false", "= true")
+  str = str:gsub("==%s*true", "= true")
+  str = str:gsub("==%s*false", "= false")
   local safestr = "#="
   local convstr = str:gsub("!=", safestr)
   convstr = convstr:gsub("!", " not ")
@@ -737,6 +745,23 @@ local function convertGuard(gstr)
   
   local convstr = gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or ") -- gsub("![^=]", "not ")
   convstr = handleNot(convstr)
+  
+  convstr = convstr:gsub("([%w_]+)%s*(!?=)%s*([%w_]+)", function(left, op, right)
+     local aut, loc
+     if isAutomaton[left] and isLocation[right] then
+         aut, loc = left, right
+     elseif isAutomaton[right] and isLocation[left] then
+         aut, loc = right, left
+     else
+         return left .. " " .. op .. " " .. right
+     end
+
+     if op == "=" then
+         return aut .. "." .. loc
+     else
+         return "not " .. aut .. "." .. loc
+     end
+  end)
   return convstr
 end
 
@@ -983,11 +1008,11 @@ local function preProcessVariables()
     local var = iterator:next()
     local name = sanitize(var:getName(), "variable")  -- should be sanitized
     local kind, range, init, mark = getVariableInfo(var)
-	local is_input = false
-	if var:isInput() and kind == IS_BOOL then
-		is_input = true
-	end
-    variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil, is_input = is_input}
+--	local is_input = false
+--	if var:isInput() and kind == IS_BOOL then
+--		is_input = true
+--	end
+    variables[name] = {kind = kind, range = range, init = init, mark = mark, owner = nil, is_input = false}
   end
   
   return variables
@@ -1542,7 +1567,39 @@ local function processGuardAction(gablock, cevs, uevs)
 	        clause = clause:gsub("!%s*([a-zA-Z_][%w_%.%[%]]*)", function(v)
 	            return resolveNaked(v, true)
 	        end)
-	        
+			
+			local offset_lit = 1
+            while true do
+                -- Find '0' or '1' anywhere in the clause
+                local s, e, literal = clause:find("([01])", offset_lit)
+                if not s then break end
+                
+                local pre = clause:sub(1, s - 1)
+                local post = clause:sub(e + 1)
+                local pre_char = pre:match("([^%s])%s*$")
+                local post_char = post:match("^%s*([^%s])")
+                
+                -- Check if it is part of a word/number (e.g., '10', 'var1', '1var')
+                local is_word_part = false
+                if pre_char and pre_char:match("[%w_%.]") then is_word_part = true end
+                if post_char and post_char:match("[%w_%.]") then is_word_part = true end
+                
+                if not is_word_part then
+                    local comp_chars = {
+                      ["="]=true, ["<"]=true, [">"]=true, ["!"]=true,
+                      ["+"]=true, ["-"]=true, ["*"]=true, ["/"]=true, ["%"]=true, ["'"]=true
+                    }
+                    
+                    -- If it does not touch a math comparison, it is a naked literal!
+                    if not ((pre_char and comp_chars[pre_char]) or (post_char and comp_chars[post_char])) then
+                        local replacement = (literal == "1") and "true" or "false"
+                        clause = clause:sub(1, s - 1) .. replacement .. clause:sub(e + 1)
+                        e = s - 1 + #replacement
+                    end
+                end
+                offset_lit = e + 1
+            end
+
 	        -- B) Handle positive naked variables embedded inside larger sentences
 	        local offset = 1
 	        while true do
@@ -2022,7 +2079,7 @@ local function outputConstants()
   if hasConstants then print("") end
 end
 
-local function outputInputs()
+--[[local function outputInputs()
   local hasInputs = false
   for name, info in pairs(Variables) do
     if info.is_input then
@@ -2035,7 +2092,7 @@ local function outputInputs()
     end
   end
   if hasInputs then print("") end
-end
+end --]]
 --[[
     In Supremica, variables are not owned by any specific EFA, they are free for all
     In CIF, variables MUST be owned by some EFA
@@ -2175,7 +2232,7 @@ local function processModule()
   outputBlockedEvents()
   outputEnums()
   outputConstants()
-  outputInputs()
+ -- outputInputs()
   
   for i = 1, efalist:size() do
     local efa = efalist:get(i-1)

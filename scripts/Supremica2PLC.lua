@@ -333,6 +333,8 @@ local CIFReserved = {
 -- So we keep a double-directed map with both the sanitized and un-sanitized as keys
 local Sanity, Insanity = {}, {} -- maps for sanitation
 local NameChanges = {}
+local isAutomaton = {} 
+local isLocation = {}
 
 -- To desanitize means to make sure that some sane input does not clash
 -- with some sanitized input, like "var:X" sanitizwes to "varX", and then
@@ -790,7 +792,8 @@ for i = 1, efalist:size() do
   local efa = efalist:get(i-1)
   local rawAutName = efa:getName()
   if type(rawAutName) == "userdata" then rawAutName = rawAutName:getName() end
-  sanitize(rawAutName, "automaton")
+  local saneAut = sanitize(rawAutName, "automaton")
+  isAutomaton[saneAut] = true
   --sanitize(efa:getName(), "automaton")
 --[[  if needsFlattening then
 	local states = efa:getStates():iterator()
@@ -806,7 +809,8 @@ for i = 1, efalist:size() do
       local rawText = nodes:next():toString():gsub("\n", "")
       for capture in rawText:gmatch("(%w+)") do
         if capture ~= "initial" and capture ~= "forbidden" and capture ~= "accepting" then
-          sanitize(capture, "location")
+			local saneLoc = sanitize(capture, "location")
+			isLocation[saneLoc] = true
           break
         end
       end
@@ -854,6 +858,10 @@ end
 -- When converting "!" to "not", need to be careful not to convert "!=" to "not="
 -- First convert "!=" to a safe string, then convert "!", then convert the safe string back
 local function handleNot(str)
+  str = str:gsub("!=%s*true", "= false")
+  str = str:gsub("!=%s*false", "= true")
+  str = str:gsub("==%s*true", "= true")
+  str = str:gsub("==%s*false", "= false")
   local safestr = "#="
   local convstr = str:gsub("!=", safestr)
   convstr = convstr:gsub("!", " not ")
@@ -898,6 +906,23 @@ local function convertGuard(gstr)
   
   local convstr = gstr:gsub("==", "="):gsub("&", " and "):gsub("|", " or ") -- gsub("![^=]", "not ")
   convstr = handleNot(convstr)
+  
+  convstr = convstr:gsub("([%w_]+)%s*(!?=)%s*([%w_]+)", function(left, op, right)
+     local aut, loc
+     if isAutomaton[left] and isLocation[right] then
+         aut, loc = left, right
+     elseif isAutomaton[right] and isLocation[left] then
+         aut, loc = right, left
+     else
+         return left .. " " .. op .. " " .. right
+     end
+
+     if op == "=" then
+         return aut .. "." .. loc
+     else
+         return "not " .. aut .. "." .. loc
+     end
+  end)
   return convstr
 end
 
