@@ -18,14 +18,15 @@ local function showFileChooser(fname, fpath)
   -- Unclear why this does not work, maybe the varargs
   -- local ff = luaj.newInstance("javax.swing.filechooser.FileNameExtensionFilter", "CIF file", "cif")
   -- fc:setFileFilter(ff)
-  local suggestion = luaj.newInstance("java.io.File", fname)
+  local suggestion = luaj.newInstance("java.io.File", fpath, fname)
   fc:setSelectedFile(suggestion)
   fc:setApproveButtonText("Save")
   local retval = fc:showOpenDialog(ide) 
   if retval== fc.APPROVE_OPTION then
-		local fname = fc:getSelectedFile():getPath() -- does not work on Java > 8
+		-- local fname = fc:getSelectedFile():getPath() -- does not work on Java > 8
 		-- local fname = fc:getName(fc:getSelectedFile()) -- this works for Java > 8
-    return fname
+	return tostring(fc:getSelectedFile())
+   -- return fname
   else
     return nil
   end
@@ -63,6 +64,7 @@ end
 local function saveModel(fname, fpath, contents)
 	local filename = showFileChooser(fname, fpath)
   if filename then
+	--contents = contents:gsub("Saved to: [^\n]+", "Saved to: " .. filename:gsub("%%", "%%%%"))
     saveFile(filename, contents)
 	else
 		print("User cancelled")
@@ -2225,8 +2227,8 @@ local function processModule()
   print("/***")
   print(" * CIF model generated from Supremica by Supremica2CIF.lua script")
   print(" * Generated: "..os.date("%Y-%m-%d, %H:%M"))
-  print(" * Supremica model: "..name)
-  print(" * Saved to: "..filename)
+ -- print(" * Supremica model: "..name)
+ -- print(" * Saved to: "..filename)
   print("***/")
   outputEvents()
   outputBlockedEvents()
